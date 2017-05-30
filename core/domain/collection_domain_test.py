@@ -31,20 +31,20 @@ import utils
 
 SAMPLE_YAML_CONTENT = ("""category: A category
 language_code: en
+next_skill_id: 2
 nodes:
 - acquired_skills:
-  - s0
-  - s1
+  - skill0
+  - skill1
   exploration_id: an_exploration_id
   prerequisite_skills: []
 objective: An objective
 schema_version: %d
-skill_id_count: 2
 skills:
-  s0:
+  skill0:
     name: Skill0a
     question_ids: []
-  s1:
+  skill1:
     name: Skill0b
     question_ids: []
 tags: []
@@ -170,10 +170,11 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         # If the collection has exactly one exploration and that exploration
         # has prerequisite skills, then the collection should fail validation.
         self.collection.add_node('exp_id_1')
+        self.collection.add_skill('Skill1')
         self.save_new_valid_exploration(
             'exp_id_1', 'user@example.com', end_state_name='End')
         collection_node1 = self.collection.get_node('exp_id_1')
-        collection_node1.update_prerequisite_skills(['skill1a'])
+        collection_node1.update_prerequisite_skills(['skill0'])
         self._assert_validation_error(
             'Expected to have at least 1 exploration with no prerequisite '
             'skills.')
@@ -213,14 +214,15 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_collection_completability_validation(self):
         # Add another exploration, but make it impossible to reach exp_id_1.
         self.collection.add_node('exp_id_1')
+        self.collection.add_skill('Skill')
         collection_node1 = self.collection.get_node('exp_id_1')
-        collection_node1.update_prerequisite_skills(['skill0a'])
+        collection_node1.update_prerequisite_skills(['skill0'])
         self._assert_validation_error(
             'Some explorations are unreachable from the initial explorations')
 
         # Connecting the two explorations should lead to clean validation.
         collection_node0 = self.collection.get_node('exp_id_0')
-        collection_node0.update_acquired_skills(['skill0a'])
+        collection_node0.update_acquired_skills(['skill0'])
         self.collection.validate()
 
     def test_collection_node_exploration_id_validation(self):
@@ -333,30 +335,56 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(collection.skills, {})
 
         # Add skills
-        collection.add_skill('skill1')
-        self.assertEqual(collection.skills.keys(), ['s0'])
-        self.assertEqual(collection.skills['s0'].name, 'skill1')
+        collection.add_skill('skillname1')
+        self.assertEqual(collection.skills.keys(), ['skill0'])
+        self.assertEqual(collection.skills['skill0'].name, 'skillname1')
 
-        collection.add_skill('skill2')
-        self.assertEqual(sorted(collection.skills.keys()), ['s0', 's1'])
+        collection.add_skill('skillname2')
+        self.assertEqual(sorted(collection.skills.keys()), ['skill0', 'skill1'])
 
         # Names should be unique
         with self.assertRaisesRegexp(
-            ValueError, 'Skill with name "skill1" already exists.'):
-            collection.add_skill('skill1')
+            ValueError, 'Skill with name "skillname1" already exists.'):
+            collection.add_skill('skillname1')
 
         # Delete a skill
-        collection.delete_skill('s1')
-        self.assertEqual(collection.skills.keys(), ['s0'])
+        collection.delete_skill('skill1')
+        self.assertEqual(collection.skills.keys(), ['skill0'])
 
         # Should raise error if ID is not found
         with self.assertRaisesRegexp(
-            ValueError, 'Skill with ID "s1" does not exist.'):
-            collection.delete_skill('s1')
+            ValueError, 'Skill with ID "skill1" does not exist.'):
+            collection.delete_skill('skill1')
 
         # New IDs should skip deleted IDs
-        collection.add_skill('skill3')
-        self.assertEqual(sorted(collection.skills.keys()), ['s0', 's2'])
+        collection.add_skill('skillname3')
+        self.assertEqual(sorted(collection.skills.keys()), ['skill0', 'skill2'])
+
+    def test_delete_skill(self):
+        """Test that deleting skills works."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        self.assertEqual(collection.skills, {})
+
+        # Add prerequisite and acquired skills
+        collection.add_skill('skillname1')
+        self.assertEqual(collection.skills.keys(), ['skill0'])
+        self.assertEqual(collection.skills['skill0'].name, 'skillname1')
+
+        collection.add_skill('skillname2')
+        self.assertEqual(sorted(collection.skills.keys()), ['skill0', 'skill1'])
+
+        collection.add_node('exp_id_0')
+        collection.add_node('exp_id_1')
+        collection.get_node('exp_id_0').update_acquired_skills(['skill0'])
+        collection.get_node('exp_id_1').update_prerequisite_skills(['skill0'])
+
+        # Check that prerequisite and acquired skills are updated when skill
+        # is deleted.
+        collection.delete_skill('skill0')
+        self.assertEqual(collection.get_node('exp_id_0').acquired_skills, [])
+        self.assertEqual(
+            collection.get_node('exp_id_1').prerequisite_skills, [])
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the skill graph structure within a collection."""
@@ -572,7 +600,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         collection.add_skill('Skill0a')
         collection.add_skill('Skill0b')
         collection_node = collection.get_node(self.EXPLORATION_ID)
-        collection_node.update_acquired_skills(['s0', 's1'])
+        collection_node.update_acquired_skills(['skill0', 'skill1'])
 
         collection.validate()
 
@@ -685,24 +713,24 @@ title: A title
 """)
     YAML_CONTENT_V4 = ("""category: A category
 language_code: en
+next_skill_id: 2
 nodes:
 - acquired_skills:
-  - s0
-  - s1
+  - skill0
+  - skill1
   exploration_id: Exp1
   prerequisite_skills: []
 - acquired_skills: []
   exploration_id: Exp2
   prerequisite_skills:
-  - s0
+  - skill0
 objective: ''
 schema_version: 4
-skill_id_count: 2
 skills:
-  s0:
+  skill0:
     name: Skill1
     question_ids: []
-  s1:
+  skill1:
     name: Skill2
     question_ids: []
 tags: []

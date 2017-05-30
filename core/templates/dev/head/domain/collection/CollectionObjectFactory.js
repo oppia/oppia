@@ -33,7 +33,7 @@ oppia.factory('CollectionObjectFactory', [
       this._version = collectionBackendObject.version;
       this._nodes = [];
       this._skills = {};
-      this._skillIdCount = Number(collectionBackendObject.skill_id_count);
+      this._nextSkillId = Number(collectionBackendObject.next_skill_id);
 
       // This map acts as a fast way of looking up a collection node for a given
       // exploration ID.
@@ -102,12 +102,16 @@ oppia.factory('CollectionObjectFactory', [
       return this._version;
     };
 
-    Collection.prototype.getSkillIdCount = function() {
-      return this._skillIdCount;
+    // This gets the next skill ID number. It is the smallest integer not
+    // already used for a skill ID in this collection node, including deleted
+    // skills.
+    Collection.prototype.getNextSkillId = function() {
+      return this._nextSkillId;
     };
 
-    Collection.prototype.setSkillIdCount = function(skillIdCount) {
-      this._skillIdCount = skillIdCount;
+    // This sets the next skill ID number.
+    Collection.prototype.setNextSkillId = function(nextSkillId) {
+      this._nextSkillId = nextSkillId;
     };
 
     // Adds a new frontend collection node domain object to this collection.
@@ -224,29 +228,19 @@ oppia.factory('CollectionObjectFactory', [
     };
 
     // Gets a new ID for a skill. This should be of the same form as in the
-    // backend.
+    // backend. This increments nextSkillId.
     Collection.prototype.getNewSkillId = function() {
-      var newId = 's' + String(this._skillIdCount);
-      this._skillIdCount++;
+      var newId = 'skill' + String(this._nextSkillId);
+      this._nextSkillId++;
       return newId;
     };
 
     // Adds a new frontend collection skill domain object to this collection.
     // This will return true if the skill was successfully added, or false if
-    // the given collection skill has an ID already used by another skill, the
-    // ID is invalid, or another skill already has the same name.
+    // the given collection skill has an ID already used by another skill.
     // Changes to the provided object will be reflected in this collection.
     Collection.prototype.addCollectionSkill = function(collectionSkillObject) {
       if (!this._skills.hasOwnProperty(collectionSkillObject.getId())) {
-        if (Number(collectionSkillObject.getId().slice(1)) >=
-            this._skillIdCount) {
-          return false;
-        }
-        for (var skill in this._skills) {
-          if (skill.name == collectionSkillObject.getName()) {
-            return false;
-          }
-        }
         this._skills[collectionSkillObject.getId()] = collectionSkillObject;
         return true;
       }
@@ -268,7 +262,7 @@ oppia.factory('CollectionObjectFactory', [
     // Deletes all collection skills within this collection.
     Collection.prototype.clearCollectionSkills = function() {
       this._skills = {};
-      this.setSkillIdCount(0);
+      this.setNextSkillId(0);
     };
 
     // Returns a dict mapping ids to collection skill objects for this
@@ -294,7 +288,7 @@ oppia.factory('CollectionObjectFactory', [
     };
 
     // Gets the skill object of from the collection by ID. Returns null if the
-    // id is invalid.
+    // collection does not contain a skill with the specified ID.
     Collection.prototype.getSkill = function(skillId) {
       if (this._skills.hasOwnProperty(skillId)) {
         return this._skills[skillId];
@@ -317,7 +311,7 @@ oppia.factory('CollectionObjectFactory', [
       this._version = otherCollection.getVersion();
       this.clearCollectionNodes();
       this.clearCollectionSkills();
-      this.setSkillIdCount(otherCollection.getSkillIdCount());
+      this.setNextSkillId(otherCollection.getNextSkillId());
 
       var nodes = otherCollection.getCollectionNodes();
       for (var i = 0; i < nodes.length; i++) {
@@ -344,7 +338,7 @@ oppia.factory('CollectionObjectFactory', [
       return new Collection({
         nodes: [],
         skills: {},
-        skill_id_count: 0
+        next_skill_id: 0
       });
     };
 

@@ -38,7 +38,7 @@ describe('Collection object factory', function() {
       version: '1',
       nodes: [],
       skills: {},
-      skill_id_count: 0
+      next_skill_id: 0
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
@@ -75,7 +75,7 @@ describe('Collection object factory', function() {
     expect(collection.getTags()).toBeUndefined();
     expect(collection.getVersion()).toBeUndefined();
     expect(collection.getCollectionNodes()).toEqual([]);
-    expect(collection.getSkillIdCount()).toEqual(0);
+    expect(collection.getNextSkillId()).toEqual(0);
     expect(collection.getCollectionSkills()).toEqual({});
   });
 
@@ -347,15 +347,15 @@ describe('Collection object factory', function() {
         id: 'collection_id',
         nodes: [],
         skills: {
-          s0: collectionSkillBackendObject
+          skill0: collectionSkillBackendObject
         },
-        skill_id_count: 1
+        next_skill_id: 1
       });
-      expect(collection.containsCollectionSkill('s0')).toBe(true);
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
       expect(collection.containsCollectionSkill('fake skill')).toBe(false);
       expect(collection.getCollectionSkills()).toEqual({
-        s0: CollectionSkillObjectFactory.create(
-          's0', collectionSkillBackendObject)
+        skill0: CollectionSkillObjectFactory.create(
+          'skill0', collectionSkillBackendObject)
       });
     }
   );
@@ -366,23 +366,23 @@ describe('Collection object factory', function() {
         name: 'skill01',
         question_ids: []
       };
-      _sampleCollection.setSkillIdCount(1);
+      _sampleCollection.setNextSkillId(1);
       expect(_sampleCollection.addCollectionSkill(
         CollectionSkillObjectFactory.create(
-          's0', collectionSkillBackendObject))).toBe(true);
-      expect(_sampleCollection.containsCollectionSkill('s0')).toBe(true);
+          'skill0', collectionSkillBackendObject))).toBe(true);
+      expect(_sampleCollection.containsCollectionSkill('skill0')).toBe(true);
     }
   );
 
   it('should be able to add new skills by skill name', function() {
     expect(_addCollectionSkill('new skill')).toBe(true);
     var newSkillId = _sampleCollection.getSkillIdFromName('new skill');
-    expect(newSkillId).toEqual('s0');
+    expect(newSkillId).toEqual('skill0');
     expect(_sampleCollection.containsCollectionSkill(newSkillId)).toBe(true);
 
     expect(_addCollectionSkill('new skill 2')).toBe(true);
     var newSkillId2 = _sampleCollection.getSkillIdFromName('new skill 2');
-    expect(newSkillId2).toEqual('s1');
+    expect(newSkillId2).toEqual('skill1');
     expect(_sampleCollection.containsCollectionSkill(newSkillId2)).toBe(true);
   });
 
@@ -404,7 +404,7 @@ describe('Collection object factory', function() {
     // Skill ID is not reused
     expect(_addCollectionSkill('skill03')).toBe(true);
     var skillId3 = _sampleCollection.getSkillIdFromName('skill03');
-    expect(skillId3).toEqual('s2');
+    expect(skillId3).toEqual('skill2');
   });
 
   it('should be able to get all skills and clear skills', function() {
@@ -430,7 +430,7 @@ describe('Collection object factory', function() {
     // Check that IDs reset.
     expect(_addCollectionSkill('new skill')).toBe(true);
     var newSkillId = _sampleCollection.getSkillIdFromName('new skill');
-    expect(newSkillId).toEqual('s0');
+    expect(newSkillId).toEqual('skill0');
     expect(_sampleCollection.containsCollectionSkill(newSkillId)).toBe(true);
   });
 
@@ -444,7 +444,7 @@ describe('Collection object factory', function() {
       version: '15',
       nodes: [],
       skills: {},
-      skill_id_count: 0
+      next_skill_id: 0
     });
     secondCollection.addCollectionNode(CollectionNodeObjectFactory.create({
       exploration_id: 'exp_id5',
@@ -452,9 +452,9 @@ describe('Collection object factory', function() {
       acquired_skills: [],
       exploration: {}
     }));
-    secondCollection.setSkillIdCount(1);
+    secondCollection.setNextSkillId(1);
     secondCollection.addCollectionSkill(
-      CollectionSkillObjectFactory.createFromIdAndName('s0', 'skill'));
+      CollectionSkillObjectFactory.createFromIdAndName('skill0', 'skill'));
 
     _addCollectionNode('exp_id0');
     _addCollectionNode('exp_id1');

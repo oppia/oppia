@@ -49,7 +49,7 @@ oppia.factory('CollectionSkillObjectFactory', [
       return new CollectionSkill(skillId, collectionSkillBackendObject);
     };
 
-    // TODO(wxy): Ensure this matches the backend dict elements for
+    // Note to developers: Ensure this matches the backend dict elements for
     // collection skills.
     CollectionSkill.createFromIdAndName = function(skillId, skillName) {
       return CollectionSkill.create(skillId, {

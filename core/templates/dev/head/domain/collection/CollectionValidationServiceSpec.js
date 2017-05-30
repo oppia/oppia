@@ -20,6 +20,7 @@ describe('Collection validation service', function() {
   var CollectionValidationService = null;
   var CollectionObjectFactory = null;
   var CollectionNodeObjectFactory = null;
+  var CollectionSkillObjectFactory = null;
 
   var EXISTS = true;
   var DOES_NOT_EXIST = false;
@@ -32,6 +33,8 @@ describe('Collection validation service', function() {
     CollectionValidationService = $injector.get('CollectionValidationService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    CollectionSkillObjectFactory = $injector.get(
+      'CollectionSkillObjectFactory');
 
     var sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -39,7 +42,9 @@ describe('Collection validation service', function() {
       objective: 'an objective',
       category: 'a category',
       version: '1',
-      nodes: []
+      nodes: [],
+      skills: {},
+      next_skill_id: 0
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
@@ -59,6 +64,12 @@ describe('Collection validation service', function() {
 
   var _getCollectionNode = function(explorationId) {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
+  };
+
+  var _addCollectionSkill = function(skillName) {
+    var skillId = _sampleCollection.getNewSkillId();
+    return _sampleCollection.addCollectionSkill(
+      CollectionSkillObjectFactory.createFromIdAndName(skillId, skillName));
   };
 
   var _findPrivateValidationIssues = function() {
@@ -97,6 +108,20 @@ describe('Collection validation service', function() {
 
     // However, removing the prerequisite skill makes the node accessible again.
     node.getPrerequisiteSkillList().clearSkills();
+
+    issues = _findPrivateValidationIssues();
+    expect(issues).toEqual([]);
+  });
+
+  it('should detect non-unique skill names', function() {
+    expect(_addCollectionSkill('skill name')).toBe(true);
+    expect(_addCollectionSkill('skill name2')).toBe(true);
+    expect(_addCollectionSkill('skill name')).toBe(true);
+
+    var issues = _findPrivateValidationIssues();
+    expect(issues.length).toEqual(1);
+    expect(issues[0]).toEqual('Skill name \'skill name\' is not unique.');
+    expect(_sampleCollection.deleteCollectionSkill('skill0')).toBe(true);
 
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([]);

@@ -104,19 +104,19 @@ describe('Collection editor state service', function() {
       nodes: [{
         exploration_id: '0',
         prerequisite_skills: [],
-        acquired_skills: ['s0']
+        acquired_skills: ['skill0']
       }, {
         exploration_id: '1',
-        prerequisite_skills: ['s0'],
-        acquired_skills: ['s1']
+        prerequisite_skills: ['skill0'],
+        acquired_skills: ['skill1']
       }],
-      skill_id_count: 2,
+      next_skill_id: 2,
       skills: {
-        s0: {
+        skill0: {
           name: '0',
           question_ids: []
         },
-        s1: {
+        skill1: {
           name: '1',
           question_ids: []
         }
@@ -134,11 +134,11 @@ describe('Collection editor state service', function() {
       nodes: [{
         exploration_id: '0',
         prerequisite_skills: [],
-        acquired_skills: ['s0']
+        acquired_skills: ['skill0']
       }],
-      skill_id_count: 1,
+      next_skill_id: 1,
       skills: {
-        s0: {
+        skill0: {
           name: '0',
           question_ids: []
         }
@@ -483,7 +483,7 @@ describe('Collection editor state service', function() {
 
     var collectionSkillList = (
       CollectionEditorStateService.getCollectionSkillList());
-    expect(collectionSkillList.getSkills()).toEqual(['s0', 's1']);
+    expect(collectionSkillList.getSkills()).toEqual(['skill0', 'skill1']);
     expect(collectionSkillList).toBe(prevCollectionSkillList);
   });
 
@@ -494,18 +494,18 @@ describe('Collection editor state service', function() {
 
       var prevCollectionSkillList = (
         CollectionEditorStateService.getCollectionSkillList());
-      expect(prevCollectionSkillList.getSkills()).toEqual(['s0', 's1']);
+      expect(prevCollectionSkillList.getSkills()).toEqual(['skill0', 'skill1']);
 
       // Simply applying a change is adequate for updating the skill list.
       var collection = CollectionEditorStateService.getCollection();
       CollectionUpdateService.setAcquiredSkills(
-        collection, '0', ['s1', 'skill3']);
+        collection, '0', ['skill1', 'skill3']);
       $rootScope.$apply();
 
       var collectionSkillList = (
         CollectionEditorStateService.getCollectionSkillList());
       expect(collectionSkillList.getSkills()).toEqual([
-        's0', 's1', 'skill3']);
+        'skill0', 'skill1', 'skill3']);
       expect(collectionSkillList).toBe(prevCollectionSkillList);
     }
   );
