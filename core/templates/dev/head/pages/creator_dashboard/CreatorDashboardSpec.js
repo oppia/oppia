@@ -18,7 +18,7 @@
  */
 
 describe('Creator dashboard controller', function() {
-  describe('Dashboard', function() {
+  describe('CreatorDashboard', function() {
     var scope, ctrl;
     var mockDashboardBackendApiService;
     var dashboardData = {
@@ -75,7 +75,7 @@ describe('Creator dashboard controller', function() {
         spyOn(mockDashboardBackendApiService, 'fetchDashboardData')
           .and.callThrough();
         scope = $rootScope.$new();
-        ctrl = $controller('Dashboard', {
+        ctrl = $controller('CreatorDashboard', {
           $scope: scope,
           alertsService: null,
           CreatorDashboardBackendApiService: mockDashboardBackendApiService
