@@ -55,7 +55,8 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
     browser.get(general.SERVER_URL_PREFIX);
-    var numberOfFeedbackMessages = creator_dashboard.getNumberOfFeedbackMessages();
+    var numberOfFeedbackMessages = (
+      creator_dashboard.getNumberOfFeedbackMessages());
     expect(numberOfFeedbackMessages).toEqual(0);
     users.logout();
 
