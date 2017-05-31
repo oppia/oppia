@@ -17,7 +17,7 @@
  * backend.
  */
 
-oppia.factory('DashboardBackendApiService', ['$http', function($http) {
+oppia.factory('CreatorDashboardBackendApiService', ['$http', function($http) {
   var _fetchDashboardData = function() {
     return $http.get('/dashboardhandler/data');
   };

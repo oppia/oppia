@@ -57,7 +57,7 @@ describe('Creator dashboard controller', function() {
     beforeEach(function() {
       module('oppia');
       module(function($provide) {
-        $provide.factory('DashboardBackendApiService', ['$q', function($q) {
+        $provide.factory('CreatorDashboardBackendApiService', ['$q', function($q) {
           var fetchDashboardData = function() {
             return $q.resolve(dashboardData);
           };
@@ -69,15 +69,15 @@ describe('Creator dashboard controller', function() {
     });
 
     beforeEach(inject(
-      function($rootScope, $controller, DashboardBackendApiService) {
-        mockDashboardBackendApiService = DashboardBackendApiService;
+      function($rootScope, $controller, CreatorDashboardBackendApiService) {
+        mockDashboardBackendApiService = CreatorDashboardBackendApiService;
         spyOn(mockDashboardBackendApiService, 'fetchDashboardData')
           .and.callThrough();
         scope = $rootScope.$new();
         ctrl = $controller('Dashboard', {
           $scope: scope,
           alertsService: null,
-          DashboardBackendApiService: mockDashboardBackendApiService
+          CreatorDashboardBackendApiService: mockDashboardBackendApiService
         });
       }
     ));

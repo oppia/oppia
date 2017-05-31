@@ -23,7 +23,7 @@
  * in an e2e test.
  */
 
-var dashboard = require('../protractor_utils/dashboard.js');
+var dashboard = require('../protractor_utils/creator_dashboard.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');
@@ -55,7 +55,7 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
     browser.get(general.SERVER_URL_PREFIX);
-    var numberOfFeedbackMessages = dashboard.getNumberOfFeedbackMessages();
+    var numberOfFeedbackMessages = creator_dashboard.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(0);
     users.logout();
 
@@ -69,9 +69,9 @@ describe('ExplorationFeedback', function() {
     // Creator reads the feedback and responds
     users.login('user1@ExplorationFeedback.com');
     browser.get(general.SERVER_URL_PREFIX);
-    numberOfFeedbackMessages = dashboard.getNumberOfFeedbackMessages();
+    numberOfFeedbackMessages = creator_dashboard.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(1);
-    dashboard.navigateToExplorationEditor();
+    creator_dashboard.navigateToExplorationEditor();
 
     editor.readFeedbackMessages().then(function(messages) {
       expect(messages.length).toEqual(1);
