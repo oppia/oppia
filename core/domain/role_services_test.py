@@ -18,7 +18,7 @@
 
 import string
 
-from core.domain import role_domain
+from core.domain import role_services
 from core.tests import test_utils
 import feconf
 
