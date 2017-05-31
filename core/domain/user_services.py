@@ -24,7 +24,7 @@ import re
 
 from core.platform import models
 from core.domain import user_domain
-from core.domain import role_domain
+from core.domain import role_services
 import feconf
 import utils
 
@@ -797,7 +797,7 @@ def update_user_role(user_id, role):
         Exception: The argument passed does not correspond
             to any existing role.
     """
-    if role not in role_domain.ROLE_HIERARCHY:
+    if role not in role_services.ROLE_HIERARCHY:
         raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.role = role

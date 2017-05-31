@@ -25,8 +25,8 @@ import feconf
 
 class RoleDomainUnitTests(test_utils.GenericTestBase):
     """Tests for role hierarchy and actions."""
-    HIERARCHY = role_domain.ROLE_HIERARCHY
-    ACTIONS = role_domain.ROLE_ACTIONS
+    HIERARCHY = role_services.ROLE_HIERARCHY
+    ACTIONS = role_services.ROLE_ACTIONS
 
     def test_dicts_have_same_keys(self):
         """Test that ROLE_HIERARCHY and ROLE_ACTIONS have same keys.
@@ -120,15 +120,15 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
         # Case when wrong input is given.
         with self.assertRaisesRegexp(
             Exception, "no role with name TEST_ROLE exists."):
-            role_domain.get_all_actions('TEST_ROLE')
+            role_services.get_all_actions('TEST_ROLE')
 
         # Case for collection editor is checked.
         collection_editor_actions = list(
-            set(role_domain.ROLE_ACTIONS[feconf.ROLE_EXPLORATION_EDITOR]) |
-            set(role_domain.ROLE_ACTIONS[feconf.ROLE_BANNED_USER]) |
-            set(role_domain.ROLE_ACTIONS[feconf.ROLE_GUEST]) |
-            set(role_domain.ROLE_ACTIONS[feconf.ROLE_COLLECTION_EDITOR]))
+            set(role_services.ROLE_ACTIONS[feconf.ROLE_EXPLORATION_EDITOR]) |
+            set(role_services.ROLE_ACTIONS[feconf.ROLE_BANNED_USER]) |
+            set(role_services.ROLE_ACTIONS[feconf.ROLE_GUEST]) |
+            set(role_services.ROLE_ACTIONS[feconf.ROLE_COLLECTION_EDITOR]))
 
         self.assertEqual(collection_editor_actions,
-                         role_domain.get_all_actions(
+                         role_services.get_all_actions(
                              feconf.ROLE_COLLECTION_EDITOR))
