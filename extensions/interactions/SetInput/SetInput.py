@@ -50,5 +50,3 @@ class SetInput(base.BaseInteraction):
         },
         'calculation_id': 'FrequencyCommonlySubmittedElements',
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

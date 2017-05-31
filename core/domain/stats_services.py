@@ -223,6 +223,10 @@ def get_top_state_rule_answers_multi(
     # be bounds set on the values returned by TopAnswersByCategorization or the
     # visualization itself. This function may be prohibitively expensive for
     # states with very large numbers of answers.
+
+    # NOTE TO DEVELOPERS: 'TopAnswersByCategorization' computations were removed
+    # from the answer summarizers job at the end of May 2017, due to taking up
+    # too much memory/time. They will be reinstated in some other form later on.
     answer_lists = []
     for exploration_id, state_name in exploration_state_list:
         job_result = (

@@ -58,5 +58,3 @@ class MusicNotesInput(base.BaseInteraction):
         },
         'calculation_id': 'Top10AnswerFrequencies',
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']
