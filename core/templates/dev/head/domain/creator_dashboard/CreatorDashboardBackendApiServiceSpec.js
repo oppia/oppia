@@ -62,7 +62,7 @@ describe('Creator Dashboard backend API service', function() {
     }
   };
 
-  var CREATOR_DASHBOARD_DATA_URL = '/dashboardhandler/data';
+  var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
   var ERROR_STATUS_CODE = 500;
 
   beforeEach(module('oppia'));
