@@ -69,7 +69,8 @@ describe('Creator Dashboard backend API service', function() {
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
-    CreatorDashboardBackendApiService = $injector.get('CreatorDashboardBackendApiService');
+    CreatorDashboardBackendApiService = $injector.get(
+      'CreatorDashboardBackendApiService');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
   }));

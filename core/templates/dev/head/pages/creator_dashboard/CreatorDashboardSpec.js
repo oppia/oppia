@@ -57,14 +57,15 @@ describe('Creator dashboard controller', function() {
     beforeEach(function() {
       module('oppia');
       module(function($provide) {
-        $provide.factory('CreatorDashboardBackendApiService', ['$q', function($q) {
-          var fetchDashboardData = function() {
-            return $q.resolve(dashboardData);
-          };
-          return {
-            fetchDashboardData: fetchDashboardData
-          };
-        }]);
+        $provide.factory(
+          'CreatorDashboardBackendApiService', ['$q', function($q) {
+            var fetchDashboardData = function() {
+              return $q.resolve(dashboardData);
+            };
+            return {
+              fetchDashboardData: fetchDashboardData
+            };
+          }]);
       });
     });
 
