@@ -128,7 +128,8 @@ class CreatorDashboardPage(base.BaseHandler):
                     DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
             })
             self.render_template(
-                'pages/creator_dashboard/creator_dashboard.html', redirect_url_on_logout='/')
+                'pages/creator_dashboard/creator_dashboard.html',
+                redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
                 feconf.SIGNUP_URL, 'return_url', feconf.CREATOR_DASHBOARD_URL))

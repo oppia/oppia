@@ -180,16 +180,19 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.AdminTopicsCsvDownloadHandler),
 
     get_redirect_route(
-        r'/notifications_dashboard', creator_dashboard.NotificationsDashboardPage),
+        r'/notifications_dashboard',
+        creator_dashboard.NotificationsDashboardPage),
     get_redirect_route(
         r'/notificationsdashboardhandler/data',
         creator_dashboard.NotificationsDashboardHandler),
     get_redirect_route(
         r'/notificationshandler', creator_dashboard.NotificationsHandler),
     get_redirect_route(
-        r'%s' % feconf.CREATOR_DASHBOARD_URL, creator_dashboard.CreatorDashboardPage),
+        r'%s' % feconf.CREATOR_DASHBOARD_URL,
+        creator_dashboard.CreatorDashboardPage),
     get_redirect_route(
-        r'%s' % feconf.CREATOR_DASHBOARD_DATA_URL, creator_dashboard.CreatorDashboardHandler),
+        r'%s' % feconf.CREATOR_DASHBOARD_DATA_URL,
+        creator_dashboard.CreatorDashboardHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.DASHBOARD_EXPLORATION_STATS_PREFIX,
         creator_dashboard.ExplorationDashboardStatsHandler),
@@ -198,7 +201,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.NEW_COLLECTION_URL, creator_dashboard.NewCollection),
     get_redirect_route(
-        r'%s' % feconf.UPLOAD_EXPLORATION_URL, creator_dashboard.UploadExploration),
+        r'%s' % feconf.UPLOAD_EXPLORATION_URL,
+        creator_dashboard.UploadExploration),
     get_redirect_route(
         r'/my_explorations', creator_dashboard.CreatorDashboardRedirectPage),
 
