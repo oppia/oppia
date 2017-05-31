@@ -14,63 +14,100 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""contains required constants and functions for user roles and actions"""
+"""This module contains the Hierarchy Structure of roles for action
+inheritance, Actions permitted to the roles and the functions used to
+access roles and actions.
+"""
 
-# dict to contain the hierarchy information for a role in oppia
-# NOTE FOR DEVELOPERS :
+import feconf
+
+# This dict represents how the actions are inherited among different
+# roles in the site.
+#   key -> name of role
+#   value -> list of direct neighbour roles from which actions are inherited
+# Eg -
+#   say, key 'COLLECTION_EDITOR' has ['EXPLORATION_EDITOR'] as its value, then
+#   'COLLECTION_EDITOR' can perform {all the actions that can be performed by
+#   'EXPLORATION_EDITOR' and its value recursively} plus {the actions
+#   corresponding to 'COLLECTION_EDITOR'.}
+#
+# NOTE FOR DEVELOPERS:
+# TODO(1995YogeshSharma): Add a link to the Playbook below.
 # - Follow the Playbook in wiki before making any changes to this dict.
-# - Maintain the alphabetical in keys.
+#
+# CAUTION: Before removing any role from this dict, please ensure that there is
+#          no existing user with that role.
 ROLE_HIERARCHY = {
-    'ADMIN': ['MODERATOR'],
-    'BANNED_USER': ['GUEST'],
-    'COLLECTION_EDITOR': ['EXPLORATION_EDITOR'],
-    'EXPLORATION_EDITOR': ['BANNED_USER'],
-    'GUEST': [],
-    'MODERATOR': ['COLLECTION_EDITOR'],
-    'SUPER_ADMIN': ['ADMIN']
+    feconf.ROLE_ADMIN: [feconf.ROLE_MODERATOR],
+    feconf.ROLE_BANNED_USER: [feconf.ROLE_GUEST],
+    feconf.ROLE_COLLECTION_EDITOR: [feconf.ROLE_EXPLORATION_EDITOR],
+    feconf.ROLE_EXPLORATION_EDITOR: [feconf.ROLE_BANNED_USER],
+    feconf.ROLE_GUEST: [],
+    feconf.ROLE_MODERATOR: [feconf.ROLE_COLLECTION_EDITOR],
+    feconf.ROLE_SUPER_ADMIN: [feconf.ROLE_ADMIN]
 }
 
-# dict to contain unique actions (actions which are not inherited from parents)
-# corresponding to roles.
+# This dict represents the unique actions that belong to a particular role.
+# Unique in the sense that the action belongs to this role but can't be
+# inherited from any other role.
+#   key -> name of role
+#   value -> list of unique actions.
+#
 # NOTE FOR DEVELOPERS :
 # - Follow the Playbook in wiki before making any changes to this dict.
-# - Maintain the alphabetical order in keys.
 ROLE_ACTIONS = {
-    'ADMIN': [],
-    'BANNED_USER': [],
-    'COLLECTION_EDITOR': ['CREATE_COLLECTION', 'EDIT_COLLECTION',
-                          'VIEW_COLLECTION_RIGHTS', 'EDIT_COLLECTION_RIGHTS'],
-    'EXPLORATION_EDITOR': ['CREATE_EXPLORATION', 'START_FEEDBACK_THREAD',
-                           'EDIT_EXPLORATION', 'SUGGEST_EDIT_TO_EXPLORATION'],
-    'GUEST': ['DOWNLOAD_EXPLORATION', 'PLAY_COLLECTION', 'PLAY_EXPLORATION',
-              'VIEW_EXPLORATION_STATS'],
-    'MODERATOR': ['ACCESS_MODERATOR_PAGE', 'UPDATE_FEATURED_ACTIVITIES'],
-    'SUPER_ADMIN': ['ACCESS_ADMIN_PAGE', 'SEND_BULK_EMAIL']
+    feconf.ROLE_ADMIN: [],
+    feconf.ROLE_BANNED_USER: [],
+    feconf.ROLE_COLLECTION_EDITOR: [
+        feconf.ACTION_CREATE_COLLECTION,
+        feconf.ACTION_EDIT_COLLECTION,
+        feconf.ACTION_EDIT_COLLECTION_RIGHTS,
+        feconf.ACTION_VIEW_COLLECTION_RIGHTS,
+    ],
+    feconf.ROLE_EXPLORATION_EDITOR: [
+        feconf.ACTION_CREATE_EXPLORATION,
+        feconf.ACTION_EDIT_EXPLORATION,
+        feconf.ACTION_START_FEEDBACK_THREAD,
+        feconf.ACTION_SUGGEST_EDIT_TO_EXPLORATION
+    ],
+    feconf.ROLE_GUEST: [
+        feconf.ACTION_DOWNLOAD_EXPLORATION,
+        feconf.ACTION_PLAY_COLLECTION,
+        feconf.ACTION_PLAY_EXPLORATION,
+        feconf.ACTION_VIEW_EXPLORATION_STATS
+    ],
+    feconf.ROLE_MODERATOR: [
+        feconf.ACTION_ACCESS_MODERATOR_PAGE,
+        feconf.ACTION_UPDATE_FEATURED_ACTIVITIES
+    ],
+    feconf.ROLE_SUPER_ADMIN: [
+        feconf.ACTION_ACCESS_ADMIN_PAGE,
+        feconf.ACTION_SEND_BULK_EMAIL
+    ]
 }
 
 
 def get_all_actions(role):
-    """Given a string defining role of the user, this method returns all the
-    list of all the actions(its own actions plus inherited actions) that can
-    be performed by that role
-    args: role - a string defining user role
-    returns: a list of actions belonging to the role
+    """Returns a list of all the actions (including inherited actions)
+    that can be performed by the given role.
+
+    Args:
+        role: str. A string defining user role. It should be a key of
+              ROLE_HIERARCHY
+
+    Returns:
+        list. A list of actions accessible to the role.
+
+    Raises:
+        Exception: The argument passed does not correspond to any existing
+                   role.
     """
-    if role not in ROLE_HIERARCHY.keys():
-        raise Exception("no role with name %s exists." % role)
+    if role not in ROLE_HIERARCHY:
+        raise Exception('Role %s does not exist.' % role)
 
-    role_actions = []
-    parents = ROLE_HIERARCHY[role]
+    role_actions = ROLE_ACTIONS[role]
 
-    if len(parents) == 0:
-        return ROLE_ACTIONS[role]
-    else:
-        for parent in parents:
-            role_actions = list(
-                set(role_actions) | set(get_all_actions(parent)))
+    for parent in ROLE_HIERARCHY[role]:
+        role_actions.extend(get_all_actions(parent))
 
-        if len(ROLE_ACTIONS[role]) != 0:
-            role_actions = list(
-                set(role_actions) | set(ROLE_ACTIONS[role]))
-
-        return role_actions
+    return list(set(role_actions))

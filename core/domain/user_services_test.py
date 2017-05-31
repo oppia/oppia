@@ -317,19 +317,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(email_preferences.mute_suggestion_notifications)
 
     def test_update_user_role(self):
-        user_id = "test_id"
-        user_name = "testname"
-        user_email = "test@email.com"
+        user_id = 'test_id'
+        user_name = 'testname'
+        user_email = 'test@email.com'
 
         user_services.get_or_create_user(user_id, user_email)
         user_services.set_username(user_id, user_name)
 
         self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         "EXPLORATION_EDITOR")
+                         feconf.ROLE_EXPLORATION_EDITOR)
 
-        user_services.update_user_role(user_id, "COLLECTION_EDITOR")
+        user_services.update_user_role(user_id, feconf.ROLE_COLLECTION_EDITOR)
         self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         "COLLECTION_EDITOR")
+                         feconf.ROLE_COLLECTION_EDITOR)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [

@@ -38,7 +38,7 @@ class UserSettingsModel(base_models.BaseModel):
     normalized_username = ndb.StringProperty(indexed=True)
     # User role. Required for authorization. EXPLORATION_EDITOR is default
     # role given to any logged in user.
-    role = ndb.StringProperty(default='EXPLORATION_EDITOR')
+    role = ndb.StringProperty(default=feconf.ROLE_EXPLORATION_EDITOR)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.

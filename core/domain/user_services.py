@@ -24,6 +24,7 @@ import re
 
 from core.platform import models
 from core.domain import user_domain
+from core.domain import role_domain
 import feconf
 import utils
 
@@ -67,8 +68,8 @@ class UserSettings(object):
         preferred_language_codes: list(str) or None. Exploration language
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
-        role: str. Role of the user. Role corresponds to actions user can
-            perform.
+        role: str. Role of the user. This is used in conjunction with
+            ROLE_HIERARCHY to determine which actions the user can perform.
     """
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
@@ -77,7 +78,7 @@ class UserSettings(object):
             last_edited_an_exploration=None, profile_picture_data_url=None,
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
-            role='EXPLORATION_EDITOR'):
+            role=feconf.ROLE_EXPLORATION_EDITOR):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -105,8 +106,8 @@ class UserSettings(object):
                 preferences specified by the user.
             preferred_site_language_code: str or None. System language
                 preference.
-            role: str. Role of the user. Role corresponds to actions user can
-                perform.
+            role: str. Role of the user. This is used in conjunction with
+                ROLE_HIERARCHY to determine which actions the user can perform.
         """
         self.user_id = user_id
         self.email = email
@@ -348,7 +349,7 @@ def get_users_settings(user_ids):
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow(),
-                role='SUPER_ADMIN'
+                role=feconf.ROLE_SUPER_ADMIN
             ))
         elif model:
             result.append(UserSettings(
@@ -480,11 +481,13 @@ def get_user_settings(user_id, strict=False):
 
 
 def get_user_role_from_id(user_id):
-    """gives the role of a user
+    """Returns the role of the user with given user_id.
+
     Args:
-        user_id: str. user's id.
+        user_id: str. User's id.
+
     Returns:
-        role: str. role of the user.
+        role: str. Role of the user.
     """
     user_settings = get_user_settings(user_id)
     return user_settings.role
@@ -784,12 +787,18 @@ def update_preferred_site_language_code(user_id, preferred_site_language_code):
 
 
 def update_user_role(user_id, role):
-    """Updates the role of the user with given user_id
+    """Updates the role of the user with given user_id.
 
     Args:
         user_id: str. The user id.
         role: str. The role to be assigned to user.
+
+    Raises:
+        Exception: The argument passed does not correspond
+            to any existing role.
     """
+    if role not in role_domain.ROLE_HIERARCHY:
+        raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.role = role
     _save_user_settings(user_settings)
