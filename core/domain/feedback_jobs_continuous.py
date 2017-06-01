@@ -35,7 +35,8 @@ class FeedbackAnalyticsRealtimeModel(
 
 class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
     """A continuous-computation job that computes analytics for feedback
-    threads of explorations."""
+    threads of explorations.
+    """
 
     @classmethod
     def get_event_types_listened_to(cls):
@@ -52,6 +53,16 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
+        """Records thread analytics in the given realtime layer.
+
+        Args:
+            active_realtime_layer: int. Currently active realtime datastore
+                layer.
+            event_type: str. The event triggered by the student.
+            *args: Variable length argument list. The first element of *args
+                corresponds to the id of the exploration currently being
+                played.
+        """
         exp_id = args[0]
 
         def _increment_open_threads_count():
@@ -118,13 +129,16 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
     # Public query methods.
     @classmethod
     def get_thread_analytics_multi(cls, exploration_ids):
-        """
-        Args:
-          - exploration_ids: ids of the explorations to get statistics for.
+        """Get the thread analytics for the explorations specified by the
+        exploration_ids.
 
-        Returns a list of dicts, each with two keys: 'num_open_threads' and
-        'num_total_threads', representing the counts of open and all feedback
-        threads, respectively.
+        Args:
+            exploration_ids: ids of the explorations to get analytics for.
+
+        Returns:
+            A list of dicts, each with two keys: 'num_open_threads' and
+            'num_total_threads', representing the counts of open and all
+            feedback threads, respectively.
         """
         realtime_model_ids = cls.get_multi_active_realtime_layer_ids(
             exploration_ids)
@@ -135,26 +149,25 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 exploration_ids))
 
         return [feedback_domain.FeedbackAnalytics(
-            exploration_ids[i],
-            (realtime_models[i].num_open_threads
-             if realtime_models[i] is not None else 0) +
+            exploration_ids[i], (realtime_models[i].num_open_threads
+                                 if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_open_threads
              if feedback_thread_analytics_models[i] is not None else 0),
             (realtime_models[i].num_total_threads
              if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_total_threads
              if feedback_thread_analytics_models[i] is not None else 0)
-        ) for i in range(len(exploration_ids))]
+            ) for i in range(len(exploration_ids))]
 
     @classmethod
     def get_thread_analytics(cls, exploration_id):
-        """
+        """Retrieves the analytics for feedback threads.
+
         Args:
-         - exploration_id: id of exploration to get statistics for
+            exploration_id: id of exploration to get statistics for
 
-        Calls get_thread_analytics_multi internally and returns a dict with two
-        keys - 'num_open_threads' and 'num_total_threads'.
-
+        Returns:
+            A dict with two keys, 'num_open_threads' and 'num_total_threads'
         """
         return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
             [exploration_id])[0]
