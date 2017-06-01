@@ -17,21 +17,18 @@
  * exploration editor.
  */
 
-oppia.constant('IMPROVE_TYPE_DEFAULT', 'default');
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
-  'ReadOnlyExplorationBackendApiService',
-  'IMPROVE_TYPE_DEFAULT', 'IMPROVE_TYPE_INCOMPLETE',
+  'ReadOnlyExplorationBackendApiService', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
-      ReadOnlyExplorationBackendApiService,
-      IMPROVE_TYPE_DEFAULT, IMPROVE_TYPE_INCOMPLETE) {
+      ReadOnlyExplorationBackendApiService, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -80,10 +77,7 @@ oppia.controller('StatisticsTab', [
               // TODO(bhenning): This is the feedback for improvement types and
               // should be included with the definitions of the improvement
               // types.
-              if (impItem.type === IMPROVE_TYPE_DEFAULT) {
-                $scope.highlightStates[impItem.stateName] = (
-                  'Needs more feedback');
-              } else if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
+              if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
                 $scope.highlightStates[impItem.stateName] = 'May be confusing';
               }
             });
