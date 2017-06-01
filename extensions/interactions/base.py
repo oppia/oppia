@@ -202,7 +202,9 @@ class BaseInteraction(object):
         return (
             '<script>%s</script>\n' %
             utils.get_file_contents(os.path.join(
-                feconf.INTERACTIONS_DIR, self.id, 'validator.js')))
+                feconf.INTERACTIONS_DIR,
+                self.id,
+                '%sValidationService.js' % self.id)))
 
     def to_dict(self):
         """Gets a dict representing this interaction. Only default values are

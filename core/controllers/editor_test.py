@@ -296,6 +296,7 @@ class EditorTest(BaseEditorControllerTest):
             self.assertEqual(
                 response_dict['unhandled_answers'],
                 _create_training_data('joyful', 'sad'))
+            self.assertTrue(exploration_dict['version'])
 
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.

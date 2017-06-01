@@ -60,6 +60,26 @@
   100% { opacity: 1; }
 }
 
+@-webkit-viewport {
+  width: device-width;
+}
+
+@-moz-viewport {
+  width: device-width;
+}
+
+@-ms-viewport {
+  width: device-width;
+}
+
+@-o-viewport {
+  width: device-width;
+}
+
+@viewport {
+  width: device-width;
+}
+
 /* Angular material overrides. */
 md-input-group.long > input {
   width: 100%;
@@ -142,6 +162,33 @@ body {
   overflow-x: hidden;
   padding: 0;
   width: 100%;
+}
+
+.oppia-skip-to-content {
+  left: -10000px;
+  padding: 6px;
+  position: absolute;
+  top: auto;
+  transition-duration: 1s;
+  transition-property: color left;
+  transition-timing-function: ease-in;
+  z-index: 99999;
+}
+.oppia-skip-to-content:active,
+.oppia-skip-to-content:hover,
+.oppia-skip-to-content:focus {
+  background-color: #e8e7e3;
+  border-bottom: 1px solid black;
+  border-bottom-right-radius: 5px;
+  border-right: 1px solid black;
+  color: #23527e;
+  height: auto;
+  left: 0;
+  position: absolute;
+  transition-duration: .5s;
+  transition-property: color left;
+  transition-timing-function: ease-out;
+  width: auto;
 }
 
 .oppia-stop-scroll {
@@ -561,6 +608,19 @@ textarea {
 }
 
 /*
+  Styles for BackgroundMaskService.
+*/
+.oppia-background-mask {
+  background: rgba(0,0,0,0.33);
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 30;
+}
+
+/*
   Styles for the global navigation sidebar menu.
 */
 .oppia-base-container {
@@ -864,6 +924,10 @@ textarea {
     margin: 0;
   }
 }
+
+/* NOTE TO DEVELOPERS: This value should be updated in
+   windowDimensionsService if changed.
+ */
 @media(max-width: 651px) {
   .navbar-nav.oppia-navbar-nav > li > a {
     display: none;
@@ -2878,6 +2942,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-modal-information-card .modal-dialog {
   margin: 100px auto;
+  max-width: 98vw;
   width: 400px;
 }
 
@@ -3759,6 +3824,9 @@ md-card.preview-conversation-skin-supplemental-card {
   text-overflow: ellipsis;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3; /* Truncating to 3 lines. */
+}
+.oppia-activity-summary-tile-pre-hover-preview {
+  margin-bottom: 35px;
 }
 
 .oppia-activity-summary-tile-mobile .objective {

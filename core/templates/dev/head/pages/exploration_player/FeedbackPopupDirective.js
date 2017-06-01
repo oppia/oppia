@@ -34,10 +34,12 @@ oppia.directive('feedbackPopup', [
       templateUrl: 'components/feedback',
       controller: [
         '$scope', '$element', '$http', '$timeout', 'focusService',
-        'alertsService', 'playerPositionService',
+        'alertsService', 'BackgroundMaskService', 'playerPositionService',
+        'windowDimensionsService',
         function(
             $scope, $element, $http, $timeout, focusService,
-            alertsService, playerPositionService) {
+            alertsService, BackgroundMaskService, playerPositionService,
+            windowDimensionsService) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
@@ -46,6 +48,10 @@ oppia.directive('feedbackPopup', [
           // elements on the same page.
           $scope.feedbackPopoverId = (
             'feedbackPopover' + Math.random().toString(36).slice(2));
+
+          if (windowDimensionsService.isExplorationPlayerNavHidden()) {
+            BackgroundMaskService.activateMask();
+          }
 
           focusService.setFocus($scope.feedbackPopoverId);
 
@@ -125,7 +131,12 @@ oppia.directive('feedbackPopup', [
             $timeout(function() {
               getTriggerElt().trigger('click');
             });
+            BackgroundMaskService.deactivateMask();
           };
+
+          $scope.$on('$destroy', function() {
+            BackgroundMaskService.deactivateMask();
+          });
         }
       ]
     };

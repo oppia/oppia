@@ -203,6 +203,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/my_explorations', dashboard.DashboardRedirectPage),
 
     get_redirect_route(
+        r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
+        reader.RemoveExpFromIncompleteListHandler),
+    get_redirect_route(
+        r'%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
+        reader.RemoveCollectionFromIncompleteListHandler),
+    get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
         resources.ImageHandler),
     get_redirect_route(
@@ -299,7 +305,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
         editor.ExplorationPage),
     get_redirect_route(
-        r'/createhandler/data/<exploration_id>', editor.ExplorationHandler),
+        r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
+        editor.ExplorationHandler),
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler),

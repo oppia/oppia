@@ -27,7 +27,7 @@ var workflow = require('../protractor_utils/workflow.js');
 
 describe('Suggestions on Explorations', function() {
   var EXPLORATION_TITLE = 'Sample Exploration';
-  var EXPLORATION_CATEGORY = 'Random';
+  var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
   var EXPLORATION_LANGUAGE = 'English';
 
