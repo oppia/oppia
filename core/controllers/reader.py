@@ -389,7 +389,10 @@ class ClassifyHandler(base.BaseHandler):
             dict. A classification result, which is a dictionary containing
                 three keys.
                 'outcome': dict. A dict representing the outcome of the answer
-                    group matched.
+                    group matched. it contains three keys.
+                        'dest': str. Exploration init state(exploration.init_state_name).
+                        'feedback: list. A list of feedbacks relating to the answer.
+                        'param_changes': list. Any previous changes to the answer if any.
                 'answer_group_index': int. An index into the answer groups list
                     indicating which one was selected as the group which this
                     answer belongs to. This is equal to the number of answer
@@ -399,7 +402,6 @@ class ClassifyHandler(base.BaseHandler):
                     which rule spec was matched. This is equal to 0 if the
                     default outcome is selected.
         """
-        # FIXME: Document 'outcome' dict keys.
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
         # The learner's raw answer.
