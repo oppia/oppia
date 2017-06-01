@@ -16,6 +16,7 @@
 
 """Services for tracking the progress of the learner."""
 
+from core.domain import collection_services
 from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
@@ -409,10 +410,19 @@ def get_all_completed_collection_ids(user_id):
         user_models.CompletedActivitiesModel.get(
             user_id, strict=False))
 
+    completed_collection_ids = []
+
     if completed_activities_model:
         activities_completed = get_completed_activities_from_model(
             completed_activities_model)
-        return activities_completed.collection_ids
+        for collection_id in activities_completed.collection_ids:
+            if collection_services.get_next_exploration_ids_to_complete_by_user(
+                    user_id, collection_id):
+                remove_collection_from_completed_list(user_id, collection_id)
+                mark_collection_as_incomplete(user_id, collection_id)
+            else:
+                completed_collection_ids.append(collection_id)
+        return completed_collection_ids
     else:
         return []
 
@@ -460,3 +470,46 @@ def get_all_incomplete_collection_ids(user_id):
         return incomplete_activities.collection_ids
     else:
         return []
+
+
+def remove_none_entities_from_list(
+        user_id, entity_summary_list, entity_ids, section, sub_section):
+    """Removes all the None entries from a list and returns it.
+
+    Args:
+        user_id: str. The id of the user.
+        entity_summary_list: list(Summary|None). A list of the summary domain
+            objects.
+        entity_ids: list(str). The ids of the entities.
+        section: str. To which section does the entities belong to. Can be
+            'complete' or 'incomplete'.
+        sub_section: str. To which the sub-section do the entities belong to.
+            Can be 'explorations' or 'collections'.
+
+    Returns:
+        list(Summary). A list of summary domain objects.
+        int. The number of none entities in the list.
+    """
+    number_removed = 0
+    index = 0
+    filtered_entity_summary_list = []
+    for summary in entity_summary_list:
+        if summary is None:
+            number_removed = number_removed + 1
+            if section == 'complete':
+                if sub_section == 'explorations':
+                    remove_exp_from_completed_list(user_id, entity_ids[index])
+                elif sub_section == 'collections':
+                    remove_collection_from_completed_list(
+                        user_id, entity_ids[index])
+            elif section == 'incomplete':
+                if sub_section == 'explorations':
+                    remove_exp_from_incomplete_list(user_id, entity_ids[index])
+                elif sub_section == 'collections':
+                    remove_collection_from_incomplete_list(
+                        user_id, entity_ids[index])
+        else:
+            filtered_entity_summary_list.append(summary)
+        index = index + 1
+
+    return filtered_entity_summary_list, number_removed

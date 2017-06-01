@@ -213,8 +213,8 @@ body {
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 3em;
   margin-top: 0px;
-  margin-bottom: 20px;
-  padding-top: 78.5px;
+  margin-bottom: 33px;
+  padding-top: 65.5px;
   text-align: center;
 }
 
@@ -415,6 +415,24 @@ body {
 
   .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
     margin: 0px 2px 0 4px;
+  }
+}
+
+@media (max-width: 380px) {
+  .oppia-learner-dashboard-title-mobile {
+    padding-top: 54.5px;
+  }
+
+  .oppia-learner-dashboard-mascot {
+    margin-top: 335px;
+  }
+
+  .oppia-learner-dashboard-intro-card:before {
+    left: 15em;
+  }
+
+  .oppia-learner-dashboard-intro-card:after {
+    left: 15em;
   }
 }
 

@@ -22,7 +22,7 @@ oppia.constant('LEARNER_DASHBOARD_SECTIONS', {
   SUBSCRIPTIONS: 'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION'
 });
 
-oppia.constant('LEARNER_DASHBOARD_SUB_SECTIONS', {
+oppia.constant('LEARNER_DASHBOARD_SUBSECTIONS', {
   EXPLORATIONS: 'I18N_DASHBOARD_EXPLORATIONS',
   COLLECTIONS: 'I18N_DASHBOARD_COLLECTIONS'
 });
@@ -55,13 +55,13 @@ oppia.controller('LearnerDashboard', [
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'FATAL_ERROR_CODES',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
-  'LEARNER_DASHBOARD_SECTIONS', 'LEARNER_DASHBOARD_SUB_SECTIONS',
+  'LEARNER_DASHBOARD_SECTIONS', 'LEARNER_DASHBOARD_SUBSECTIONS',
   function(
       $scope, $rootScope, $window, $http, $modal, EXPLORATIONS_SORT_BY_KEYS,
       SUBSCRIPTION_SORT_BY_KEYS, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, 
       FATAL_ERROR_CODES, HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
       LearnerDashboardBackendApiService, UrlInterpolationService,
-      LEARNER_DASHBOARD_SECTIONS, LEARNER_DASHBOARD_SUB_SECTIONS) {
+      LEARNER_DASHBOARD_SECTIONS, LEARNER_DASHBOARD_SUBSECTIONS) {
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.SUBSCRIPTION_SORT_BY_KEYS = SUBSCRIPTION_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
@@ -69,7 +69,7 @@ oppia.controller('LearnerDashboard', [
     $scope.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = (
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
     $scope.LEARNER_DASHBOARD_SECTIONS = LEARNER_DASHBOARD_SECTIONS;
-    $scope.LEARNER_DASHBOARD_SUB_SECTIONS = LEARNER_DASHBOARD_SUB_SECTIONS;
+    $scope.LEARNER_DASHBOARD_SUBSECTIONS = LEARNER_DASHBOARD_SUBSECTIONS;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.PAGE_SIZE = 8;
     $scope.Math = window.Math;
@@ -105,46 +105,46 @@ oppia.controller('LearnerDashboard', [
       }
     };
 
-    $scope.goToPreviousPage = function(section, subSection) {
+    $scope.goToPreviousPage = function(section, subsection) {
       if (section === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE) {
-        if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+        if (subsection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS) {
           $scope.startIncompleteExpIndex = Math.max(
             $scope.startIncompleteExpIndex - $scope.PAGE_SIZE, 0);
-        } else if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+        } else if (subsection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS) {
           $scope.startIncompleteCollectionIndex = Math.max(
             $scope.startIncompleteCollectionIndex - $scope.PAGE_SIZE, 0);
         }
       } else if (section === LEARNER_DASHBOARD_SECTIONS.COMPLETED) {
-        if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+        if (subsection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS) {
           $scope.startCompletedExpIndex = Math.max(
             $scope.startCompletedExpIndex - $scope.PAGE_SIZE, 0);
-        } else if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+        } else if (subsection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS) {
           $scope.startCompletedCollectionIndex = Math.max(
             $scope.startCompletedCollectionIndex - $scope.PAGE_SIZE, 0);
         }
       }
     };
 
-    $scope.goToNextPage = function(section, subSection) {
+    $scope.goToNextPage = function(section, subsection) {
       if (section === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE) {
-        if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+        if (subsection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS) {
           if ($scope.startIncompleteExpIndex +
             $scope.PAGE_SIZE <= $scope.incompleteExplorationsList.length) {
             $scope.startIncompleteExpIndex += $scope.PAGE_SIZE;
           }
-        } else if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+        } else if (subsection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS) {
           if ($scope.startIncompleteCollectionIndex +
             $scope.PAGE_SIZE <= $scope.startIncompleteCollectionIndex.length) {
             $scope.startIncompleteCollectionIndex += $scope.PAGE_SIZE;
           }
         }
       } else if (section === LEARNER_DASHBOARD_SECTIONS.COMPLETED) {
-        if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+        if (subsection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS) {
           if ($scope.startCompletedExpIndex +
             $scope.PAGE_SIZE <= $scope.startCompletedExpIndex.length) {
             $scope.startCompletedExpIndex += $scope.PAGE_SIZE;
           }
-        } else if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+        } else if (subsection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS) {
           if ($scope.startCompletedCollectionIndex +
             $scope.PAGE_SIZE <= $scope.startCompletedCollectionIndex.length) {
             $scope.startCompletedCollectionIndex += $scope.PAGE_SIZE;
@@ -216,14 +216,14 @@ oppia.controller('LearnerDashboard', [
 
             $scope.remove = function() {
               /* eslint-disable max-len */
-              if (subSectionName === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+              if (subSectionName === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS) {
               /*eslint-enable */
                 $http.post(
                   '/learner_dashboard/remove_in_progress_exploration', {
                     exploration_id: entity.id
                   });
               } else if (
-                subSectionName === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+                subSectionName === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS) {
                 $http.post('/learner_dashboard/remove_in_progress_collection', {
                   collection_id: entity.id
                 });
@@ -237,19 +237,19 @@ oppia.controller('LearnerDashboard', [
           }
         ]
       }).result.then(function() {
-        if (subSectionName === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+        if (subSectionName === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS) {
           var index = $scope.incompleteExplorationsList.indexOf(entity);
           if (index !== -1) {
             $scope.incompleteExplorationsList.splice(index, 1);
           }
         } else if (
-          subSectionName === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+          subSectionName === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS) {
           var index = $scope.incompleteCollectionsList.indexOf(entity);
           if (index !== -1) {
             $scope.incompleteCollectionsList.splice(index, 1);
           }
         }
-      })
+      });
     }
 
     $rootScope.loadingMessage = 'Loading';
@@ -295,7 +295,7 @@ oppia.controller('LearnerDashboard', [
         );
 
         $scope.activeSection = LEARNER_DASHBOARD_SECTIONS.INCOMPLETE;
-        $scope.activeSubSection = LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS;
+        $scope.activeSubSection = LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS;
 
         $scope.noActivity = (
           ($scope.completedExplorationsList.length === 0) &&

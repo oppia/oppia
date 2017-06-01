@@ -61,7 +61,7 @@
           <p class="oppia-learner-dashboard-intro-card-message" style="padding-top: 6px;"
              translate="I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE">
           </p>
-          <p class="oppia-learner-dashboard-intro-card-message" style="padding-top: 9px;"
+          <p class="oppia-learner-dashboard-intro-card-message" style="padding-top: 15px;"
              translate="I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_TWO">
           </p>
           <a class="btn oppia-learner-dashboard-intro-button oppia-transition-200"
@@ -93,14 +93,14 @@
           </h4>
           <div ng-show="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE" class="menu-sub-section">
             <div class="oppia-learner-dashboard-submenu"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">
             </div>
             <div id="completedSection"
                  class="oppia-learner-dashboard-submenu"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)"
                  translate="I18N_DASHBOARD_COLLECTIONS">
             </div>
           </div>
@@ -112,14 +112,14 @@
           </h4>
           <div ng-show="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED" class="menu-sub-section">
             <div class="oppia-learner-dashboard-submenu"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">
             </div>
             <div id="completedSection"
                  class="oppia-learner-dashboard-submenu"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)"
                  translate="I18N_DASHBOARD_COLLECTIONS">
             </div>
           </div>
@@ -146,7 +146,7 @@
 
           <span class="sort-explorations-select oppia-learner-dashboard-sort"
                 ng-class="{'oppia-learner-dashboard-sort-mobile': checkMobileView()}"
-                ng-if="activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS && ((activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && completedExplorationsList.length !== 0) || (activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && incompleteExplorationsList.length !== 0))">
+                ng-if="activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS && ((activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && completedExplorationsList.length !== 0) || (activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && incompleteExplorationsList.length !== 0))">
             <p class="sort-by-text" style="margin-top: 0;">Sort By</p>
             <select ng-model="currentExpSortType"
                     class="sort-options"
@@ -178,7 +178,7 @@
           </span>
         </div>
         <div class="oppia-learner-dashboard-main-content-container">
-          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS">
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteExplorations !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATION"
@@ -226,13 +226,13 @@
             <div class="oppia-learner-dashboard-page-portfolio"
                  ng-if="incompleteExplorationsList.length > 8">
               <i class="material-icons md-18"
-                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)">&#xE5C4;</i>
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)">&#xE5C4;</i>
               Showing <[startIncompleteExpIndex + 1]> - <[Math.min(startIncompleteExpIndex + PAGE_SIZE, incompleteExplorationsList.length)]> of <[incompleteExplorationsList.length]>
-              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)">&#xE5C8;</i>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)">&#xE5C8;</i>
             </div>
           </div>
 
-          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS">
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCompletedExplorations !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATION"
@@ -273,13 +273,13 @@
             <div class="oppia-learner-dashboard-page-portfolio"
                  ng-if="completedExplorationsList.length > 8">
               <i class="material-icons md-18"
-                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)">&#xE5C4;</i>
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)">&#xE5C4;</i>
               Showing <[startCompletedExpIndex + 1]> - <[Math.min(startCompletedExpIndex + PAGE_SIZE, completedExplorationsList.length)]> of <[completedExplorationsList.length]>
-              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)">&#xE5C8;</i>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)">&#xE5C8;</i>
             </div>
           </div>
 
-          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS">
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteCollections !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTION"
@@ -325,12 +325,12 @@
             <div class="oppia-learner-dashboard-page-portfolio"
                  ng-if="incompleteCollectionsList.length > 8">
               <i class="material-icons md-18"
-                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)">&#xE5C4;</i>
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)">&#xE5C4;</i>
               Showing <[startIncompleteCollectionIndex + 1]> - <[Math.min(startIncompleteCollectionIndex + PAGE_SIZE, incompleteCollectionsList.length)]> of <[incompleteCollectionsList.length]>
-              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)">&#xE5C8;</i>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)">&#xE5C8;</i>
             </div>
           </div>
-          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS">
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="completedToIncompleteCollections.length !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS"
@@ -381,9 +381,9 @@
             <div class="oppia-learner-dashboard-page-portfolio"
                  ng-if="completedCollectionsList.length > 8">
               <i class="material-icons md-18"
-                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)">&#xE5C4;</i>
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)">&#xE5C4;</i>
               Showing <[startCompletedCollectionIndex + 1]> - <[Math.min(startCompletedCollectionIndex + PAGE_SIZE, completedCollectionsList.length)]> of <[completedCollectionsList.length]>
-              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.COMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)">&#xE5C8;</i>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.COMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)">&#xE5C8;</i>
             </div>
           </div>
 

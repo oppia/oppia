@@ -288,80 +288,63 @@ class LearnerDashboardHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        incomplete_exploration_summaries = []
         incomplete_exploration_ids = (
             learner_progress_services.get_all_incomplete_exp_ids(self.user_id))
+        incomplete_exploration_summaries, number_of_deleted_incomplete_explorations = ( # pylint: disable=line-too-long
+            learner_progress_services.remove_none_entities_from_list(
+                self.user_id,
+                exp_services.get_exploration_summaries_matching_ids(
+                    incomplete_exploration_ids),
+                incomplete_exploration_ids, 'incomplete', 'explorations'))
 
-        index = 0
-        number_of_deleted_incomplete_explorations = 0
-        for summary in exp_services.get_exploration_summaries_matching_ids(
-                incomplete_exploration_ids):
-            if summary is not None:
-                incomplete_exploration_summaries.append(summary)
-            else:
-                number_of_deleted_incomplete_explorations += 1
-                learner_progress_services.remove_exp_from_incomplete_list(
-                    self.user_id, incomplete_exploration_ids[index])
-            index = index + 1
-
-        completed_exploration_summaries = []
         completed_exploration_ids = (
             learner_progress_services.get_all_completed_exp_ids(self.user_id))
+        completed_exploration_summaries, number_of_deleted_completed_explorations = ( # pylint: disable=line-too-long
+            learner_progress_services.remove_none_entities_from_list(
+                self.user_id,
+                exp_services.get_exploration_summaries_matching_ids(
+                    completed_exploration_ids),
+                completed_exploration_ids, 'complete', 'explorations'))
 
-        index = 0
-        number_of_deleted_completed_explorations = 0
-        for summary in exp_services.get_exploration_summaries_matching_ids(
-                completed_exploration_ids):
-            if summary is not None:
-                completed_exploration_summaries.append(summary)
-            else:
-                number_of_deleted_completed_explorations += 1
-                learner_progress_services.remove_exp_from_completed_list(
-                    self.user_id, completed_exploration_ids[index])
-            index = index + 1
-
-        completed_collection_summaries = []
+        outdated_incomplete_collection_ids = (
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id))[:]
         completed_collection_ids = (
             learner_progress_services.get_all_completed_collection_ids(
                 self.user_id))
-
-        index = 0
-        number_of_deleted_completed_collections = 0
-        completed_to_incomplete_collections = []
-        for summary in collection_services.get_collection_summaries_matching_ids( # pylint: disable=line-too-long
-                completed_collection_ids):
-            if summary is not None:
-                if collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
-                        self.user_id, summary.id):
-                    learner_progress_services.remove_collection_from_completed_list( # pylint: disable=line-too-long
-                        self.user_id, summary.id)
-                    learner_progress_services.mark_collection_as_incomplete(
-                        self.user_id, summary.id)
-                    completed_to_incomplete_collections.append(summary.title)
-                else:
-                    completed_collection_summaries.append(summary)
-            else:
-                number_of_deleted_completed_collections += 1
-                learner_progress_services.remove_collection_from_completed_list(
-                    self.user_id, completed_collection_ids[index])
-            index = index + 1
-
-        incomplete_collection_summaries = []
-        incomplete_collection_ids = (
+        updated_incomplete_collection_ids = (
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id))
 
-        index = 0
-        number_of_deleted_incomplete_collections = 0
-        for summary in collection_services.get_collection_summaries_matching_ids( # pylint: disable=line-too-long
-                incomplete_collection_ids):
-            if summary is not None:
-                incomplete_collection_summaries.append(summary)
-            else:
-                number_of_deleted_incomplete_collections += 1
-                learner_progress_services.remove_collection_from_incomplete_list( # pylint: disable=line-too-long
-                    self.user_id, incomplete_collection_ids[index])
-            index = index + 1
+        completed_to_incomplete_collections = []
+        # Get the collections that were updated to have new explorations.
+        completed_to_incomplete_collection_ids = (
+            set(outdated_incomplete_collection_ids).symmetric_difference(
+                updated_incomplete_collection_ids))
+
+        collection_titles_and_categories = (
+            collection_services.get_collection_titles_and_categories(
+                list(completed_to_incomplete_collection_ids)))
+        for collection_id in collection_titles_and_categories:
+            completed_to_incomplete_collections.append(
+                collection_titles_and_categories[collection_id]['title'])
+
+        completed_collection_summaries, number_of_deleted_completed_collections = ( # pylint: disable=line-too-long
+            learner_progress_services.remove_none_entities_from_list(
+                self.user_id,
+                collection_services.get_collection_summaries_matching_ids(
+                    completed_collection_ids),
+                completed_collection_ids, 'complete', 'collections'))
+
+        updated_incomplete_collection_ids = (
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id))
+        incomplete_collection_summaries, number_of_deleted_incomplete_collections = ( # pylint: disable=line-too-long
+            learner_progress_services.remove_none_entities_from_list(
+                self.user_id,
+                collection_services.get_collection_summaries_matching_ids(
+                    updated_incomplete_collection_ids),
+                updated_incomplete_collection_ids, 'incomplete', 'collections'))
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
