@@ -129,6 +129,7 @@
 	"I18N_PREFERENCES_BREADCRUMB": "Настройки",
 	"I18N_PREFERENCES_CANCEL_BUTTON": "Отмена",
 	"I18N_PREFERENCES_EMAIL": "Электронная почта",
+	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Только модераторы и администраторы сайта могут увидеть Вашу электронную почту.",
 	"I18N_PREFERENCES_HEADING": "Настройки",
 	"I18N_PREFERENCES_PAGE_TITLE": "Изменить свой профиль предпочтений - Oppia",
 	"I18N_PREFERENCES_PICTURE": "Изображение",
