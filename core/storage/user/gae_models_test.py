@@ -77,6 +77,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_object, None)
 
+
 class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     """Tests for the ExplorationUserDataModel class."""
 
