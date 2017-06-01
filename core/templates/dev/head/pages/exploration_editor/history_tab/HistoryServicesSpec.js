@@ -174,7 +174,7 @@ describe('Compare versions service', function() {
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(function() {
       mockExplorationData = {
-        explorationId: 0
+        explorationId: '0'
       };
       module(function($provide) {
         $provide.value('explorationData', mockExplorationData);
@@ -200,9 +200,7 @@ describe('Compare versions service', function() {
     // Only information accessed by getDiffGraphData is included in the return
     // value
     var _getStatesData = function(statesDetails) {
-      var statesData = {
-        states: {}
-      };
+      var statesData = {};
       for (var stateName in statesDetails) {
         var newStateData = {
           content: [{
@@ -232,9 +230,13 @@ describe('Compare versions service', function() {
               correct: false
             };
           });
-        statesData.states[stateName] = newStateData;
+        statesData[stateName] = newStateData;
       }
-      return statesData;
+      return {
+        exploration: {
+          states: statesData
+        }
+      };
     };
 
     var testSnapshots1 = [{
@@ -477,15 +479,16 @@ describe('Compare versions service', function() {
 
     // Tests for getDiffGraphData on linear commits
     it('should detect changed, renamed and added states', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=1')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
         .respond(_getStatesData(testExplorationData1[0]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=7')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=7')
         .respond(_getStatesData(testExplorationData1[6]));
       vts.init(testSnapshots1);
       var nodeData = null;
       cvs.getDiffGraphData(1, 7).then(function(data) {
         nodeData = data.nodes;
       });
+
       $httpBackend.flush();
       expect(nodeData).toEqual({
         1: {
@@ -503,9 +506,9 @@ describe('Compare versions service', function() {
 
     it('should add new state with same name as old name of renamed state',
       function() {
-        $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+        $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
           .respond(_getStatesData(testExplorationData1[4]));
-        $httpBackend.expect('GET', '/createhandler/data/0?v=8')
+        $httpBackend.expect('GET', '/explorehandler/init/0?v=8')
           .respond(_getStatesData(testExplorationData1[7]));
         vts.init(testSnapshots1);
         var nodeData = null;
@@ -534,9 +537,9 @@ describe('Compare versions service', function() {
     );
 
     it('should not include added, then deleted state', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=7')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=7')
         .respond(_getStatesData(testExplorationData1[6]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=9')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=9')
         .respond(_getStatesData(testExplorationData1[8]));
       vts.init(testSnapshots1);
       var nodeData = null;
@@ -559,9 +562,9 @@ describe('Compare versions service', function() {
     });
 
     it('should mark deleted then added states as changed', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=8')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=8')
         .respond(_getStatesData(testExplorationData1[7]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=10')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=10')
         .respond(_getStatesData(testExplorationData1[9]));
       vts.init(testSnapshots1);
       var nodeData = null;
@@ -589,9 +592,9 @@ describe('Compare versions service', function() {
     });
 
     it('should mark renamed then deleted states as deleted', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=11')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=11')
         .respond(_getStatesData(testExplorationData1[10]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=13')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=13')
         .respond(_getStatesData(testExplorationData1[12]));
       vts.init(testSnapshots1);
       var nodeData = null;
@@ -620,9 +623,9 @@ describe('Compare versions service', function() {
 
     it('should mark changed state as unchanged when name and content is same' +
        'on both versions', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=1')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
         .respond(_getStatesData(testExplorationData1[0]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=11')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=11')
         .respond(_getStatesData(testExplorationData1[10]));
       vts.init(testSnapshots1);
       var nodeData = null;
@@ -651,9 +654,9 @@ describe('Compare versions service', function() {
 
     it('should mark renamed state as not renamed when name is same on both ' +
        'versions', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=2')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=2')
         .respond(_getStatesData(testExplorationData1[1]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=4')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=4')
         .respond(_getStatesData(testExplorationData1[3]));
       vts.init(testSnapshots1);
       var nodeData = null;
@@ -672,9 +675,9 @@ describe('Compare versions service', function() {
 
     it('should mark states correctly when a series of changes are applied',
       function() {
-        $httpBackend.expect('GET', '/createhandler/data/0?v=1')
+        $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
           .respond(_getStatesData(testExplorationData1[0]));
-        $httpBackend.expect('GET', '/createhandler/data/0?v=13')
+        $httpBackend.expect('GET', '/explorehandler/init/0?v=13')
           .respond(_getStatesData(testExplorationData1[12]));
         vts.init(testSnapshots1);
         var nodeData = null;
@@ -843,9 +846,9 @@ describe('Compare versions service', function() {
 
     // Tests for getDiffGraphData with reversions
     it('should mark states correctly when there is 1 reversion', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=1')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
         .respond(_getStatesData(testExplorationData2[0]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
         .respond(_getStatesData(testExplorationData2[4]));
       vts.init(testSnapshots2);
       var nodeData = null;
@@ -864,9 +867,9 @@ describe('Compare versions service', function() {
 
     it('should mark states correctly when there is 1 reversion to before v1',
       function() {
-        $httpBackend.expect('GET', '/createhandler/data/0?v=3')
+        $httpBackend.expect('GET', '/explorehandler/init/0?v=3')
           .respond(_getStatesData(testExplorationData2[2]));
-        $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+        $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
           .respond(_getStatesData(testExplorationData2[4]));
         vts.init(testSnapshots2);
         var nodeData = null;
@@ -891,9 +894,9 @@ describe('Compare versions service', function() {
 
     it('should mark states correctly when compared version is a reversion',
       function() {
-        $httpBackend.expect('GET', '/createhandler/data/0?v=4')
+        $httpBackend.expect('GET', '/explorehandler/init/0?v=4')
           .respond(_getStatesData(testExplorationData2[3]));
-        $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+        $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
           .respond(_getStatesData(testExplorationData2[4]));
         vts.init(testSnapshots2);
         var nodeData = null;
@@ -917,9 +920,9 @@ describe('Compare versions service', function() {
     );
 
     it('should mark states correctly when there are 2 reversions', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
         .respond(_getStatesData(testExplorationData2[4]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=8')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=8')
         .respond(_getStatesData(testExplorationData2[7]));
       vts.init(testSnapshots2);
       cvs.getDiffGraphData(5, 8).then(function(data) {
@@ -1124,9 +1127,9 @@ describe('Compare versions service', function() {
     }];
 
     it('should correctly display added links', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=1')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
         .respond(_getStatesData(testExplorationData3[0]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=2')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=2')
         .respond(_getStatesData(testExplorationData3[1]));
       vts.init(testSnapshots3);
       var linkData = null;
@@ -1146,9 +1149,9 @@ describe('Compare versions service', function() {
     });
 
     it('should correctly display deleted links', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
         .respond(_getStatesData(testExplorationData3[4]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=6')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=6')
         .respond(_getStatesData(testExplorationData3[5]));
       vts.init(testSnapshots3);
       var linkData = null;
@@ -1180,9 +1183,9 @@ describe('Compare versions service', function() {
     });
 
     it('should correctly display links on renamed states', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=3')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=3')
         .respond(_getStatesData(testExplorationData3[2]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
         .respond(_getStatesData(testExplorationData3[4]));
       vts.init(testSnapshots3);
       var linkData = null;
@@ -1214,9 +1217,9 @@ describe('Compare versions service', function() {
     });
 
     it('should correctly display added, then deleted links', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=2')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=2')
         .respond(_getStatesData(testExplorationData3[1]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=7')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=7')
         .respond(_getStatesData(testExplorationData3[6]));
       vts.init(testSnapshots3);
       var linkData = null;
@@ -1236,9 +1239,9 @@ describe('Compare versions service', function() {
     });
 
     it('should correctly display deleted, then added links', function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=6')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=6')
         .respond(_getStatesData(testExplorationData3[5]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=8')
+      $httpBackend.expect('GET', '/explorehandler/init/0?v=8')
         .respond(_getStatesData(testExplorationData3[7]));
       vts.init(testSnapshots3);
       var linkData = null;

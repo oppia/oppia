@@ -18,131 +18,136 @@
  * and also delete the collection node represented by this directive.
  */
 
-oppia.directive('collectionNodeEditor', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      getCollectionNode: '&collectionNode',
-      getLinearIndex: '&linearIndex'
-    },
-    templateUrl: 'inline/collection_node_editor_directive',
-    controller: [
-      '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
-      'CollectionUpdateService', 'alertsService',
-      function(
-          $scope, CollectionEditorStateService, CollectionLinearizerService,
-          CollectionUpdateService, alertsService) {
-        $scope.collection = CollectionEditorStateService.getCollection();
+oppia.directive('collectionNodeEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        getCollectionNode: '&collectionNode',
+        getLinearIndex: '&linearIndex'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/editor_tab/' +
+        'collection_node_editor_directive.html'),
+      controller: [
+        '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
+        'CollectionUpdateService', 'alertsService',
+        function(
+            $scope, CollectionEditorStateService, CollectionLinearizerService,
+            CollectionUpdateService, alertsService) {
+          $scope.collection = CollectionEditorStateService.getCollection();
 
-        var _addSkill = function(skillList, newSkillName) {
-          // Ensure the user entered a skill name.
-          if (!newSkillName) {
-            alertsService.addWarning('Cannot add empty skill to collection.');
-            return false;
-          } else if (!skillList.addSkill(newSkillName)) {
-            alertsService.addWarning(
-              'Skill is already added: ' + newSkillName);
-            return false;
-          }
-          return true;
-        };
+          var _addSkill = function(skillList, newSkillName) {
+            // Ensure the user entered a skill name.
+            if (!newSkillName) {
+              alertsService.addWarning('Cannot add empty skill to collection.');
+              return false;
+            } else if (!skillList.addSkill(newSkillName)) {
+              alertsService.addWarning(
+                'Skill is already added: ' + newSkillName);
+              return false;
+            }
+            return true;
+          };
 
-        var _copyPrerequisiteSkillList = function() {
-          var collectionNode = $scope.getCollectionNode();
-          return angular.copy(collectionNode.getPrerequisiteSkillList());
-        };
+          var _copyPrerequisiteSkillList = function() {
+            var collectionNode = $scope.getCollectionNode();
+            return angular.copy(collectionNode.getPrerequisiteSkillList());
+          };
 
-        var _copyAcquiredSkillList = function() {
-          var collectionNode = $scope.getCollectionNode();
-          return angular.copy(collectionNode.getAcquiredSkillList());
-        };
+          var _copyAcquiredSkillList = function() {
+            var collectionNode = $scope.getCollectionNode();
+            return angular.copy(collectionNode.getAcquiredSkillList());
+          };
 
-        // Adds a prerequisite skill to the frontend collection object and also
-        // updates the changelist.
-        $scope.addNewPrerequisiteSkill = function() {
-          var collectionNode = $scope.getCollectionNode();
-          var prerequisiteSkillList = _copyPrerequisiteSkillList();
-          if (!_addSkill(prerequisiteSkillList, $scope.prerequisiteSkillName)) {
-            return;
-          }
-          CollectionUpdateService.setPrerequisiteSkills(
-            $scope.collection, collectionNode.getExplorationId(),
-            prerequisiteSkillList.getSkills());
-          $scope.prerequisiteSkillName = '';
-        };
+          // Adds a prerequisite skill to the frontend collection object
+          // and also updates the changelist.
+          $scope.addNewPrerequisiteSkill = function() {
+            var collectionNode = $scope.getCollectionNode();
+            var prerequisiteSkillList = _copyPrerequisiteSkillList();
+            if (
+              !_addSkill(prerequisiteSkillList, $scope.prerequisiteSkillName)
+              ) {
+              return;
+            }
+            CollectionUpdateService.setPrerequisiteSkills(
+              $scope.collection, collectionNode.getExplorationId(),
+              prerequisiteSkillList.getSkills());
+            $scope.prerequisiteSkillName = '';
+          };
 
-        // Removes a prerequisite skill from the frontend collection object and
-        // also updates the changelist.
-        $scope.removePrerequisiteSkill = function(index) {
-          var collectionNode = $scope.getCollectionNode();
-          var prerequisiteSkillList = _copyPrerequisiteSkillList();
-          prerequisiteSkillList.removeSkillByIndex(index);
-          CollectionUpdateService.setPrerequisiteSkills(
-            $scope.collection, collectionNode.getExplorationId(),
-            prerequisiteSkillList.getSkills());
-        };
+          // Removes a prerequisite skill from the frontend collection object
+          // and also updates the changelist.
+          $scope.removePrerequisiteSkill = function(index) {
+            var collectionNode = $scope.getCollectionNode();
+            var prerequisiteSkillList = _copyPrerequisiteSkillList();
+            prerequisiteSkillList.removeSkillByIndex(index);
+            CollectionUpdateService.setPrerequisiteSkills(
+              $scope.collection, collectionNode.getExplorationId(),
+              prerequisiteSkillList.getSkills());
+          };
 
-        // Adds an acquired skill to the frontend collection object and also
-        // updates the changelist.
-        $scope.addNewAcquiredSkill = function() {
-          var collectionNode = $scope.getCollectionNode();
-          var acquiredSkillList = _copyAcquiredSkillList();
-          if (!_addSkill(acquiredSkillList, $scope.acquiredSkillName)) {
-            return;
-          }
-          CollectionUpdateService.setAcquiredSkills(
-            $scope.collection, collectionNode.getExplorationId(),
-            acquiredSkillList.getSkills());
-          $scope.acquiredSkillName = '';
-        };
+          // Adds an acquired skill to the frontend collection object and also
+          // updates the changelist.
+          $scope.addNewAcquiredSkill = function() {
+            var collectionNode = $scope.getCollectionNode();
+            var acquiredSkillList = _copyAcquiredSkillList();
+            if (!_addSkill(acquiredSkillList, $scope.acquiredSkillName)) {
+              return;
+            }
+            CollectionUpdateService.setAcquiredSkills(
+              $scope.collection, collectionNode.getExplorationId(),
+              acquiredSkillList.getSkills());
+            $scope.acquiredSkillName = '';
+          };
 
-        // Removes an acquired skill from the frontend collection object and
-        // also updates the changelist.
-        $scope.removeAcquiredSkill = function(index) {
-          var collectionNode = $scope.getCollectionNode();
-          var acquiredSkillList = _copyAcquiredSkillList();
-          acquiredSkillList.removeSkillByIndex(index);
-          CollectionUpdateService.setAcquiredSkills(
-            $scope.collection, collectionNode.getExplorationId(),
-            acquiredSkillList.getSkills());
-        };
+          // Removes an acquired skill from the frontend collection object and
+          // also updates the changelist.
+          $scope.removeAcquiredSkill = function(index) {
+            var collectionNode = $scope.getCollectionNode();
+            var acquiredSkillList = _copyAcquiredSkillList();
+            acquiredSkillList.removeSkillByIndex(index);
+            CollectionUpdateService.setAcquiredSkills(
+              $scope.collection, collectionNode.getExplorationId(),
+              acquiredSkillList.getSkills());
+          };
 
-        // Deletes this collection node from the frontend collection object and
-        // also updates the changelist.
-        $scope.deleteNode = function() {
-          var explorationId = $scope.getCollectionNode().getExplorationId();
-          if (!CollectionLinearizerService.removeCollectionNode(
-              $scope.collection, explorationId)) {
-            alertsService.fatalWarning(
-              'Internal collection editor error. Could not delete ' +
-              'exploration by ID: ' + explorationId);
-          }
-        };
+          // Deletes this collection node from the frontend collection
+          // object and also updates the changelist.
+          $scope.deleteNode = function() {
+            var explorationId = $scope.getCollectionNode().getExplorationId();
+            if (!CollectionLinearizerService.removeCollectionNode(
+                $scope.collection, explorationId)) {
+              alertsService.fatalWarning(
+                'Internal collection editor error. Could not delete ' +
+                'exploration by ID: ' + explorationId);
+            }
+          };
 
-        // Shifts this collection node left in the linearized list of the
-        // collection, if possible.
-        $scope.shiftNodeLeft = function() {
-          var explorationId = $scope.getCollectionNode().getExplorationId();
-          if (!CollectionLinearizerService.shiftNodeLeft(
-              $scope.collection, explorationId)) {
-            alertsService.fatalWarning(
-              'Internal collection editor error. Could not shift node left ' +
-              'with ID: ' + explorationId);
-          }
-        };
+          // Shifts this collection node left in the linearized list of the
+          // collection, if possible.
+          $scope.shiftNodeLeft = function() {
+            var explorationId = $scope.getCollectionNode().getExplorationId();
+            if (!CollectionLinearizerService.shiftNodeLeft(
+                $scope.collection, explorationId)) {
+              alertsService.fatalWarning(
+                'Internal collection editor error. Could not shift node left ' +
+                'with ID: ' + explorationId);
+            }
+          };
 
-        // Shifts this collection node right in the linearized list of the
-        // collection, if possible.
-        $scope.shiftNodeRight = function() {
-          var explorationId = $scope.getCollectionNode().getExplorationId();
-          if (!CollectionLinearizerService.shiftNodeRight(
-              $scope.collection, explorationId)) {
-            alertsService.fatalWarning(
-              'Internal collection editor error. Could not shift node right ' +
-              'with ID: ' + explorationId);
-          }
-        };
-      }
-    ]
-  };
-}]);
+          // Shifts this collection node right in the linearized list of the
+          // collection, if possible.
+          $scope.shiftNodeRight = function() {
+            var explorationId = $scope.getCollectionNode().getExplorationId();
+            if (!CollectionLinearizerService.shiftNodeRight(
+                $scope.collection, explorationId)) {
+              alertsService.fatalWarning(
+                'Internal collection editor error. Could not shift node ' +
+                'right with ID: ' + explorationId);
+            }
+          };
+        }
+      ]
+    };
+  }]);

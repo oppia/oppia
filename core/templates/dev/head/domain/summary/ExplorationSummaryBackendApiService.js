@@ -19,9 +19,25 @@
 
 oppia.factory('ExplorationSummaryBackendApiService', [
   '$http', '$q', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-  function($http, $q, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
-    var _fetchExpSummaries = function(explorationIds,
-      includePrivateExplorations, successCallback, errorCallback) {
+  'validatorsService', 'alertsService',
+  function(
+      $http, $q, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
+      validatorsService, alertsService) {
+    var _fetchExpSummaries = function(
+        explorationIds, includePrivateExplorations, successCallback,
+        errorCallback) {
+      if (!explorationIds.every(validatorsService.isValidExplorationId)) {
+        alertsService.addWarning('Please enter a valid exploration ID.');
+
+        var deferred = $q.defer();
+        var returnValue = [];
+        for (var i = 0; i < explorationIds.length; i++) {
+          returnValue.push(null);
+        }
+        deferred.resolve(returnValue);
+        return deferred.promise;
+      }
+
       var explorationSummaryDataUrl = EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
 
       $http.get(explorationSummaryDataUrl, {

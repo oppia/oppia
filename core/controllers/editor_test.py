@@ -296,6 +296,7 @@ class EditorTest(BaseEditorControllerTest):
             self.assertEqual(
                 response_dict['unhandled_answers'],
                 _create_training_data('joyful', 'sad'))
+            self.assertTrue(exploration_dict['version'])
 
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.
@@ -657,7 +658,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
         def add_logging_info(msg, *_):
             # Message logged by function clear_all_pending() in
-            # oppia_tools/google_appengine_1.9.19/google_appengine/google/
+            # oppia_tools/google_appengine_1.9.50/google_appengine/google/
             # appengine/ext/ndb/tasklets.py, not to be checked here.
             log_from_google_app_engine = 'all_pending: clear %s'
 

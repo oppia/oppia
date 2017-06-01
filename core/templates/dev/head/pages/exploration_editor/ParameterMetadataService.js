@@ -163,16 +163,17 @@ oppia.factory('parameterMetadataService', [
             allParamNames.push(expParamMetadataItem.paramName);
           }
         });
-        for (var stateName in states) {
+
+        states.getStateNames().forEach(function(stateName) {
           stateParamMetadatas[stateName] = getStateParamMetadata(
-            states[stateName]);
+            states.getState(stateName));
           for (var i = 0; i < stateParamMetadatas[stateName].length; i++) {
             var pName = stateParamMetadatas[stateName][i].paramName;
             if (allParamNames.indexOf(pName) === -1) {
               allParamNames.push(pName);
             }
           }
-        }
+        });
 
         // For each parameter, do a BFS to see if it's possible to get from
         // the start node to a node requiring this parameter, without passing

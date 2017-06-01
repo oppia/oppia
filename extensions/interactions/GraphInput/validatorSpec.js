@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveGraphInputValidator', function() {
-  var WARNING_TYPES, validator;
+describe('GraphInputValidationService', function() {
+  var WARNING_TYPES, validatorService;
   var currentState, customizationArguments, answerGroups, goodDefaultOutcome;
 
   beforeEach(function() {
@@ -22,7 +22,7 @@ describe('oppiaInteractiveGraphInputValidator', function() {
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
     WARNING_TYPES = $injector.get('WARNING_TYPES');
-    validator = $injector.get('$filter')('oppiaInteractiveGraphInputValidator');
+    validatorService = $injector.get('GraphInputValidationService');
 
     currentState = 'First State';
     goodDefaultOutcome = {
@@ -48,20 +48,20 @@ describe('oppiaInteractiveGraphInputValidator', function() {
 
     var answerGroup = {
       outcome: goodDefaultOutcome,
-      ruleSpecs: [{
+      rules: [{
         inputs: {
           g: {
             vertices: new Array(10)
           }
         },
-        rule_type: 'IsIsomorphicTo'
+        type: 'IsIsomorphicTo'
       }, {
         inputs: {
           g: {
             vertices: new Array(10)
           }
         },
-        rule_type: 'IsIsomorphicTo'
+        type: 'IsIsomorphicTo'
       }],
       correct: false
     };
@@ -69,7 +69,7 @@ describe('oppiaInteractiveGraphInputValidator', function() {
   }));
 
   it('should be able to perform basic validation', function() {
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
@@ -77,7 +77,8 @@ describe('oppiaInteractiveGraphInputValidator', function() {
 
   it('should expect graph and edit customization arguments', function() {
     expect(function() {
-      validator(currentState, {}, answerGroups, goodDefaultOutcome);
+      validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
     }).toThrow('Expected customization arguments to have properties: ' +
       'graph, canEditEdgeWeight, canEditVertexLabel');
   });
@@ -86,7 +87,7 @@ describe('oppiaInteractiveGraphInputValidator', function() {
     'vertices of 50.',
     function() {
       customizationArguments.graph.value.vertices = new Array(51);
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, answerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -99,10 +100,10 @@ describe('oppiaInteractiveGraphInputValidator', function() {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
     function() {
-      answerGroups[0].ruleSpecs[0].inputs.g.vertices = new Array(11);
-      answerGroups[0].ruleSpecs[1].inputs.g.vertices = new Array(11);
-      answerGroups[1].ruleSpecs[0].inputs.g.vertices = new Array(11);
-      var warnings = validator(
+      answerGroups[0].rules[0].inputs.g.vertices = new Array(11);
+      answerGroups[0].rules[1].inputs.g.vertices = new Array(11);
+      answerGroups[1].rules[0].inputs.g.vertices = new Array(11);
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, answerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -123,7 +124,7 @@ describe('oppiaInteractiveGraphInputValidator', function() {
   it('should verify edge weight edit permissions make sense', function() {
     customizationArguments.graph.value.isWeighted = false;
     customizationArguments.canEditEdgeWeight.value = true;
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -136,7 +137,7 @@ describe('oppiaInteractiveGraphInputValidator', function() {
   it('should verify vertex label edit permissions make sense', function() {
     customizationArguments.graph.value.isLabeled = false;
     customizationArguments.canEditVertexLabel.value = true;
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{

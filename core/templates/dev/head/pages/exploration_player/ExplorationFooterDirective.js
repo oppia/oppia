@@ -17,49 +17,52 @@
  * in exploration player.
  */
 
-oppia.directive('explorationFooter', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      twitterText: '@'
-    },
-    templateUrl: 'components/explorationFooter',
-    controller: [
-      '$scope', '$http', '$log', 'explorationContextService',
-      'UrlInterpolationService', 'ExplorationSummaryBackendApiService',
-      function(
-          $scope, $http, $log, explorationContextService,
-          UrlInterpolationService, ExplorationSummaryBackendApiService) {
-        $scope.explorationId = explorationContextService.getExplorationId();
+oppia.directive('explorationFooter', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        twitterText: '@'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_player/' +
+        'exploration_footer_directive.html'),
+      controller: [
+        '$scope', '$http', '$log', 'explorationContextService',
+        'ExplorationSummaryBackendApiService',
+        function(
+            $scope, $http, $log, explorationContextService,
+            ExplorationSummaryBackendApiService) {
+          $scope.explorationId = explorationContextService.getExplorationId();
 
-        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
-        $scope.contributorNames = [];
+          $scope.contributorNames = [];
 
-        $scope.getTwitterText = function() {
-          return $scope.twitterText;
-        };
+          $scope.getTwitterText = function() {
+            return $scope.twitterText;
+          };
 
-        ExplorationSummaryBackendApiService
-          .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
-          .then(
-            function(summaries) {
-              var summaryBackendObject = null;
-              if (summaries.length > 0) {
-                var contributorSummary = (
-                  summaries[0].human_readable_contributors_summary);
-                $scope.contributorNames = (
-                  Object.keys(contributorSummary).sort(
-                      function(contributorUsername1, contributorUsername2) {
-                        var commitsOfContributor1 = contributorSummary[
-                          contributorUsername1].num_commits;
-                        var commitsOfContributor2 = contributorSummary[
-                          contributorUsername2].num_commits;
-                        return commitsOfContributor2 - commitsOfContributor1;
-                      }));
-              }
-            });
-      }
-    ]
-  };
-}]);
+          ExplorationSummaryBackendApiService
+            .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
+            .then(
+              function(summaries) {
+                var summaryBackendObject = null;
+                if (summaries.length > 0) {
+                  var contributorSummary = (
+                    summaries[0].human_readable_contributors_summary);
+                  $scope.contributorNames = (
+                    Object.keys(contributorSummary).sort(
+                        function(contributorUsername1, contributorUsername2) {
+                          var commitsOfContributor1 = contributorSummary[
+                            contributorUsername1].num_commits;
+                          var commitsOfContributor2 = contributorSummary[
+                            contributorUsername2].num_commits;
+                          return commitsOfContributor2 - commitsOfContributor1;
+                        }));
+                }
+              });
+        }
+      ]
+    };
+  }]);
