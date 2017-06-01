@@ -14,9 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test functions relating to roles and actions"""
-
-import string
+"""Test functions relating to roles and actions."""
 
 from core.domain import role_services
 from core.tests import test_utils
@@ -24,51 +22,34 @@ import feconf
 
 
 class RoleDomainUnitTests(test_utils.GenericTestBase):
-    """Tests for role hierarchy and actions."""
-    HIERARCHY = role_services.ROLE_HIERARCHY
+    """Tests for role PARENT_ROLES and actions."""
+    PARENT_ROLES = role_services.PARENT_ROLES
     ACTIONS = role_services.ROLE_ACTIONS
 
     def test_dicts_have_same_keys(self):
-        """Test that ROLE_HIERARCHY and ROLE_ACTIONS have same keys.
+        """Test that PARENT_ROLES and ROLE_ACTIONS have same keys.
         """
-        self.assertEqual(self.HIERARCHY.keys(), self.ACTIONS.keys())
+        self.assertEqual(
+            set(self.PARENT_ROLES.keys()), set(self.ACTIONS.keys()))
 
     def test_dicts_have_list_value(self):
-        """Test that ROLE_HIERARCHY and ROLE_ACTIONS, both have list as value
+        """Test that PARENT_ROLES and ROLE_ACTIONS, both have list as value
         to all the keys.
         """
-        for role_name in self.HIERARCHY:
-            self.assertTrue(isinstance(self.HIERARCHY[role_name], list))
+        for role_name in self.PARENT_ROLES:
+            self.assertTrue(isinstance(self.PARENT_ROLES[role_name], list))
 
         for role_name in self.ACTIONS:
             self.assertTrue(isinstance(self.ACTIONS[role_name], list))
 
-    def test_valid_names(self):
-        """Strings with UPPERCASE alphabets and underscores are allowed. This
-        test checks whether all entries comply with this rule.
-        """
-
-        def valid_character(character):
-            if (character in string.ascii_uppercase) or (character == '_'):
-                return True
-            return False
-
-        for role_name in self.HIERARCHY:
-            for character in role_name:
-                self.assertTrue(valid_character(character))
-
-            for action_name in self.HIERARCHY[role_name]:
-                for character in action_name:
-                    self.assertTrue(valid_character(character))
-
     def test_every_dict_entry_is_string(self):
-        """Test that all keys and values(elements in lists) in ROLE_HIERARCHY
+        """Test that all keys and values(elements in lists) in PARENT_ROLES
         and ROLE_ACTIONS are string.
         """
-        for role_name in self.HIERARCHY:
+        for role_name in self.PARENT_ROLES:
             self.assertTrue(isinstance(role_name, str))
 
-            for role in self.HIERARCHY[role_name]:
+            for role in self.PARENT_ROLES[role_name]:
                 self.assertTrue(isinstance(role, str))
 
         for role_name in self.ACTIONS:
@@ -79,12 +60,12 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
 
     def test_valid_parents(self):
         """Test that all the roles present in value list for any key in
-        ROLE_HIERARCHY are valid(i.e there exists a key with that name).
+        PARENT_ROLES are valid(i.e there exists a key with that name).
         """
-        valid_roles = self.HIERARCHY.keys()
+        valid_roles = self.PARENT_ROLES.keys()
 
-        for role_name in self.HIERARCHY:
-            for role in self.HIERARCHY[role_name]:
+        for role_name in self.PARENT_ROLES:
+            for role in self.PARENT_ROLES[role_name]:
                 self.assertIn(role, valid_roles)
 
     def test_that_role_graph_has_no_directed_cycles(self):
@@ -106,20 +87,20 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
                 self.assertNotEqual(role, source)
                 if role not in visited:
                     visited.add(role)
-                    check_cycle(source, self.HIERARCHY[role])
+                    check_cycle(source, self.PARENT_ROLES[role])
 
             return
 
-        for role_name in self.HIERARCHY:
+        for role_name in self.PARENT_ROLES:
             visited = set()
-            check_cycle(role_name, self.HIERARCHY[role_name])
+            check_cycle(role_name, self.PARENT_ROLES[role_name])
 
     def test_get_all_actions(self):
         """Test that get_all_actions is working correctly."""
 
         # Case when wrong input is given.
         with self.assertRaisesRegexp(
-            Exception, "no role with name TEST_ROLE exists."):
+            Exception, 'Role TEST_ROLE does not exist.'):
             role_services.get_all_actions('TEST_ROLE')
 
         # Case for collection editor is checked.
@@ -129,6 +110,7 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
             set(role_services.ROLE_ACTIONS[feconf.ROLE_GUEST]) |
             set(role_services.ROLE_ACTIONS[feconf.ROLE_COLLECTION_EDITOR]))
 
-        self.assertEqual(collection_editor_actions,
-                         role_services.get_all_actions(
-                             feconf.ROLE_COLLECTION_EDITOR))
+        # Sets are compared as their element order don't need to be same.
+        self.assertEqual(set(collection_editor_actions),
+                         set(role_services.get_all_actions(
+                             feconf.ROLE_COLLECTION_EDITOR)))

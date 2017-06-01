@@ -32,12 +32,13 @@ import feconf
 #   corresponding to 'COLLECTION_EDITOR'.}
 #
 # NOTE FOR DEVELOPERS:
-# TODO(1995YogeshSharma): Add a link to the Playbook below.
-# - Follow the Playbook in wiki before making any changes to this dict.
+# - Follow the Playbook in wiki(https://github.com/oppia/oppia/wiki/
+#   Instructions-for-editing-roles-or-actions) before making any changes to
+#   this dict.
 #
 # CAUTION: Before removing any role from this dict, please ensure that there is
 #          no existing user with that role.
-ROLE_HIERARCHY = {
+PARENT_ROLES = {
     feconf.ROLE_ADMIN: [feconf.ROLE_MODERATOR],
     feconf.ROLE_BANNED_USER: [feconf.ROLE_GUEST],
     feconf.ROLE_COLLECTION_EDITOR: [feconf.ROLE_EXPLORATION_EDITOR],
@@ -54,7 +55,9 @@ ROLE_HIERARCHY = {
 #   value -> list of unique actions.
 #
 # NOTE FOR DEVELOPERS :
-# - Follow the Playbook in wiki before making any changes to this dict.
+# - Follow the Playbook in wiki(https://github.com/oppia/oppia/wiki/
+#   Instructions-for-editing-roles-or-actions) before making any changes to
+#   this dict.
 ROLE_ACTIONS = {
     feconf.ROLE_ADMIN: [],
     feconf.ROLE_BANNED_USER: [],
@@ -93,7 +96,7 @@ def get_all_actions(role):
 
     Args:
         role: str. A string defining user role. It should be a key of
-              ROLE_HIERARCHY
+              PARENT_ROLES
 
     Returns:
         list. A list of actions accessible to the role.
@@ -102,12 +105,12 @@ def get_all_actions(role):
         Exception: The argument passed does not correspond to any existing
                    role.
     """
-    if role not in ROLE_HIERARCHY:
+    if role not in PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)
 
     role_actions = ROLE_ACTIONS[role]
 
-    for parent in ROLE_HIERARCHY[role]:
-        role_actions.extend(get_all_actions(parent))
+    for parent_role in PARENT_ROLES[role]:
+        role_actions.extend(get_all_actions(parent_role))
 
     return list(set(role_actions))

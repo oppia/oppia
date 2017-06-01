@@ -49,6 +49,8 @@ class UserSettings(object):
         user_id: str. The user id.
         email: str. The user email.
         username: str or None. Identifiable username to display in the UI.
+        role: str. Role of the user. This is used in conjunction with
+            PARENT_ROLES to determine which actions the user can perform.
         last_agreed_to_terms: datetime.datetime or None. When the user last
             agreed to the terms of the site.
         last_started_state_editor_tutorial: datetime.datetime or None. When
@@ -68,23 +70,24 @@ class UserSettings(object):
         preferred_language_codes: list(str) or None. Exploration language
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
-        role: str. Role of the user. This is used in conjunction with
-            ROLE_HIERARCHY to determine which actions the user can perform.
     """
     def __init__(
-            self, user_id, email, username=None, last_agreed_to_terms=None,
+            self, user_id, email, username=None,
+            role=feconf.ROLE_EXPLORATION_EDITOR, last_agreed_to_terms=None,
             last_started_state_editor_tutorial=None, last_logged_in=None,
             last_created_an_exploration=None,
             last_edited_an_exploration=None, profile_picture_data_url=None,
             user_bio='', subject_interests=None, first_contribution_msec=None,
-            preferred_language_codes=None, preferred_site_language_code=None,
-            role=feconf.ROLE_EXPLORATION_EDITOR):
+            preferred_language_codes=None, preferred_site_language_code=None
+    ):
         """Constructs a UserSettings domain object.
 
         Args:
             user_id: str. The user id.
             email: str. The user email.
             username: str or None. Identifiable username to display in the UI.
+            role: str. Role of the user. This is used in conjunction with
+                PARENT_ROLES to determine which actions the user can perform.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
             last_started_state_editor_tutorial: datetime.datetime or None. When
@@ -106,12 +109,11 @@ class UserSettings(object):
                 preferences specified by the user.
             preferred_site_language_code: str or None. System language
                 preference.
-            role: str. Role of the user. This is used in conjunction with
-                ROLE_HIERARCHY to determine which actions the user can perform.
         """
         self.user_id = user_id
         self.email = email
         self.username = username
+        self.role = role
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (  # pylint: disable=invalid-name
             last_started_state_editor_tutorial)
@@ -126,7 +128,6 @@ class UserSettings(object):
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
-        self.role = role
 
     def validate(self):
         """Checks that user_id and email fields of this UserSettings domain
@@ -348,12 +349,13 @@ def get_users_settings(user_ids):
                 feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
                 username='admin',
-                last_agreed_to_terms=datetime.datetime.utcnow(),
-                role=feconf.ROLE_SUPER_ADMIN
+                role=feconf.ROLE_SUPER_ADMIN,
+                last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         elif model:
             result.append(UserSettings(
                 model.id, email=model.email, username=model.username,
+                role=model.role,
                 last_agreed_to_terms=model.last_agreed_to_terms,
                 last_started_state_editor_tutorial=(
                     model.last_started_state_editor_tutorial),
@@ -367,8 +369,7 @@ def get_users_settings(user_ids):
                 first_contribution_msec=model.first_contribution_msec,
                 preferred_language_codes=model.preferred_language_codes,
                 preferred_site_language_code=(
-                    model.preferred_site_language_code),
-                role=model.role
+                    model.preferred_site_language_code)
             ))
         else:
             result.append(None)
@@ -504,6 +505,7 @@ def _save_user_settings(user_settings):
         id=user_settings.user_id,
         email=user_settings.email,
         username=user_settings.username,
+        role=user_settings.role,
         normalized_username=user_settings.normalized_username,
         last_agreed_to_terms=user_settings.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
@@ -518,8 +520,7 @@ def _save_user_settings(user_settings):
         first_contribution_msec=user_settings.first_contribution_msec,
         preferred_language_codes=user_settings.preferred_language_codes,
         preferred_site_language_code=(
-            user_settings.preferred_site_language_code),
-        role=user_settings.role
+            user_settings.preferred_site_language_code)
     ).put()
 
 
@@ -797,7 +798,7 @@ def update_user_role(user_id, role):
         Exception: The argument passed does not correspond
             to any existing role.
     """
-    if role not in role_services.ROLE_HIERARCHY:
+    if role not in role_services.PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.role = role
