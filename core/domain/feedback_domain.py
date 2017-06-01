@@ -83,10 +83,25 @@ class FeedbackThread(object):
 
     @staticmethod
     def get_exp_id_from_full_thread_id(full_thread_id):
+        """Returns the ID of the exploration that the thread belongs to.
+        Args:
+            full_thread_id: str. The ID of the feedback thread.
+
+        Returns:
+            str. The ID of the associated exploration.
+        """
         return full_thread_id.split('.')[0]
 
     @staticmethod
     def get_thread_id_from_full_thread_id(full_thread_id):
+        """Returns the ID of the feedback thread.
+
+        Args:
+            full_thread_id: str. The ID of the feedback thread.
+
+        Returns:
+            str. The ID of the feedback thread.
+        """
         return full_thread_id.split('.')[1]
 
 
@@ -159,9 +174,9 @@ class FeedbackAnalytics(object):
 
     Attributes:
         exploration_id: str. The ID of the associated exploration.
-        num_open_threads: int. The number of open threads under
-            a given exploration.
-        num_total_threads: int. The total number of threads under a given
+        num_open_threads: int. The number of open threads associated with the
+            exploration.
+        num_total_threads: int. The total number of threads associated with the
             exploration (regardless of status).
     """
 
@@ -194,7 +209,7 @@ class Suggestion(object):
         exploration_id: str. The ID of the associated exploration.
         exploration_version: int. The version of the exploration associated
             with the suggestion.
-        state_name: str. The name of the state attached to the suggestion.
+        state_name: str. The name of the state associated with the suggestion.
         description: str. A description of the suggestion.
         state_content: str. The state's suggested content.
         """
@@ -211,7 +226,7 @@ class Suggestion(object):
         self.state_content = state_content
 
     def get_author_name(self):
-        """Returns the author username.
+        """Returns the author's username.
 
         Returns:
             str. The username of the author of the suggestion.
