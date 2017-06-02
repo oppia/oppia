@@ -201,26 +201,26 @@ class FeedbackAnalyticsMRJobManager(
 
     @staticmethod
     def map(item):
-      """Map function.
+        """Map function.
 
-      Args:
-          item: A single element of the type given by entity_class().
+        Args:
+            item: A single element of the type given by entity_class().
 
-      Yields:
-          A tuple of two elements:
-             - item.exploration_id: str. The exploration id of the item. 
-             - item.status: str. The feedback thread status.  
+        Yields:
+            A tuple of two elements:
+              - item.exploration_id: str. The exploration id of the item. 
+              - item.status: str. The feedback thread status.  
       """
         yield (item.exploration_id, item.status)
 
     @staticmethod
     def reduce(key, stringified_values):
-      """Reduce function.
+        """Reduce function.
 
-      Args: 
-          key: The key value from the above map() function
-          stringified_values: list(str). List of all status from all 
-          mappers tagged with the given key.  
+        Args: 
+            key: The key value from the above map() function
+            stringified_values: list(str). List of all status from all 
+            mappers tagged with the given key.  
       """
         num_open_threads = stringified_values.count(
             feedback_models.STATUS_CHOICES_OPEN)
