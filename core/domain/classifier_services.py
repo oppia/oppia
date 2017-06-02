@@ -84,7 +84,7 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_rule_spec_index = None
 
     sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
-        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'])
 
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
@@ -124,6 +124,54 @@ def classify_string_classifier_rule(state, normalized_answer):
 
     return None
 
+def train(exploration):
+    """Trains classifiers for all states in an exploration that satisfies
+    the necessary conditions.
+
+    Args:
+        exploration: Domain object for an exploration.
+
+    Returns:
+        exploration: Domain object for an exploration.
+    """
+    states = exploration.states
+    for state_name in states:
+        state = states[state_name]
+        if state.can_undergo_classification() and (
+                state.classifier_model_id is None):
+            algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+                state.interaction.id]['algorithm_id']
+            classifier_algorithm = (
+                classifier_registry.Registry.get_classifier_by_algorithm_id(
+                    algorithm_id))
+
+            training_examples = [
+                [doc, []] for doc in (
+                    state.interaction.confirmed_unclassified_answers)]
+            for (answer_group_index, answer_group) in enumerate(
+                    state.interaction.answer_groups):
+                classifier_rule_spec_index = (
+                    answer_group.get_classifier_rule_index())
+                if classifier_rule_spec_index is not None:
+                    classifier_rule_spec = answer_group.rule_specs[
+                        classifier_rule_spec_index]
+                    training_examples.extend([
+                        [doc, [str(answer_group_index)]]
+                        for doc in classifier_rule_spec.inputs[
+                            'training_data']])
+
+                classifier_algorithm.train(training_examples)
+                cached_classifier_data = classifier_algorithm.to_dict()
+                algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
+                    state.interaction.id]['current_data_schema_version']
+                classifier = classifier_domain.Classifier(
+                    '0', exploration.id, exploration.version, state_name,
+                    algorithm_id, cached_classifier_data, algorithm_version)
+                classifier_id = save_classifier(classifier)
+                exploration.states[state_name].classifier_model_id = (
+                    classifier_id)
+
+    return exploration
 
 def get_classifier_from_model(classifier_model):
     """Gets a classifier domain object from a classifier model.

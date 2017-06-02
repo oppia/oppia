@@ -53,7 +53,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def _is_string_classifier_called(self, answer):
         sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'])
         string_classifier_predict = (
             sc.__class__.predict)
         predict_counter = test_utils.CallCounter(
@@ -71,6 +72,16 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         answer_group = answer_groups[answer_group_index]
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
+
+    def test_training_on_exploration_save(self):
+        """Load a YAML exploration, save it and check if a classifier is being
+        generated.
+        """
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        state_with_classifier = exploration.states['Home']
+        state_without_classifier = exploration.states['End']
+        self.assertTrue(state_with_classifier.classifier_model_id, not None)
+        self.assertFalse(state_without_classifier.classifier_model_id, not None)
 
     def test_string_classifier_classification(self):
         """All these responses trigger the string classifier."""
@@ -99,7 +110,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state = 'Home'
         classifier_id = classifier_models.ClassifierModel.create(
             exp_id, 1, state,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'], [], 1)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
@@ -116,7 +128,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state = 'Home'
         classifier_id = classifier_models.ClassifierModel.create(
             exp_id, 1, state,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'], [], 1)
         classifier_services.delete_classifier(classifier_id)
         with self.assertRaisesRegexp(Exception, (
             "Entity for class ClassifierModel with id %s not found" %(
@@ -149,7 +162,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         }
         classifier = classifier_domain.Classifier(
             '1', exp_id, 1, state_name,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], cached_data, 1)
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'], cached_data, 1)
         classifier_id = (
             classifier_services.save_classifier(classifier))
         classifier = classifier_services.get_classifier_by_id(
