@@ -84,8 +84,10 @@ class FeedbackThread(object):
     @staticmethod
     def get_exp_id_from_full_thread_id(full_thread_id):
         """Returns the ID of the exploration that the thread belongs to.
+
         Args:
-            full_thread_id: str. The ID of the feedback thread.
+            full_thread_id: str. The "full ID" of the feedback thread. (This is
+                a concatenation of the exploration ID and the thread ID.)
 
         Returns:
             str. The ID of the associated exploration.
@@ -97,7 +99,8 @@ class FeedbackThread(object):
         """Returns the ID of the feedback thread.
 
         Args:
-            full_thread_id: str. The ID of the feedback thread.
+            full_thread_id: str. The "full ID" of the feedback thread. (This is
+                a concatenation of the exploration ID and the thread ID.)
 
         Returns:
             str. The ID of the feedback thread.
