@@ -344,8 +344,15 @@ class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
         exploration = exp_services.get_exploration_from_model(item)
         for state_name, state in exploration.states.iteritems():
             for fallback in state.interaction.fallbacks:
-                yield (state_name.encode('utf-8'),
-                       fallback.outcome.feedback[0].encode('utf-8'))
+                num_submits = fallback.trigger.customization_args['num_submits']
+                feedback = fallback.outcome.feedback[0]
+                yield (
+                    '%s: %s' % (
+                        item.id,
+                        state_name.encode('utf-8')),
+                    '%s: %s' % (
+                        num_submits['value'],
+                        feedback.encode('utf-8')))
 
     @staticmethod
     def reduce(key, values):
