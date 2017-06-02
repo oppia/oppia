@@ -40,13 +40,14 @@ oppia.factory('NumericInputValidationService', [
           ubi: bool, is upper bound inclusive
         }
         */
-        function isEnclosedBy(ra, rb) {
+        var isEnclosedBy = function(ra, rb) {
           // Checks if range ra is enclosed by range rb.
           var lowerBoundConditionIsSatisfied =
               (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
           var upperBoundConditionIsSatisfied =
               (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
-          return lowerBoundConditionIsSatisfied && upperBoundConditionIsSatisfied;
+          return lowerBoundConditionIsSatisfied &&
+              upperBoundConditionIsSatisfied;
         };
 
         var ranges = [];
