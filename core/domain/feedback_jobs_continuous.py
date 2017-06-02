@@ -219,8 +219,8 @@ class FeedbackAnalyticsMRJobManager(
 
         Args:
             key: str. The exploration ID.
-                stringified_values: list(str). List of all statuses from all
-            mappers tagged with the given key.
+            stringified_values: list(str). List of all statuses from all
+              mappers tagged with the given key.
       """
         num_open_threads = stringified_values.count(
             feedback_models.STATUS_CHOICES_OPEN)
