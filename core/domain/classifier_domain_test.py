@@ -27,6 +27,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         expected_classifier_dict = {
             'classifier_id': 'exp_id1.SOME_RANDOM_STRING',
             'exp_id': 'exp_id1',
+            'job_request_id': 'job_request_id1',
             'exp_version_when_created': 1,
             'state_name': 'a state name',
             'algorithm_id': "LDAStringClassifier",
@@ -36,6 +37,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         observed_classifier = classifier_domain.Classifier(
             expected_classifier_dict['classifier_id'],
             expected_classifier_dict['exp_id'],
+            expected_classifier_dict['job_request_id'],
             expected_classifier_dict['exp_version_when_created'],
             expected_classifier_dict['state_name'],
             expected_classifier_dict['algorithm_id'],
@@ -69,6 +71,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         classifier_dict = {
             'classifier_id': 'exp_id1.SOME_RANDOM_STRING',
             'exp_id': 'exp_id1',
+            'job_request_id': 'job_request_id1',
             'exp_version_when_created': 1,
             'state_name': 'a state name',
             'algorithm_id': "LDAStringClassifier",
@@ -78,6 +81,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         classifier = classifier_domain.Classifier(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
+            classifier_dict['job_request_id'],
             classifier_dict['exp_version_when_created'],
             classifier_dict['state_name'],
             classifier_dict['algorithm_id'],
@@ -91,6 +95,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         classifier = classifier_domain.Classifier(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
+            classifier_dict['job_request_id'],
             classifier_dict['exp_version_when_created'],
             classifier_dict['state_name'],
             classifier_dict['algorithm_id'],
@@ -107,6 +112,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         classifier = classifier_domain.Classifier(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
+            classifier_dict['job_request_id'],
             classifier_dict['exp_version_when_created'],
             classifier_dict['state_name'],
             classifier_dict['algorithm_id'],
@@ -122,6 +128,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         classifier = classifier_domain.Classifier(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
+            classifier_dict['job_request_id'],
             classifier_dict['exp_version_when_created'],
             classifier_dict['state_name'],
             classifier_dict['algorithm_id'],
@@ -138,6 +145,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         classifier = classifier_domain.Classifier(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
+            classifier_dict['job_request_id'],
             classifier_dict['exp_version_when_created'],
             classifier_dict['state_name'],
             classifier_dict['algorithm_id'],
@@ -153,6 +161,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         classifier = classifier_domain.Classifier(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
+            classifier_dict['job_request_id'],
             classifier_dict['exp_version_when_created'],
             classifier_dict['state_name'],
             classifier_dict['algorithm_id'],

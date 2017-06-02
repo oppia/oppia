@@ -25,7 +25,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+(classifier_data_models,) = models.Registry.import_models(
+    [models.NAMES.classifier])
 
 class ClassifierServicesTests(test_utils.GenericTestBase):
     """Test "classify" using the sample explorations.
@@ -93,36 +94,39 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the get_classifier_by_id method."""
 
         with self.assertRaisesRegexp(Exception, (
-            "Entity for class ClassifierModel with id fake_id not found")):
+            "Entity for class ClassifierDataModel with id fake_id not found")):
             classifier_services.get_classifier_by_id('fake_id')
 
         exp_id = u'1'
+        job_request_id = u'1'
         state = 'Home'
-        classifier_id = classifier_models.ClassifierModel.create(
-            exp_id, 1, state,
+        classifier_id = classifier_data_models.ClassifierDataModel.create(
+            exp_id, job_request_id, 1, state,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                 'algorithm_id'], [], 1)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, state)
+        self.assertEqual(classifier.job_request_id, job_request_id)
 
     def test_deletion_of_classifiers(self):
         """Test the delete_classifier method."""
 
         with self.assertRaisesRegexp(Exception, (
-            "Entity for class ClassifierModel with id fake_id not found")):
+            "Entity for class ClassifierDataModel with id fake_id not found")):
             classifier_services.delete_classifier('fake_id')
 
         exp_id = u'1'
+        job_request_id = u'1'
         state = 'Home'
-        classifier_id = classifier_models.ClassifierModel.create(
-            exp_id, 1, state,
+        classifier_id = classifier_data_models.ClassifierDataModel.create(
+            exp_id, job_request_id, 1, state,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                 'algorithm_id'], [], 1)
         classifier_services.delete_classifier(classifier_id)
         with self.assertRaisesRegexp(Exception, (
-            "Entity for class ClassifierModel with id %s not found" %(
+            "Entity for class ClassifierDataModel with id %s not found" %(
                 classifier_id))):
             classifier_services.get_classifier_by_id(classifier_id)
 
@@ -130,6 +134,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the save_classifier method."""
 
         exp_id = u'1'
+        job_request_id = u'1'
         state_name = 'Home'
         test_state_name = 'State'
         cached_data = {
@@ -151,7 +156,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             '_c_l': []
         }
         classifier = classifier_domain.Classifier(
-            '1', exp_id, 1, state_name,
+            '1', exp_id, job_request_id, 1, state_name,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                 'algorithm_id'], cached_data, 1)
         classifier_id = (
@@ -160,9 +165,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, state_name)
+        self.assertEqual(classifier.job_request_id, job_request_id)
         classifier.update_state_name(test_state_name)
         classifier_services.save_classifier(classifier)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, test_state_name)
+        self.assertEqual(classifier.job_request_id, job_request_id)

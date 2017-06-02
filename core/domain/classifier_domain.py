@@ -21,7 +21,8 @@ from core.platform import models
 import feconf
 import utils
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+(classifier_data_models,) = models.Registry.import_models(
+    [models.NAMES.classifier])
 
 class Classifier(object):
     """Domain object for a classifier.
@@ -33,6 +34,7 @@ class Classifier(object):
     Attributes:
         id: str. The unique id of the classifier.
         exp_id: str. The exploration id to which this classifier belongs.
+        job_request_id: str. ID of the job used for training the classifier.
         exp_version_when_created: str. The version of the exploration when
             this classification model was created.
         state_name: str. The name of the state to which the classifier belongs.
@@ -44,14 +46,15 @@ class Classifier(object):
             classifier. This depends on the algorithm ID.
     """
 
-    def __init__(self, classifier_id, exp_id, exp_version_when_created,
-                 state_name, algorithm_id, cached_classifier_data,
-                 data_schema_version):
+    def __init__(self, classifier_id, exp_id, job_request_id,
+                 exp_version_when_created, state_name, algorithm_id,
+                 cached_classifier_data, data_schema_version):
         """Constructs an Classifier domain object.
 
         Args:
             classifier_id: str. The unique id of the classifier.
             exp_id: str. The exploration id to which the classifier belongs.
+            job_request_id: str. ID of the job used for training the classifier.
             exp_version_when_created: int. The version of the exploration when
                 this classification model was created.
             state_name: str. The name of the state to which the classifier
@@ -65,6 +68,7 @@ class Classifier(object):
         """
         self._id = classifier_id
         self._exp_id = exp_id
+        self._job_request_id = job_request_id
         self._exp_version_when_created = exp_version_when_created
         self._state_name = state_name
         self._algorithm_id = algorithm_id
@@ -78,6 +82,10 @@ class Classifier(object):
     @property
     def exp_id(self):
         return self._exp_id
+
+    @property
+    def job_request_id(self):
+        return self._job_request_id
 
     @property
     def exp_version_when_created(self):
@@ -119,6 +127,7 @@ class Classifier(object):
         return {
             'classifier_id': self._id,
             'exp_id': self._exp_id,
+            'job_request_id': self._job_request_id,
             'exp_version_when_created': self._exp_version_when_created,
             'state_name': self._state_name,
             'algorithm_id': self._algorithm_id,
@@ -136,6 +145,11 @@ class Classifier(object):
         if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
+
+        if not isinstance(self.job_request_id, basestring):
+            raise utils.ValidationError(
+                'Expected job_request_id to be a string, received %s' % (
+                    self.job_request_id))
 
         if not isinstance(self.exp_version_when_created, int):
             raise utils.ValidationError(

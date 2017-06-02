@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for storing the classification models."""
+"""Models for storing the classification data models."""
 
 from core.platform import models
 import utils
@@ -27,13 +27,14 @@ ALGORITHM_CHOICES = [
 ]
 
 
-class ClassifierModel(base_models.BaseModel):
+class ClassifierDataModel(base_models.BaseModel):
     """Storage model for classifier used for answer classification.
 
     The id of instances of this class has the form
     {{exp_id}}.{{random_hash_of_16_chars}}
     """
-
+    # The job_request_id received from the TrainClassifierJobModel
+    job_request_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration_id of the exploration to whose state the model belongs.
     exp_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration version at the time this classifier model was created.
@@ -50,17 +51,17 @@ class ClassifierModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, exp_id):
-        """Generates a unique id for the classifier model of the form
+        """Generates a unique id for the classifier data model of the form
         {{exp_id}}.{{random_hash_of_16_chars}}
 
         Args:
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new classifier model.
+            ID of the new classifier data model.
 
         Raises:
-            Exception: The id generator for ClassifierModel is producing too
+            Exception: The id generator for ClassifierDataModel is producing too
             many collisions.
         """
 
@@ -74,16 +75,17 @@ class ClassifierModel(base_models.BaseModel):
                 return new_id
 
         raise Exception(
-            'The id generator for ClassifierModel is producing too many '
+            'The id generator for ClassifierDataModel is producing too many '
             'collisions.')
 
     @classmethod
     def create(
-            cls, exp_id, exp_version_when_created, state_name, algorithm_id,
-            cached_classifier_data, data_schema_version):
-        """Creates a new ClassifierModel entry.
+            cls, exp_id, job_request_id, exp_version_when_created, state_name,
+            algorithm_id, cached_classifier_data, data_schema_version):
+        """Creates a new ClassifierDataModel entry.
 
         Args:
+            job_request_id: str. ID of the job used for training the classifier.
             exp_id: str. ID of the exploration.
             exp_version_when_created: int. The version of the exploration when
                 this classification model was created.
@@ -95,19 +97,19 @@ class ClassifierModel(base_models.BaseModel):
                 data used by the classifier.
 
         Returns:
-            ID of the new ClassifierModel entry.
+            ID of the new ClassifierDataModel entry.
 
         Raises:
             Exception: A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id)
-        classifier_model_instance = cls(
-            id=instance_id, exp_id=exp_id,
+        classifier_data_model_instance = cls(
+            id=instance_id, job_request_id=job_request_id, exp_id=exp_id,
             exp_version_when_created=exp_version_when_created,
             state_name=state_name, algorithm_id=algorithm_id,
             cached_classifier_data=cached_classifier_data,
             data_schema_version=data_schema_version)
 
-        classifier_model_instance.put()
+        classifier_data_model_instance.put()
         return instance_id

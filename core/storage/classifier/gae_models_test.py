@@ -17,33 +17,42 @@
 from core.platform import models
 from core.tests import test_utils
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+(classifier_data_models,) = models.Registry.import_models(
+    [models.NAMES.classifier])
 
 
-class ClassifierModelUnitTests(test_utils.GenericTestBase):
-    """Test the ClassifierModel class."""
+class ClassifierDataModelUnitTests(test_utils.GenericTestBase):
+    """Test the ClassifierDataModel class."""
 
     def setUp(self):
-        super(ClassifierModelUnitTests, self).setUp()
-        classifier_models.ClassifierModel.create('exp_id1', 1, 'state_name1',
-                                                 'LDAStringClassifier',
-                                                 {'alpha': 1.0}, 1)
-        classifier_models.ClassifierModel.create('exp_id1', 1, 'state_name2',
-                                                 'LDAStringClassifier',
-                                                 {'alpha': 1.0}, 1)
-        classifier_models.ClassifierModel.create('exp_id2', 1, 'state_name3',
-                                                 'LDAStringClassifier',
-                                                 {'alpha': 1.0}, 1)
+        super(ClassifierDataModelUnitTests, self).setUp()
+        classifier_data_models.ClassifierDataModel.create('exp_id1',
+                                                          'job_request_id1', 1,
+                                                          'state_name1',
+                                                          'LDAStringClassifier',
+                                                          {'alpha': 1.0}, 1)
+        classifier_data_models.ClassifierDataModel.create('exp_id1',
+                                                          'job_request_id2', 1,
+                                                          'state_name2',
+                                                          'LDAStringClassifier',
+                                                          {'alpha': 1.0}, 1)
+        classifier_data_models.ClassifierDataModel.create('exp_id2',
+                                                          'job_request_id3', 1,
+                                                          'state_name3',
+                                                          'LDAStringClassifier',
+                                                          {'alpha': 1.0}, 1)
 
     def test_create_new_classifier_runs_successfully(self):
-        classifier_id = classifier_models.ClassifierModel.create(
-            'exp_id3', 1, 'state_name1', 'LDAStringClassifier', {'alpha': 1.0},
+        classifier_id = classifier_data_models.ClassifierDataModel.create(
+            'exp_id3', 'job_request_id4', 1, 'state_name1',
+            'LDAStringClassifier', {'alpha': 1.0},
             1)
 
         classifier = (
-            classifier_models.ClassifierModel.get(classifier_id))
+            classifier_data_models.ClassifierDataModel.get(classifier_id))
 
         self.assertEqual(classifier.exp_id, 'exp_id3')
+        self.assertEqual(classifier.job_request_id, 'job_request_id4')
         self.assertEqual(classifier.exp_version_when_created, 1)
         self.assertEqual(classifier.state_name, 'state_name1')
         self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
