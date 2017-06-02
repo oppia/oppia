@@ -217,7 +217,7 @@ oppia.controller('LearnerDashboard', [
             $scope.remove = function() {
               /* eslint-disable max-len */
               if (subSectionName === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS) {
-              /*eslint-enable */
+              /* eslint-enable max-len */
                 $http.post(
                   '/learner_dashboard/remove_in_progress_exploration', {
                     exploration_id: entity.id

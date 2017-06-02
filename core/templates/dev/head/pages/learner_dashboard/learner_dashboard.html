@@ -181,7 +181,11 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteExplorations !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATION"
+              <span ng-if="numberDeletedIncompleteExplorations === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATION"
+                    translate-values="{numberDeleted: numberDeletedIncompleteExplorations}"></span>
+              <span ng-if="numberDeletedIncompleteExplorations > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATIONS"
                     translate-values="{numberDeleted: numberDeletedIncompleteExplorations}"></span>
               &#9785
             </span>
@@ -235,7 +239,11 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCompletedExplorations !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATION"
+              <span ng-if="numberDeletedCompletedExplorations === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATION"
+                    translate-values="{numberDeleted: numberDeletedCompletedExplorations}"></span>
+              <span ng-if="numberDeletedCompletedExplorations > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATIONS"
                     translate-values="{numberDeleted: numberDeletedCompletedExplorations}"></span>
               &#9785
             </span>
@@ -282,7 +290,11 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteCollections !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTION"
+              <span ng-if="numberDeletedIncompleteCollections === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTION"
+                    translate-values="{numberDeleted: numberDeletedIncompleteCollections}"></span>
+              <span ng-if="numberDeletedIncompleteCollections > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTIONS"
                     translate-values="{numberDeleted: numberDeletedIncompleteCollections}"></span>
               &#9785
             </span>
@@ -345,7 +357,11 @@
 
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCompletedCollections !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTION"
+              <span ng-if="numberDeletedCompletedCollections === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTION"
+                    translate-values="{numberDeleted: numberDeletedCompletedCollections}"></span>
+              <span ng-if="numberDeletedCompletedCollections > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTIONS"
                     translate-values="{numberDeleted: numberDeletedCompletedCollections}"></span>
               &#9785
             </span>
