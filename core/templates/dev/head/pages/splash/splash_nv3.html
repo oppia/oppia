@@ -1,0 +1,285 @@
+{% extends 'pages/base.html' %}
+
+{% block prerender %}
+  <link rel="prerender" href="/library">
+{% endblock prerender %}
+
+{% block maintitle %}
+  I18N_SPLASH_PAGE_TITLE
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div ng-controller="Splash" style="background-color: #afd2eb; font-size: 14px;">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 oppia-display-desktop-only col-sm-3">
+          <img ng-src="<[aboutPageMascotImgUrl]>" id="oppia-splash-new-otter" />
+        </div>
+        <div class="col-xs-12 col-sm-9 col-md-6" style="margin-top: 20px;">
+          <h1 class="oppia-splash-new-h1">Welcome to Oppia</h1>
+          <h2 class="oppia-splash-new-h2">Oppia's mission is to help anyone learn in an effective and enjoyable way.</h2>
+          <div class="oppia-button-container">
+            <button type="button"
+                    ng-click="onClickBrowseLibraryButton()"
+                    class="btn oppia-transition-200">
+              Start Learning
+            </button>
+            <button type="button"
+                    ng-click="onRedirectToLogin('/creator_dashboard?mode=create')"
+                    class="btn oppia-transition-200">
+              Share Your Knowledge
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="jumbotron oppia-jumbotron-bottom-padding-reduction">
+        <div class="row oppia-row-maintain-horizontal-margin">
+          <h2 class="oppia-splash-new-h2"><strong>Oppia</strong> is a free online learning tool that enables anyone to easily create and share interactive activities, or lessons, simulating a one-on-one conversation with an intelligent tutor.</h2>
+          <br />
+          <h2 class="oppia-splash-new-h2">Imagine what you could learn today&hellip;</h2>
+        </div>
+      </div>
+      <div class="row">
+        <h3 class="oppia-splash-new-h3">Featured Lessons</h2>
+        <div class="oppia-splash-new-exploration-summaries">
+          <div ng-repeat="tile in activityList" style="display: inline-block;">
+            <exploration-summary-tile exploration-id="tile.id"
+                                      exploration-title="tile.title"
+                                      last-updated-msec="tile.last_updated_msec"
+                                      objective="tile.objective"
+                                      category="tile.category"
+                                      ratings="tile.ratings"
+                                      num-views="tile.num_views"
+                                      thumbnail-icon-url="tile.thumbnail_icon_url"
+                                      thumbnail-bg-color="tile.thumbnail_bg_color"
+                                      class="protractor-test-exp-summary-tile">
+            </exploration-summary-tile>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="oppia-splash-new-callout container-fluid">
+      <h2>Share Your Knowledge</h2>
+      <p>Whether you're a K-12 educator, a graduate student, or an individual who's passionate about a specific subject and wants to share your knowledge, Oppia welcomes you. Join the community and start exploring with us.</p>
+      <button type="button"
+              ng-click="onRedirectToLogin('/creator_dashboard?mode=create')"
+              class="btn oppia-transition-200">
+        Get Started
+      </button>
+    </div>
+  </div>
+
+  <style>
+    .oppia-splash-new-h1 {
+      color: #024340;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 2.75em;
+      margin: 20px auto 0 auto;
+      text-align: center;
+    }
+
+    .oppia-splash-new-h2 {
+      color: #04857c;
+      font-family: 'Rubik', 'Roboto', Arial, sans-serif;
+      font-size: 2em;
+      -webkit-font-smoothing: subpixel-antialiased;
+      font-weight: 300;
+      line-height: 1.2;
+      margin: 18px 0;
+      text-align: center;
+      text-rendering: auto;
+    }
+
+    .jumbotron .oppia-splash-new-h2 {
+      font-size: 1.75em;
+      line-height: 1.6;
+      margin: 0 auto;
+      max-width: 750px;
+    }
+
+    .oppia-jumbotron-bottom-padding-reduction {
+      padding-bottom: 1.67em;
+    }
+
+    .oppia-row-maintain-horizontal-margin {
+        margin: auto 15px;
+    }
+
+    .oppia-splash-new-h3 {
+      color: #04857c;
+      font-family: 'Rubik', 'Roboto', Arial, sans-serif;
+      font-size: 1.5em;
+      -webkit-font-smoothing: subpixel-antialiased;
+      font-weight: 300;
+      margin: 18px 0;
+      text-align: left;
+    }
+
+    #oppia-splash-new-otter {
+      bottom: -35px;
+      left: 10px;
+      position: relative;
+      width: 250px;
+    }
+
+    .oppia-button-container {
+      display: flex;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .oppia-button-container button {
+      background-color: #015c53;
+      border-radius: 0;
+      border: none;
+      color: #ffffff;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 16px;
+      margin: auto 5px;
+      max-width: 300px;
+      padding: 10px;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    .oppia-button-container button:hover {
+      background-color: #05beb2;
+      color: #ffffff;
+    }
+
+    .oppia-bullet-holder img {
+      display: block;
+      height: 125px;
+      margin: auto;
+    }
+
+    .oppia-bullet-holder p {
+      color: #333333;
+      font-family: 'Rubik', 'Roboto', Arial, sans-serif;
+      -webkit-font-smoothing: subpixel-antialiased;
+      font-weight: 300;
+      line-height: 1.45;
+      padding: 5px 15px;
+    }
+
+    .oppia-splash-new-exploration-summaries {
+      font-size: 16px;
+      margin-bottom: 2em;
+      text-align: center;
+    }
+
+    .oppia-splash-new-callout {
+      background-color: #009788;
+      color: #ffffff;
+      font-family: 'Rubik', 'Roboto', Arial, sans-serif;
+      text-align: center;
+    }
+
+    .oppia-splash-new-callout h2 {
+      color: #ffffff;
+      font-size: 2em;
+      font-weight: 600;
+      margin: 22px auto 0 auto;
+    }
+
+    .oppia-splash-new-callout p {
+      font-size: 1.3em;
+      line-height: 1.8;
+      margin: 15px auto;
+      max-width: 650px;
+      text-align: center;
+    }
+
+    .oppia-splash-new-callout button {
+      background-color: #00796d;
+      border-radius: 5px;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 1.1em;
+      -webkit-font-smoothing: subpixel-antialiased;
+      margin-bottom: 22px;
+      padding: 10px 20px;
+      text-transform: uppercase;
+      white-space: normal;
+    }
+
+    .oppia-splash-new-callout button:hover {
+      background-color: #05beb2;
+      color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+      .oppia-display-desktop-only {
+        display: none !important;
+      }
+
+      .oppia-button-container {
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+
+      .oppia-button-container button {
+        margin-bottom: 5px;
+      }
+
+      .oppia-jumbotron-bottom-padding-reduction {
+        padding-top: 1.67em;
+      }
+
+      .oppia-splash-new-callout {
+        height: auto;
+        padding: 15px;
+      }
+
+      .oppia-splash-new-callout button {
+        position: auto;
+        top: auto;
+        transform: none;
+      }
+
+      .oppia-splash-new-callout button:first-of-type {
+        margin-top: 15px;
+      }
+    }
+
+    @media (max-width: 992px) {
+      #oppia-splash-new-otter {
+        bottom: -85px;
+        width: 175px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .oppia-splash-new-h1 {
+        margin-top: 10px;
+      }
+      
+      .oppia-splash-new-h3 {
+        text-align: center;
+      }
+      
+      .oppia-activity-summary-tile {
+        margin: 8px 5.5px;
+      }
+    }
+  </style>
+
+  <link rel="stylesheet" type="text/css" media="screen" href="https://fonts.googleapis.com/css?family=Rubik:300">
+{% endblock %}
+
+{% block footer %}
+  {% include 'pages/footer.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/splash/Splash.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+{% endblock footer_js %}

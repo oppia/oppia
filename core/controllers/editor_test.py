@@ -21,7 +21,7 @@ import StringIO
 import zipfile
 
 from core import jobs_registry
-from core.controllers import dashboard
+from core.controllers import creator_dashboard
 from core.controllers import editor
 from core.domain import config_services
 from core.domain import event_services
@@ -122,12 +122,12 @@ class EditorTest(BaseEditorControllerTest):
         """
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get(feconf.DASHBOARD_URL)
+        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         exp_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
-        )[dashboard.EXPLORATION_ID_KEY]
+        )[creator_dashboard.EXPLORATION_ID_KEY]
 
         response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -296,6 +296,7 @@ class EditorTest(BaseEditorControllerTest):
             self.assertEqual(
                 response_dict['unhandled_answers'],
                 _create_training_data('joyful', 'sad'))
+            self.assertTrue(exploration_dict['version'])
 
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.

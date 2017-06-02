@@ -1,5 +1,5 @@
 {% macro warnings_and_loader() -%}
-  <div ng-cloak>
+  <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
     <div class="oppia-toast-container toast-top-center">
       <div ng-repeat="warning in (alertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
         <button type="button" class="toast-close-button" ng-click="alertsService.deleteWarning(warning)" role="button">&times;</button>
@@ -139,8 +139,11 @@
     {% if iframed %}
       {{ warnings_and_loader() }}
     {% else %}
+      <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
       <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
       </promo-bar>
+      <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
+      </div>
 
       <div class="oppia-base-container"
            ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
@@ -206,28 +209,10 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
+    {% include 'components/forms/form_builder_templates.html' %}
     {% include 'components/create_button/create_activity_button_directive.html' %}
 
-    {% include 'components/forms/form_builder_templates.html' %}
-    {% include 'components/forms/image_uploader_directive.html' %}
-    {% include 'components/forms/schema_viewers/schema_based_custom_viewer_directive.html' %}
-    {% include 'components/forms/schema_viewers/schema_based_dict_viewer_directive.html' %}
-    {% include 'components/forms/schema_viewers/schema_based_html_viewer_directive.html' %}
-    {% include 'components/forms/schema_viewers/schema_based_list_viewer_directive.html' %}
-    {% include 'components/forms/schema_viewers/schema_based_primitive_viewer_directive.html' %}
-    {% include 'components/forms/schema_viewers/schema_based_unicode_viewer_directive.html' %}
-    {% include 'components/forms/schema_viewers/schema_based_viewer_directive.html' %}
-
-    {% include 'components/loading/loading_dots_directive.html' %}
-    {% include 'components/promo/promo_bar_directive.html' %}
-    {% include 'components/summary_tile/circular_image_directive.html' %}
-    {% include 'components/summary_tile/collection_summary_tile_directive.html' %}
-    {% include 'components/summary_tile/exploration_summary_tile_directive.html' %}
-
     {% include 'components/rating_display.html' %}
-    {% include 'components/side_navigation_bar/side_navigation_bar_directive.html' %}
-    {% include 'components/top_navigation_bar/top_navigation_bar_directive.html' %}
-    {% include 'components/social_buttons/social_buttons_directive.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>

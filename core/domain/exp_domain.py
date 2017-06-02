@@ -1162,6 +1162,31 @@ class State(object):
         elif self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
 
+    def can_undergo_classification(self):
+        """Checks whether the answers for this state satisfy the preconditions
+        for a ML model to be trained.
+
+        Returns:
+            bool: True, if the conditions are satisfied.
+        """
+        training_examples_count = 0
+        labels_count = 0
+        training_examples_count += len(
+            self.interaction.confirmed_unclassified_answers)
+        for answer_group in self.interaction.answer_groups:
+            classifier_rule_spec_index = (
+                answer_group.get_classifier_rule_index())
+            if classifier_rule_spec_index is not None:
+                classifier_rule_spec = answer_group.rule_specs[
+                    classifier_rule_spec_index]
+                training_examples_count += len(
+                    classifier_rule_spec.inputs['training_data'])
+                labels_count += 1
+        if ((training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
+                (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
+            return True
+        return False
+
     def update_content(self, content_list):
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = [Content.from_dict(content_list[0])]
@@ -2267,16 +2292,10 @@ class Exploration(object):
 
     @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version,
-            pre_v4_states_conversion_func=None):
+            cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
-
-        If pre_v4_states_conversion_func is provided, it will be called in the
-        migration process before migrating from v3 to v4. It is provided a
-        states dict and will overwrite the migrated states dict with the dict it
-        returns.
 
         Note that the versioned_exploration_states being passed in is modified
         in-place.
@@ -2284,10 +2303,6 @@ class Exploration(object):
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
-        if pre_v4_states_conversion_func and current_states_schema_version == 3:
-            versioned_exploration_states['states'] = (
-                pre_v4_states_conversion_func(
-                    versioned_exploration_states['states']))
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
         versioned_exploration_states['states'] = conversion_fn(

@@ -28,17 +28,55 @@ oppia.directive('collectionNodeCreator', [
         'validatorsService', 'CollectionEditorStateService',
         'CollectionLinearizerService', 'CollectionUpdateService',
         'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-        'siteAnalyticsService',
+        'SearchExplorationsBackendApiService', 'siteAnalyticsService',
         function(
             $scope, $http, $window, $filter, alertsService,
             validatorsService, CollectionEditorStateService,
             CollectionLinearizerService, CollectionUpdateService,
             CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-            siteAnalyticsService) {
+            SearchExplorationsBackendApiService, siteAnalyticsService) {
           $scope.collection = CollectionEditorStateService.getCollection();
           $scope.newExplorationId = '';
           $scope.newExplorationTitle = '';
+          $scope.searchQueryHasError = false;
+
           var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+
+          /**
+           * Fetches a list of exploration metadata dicts from backend, given
+           * a search query. It then extracts the title and id of the
+           * exploration to prepare typeahead options.
+           */
+          $scope.fetchTypeaheadResults = function(searchQuery) {
+            if (isValidSearchQuery(searchQuery)) {
+              $scope.searchQueryHasError = false;
+              return SearchExplorationsBackendApiService.fetchExplorations(
+                searchQuery
+              ).then(function(explorationMetadataBackendDict) {
+                var options = [];
+                explorationMetadataBackendDict.collection_node_metadata_list.
+                  map(function(item) {
+                    if (!$scope.collection.containsCollectionNode(item.id)) {
+                      options.push('(#' + item.id + ') ' + item.title);
+                    }
+                  });
+                return options;
+              }, function() {
+                alertsService.addWarning(
+                  'There was an error when searching for matching ' + 
+                  'explorations.');
+              });
+            } else {
+              $scope.searchQueryHasError = true;
+            }
+          };
+
+          var isValidSearchQuery = function(searchQuery) {
+            if (/^[a-zA-Z0-9- ]*$/.test(searchQuery)) {
+              return true;
+            }
+            return;
+          };
 
           var addExplorationToCollection = function(newExplorationId) {
             if (!newExplorationId) {
@@ -51,7 +89,7 @@ oppia.directive('collectionNodeCreator', [
                 'with that id.');
               return;
             }
-      
+
             ExplorationSummaryBackendApiService
               .loadPublicAndPrivateExplorationSummaries([newExplorationId])
               .then(function(summaries) {
@@ -74,6 +112,14 @@ oppia.directive('collectionNodeCreator', [
                   'collection.');
               }
             );
+          };
+
+          var convertTypeaheadToExplorationId = function(typeaheadOption) {
+            var matchResults = typeaheadOption.match(/\(#(.*?)\)/);
+            if (matchResults == null) {
+              return typeaheadOption;
+            }
+            return matchResults[1];
           };
 
           // Creates a new exploration, then adds it to the collection.
@@ -100,7 +146,8 @@ oppia.directive('collectionNodeCreator', [
           };
 
           $scope.addExploration = function() {
-            addExplorationToCollection($scope.newExplorationId);
+            addExplorationToCollection(convertTypeaheadToExplorationId(
+              $scope.newExplorationId));
             $scope.newExplorationId = '';
           };
         }
