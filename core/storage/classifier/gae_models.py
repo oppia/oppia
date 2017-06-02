@@ -15,6 +15,8 @@
 """Models for storing the classification data models."""
 
 from core.platform import models
+
+import feconf
 import utils
 
 from google.appengine.ext import ndb
@@ -22,9 +24,10 @@ from google.appengine.ext import ndb
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 # Available choices of algorithms for classification.
-ALGORITHM_CHOICES = [
-    'LDAStringClassifier'
-]
+ALGORITHM_CHOICES = []
+for classifier_details in (
+        feconf.INTERACTION_CLASSIFIER_MAPPING.values()):
+    ALGORITHM_CHOICES.append(classifier_details['algorithm_id'])
 
 
 class ClassifierDataModel(base_models.BaseModel):
