@@ -24,11 +24,13 @@ oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
+  'ReadOnlyExplorationBackendApiService',
   'IMPROVE_TYPE_DEFAULT', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
+      ReadOnlyExplorationBackendApiService,
       IMPROVE_TYPE_DEFAULT, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
@@ -62,32 +64,31 @@ oppia.controller('StatisticsTab', [
         '/createhandler/statistics/' + explorationData.explorationId +
         '/' + version);
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
-        var explorationDataUrl = (
-          '/createhandler/data/' + explorationData.explorationId);
+        ReadOnlyExplorationBackendApiService.loadLatestExploration(
+          explorationData.explorationId).then(function(response) {
+            var statesDict = response.exploration.states;
+            var states = StatesObjectFactory.createFromBackendDict(statesDict);
+            var initStateName = response.exploration.init_state_name;
 
-        $http.get(explorationDataUrl).then(function(response) {
-          var statesDict = response.data.states;
-          var states = StatesObjectFactory.createFromBackendDict(statesDict);
-          var initStateName = response.data.init_state_name;
-          $scope.statsGraphData = computeGraphService.compute(
-            initStateName, states);
-
-          var improvements = (
-            StateImprovementSuggestionService.getStateImprovements(
-              states, $scope.stateStats));
-          $scope.highlightStates = {};
-          improvements.forEach(function(impItem) {
-            // TODO(bhenning): This is the feedback for improvement types and
-            // should be included with the definitions of the improvement types.
-            if (impItem.type === IMPROVE_TYPE_DEFAULT) {
-              $scope.highlightStates[impItem.stateName] = (
-                'Needs more feedback');
-            } else if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
-              $scope.highlightStates[impItem.stateName] = 'May be confusing';
-            }
-          });
-        });
-
+            $scope.statsGraphData = computeGraphService.compute(
+              initStateName, states);
+            var improvements = (
+              StateImprovementSuggestionService.getStateImprovements(
+                states, $scope.stateStats));
+            $scope.highlightStates = {};
+            improvements.forEach(function(impItem) {
+              // TODO(bhenning): This is the feedback for improvement types and
+              // should be included with the definitions of the improvement
+              // types.
+              if (impItem.type === IMPROVE_TYPE_DEFAULT) {
+                $scope.highlightStates[impItem.stateName] = (
+                  'Needs more feedback');
+              } else if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
+                $scope.highlightStates[impItem.stateName] = 'May be confusing';
+              }
+            });
+          }
+        );
         var data = response.data;
         var numVisits = data.num_starts;
         var numCompletions = data.num_completions;
@@ -111,14 +112,15 @@ oppia.controller('StatisticsTab', [
         // ending (numCompletions/numVisits), should we do this for all
         // terminal nodes, instead? If so, explorationStatesService needs to be
         // able to provide whether given states are terminal
-        for (var stateName in explorationStatesService.getStates()) {
+
+        explorationStatesService.getStateNames().forEach(function(stateName) {
           var visits = 0;
           if ($scope.stateStats.hasOwnProperty(stateName)) {
             visits = $scope.stateStats[stateName].first_entry_count;
           }
           $scope.statsGraphOpacities[stateName] = Math.max(
             visits / numVisits, 0.05);
-        }
+        });
 
         $scope.hasTabLoaded = true;
       });
@@ -191,64 +193,3 @@ oppia.controller('StatisticsTab', [
     };
   }
 ]);
-
-oppia.factory('StateImprovementSuggestionService', [
-  'IMPROVE_TYPE_DEFAULT', 'IMPROVE_TYPE_INCOMPLETE',
-  function(
-    IMPROVE_TYPE_DEFAULT, IMPROVE_TYPE_INCOMPLETE) {
-    return {
-      // Returns an array of suggested improvements to states. Each suggestion
-      // is an object with the keys: rank, improveType, and stateName.
-      getStateImprovements: function(explorationStates, allStateStats) {
-        var rankComparator = function(lhs, rhs) {
-          return rhs.rank - lhs.rank;
-        };
-
-        var rankedStates = [];
-        var stateNames = Object.keys(explorationStates);
-        for (var i = 0; i < stateNames.length; i++) {
-          var stateName = stateNames[i];
-          var stateStats = allStateStats[stateName];
-
-          var totalEntryCount = stateStats.total_entry_count;
-          var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
-          var defaultAnswerCount = stateStats.num_default_answers;
-
-          if (totalEntryCount == 0) {
-            continue;
-          }
-
-          var threshold = 0.2 * totalEntryCount;
-          var eligibleFlags = [];
-          var state = explorationStates[stateName];
-          var stateInteraction = state.interaction;
-          if (defaultAnswerCount > threshold &&
-              stateInteraction.default_outcome &&
-              stateInteraction.default_outcome.dest == stateName) {
-            eligibleFlags.push({
-              rank: defaultAnswerCount,
-              improveType: IMPROVE_TYPE_DEFAULT,
-            });
-          }
-          if (noAnswerSubmittedCount > threshold) {
-            eligibleFlags.push({
-              rank: noAnswerSubmittedCount,
-              improveType: IMPROVE_TYPE_INCOMPLETE,
-            });
-          }
-          if (eligibleFlags.length > 0) {
-            eligibleFlags.sort(rankComparator);
-            rankedStates.push({
-              rank: eligibleFlags[0].rank,
-              stateName: stateName,
-              type: eligibleFlags[0].improveType,
-            });
-          }
-        }
-
-        // The returned suggestions are sorted decreasingly by their ranks.
-        rankedStates.sort(rankComparator);
-        return rankedStates;
-      }
-    };
-  }]);

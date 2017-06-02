@@ -225,10 +225,10 @@ describe('URL Interpolation Service', function() {
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/LogicProof' +
       '/static/LogicProof.png');
 
-    expect(uis.getComponentUrl('/test.html')).toBe(
-      GLOBALS.TEMPLATE_DIR_PREFIX + '/components/test.html');
-    expect(uis.getComponentUrl('/test_url/test.html')).toBe(
-      GLOBALS.TEMPLATE_DIR_PREFIX + '/components/test_url/test.html');
+    expect(uis.getDirectiveTemplateUrl('/test.html')).toBe(
+      GLOBALS.TEMPLATE_DIR_PREFIX + '/test.html');
+    expect(uis.getDirectiveTemplateUrl('/test_url/test.html')).toBe(
+      GLOBALS.TEMPLATE_DIR_PREFIX + '/test_url/test.html');
   });
 
   it('should throw an error for empty path', function() {
@@ -260,9 +260,9 @@ describe('URL Interpolation Service', function() {
       new Error(
         'Empty interactionId passed in getInteractionThumbnailImageUrl.'));
 
-    expect(uis.getComponentUrl.bind(null, null)).toThrow(
+    expect(uis.getDirectiveTemplateUrl.bind(null, null)).toThrow(
       new Error('Empty path passed in method.'));
-    expect(uis.getComponentUrl.bind(null, '')).toThrow(
+    expect(uis.getDirectiveTemplateUrl.bind(null, '')).toThrow(
       new Error('Empty path passed in method.'));
   });
 
@@ -282,10 +282,11 @@ describe('URL Interpolation Service', function() {
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
 
-      expect(uis.getComponentUrl.bind(null, 'test_fail.html')).toThrow(
+      expect(uis.getDirectiveTemplateUrl.bind(null, 'test_fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
-      expect(uis.getComponentUrl.bind(null, 'test_url/fail.html')).toThrow(
+      expect(
+         uis.getDirectiveTemplateUrl.bind(null, 'test_url/fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
     });

@@ -16,103 +16,89 @@
  * @fileoverview Directive for a schema-based editor for floats.
  */
 
-oppia.directive('schemaBasedFloatEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      allowExpressions: '&',
-      validators: '&',
-      labelForFocusTarget: '&',
-      onInputBlur: '=',
-      onInputFocus: '='
-    },
-    templateUrl: 'schemaBasedEditor/float',
-    restrict: 'E',
-    controller: [
-      '$scope', '$filter', '$timeout', 'parameterSpecsService',
-      'focusService',
-      function(
-          $scope, $filter, $timeout, parameterSpecsService, focusService) {
-        $scope.hasLoaded = false;
-        $scope.isUserCurrentlyTyping = false;
-        $scope.hasFocusedAtLeastOnce = false;
-
-        $scope.labelForErrorFocusTarget = focusService.generateFocusLabel();
-
-        $scope.validate = function(localValue) {
-          return $filter('isFloat')(localValue) !== undefined;
-        };
-
-        $scope.onFocus = function() {
-          $scope.hasFocusedAtLeastOnce = true;
-          if ($scope.onInputFocus) {
-            $scope.onInputFocus();
-          }
-        };
-
-        $scope.onBlur = function() {
+oppia.directive('schemaBasedFloatEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      scope: {
+        localValue: '=',
+        isDisabled: '&',
+        validators: '&',
+        labelForFocusTarget: '&',
+        onInputBlur: '=',
+        onInputFocus: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_float_editor_directive.html'),
+      restrict: 'E',
+      controller: [
+        '$scope', '$filter', '$timeout', 'focusService',
+        function($scope, $filter, $timeout, focusService) {
+          $scope.hasLoaded = false;
           $scope.isUserCurrentlyTyping = false;
-          if ($scope.onInputBlur) {
-            $scope.onInputBlur();
-          }
-        };
+          $scope.hasFocusedAtLeastOnce = false;
 
-        // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
-        $scope.getMinValue = function() {
-          for (var i = 0; i < $scope.validators().length; i++) {
-            if ($scope.validators()[i].id === 'is_at_least') {
-              return $scope.validators()[i].min_value;
-            }
-          }
-        };
+          $scope.labelForErrorFocusTarget = focusService.generateFocusLabel();
 
-        $scope.getMaxValue = function() {
-          for (var i = 0; i < $scope.validators().length; i++) {
-            if ($scope.validators()[i].id === 'is_at_most') {
-              return $scope.validators()[i].max_value;
-            }
-          }
-        };
-
-        $scope.onKeypress = function(evt) {
-          if (evt.keyCode === 13) {
-            if (Object.keys($scope.floatForm.floatValue.$error).length !== 0) {
-              $scope.isUserCurrentlyTyping = false;
-              focusService.setFocus($scope.labelForErrorFocusTarget);
-            } else {
-              $scope.$emit('submittedSchemaBasedFloatForm');
-            }
-          } else {
-            $scope.isUserCurrentlyTyping = true;
-          }
-        };
-
-        if ($scope.localValue === undefined) {
-          $scope.localValue = 0.0;
-        }
-
-        if ($scope.allowExpressions()) {
-          $scope.paramNames = parameterSpecsService.getAllParamsOfType('float');
-          $scope.expressionMode = angular.isString($scope.localValue);
-
-          $scope.$watch('localValue', function(newValue) {
-            $scope.expressionMode = angular.isString(newValue);
-          });
-
-          $scope.toggleExpressionMode = function() {
-            $scope.expressionMode = !$scope.expressionMode;
-            $scope.localValue = (
-              $scope.expressionMode ? $scope.paramNames[0] : 0.0);
+          $scope.validate = function(localValue) {
+            return $filter('isFloat')(localValue) !== undefined;
           };
-        }
 
-        // This prevents the red 'invalid input' warning message from flashing
-        // at the outset.
-        $timeout(function() {
-          $scope.hasLoaded = true;
-        });
-      }
-    ]
-  };
-}]);
+          $scope.onFocus = function() {
+            $scope.hasFocusedAtLeastOnce = true;
+            if ($scope.onInputFocus) {
+              $scope.onInputFocus();
+            }
+          };
+
+          $scope.onBlur = function() {
+            $scope.isUserCurrentlyTyping = false;
+            if ($scope.onInputBlur) {
+              $scope.onInputBlur();
+            }
+          };
+
+          // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
+          $scope.getMinValue = function() {
+            for (var i = 0; i < $scope.validators().length; i++) {
+              if ($scope.validators()[i].id === 'is_at_least') {
+                return $scope.validators()[i].min_value;
+              }
+            }
+          };
+
+          $scope.getMaxValue = function() {
+            for (var i = 0; i < $scope.validators().length; i++) {
+              if ($scope.validators()[i].id === 'is_at_most') {
+                return $scope.validators()[i].max_value;
+              }
+            }
+          };
+
+          $scope.onKeypress = function(evt) {
+            if (evt.keyCode === 13) {
+              if (
+                Object.keys($scope.floatForm.floatValue.$error).length !== 0) {
+                $scope.isUserCurrentlyTyping = false;
+                focusService.setFocus($scope.labelForErrorFocusTarget);
+              } else {
+                $scope.$emit('submittedSchemaBasedFloatForm');
+              }
+            } else {
+              $scope.isUserCurrentlyTyping = true;
+            }
+          };
+
+          if ($scope.localValue === undefined) {
+            $scope.localValue = 0.0;
+          }
+
+          // This prevents the red 'invalid input' warning message from flashing
+          // at the outset.
+          $timeout(function() {
+            $scope.hasLoaded = true;
+          });
+        }
+      ]
+    };
+  }]);

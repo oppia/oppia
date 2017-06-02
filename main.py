@@ -21,6 +21,7 @@ from core.controllers import admin
 from core.controllers import base
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
+from core.controllers import custom_landing_pages
 from core.controllers import dashboard
 from core.controllers import email_dashboard
 from core.controllers import editor
@@ -76,10 +77,9 @@ class HomePageRedirectHandler(base.BaseHandler):
                 self.user_id)
 
             # 'Creator' is a user who has created or edited an exploration.
-            user_is_creator = (
-                user_contributions is not None and
-                (len(user_contributions.created_exploration_ids) > 0 or
-                 len(user_contributions.edited_exploration_ids) > 0))
+            user_is_creator = user_contributions and (
+                user_contributions.created_exploration_ids or
+                user_contributions.edited_exploration_ids)
             if user_is_creator:
                 self.redirect(feconf.DASHBOARD_URL)
             else:
@@ -203,6 +203,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/my_explorations', dashboard.DashboardRedirectPage),
 
     get_redirect_route(
+        r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
+        reader.RemoveExpFromIncompleteListHandler),
+    get_redirect_route(
+        r'%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
+        reader.RemoveCollectionFromIncompleteListHandler),
+    get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
         resources.ImageHandler),
     get_redirect_route(
@@ -211,7 +217,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
-
+    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
+                       custom_landing_pages.FractionLandingPage),
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
                        library.LibraryIndexHandler),
@@ -298,7 +305,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
         editor.ExplorationPage),
     get_redirect_route(
-        r'/createhandler/data/<exploration_id>', editor.ExplorationHandler),
+        r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
+        editor.ExplorationHandler),
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler),

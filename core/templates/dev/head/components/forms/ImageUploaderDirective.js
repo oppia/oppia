@@ -17,7 +17,8 @@
  */
 
 oppia.directive('imageUploader', [
-  'IdGenerationService', function(IdGenerationService) {
+  'IdGenerationService', 'UrlInterpolationService',
+  function(IdGenerationService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -25,7 +26,8 @@ oppia.directive('imageUploader', [
         onFileChanged: '=',
         width: '@'
       },
-      templateUrl: 'components/imageUploader',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/image_uploader_directive.html'),
       link: function(scope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
