@@ -40,12 +40,13 @@ oppia.factory('NumericInputValidationService', [
           ubi: bool, is upper bound inclusive
         }
         */
-        var isEnclosedBy = function(ra, rb) {
-          var lower = 
+        function isEnclosedBy(ra, rb) {
+          // Checks if range ra is enclosed by range rb.
+          var lowerBoundConditionIsSatisfied =
               (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
-          var upper = 
+          var upperBoundConditionIsSatisfied =
               (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
-          return lower && upper;
+          return lowerBoundConditionIsSatisfied && upperBoundConditionIsSatisfied;
         };
 
         var ranges = [];
@@ -87,13 +88,17 @@ oppia.factory('NumericInputValidationService', [
                 break;
               default:
             }
+            range.answerGroup = i + 1;
+            range.rule = j + 1;
             for (var k = 0; k < ranges.length; k++) {
               if (isEnclosedBy(range, ranges[k])) {
                 warningsList.push({
                   type: WARNING_TYPES.CRITICAL,
                   message: (
-                    'Some rules will never be matched because' +
-                    ' they are made redundant by preceding rules.')
+                    'Rule ' + (j + 1) + ' from answer group ' +
+                    (i + 1) + ' will never be matched because it ' +
+                    'is made redundant by rule ' + ranges[k].rule + ' from ' +
+                    'answer group ' + ranges[k].answerGroup + '.')
                 });
               }
             }
