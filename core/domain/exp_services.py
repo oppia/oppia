@@ -651,6 +651,10 @@ def apply_change_list(exploration_id, change_list):
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     state.update_param_changes(change.new_value)
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_CLASSIFIER_MODEL_ID):
+                    state.update_classifier_model_id(change.new_value)
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(change.new_value)
                 elif (

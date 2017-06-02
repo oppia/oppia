@@ -108,8 +108,8 @@ oppia.factory('AnswerClassificationService', [
        * </ul>
        */
       getMatchingClassificationResult: function(
-          explorationId, oldState, answer, isInEditorMode,
-          interactionRulesService) {
+          explorationId, explorationVersion, stateName, oldState,
+          answer, isInEditorMode, interactionRulesService) {
         var deferred = $q.defer();
         var result = null;
         var answerGroups = oldState.interaction.answerGroups;
@@ -135,6 +135,9 @@ oppia.factory('AnswerClassificationService', [
 
           $http.post(classifyUrl, {
             old_state: oldState.toBackendDict(),
+            exp_id: explorationId,
+            exp_version: explorationVersion,
+            state_name: stateName,
             params: params,
             answer: answer
           }).then(function(response) {

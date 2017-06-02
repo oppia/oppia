@@ -331,12 +331,19 @@ class ClassifyHandler(base.BaseHandler):
         """
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
+        # The id of the exploration to which the state belongs.
+        exp_id = self.payload.get('exp_id')
+        # The version of the exploration when the classifier model was created.
+        exp_version_when_created = self.payload.get('exp_version')
+        # The name of the State to which the interaction belongs.
+        state_name = self.payload.get('state_name')
         # The learner's raw answer.
         answer = self.payload.get('answer')
         # The learner's parameter values.
         params = self.payload.get('params')
         params['answer'] = answer
-        result = classifier_services.classify(old_state, answer)
+        result = classifier_services.classify(
+            old_state, answer, exp_id, exp_version_when_created, state_name)
         self.render_json(result)
 
 

@@ -144,10 +144,12 @@ oppia.factory('trainingModalService', [
             'explorationStatesService', 'editorContextService',
             'AnswerClassificationService', 'explorationContextService',
             'stateInteractionIdService', 'angularNameService',
+            'explorationData',
             function($scope, $injector, $modalInstance,
                 explorationStatesService, editorContextService,
                 AnswerClassificationService, explorationContextService,
-                stateInteractionIdService, angularNameService) {
+                stateInteractionIdService, angularNameService,
+                explorationData) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
               $scope.trainingDataOutcomeDest = '';
@@ -166,6 +168,8 @@ oppia.factory('trainingModalService', [
               $scope.init = function() {
                 var explorationId =
                   explorationContextService.getExplorationId();
+                var explorationVersion =
+                  explorationData.data.version;
                 var currentStateName =
                   editorContextService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);
@@ -181,7 +185,8 @@ oppia.factory('trainingModalService', [
                 var rulesService = $injector.get(rulesServiceName);
 
                 AnswerClassificationService.getMatchingClassificationResult(
-                  explorationId, state, unhandledAnswer, true, rulesService)
+                  explorationId, explorationVersion, currentStateName, state,
+                  unhandledAnswer, true, rulesService)
                   .then(function(classificationResult) {
                     var feedback = 'Nothing';
                     var dest = classificationResult.outcome.dest;

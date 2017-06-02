@@ -49,7 +49,8 @@ oppia.factory('responsesService', [
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
-      explorationStatesService, graphDataService, OutcomeObjectFactory) {
+      explorationStatesService, graphDataService, OutcomeObjectFactory,
+      explorationData) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -564,7 +565,7 @@ oppia.controller('StateResponses', [
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'AnswerClassificationService', 'focusService',
-          'angularNameService', 'RULE_TYPE_CLASSIFIER',
+          'angularNameService', 'RULE_TYPE_CLASSIFIER', 'explorationData',
           function(
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
@@ -572,8 +573,9 @@ oppia.controller('StateResponses', [
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
               AnswerClassificationService, focusService,
-              angularNameService, RULE_TYPE_CLASSIFIER) {
+              angularNameService, RULE_TYPE_CLASSIFIER, explorationData) {
             var _explorationId = explorationContextService.getExplorationId();
+            var _explorationVersion = explorationData.data.version
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
 
@@ -622,7 +624,8 @@ oppia.controller('StateResponses', [
                   stateCustomizationArgsService.savedMemento));
 
               AnswerClassificationService.getMatchingClassificationResult(
-                _explorationId, _state, answer, true, rulesService)
+                _explorationId, _explorationVersion,
+                _stateName, _state, answer, true, rulesService)
                 .then(function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
