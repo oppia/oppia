@@ -54,10 +54,10 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                 (_STATE_COUNTER_ERROR_KEY, error message).
             tuple. For ExplorationAnnotationModel, a 2-tuple in the form
                 ('exploration_id', value).
-                'exploration_id': the id of the exploration.
+                'exploration_id': str. the id of the exploration.
                 'value': a dict, whose structure is as follows:
                     {
-                        'version': version of the exploration.
+                        'version': str. version of the exploration.
                         'starts': int. # of times exploration was started.
                         'completions': int. # of times exploration was
                             completed.
@@ -98,12 +98,12 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
         """Updates statistics for the given exploration.
 
         Args:
-            key: str. The exploration id of the exploration.
+            key: str. The id of the exploration.
             stringified_values: list(str). A list of stringified values
-                associated with the given key. An element of stringfield_values
+                associated with the given key. An element of stringified_values
                 would be of the form:
                     {
-                        'version': version of the exploration.
+                        'version': str. version of the exploration.
                         'starts': int. # of times exploration was started.
                         'completions': int. # of times exploration was
                             completed.
