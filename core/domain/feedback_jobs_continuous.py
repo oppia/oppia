@@ -208,8 +208,8 @@ class FeedbackAnalyticsMRJobManager(
 
         Yields:
             A tuple of two elements:
-              - item.exploration_id: str. The exploration id of the item. 
-              - item.status: str. The feedback thread status.  
+              - item.exploration_id: str. The exploration id of the item.
+              - item.status: str. The feedback thread status.
       """
         yield (item.exploration_id, item.status)
 
@@ -217,10 +217,10 @@ class FeedbackAnalyticsMRJobManager(
     def reduce(key, stringified_values):
         """Reduce function.
 
-        Args: 
+        Args:
             key: The key value from the above map() function
-            stringified_values: list(str). List of all status from all 
-            mappers tagged with the given key.  
+            stringified_values: list(str). List of all status from all
+            mappers tagged with the given key.
       """
         num_open_threads = stringified_values.count(
             feedback_models.STATUS_CHOICES_OPEN)
