@@ -25,10 +25,10 @@
         <p style="text-align: center;">
           <span translate="I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY"></span><br><br>
           {% if not has_fully_registered %}
-            <a href ng-click="onRedirectToLogin('/dashboard?mode=create')"
+            <a href ng-click="onRedirectToLogin('/creator_dashboard?mode=create')"
                translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION"></a>
           {% else %}
-            <a href="/dashboard?mode=create"
+            <a href="/creator_dashboard?mode=create"
                translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION"></a>
           {% endif %}
         </p>

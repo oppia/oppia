@@ -14,7 +14,7 @@
 
 """Tests for the creator dashboard and the notifications dashboard."""
 
-from core.controllers import dashboard
+from core.controllers import creator_dashboard
 from core.domain import event_services
 from core.domain import exp_services
 from core.domain import feedback_domain
@@ -68,7 +68,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class DashboardStatisticsTest(test_utils.GenericTestBase):
+class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
     OWNER_EMAIL_1 = 'owner1@example.com'
     OWNER_USERNAME_1 = 'owner1'
     OWNER_EMAIL_2 = 'owner2@example.com'
@@ -85,7 +85,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
     USER_IMPACT_SCORE_DEFAULT = 0.0
 
     def setUp(self):
-        super(DashboardStatisticsTest, self).setUp()
+        super(CreatorDashboardStatisticsTest, self).setUp()
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
 
@@ -144,7 +144,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
 
     def test_stats_no_explorations(self):
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
         self._run_user_stats_aggregator_job()
         self.assertIsNone(user_models.UserStatsModel.get(
@@ -156,7 +156,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
 
         exp_version = self.EXP_DEFAULT_VERSION
@@ -180,7 +180,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
 
         exp_id = self.EXP_ID_1
@@ -200,7 +200,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
 
         exp_id = self.EXP_ID_1
@@ -227,7 +227,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
 
         exp_version = self.EXP_DEFAULT_VERSION
@@ -259,7 +259,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
 
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
 
         exp_version = self.EXP_DEFAULT_VERSION
@@ -287,7 +287,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
 
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
 
         exp_version = self.EXP_DEFAULT_VERSION
@@ -324,7 +324,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             rights_manager.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
 
         exp_version = self.EXP_DEFAULT_VERSION
@@ -339,7 +339,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.logout()
 
         self.login(self.OWNER_EMAIL_2)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
 
         self._rate_exploration(exp_id, [3, 4, 5])
@@ -377,7 +377,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             rights_manager.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_2)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
 
         exp_version = self.EXP_DEFAULT_VERSION
@@ -417,7 +417,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.logout()
 
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
 
         user_model_1 = user_models.UserStatsModel.get(self.owner_id_1)
@@ -432,7 +432,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class DashboardHandlerTest(test_utils.GenericTestBase):
+class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
 
     COLLABORATOR_EMAIL = 'collaborator@example.com'
     COLLABORATOR_USERNAME = 'collaborator'
@@ -452,7 +452,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
     EXP_TITLE_3 = 'Exploration title 3'
 
     def setUp(self):
-        super(DashboardHandlerTest, self).setUp()
+        super(CreatorDashboardHandlerTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
@@ -468,7 +468,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
     def test_no_explorations(self):
         self.login(self.OWNER_EMAIL)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
         self.logout()
 
@@ -476,7 +476,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         # Testing that creator only visit dashboard without any exploration
         # created.
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 0)
         self.logout()
 
@@ -485,7 +485,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         # Testing the quantity of exploration created and it should be 1.
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.logout()
 
@@ -496,11 +496,11 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.save_new_default_exploration(
             self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
         # Testing the quantity of exploration and it should be 2.
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
         exp_services.delete_exploration(self.owner_id_1, self.EXP_ID_1)
         # Testing whether 1 exploration left after deletion of previous one.
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.logout()
 
@@ -513,7 +513,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.save_new_default_exploration(
             self.EXP_ID_3, self.owner_id_2, title=self.EXP_TITLE_3)
         # Testing for quantity of explorations to be 3.
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 3)
         # Testing for deletion of all created previously.
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_1)
@@ -521,7 +521,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_3)
         # All explorations have been deleted, so the dashboard query should not
         # load any explorations.
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 0)
         self.logout()
 
@@ -531,21 +531,21 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.OWNER_EMAIL)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
@@ -561,21 +561,21 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.COLLABORATOR_EMAIL)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
@@ -592,15 +592,15 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.VIEWER_EMAIL)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
         self.logout()
 
@@ -610,7 +610,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['num_open_threads'], 0)
@@ -624,7 +624,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
             feedback_services, 'get_thread_analytics_multi',
             mock_get_thread_analytics_multi):
 
-            response = self.get_json(feconf.DASHBOARD_DATA_URL)
+            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['explorations_list']), 1)
             self.assertEqual(
                 response['explorations_list'][0]['num_open_threads'], 2)
@@ -636,13 +636,13 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
     def test_can_see_subscribers(self):
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 0)
 
         # Subscribe to creator.
         subscription_services.subscribe_to_creator(
             self.viewer_id, self.owner_id)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 1)
         self.assertEqual(
             response['subscribers_list'][0]['subscriber_username'],
@@ -651,7 +651,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         # Unsubscribe from creator.
         subscription_services.unsubscribe_from_creator(
             self.viewer_id, self.owner_id)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 0)
 
 
@@ -832,12 +832,12 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         """Test generation of exploration ids."""
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get(feconf.DASHBOARD_URL)
+        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         exp_a_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
-        )[dashboard.EXPLORATION_ID_KEY]
+        )[creator_dashboard.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
 
         self.logout()
@@ -846,12 +846,12 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         """Test that the exploration upload button appears when appropriate."""
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get(feconf.DASHBOARD_URL)
+        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
 
         with self.swap(feconf, 'ALLOW_YAML_FILE_UPLOAD', True):
-            response = self.testapp.get(feconf.DASHBOARD_URL)
+            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
             self.assertEqual(response.status_int, 200)
             response.mustcontain('ng-click="showUploadExplorationModal()"')
 
