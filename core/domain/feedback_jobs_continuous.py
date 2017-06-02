@@ -56,8 +56,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         """Records thread analytics in the given realtime layer.
 
         Args:
-            active_realtime_layer: int. Currently active realtime datastore
-                layer.
+            active_realtime_layer: int. The currently active realtime
+            datastore layer.
             event_type: str. The event triggered by the student.
             *args: Variable length argument list. The first element of *args
                 corresponds to the id of the exploration currently being
@@ -129,16 +129,20 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
     # Public query methods.
     @classmethod
     def get_thread_analytics_multi(cls, exploration_ids):
-        """Get the thread analytics for the explorations specified by the
+        """Gets the thread analytics for the explorations specified by the
         exploration_ids.
 
         Args:
-            exploration_ids: ids of the explorations to get analytics for.
+            exploration_ids: list(str) IDs of the explorations to get
+            analytics for.
 
         Returns:
-            A list of dicts, each with two keys: 'num_open_threads' and
-            'num_total_threads', representing the counts of open and all
-            feedback threads, respectively.
+            list(dict). Each dict in this list corresponds to an
+            exploration ID in the input list, and has two keys:
+            - num_open_threads: int. The count of open feedback threads
+              for this exploration.
+            - num_total_threads: int. The count of all feedback threads
+              for this exploration.
         """
         realtime_model_ids = cls.get_multi_active_realtime_layer_ids(
             exploration_ids)
@@ -149,25 +153,30 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 exploration_ids))
 
         return [feedback_domain.FeedbackAnalytics(
-            exploration_ids[i], (realtime_models[i].num_open_threads
-                                 if realtime_models[i] is not None else 0) +
+            exploration_ids[i],
+            (realtime_models[i].num_open_threads
+             if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_open_threads
              if feedback_thread_analytics_models[i] is not None else 0),
             (realtime_models[i].num_total_threads
              if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_total_threads
              if feedback_thread_analytics_models[i] is not None else 0)
-            ) for i in range(len(exploration_ids))]
+        ) for i in range(len(exploration_ids))]
 
     @classmethod
     def get_thread_analytics(cls, exploration_id):
         """Retrieves the analytics for feedback threads.
 
         Args:
-            exploration_id: id of exploration to get statistics for
+            exploration_id: str. id of exploration to get statistics for.
 
         Returns:
-            A dict with two keys, 'num_open_threads' and 'num_total_threads'
+            dict with two keys:
+            - num_open_threads: int. The count of open feedback threads for
+              this exploration.
+            - num_total_threads: int. The count of all open feedback
+              threads for this exploration.
         """
         return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
             [exploration_id])[0]
@@ -192,10 +201,27 @@ class FeedbackAnalyticsMRJobManager(
 
     @staticmethod
     def map(item):
+      """Map function.
+
+      Args:
+          item: A single element of the type given by entity_class().
+
+      Yields:
+          A tuple of two elements:
+             - item.exploration_id: str. The exploration id of the item. 
+             - item.status: str. The feedback thread status.  
+      """
         yield (item.exploration_id, item.status)
 
     @staticmethod
     def reduce(key, stringified_values):
+      """Reduce function.
+
+      Args: 
+          key: The key value from the above map() function
+          stringified_values: list(str). List of all status from all 
+          mappers tagged with the given key.  
+      """
         num_open_threads = stringified_values.count(
             feedback_models.STATUS_CHOICES_OPEN)
         num_total_threads = len(stringified_values)
