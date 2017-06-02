@@ -53,7 +53,7 @@ oppia.controller('SettingsTab', [
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-    var DASHBOARD_PAGE_URL = '/dashboard';
+    var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
     $scope.getExplorePageUrl = function() {
@@ -311,7 +311,7 @@ oppia.controller('SettingsTab', [
       }).result.then(function() {
         EditableExplorationBackendApiService.deleteExploration(
           $scope.explorationId).then(function() {
-            $window.location = DASHBOARD_PAGE_URL;
+            $window.location = CREATOR_DASHBOARD_PAGE_URL;
           });
       });
     };

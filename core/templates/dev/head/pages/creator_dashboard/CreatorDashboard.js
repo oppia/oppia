@@ -46,16 +46,16 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
   IMPACT: 'Impact'
 });
 
-oppia.controller('Dashboard', [
+oppia.controller('CreatorDashboard', [
   '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
-  'DashboardBackendApiService', 'RatingComputationService',
+  'CreatorDashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
-      DashboardBackendApiService, RatingComputationService,
+      CreatorDashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
@@ -179,7 +179,7 @@ oppia.controller('Dashboard', [
     };
 
     $rootScope.loadingMessage = 'Loading';
-    DashboardBackendApiService.fetchDashboardData().then(
+    CreatorDashboardBackendApiService.fetchDashboardData().then(
       function(response) {
         var responseData = response.data;
         $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;

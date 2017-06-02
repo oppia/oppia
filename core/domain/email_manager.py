@@ -624,7 +624,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         'You\'ve received %s new message%s on your Oppia explorations:<br>'
         '<ul>%s</ul>'
         'You can view and reply to your messages from your '
-        '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+        '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
         '<br>'
         '<br>Thanks, and happy teaching!<br>'
         '<br>'
