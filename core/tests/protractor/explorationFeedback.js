@@ -23,7 +23,7 @@
  * in an e2e test.
  */
 
-var creatorDashboard = require('../protractor_utils/creator_dashboard.js');
+var creatorDashboard = require('../protractor_utils/creatorDashboard.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');

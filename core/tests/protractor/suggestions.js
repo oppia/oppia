@@ -16,7 +16,7 @@
  * @fileoverview End-to-end tests for suggestions on explorations
  */
 
-var creatorDashboard = require('../protractor_utils/creator_dashboard.js');
+var creatorDashboard = require('../protractor_utils/creatorDashboard.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
