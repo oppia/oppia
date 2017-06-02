@@ -57,7 +57,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
         Args:
             active_realtime_layer: int. The currently active realtime
-            datastore layer.
+                datastore layer.
             event_type: str. The event triggered by the student.
             *args: Variable length argument list. The first element of *args
                 corresponds to the id of the exploration currently being
@@ -133,7 +133,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         exploration_ids.
 
         Args:
-            exploration_ids: list(str) IDs of the explorations to get
+            exploration_ids: list(str). IDs of the explorations to get
             analytics for.
 
         Returns:
@@ -204,7 +204,7 @@ class FeedbackAnalyticsMRJobManager(
         """Map function.
 
         Args:
-            item: A single element of the type given by entity_class().
+            item: FeedbackThreadModel. A feedback thread model instance.
 
         Yields:
             A tuple of two elements:
@@ -218,8 +218,8 @@ class FeedbackAnalyticsMRJobManager(
         """Reduce function.
 
         Args:
-            key: The key value from the above map() function
-            stringified_values: list(str). List of all status from all
+            key: str. The exploration ID.
+                stringified_values: list(str). List of all statuses from all
             mappers tagged with the given key.
       """
         num_open_threads = stringified_values.count(
