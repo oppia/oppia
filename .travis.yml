@@ -77,7 +77,6 @@ before_install:
 - bash -e /etc/init.d/xvfb start
 
 install:
-- set -e
 - pushd $TRAVIS_BUILD_DIR
 - source scripts/setup.sh || exit 1
 - source scripts/setup_gae.sh || exit 1

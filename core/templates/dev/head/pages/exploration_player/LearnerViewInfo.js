@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the learner view breadcrumb section of the
- * navbar.
+ * @fileoverview Controllers for the learner view info section of the
+ * footer.
  */
 
-oppia.controller('LearnerViewBreadcrumb', [
+oppia.controller('LearnerViewInfo', [
   '$scope', '$modal', '$http', '$log', 'explorationContextService',
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
   function($scope, $modal, $http, $log, explorationContextService,

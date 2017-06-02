@@ -153,8 +153,11 @@ class Classifier(object):
                 self.algorithm_id)
         utils.require_valid_name(
             self.algorithm_id, 'the algorithm id')
-        if self.algorithm_id not in (
+        algorithm_ids = []
+        for classifier_details in (
                 feconf.INTERACTION_CLASSIFIER_MAPPING.values()):
+            algorithm_ids.append(classifier_details['algorithm_id'])
+        if self.algorithm_id not in algorithm_ids:
             raise utils.ValidationError(
                 'Invalid algorithm id: %s' % self.algorithm_id)
 
