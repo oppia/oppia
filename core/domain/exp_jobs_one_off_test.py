@@ -785,7 +785,7 @@ class FallbackOneOffJobTest(test_utils.GenericTestBase):
             new_state.update_interaction_fallbacks(self.FALLBACK)
             exploration.states['end'].update_interaction_id('EndExploration')
 
-            exp_services._save_exploration(self.owner_id, exploration, '', [])
+            exp_services._save_exploration(self.owner_id, exploration, '', []) # pylint: disable=W0212
             rights_manager.publish_exploration(self.owner_id, exploration.id)
 
         job_id = (exp_jobs_one_off.FallbackOneOffJob.create_new())
