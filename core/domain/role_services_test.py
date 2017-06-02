@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import feconf
 
 
 class RoleDomainUnitTests(test_utils.GenericTestBase):
-    """Tests for role PARENT_ROLES and actions."""
+    """Tests for PARENT_ROLES and ROLE_ACTIONS."""
     PARENT_ROLES = role_services.PARENT_ROLES
     ACTIONS = role_services.ROLE_ACTIONS
 
@@ -96,7 +96,7 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
             check_cycle(role_name, self.PARENT_ROLES[role_name])
 
     def test_get_all_actions(self):
-        """Test that get_all_actions is working correctly."""
+        """Test that get_all_actions works as expected."""
 
         # Case when wrong input is given.
         with self.assertRaisesRegexp(

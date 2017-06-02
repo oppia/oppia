@@ -482,13 +482,13 @@ def get_user_settings(user_id, strict=False):
 
 
 def get_user_role_from_id(user_id):
-    """Returns the role of the user with given user_id.
+    """Returns role of the user with given user_id.
 
     Args:
         user_id: str. User's id.
 
     Returns:
-        role: str. Role of the user.
+        role: str. Role of the user with given id.
     """
     user_settings = get_user_settings(user_id)
     return user_settings.role
@@ -791,12 +791,11 @@ def update_user_role(user_id, role):
     """Updates the role of the user with given user_id.
 
     Args:
-        user_id: str. The user id.
-        role: str. The role to be assigned to user.
+        user_id: str. Id of user whose role is to be updated.
+        role: str. The role to be assigned to user with given id.
 
     Raises:
-        Exception: The argument passed does not correspond
-            to any existing role.
+        Exception: Given role does not exist.
     """
     if role not in role_services.PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)

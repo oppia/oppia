@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """This module contains the Hierarchy Structure of roles for action
-inheritance, Actions permitted to the roles and the functions used to
+inheritance, Actions permitted to the roles and the functions needed to
 access roles and actions.
 """
 
@@ -91,19 +91,18 @@ ROLE_ACTIONS = {
 
 
 def get_all_actions(role):
-    """Returns a list of all the actions (including inherited actions)
+    """Returns a list of all actions (including inherited actions)
     that can be performed by the given role.
 
     Args:
         role: str. A string defining user role. It should be a key of
-              PARENT_ROLES
+              PARENT_ROLES.
 
     Returns:
         list. A list of actions accessible to the role.
 
     Raises:
-        Exception: The argument passed does not correspond to any existing
-                   role.
+        Exception: Given role does not exist.
     """
     if role not in PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)
