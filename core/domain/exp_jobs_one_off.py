@@ -329,6 +329,7 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceJobManager):
     def reduce(key, values):
         yield (key, values)
 
+
 class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
     """Job that outputs a list of fallbacks."""
 

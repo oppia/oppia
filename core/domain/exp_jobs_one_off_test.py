@@ -738,6 +738,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
 
+
 class FallbackOneOffJobTest(test_utils.GenericTestBase):
 
     EXP_IDS = ['exp_id0', 'exp_id1']
@@ -745,7 +746,7 @@ class FallbackOneOffJobTest(test_utils.GenericTestBase):
         'trigger': {
             'customization_args': {
                 'num_submits': {
-                    'value': i+3
+                    'value': i + 3
                 }
             },
             'trigger_type': 'NthResubmission'
@@ -760,17 +761,14 @@ class FallbackOneOffJobTest(test_utils.GenericTestBase):
     } for i in xrange(3)]
     STATE_NAMES = ['Introduction', 'state 1']
 
-
     def setUp(self):
         super(FallbackOneOffJobTest, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-
     def test_fallbacks_are_listed(self):
-        """Tests that fallbacks are listed.
-        """
+        """Tests that fallbacks are listed."""
         explorations = [self.save_new_valid_exploration(
             EXP_ID, self.owner_id, objective='The objective',
             end_state_name='end') for EXP_ID in self.EXP_IDS]
@@ -788,28 +786,33 @@ class FallbackOneOffJobTest(test_utils.GenericTestBase):
             exp_services._save_exploration(self.owner_id, exploration, '', []) # pylint: disable=W0212
             rights_manager.publish_exploration(self.owner_id, exploration.id)
 
-        job_id = (exp_jobs_one_off.FallbackOneOffJob.create_new())
+        job_id = exp_jobs_one_off.FallbackOneOffJob.create_new()
         exp_jobs_one_off.FallbackOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         actual_values = exp_jobs_one_off.FallbackOneOffJob.get_output(job_id)
-        updated_exps = [
-            exp_services.get_exploration_by_id(exploration.id)
-            for exploration in explorations]
-        expected_values = []
 
-        for updated_exp in updated_exps:
-            for state_name in self.STATE_NAMES:
-                interaction = updated_exp.states[state_name].interaction
-                expected_values.append([
-                    u'%s: %s' % (
-                        updated_exp.id,
-                        state_name),
-                    [u'%s: %s' % (
-                        interaction.fallbacks[i].trigger
-                        .customization_args['num_submits']['value'],
-                        interaction.fallbacks[i].outcome.feedback[0]
-                    ) for i in xrange(3)]])
+        expected_values = [[
+            u'exp_id0: Introduction',
+            [u'3: <p>feedback 0</p>',
+             u'4: <p>feedback 1</p>',
+             u'5: <p>feedback 2</p>']
+        ], [
+            u'exp_id0: state 1',
+            [u'3: <p>feedback 0</p>',
+             u'4: <p>feedback 1</p>',
+             u'5: <p>feedback 2</p>']
+        ], [
+            u'exp_id1: Introduction',
+            [u'3: <p>feedback 0</p>',
+             u'4: <p>feedback 1</p>',
+             u'5: <p>feedback 2</p>']
+        ], [u'exp_id1: state 1',
+            [u'3: <p>feedback 0</p>',
+             u'4: <p>feedback 1</p>',
+             u'5: <p>feedback 2</p>']]]
 
-        for actual_value in actual_values:
-            self.assertIn(actual_value.encode('ascii'), str(expected_values))
+        actual_values.sort()
+        for index, actual_value in enumerate(actual_values):
+            self.assertEqual(actual_value.encode('ascii'),
+                             str(expected_values[index]))
