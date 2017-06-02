@@ -84,7 +84,8 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_rule_spec_index = None
 
     sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
-        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+        feconf.INTERACTION_CLASSIFIER_MAPPING[state.interaction.id][
+            'algorithm_id'])
 
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
