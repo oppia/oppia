@@ -53,8 +53,8 @@ class NotificationsDashboardPage(base.BaseHandler):
                 'You do not have the credentials to access this page.')
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
-                'meta_description': feconf.DASHBOARD_PAGE_DESCRIPTION,
-                'nav_mode': feconf.NAV_MODE_DASHBOARD,
+                'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
+                'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
             })
             self.render_template(
                 'pages/notifications_dashboard/notifications_dashboard.html',
@@ -112,7 +112,7 @@ class NotificationsDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class DashboardPage(base.BaseHandler):
+class CreatorDashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
     @base.require_user
@@ -122,19 +122,20 @@ class DashboardPage(base.BaseHandler):
                 'You do not have the credentials to access this page.')
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
-                'nav_mode': feconf.NAV_MODE_DASHBOARD,
+                'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
                 'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
                 'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                     DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
             })
             self.render_template(
-                'pages/dashboard/dashboard.html', redirect_url_on_logout='/')
+                'pages/creator_dashboard/creator_dashboard.html',
+                redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', feconf.DASHBOARD_URL))
+                feconf.SIGNUP_URL, 'return_url', feconf.CREATOR_DASHBOARD_URL))
 
 
-class DashboardHandler(base.BaseHandler):
+class CreatorDashboardHandler(base.BaseHandler):
     """Provides data for the user's creator dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -350,9 +351,9 @@ class UploadExploration(base.BaseHandler):
                 'This server does not allow file uploads.')
 
 
-class DashboardRedirectPage(base.BaseHandler):
+class CreatorDashboardRedirectPage(base.BaseHandler):
     """An page that redirects to the main Dashboard page."""
 
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.DASHBOARD_URL)
+        self.redirect(feconf.CREATOR_DASHBOARD_URL)

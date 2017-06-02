@@ -142,6 +142,8 @@
       <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
       <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
       </promo-bar>
+      <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
+      </div>
 
       <div class="oppia-base-container"
            ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"

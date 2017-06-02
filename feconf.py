@@ -72,7 +72,10 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 
 # A mapping of interaction ids to their default classifier.
 INTERACTION_CLASSIFIER_MAPPING = {
-    'TextInput': 'LDAStringClassifier'
+    'TextInput': {
+        'algorithm_id': 'LDAStringClassifier',
+        'current_data_schema_version': 1
+    }
 }
 
 # The minimum number of training samples required for training a classifier.
@@ -154,6 +157,11 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
+
+# Default ID of VM which is used for training classifier.
+DEFAULT_VM_ID = 'vm_default'
+# Shared secret key for default VM.
+DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -508,10 +516,10 @@ EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-DASHBOARD_URL = '/dashboard'
-DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
-DASHBOARD_DATA_URL = '/dashboardhandler/data'
-DASHBOARD_EXPLORATION_STATS_PREFIX = '/dashboardhandler/explorationstats'
+CREATOR_DASHBOARD_URL = '/creator_dashboard'
+DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
+CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
+DASHBOARD_EXPLORATION_STATS_PREFIX = '/creatordashboardhandler/explorationstats'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
@@ -560,7 +568,7 @@ NAV_MODE_BLOG = 'blog'
 NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
-NAV_MODE_DASHBOARD = 'dashboard'
+NAV_MODE_CREATOR_DASHBOARD = 'creator_dashboard'
 NAV_MODE_DONATE = 'donate'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LIBRARY = 'library'
@@ -900,7 +908,7 @@ CONTACT_PAGE_DESCRIPTION = (
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
-DASHBOARD_PAGE_DESCRIPTION = (
+CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
 DONATE_PAGE_DESCRIPTION = (

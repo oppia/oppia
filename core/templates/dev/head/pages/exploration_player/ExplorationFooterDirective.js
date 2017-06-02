@@ -29,10 +29,10 @@ oppia.directive('explorationFooter', [
         'exploration_footer_directive.html'),
       controller: [
         '$scope', '$http', '$log', 'explorationContextService',
-        'ExplorationSummaryBackendApiService',
+        'ExplorationSummaryBackendApiService', 'windowDimensionsService',
         function(
             $scope, $http, $log, explorationContextService,
-            ExplorationSummaryBackendApiService) {
+            ExplorationSummaryBackendApiService, windowDimensionsService) {
           $scope.explorationId = explorationContextService.getExplorationId();
 
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
@@ -43,6 +43,14 @@ oppia.directive('explorationFooter', [
             return $scope.twitterText;
           };
 
+          $scope.mobileFeedbackIsShown =
+            windowDimensionsService.isExplorationPlayerNavHidden();
+          windowDimensionsService.registerOnResizeHook(function() {
+            $scope.mobileFeedbackIsShown =
+              windowDimensionsService.isExplorationPlayerNavHidden();
+            $scope.$apply();
+          });
+          
           ExplorationSummaryBackendApiService
             .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
             .then(

@@ -1107,7 +1107,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             '<li>Message 1.3<br></li>'
             '</ul></li></ul>'
             'You can view and reply to your messages from your '
-            '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+            '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
             '<br>'
             '<br>Thanks, and happy teaching!<br>'
             '<br>'

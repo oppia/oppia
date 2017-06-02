@@ -4,7 +4,7 @@
   <button class="btn btn-success" type="submit" ng-disabled="!newExplorationTitle">Create New Exploration</button>
 </form>
 or
-<form class="form-inline" ng-submit="addExploration()">
-  <input class="form-control protractor-test-add-exploration-input" ng-model="newExplorationId" type="text" placeholder="Existing exploration ID">
-  <button class="btn btn-default protractor-test-add-exploration-button" type="submit" ng-disabled="!newExplorationId">Add Existing Exploration</button>
+<form class="form-inline" ng-class="{'has-error': searchQueryHasError}" ng-submit="addExploration()">
+  <input class="form-control protractor-test-add-exploration-input" style="width: 430px" ng-model="newExplorationId" type="text" placeholder="Enter exploration id to be added, or search explorations by name" typeahead="exploration for exploration in fetchTypeaheadResults($viewValue)" ng-model-options="{ debounce: 300 }">
+  <button class="btn btn-success protractor-test-add-exploration-button" type="submit" ng-disabled="!newExplorationId">Add Existing Exploration</button>
 </form>

@@ -63,8 +63,7 @@ exports.config = {
     mainEditor: [
       'protractor/editorAndPlayer.js',
       'protractor/stateEditor.js',
-      'protractor/explorationFeedback.js',
-      'protractor/suggestions.js'
+      'protractor/explorationFeedback.js'
     ],
 
     editorFeatures: [
@@ -94,6 +93,7 @@ exports.config = {
     ],
 
     misc: [
+      'protractor/suggestions.js',
       'protractor/cacheSlugs.js',
       'protractor/staticPagesTour.js',
       'protractor/collections.js',
