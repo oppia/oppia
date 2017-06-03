@@ -66,11 +66,13 @@
                      ng-click="onClickContinueButton()"
                      translate="I18N_PLAYER_CONTINUE_BUTTON"
                      aria-label="Continue">
+            <i class="material-icons"
+               style="margin-right: 2px; font-size: 22px;">&#xE002;</i>
           </md-button>
-          <i class="fa fa-arrow-right oppia-learner-continue-icon"
+          <!-- <i class="fa fa-arrow-right oppia-learner-continue-icon"
              ng-click="onClickContinueButton()"
              style="font-size: 1.5em; padding-left: 6px; padding-bottom: 1.5px; padding-top: 2.5px; padding-right: 6px; border-radius: 3px; position: absolute; height: 34px; color: white; margin-left: -10px;"
-             aria-hidden="true"></i>
+             aria-hidden="true"></i> -->
         </div>
         <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
           <div class="protractor-test-conversation-input"
