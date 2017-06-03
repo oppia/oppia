@@ -16,8 +16,9 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
-oppia.factory('FatigueDetectionService', 
-  ['$modal', function($modal) {
+oppia.factory('FatigueDetectionService', [
+  '$modal', 'UrlInterpolationService',
+  function($modal, UrlInterpolationService) {
     // 4 submissions in under 10 seconds triggers modal.
     var SPAM_COUNT_THRESHOLD = 4;
     var SPAM_WINDOW_MSEC = 10000;
@@ -40,7 +41,8 @@ oppia.factory('FatigueDetectionService',
       },
       displayTakeBreakMessage: function() {
         $modal.open({
-          templateUrl: 'modals/takeBreak',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/take_break_modal.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
