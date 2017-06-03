@@ -90,18 +90,6 @@ md-input-group.md-default-theme label
   text-decoration: none;
 }
 
-.oppia-learner-continue-icon {
-  background-color: #0D48A1;
-}
-
-.oppia-learner-continue-button:hover + .oppia-learner-continue-icon {
-  background-color: #115FD4;
-}
-
-.oppia-learner-continue-button:focus + .oppia-learner-continue-icon {
-  background-color: #115FD4;
-}
-
 /* Attributes for material-icons. */
 .material-icons {
   vertical-align: middle;
