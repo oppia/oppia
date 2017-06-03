@@ -98,17 +98,17 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.get_classifier_by_id('fake_id')
 
         exp_id = u'1'
-        job_request_id = u'1'
+        classifier_id = u'1'
         state = 'Home'
         classifier_id = classifier_data_models.ClassifierDataModel.create(
-            job_request_id, exp_id, 1, state,
+            classifier_id, exp_id, 1, state,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                 'algorithm_id'], [], 1)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, state)
-        self.assertEqual(classifier.id, job_request_id)
+        self.assertEqual(classifier.id, classifier_id)
 
     def test_deletion_of_classifiers(self):
         """Test the delete_classifier method."""
@@ -118,10 +118,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.delete_classifier('fake_id')
 
         exp_id = u'1'
-        job_request_id = u'1'
+        classifier_id = u'1'
         state = 'Home'
         classifier_id = classifier_data_models.ClassifierDataModel.create(
-            job_request_id, exp_id, 1, state,
+            classifier_id, exp_id, 1, state,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                 'algorithm_id'], [], 1)
         classifier_services.delete_classifier(classifier_id)
@@ -134,7 +134,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the save_classifier method."""
 
         exp_id = u'1'
-        job_request_id = u'1'
+        classifier_id = u'1'
         state_name = 'Home'
         test_state_name = 'State'
         classifier_data = {
@@ -156,7 +156,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             '_c_l': []
         }
         classifier = classifier_domain.Classifier(
-            job_request_id, exp_id, 1, state_name,
+            classifier_id, exp_id, 1, state_name,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                 'algorithm_id'], classifier_data, 1)
         classifier_id = (
@@ -165,11 +165,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, state_name)
-        self.assertEqual(classifier.id, job_request_id)
+        self.assertEqual(classifier.id, classifier_id)
         classifier.update_state_name(test_state_name)
         classifier_services.save_classifier(classifier)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, test_state_name)
-        self.assertEqual(classifier.id, job_request_id)
+        self.assertEqual(classifier.id, classifier_id)

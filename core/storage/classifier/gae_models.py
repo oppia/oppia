@@ -49,12 +49,12 @@ class ClassifierDataModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, job_request_id, exp_id, exp_version_when_created, state_name,
+            cls, classifier_id, exp_id, exp_version_when_created, state_name,
             algorithm_id, classifier_data, data_schema_version):
         """Creates a new ClassifierDataModel entry.
 
         Args:
-            job_request_id: str. ID of the job used for training the classifier.
+            classifier_id: str. ID of the job used for training the classifier.
             exp_id: str. ID of the exploration.
             exp_version_when_created: int. The version of the exploration when
                 this classification model was created.
@@ -72,7 +72,7 @@ class ClassifierDataModel(base_models.BaseModel):
             Exception: A model with the same ID already exists.
         """
 
-        instance_id = job_request_id
+        instance_id = classifier_id
         classifier_data_model_instance = cls(
             id=instance_id, exp_id=exp_id,
             exp_version_when_created=exp_version_when_created,
