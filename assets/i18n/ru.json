@@ -1,7 +1,11 @@
 {
+	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING": "Лицензия",
 	"I18N_ABOUT_PAGE_TITLE": "О нас - Oppia",
 	"I18N_ACTION_BROWSE_LESSONS": "Просмотреть наши уроки",
 	"I18N_ACTION_CREATE_LESSON": "Создайте свой собственный урок",
+	"I18N_CONTACT_PAGE_PARAGRAPH_11_HEADING": "Пожертвования",
+	"I18N_CONTACT_PAGE_PARAGRAPH_14_HEADING": "Партнёрство",
+	"I18N_CONTACT_PAGE_PARAGRAPH_15_HEADING": "Безопасность",
 	"I18N_CREATE_ACTIVITY_QUESTION": "Что вы хотите создать?",
 	"I18N_CREATE_COLLECTION": "Создать коллекцию",
 	"I18N_CREATE_EXPLORATION_CREATE": "Создать",
@@ -125,6 +129,7 @@
 	"I18N_PREFERENCES_BREADCRUMB": "Настройки",
 	"I18N_PREFERENCES_CANCEL_BUTTON": "Отмена",
 	"I18N_PREFERENCES_EMAIL": "Электронная почта",
+	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Только модераторы и администраторы сайта могут увидеть Вашу электронную почту.",
 	"I18N_PREFERENCES_HEADING": "Настройки",
 	"I18N_PREFERENCES_PAGE_TITLE": "Изменить свой профиль предпочтений - Oppia",
 	"I18N_PREFERENCES_PICTURE": "Изображение",
@@ -170,6 +175,7 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Уведомления",
 	"I18N_TOPNAV_PREFERENCES": "Настройки",
 	"I18N_TOPNAV_SIGN_IN": "Войти",
+	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Войти с помощью Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Учить с Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "У Вас <[totalSubscribers]> подписчиков.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Отписаться"
