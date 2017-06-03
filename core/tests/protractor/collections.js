@@ -30,6 +30,10 @@ describe('Collections', function() {
       '.protractor-test-reload-collection-button')).first().click();
     general.acceptAlert();
     browser.waitForAngular();
+    element.all(by.css(
+      '.protractor-test-reload-all-explorations-button')).first().click();
+    general.acceptAlert();
+    browser.waitForAngular();
     admin.editConfigProperty(
       'Names of users allowed to use the collection editor',
       'List', function(listEditor) {
@@ -59,6 +63,33 @@ describe('Collections', function() {
     collectionEditor.shiftNodeRight(1);
     // Delete node in the node graph.
     collectionEditor.deleteNode(1);
+    // Publish the collection.
+    collectionEditor.saveDraft();
+    collectionEditor.closeSaveModal();
+    collectionEditor.publishCollection();
+    collectionEditor.setTitle('Test Collection');
+    collectionEditor.setObjective('This is a test collection.');
+    collectionEditor.setCategory('Algebra');
+    collectionEditor.saveChanges();
+    browser.waitForAngular();
+    users.logout();
+  });
+
+  it('searches explorations in collection editor', function() {
+    users.login('alice@collections.com');
+    browser.get(general.SERVER_URL_PREFIX);
+    var dropdown = element(by.css('.protractor-test-profile-dropdown'));
+    browser.actions().mouseMove(dropdown).perform();
+    dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    browser.waitForAngular();
+    element(by.css('.protractor-test-create-activity')).click();
+    // Create new collection.
+    element(by.css('.protractor-test-create-collection')).click();
+    browser.waitForAngular();
+    // Search and add existing explorations.
+    collectionEditor.searchExistingExploration('Lazy');
+    collectionEditor.searchExistingExploration('Linear');
+    collectionEditor.searchExistingExploration('The');
     // Publish the collection.
     collectionEditor.saveDraft();
     collectionEditor.closeSaveModal();
