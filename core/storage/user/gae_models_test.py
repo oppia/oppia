@@ -21,24 +21,6 @@ from core.tests import test_utils
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class UserSettingsModelTest(test_utils.GenericTestBase):
-    """Tests for the UserSettingsModel class."""
-    USER_ID = 'user_id'
-    USER_NAME = 'testuser'
-    USER_EMAIL = 'test@email.com'
-
-    def setUp(self):
-        super(UserSettingsModelTest, self).setUp()
-        user_models.UserSettingsModel(
-            id=self.USER_ID,
-            email=self.USER_EMAIL,
-            username=self.USER_NAME).put()
-
-    def test_user_gets_correct_role_by_default(self):
-        user = user_models.UserSettingsModel.get(self.USER_ID)
-        self.assertEqual(user.role, 'EXPLORATION_EDITOR')
-
-
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     """Tests for ExpUserLastPlaythroughModel class."""
 

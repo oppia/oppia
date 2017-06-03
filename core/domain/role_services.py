@@ -37,7 +37,7 @@ import feconf
 #   this dict.
 #
 # CAUTION: Before removing any role from this dict, please ensure that there is
-#          no existing user with that role.
+#   no existing user with that role.
 PARENT_ROLES = {
     feconf.ROLE_ADMIN: [feconf.ROLE_MODERATOR],
     feconf.ROLE_BANNED_USER: [feconf.ROLE_GUEST],
@@ -96,7 +96,7 @@ def get_all_actions(role):
 
     Args:
         role: str. A string defining user role. It should be a key of
-              PARENT_ROLES.
+            PARENT_ROLES.
 
     Returns:
         list. A list of actions accessible to the role.

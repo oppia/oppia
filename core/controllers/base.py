@@ -184,6 +184,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.user = current_user_services.get_current_user()
         self.user_id = current_user_services.get_user_id(
             self.user) if self.user else None
+        self.role = user_services.get_user_role_from_id(
+            self.user_id) if self.user else feconf.ROLE_GUEST
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
@@ -193,7 +195,7 @@ class BaseHandler(webapp2.RequestHandler):
         if self.user_id:
             email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
-                self.user_id, email)
+                self.user_id, email, self.role)
             self.values['user_email'] = user_settings.email
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not

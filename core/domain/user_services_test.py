@@ -40,7 +40,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.set_username(user_id, username)
 
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.get_or_create_user(
+            user_id, 'user@example.com', self.USER_ROLE)
 
         user_services.set_username(user_id, username)
         self.assertEquals(username, user_services.get_username(user_id))
@@ -50,7 +51,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_username('fakeUser')
 
     def test_get_username_none(self):
-        user_services.get_or_create_user('fakeUser', 'user@example.com')
+        user_services.get_or_create_user(
+            'fakeUser', 'user@example.com', self.USER_ROLE)
         self.assertEquals(None, user_services.get_username('fakeUser'))
 
     def test_is_username_taken_false(self):
@@ -59,20 +61,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_is_username_taken_true(self):
         user_id = 'someUser'
         username = 'newUsername'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.get_or_create_user(
+            user_id, 'user@example.com', self.USER_ROLE)
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_is_username_taken_different_case(self):
         user_id = 'someUser'
         username = 'camelCase'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.get_or_create_user(
+            user_id, 'user@example.com', self.USER_ROLE)
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
     def test_set_invalid_usernames(self):
         user_id = 'someUser'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.get_or_create_user(
+            user_id, 'user@example.com', self.USER_ROLE)
         bad_usernames = [
             ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020']
         for username in bad_usernames:
@@ -83,7 +88,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
         for email in bad_email_addresses:
             with self.assertRaises(utils.ValidationError):
-                user_services.get_or_create_user('user_id', email)
+                user_services.get_or_create_user(
+                    'user_id', email, self.USER_ROLE)
+
+    def test_invalid_roles(self):
+        with self.assertRaises(utils.ValidationError):
+            user_services.get_or_create_user(
+                'test_id', 'test@example.com', 'THIS_ROLE_DOES_NOT_EXIST')
 
     def test_email_truncation(self):
         email_addresses = [
@@ -95,7 +106,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
             user_settings = user_services.get_or_create_user(
-                str(ind), actual_email)
+                str(ind), actual_email, self.USER_ROLE)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_email_from_username(self):
@@ -103,7 +114,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.get_or_create_user(user_id, user_email, self.USER_ROLE)
         user_services.set_username(user_id, username)
         self.assertEquals(user_services.get_username(user_id), username)
 
@@ -124,7 +135,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.get_or_create_user(user_id, user_email, self.USER_ROLE)
         user_services.set_username(user_id, username)
         self.assertEquals(user_services.get_username(user_id), username)
 
@@ -211,7 +222,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.get_or_create_user(user_id, user_email, self.USER_ROLE)
         user_services.set_username(user_id, username)
 
         # When UserEmailPreferencesModel is yet to be created,
@@ -259,7 +270,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.get_or_create_user(user_id, user_email, self.USER_ROLE)
         user_services.set_username(user_id, username)
 
         # When ExplorationUserDataModel is yet to be created, the value
@@ -321,7 +332,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_name = 'testname'
         user_email = 'test@email.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.get_or_create_user(user_id, user_email, self.USER_ROLE)
         user_services.set_username(user_id, user_name)
 
         self.assertEqual(user_services.get_user_role_from_id(user_id),
@@ -735,7 +746,8 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         self.username = 'username'
         self.user_email = 'user@example.com'
 
-        user_services.get_or_create_user(self.user_id, self.user_email)
+        user_services.get_or_create_user(
+            self.user_id, self.user_email, self.USER_ROLE)
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self):
