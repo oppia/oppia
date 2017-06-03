@@ -26,35 +26,35 @@ class ClassifierDataModelUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ClassifierDataModelUnitTests, self).setUp()
-        classifier_data_models.ClassifierDataModel.create('exp_id1',
-                                                          'job_request_id1', 1,
+        classifier_data_models.ClassifierDataModel.create('job_request_id1',
+                                                          'exp_id1', 1,
                                                           'state_name1',
                                                           'LDAStringClassifier',
                                                           {'alpha': 1.0}, 1)
-        classifier_data_models.ClassifierDataModel.create('exp_id1',
-                                                          'job_request_id2', 1,
+        classifier_data_models.ClassifierDataModel.create('job_request_id2',
+                                                          'exp_id1', 1,
                                                           'state_name2',
                                                           'LDAStringClassifier',
                                                           {'alpha': 1.0}, 1)
-        classifier_data_models.ClassifierDataModel.create('exp_id2',
-                                                          'job_request_id3', 1,
+        classifier_data_models.ClassifierDataModel.create('job_request_id3',
+                                                          'exp_id2', 1,
                                                           'state_name3',
                                                           'LDAStringClassifier',
                                                           {'alpha': 1.0}, 1)
 
     def test_create_new_classifier_runs_successfully(self):
         classifier_id = classifier_data_models.ClassifierDataModel.create(
-            'exp_id3', 'job_request_id4', 1, 'state_name1',
+            'job_request_id4', 'exp_id3', 1, 'state_name1',
             'LDAStringClassifier', {'alpha': 1.0},
             1)
 
         classifier = (
             classifier_data_models.ClassifierDataModel.get(classifier_id))
 
+        self.assertEqual(classifier.id, 'job_request_id4')
         self.assertEqual(classifier.exp_id, 'exp_id3')
-        self.assertEqual(classifier.job_request_id, 'job_request_id4')
         self.assertEqual(classifier.exp_version_when_created, 1)
         self.assertEqual(classifier.state_name, 'state_name1')
         self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
-        self.assertEqual(classifier.cached_classifier_data, {'alpha': 1.0})
+        self.assertEqual(classifier.classifier_data, {'alpha': 1.0})
         self.assertEqual(classifier.data_schema_version, 1)

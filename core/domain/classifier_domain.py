@@ -34,45 +34,42 @@ class Classifier(object):
     Attributes:
         id: str. The unique id of the classifier.
         exp_id: str. The exploration id to which this classifier belongs.
-        job_request_id: str. ID of the job used for training the classifier.
         exp_version_when_created: str. The version of the exploration when
             this classification model was created.
         state_name: str. The name of the state to which the classifier belongs.
         algorithm_id: str. The id of the algorithm used for generating
             classifier.
-        cached_classifier_data: dict. The actual classifier model used for
+        classifier_data: dict. The actual classifier model used for
             classification purpose.
         data_schema_version: int. Schema version of the data used by the
             classifier. This depends on the algorithm ID.
     """
 
-    def __init__(self, classifier_id, exp_id, job_request_id,
+    def __init__(self, classifier_id, exp_id,
                  exp_version_when_created, state_name, algorithm_id,
-                 cached_classifier_data, data_schema_version):
+                 classifier_data, data_schema_version):
         """Constructs an Classifier domain object.
 
         Args:
             classifier_id: str. The unique id of the classifier.
             exp_id: str. The exploration id to which the classifier belongs.
-            job_request_id: str. ID of the job used for training the classifier.
             exp_version_when_created: int. The version of the exploration when
                 this classification model was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
             algorithm_id: str. The id of the algorithm used for generating
                 classifier.
-            cached_classifier_data: dict. The actual classifier model used for
+            classifier_data: dict. The actual classifier model used for
                 classification purpose.
             data_schema_version: int. Schema version of the
                 data used by the classifier.
         """
         self._id = classifier_id
         self._exp_id = exp_id
-        self._job_request_id = job_request_id
         self._exp_version_when_created = exp_version_when_created
         self._state_name = state_name
         self._algorithm_id = algorithm_id
-        self._cached_classifier_data = copy.deepcopy(cached_classifier_data)
+        self._classifier_data = copy.deepcopy(classifier_data)
         self._data_schema_version = data_schema_version
 
     @property
@@ -82,10 +79,6 @@ class Classifier(object):
     @property
     def exp_id(self):
         return self._exp_id
-
-    @property
-    def job_request_id(self):
-        return self._job_request_id
 
     @property
     def exp_version_when_created(self):
@@ -100,8 +93,8 @@ class Classifier(object):
         return self._algorithm_id
 
     @property
-    def cached_classifier_data(self):
-        return self._cached_classifier_data
+    def classifier_data(self):
+        return self._classifier_data
 
     @property
     def data_schema_version(self):
@@ -127,11 +120,10 @@ class Classifier(object):
         return {
             'classifier_id': self._id,
             'exp_id': self._exp_id,
-            'job_request_id': self._job_request_id,
             'exp_version_when_created': self._exp_version_when_created,
             'state_name': self._state_name,
             'algorithm_id': self._algorithm_id,
-            'cached_classifier_data': self._cached_classifier_data,
+            'classifier_data': self._classifier_data,
             'data_schema_version': self._data_schema_version
         }
 
@@ -145,11 +137,6 @@ class Classifier(object):
         if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
-
-        if not isinstance(self.job_request_id, basestring):
-            raise utils.ValidationError(
-                'Expected job_request_id to be a string, received %s' % (
-                    self.job_request_id))
 
         if not isinstance(self.exp_version_when_created, int):
             raise utils.ValidationError(
@@ -175,11 +162,11 @@ class Classifier(object):
             raise utils.ValidationError(
                 'Invalid algorithm id: %s' % self.algorithm_id)
 
-        if not isinstance(self.cached_classifier_data, dict):
+        if not isinstance(self.classifier_data, dict):
             raise utils.ValidationError(
-                'Expected cached_classifier_data to be a dict, received %s' %(
-                    self.cached_classifier_data))
+                'Expected classifier_data to be a dict, received %s' %(
+                    self.classifier_data))
         classifier_class = (
             classifier_registry.Registry.get_classifier_by_algorithm_id(
                 self.algorithm_id))
-        classifier_class.validate(self.cached_classifier_data)
+        classifier_class.validate(self.classifier_data)

@@ -138,10 +138,9 @@ def get_classifier_from_model(classifier_data_model):
     """
     return classifier_domain.Classifier(
         classifier_data_model.id, classifier_data_model.exp_id,
-        classifier_data_model.job_request_id,
         classifier_data_model.exp_version_when_created,
         classifier_data_model.state_name, classifier_data_model.algorithm_id,
-        classifier_data_model.cached_classifier_data,
+        classifier_data_model.classifier_data,
         classifier_data_model.data_schema_version)
 
 
@@ -172,10 +171,10 @@ def _create_classifier(classifier):
 
     """
     classifier_id = classifier_data_models.ClassifierDataModel.create(
-        classifier.exp_id, classifier.job_request_id,
+        classifier.id, classifier.exp_id,
         classifier.exp_version_when_created,
         classifier.state_name, classifier.algorithm_id,
-        classifier.cached_classifier_data, classifier.data_schema_version)
+        classifier.classifier_data, classifier.data_schema_version)
     return classifier_id
 
 
