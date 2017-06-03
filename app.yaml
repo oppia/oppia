@@ -15,6 +15,9 @@ inbound_services:
 - mail
 
 handlers:
+- url: /staticpage
+  static_files: assets/pages/staticpage.html
+  upload: assets/common/staticpage.html
 - url: /favicon.ico
   static_files: assets/common/favicon.ico
   upload: assets/common/favicon.ico
