@@ -15,9 +15,7 @@
 """Controllers for the learner dashboard."""
 
 from core.controllers import base
-from core.domain import collection_services
 from core.domain import config_domain
-from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import subscription_services
 from core.domain import summary_services
@@ -55,71 +53,29 @@ class LearnerDashboardHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        incomplete_exploration_ids = (
-            learner_progress_services.get_all_incomplete_exp_ids(self.user_id))
-        incomplete_exploration_summaries, number_of_deleted_incomplete_explorations = ( # pylint: disable=line-too-long
-            learner_progress_services.remove_none_entities_from_list(
-                self.user_id,
-                exp_services.get_exploration_summaries_matching_ids(
-                    incomplete_exploration_ids),
-                incomplete_exploration_ids, 'incomplete', 'explorations'))
-
-        completed_exploration_ids = (
-            learner_progress_services.get_all_completed_exp_ids(self.user_id))
-        completed_exploration_summaries, number_of_deleted_completed_explorations = ( # pylint: disable=line-too-long
-            learner_progress_services.remove_none_entities_from_list(
-                self.user_id,
-                exp_services.get_exploration_summaries_matching_ids(
-                    completed_exploration_ids),
-                completed_exploration_ids, 'complete', 'explorations'))
-
-        outdated_incomplete_collection_ids = (
-            learner_progress_services.get_all_incomplete_collection_ids(
-                self.user_id))[:]
-        completed_collection_ids = (
-            learner_progress_services.get_all_completed_collection_ids(
-                self.user_id))
-        updated_incomplete_collection_ids = (
-            learner_progress_services.get_all_incomplete_collection_ids(
+        incomplete_exp_summaries, num_deleted_incomplete_exps = (
+            learner_progress_services.get_incomplete_exp_summaries(
                 self.user_id))
 
-        completed_to_incomplete_collections = []
-        # Get the collections that were updated to have new explorations.
-        completed_to_incomplete_collection_ids = (
-            set(outdated_incomplete_collection_ids).symmetric_difference(
-                updated_incomplete_collection_ids))
+        completed_exp_summaries, num_deleted_completed_exps = (
+            learner_progress_services.get_completed_exp_summaries(self.user_id))
 
-        collection_titles_and_categories = (
-            collection_services.get_collection_titles_and_categories(
-                list(completed_to_incomplete_collection_ids)))
-        for collection_id in collection_titles_and_categories:
-            completed_to_incomplete_collections.append(
-                collection_titles_and_categories[collection_id]['title'])
+        (completed_collection_summaries, num_deleted_completed_collections,
+         completed_to_incomplete_collections) = (
+             learner_progress_services.get_completed_collection_summaries(
+                 self.user_id))
 
-        completed_collection_summaries, number_of_deleted_completed_collections = ( # pylint: disable=line-too-long
-            learner_progress_services.remove_none_entities_from_list(
-                self.user_id,
-                collection_services.get_collection_summaries_matching_ids(
-                    completed_collection_ids),
-                completed_collection_ids, 'complete', 'collections'))
-
-        updated_incomplete_collection_ids = (
-            learner_progress_services.get_all_incomplete_collection_ids(
+        incomplete_collection_summaries, num_deleted_incomplete_collections = (
+            learner_progress_services.get_incomplete_collection_summaries(
                 self.user_id))
-        incomplete_collection_summaries, number_of_deleted_incomplete_collections = ( # pylint: disable=line-too-long
-            learner_progress_services.remove_none_entities_from_list(
-                self.user_id,
-                collection_services.get_collection_summaries_matching_ids(
-                    updated_incomplete_collection_ids),
-                updated_incomplete_collection_ids, 'incomplete', 'collections'))
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
-                completed_exploration_summaries))
+                completed_exp_summaries))
 
         incomplete_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
-                incomplete_exploration_summaries))
+                incomplete_exp_summaries))
 
         completed_collection_summary_dicts = []
         incomplete_collection_summary_dicts = []
@@ -190,14 +146,10 @@ class LearnerDashboardHandler(base.BaseHandler):
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
             'incomplete_collections_list': incomplete_collection_summary_dicts,
             'number_of_deleted_activities': {
-                'incomplete_explorations': (
-                    number_of_deleted_incomplete_explorations),
-                'incomplete_collections': (
-                    number_of_deleted_incomplete_collections),
-                'completed_explorations': (
-                    number_of_deleted_completed_explorations),
-                'completed_collections': (
-                    number_of_deleted_completed_collections)
+                'incomplete_explorations': num_deleted_incomplete_exps,
+                'incomplete_collections': num_deleted_incomplete_collections,
+                'completed_explorations': num_deleted_completed_exps,
+                'completed_collections': num_deleted_completed_collections
             },
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
