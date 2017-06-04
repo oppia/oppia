@@ -30,7 +30,8 @@ ALGORITHM_CHOICES = [classifier_details['algorithm_id'] for (
 class ClassifierDataModel(base_models.BaseModel):
     """Storage model for classifier used for answer classification.
 
-    The id of instances of this class has the form
+    The id of instances of this class is the job_request_id of the corresponding
+    TrainClassifierJobModel and has the form
     {{exp_id}}.{{random_hash_of_16_chars}}
     """
     # The exploration_id of the exploration to whose state the model belongs.
