@@ -161,3 +161,147 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected cached_classifier_data to be a dict')):
             classifier.validate()
+
+
+class TrainClassifierJobDomainTests(test_utils.GenericTestBase):
+    """Test the TrainClassifierJob domain."""
+
+    def test_to_dict(self):
+        expected_training_job_dict = {
+            'job_id': 'exp_id1.SOME_RANDOM_STRING',
+            'algorithm_id': "LDAStringClassifier",
+            'exp_id': 'exp_id1',
+            'exp_version_when_created': 1,
+            'state_name': 'a state name',
+            'status': 'PENDING',
+            'training_data': [
+                {
+                    'answer_group_index': 1,
+                    'answers': ['a1', 'a2']
+                },
+                {
+                    'answer_group_index': 2,
+                    'answers': ['a2', 'a3']
+                }
+            ]
+        }
+        observed_training_job = classifier_domain.TrainClassifierJob(
+            expected_training_job_dict['job_id'],
+            expected_training_job_dict['algorithm_id'],
+            expected_training_job_dict['exp_id'],
+            expected_training_job_dict['exp_version_when_created'],
+            expected_training_job_dict['state_name'],
+            expected_training_job_dict['status'],
+            expected_training_job_dict['training_data'])
+        self.assertDictEqual(expected_training_job_dict,
+                             observed_training_job.to_dict())
+
+    def test_validation(self):
+        """Tests to verify validate method of TrainClassifierJob domain."""
+
+        # Verify no errors are raised for correct data.
+        training_data = [
+            {
+                'answer_group_index': 1,
+                'answers': ['a1', 'a2']
+            },
+            {
+                'answer_group_index': 2,
+                'answers': ['a2', 'a3']
+            }
+        ]
+        training_job_dict = {
+            'job_id': 'exp_id1.SOME_RANDOM_STRING',
+            'exp_id': 'exp_id1',
+            'exp_version_when_created': 1,
+            'state_name': 'some state',
+            'algorithm_id': "LDAStringClassifier",
+            'training_data': training_data,
+            'status': 'PENDING'
+        }
+        training_job = classifier_domain.TrainClassifierJob(
+            training_job_dict['job_id'],
+            training_job_dict['algorithm_id'],
+            training_job_dict['exp_id'],
+            training_job_dict['exp_version_when_created'],
+            training_job_dict['state_name'],
+            training_job_dict['status'],
+            training_job_dict['training_data'])
+        training_job.validate()
+
+        # Verify validation error is raised when int is provided for instance id
+        # instead of string.
+        training_job_dict['job_id'] = 1
+        training_job = classifier_domain.TrainClassifierJob(
+            training_job_dict['job_id'],
+            training_job_dict['algorithm_id'],
+            training_job_dict['exp_id'],
+            training_job_dict['exp_version_when_created'],
+            training_job_dict['state_name'],
+            training_job_dict['status'],
+            training_job_dict['training_data'])
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected id to be a string')):
+            training_job.validate()
+
+        # Verify validation error is raised when string is provided for
+        # exp_version_when_created instead of int.
+        training_job_dict['job_id'] = 'exp_id1.SOME_RANDOM_STRING'
+        training_job_dict['exp_version_when_created'] = 'abc'
+        training_job = classifier_domain.TrainClassifierJob(
+            training_job_dict['job_id'],
+            training_job_dict['algorithm_id'],
+            training_job_dict['exp_id'],
+            training_job_dict['exp_version_when_created'],
+            training_job_dict['state_name'],
+            training_job_dict['status'],
+            training_job_dict['training_data'])
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_version_when_created to be a int')):
+            training_job.validate()
+
+        # Verify validation error is raised when invalid state_name is provided.
+        training_job_dict['exp_version_when_created'] = 1
+        training_job_dict['state_name'] = 'A string #'
+        training_job = classifier_domain.TrainClassifierJob(
+            training_job_dict['job_id'],
+            training_job_dict['algorithm_id'],
+            training_job_dict['exp_id'],
+            training_job_dict['exp_version_when_created'],
+            training_job_dict['state_name'],
+            training_job_dict['status'],
+            training_job_dict['training_data'])
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Invalid character # in the state name')):
+            training_job.validate()
+
+        # Verify validation error is raised when invalid algorithm_id is
+        # provided.
+        training_job_dict['state_name'] = 'a state name'
+        training_job_dict['algorithm_id'] = 'abc'
+        training_job = classifier_domain.TrainClassifierJob(
+            training_job_dict['job_id'],
+            training_job_dict['algorithm_id'],
+            training_job_dict['exp_id'],
+            training_job_dict['exp_version_when_created'],
+            training_job_dict['state_name'],
+            training_job_dict['status'],
+            training_job_dict['training_data'])
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Invalid algorithm id')):
+            training_job.validate()
+
+        # Verify validation error is raised when dict is provided for list.
+        training_job_dict['algorithm_id'] = "LDAStringClassifier"
+        training_job_dict['training_data'] = {}
+        training_job = classifier_domain.TrainClassifierJob(
+            training_job_dict['job_id'],
+            training_job_dict['algorithm_id'],
+            training_job_dict['exp_id'],
+            training_job_dict['exp_version_when_created'],
+            training_job_dict['state_name'],
+            training_job_dict['status'],
+            training_job_dict['training_data'])
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected training_data to be a list')):
+            training_job.validate()

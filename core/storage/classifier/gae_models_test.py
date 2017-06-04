@@ -49,3 +49,35 @@ class ClassifierModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
         self.assertEqual(classifier.cached_classifier_data, {'alpha': 1.0})
         self.assertEqual(classifier.data_schema_version, 1)
+
+
+class TrainClassifierJobModelUnitTests(test_utils.GenericTestBase):
+    """Test the TrainClassifierJobModel class."""
+
+    def setUp(self):
+        super(TrainClassifierJobModelUnitTests, self).setUp()
+        classifier_models.TrainClassifierJobModel.create(
+            'LDAStringClassifier', 'exp_id1', 1, 'state_name1', 'PENDING',
+            [{'answer_group_index': 1, 'answers': ["a1", "a2"]}])
+        classifier_models.TrainClassifierJobModel.create(
+            'LDAStringClassifier', 'exp_id2', 2, 'state_name1', 'PENDING',
+            [{'answer_group_index': 1, 'answers': ["a1", "a2"]}])
+        classifier_models.TrainClassifierJobModel.create(
+            'LDAStringClassifier', 'exp_id3', 3, 'state_name1', 'PENDING',
+            [{'answer_group_index': 1, 'answers': ["a1", "a2"]}])
+
+    def test_create_and_get_new_training_job_runs_successfully(self):
+        job_id = classifier_models.TrainClassifierJobModel.create(
+            'LDAStringClassifier', 'exp_id1', 1, 'state_name2', 'PENDING',
+            [{'answer_group_index': 1, 'answers': ["a1", "a2"]}])
+
+        training_job = (
+            classifier_models.TrainClassifierJobModel.get(job_id))
+
+        self.assertEqual(training_job.algorithm_id, 'LDAStringClassifier')
+        self.assertEqual(training_job.exp_id, 'exp_id1')
+        self.assertEqual(training_job.exp_version_when_created, 1)
+        self.assertEqual(training_job.state_name, 'state_name2')
+        self.assertEqual(training_job.status, 'PENDING')
+        self.assertEqual(training_job.training_data,
+                         [{'answer_group_index': 1, 'answers': ["a1", "a2"]}])

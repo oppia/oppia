@@ -72,7 +72,10 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 
 # A mapping of interaction ids to their default classifier.
 INTERACTION_CLASSIFIER_MAPPING = {
-    'TextInput': 'LDAStringClassifier'
+    'TextInput': {
+        'algorithm_id': 'LDAStringClassifier',
+        'current_data_schema_version': 1
+    }
 }
 
 # The minimum number of training samples required for training a classifier.
