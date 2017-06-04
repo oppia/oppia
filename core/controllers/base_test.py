@@ -333,7 +333,9 @@ class I18nDictsTest(test_utils.GenericTestBase):
             filename))
 
     def test_i18n_keys(self):
-        """Tests that all JSON files in i18n.js have the same set of keys."""
+        """Tests that the keys in all JSON files are a subset of those in
+        en.json.
+        """
         master_key_list = self._extract_keys_from_json_file('en.json')
         self.assertGreater(len(master_key_list), 0)
 
@@ -364,7 +366,8 @@ class I18nDictsTest(test_utils.GenericTestBase):
 
     def test_alphabetic_i18n_keys(self):
         """Tests that the keys of all i18n json files are arranged in
-        alphabetical order."""
+        alphabetical order.
+        """
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
@@ -390,7 +393,9 @@ class I18nDictsTest(test_utils.GenericTestBase):
     def test_keys_in_source_code_match_en(self):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
-        dirs_to_search = ['core', 'extensions']
+        dirs_to_search = [
+            os.path.join('core', 'templates', 'dev', 'head'),
+            'extensions']
         files_checked = 0
         missing_keys_count = 0
         for directory in dirs_to_search:

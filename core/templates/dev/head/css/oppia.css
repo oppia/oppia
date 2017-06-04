@@ -4542,7 +4542,9 @@ md-card.preview-conversation-skin-supplemental-card {
     margin-bottom: 90px;
   }
   .oppia-donate-info {
-    display: none;
+    display: block;
+    position: inherit;
+    width: 100%;
   }
   .oppia-donate-options {
     float: clear;
