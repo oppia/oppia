@@ -209,7 +209,7 @@ class FeedbackAnalyticsMRJobManager(
         Yields:
             A tuple of two elements:
               - str. The exploration associated to the feedback thread.
-              - item.status: str. The feedback thread's status.
+              - str. The feedback thread's status.
       """
         yield (item.exploration_id, item.status)
 
