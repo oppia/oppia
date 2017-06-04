@@ -28,7 +28,7 @@ var addExistingExploration = function(explorationId) {
 };
 
 // Search and add existing exploration to the node graph.
-var searchExistingExploration = function(query) {
+var searchForAndAddExistingExploration = function(query) {
   element(
     by.css('.protractor-test-add-exploration-input')
   ).sendKeys(query);
@@ -106,7 +106,7 @@ var saveChanges = function () {
 };
 
 exports.addExistingExploration = addExistingExploration;
-exports.searchExistingExploration = searchExistingExploration;
+exports.searchForAndAddExistingExploration = searchForAndAddExistingExploration;
 exports.shiftNodeLeft = shiftNodeLeft;
 exports.shiftNodeRight = shiftNodeRight;
 exports.deleteNode = deleteNode;
