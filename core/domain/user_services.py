@@ -161,7 +161,6 @@ class UserSettings(object):
         if self.role not in role_services.PARENT_ROLES:
             raise utils.ValidationError('Role %s does not exist.' % self.role)
 
-
     @property
     def truncated_email(self):
         """Returns truncated email by replacing last two characters before @
@@ -356,7 +355,7 @@ def get_users_settings(user_ids):
             result.append(UserSettings(
                 feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
-                role=feconf.ROLE_SUPER_ADMIN,
+                role=feconf.ROLE_ADMIN,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
@@ -807,7 +806,7 @@ def update_user_role(user_id, role):
         role: str. The role to be assigned to user with given id.
 
     Raises:
-        Exception: Given role does not exist.
+        Exception: The given role does not exist.
     """
     if role not in role_services.PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)

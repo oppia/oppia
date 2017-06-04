@@ -27,8 +27,7 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
     ACTIONS = role_services.ROLE_ACTIONS
 
     def test_dicts_have_same_keys(self):
-        """Test that PARENT_ROLES and ROLE_ACTIONS have same keys.
-        """
+        """Test that PARENT_ROLES and ROLE_ACTIONS have same keys."""
         self.assertEqual(
             set(self.PARENT_ROLES.keys()), set(self.ACTIONS.keys()))
 
@@ -79,9 +78,9 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
 
             Args :
                 source: str. Role that should not be reachable via any path
-                        from roles.
-                parents: list. List of roles that should not be able to reach
-                         source.
+                    from roles.
+                roles: list(str). List of roles that should not be able to
+                    reach source.
             """
             for role in roles:
                 self.assertNotEqual(role, source)
