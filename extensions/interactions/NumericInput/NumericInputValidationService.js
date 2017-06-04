@@ -40,6 +40,12 @@ oppia.factory('NumericInputValidationService', [
           ubi: bool, is upper bound inclusive
         }
         */
+        var setLowerAndUpperBounds = function(range, lb, ub, lbi, ubi) {
+          range.lb = lb;
+          range.ub = ub;
+          range.lbi = lbi;
+          range.ubi = ubi;
+        };
         var isEnclosedBy = function(ra, rb) {
           // Checks if range ra is enclosed by range rb.
           var lowerBoundConditionIsSatisfied =
@@ -55,51 +61,56 @@ oppia.factory('NumericInputValidationService', [
           var rules = answerGroups[i].rules;
           for (var j = 0; j < rules.length; j++) {
             var rule = rules[j];
-            var range = {};
+            var range = {
+              answerGroupIndex: i + 1,
+              ruleIndex: j + 1,
+              lb: null,
+              ub: null,
+              lbi: false,
+              ubi: false,
+            };
             switch (rule.type) {
               case 'Equals':
                 var x = rule.inputs.x;
-                range = { lb: x, ub: x, lbi: true, ubi: true };
+                setLowerAndUpperBounds(range, x, x, true, true);
                 break;
               case 'IsInclusivelyBetween':
                 var a = rule.inputs.a;
                 var b = rule.inputs.b;
-                range = { lb: a, ub: b, lbi: true, ubi: true };
+                setLowerAndUpperBounds(range, a, b, true, true);
                 break;
               case 'IsGreaterThan':
                 var x = rule.inputs.x;
-                range = { lb: x, ub: Infinity, lbi: false, ubi: false };
+                setLowerAndUpperBounds(range, x, Infinity, false, false);
                 break;
               case 'IsGreaterThanOrEqualTo':
                 var x = rule.inputs.x;
-                range = { lb: x, ub: Infinity, lbi: true, ubi: false };
+                setLowerAndUpperBounds(range, x, Infinity, true, false);
                 break;
               case 'IsLessThan':
                 var x = rule.inputs.x;
-                range = { lb: -Infinity, ub: x, lbi: false, ubi: false };
+                setLowerAndUpperBounds(range, -Infinity, x, false, false);
                 break;
               case 'IsLessThanOrEqualTo':
                 var x = rule.inputs.x;
-                range = { lb: -Infinity, ub: x, lbi: false, ubi: true };
+                setLowerAndUpperBounds(range, -Infinity, x, false, true);
                 break;
               case 'IsWithinTolerance':
                 var x = rule.inputs.x;
                 var tol = rule.inputs.tol;
-                range = { lb: x - tol, ub: x + tol, lbi: true, ubi: true };
+                setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
                 break;
               default:
             }
-            range.answerGroup = i + 1;
-            range.rule = j + 1;
             for (var k = 0; k < ranges.length; k++) {
               if (isEnclosedBy(range, ranges[k])) {
                 warningsList.push({
-                  type: WARNING_TYPES.CRITICAL,
+                  type: WARNING_TYPES.ERROR,
                   message: (
                     'Rule ' + (j + 1) + ' from answer group ' +
                     (i + 1) + ' will never be matched because it ' +
-                    'is made redundant by rule ' + ranges[k].rule + ' from ' +
-                    'answer group ' + ranges[k].answerGroup + '.')
+                    'is made redundant by rule ' + ranges[k].ruleIndex + ' from ' +
+                    'answer group ' + ranges[k].answerGroupIndex + '.')
                 });
               }
             }
