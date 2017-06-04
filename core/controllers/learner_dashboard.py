@@ -63,7 +63,7 @@ class LearnerDashboardHandler(base.BaseHandler):
         (completed_collection_summaries, num_deleted_completed_collections,
          completed_to_incomplete_collections) = (
              learner_progress_services.get_completed_collection_summaries(
-                self.user_id))
+                 self.user_id))
 
         incomplete_collection_summaries, num_deleted_incomplete_collections = (
             learner_progress_services.get_incomplete_collection_summaries(
