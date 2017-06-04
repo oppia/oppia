@@ -80,6 +80,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           }
           $scope.allRegions = imageAndLabels.labeledRegions;
           $scope.regionsAndBonus = $scope.allRegions.map(function (x){return x.label;}).concat($scope.bonusWords);
+          $scope.regionsAndBonus = $scope.regionsAndBonus.filter(function (x){return x != "";});
           $scope.shuffle($scope.allRegions);
           $scope.shuffle($scope.regionsAndBonus);
           $scope.numRegions = $scope.allRegions.length;

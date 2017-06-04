@@ -55,6 +55,7 @@
         jqyoui-draggable="{animate:true, onStart:'getThisName(region.label)'}"
         ><[region.label]>
       </div> -->
+      </div>
       <div ng-repeat="word in regionsAndBonus"
         style="
           margin-bottom: 1rem;
@@ -82,25 +83,11 @@
          class="oppia-image-click-img"
          ng-mousemove="onMousemoveImage($event)">
 
-    <div ng-if="highlightRegionsOnHover">
-      <div ng-repeat="region in allRegions"
-           style="
-             height: <[getRegionDimensions($index).height]>px;
-             width: <[getRegionDimensions($index).width]>px;
-             left: <[getRegionDimensions($index).left]>px;
-             top: <[getRegionDimensions($index).top]>px;
-             pointer-events: none;
-             position: absolute;
-             display: <[getRegionDisplay(region.label)]>;
-             background: rgba(0,0,255,0.5);
-             z-index: 10;">
-      </div>
-    </div>
-
      <div ng-if="alwaysShowRegions">
-      <div ng-repeat="region in allRegions"
-          data-drop="true"
-          jqyoui-droppable="{animate:true, onDrop: 'checkTheValues(region.label)'}"
+      <div ng-repeat="region in allRegions",
+          data-drop="true",
+          jqyoui-droppable="{animate:false, onDrop: 'checkTheValues(region.label)'}",
+          data-jqyoui-options="{snap:true}",
           style="
             height: <[getRegionDimensions($index).height]>px;
              width: <[getRegionDimensions($index).width]>px;
