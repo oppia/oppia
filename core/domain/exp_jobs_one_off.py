@@ -328,3 +328,33 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
+    """Job that outputs a list of fallbacks."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        for state_name, state in exploration.states.iteritems():
+            for fallback in state.interaction.fallbacks:
+                num_submits = fallback.trigger.customization_args['num_submits']
+                feedback = fallback.outcome.feedback[0]
+                yield (
+                    '%s: %s' % (
+                        item.id,
+                        state_name.encode('utf-8')),
+                    '%s: %s' % (
+                        num_submits['value'],
+                        feedback.encode('utf-8')))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

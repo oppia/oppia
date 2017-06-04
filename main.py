@@ -21,8 +21,8 @@ from core.controllers import admin
 from core.controllers import base
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
+from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
-from core.controllers import dashboard
 from core.controllers import email_dashboard
 from core.controllers import editor
 from core.controllers import feedback
@@ -81,7 +81,7 @@ class HomePageRedirectHandler(base.BaseHandler):
                 user_contributions.created_exploration_ids or
                 user_contributions.edited_exploration_ids)
             if user_is_creator:
-                self.redirect(feconf.DASHBOARD_URL)
+                self.redirect(feconf.CREATOR_DASHBOARD_URL)
             else:
                 self.redirect(feconf.LIBRARY_INDEX_URL)
         else:
@@ -180,27 +180,31 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.AdminTopicsCsvDownloadHandler),
 
     get_redirect_route(
-        r'/notifications_dashboard', dashboard.NotificationsDashboardPage),
+        r'/notifications_dashboard',
+        creator_dashboard.NotificationsDashboardPage),
     get_redirect_route(
         r'/notificationsdashboardhandler/data',
-        dashboard.NotificationsDashboardHandler),
+        creator_dashboard.NotificationsDashboardHandler),
     get_redirect_route(
-        r'/notificationshandler', dashboard.NotificationsHandler),
+        r'/notificationshandler', creator_dashboard.NotificationsHandler),
     get_redirect_route(
-        r'%s' % feconf.DASHBOARD_URL, dashboard.DashboardPage),
+        r'%s' % feconf.CREATOR_DASHBOARD_URL,
+        creator_dashboard.CreatorDashboardPage),
     get_redirect_route(
-        r'%s' % feconf.DASHBOARD_DATA_URL, dashboard.DashboardHandler),
+        r'%s' % feconf.CREATOR_DASHBOARD_DATA_URL,
+        creator_dashboard.CreatorDashboardHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.DASHBOARD_EXPLORATION_STATS_PREFIX,
-        dashboard.ExplorationDashboardStatsHandler),
+        creator_dashboard.ExplorationDashboardStatsHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_EXPLORATION_URL, dashboard.NewExploration),
+        r'%s' % feconf.NEW_EXPLORATION_URL, creator_dashboard.NewExploration),
     get_redirect_route(
-        r'%s' % feconf.NEW_COLLECTION_URL, dashboard.NewCollection),
+        r'%s' % feconf.NEW_COLLECTION_URL, creator_dashboard.NewCollection),
     get_redirect_route(
-        r'%s' % feconf.UPLOAD_EXPLORATION_URL, dashboard.UploadExploration),
+        r'%s' % feconf.UPLOAD_EXPLORATION_URL,
+        creator_dashboard.UploadExploration),
     get_redirect_route(
-        r'/my_explorations', dashboard.DashboardRedirectPage),
+        r'/my_explorations', creator_dashboard.CreatorDashboardRedirectPage),
 
     get_redirect_route(
         r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
