@@ -120,8 +120,7 @@ oppia.factory('SimpleEditorManagerService', [
           stateName).setBridgeHtml(newHtml);
       },
       addNewQuestion: function(type) {
-
-        if(type == "multiple"){
+        if(type == 'multiple'){
         // This effectively adds a new multiple-choice interaction to the
         // latest state in the chain.
           var lastStateName = (
@@ -139,8 +138,7 @@ oppia.factory('SimpleEditorManagerService', [
           var stateData = SimpleEditorShimService.getState(lastStateName);
           data.questionList.addQuestion(QuestionObjectFactory.create(
             lastStateName, stateData.interaction, ''));
-        }Z
-
+        }
       },
       canAddNewQuestion: function() {
         // Requirements:
