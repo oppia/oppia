@@ -38,6 +38,7 @@ oppia.controller('Admin', [
     $scope.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
     $scope.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
     $scope.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
+    $scope.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
     $scope.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
 
     $scope.setStatusMessage = function(statusMessage) {
