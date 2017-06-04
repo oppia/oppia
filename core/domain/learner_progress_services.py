@@ -21,6 +21,7 @@ from core.domain import exp_services
 from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
+import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -578,3 +579,40 @@ def get_incomplete_collection_summaries(user_id):
 
     return collection_services.get_collection_summaries_matching_ids(
         incomplete_collection_ids), number_deleted
+
+
+def get_collection_summary_dicts(collection_summaries):
+    """Returns a displayable summary dict of the the collection summaries
+    given to it.
+
+    Args:
+        collection_summaries: list(CollectionSummary). A list of the
+            summary domain objects.
+
+    Returns:
+        list(dict). The summary dict objects corresponding to the given summary
+            domain objects.
+    """
+    summary_dicts = []
+    for collection_summary in collection_summaries:
+        summary_dicts.append({
+            'id': collection_summary.id,
+            'title': collection_summary.title,
+            'category': collection_summary.category,
+            'objective': collection_summary.objective,
+            'language_code': collection_summary.language_code,
+            'last_updated': utils.get_time_in_millisecs(
+                collection_summary.collection_model_last_updated),
+            'created_on': utils.get_time_in_millisecs(
+                collection_summary.collection_model_created_on),
+            'status': collection_summary.status,
+            'node_count': collection_summary.node_count,
+            'community_owned': collection_summary.community_owned,
+            'thumbnail_icon_url': (
+                utils.get_thumbnail_icon_url_for_category(
+                    collection_summary.category)),
+            'thumbnail_bg_color': utils.get_hex_color_for_category(
+                collection_summary.category),
+        })
+
+    return summary_dicts

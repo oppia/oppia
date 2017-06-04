@@ -63,7 +63,7 @@ class LearnerDashboardHandler(base.BaseHandler):
         (completed_collection_summaries, num_deleted_completed_collections,
          completed_to_incomplete_collections) = (
              learner_progress_services.get_completed_collection_summaries(
-                 self.user_id))
+                self.user_id))
 
         incomplete_collection_summaries, num_deleted_incomplete_collections = (
             learner_progress_services.get_incomplete_collection_summaries(
@@ -77,50 +77,12 @@ class LearnerDashboardHandler(base.BaseHandler):
             summary_services.get_displayable_exp_summary_dicts(
                 incomplete_exp_summaries))
 
-        completed_collection_summary_dicts = []
-        incomplete_collection_summary_dicts = []
-
-        for collection_summary in completed_collection_summaries:
-            completed_collection_summary_dicts.append({
-                'id': collection_summary.id,
-                'title': collection_summary.title,
-                'category': collection_summary.category,
-                'objective': collection_summary.objective,
-                'language_code': collection_summary.language_code,
-                'last_updated': utils.get_time_in_millisecs(
-                    collection_summary.collection_model_last_updated),
-                'created_on': utils.get_time_in_millisecs(
-                    collection_summary.collection_model_created_on),
-                'status': collection_summary.status,
-                'node_count': collection_summary.node_count,
-                'community_owned': collection_summary.community_owned,
-                'thumbnail_icon_url': (
-                    utils.get_thumbnail_icon_url_for_category(
-                        collection_summary.category)),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    collection_summary.category),
-            })
-
-        for collection_summary in incomplete_collection_summaries:
-            incomplete_collection_summary_dicts.append({
-                'id': collection_summary.id,
-                'title': collection_summary.title,
-                'category': collection_summary.category,
-                'objective': collection_summary.objective,
-                'language_code': collection_summary.language_code,
-                'last_updated': utils.get_time_in_millisecs(
-                    collection_summary.collection_model_last_updated),
-                'created_on': utils.get_time_in_millisecs(
-                    collection_summary.collection_model_created_on),
-                'status': collection_summary.status,
-                'node_count': collection_summary.node_count,
-                'community_owned': collection_summary.community_owned,
-                'thumbnail_icon_url': (
-                    utils.get_thumbnail_icon_url_for_category(
-                        collection_summary.category)),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    collection_summary.category),
-            })
+        completed_collection_summary_dicts = (
+            learner_progress_services.get_collection_summary_dicts(
+                completed_collection_summaries))
+        incomplete_collection_summary_dicts = (
+            learner_progress_services.get_collection_summary_dicts(
+                incomplete_collection_summaries))
 
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))
