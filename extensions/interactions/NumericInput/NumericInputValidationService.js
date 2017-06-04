@@ -109,8 +109,8 @@ oppia.factory('NumericInputValidationService', [
                   message: (
                     'Rule ' + (j + 1) + ' from answer group ' +
                     (i + 1) + ' will never be matched because it ' +
-                    'is made redundant by rule ' + ranges[k].ruleIndex + ' from ' +
-                    'answer group ' + ranges[k].answerGroupIndex + '.')
+                    'is made redundant by rule ' + ranges[k].ruleIndex +
+                    ' from answer group ' + ranges[k].answerGroupIndex + '.')
                 });
               }
             }
