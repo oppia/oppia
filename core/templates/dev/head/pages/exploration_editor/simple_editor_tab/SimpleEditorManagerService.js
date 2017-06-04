@@ -119,24 +119,28 @@ oppia.factory('SimpleEditorManagerService', [
         data.questionList.getBindableQuestion(
           stateName).setBridgeHtml(newHtml);
       },
-      addNewQuestion: function() {
+      addNewQuestion: function(type) {
+
+        if(type == "multiple"){
         // This effectively adds a new multiple-choice interaction to the
         // latest state in the chain.
-        var lastStateName = (
-          data.questionList.isEmpty() ?
-          SimpleEditorShimService.getInitStateName() :
-          data.questionList.getLastQuestion().getDestinationStateName());
+          var lastStateName = (
+            data.questionList.isEmpty() ?
+            SimpleEditorShimService.getInitStateName() :
+            data.questionList.getLastQuestion().getDestinationStateName());
 
-        SimpleEditorShimService.saveInteractionId(
-          lastStateName, DEFAULT_INTERACTION.ID);
-        SimpleEditorShimService.saveCustomizationArgs(
-          lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-        SimpleEditorShimService.saveDefaultOutcome(
-          lastStateName, OutcomeObjectFactory.createEmpty(lastStateName));
+          SimpleEditorShimService.saveInteractionId(
+            lastStateName, DEFAULT_INTERACTION.ID);
+          SimpleEditorShimService.saveCustomizationArgs(
+            lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+          SimpleEditorShimService.saveDefaultOutcome(
+            lastStateName, OutcomeObjectFactory.createEmpty(lastStateName));
 
-        var stateData = SimpleEditorShimService.getState(lastStateName);
-        data.questionList.addQuestion(QuestionObjectFactory.create(
-          lastStateName, stateData.interaction, ''));
+          var stateData = SimpleEditorShimService.getState(lastStateName);
+          data.questionList.addQuestion(QuestionObjectFactory.create(
+            lastStateName, stateData.interaction, ''));
+        }Z
+
       },
       canAddNewQuestion: function() {
         // Requirements:

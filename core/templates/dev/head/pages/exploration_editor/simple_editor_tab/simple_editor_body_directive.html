@@ -38,16 +38,21 @@
     </div>
   </div>
 
+
+
   <div class="advance-btn-wrapper">
-    <span class="advance-btn-description" ng-show="advBtnHovered">Add new question</span>
+    <div ng-show="chooseQuestionType" class="question-type-wrapper" >
+      <button type="button" class="oppia-question-button btn btn-primary" ng-click="chooseQuestionType = false; addNewQuestion('multiple');">Multiple Choice Input</button>
+    </div>
+    <span class="advance-btn-description" ng-show="advBtnHovered" ng-if="!chooseQuestionType">Add new question</span>
     <button ng-disabled="!canAddNewQuestion()" type="button"
-            class="btn btn-default advance-btn" ng-click="addNewQuestion(); advBtnHovered = false"
+            class="btn btn-default advance-btn" ng-click="chooseQuestionType = true; advBtnHovered = false"
             ng-mouseenter="advBtnHovered = true" ng-mouseleave="advBtnHovered = false">
       <i class="material-icons md-30">&#xE5CF;</i>
     </button>
   </div>
   <div class="advance-btn-wrapper end-exploration-btn-wrapper">
-    <span class="advance-btn-description" ng-show="finishBtnHovered">Finish exploration</span>
+    <span class="advance-btn-description" ng-show="finishBtnHovered" ng-if="!chooseQuestionType">Finish exploration</span>
     <button ng-show="canTryToFinishExploration()" ng-disabled="!isExplorationFinishable()" type="button"
             class="btn btn-default advance-btn"
             ng-click="publishChanges(); finishBtnHovered = false"
@@ -130,5 +135,26 @@
     margin-right: -100%;
     text-align: center;
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  }
+
+  simple-editor-body .question-type-wrapper {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    margin: 0 0 20px -30px;
+    overflow: hidden;
+    width: 200px;
+  }
+  simple-editor-body .oppia-question-button {
+    background-color: #fff;
+    border-color: #fff;
+    border-width: 0px;
+    color: #000;
+    height: 55px;
+    min-width: 202px;
+  }
+  simple-editor-body .oppia-question-button:hover,.oppia-question-button:focus {
+    background-color: #e4e4e4;
+    color: #000;
   }
 </style>
