@@ -1806,7 +1806,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
         for user_id, username, user_email in zip(user_ids, usernames, emails):
             user_services.get_or_create_user(
-                user_id, user_email, self.USER_ROLE)
+                user_id, user_email, feconf.ROLE_EXPLORATION_EDITOR)
             user_services.set_username(user_id, username)
 
         # Both users can receive all emails in default setting.

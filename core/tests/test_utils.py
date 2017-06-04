@@ -109,21 +109,15 @@ class TestBase(unittest.TestCase):
     # Usernames containing the string 'admin' are reserved, so we use 'adm'
     # instead.
     ADMIN_USERNAME = 'adm'
-    ADMIN_ROLE = feconf.ROLE_ADMIN
     MODERATOR_EMAIL = 'moderator@example.com'
-    MODERATOR_ROLE = feconf.ROLE_MODERATOR
     MODERATOR_USERNAME = 'moderator'
     OWNER_EMAIL = 'owner@example.com'
-    OWNER_ROLE = feconf.ROLE_COLLECTION_EDITOR
     OWNER_USERNAME = 'owner'
     EDITOR_EMAIL = 'editor@example.com'
-    EDITOR_ROLE = feconf.ROLE_COLLECTION_EDITOR
     EDITOR_USERNAME = 'editor'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
-    VIEWER_ROLE = feconf.ROLE_EXPLORATION_EDITOR
     NEW_USER_EMAIL = 'new.user@example.com'
-    USER_ROLE = feconf.ROLE_EXPLORATION_EDITOR
     NEW_USER_USERNAME = 'newuser'
     DEFAULT_END_STATE_NAME = 'End'
 

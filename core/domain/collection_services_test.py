@@ -56,11 +56,11 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         user_services.get_or_create_user(
-            self.owner_id, self.OWNER_EMAIL, self.OWNER_ROLE)
+            self.owner_id, self.OWNER_EMAIL, feconf.ROLE_COLLECTION_EDITOR)
         user_services.get_or_create_user(
-            self.editor_id, self.EDITOR_EMAIL, self.EDITOR_ROLE)
+            self.editor_id, self.EDITOR_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
         user_services.get_or_create_user(
-            self.viewer_id, self.VIEWER_EMAIL, self.VIEWER_ROLE)
+            self.viewer_id, self.VIEWER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
