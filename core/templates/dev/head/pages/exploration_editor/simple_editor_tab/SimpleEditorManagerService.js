@@ -121,8 +121,8 @@ oppia.factory('SimpleEditorManagerService', [
       },
       addNewQuestion: function(type) {
         if(type == 'multiple'){
-        // This effectively adds a new multiple-choice interaction to the
-        // latest state in the chain.
+          // This effectively adds a new multiple-choice interaction to the
+          // latest state in the chain.
           var lastStateName = (
             data.questionList.isEmpty() ?
             SimpleEditorShimService.getInitStateName() :
