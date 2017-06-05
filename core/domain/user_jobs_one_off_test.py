@@ -222,6 +222,52 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(output['2'], 2)
         self.assertEqual(output['1'], 1)
 
+class UserBioLengthOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off username length distribution job."""
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_A_BIO = 'I am less than 500'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_USERNAME = 'b'
+    USER_B_BIO = 'Long Bio' *100
+    USER_C_EMAIL = 'c@example.com'
+    USER_C_USERNAME = 'cnone'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UserBioLengthOneOffJob.create_new())
+        user_jobs_one_off.UserBioLengthOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+
+    def test_null_user_bio(self):
+        """Tests the case where the userbio has 0 chars."""
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        result = self._run_one_off_job()
+        self.assertIsNone(result)
+
+    def test_inbound_limit(self):
+        """Tests the case where the userbio is less than 500 characters."""
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
+        user_services.update_user_bio(user_id_a, self.USER_A_BIO)
+        result = self._run_one_off_job()
+        self.assertIsNone(result)
+
+    def test_outbound_limit(self):
+        """Tests the case where the userbio is more than 500 characters."""
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
+        user_services.update_user_bio(user_id_b, self.USER_B_BIO)
+        self._run_one_off_job()
+        user_settings = user_services.get_user_settings(user_id_b, strict=True)
+        bio = user_settings.user_bio
+        self.assertEqual(len(bio), 800)
+
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""

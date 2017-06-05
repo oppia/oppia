@@ -87,8 +87,14 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
         yield (key, len(username_counter))
 
 
-class UserbioLengthOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for calculating the length of user_bio."""
+class UserBioLengthOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for calculating the length of user_bio.
+
+    Returns:
+        None: If all the user_bios' length are less than 500 chars.
+        Lists: List of lengths of user_bio, user_name  for char
+            greater than 500.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
