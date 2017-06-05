@@ -689,7 +689,7 @@ class Actor(object):
     def can_change_private_viewability(
             self, activity_type, activity_id):
         """Returns whether this user is allowed to change the viewability of
-        a private activity.
+        the given private activity.
 
         The caller is responsible for ensuring that the given activity is
         private.
@@ -702,7 +702,7 @@ class Actor(object):
 
         Returns:
             bool. Whether the user is allowed to change the viewability of
-                a private activity.
+                the given private activity.
         """
 
         return self.can_publish(activity_type, activity_id)
