@@ -257,7 +257,7 @@ body {
   font-size: 1em;
   font-weight: normal;
   margin: 0;
-  padding: 15px 98px 15px 20px;
+  padding: 15px 20px 15px 20px;
 }
 
 .oppia-learner-dashboard-main-menu .oppia-learner-dashboard-sub-section-active {
@@ -265,7 +265,7 @@ body {
 }
 
 .oppia-learner-dashboard-submenu {
-  padding: 12px 80px 12px 40px;
+  padding: 12px 20px 12px 40px;
   font-size: 16px;
   color: #8c8c8c;
   background-color: #fff;
@@ -286,6 +286,22 @@ body {
 .oppia-learner-dashboard-main-content {
   padding: 0;
   width: 60%;
+}
+
+.oppia-learner-dashboard-main-content .stats-card {
+  min-height: 63px;
+  position: relative;
+}
+
+.oppia-learner-dashboard-main-content .stats-card .stat-description {
+  line-height: 1.646;
+  margin-bottom: 35px;
+  padding-right: 10px;
+}
+
+.oppia-learner-dashboard-main-content .stats-card .stat-value {
+  bottom: 0;
+  position: absolute;
 }
 
 .oppia-learner-dashboard-main-content .remove-icon {
