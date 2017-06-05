@@ -99,9 +99,6 @@ class BaseInteraction(object):
     # Specs for desired visualizations of recorded state answers. Overridden
     # in subclasses.
     _answer_visualization_specs = []
-    # Auxiliary calculations supported by this interaction, but not used for
-    # visualization.
-    _auxiliary_calculation_ids = []
     # Instructions for using this interaction, to be shown to the learner. Only
     # relevant for supplemental interactions.
     instructions = None
@@ -146,8 +143,7 @@ class BaseInteraction(object):
     def answer_calculation_ids(self):
         visualizations = self.answer_visualizations
         return set(
-            [visualization.calculation_id for visualization in visualizations]
-            + self._auxiliary_calculation_ids)
+            [visualization.calculation_id for visualization in visualizations])
 
     @property
     def dependency_ids(self):

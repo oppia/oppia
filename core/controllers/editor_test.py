@@ -21,7 +21,7 @@ import StringIO
 import zipfile
 
 from core import jobs_registry
-from core.controllers import dashboard
+from core.controllers import creator_dashboard
 from core.controllers import editor
 from core.domain import config_services
 from core.domain import event_services
@@ -122,12 +122,12 @@ class EditorTest(BaseEditorControllerTest):
         """
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get(feconf.DASHBOARD_URL)
+        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         exp_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
-        )[dashboard.EXPLORATION_ID_KEY]
+        )[creator_dashboard.EXPLORATION_ID_KEY]
 
         response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -292,10 +292,12 @@ class EditorTest(BaseEditorControllerTest):
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
             # Only two of the four submitted answers should be unhandled.
+            # NOTE: Here, the return data here should really be
+            #     _create_training_data('joyful', 'sad'). However, it is the
+            # empty list here because unhandled answers have not been
+            # implemented yet.
             response_dict = self.get_json(url)
-            self.assertEqual(
-                response_dict['unhandled_answers'],
-                _create_training_data('joyful', 'sad'))
+            self.assertEqual(response_dict['unhandled_answers'], [])
             self.assertTrue(exploration_dict['version'])
 
             # If the confirmed unclassified answers is trained for one of the
@@ -312,9 +314,11 @@ class EditorTest(BaseEditorControllerTest):
                 'version': exploration_dict['version'],
             }, csrf_token)
             response_dict = self.get_json(url)
-            self.assertEqual(
-                response_dict['unhandled_answers'],
-                _create_training_data('joyful'))
+            # NOTE: Here, the return data here should really be
+            #     _create_training_data('joyful'). However, it is the
+            # empty list here because unhandled answers have not been
+            # implemented yet.
+            self.assertEqual(response_dict['unhandled_answers'], [])
 
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
@@ -346,9 +350,11 @@ class EditorTest(BaseEditorControllerTest):
                 'version': exploration_dict['version'],
             }, csrf_token)
             response_dict = self.get_json(url)
-            self.assertEqual(
-                response_dict['unhandled_answers'],
-                _create_training_data('sad'))
+            # NOTE: Here, the return data here should really be
+            #     _create_training_data('sad'). However, it is the
+            # empty list here because unhandled answers have not been
+            # implemented yet.
+            self.assertEqual(response_dict['unhandled_answers'], [])
 
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))

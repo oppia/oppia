@@ -640,11 +640,12 @@ class UntrainedAnswersHandler(EditorHandler):
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to the classifier individually.
-        submitted_answers = stats_services.get_top_state_rule_answers(
-            exploration_id, state_name, [
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
-                exp_domain.TRAINING_DATA_CLASSIFICATION])[
-                    :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
+
+        # TODO(sll): Functionality for retrieving untrained answers was removed
+        # in PR 3489 due to infeasibility of the calculation approach. It needs
+        # to be reinstated in the future so that the training interface can
+        # function.
+        submitted_answers = []
 
         interaction = state.interaction
         unhandled_answers = []

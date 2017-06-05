@@ -49,7 +49,7 @@ oppia.controller('Splash', [
     $scope.onClickCreateExplorationButton = function() {
       siteAnalyticsService.registerClickCreateExplorationButtonEvent();
       $timeout(function() {
-        $window.location = '/dashboard?mode=create';
+        $window.location = '/creator_dashboard?mode=create';
       }, 150);
       return false;
     };
