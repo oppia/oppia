@@ -32,8 +32,7 @@ class UserSettingsModel(base_models.BaseModel):
     """
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
-    # User role. Required for authorization. EXPLORATION_EDITOR is default
-    # role given to any logged in user.
+    # User role. Required for authorization.
     role = ndb.StringProperty(required=True, indexed=True)
     # Identifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
