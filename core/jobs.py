@@ -103,7 +103,13 @@ class BaseJobManager(object):
 
     @classmethod
     def create_new(cls):
-        """Creates a new job of this class type. Returns the id of this job."""
+        """Creates a new job of this class type.
+        Returns:
+            The id of this job.
+        Raises:
+            Exception: A job using an abstract base manager tried to directly
+                create a job
+        """
         if cls._is_abstract():
             raise Exception(
                 'Tried to directly create a job using the abstract base '
@@ -118,7 +124,11 @@ class BaseJobManager(object):
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
-        """Marks a job as queued and adds it to a queue for processing."""
+        """Marks a job as queued and adds it to a queue for processing.
+        Args:
+            job_id: str. The id of the job
+            additional_job_params: dict(str : int).
+                Additional parameters on jobs"""
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -138,6 +148,10 @@ class BaseJobManager(object):
 
     @classmethod
     def register_start(cls, job_id, metadata=None):
+        """Marks job as started.
+        Args:
+            job_id: str. The id of the job
+            metadata: ---. The metadata of the job"""  # TODO: Put Data Type.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_STARTED)
@@ -154,7 +168,12 @@ class BaseJobManager(object):
 
     @classmethod
     def register_completion(cls, job_id, output_list):
-        """Marks a job as completed."""
+        """Marks a job as completed.
+        Args:
+            job_id: str. The id of the job
+            output_list: list(str). The output of the job"""
+            # TODO: Better discription.
+
         _MAX_OUTPUT_LENGTH_CHARS = 900000
 
         # Ensure that preconditions are met.
@@ -197,7 +216,10 @@ class BaseJobManager(object):
 
     @classmethod
     def register_failure(cls, job_id, error):
-        """Marks a job as failed."""
+        """Marks a job as completed.
+        Args:
+            job_id: str. The id of the job
+            error: str. The error to be raised of the job"""
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -213,6 +235,10 @@ class BaseJobManager(object):
 
     @classmethod
     def cancel(cls, job_id, user_id):
+        """Marks job as canceled.
+        Args:
+            job_id: str. The id of the job.
+            user_id: str. The id of the user."""
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -233,19 +259,29 @@ class BaseJobManager(object):
 
     @classmethod
     def is_active(cls, job_id):
+        """Asserts if job is still active.
+        Args:
+            job_id: str. The id of the job.
+        Returns: Boolean. If the job is active or not."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     @classmethod
     def has_finished(cls, job_id):
+        """Asserts if job has finished.
+        Args:
+            job_id: str. The id of the job.
+        Returns: Boolean. If the job has finished or not."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.status_code in [STATUS_CODE_COMPLETED, STATUS_CODE_FAILED]
 
     @classmethod
     def cancel_all_unfinished_jobs(cls, user_id):
-        """Cancel all queued or started jobs of this job type."""
+        """Cancel all queued or started jobs of this job type.
+        Args:
+            job_id: str. The id of the job."""
         unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
             cls.__name__)
         for model in unfinished_job_models:
@@ -256,48 +292,58 @@ class BaseJobManager(object):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Must be implemented by subclasses.
-        """
+        Args:
+            job_id: str. The id of the job.
+            additional_job_params: dict(str : int).
+                Additional parameters on jobs """
         raise NotImplementedError(
             'Subclasses of BaseJobManager should implement _real_enqueue().')
 
     @classmethod
     def get_status_code(cls, job_id):
+        """Returns the status code of the the job."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.status_code
 
     @classmethod
     def get_time_queued_msec(cls, job_id):
+        """Returns the time the job got queued."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.time_queued_msec
 
     @classmethod
     def get_time_started_msec(cls, job_id):
+        """Returns the time the job got started."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.time_started_msec
 
     @classmethod
     def get_time_finished_msec(cls, job_id):
+        """Returns the time the job got finished."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.time_finished_msec
 
     @classmethod
     def get_metadata(cls, job_id):
+        """Returns the metadata of the job."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.metadata
 
     @classmethod
     def get_output(cls, job_id):
+        """Returns the output of the job."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.output
 
     @classmethod
     def get_error(cls, job_id):
+        """Returns the error in the job."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.error
@@ -305,6 +351,14 @@ class BaseJobManager(object):
     @classmethod
     def _require_valid_transition(
             cls, job_id, old_status_code, new_status_code):
+        """Asserts if the transition of the job status code is valid.
+        Args:
+            job_id: str. The id of the job.
+            old_status_code: str. Old status code.
+            new_status_code: str. New status code.
+        Raises:
+            AttributeError: Invalid status code change for job.
+            """
         valid_new_status_codes = VALID_STATUS_CODE_TRANSITIONS[old_status_code]
         if new_status_code not in valid_new_status_codes:
             raise Exception(
@@ -313,6 +367,7 @@ class BaseJobManager(object):
 
     @classmethod
     def _require_correct_job_type(cls, job_type):
+        """Raises Exception if incorrect job type."""
         if job_type != cls.__name__:
             raise Exception(
                 'Invalid job type %s for class %s' % (job_type, cls.__name__))
@@ -357,12 +412,23 @@ class BaseDeferredJobManager(BaseJobManager):
         """Function that performs the main business logic of the job.
 
         Needs to be implemented by subclasses.
+        Args:
+            additional_job_params: additional_job_params: dict(str : int).
+                Additional parameters on jobs.
+        Raises: NotImplementedError
         """
         raise NotImplementedError
 
     @classmethod
     def _run_job(cls, job_id, additional_job_params):
-        """Starts the job."""
+        """Starts the job.
+        Args:
+            job_id: str. The id of the job.
+            additional_job_params: dict(str : int).
+                Additional parameters on job.
+        Raises:
+
+            """  # TODO: Finish Raises
         logging.info(
             'Job %s started at %s' %
             (job_id, utils.get_current_time_in_millisecs()))
@@ -393,9 +459,9 @@ class BaseDeferredJobManager(BaseJobManager):
         """Puts the job in the task queue.
 
         Args:
-        - job_id: str, the id of the job.
-        - additional_job_params: dict of additional params to pass into the
-            job's _run() method.
+            job_id: str. the id of the job.
+            additional_job_params: dict. Additional params to pass into the
+                job's _run() method.
         """
         taskqueue_services.defer(cls._run_job, job_id, additional_job_params)
 
@@ -403,6 +469,12 @@ class BaseDeferredJobManager(BaseJobManager):
 class MapReduceJobPipeline(base_handler.PipelineBase):
 
     def run(self, job_id, job_class_str, kwargs):
+        """ Runs job pipeline
+            Args:
+                job_id: str. the id of the job.
+                additional_job_params: dict. Additional params to pass into the
+                    job's _run() method.
+        """
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
             job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id  # pylint: disable=protected-access
@@ -421,6 +493,12 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 class StoreMapReduceResults(base_handler.PipelineBase):
 
     def run(self, job_id, job_class_str, output):
+        """ Runs store mapreduce results.
+            Args:
+                job_id: str. the id of the job.
+                additional_job_params: dict. Additional params to pass into the
+                    job's _run() method.
+        """
         job_class = mapreduce_util.for_name(job_class_str)
 
         try:
@@ -489,6 +567,8 @@ class BaseMapReduceJobManager(BaseJobManager):
           WARNING: The OutputWriter converts mapper output keys to type str.
           So, if you have keys that are of type unicode, you must yield
           "key.encode('utf-8')", rather than "key".
+          Raises:
+            NotImplementedError
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement map '
@@ -511,6 +591,8 @@ class BaseMapReduceJobManager(BaseJobManager):
           handling values for this key. (It can probably also assume that
           it will be called exactly once for each key with all of the output,
           but this needs to be verified.)
+         Raises:
+            NotImplementedError
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement '
@@ -577,6 +659,8 @@ class BaseMapReduceJobManager(BaseJobManager):
         Mapper methods may want to use this as a precomputation check,
         especially if the datastore classes being iterated over are append-only
         event logs.
+        Returns:
+            Bool. If job_queued_msec >= created_on_msec.
         """
         created_on_msec = utils.get_time_in_millisecs(entity.created_on)
         job_queued_msec = float(context.get().mapreduce_spec.mapper.params[
@@ -597,16 +681,21 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
     @classmethod
     def from_json(cls, input_shard_state):
+        """Returns JSON data as list."""
         return cls(input_readers.DatastoreInputReader.from_json(
             input_shard_state[cls._READER_LIST_PARAM]))
 
     def to_json(self):
+        """Returns JSON form of data."""
         return {
             self._READER_LIST_PARAM: self._reader_list.to_json()
         }
 
     @classmethod
     def split_input(cls, mapper_spec):
+        """Returns data split from mapper_spec as inputs(list)
+        Args:
+            mapper_spec: dict. """  # TODO: Write what is mapper_spec
         params = mapper_spec.params
         entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
 
@@ -635,6 +724,8 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
     def _get_continuous_computation_class(cls):
         """Returns the ContinuousComputationManager class associated with this
         MapReduce job.
+        Raises:
+            NotImplementedError.
         """
         raise NotImplementedError(
             'Subclasses of BaseMapReduceJobManagerForContinuousComputations '
@@ -642,6 +733,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
     @staticmethod
     def _get_job_queued_msec():
+        """Returns the time job got queued in milliseconds."""
         return float(context.get().mapreduce_spec.mapper.params[
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
 
