@@ -20,6 +20,7 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
+var collectionPlayer = require('../protractor_utils/collectionPlayer.js');
 
 describe('Collections', function() {
   beforeAll(function() {
@@ -30,7 +31,6 @@ describe('Collections', function() {
       '.protractor-test-reload-collection-button')).first().click();
     general.acceptAlert();
     browser.waitForAngular();
-    admin.reloadAllExplorations();
     admin.editConfigProperty(
       'Names of users allowed to use the collection editor',
       'List', function(listEditor) {
@@ -39,6 +39,8 @@ describe('Collections', function() {
     );
     users.logout();
   });
+ 
+ 
 
   it('visits the collection editor', function() {
     users.login('alice@collections.com');
@@ -55,10 +57,6 @@ describe('Collections', function() {
     collectionEditor.addExistingExploration('0');
     collectionEditor.addExistingExploration('4');
     collectionEditor.addExistingExploration('13');
-    // Search and add existing explorations.
-    collectionEditor.searchForAndAddExistingExploration('Lazy');
-    collectionEditor.searchForAndAddExistingExploration('Linear');
-    collectionEditor.searchForAndAddExistingExploration('The');
     // Shifting nodes in the node graph.
     collectionEditor.shiftNodeLeft(1);
     collectionEditor.shiftNodeRight(1);
@@ -81,6 +79,32 @@ describe('Collections', function() {
     browser.get('/collection/0');
     browser.waitForAngular();
     users.logout();
+  });
+
+  it('interacts with the collection player as a guest', function() {
+    collectionPlayer.goToDemoCollection();
+    // Check that we are in the guest state (sign in button visible).
+    collectionPlayer.verifySignInButton();
+    // Verify that there are 5 uncompleted explorations (initial state).
+    collectionPlayer.verifyNumUncompletedExplorations(5);
+    // Play the third exploration in the demo collection.
+    collectionPlayer.playDemoExplorationThree();
+    // Verify that the suggested exploration is the next in the collection.
+    collectionPlayer.verifySuggestedExplorationAsGuest();
+    // Go back to collection player.
+    collectionPlayer.goToDemoCollection();
+    // Verify that there are 5 uncompleted explorations, since this is a guest.
+    collectionPlayer.verifyNumUncompletedExplorations(5);
+  });
+    
+  it('interacts with the collection player as a logged-in user', function() {
+    users.login('alice@collections.com');
+    collectionPlayer.goToDemoCollection();
+    // Verify that profile dropdown thumbnail appears, since we are logged in.
+    collectionPlayer.verifyProfileDropdown();
+    // Verify that there are 5 uncompleted explorations (initial state).
+    collectionPlayer.verifyNumUncompletedExplorations(5);
+    // This test (i.e. part 3) needs to be finished
   });
 
   afterEach(function() {
