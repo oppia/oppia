@@ -140,7 +140,7 @@ class Classifier(object):
 
         if not isinstance(self.exp_version_when_created, int):
             raise utils.ValidationError(
-                'Expected exp_version_when_created to be a int, received %s' %
+                'Expected exp_version_when_created to be an int, received %s' %
                 self.exp_version_when_created)
 
         if not isinstance(self.state_name, basestring):
@@ -172,7 +172,7 @@ class Classifier(object):
         classifier_class.validate(self.cached_classifier_data)
 
 
-class TrainClassifierJob(object):
+class ClassifierTrainingJob(object):
     """Domain object for a classifier training job.
 
     A classifier training job is an abstraction of a request made by Oppia
@@ -194,9 +194,21 @@ class TrainClassifierJob(object):
             generated.
         status: str. The status of the training job request. This can be either
             PENDING (default value) or COMPLETE.
-        training_data: list. The training data that is used for training the
-            classifier. This field populated lazily when the job request is
-            picked up by the VM.
+        training_data: list(dict). The training data that is used for training
+            the classifier. This field is populated lazily when the job request
+            is picked up by the VM. The list contains dicts where each dict
+            represents a single training data group, for example:
+            training_data = [
+                {
+                    'answer_group_index': 1,
+                    'answers': ['a1', 'a2']
+                },
+                {
+                    'answer_group_index': 2,
+                    'answers': ['a2', 'a3']
+                }
+            ]
+
     """
 
     def __init__(self, job_id, algorithm_id, exp_id, exp_version_when_created,
@@ -214,10 +226,21 @@ class TrainClassifierJob(object):
         state_name: str. The name of the state for which the classifier will be
             generated.
         status: str. The status of the training job request. This can be either
-            PENDING (default value) or COMPLETE.
+            NEW (default), PENDING (when a job has been picked up) or COMPLETE.
         training_data: list. The training data that is used for training the
             classifier. This is populated lazily when the job request is picked
-            up by the VM.
+            up by the VM. The list contains dicts where each dict
+            represents a single training data group, for example:
+            training_data = [
+                {
+                    'answer_group_index': 1,
+                    'answers': ['a1', 'a2']
+                },
+                {
+                    'answer_group_index': 2,
+                    'answers': ['a2', 'a3']
+                }
+            ]
         """
         self._job_id = job_id
         self._algorithm_id = algorithm_id
@@ -286,13 +309,19 @@ class TrainClassifierJob(object):
 
         if not isinstance(self.exp_version_when_created, int):
             raise utils.ValidationError(
-                'Expected exp_version_when_created to be a int, received %s' %
+                'Expected exp_version_when_created to be an int, received %s' %
                 self.exp_version_when_created)
 
         if not isinstance(self.state_name, basestring):
             raise utils.ValidationError(
                 'Expected state to be a string, received %s' % self.state_name)
         utils.require_valid_name(self.state_name, 'the state name')
+
+        if self.status not in feconf.ALLOWED_TRAINING_JOB_STATUSES:
+            raise utils.ValidationError(
+                'Expected status to be in %s, received %s' %
+                feconf.ALLOWED_TRAINING_JOB_STATUSES,
+                self.exp_version_when_created)
 
         if not isinstance(self.algorithm_id, basestring):
             raise utils.ValidationError(
@@ -323,7 +352,7 @@ class TrainClassifierJob(object):
                     'Expected answers to be a key in training_data list item')
             if not isinstance(grouped_answers['answer_group_index'], int):
                 raise utils.ValidationError(
-                    'Expected answer_group_index to be a int, received %s' %
+                    'Expected answer_group_index to be an int, received %s' %
                     grouped_answers['answer_group_index'])
             if not isinstance(grouped_answers['answers'], list):
                 raise utils.ValidationError(

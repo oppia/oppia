@@ -15,9 +15,11 @@
 """Models for storing the classification models."""
 
 from core.platform import models
+import feconf
 import utils
 
 from google.appengine.ext import ndb
+
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -26,11 +28,6 @@ ALGORITHM_CHOICES = [
     'LDAStringClassifier'
 ]
 
-# Permitted training job status values
-TRAINING_JOB_STATUSES = [
-    'PENDING',
-    'COMPLETE'
-]
 
 class ClassifierModel(base_models.BaseModel):
     """Storage model for classifier used for answer classification.
@@ -118,7 +115,7 @@ class ClassifierModel(base_models.BaseModel):
         return instance_id
 
 
-class TrainClassifierJobModel(base_models.BaseModel):
+class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
 
     The id of instances of this class has the form
@@ -133,10 +130,13 @@ class TrainClassifierJobModel(base_models.BaseModel):
     exp_version_when_created = ndb.IntegerProperty(required=True)
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True)
-    # The status of the training job. It can be either COMPLETE or PENDING.
-    status = ndb.StringProperty(required=True, choices=TRAINING_JOB_STATUSES,
-                                default='PENDING')
+    # The status of the training job. It can be either NEW, COMPLETE or PENDING
+    status = ndb.StringProperty(required=True,
+                                choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
+                                default=feconf.TRAINING_JOB_STATUS_PENDING)
     # The training data which is to be populated when retrieving the job.
+    # The list contains dicts where each dict represents a single training
+    # data group.
     training_data = ndb.JsonProperty(default=None)
 
     @classmethod
@@ -148,10 +148,10 @@ class TrainClassifierJobModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new TrainClassifierJobModel instance.
+            ID of the new ClassifierTrainingJobModel instance.
 
         Raises:
-            Exception: The id generator for TrainClassifierJobModel is
+            Exception: The id generator for ClassifierTrainingJobModel is
             producing too many collisions.
         """
 
@@ -165,14 +165,14 @@ class TrainClassifierJobModel(base_models.BaseModel):
                 return new_id
 
         raise Exception(
-            'The id generator for TrainClassifierJobModel is producing '
+            'The id generator for ClassifierTrainingJobModel is producing '
             'too many collisions.')
 
     @classmethod
     def create(
             cls, algorithm_id, exp_id, exp_version_when_created, state_name,
             status, training_data):
-        """Creates a new TrainClassifierJobModel entry.
+        """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
             algorithm_id: str. ID of the algorithm used to generate the model.
