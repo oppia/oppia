@@ -154,10 +154,9 @@ class Classifier(object):
                 self.algorithm_id)
         utils.require_valid_name(
             self.algorithm_id, 'the algorithm id')
-        algorithm_ids = []
-        for classifier_details in (
-                feconf.INTERACTION_CLASSIFIER_MAPPING.values()):
-            algorithm_ids.append(classifier_details['algorithm_id'])
+        algorithm_ids = [
+            classifier_details['algorithm_id'] for classifier_details in
+            feconf.INTERACTION_CLASSIFIER_MAPPING.values()]
         if self.algorithm_id not in algorithm_ids:
             raise utils.ValidationError(
                 'Invalid algorithm id: %s' % self.algorithm_id)
@@ -213,7 +212,7 @@ class ClassifierTrainingJob(object):
 
     def __init__(self, job_id, algorithm_id, exp_id, exp_version_when_created,
                  state_name, status, training_data):
-        """Constructs an TrainClassiferJob domain object.
+        """Constructs a TrainClassiferJob domain object.
 
         Args:
         job_id: str. The unique id of the classifier training job.
@@ -330,9 +329,9 @@ class ClassifierTrainingJob(object):
         utils.require_valid_name(
             self.algorithm_id, 'the algorithm id')
 
-        for classifier_details in (
-                feconf.INTERACTION_CLASSIFIER_MAPPING.values()):
-            algorithm_ids.append(classifier_details['algorithm_id'])
+        algorithm_ids = [
+            classifier_details['algorithm_id'] for classifier_details in
+            feconf.INTERACTION_CLASSIFIER_MAPPING.values()]
         if self.algorithm_id not in algorithm_ids:
             raise utils.ValidationError(
                 'Invalid algorithm id: %s' % self.algorithm_id)
