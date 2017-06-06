@@ -20,7 +20,7 @@ from core.tests import test_utils
 import utils
 
 
-class ClassifierDomainTests(test_utils.GenericTestBase):
+class ClassifierDataDomainTests(test_utils.GenericTestBase):
     """Test the classifier domain."""
 
     def test_to_dict(self):
@@ -33,7 +33,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             'classifier_data': {'alpha': 1.0},
             'data_schema_version': 1
         }
-        observed_classifier = classifier_domain.Classifier(
+        observed_classifier = classifier_domain.ClassifierData(
             expected_classifier_dict['classifier_id'],
             expected_classifier_dict['exp_id'],
             expected_classifier_dict['exp_version_when_created'],
@@ -75,7 +75,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             'classifier_data': classifier_data,
             'data_schema_version': 1
         }
-        classifier = classifier_domain.Classifier(
+        classifier = classifier_domain.ClassifierData(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
             classifier_dict['exp_version_when_created'],
@@ -88,7 +88,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         # Verify validation error is raised when int is provided instead of
         # string.
         classifier_dict['classifier_id'] = 1
-        classifier = classifier_domain.Classifier(
+        classifier = classifier_domain.ClassifierData(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
             classifier_dict['exp_version_when_created'],
@@ -104,7 +104,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         # int.
         classifier_dict['classifier_id'] = 'job_request_id1'
         classifier_dict['exp_version_when_created'] = 'abc'
-        classifier = classifier_domain.Classifier(
+        classifier = classifier_domain.ClassifierData(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
             classifier_dict['exp_version_when_created'],
@@ -119,7 +119,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         # Verify valdation error is raised when invalid state_name is provided.
         classifier_dict['exp_version_when_created'] = 1
         classifier_dict['state_name'] = 'A string #'
-        classifier = classifier_domain.Classifier(
+        classifier = classifier_domain.ClassifierData(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
             classifier_dict['exp_version_when_created'],
@@ -135,7 +135,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         # provided.
         classifier_dict['state_name'] = 'a state name'
         classifier_dict['algorithm_id'] = 'abc'
-        classifier = classifier_domain.Classifier(
+        classifier = classifier_domain.ClassifierData(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
             classifier_dict['exp_version_when_created'],
@@ -150,7 +150,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
         # Verify validation error is raised when list is provided for dict.
         classifier_dict['algorithm_id'] = "LDAStringClassifier"
         classifier_dict['classifier_data'] = []
-        classifier = classifier_domain.Classifier(
+        classifier = classifier_domain.ClassifierData(
             classifier_dict['classifier_id'],
             classifier_dict['exp_id'],
             classifier_dict['exp_version_when_created'],

@@ -22,7 +22,7 @@ from core.platform import models
 
 import feconf
 
-(classifier_data_models,) = models.Registry.import_models(
+(classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
 
 
@@ -136,7 +136,7 @@ def get_classifier_from_model(classifier_data_model):
     Returns:
         classifier: Domain object for the classifier.
     """
-    return classifier_domain.Classifier(
+    return classifier_domain.ClassifierData(
         classifier_data_model.id, classifier_data_model.exp_id,
         classifier_data_model.exp_version_when_created,
         classifier_data_model.state_name, classifier_data_model.algorithm_id,
@@ -156,7 +156,7 @@ def get_classifier_by_id(classifier_id):
     Raises:
         Exception: Entity for class ClassifierDataModel with id not found.
     """
-    classifier_data_model = classifier_data_models.ClassifierDataModel.get(
+    classifier_data_model = classifier_models.ClassifierDataModel.get(
         classifier_id)
     classifier = get_classifier_from_model(classifier_data_model)
     return classifier
@@ -170,7 +170,7 @@ def _create_classifier(classifier):
         classifier: Domain object for the classifier.
 
     """
-    classifier_id = classifier_data_models.ClassifierDataModel.create(
+    classifier_id = classifier_models.ClassifierDataModel.create(
         classifier.id, classifier.exp_id,
         classifier.exp_version_when_created,
         classifier.state_name, classifier.algorithm_id,
@@ -205,7 +205,7 @@ def save_classifier(classifier):
         classifier_id: str. ID of the classifier.
     """
     classifier_id = classifier.id
-    classifier_data_model = classifier_data_models.ClassifierDataModel.get(
+    classifier_data_model = classifier_models.ClassifierDataModel.get(
         classifier_id, False)
     classifier.validate()
     if classifier_data_model is None:
@@ -221,6 +221,6 @@ def delete_classifier(classifier_id):
     Args:
         classifier_id: str. ID of the classifier.
     """
-    classifier_data_model = classifier_data_models.ClassifierDataModel.get(
+    classifier_data_model = classifier_models.ClassifierDataModel.get(
         classifier_id)
     classifier_data_model.delete()

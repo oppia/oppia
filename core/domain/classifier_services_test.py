@@ -25,7 +25,7 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(classifier_data_models,) = models.Registry.import_models(
+(classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
 
 class ClassifierServicesTests(test_utils.GenericTestBase):
@@ -100,7 +100,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exp_id = u'1'
         classifier_id = u'1'
         state = 'Home'
-        classifier_id = classifier_data_models.ClassifierDataModel.create(
+        classifier_id = classifier_models.ClassifierDataModel.create(
             classifier_id, exp_id, 1, state,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                 'algorithm_id'], [], 1)
@@ -120,7 +120,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exp_id = u'1'
         classifier_id = u'1'
         state = 'Home'
-        classifier_id = classifier_data_models.ClassifierDataModel.create(
+        classifier_id = classifier_models.ClassifierDataModel.create(
             classifier_id, exp_id, 1, state,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                 'algorithm_id'], [], 1)
@@ -155,7 +155,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             '_c_lw': [],
             '_c_l': []
         }
-        classifier = classifier_domain.Classifier(
+        classifier = classifier_domain.ClassifierData(
             classifier_id, exp_id, 1, state_name,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                 'algorithm_id'], classifier_data, 1)

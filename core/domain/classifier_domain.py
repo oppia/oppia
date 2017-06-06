@@ -21,10 +21,10 @@ from core.platform import models
 import feconf
 import utils
 
-(classifier_data_models,) = models.Registry.import_models(
+(classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
 
-class Classifier(object):
+class ClassifierData(object):
     """Domain object for a classifier.
 
     A classifier is a machine learning model created using a particular
@@ -48,7 +48,7 @@ class Classifier(object):
     def __init__(self, classifier_id, exp_id,
                  exp_version_when_created, state_name, algorithm_id,
                  classifier_data, data_schema_version):
-        """Constructs an Classifier domain object.
+        """Constructs a ClassifierData domain object.
 
         Args:
             classifier_id: str. The unique id of the classifier.
@@ -101,7 +101,7 @@ class Classifier(object):
         return self._data_schema_version
 
     def update_state_name(self, state_name):
-        """Updates the state_name attribute of the Classifier domain object.
+        """Updates the state_name attribute of the ClassifierData domain object.
 
         Args:
             state_name: str. The name of the updated state to which the
@@ -111,10 +111,10 @@ class Classifier(object):
         self._state_name = state_name
 
     def to_dict(self):
-        """Constructs a dict representation of Classifier domain object.
+        """Constructs a dict representation of ClassifierData domain object.
 
         Returns:
-            A dict representation of Classifier domain object.
+            A dict representation of ClassifierData domain object.
         """
 
         return {
