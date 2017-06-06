@@ -67,9 +67,12 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
-        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.get_or_create_user(self.viewer_id, self.VIEWER_EMAIL)
+        user_services.get_or_create_user(
+            self.owner_id, self.OWNER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+        user_services.get_or_create_user(
+            self.editor_id, self.EDITOR_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+        user_services.get_or_create_user(
+            self.viewer_id, self.VIEWER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -2814,8 +2817,10 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         super(SuggestionActionUnitTests, self).setUp()
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        user_services.get_or_create_user(self.user_id, self.USER_EMAIL)
-        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
+        user_services.get_or_create_user(
+            self.user_id, self.USER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+        user_services.get_or_create_user(
+            self.editor_id, self.EDITOR_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
         self.signup(self.USER_EMAIL, self.USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         with self.swap(feedback_models.FeedbackThreadModel,
