@@ -738,6 +738,12 @@ class TriggerInstance(object):
     or a certain amount of time having elapsed.
     """
     def __init__(self, trigger_type, customization_args):
+        """Initializes a TriggerInstance domain object.
+
+        Args:
+            trigger_type: str. The type of trigger.
+            customization_args: dict. The customization args for the trigger.
+        """
         # A string denoting the type of trigger.
         self.trigger_type = trigger_type
         # Customization args for the trigger. This is a dict: the keys and
@@ -748,6 +754,11 @@ class TriggerInstance(object):
         self.customization_args = customization_args
 
     def to_dict(self):
+        """Returns a dict representing this TriggerInstance domain object.
+
+        Returns:
+            dict. A dict mapping all fields of TriggerInstance instance.
+        """
         return {
             'trigger_type': self.trigger_type,
             'customization_args': self.customization_args,
@@ -755,11 +766,26 @@ class TriggerInstance(object):
 
     @classmethod
     def from_dict(cls, trigger_dict):
+        """Return a TriggerInstance domain object from a dict.
+
+        Args:
+            trigger_dict: dict. The dict representation of TriggerInstance
+                object.
+
+        Returns:
+            TriggerInstance. The corresponding TriggerInstance domain object.
+        """
         return cls(
             trigger_dict['trigger_type'],
             trigger_dict['customization_args'])
 
     def validate(self):
+        """Validates various properties of the TriggerInstance.
+
+        Raises:
+            ValidationError: One or more attributes of the TriggerInstance are
+            invalid.
+        """
         if not isinstance(self.trigger_type, basestring):
             raise utils.ValidationError(
                 'Expected trigger type to be a string, received %s' %
@@ -784,10 +810,21 @@ class Fallback(object):
     satisfied, the user flow is rerouted to the given outcome.
     """
     def __init__(self, trigger, outcome):
+        """Initializes a Fallback domain object.
+
+        Args:
+            trigger: TriggerInstance. The satisfied trigger.
+            outcome: Outcome. The outcome where reroute the user flow.
+        """
         self.trigger = trigger
         self.outcome = outcome
 
     def to_dict(self):
+        """Returns a dict representing this Fallback domain object.
+
+        Returns:
+            dict. A dict mapping all fields of Fallback instance.
+        """
         return {
             'trigger': self.trigger.to_dict(),
             'outcome': self.outcome.to_dict(),
@@ -795,6 +832,14 @@ class Fallback(object):
 
     @classmethod
     def from_dict(cls, fallback_dict):
+        """Return a Fallback domain object from a dict.
+
+        Args:
+            fallback_dict: dict. The dict representation of Fallback object.
+
+        Returns:
+            Fallback. The corresponding Fallback domain object.
+        """
         return cls(
             TriggerInstance.from_dict(fallback_dict['trigger']),
             Outcome.from_dict(fallback_dict['outcome']))
@@ -811,6 +856,11 @@ class InteractionInstance(object):
     _DEFAULT_INTERACTION_ID = None
 
     def to_dict(self):
+        """Returns a dict representing this InteractionInstance domain object.
+
+        Returns:
+            dict. A dict mapping all fields of InteractionInstance instance.
+        """
         return {
             'id': self.id,
             'customization_args': (
@@ -831,6 +881,16 @@ class InteractionInstance(object):
 
     @classmethod
     def from_dict(cls, interaction_dict):
+        """Return a InteractionInstance domain object from a dict.
+
+        Args:
+            interaction_dict: dict. The dict representation of
+                InteractionInstance object.
+
+        Returns:
+            InteractionInstance. The corresponding InteractionInstance domain
+            object.
+        """
         default_outcome_dict = (
             Outcome.from_dict(interaction_dict['default_outcome'])
             if interaction_dict['default_outcome'] is not None else None)
@@ -846,6 +906,23 @@ class InteractionInstance(object):
     def __init__(
             self, interaction_id, customization_args, answer_groups,
             default_outcome, confirmed_unclassified_answers, fallbacks):
+        """Initializes a InteractionInstance domain object.
+
+        Args:
+            interaction_id: str. The interaction id.
+            customization_args: dict. The customization dict. The value of
+                content. The keys are names of customization_args and the
+                values are dicts with a single key, 'value', whose
+                corresponding value is the value of the customization arg.
+            answer_groups: list(AnswerGroup). List of AnswerGroup of the
+                interaction instance.
+            default_outcome: Outcome. The default outcome of the interaction
+                instance.
+            confirmed_unclassified_answers: list(AnswerGroup). List of answers
+                which have been confirmed to be associated with the default
+                outcome.
+            fallbacks: list(Fallback). List of fallbacks.
+        """
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
@@ -862,6 +939,9 @@ class InteractionInstance(object):
     def is_terminal(self):
         """Determines if this interaction type is terminal. If no ID is set for
         this interaction, it is assumed to not be terminal.
+
+        Returns:
+            bool. True if the interaction is terminal, else False.
         """
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
@@ -869,6 +949,9 @@ class InteractionInstance(object):
     def get_all_non_fallback_outcomes(self):
         """Returns a list of all non-fallback outcomes of this interaction, i.e.
         every answer group and the default outcome.
+
+        Returns:
+            list(Outcome). List of non-fallback outcomes of this interacion.
         """
         outcomes = []
         for answer_group in self.answer_groups:
@@ -881,6 +964,9 @@ class InteractionInstance(object):
         """Returns a list of all outcomes of this interaction, taking into
         consideration every answer group, the default outcome, and every
         fallback.
+
+        Returns:
+            list(Outcome). List of all outcomes of this interaction.
         """
         outcomes = self.get_all_non_fallback_outcomes()
         for fallback in self.fallbacks:
@@ -888,6 +974,12 @@ class InteractionInstance(object):
         return outcomes
 
     def validate(self, exp_param_specs_dict):
+        """Validates various properties of the InteractionInstance.
+
+        Raises:
+            ValidationError: One or more attributes of the InteractionInstance
+            are invalid.
+        """
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
                 'Expected interaction id to be a string, received %s' %
@@ -930,6 +1022,21 @@ class InteractionInstance(object):
 
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
+        """Create a default InteractionInstance domain object:
+		    -customization_args: empty dictionary;
+            -answer_groups: empty list;
+            -default_outcome: dest is set to 'default_dest_state_name' and 
+                feedback and param_changes are initialized as empty lists;
+            -confirmed_unclassified_answers: empty list;
+            -fallbacks: empty list;
+
+        Args:
+            default_dest_state_name: str. The default destination state.
+
+        Returns:
+            InteractionInstance. The corresponding InteractionInstance domain
+            object with default values.
+        """
         return cls(
             cls._DEFAULT_INTERACTION_ID,
             {}, [],
@@ -944,6 +1051,17 @@ class GadgetInstance(object):
 
     def __init__(self, gadget_type, gadget_name,
                  visible_in_states, customization_args):
+    """Initializes a GadgetInstance domain object.
+
+        Args:
+            gadget_type: str. Backend ID referring to the gadget's type in
+                gadget registry.
+            gadget_name: str. The gadget name.
+            visible_in_states: list(str). List of state name strings where this
+                gadget is visible.
+            customization_args: dict. The customization args for the gadget's
+                view.
+        """
         # Backend ID referring to the gadget's type in gadget registry.
         self.type = gadget_type
 
@@ -959,23 +1077,40 @@ class GadgetInstance(object):
 
     @property
     def gadget(self):
-        """Gadget spec for validation and derived properties below."""
+        """Get a Gadget spec for validation and derived properties below. The
+        Gadget is found through its id (gadget_type).
+
+        Returns:
+            GadgetInstance. The corresponding GadgetInstance domain object.
+        """
         return gadget_registry.Registry.get_gadget_by_type(self.type)
 
     @property
     def width(self):
-        """Width in pixels."""
+        """Get the gadget Width in pixels.
+
+        Returns:
+            int. The gadget width.
+        """
         return self.gadget.width_px
 
     @property
     def height(self):
-        """Height in pixels."""
+        """Get the gadget Height in pixels.
+
+        Returns:
+            int. The gadget height.
+        """
         return self.gadget.height_px
 
     @staticmethod
     def _validate_gadget_name(gadget_name):
-        """Validates gadget_name is a non-empty string of alphanumerics
-        allowing spaces."""
+        """Validates gadget_name property of the GadgetInstance. gadget_name is
+        a non-empty string of alphanumerics allowing spaces.
+
+        Raises:
+            ValidationError: gadget_name is a empty string or not alphanumeric.
+        """
         if gadget_name == '':
             raise utils.ValidationError(
                 'Gadget name must not be an empty string.')
@@ -1001,7 +1136,12 @@ class GadgetInstance(object):
             )
 
     def validate(self):
-        """Validate attributes of this GadgetInstance."""
+        """Validates properties of the GadgetInstance.
+
+        Raises:
+            ValidationError: One or more attributes of the GadgetInstance are
+            invalid.
+        """
         try:
             self.gadget
         except KeyError:
@@ -1037,7 +1177,11 @@ class GadgetInstance(object):
                     ', '.join(redundant_visible_states)))
 
     def to_dict(self):
-        """Returns GadgetInstance data represented in dict form."""
+        """Returns a dict representing this GadgetInstance domain object.
+
+        Returns:
+            dict. A dict mapping all fields of GadgetInstance instance.
+        """
         return {
             'gadget_type': self.type,
             'gadget_name': self.name,
@@ -1049,7 +1193,15 @@ class GadgetInstance(object):
 
     @classmethod
     def from_dict(cls, gadget_dict):
-        """Returns GadgetInstance constructed from dict data."""
+        """Return a GadgetInstance domain object from a dict.
+
+        Args:
+            gadget_dict: dict. The dict representation of GadgetInstance
+                object.
+
+        Returns:
+            GadgetInstance. The corresponding GadgetInstance domain object.
+        """
         return GadgetInstance(
             gadget_dict['gadget_type'],
             gadget_dict['gadget_name'],
@@ -1067,6 +1219,10 @@ class GadgetInstance(object):
     def _get_full_customization_args(self):
         """Populates the customization_args dict of the gadget with
         default values, if any of the expected customization_args are missing.
+
+        Returns:
+            dict. The customization_args dict of the gadget with default
+            values.
         """
         full_customization_args_dict = copy.deepcopy(self.customization_args)
 
