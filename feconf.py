@@ -950,3 +950,12 @@ SITE_NAME = 'Oppia.org'
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
+
+# Following are the constants for the roles.
+ROLE_GUEST = 'GUEST'
+ROLE_BANNED_USER = 'BANNED_USER'
+ROLE_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
+ROLE_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_MODERATOR = 'MODERATOR'
+ROLE_ADMIN = 'ADMIN'
+ROLE_SUPER_ADMIN = 'SUPER_ADMIN'

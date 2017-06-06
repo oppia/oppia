@@ -236,7 +236,8 @@ class RecordAnswerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(RecordAnswerTests, self).setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.get_or_create_user(
+            self.owner_id, self.OWNER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')

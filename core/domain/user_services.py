@@ -24,6 +24,7 @@ import re
 
 from core.platform import models
 from core.domain import user_domain
+from core.domain import role_services
 import feconf
 import utils
 
@@ -47,6 +48,8 @@ class UserSettings(object):
     Attributes:
         user_id: str. The user id.
         email: str. The user email.
+        role: str. Role of the user. This is used in conjunction with
+            PARENT_ROLES to determine which actions the user can perform.
         username: str or None. Identifiable username to display in the UI.
         last_agreed_to_terms: datetime.datetime or None. When the user last
             agreed to the terms of the site.
@@ -69,17 +72,20 @@ class UserSettings(object):
         preferred_site_language_code: str or None. System language preference.
     """
     def __init__(
-            self, user_id, email, username=None, last_agreed_to_terms=None,
-            last_started_state_editor_tutorial=None, last_logged_in=None,
-            last_created_an_exploration=None,
+            self, user_id, email, role, username=None,
+            last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
+            last_logged_in=None, last_created_an_exploration=None,
             last_edited_an_exploration=None, profile_picture_data_url=None,
             user_bio='', subject_interests=None, first_contribution_msec=None,
-            preferred_language_codes=None, preferred_site_language_code=None):
+            preferred_language_codes=None, preferred_site_language_code=None
+    ):
         """Constructs a UserSettings domain object.
 
         Args:
             user_id: str. The user id.
             email: str. The user email.
+            role: str. Role of the user. This is used in conjunction with
+                PARENT_ROLES to determine which actions the user can perform.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
@@ -105,6 +111,7 @@ class UserSettings(object):
         """
         self.user_id = user_id
         self.email = email
+        self.role = role
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (  # pylint: disable=invalid-name
@@ -129,6 +136,8 @@ class UserSettings(object):
             ValidationError: user_id is not str.
             ValidationError: email is not str.
             ValidationError: email is invalid.
+            ValidationError: role is not str.
+            ValidationError: Given role does not exist.
         """
         if not isinstance(self.user_id, basestring):
             raise utils.ValidationError(
@@ -145,6 +154,12 @@ class UserSettings(object):
                 or self.email.endswith('@')):
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
+
+        if not isinstance(self.role, basestring):
+            raise utils.ValidationError(
+                'Expected role to be a string, received %s' % self.role)
+        if self.role not in role_services.PARENT_ROLES:
+            raise utils.ValidationError('Role %s does not exist.' % self.role)
 
     @property
     def truncated_email(self):
@@ -340,12 +355,14 @@ def get_users_settings(user_ids):
             result.append(UserSettings(
                 feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
+                role=feconf.ROLE_ADMIN,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         elif model:
             result.append(UserSettings(
-                model.id, email=model.email, username=model.username,
+                model.id, email=model.email, role=model.role,
+                username=model.username,
                 last_agreed_to_terms=model.last_agreed_to_terms,
                 last_started_state_editor_tutorial=(
                     model.last_started_state_editor_tutorial),
@@ -471,6 +488,21 @@ def get_user_settings(user_id, strict=False):
     return user_settings
 
 
+def get_user_role_from_id(user_id):
+    """Returns role of the user with given user_id.
+
+    Args:
+        user_id: str. The User id.
+
+    Returns:
+        role: str. Role of the user with given id.
+    """
+    user_settings = get_user_settings(user_id)
+    if user_settings is None:
+        return feconf.ROLE_GUEST
+    return user_settings.role
+
+
 def _save_user_settings(user_settings):
     """Commits a user settings object to the datastore.
 
@@ -481,6 +513,7 @@ def _save_user_settings(user_settings):
     user_models.UserSettingsModel(
         id=user_settings.user_id,
         email=user_settings.email,
+        role=user_settings.role,
         username=user_settings.username,
         normalized_username=user_settings.normalized_username,
         last_agreed_to_terms=user_settings.last_agreed_to_terms,
@@ -546,12 +579,13 @@ def has_fully_registered(user_id):
         feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
 
 
-def _create_user(user_id, email):
+def _create_user(user_id, email, role):
     """Creates a new user.
 
     Args:
         user_id: str. The user id.
         email: str. The user email.
+        role: str. The user role.
 
     Returns:
         UserSettings. The newly-created user settings domain object.
@@ -564,14 +598,14 @@ def _create_user(user_id, email):
         raise Exception('User %s already exists.' % user_id)
 
     user_settings = UserSettings(
-        user_id, email,
+        user_id, email, role,
         preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
     return user_settings
 
 
-def get_or_create_user(user_id, email):
+def get_or_create_user(user_id, email, role):
     """Returns a UserSettings domain object with given user_id and email.
     If user does not exist, it creates a new one and returns the new
     User model.
@@ -579,13 +613,14 @@ def get_or_create_user(user_id, email):
     Args:
         user_id: str. The user id.
         email: str. The user email.
+        role: str. The user role.
 
     Returns:
         UserSettings. UserSettings domain object.
     """
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is None:
-        user_settings = _create_user(user_id, email)
+        user_settings = _create_user(user_id, email, role)
     return user_settings
 
 
@@ -760,6 +795,23 @@ def update_preferred_site_language_code(user_id, preferred_site_language_code):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_site_language_code = (
         preferred_site_language_code)
+    _save_user_settings(user_settings)
+
+
+def update_user_role(user_id, role):
+    """Updates the role of the user with given user_id.
+
+    Args:
+        user_id: str. Id of user whose role is to be updated.
+        role: str. The role to be assigned to user with given id.
+
+    Raises:
+        Exception: The given role does not exist.
+    """
+    if role not in role_services.PARENT_ROLES:
+        raise Exception('Role %s does not exist.' % role)
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.role = role
     _save_user_settings(user_settings)
 
 

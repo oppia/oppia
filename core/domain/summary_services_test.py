@@ -423,8 +423,10 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
-        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
+        user_services.get_or_create_user(
+            self.owner_id, self.OWNER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+        user_services.get_or_create_user(
+            self.editor_id, self.EDITOR_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
