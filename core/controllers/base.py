@@ -184,8 +184,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.user = current_user_services.get_current_user()
         self.user_id = current_user_services.get_user_id(
             self.user) if self.user else None
-        self.role = user_services.get_user_role_from_id(
-            self.user_id) if self.user else feconf.ROLE_GUEST
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
