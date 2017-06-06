@@ -91,8 +91,8 @@ class UserBioLengthOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for calculating the length of user_bio.
 
     Returns:
-        None: If all the user_bios' length are less than 500 chars.
-        Lists: List of lengths of user_bio, user_name  for char
+        None: If all the user_bios' length is None or less than 500 chars.
+        Lists: List of length of user_bio, user_name  for char
             greater than 500.
     """
 
@@ -102,12 +102,12 @@ class UserBioLengthOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        if len(item.user_bio) > 500:
-            yield (len(item.user_bio), item.username)
+        yield (len(item.user_bio), item.username)
 
     @staticmethod
     def reduce(key, username):
-        yield (key, username)
+        if int(key) > 500:
+            yield (key, username)
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):

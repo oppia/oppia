@@ -19,6 +19,7 @@
 import datetime
 import re
 
+from ast import literal_eval
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
@@ -232,6 +233,7 @@ class UserBioLengthOneOffJobTests(test_utils.GenericTestBase):
     USER_B_BIO = 'Long Bio' *100
     USER_C_EMAIL = 'c@example.com'
     USER_C_USERNAME = 'cnone'
+    USER_C_BIO = 'Same Bio' *100
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -244,11 +246,20 @@ class UserBioLengthOneOffJobTests(test_utils.GenericTestBase):
             1)
         self.process_and_flush_pending_tasks()
 
+        stringified_output = (
+            user_jobs_one_off.UserBioLengthOneOffJob.get_output(
+                job_id))
+        output = {}
+        #for loop is needed to void `Index out of range` error
+        for stringified_output[0] in stringified_output:
+            output = literal_eval(stringified_output[0])
+        return output
+
     def test_null_user_bio(self):
-        """Tests the case where the userbio has 0 chars."""
+        """Tests the case when userbio is None."""
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         result = self._run_one_off_job()
-        self.assertIsNone(result)
+        self.assertEqual(result, {})
 
     def test_inbound_limit(self):
         """Tests the case where the userbio is less than 500 characters."""
@@ -256,17 +267,39 @@ class UserBioLengthOneOffJobTests(test_utils.GenericTestBase):
         user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
         user_services.update_user_bio(user_id_a, self.USER_A_BIO)
         result = self._run_one_off_job()
-        self.assertIsNone(result)
+        self.assertEqual(result, {})
 
     def test_outbound_limit(self):
         """Tests the case where the userbio is more than 500 characters."""
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         user_services.update_user_bio(user_id_b, self.USER_B_BIO)
-        self._run_one_off_job()
-        user_settings = user_services.get_user_settings(user_id_b, strict=True)
-        bio = user_settings.user_bio
-        self.assertEqual(len(bio), 800)
+        len_user_bio_b = len(self.USER_B_BIO)
+        result = self._run_one_off_job()
+        self.assertEqual(result[0], str(len_user_bio_b))
+        self.assertEqual(result[1], list(self.USER_B_USERNAME))
+
+    def test_same_userbio_limit(self):
+        """Tests the case where two users have same userbio limit."""
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
+        user_services.update_user_bio(user_id_b, self.USER_B_BIO)
+        len_user_bio_b = len(self.USER_B_BIO)
+
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_services.update_user_bio(user_id_c, self.USER_C_BIO)
+        len_user_bio_c = len(self.USER_C_BIO)
+
+        result = self._run_one_off_job()
+        if len_user_bio_b == len_user_bio_c:
+            self.assertEqual(result[0], str(len_user_bio_c))
+        else:
+            raise Exception("User Bio length are different")
+        if (self.USER_B_USERNAME and self.USER_C_USERNAME) in result[1]:
+            pass
+        else:
+            raise Exception("Expected User is Missing from the list")
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
