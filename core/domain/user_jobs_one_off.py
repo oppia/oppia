@@ -87,7 +87,7 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
         yield (key, len(username_counter))
 
 
-class UserBioLengthOneOffJob(jobs.BaseMapReduceJobManager):
+class LongUserBiosOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for calculating the length of user_bio.
 
     Returns:

@@ -18,8 +18,8 @@
 
 import datetime
 import re
+import ast
 
-from ast import literal_eval
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
@@ -223,7 +223,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(output['2'], 2)
         self.assertEqual(output['1'], 1)
 
-class UserBioLengthOneOffJobTests(test_utils.GenericTestBase):
+class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
@@ -238,8 +238,8 @@ class UserBioLengthOneOffJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            user_jobs_one_off.UserBioLengthOneOffJob.create_new())
-        user_jobs_one_off.UserBioLengthOneOffJob.enqueue(job_id)
+            user_jobs_one_off.LongUserBiosOneOffJob.create_new())
+        user_jobs_one_off.LongUserBiosOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
@@ -247,12 +247,12 @@ class UserBioLengthOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         stringified_output = (
-            user_jobs_one_off.UserBioLengthOneOffJob.get_output(
+            user_jobs_one_off.LongUserBiosOneOffJob.get_output(
                 job_id))
         output = {}
         #for loop is needed to void `Index out of range` error
         for stringified_output[0] in stringified_output:
-            output = literal_eval(stringified_output[0])
+            output = ast.literal_eval(stringified_output[0])
         return output
 
     def test_null_user_bio(self):
@@ -284,7 +284,6 @@ class UserBioLengthOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         user_services.update_user_bio(user_id_b, self.USER_B_BIO)
-        len_user_bio_b = len(self.USER_B_BIO)
 
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
@@ -292,10 +291,8 @@ class UserBioLengthOneOffJobTests(test_utils.GenericTestBase):
         len_user_bio_c = len(self.USER_C_BIO)
 
         result = self._run_one_off_job()
-        if len_user_bio_b == len_user_bio_c:
-            self.assertEqual(result[0], str(len_user_bio_c))
-        else:
-            raise Exception("User Bio length are different")
+
+        self.assertEqual(result[0], str(len_user_bio_c))
         if (self.USER_B_USERNAME and self.USER_C_USERNAME) in result[1]:
             pass
         else:
