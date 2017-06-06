@@ -1,48 +1,92 @@
+<style>
+    .form-horizontal .control-label {
+        text-align: left;
+    }
+</style>
+
 <div class="container-fluid">
-	<div class="row">
-		<div class="col-lg-8 col-md-8 col-sm-12">
-			<md-card class="oppia-page-card oppia-long-text view-role-form" style="">
-				<form ng-submit="SubmitRoleViewForm(values)">
-					<div class="form-horizontal" role="form">
-						<div class="form-group">
-              				<label class="col-md-4 control-label" for="values.method">
-              					Select Method
-              				</label>
-              				<div class="col-md-4">
-                				<select id="selectmethod" name="selectmethod" ng-model="values.method" class="form-control">
-                  					<option value="1">By Role</option>
-                  					<option value="2">By Username</option>
-                				</select>
-              				</div>
-						</div>
+  <div class="row">
+    <div class="col-md-8">
+      <md-card class="oppia-page-card oppia-long-text">
+        <form class="form-horizontal" ng-submit="SubmitRoleViewForm(view_form_values)">
+          <legend class="text-center">View User Roles</legend>
+          <div class="form-group">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left" for="view_form_values.method">
+              Select Method
+            </label>
+            <div class="col-md-8">
+              <select ng-model="view_form_values.method" class="form-control">
+                  <option value="role">By Role</option>
+                  <option value="username">By Username</option>
+              </select>
+            </div>
+          </div>
 
-						<div class="form-group" ng-if="values.method==1">
-							<label class="col-md-4 control-label">Select Role</label>
-							<div class="col-md-4">
-								<select ng-options="role for role in view_roles" ng-model="values.role" class="form-control">
-								</select>
-							</div>
-						</div>
+          <div class="form-group" ng-if="view_form_values.method=='role'">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Select Role</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <select ng-options="role for role in role_options" ng-model="view_form_values.role" class="form-control">
+              </select>
+            </div>
+          </div>
 
-						<div class="form-group" ng-if="values.method==2">
-							<label class="col-md-4 control-label">Enter Username</label>
-							<div class="col-md-4">
-								<input type="text" placeholder="Enter username" ng-model="values.username" class="form-control" />
-							</div>
-						</div>
-					</div>
+          <div class="form-group" ng-if="view_form_values.method=='username'">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label">Enter Username</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <input type="text" placeholder="Enter username" ng-model="view_form_values.username" class="form-control" />
+            </div>
+          </div>
 
-					<button type="submit" ng-disabled="" value="view role">View Role</button>
-				</form>
-			</md-card>
+          <button type="submit" class="btn btn-success" ng-disabled="view_form_values.method==None || (view_form_values.role==undefined && view_form_values.username==undefined)" value="view role">View Role</button>
+        </form>
 
-			<md-card class="oppia-page-card oppia-long-text update-role-form" style="">
-			</md-card>
-		</div>
-		
-		<div class="col-lg-4 col-md-4 col-sm-12 show-hierarchy">
-			<md-card class="oppia-page-card oppia-long-text" style="">
-			</md-card>
-		</div>
-	</div>
+        <div ng-show="show_result_roles">
+          <br/>
+          <table class="table text-center">
+            <thead>
+              <tr>
+                <td><strong>Username</strong></td>
+                <td><strong>Role</strong></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="(name, role) in result">
+                  <td>{{name}}</td>
+                  <td>{{role}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </md-card>
+
+      <md-card class="oppia-page-card oppia-long-text update-role-form">
+        <form class="form-horizontal" ng-submit="SubmitUpdateRoleForm(update_form_values)">
+          <legend class="text-center">Update Role</legend>            
+          <div class="form-group">
+              <label class="col-md-4 col-lg-4 col-sm-4 control-label">Enter Username</label>
+              <div class="col-md-8 col-lg-8 col-sm-8">
+                <input type="text" placeholder="Enter username" ng-model="update_form_values.username" class="form-control" />
+              </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Select Role</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <select ng-options="role for role in all_roles" ng-model="update_form_values.newrole" class="form-control">
+              </select>
+            </div>
+          </div>
+  
+          <button type="submit" class="btn btn-success" ng-disabled="update_form_values.newrole==undefined || update_form_values.username==undefined" value="update role">Update Role</button>
+        </form>
+      </md-card>
+    </div>
+    
+    <div class="col-md-4 show-hierarchy">
+      <md-card class="oppia-page-card oppia-long-text" style="">
+        <legend class="text-center">Role Hierarchy</legend>
+         <div role-graph graph-data="graphData()" node-fill="white">
+      </md-card>
+    </div>
+  </div>
 </div>
