@@ -25,7 +25,7 @@ import utils
     [models.NAMES.classifier])
 
 class ClassifierData(object):
-    """Domain object for a classifier.
+    """Domain object for a classifier data model.
 
     A classifier is a machine learning model created using a particular
     classification algorithm which is used for answer classification
