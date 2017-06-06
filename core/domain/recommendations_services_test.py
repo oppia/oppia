@@ -255,7 +255,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         user_services.get_or_create_user(
-            self.admin_id, self.ADMIN_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+            self.admin_id, self.ADMIN_EMAIL, feconf.ROLE_ADMIN)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
 

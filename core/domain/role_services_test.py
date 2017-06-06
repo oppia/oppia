@@ -88,8 +88,6 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
                     visited.add(role)
                     check_cycle(source, self.PARENT_ROLES[role])
 
-            return
-
         for role_name in self.PARENT_ROLES:
             visited = set()
             check_cycle(role_name, self.PARENT_ROLES[role_name])
