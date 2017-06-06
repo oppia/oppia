@@ -155,7 +155,7 @@ def _get_activity_rights_from_model(activity_rights_model, activity_type):
             feconf.ACTIVITY_TYPE_COLLECTION
 
     Returns:
-        ActivityRights. The rights object created from model.
+        ActivityRights. The rights object created from the model.
     """
     return ActivityRights(
         activity_rights_model.id,
@@ -185,7 +185,7 @@ def _save_activity_rights(
         activity_type: str. The type of activity. Possible values:
             feconf.ACTIVITY_TYPE_EXPLORATION
             feconf.ACTIVITY_TYPE_COLLECTION
-        commit_message: str. Descriptive message for the commit
+        commit_message: str. Descriptive message for the commit.
         commit_cmds: list(dict). A list of commands describing what kind of
             commit was done.
     """
@@ -208,10 +208,9 @@ def _save_activity_rights(
     model.commit(committer_id, commit_message, commit_cmds)
 
 
-# TODO(msl): get rid of inline imports by refactoring code.
 def _update_exploration_summary(activity_rights):
-    """Updates the exploration summary for the given activity(associated with
-    the given rights object).
+    """Updates the exploration summary for the activity associated with the
+    given rights object.
 
     The ID of rights object is the same as the ID of associated activity.
 
@@ -219,14 +218,15 @@ def _update_exploration_summary(activity_rights):
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
+    # TODO(msl): get rid of inline imports by refactoring code.
     from core.domain import exp_services
     exp_services.update_exploration_summary(
         activity_rights.id, None)
 
 
 def _update_collection_summary(activity_rights):
-    """Updates the collection summary for the given activity(associated with
-    the given rights object).
+    """Updates the collection summary for the given activity associated with
+    the given rights object.
 
     The ID of rights object is the same as the ID of associated activity.
 
@@ -240,8 +240,8 @@ def _update_collection_summary(activity_rights):
 
 
 def _update_activity_summary(activity_type, activity_rights):
-    """Updates the activity summary for the given activity(associated with
-    the given rights object).
+    """Updates the activity summary for the given activity associated with
+    the given rights object.
 
     The ID of rights object is the same as the ID of associated activity.
 
@@ -1172,8 +1172,6 @@ def set_private_viewability_of_exploration(
         exploration_id: str. ID of the exploration.
         viewable_if_private: bool. Whether the exploration should be made
             viewable (by anyone with the link).
-    Returns:
-        None.
 
     Raises:
         Exception. The committer does not have the permission to perform change
