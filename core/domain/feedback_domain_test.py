@@ -19,7 +19,6 @@ import datetime
 from core.domain import feedback_domain
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 import utils
 
 
@@ -32,8 +31,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         super(FeedbackThreadDomainUnitTests, self).setUp()
 
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        user_services.get_or_create_user(
-            self.viewer_id, self.VIEWER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_to_dict(self):
@@ -78,8 +76,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackMessageDomainUnitTests, self).setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.get_or_create_user(
-            self.owner_id, self.OWNER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_to_dict(self):
@@ -123,8 +120,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SuggestionDomainUnitTests, self).setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.get_or_create_user(
-            self.owner_id, self.OWNER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_to_dict(self):
