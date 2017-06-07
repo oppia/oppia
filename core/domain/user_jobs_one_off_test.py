@@ -15,10 +15,10 @@
 # limitations under the License.
 
 """Tests for user-related one-off computations."""
+
 import ast
 import datetime
 import re
-
 
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -259,13 +259,13 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
                   for eval_item in eval_output]
         return output
 
-    def test_no_user_bio_return_empty_list(self):
+    def test_no_userbio_returns_empty_list(self):
         """Tests the case when userbio is None."""
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         result = self._run_one_off_job()
         self.assertEqual(result, [])
 
-    def test_short_user_bio_return_empty_list(self):
+    def test_short_userbio_returns_empty_list(self):
         """Tests the case where the userbio is less than 500 characters."""
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
