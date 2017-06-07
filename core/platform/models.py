@@ -57,8 +57,8 @@ class _Gae(_Platform):
                 from core.storage.base_model import gae_models as base_models
                 returned_models.append(base_models)
             elif name == NAMES.classifier:
-                from core.storage.classifier import gae_models as classifier_models # pylint: disable=line-too-long
-                returned_models.append(classifier_models)
+                from core.storage.classifier import gae_models as classifier_data_models # pylint: disable=line-too-long
+                returned_models.append(classifier_data_models)
             elif name == NAMES.collection:
                 from core.storage.collection import gae_models as collection_models # pylint: disable=line-too-long
                 returned_models.append(collection_models)
