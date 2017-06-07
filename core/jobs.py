@@ -450,14 +450,15 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
 
 
 class BaseMapReduceJobManager(BaseJobManager):
-    # The output for this job is a list of individual results. Each item in
-    # the list will be of whatever type is yielded from the 'reduce' method.
-    #
-    # The 'metadata' field in the BaseJob representing a MapReduceJob
-    # is a dict with one key, _OUTPUT_KEY_ROOT_PIPELINE_ID. The corresponding
-    # value is a string representing the ID of the MapReduceJobPipeline
-    # as known to the mapreduce/lib/pipeline internals. This is used
-    # to generate URLs pointing at the pipeline support UI.
+    """The output for this job is a list of individual results. Each item in the
+    list will be of whatever type is yielded from the 'reduce' method.
+
+    The 'metadata' field in the BaseJob representing a MapReduceJob is a dict
+    with one key, _OUTPUT_KEY_ROOT_PIPELINE_ID. The corresponding value is a
+    string representing the ID of the MapReduceJobPipeline as known to the
+    mapreduce/lib/pipeline internals. This is used to generate URLs pointing at
+    the pipeline support UI.
+    """
     _OUTPUT_KEY_ROOT_PIPELINE_ID = 'root_pipeline_id'
 
     @staticmethod
