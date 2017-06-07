@@ -88,13 +88,7 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
 
 
 class LongUserBiosOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for calculating the length of user_bio.
-
-    Returns:
-        None: If all the user_bios' length is None or less than 500 chars.
-        Lists: List of length of user_bio, user_name  for char
-            greater than 500.
-    """
+    """One-off job for calculating the length of user_bios."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
