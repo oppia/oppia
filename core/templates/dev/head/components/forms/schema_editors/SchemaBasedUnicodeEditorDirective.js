@@ -33,7 +33,8 @@ oppia.directive('schemaBasedUnicodeEditor', [
         'schema_based_unicode_editor_directive.html'),
       restrict: 'E',
       controller: [
-        '$scope', '$filter', '$sce', function($scope, $filter, $sce) {
+        '$scope', '$filter', '$sce', '$timeout',
+        function($scope, $filter, $sce, $timeout) {
           if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
             // Flag that is flipped each time the codemirror view is
             // shown. (The codemirror instance needs to be refreshed
@@ -114,6 +115,12 @@ oppia.directive('schemaBasedUnicodeEditor', [
           $scope.getDisplayedValue = function() {
             return $sce.trustAsHtml(
               $filter('convertUnicodeWithParamsToHtml')($scope.localValue));
+          };
+
+          $scope.displayPopUpMessage = function() {
+            $timeout(function() {
+              return "Tap here to respond!";
+            }, 1000);
           };
         }
       ]
