@@ -21,10 +21,11 @@ from core.platform import models
 import feconf
 import utils
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+(classifier_models,) = models.Registry.import_models(
+    [models.NAMES.classifier])
 
-class Classifier(object):
-    """Domain object for a classifier.
+class ClassifierData(object):
+    """Domain object for a classifier data model.
 
     A classifier is a machine learning model created using a particular
     classification algorithm which is used for answer classification
@@ -38,16 +39,16 @@ class Classifier(object):
         state_name: str. The name of the state to which the classifier belongs.
         algorithm_id: str. The id of the algorithm used for generating
             classifier.
-        cached_classifier_data: dict. The actual classifier model used for
+        classifier_data: dict. The actual classifier model used for
             classification purpose.
         data_schema_version: int. Schema version of the data used by the
             classifier. This depends on the algorithm ID.
     """
 
-    def __init__(self, classifier_id, exp_id, exp_version_when_created,
-                 state_name, algorithm_id, cached_classifier_data,
-                 data_schema_version):
-        """Constructs an Classifier domain object.
+    def __init__(self, classifier_id, exp_id,
+                 exp_version_when_created, state_name, algorithm_id,
+                 classifier_data, data_schema_version):
+        """Constructs a ClassifierData domain object.
 
         Args:
             classifier_id: str. The unique id of the classifier.
@@ -58,7 +59,7 @@ class Classifier(object):
                 belongs.
             algorithm_id: str. The id of the algorithm used for generating
                 classifier.
-            cached_classifier_data: dict. The actual classifier model used for
+            classifier_data: dict. The actual classifier model used for
                 classification purpose.
             data_schema_version: int. Schema version of the
                 data used by the classifier.
@@ -68,7 +69,7 @@ class Classifier(object):
         self._exp_version_when_created = exp_version_when_created
         self._state_name = state_name
         self._algorithm_id = algorithm_id
-        self._cached_classifier_data = copy.deepcopy(cached_classifier_data)
+        self._classifier_data = copy.deepcopy(classifier_data)
         self._data_schema_version = data_schema_version
 
     @property
@@ -92,15 +93,15 @@ class Classifier(object):
         return self._algorithm_id
 
     @property
-    def cached_classifier_data(self):
-        return self._cached_classifier_data
+    def classifier_data(self):
+        return self._classifier_data
 
     @property
     def data_schema_version(self):
         return self._data_schema_version
 
     def update_state_name(self, state_name):
-        """Updates the state_name attribute of the Classifier domain object.
+        """Updates the state_name attribute of the ClassifierData domain object.
 
         Args:
             state_name: str. The name of the updated state to which the
@@ -110,10 +111,10 @@ class Classifier(object):
         self._state_name = state_name
 
     def to_dict(self):
-        """Constructs a dict representation of Classifier domain object.
+        """Constructs a dict representation of ClassifierData domain object.
 
         Returns:
-            A dict representation of Classifier domain object.
+            A dict representation of ClassifierData domain object.
         """
 
         return {
@@ -122,7 +123,7 @@ class Classifier(object):
             'exp_version_when_created': self._exp_version_when_created,
             'state_name': self._state_name,
             'algorithm_id': self._algorithm_id,
-            'cached_classifier_data': self._cached_classifier_data,
+            'classifier_data': self._classifier_data,
             'data_schema_version': self._data_schema_version
         }
 
@@ -161,11 +162,11 @@ class Classifier(object):
             raise utils.ValidationError(
                 'Invalid algorithm id: %s' % self.algorithm_id)
 
-        if not isinstance(self.cached_classifier_data, dict):
+        if not isinstance(self.classifier_data, dict):
             raise utils.ValidationError(
-                'Expected cached_classifier_data to be a dict, received %s' %(
-                    self.cached_classifier_data))
+                'Expected classifier_data to be a dict, received %s' %(
+                    self.classifier_data))
         classifier_class = (
             classifier_registry.Registry.get_classifier_by_algorithm_id(
                 self.algorithm_id))
-        classifier_class.validate(self.cached_classifier_data)
+        classifier_class.validate(self.classifier_data)

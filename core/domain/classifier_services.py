@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Services for classifier models"""
+"""Services for classifier data models"""
 
 from core.domain import classifier_domain
 from core.domain import classifier_registry
@@ -22,7 +22,8 @@ from core.platform import models
 
 import feconf
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+(classifier_models,) = models.Registry.import_models(
+    [models.NAMES.classifier])
 
 
 def classify(state, answer):
@@ -126,21 +127,21 @@ def classify_string_classifier_rule(state, normalized_answer):
     return None
 
 
-def get_classifier_from_model(classifier_model):
-    """Gets a classifier domain object from a classifier model.
+def get_classifier_from_model(classifier_data_model):
+    """Gets a classifier domain object from a classifier data model.
 
     Args:
-        classifier_model: Classifier model instance in datastore.
+        classifier_data_model: Classifier data model instance in datastore.
 
     Returns:
         classifier: Domain object for the classifier.
     """
-    return classifier_domain.Classifier(
-        classifier_model.id, classifier_model.exp_id,
-        classifier_model.exp_version_when_created,
-        classifier_model.state_name, classifier_model.algorithm_id,
-        classifier_model.cached_classifier_data,
-        classifier_model.data_schema_version)
+    return classifier_domain.ClassifierData(
+        classifier_data_model.id, classifier_data_model.exp_id,
+        classifier_data_model.exp_version_when_created,
+        classifier_data_model.state_name, classifier_data_model.algorithm_id,
+        classifier_data_model.classifier_data,
+        classifier_data_model.data_schema_version)
 
 
 def get_classifier_by_id(classifier_id):
@@ -153,42 +154,43 @@ def get_classifier_by_id(classifier_id):
         classifier: Domain object for the classifier.
 
     Raises:
-        Exception: Entity for class ClassifierModel with id not found.
+        Exception: Entity for class ClassifierDataModel with id not found.
     """
-    classifier_model = classifier_models.ClassifierModel.get(
+    classifier_data_model = classifier_models.ClassifierDataModel.get(
         classifier_id)
-    classifier = get_classifier_from_model(classifier_model)
+    classifier = get_classifier_from_model(classifier_data_model)
     return classifier
 
 
 def _create_classifier(classifier):
-    """Creates classifier model in the datastore given a classifier
+    """Creates classifier data model in the datastore given a classifier
        domain object.
 
     Args:
         classifier: Domain object for the classifier.
 
     """
-    classifier_id = classifier_models.ClassifierModel.create(
-        classifier.exp_id, classifier.exp_version_when_created,
+    classifier_id = classifier_models.ClassifierDataModel.create(
+        classifier.id, classifier.exp_id,
+        classifier.exp_version_when_created,
         classifier.state_name, classifier.algorithm_id,
-        classifier.cached_classifier_data, classifier.data_schema_version)
+        classifier.classifier_data, classifier.data_schema_version)
     return classifier_id
 
 
-def _update_classifier(classifier_model, state_name):
-    """Updates classifier model in the datastore given a classifier
+def _update_classifier(classifier_data_model, state_name):
+    """Updates classifier data model in the datastore given a classifier
     domain object.
 
     Args:
-        classifier_model: Classifier model instance in datastore.
+        classifier_data_model: Classifier data model instance in datastore.
         state_name: The name of the state.
 
     Note: All of the properties of a classifier are immutable,
     except for state_name.
     """
-    classifier_model.state_name = state_name
-    classifier_model.put()
+    classifier_data_model.state_name = state_name
+    classifier_data_model.put()
 
 
 def save_classifier(classifier):
@@ -203,22 +205,22 @@ def save_classifier(classifier):
         classifier_id: str. ID of the classifier.
     """
     classifier_id = classifier.id
-    classifier_model = classifier_models.ClassifierModel.get(
+    classifier_data_model = classifier_models.ClassifierDataModel.get(
         classifier_id, False)
     classifier.validate()
-    if classifier_model is None:
+    if classifier_data_model is None:
         classifier_id = _create_classifier(classifier)
     else:
-        _update_classifier(classifier_model, classifier.state_name)
+        _update_classifier(classifier_data_model, classifier.state_name)
     return classifier_id
 
 
 def delete_classifier(classifier_id):
-    """Deletes classifier model in the datastore given classifier_id.
+    """Deletes classifier data model in the datastore given classifier_id.
 
     Args:
         classifier_id: str. ID of the classifier.
     """
-    classifier_model = classifier_models.ClassifierModel.get(
+    classifier_data_model = classifier_models.ClassifierDataModel.get(
         classifier_id)
-    classifier_model.delete()
+    classifier_data_model.delete()
