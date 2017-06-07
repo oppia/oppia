@@ -130,8 +130,8 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job
-            additional_job_params: dict(str : int).
-                Additional parameters on jobs"""
+            additional_job_params: dict(str : int).  Additional parameters on
+                jobs"""
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -155,7 +155,7 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job
-            metadata: ---. The metadata of the job"""  # TODO: Put Data Type.
+            metadata: (TODO: Put Data Type). The metadata of the job"""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_STARTED)
@@ -271,7 +271,8 @@ class BaseJobManager(object):
         Args:
             job_id: str. The id of the job.
 
-        Returns: Boolean. If the job is active or not."""
+        Returns:
+            Boolean. If the job is active or not."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
@@ -283,7 +284,8 @@ class BaseJobManager(object):
         Args:
             job_id: str. The id of the job.
 
-        Returns: Boolean. If the job has finished or not."""
+        Returns:
+            Boolean. If the job has finished or not."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.status_code in [STATUS_CODE_COMPLETED, STATUS_CODE_FAILED]
@@ -373,7 +375,7 @@ class BaseJobManager(object):
 
         Raises:
             AttributeError: Invalid status code change for job.
-            """
+        """
         valid_new_status_codes = VALID_STATUS_CODE_TRANSITIONS[old_status_code]
         if new_status_code not in valid_new_status_codes:
             raise Exception(
@@ -432,7 +434,8 @@ class BaseDeferredJobManager(BaseJobManager):
             additional_job_params: additional_job_params: dict(str : int).
                 Additional parameters on jobs.
 
-        Raises: NotImplementedError
+        Raises:
+            NotImplementedError
         """
         raise NotImplementedError
 
@@ -446,8 +449,8 @@ class BaseDeferredJobManager(BaseJobManager):
                 Additional parameters on job.
 
         Raises:
-
-            """  # TODO: Finish Raises
+            TODO: Finish Raises
+        """
         logging.info(
             'Job %s started at %s' %
             (job_id, utils.get_current_time_in_millisecs()))
@@ -488,12 +491,12 @@ class BaseDeferredJobManager(BaseJobManager):
 class MapReduceJobPipeline(base_handler.PipelineBase):
 
     def run(self, job_id, job_class_str, kwargs):
-        """ Runs job pipeline
+        """Runs job pipeline
 
-            Args:
-                job_id: str. the id of the job.
-                additional_job_params: dict. Additional params to pass into the
-                    job's _run() method.
+        Args:
+            job_id: str. the id of the job.
+            additional_job_params: dict. Additional params to pass into the
+                job's _run() method.
         """
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
@@ -515,10 +518,10 @@ class StoreMapReduceResults(base_handler.PipelineBase):
     def run(self, job_id, job_class_str, output):
         """ Runs store mapreduce results.
 
-            Args:
-                job_id: str. the id of the job.
-                additional_job_params: dict. Additional params to pass into the
-                    job's _run() method.
+        Args:
+            job_id: str. the id of the job.
+            additional_job_params: dict. Additional params to pass into the
+                job's _run() method.
         """
         job_class = mapreduce_util.for_name(job_class_str)
 
@@ -580,17 +583,17 @@ class BaseMapReduceJobManager(BaseJobManager):
         """Implements the map function.  Must be declared @staticmethod.
 
         Args:
-          item: The parameter passed to this function is a single element of
-          the type given by entity_class(). This function may yield as many
-          times as appropriate (including zero) to return key/value 2-tuples.
-          For example, to get a count of all explorations, one might yield
-          (exploration.id, 1).
+            item: The parameter passed to this function is a single element of
+            the type given by entity_class(). This function may yield as many
+            times as appropriate (including zero) to return key/value 2-tuples.
+            For example, to get a count of all explorations, one might yield
+            (exploration.id, 1).
 
-          WARNING: The OutputWriter converts mapper output keys to type str.
-          So, if you have keys that are of type unicode, you must yield
-          "key.encode('utf-8')", rather than "key".
+            WARNING: The OutputWriter converts mapper output keys to type str.
+            So, if you have keys that are of type unicode, you must yield
+            "key.encode('utf-8')", rather than "key".
 
-          Raises:
+        Raises:
             NotImplementedError
         """
         raise NotImplementedError(
@@ -608,14 +611,14 @@ class BaseMapReduceJobManager(BaseJobManager):
         dereference it later to load content as needed).
 
         Args:
-          key: A key value as emitted from the map() function, above.
-          values: A list of all values from all mappers that were tagged with
-          the given key. This code can assume that it is the only process
-          handling values for this key. (It can probably also assume that
-          it will be called exactly once for each key with all of the output,
-          but this needs to be verified.)
+            key: A key value as emitted from the map() function, above.
+            values: A list of all values from all mappers that were tagged with
+            the given key. This code can assume that it is the only process
+            handling values for this key. (It can probably also assume that
+            it will be called exactly once for each key with all of the output,
+            but this needs to be verified.)
 
-         Raises:
+        Raises:
             NotImplementedError
         """
         raise NotImplementedError(
@@ -1253,24 +1256,24 @@ def get_continuous_computations_info(cc_classes):
     """Returns data about the given computations.
 
     Args:
-      cc_classes: a list of subclasses of BaseContinuousComputationManager.
+        cc_classes: a list of subclasses of BaseContinuousComputationManager.
 
     Returns:
-      A list of dicts, each representing a continuous computation. Each dict
-      has the following keys:
-      - 'computation_type': the type of the computation
-      - 'status_code': the current status of the computation
-      - 'last_started_msec': when a batch job for the computation was last
-            started, in milliseconds since the epoch
-      - 'last_finished_msec': when a batch job for the computation last
-            finished, in milliseconds since the epoch
-      - 'last_stopped_msec': when a batch job for the computation was last
-            stopped, in milliseconds since the epoch
-      - 'active_realtime_layer_index': the index of the active realtime layer
-      - 'is_startable': whether an admin should be allowed to start this
-            computation
-      - 'is_stoppable': whether an admin should be allowed to stop this
-            computation
+        A list of dicts, each representing a continuous computation. Each dict
+        has the following keys:
+        - 'computation_type': the type of the computation
+        - 'status_code': the current status of the computation
+        - 'last_started_msec': when a batch job for the computation was last
+              started, in milliseconds since the epoch
+        - 'last_finished_msec': when a batch job for the computation last
+              finished, in milliseconds since the epoch
+        - 'last_stopped_msec': when a batch job for the computation was last
+              stopped, in milliseconds since the epoch
+        - 'active_realtime_layer_index': the index of the active realtime layer
+        - 'is_startable': whether an admin should be allowed to start this
+              computation
+        - 'is_stoppable': whether an admin should be allowed to stop this
+              computation
     """
     cc_models = job_models.ContinuousComputationModel.get_multi(
         [cc_class.__name__ for cc_class in cc_classes])
