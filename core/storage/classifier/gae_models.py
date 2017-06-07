@@ -17,6 +17,7 @@
 from core.platform import models
 
 import feconf
+import utils
 
 from google.appengine.ext import ndb
 
@@ -95,7 +96,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     # The ID of the algorithm used to create the model.
     algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES,
-        indexed=True)
+                                      indexed=True)
     # The exploration_id of the exploration to whose state the model belongs.
     exp_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration version at the time this training job was created.
@@ -142,8 +143,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, algorithm_id, exp_id, exp_version_when_created,
-            state_name=feconf.TRAINING_JOB_STATUS_NEW, training_data):
+            cls, algorithm_id, exp_id, exp_version_when_created, training_data,
+            state_name, status=feconf.TRAINING_JOB_STATUS_NEW):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -153,7 +154,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 this training job was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
-            status: str. The status of the training job (NEW by default). 
+            status: str. The status of the training job (NEW by default).
             training_data: dict. The data used in training phase.
 
         Returns:
