@@ -110,7 +110,7 @@ class BaseJobManager(object):
 
         Raises:
             Exception: A job using an abstract base manager tried to directly
-                create a job
+                create a job.
         """
         if cls._is_abstract():
             raise Exception(
@@ -129,9 +129,8 @@ class BaseJobManager(object):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
-            job_id: str. The id of the job
-            additional_job_params: dict(str : int).  Additional parameters on
-                jobs
+            job_id: str. The id of the job.
+            additional_job_params: dict or None. Additional parameters on jobs.
         """
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -155,8 +154,8 @@ class BaseJobManager(object):
         """Marks job as started.
 
         Args:
-            job_id: str. The id of the job
-            metadata: (TODO: Put Data Type). The metadata of the job
+            job_id: str. The id of the job.
+            metadata: str. The metadata of the job.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -177,8 +176,8 @@ class BaseJobManager(object):
         """Marks a job as completed.
 
         Args:
-            job_id: str. The id of the job
-            output_list: list(str). The output of the job
+            job_id: str. The id of the job.
+            output_list: list(str). The output of the job.
         """
             # TODO: Better discription.
 
@@ -227,8 +226,8 @@ class BaseJobManager(object):
         """Marks a job as completed.
 
         Args:
-            job_id: str. The id of the job
-            error: str. The error to be raised of the job
+            job_id: str. The id of the job.
+            error: str. The error to be raised of the job.
         """
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -317,8 +316,9 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job.
-            additional_job_params: dict(str : int).
-                Additional parameters on jobs """
+            additional_job_params: dict(str : int). Additional parameters on
+                jobs.
+        """
         raise NotImplementedError(
             'Subclasses of BaseJobManager should implement _real_enqueue().')
 
@@ -439,11 +439,11 @@ class BaseDeferredJobManager(BaseJobManager):
         Needs to be implemented by subclasses.
 
         Args:
-            additional_job_params: additional_job_params: dict(str : int).
-                Additional parameters on jobs.
+            additional_job_params: dict(str : int). Additional parameters on
+                jobs.
 
         Raises:
-            NotImplementedError
+            NotImplementedError.
         """
         raise NotImplementedError
 
@@ -453,11 +453,11 @@ class BaseDeferredJobManager(BaseJobManager):
 
         Args:
             job_id: str. The id of the job.
-            additional_job_params: dict(str : int).
-                Additional parameters on job.
+            additional_job_params: dict(str : int). Additional parameters on
+                job.
 
         Raises:
-            TODO: Finish Raises
+            TODO: Finish Raises.
         """
         logging.info(
             'Job %s started at %s' %
@@ -590,16 +590,17 @@ class BaseMapReduceJobManager(BaseJobManager):
     def map(item):
         """Implements the map function.  Must be declared @staticmethod.
 
-        Args:
-            item: The parameter passed to this function is a single element of
-            the type given by entity_class(). This function may yield as many
-            times as appropriate (including zero) to return key/value 2-tuples.
-            For example, to get a count of all explorations, one might yield
-            (exploration.id, 1).
+         This function may yield as many times as appropriate (including zero)
+         to return key/value 2-tuples. For example, to get a count of all
+         explorations, one might yield (exploration.id, 1).
 
-            WARNING: The OutputWriter converts mapper output keys to type str.
-            So, if you have keys that are of type unicode, you must yield
-            "key.encode('utf-8')", rather than "key".
+         WARNING: The OutputWriter converts mapper output keys to type str. So,
+         if you have keys that are of type unicode, you must yield
+         "key.encode('utf-8')", rather than "key".
+
+
+        Args:
+            item: single element of the type given by entity_class().
 
         Raises:
             NotImplementedError
@@ -621,10 +622,10 @@ class BaseMapReduceJobManager(BaseJobManager):
         Args:
             key: A key value as emitted from the map() function, above.
             values: A list of all values from all mappers that were tagged with
-            the given key. This code can assume that it is the only process
-            handling values for this key. (It can probably also assume that
-            it will be called exactly once for each key with all of the output,
-            but this needs to be verified.)
+                the given key. This code can assume that it is the only process
+                handling values for this key. (It can probably also assume that
+                it will be called exactly once for each key with all of the
+                output, but this needs to be verified.)
 
         Raises:
             NotImplementedError
@@ -732,7 +733,8 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         """Returns data split from mapper_spec as inputs(list)
 
         Args:
-            mapper_spec: dict. """  # TODO: Write what is mapper_spec
+            mapper_spec: dict. TODO: Write what is mapper_spec
+        """
         params = mapper_spec.params
         entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
 
