@@ -280,7 +280,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(result, expected_result)
 
     def test_same_userbio_limit(self):
-        """Tests the case where two users have same userbio limit."""
+        """Tests the case where two users have same userbio length."""
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         user_services.update_user_bio(user_id_b, self.USER_B_BIO)
