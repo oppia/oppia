@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing static graph.
+ * @fileoverview Directive for showing static role graph.
  */
 
 oppia.directive('roleGraph', [
@@ -21,9 +21,6 @@ oppia.directive('roleGraph', [
     return {
       restrict: 'A',
       scope: {
-        allowPanning: '@',
-        centerAtCurrentState: '@',
-        currentStateId: '&',
         // A function returning an object with these keys:
         //  - 'nodes': An object whose keys are node ids and whose values are
         //             node labels
@@ -38,31 +35,6 @@ oppia.directive('roleGraph', [
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         //             (i.e., those whose interactions are terminal).
         graphData: '&',
-        // Object whose keys are ids of nodes to display a warning tooltip over
-        highlightStates: '=',
-        // Id of a second initial state, which will be styled as an initial
-        // state
-        initStateId2: '=',
-        isEditable: '=',
-        // Object which maps linkProperty to a style
-        linkPropertyMapping: '=',
-        // Object whose keys are node ids and whose values are node colors
-        nodeColors: '=',
-        // A value which is the color of all nodes
-        nodeFill: '@',
-        // Object whose keys are node ids with secondary labels and whose
-        // values are secondary labels. If this is undefined, it means no nodes
-        // have secondary labels.
-        nodeSecondaryLabels: '=',
-        // Function called when node is clicked. Should take a parameter
-        // node.id.
-        onClickFunction: '=',
-        onDeleteFunction: '=',
-        onMaximizeFunction: '=',
-        // Object whose keys are ids of nodes, and whose values are the
-        // corresponding node opacities.
-        opacityMap: '=',
-        showWarningSign: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/roles_tab/' +

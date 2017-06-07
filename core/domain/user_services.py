@@ -509,7 +509,7 @@ def get_usernames_by_role(role):
         role: str. The role of users requested.
 
     Returns:
-        list(str). List of usernames with given role.
+        dict. A dict with username as key and role as value.
     """
     user_settings = user_models.UserSettingsModel.get_by_role(role)
     result = {}

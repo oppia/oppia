@@ -120,7 +120,7 @@ def get_human_readable_role(role):
 
 
 def get_all_actions(role):
-    """Returns a list of all actions (including inherited actions)
+    """Returns a list of all actions(including inherited actions)
     that can be performed by the given role.
 
     Args:
@@ -148,7 +148,9 @@ def get_updatable_roles():
     """Returns roles to which a user's role can be updated by admin interface.
 
     Returns:
-        list(str). A list of all roles present in authorization system.
+        dict. A dict of all roles that a user can be given by admin.
+            key -> roles in format as stored in backed.
+            value -> roles in format to show users.
     """
     updatable_roles = {}
     for role in PARENT_ROLES:
@@ -158,10 +160,12 @@ def get_updatable_roles():
 
 
 def get_viewable_roles():
-    """Returns roles by which user can be searched in admin interface.
+    """Returns roles by which users can be searched in admin interface.
 
     Returns:
-        list(str). Roles from which a user is able to chose.
+        dict. A dict of all roles by which user's can be searched.
+            key -> roles in format as stored in backend.
+            value -> roles in format to show users.
     """
     viewable_roles = {}
     for role in PARENT_ROLES:
@@ -179,7 +183,8 @@ def get_role_graph_data():
             finalStateIds: list(str). Roles which have no child.
             initStateId: str. Role which has no parent.
             links: list(dict). List of dicts defining edges in graph.
-            nodes: dict. Role as key and human readable format of role as value.
+            nodes: dict. Role as key and human readable format of role as
+                value.
         }
     """
     role_graph = {}

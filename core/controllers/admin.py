@@ -133,6 +133,17 @@ class AdminHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         def check_and_update_config_role(old_list, new_list, role):
+            """This function is used to update the role in user settings when
+            a role is changed using config domain. If a user is removed from
+            old_list, its role is changed to exploration editor. If a new user
+            is added to new_list, its role is changed to role
+
+            Args:
+                old_list: list(str). Existing list of usernames with given
+                    role.
+                new_list: list(str). Updated list of usernames with given role.
+                role: str. The role to be used for users in these lists.
+            """
             for username in old_list:
                 if username not in new_list:
                     user_services.update_user_role(
@@ -162,9 +173,12 @@ class AdminHandler(base.BaseHandler):
                     'new_config_property_values')
                 logging.info('[ADMIN] %s saved config property values: %s' %
                              (self.user_id, new_config_property_values))
-                config_properties = config_domain.Registry.get_config_property_schemas()
+                config_properties = (
+                    config_domain.Registry.get_config_property_schemas())
                 for (name, value) in new_config_property_values.iteritems():
                     config_services.set_property(self.user_id, name, value)
+                    # below checks are for maintaining the sync between roles
+                    # in old and new authorization system.
                     if name == 'whitelisted_email_senders':
                         check_and_update_config_role(
                             config_properties[name]['value'], value,
@@ -173,10 +187,6 @@ class AdminHandler(base.BaseHandler):
                         check_and_update_config_role(
                             config_properties[name]['value'], value,
                             feconf.ROLE_ADMIN)
-                    if name == 'email_sender_name':
-                        check_and_update_config_role(
-                            config_properties[name]['value'], value,
-                            feconf.ROLE_SUPER_ADMIN)
                     if name == 'collection_editor_whitelist':
                         check_and_update_config_role(
                             config_properties[name]['value'], value,
@@ -245,7 +255,6 @@ class AdminHandler(base.BaseHandler):
                     self.payload.get('username'))
                 user_services.update_user_role(
                     user_id, self.payload.get('role'))
-                # TODO : update it with appropriate reply
                 self.render_json({})
 
         except Exception as e:

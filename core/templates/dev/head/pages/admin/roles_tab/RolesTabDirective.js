@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the jobs tab in the admin panel.
+ * @fileoverview Directive for the Roles tab in the admin panel.
  */
 
 oppia.directive('adminRolesTab', [
@@ -39,6 +39,7 @@ oppia.directive('adminRolesTab', [
         }
         $scope.show_result_roles = 0;
         $scope.result = {};
+        $scope.setStatusMessage('');
 
         $scope.SubmitRoleViewForm = function(values) {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -50,7 +51,6 @@ oppia.directive('adminRolesTab', [
           AdminTaskManagerService.startTask();
           $scope.result = {};
           if(values.method == 'role') {
-            console.log(values.role);
             $http.post(ADMIN_HANDLER_URL, {
               action: 'view_by_role',
               role: values.role
@@ -65,7 +65,6 @@ oppia.directive('adminRolesTab', [
           }
           else if(values.method == 'username') {
             $scope.result = {}
-            console.log(values.method + " " + values.username);
             $http.post(ADMIN_HANDLER_URL, {
               action: 'view_role_by_username',
               username: values.username
