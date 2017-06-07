@@ -31,9 +31,7 @@ with the same id on the page. -->
   .oppia-graph-viz .node rect.normal-node:hover {
     fill: #C8C4C4;
   }
-  .oppia-graph-viz .clickable {
-    cursor: pointer;
-  }
+  
   .oppia-graph-viz .legend-bar {
     fill: url('#nodegradient');
     stroke: black;
@@ -58,8 +56,7 @@ with the same id on the page. -->
                     class="protractor-test-node-background <[node.nodeClass]>"
                     ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
                     ng-class="{'clickable': canNavigateToNode(node.id)}"
-                    ng-attr-style="<[node.style]>"
-                    ng-click="onClickFunction(node.id)">
+                    ng-attr-style="<[node.style]>">
               </rect> 
               <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">
                 <tspan alignment-baseline="central"><[node.label]></tspan>

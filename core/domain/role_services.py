@@ -60,7 +60,7 @@ PARENT_ROLES = {
     feconf.ROLE_ADMIN: [feconf.ROLE_MODERATOR],
     feconf.ROLE_BANNED_USER: [feconf.ROLE_GUEST],
     feconf.ROLE_COLLECTION_EDITOR: [feconf.ROLE_EXPLORATION_EDITOR],
-    feconf.ROLE_EXPLORATION_EDITOR: [feconf.ROLE_BANNED_USER],
+    feconf.ROLE_EXPLORATION_EDITOR: [feconf.ROLE_GUEST],
     feconf.ROLE_GUEST: [],
     feconf.ROLE_MODERATOR: [feconf.ROLE_COLLECTION_EDITOR],
     feconf.ROLE_SUPER_ADMIN: [feconf.ROLE_ADMIN]
@@ -108,6 +108,17 @@ ROLE_ACTIONS = {
 }
 
 
+def get_human_readable_role(role):
+    """converts role to human readable format.
+
+    Args:
+        role: str. The role to convert.
+    Returns:
+        str. Role in human readable format.
+    """
+    return role.lower().replace('_', ' ')
+
+
 def get_all_actions(role):
     """Returns a list of all actions (including inherited actions)
     that can be performed by the given role.
@@ -131,3 +142,66 @@ def get_all_actions(role):
         role_actions.extend(get_all_actions(parent_role))
 
     return list(set(role_actions))
+
+
+def get_updatable_roles():
+    """Returns roles to which a user's role can be updated by admin interface.
+
+    Returns:
+        list(str). A list of all roles present in authorization system.
+    """
+    updatable_roles = {}
+    for role in PARENT_ROLES:
+        if role not in [feconf.ROLE_GUEST]:
+            updatable_roles[role] = get_human_readable_role(role)
+    return updatable_roles
+
+
+def get_viewable_roles():
+    """Returns roles by which user can be searched in admin interface.
+
+    Returns:
+        list(str). Roles from which a user is able to chose.
+    """
+    viewable_roles = {}
+    for role in PARENT_ROLES:
+        if role not in [feconf.ROLE_EXPLORATION_EDITOR, feconf.ROLE_GUEST]:
+            viewable_roles[role] = get_human_readable_role(role)
+    return viewable_roles
+
+
+def get_role_graph_data():
+    """Returns dict for displaying roles graph.
+
+    Returns:
+        dict. A dict containing data in following format:
+        {
+            finalStateIds: list(str). Roles which have no child.
+            initStateId: str. Role which has no parent.
+            links: list(dict). List of dicts defining edges in graph.
+            nodes: dict. Role as key and human readable format of role as value.
+        }
+    """
+    role_graph = {}
+    is_parent = []
+    role_graph['links'] = []
+    role_graph['nodes'] = {}
+    for role in PARENT_ROLES:
+        if not PARENT_ROLES[role]:
+            role_graph['initStateId'] = role
+
+        role_graph['nodes'][role] = get_human_readable_role(role)
+        for parent_role in PARENT_ROLES[role]:
+            link_info = {}
+            is_parent.append(parent_role)
+            link_info['source'] = parent_role
+            link_info['target'] = role
+            link_info['isFallback'] = False
+            role_graph['links'].append(link_info)
+
+    role_graph['finalStateIds'] = []
+    for role in PARENT_ROLES:
+        if role not in is_parent:
+            role_graph['finalStateIds'].append(role)
+    print role_graph
+    return role_graph

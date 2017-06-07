@@ -28,7 +28,9 @@ from core.domain import config_services
 from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import role_services
 from core.domain import rte_component_registry
+from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
@@ -105,6 +107,9 @@ class AdminPage(base.BaseHandler):
             'unfinished_job_data': unfinished_job_data,
             'value_generators_js': jinja2.utils.Markup(
                 editor.get_value_generators_js()),
+            'update_role_options': role_services.get_updatable_roles(),
+            'view_role_options': role_services.get_viewable_roles(),
+            'role_graph_data': role_services.get_role_graph_data()
         })
 
         self.render_template('pages/admin/admin.html')
@@ -127,33 +132,77 @@ class AdminHandler(base.BaseHandler):
     @require_super_admin
     def post(self):
         """Handles POST requests."""
+        def check_and_update_config_role(old_list, new_list, role):
+            for username in old_list:
+                if username not in new_list:
+                    user_services.update_user_role(
+                        user_services.get_user_id_from_username(username),
+                        feconf.ROLE_EXPLORATION_EDITOR)
+
+            for username in new_list:
+                if username not in old_list:
+                    user_services.update_user_role(
+                        user_services.get_user_id_from_username(username),
+                        role)
+
         try:
             if self.payload.get('action') == 'reload_exploration':
                 exploration_id = self.payload.get('exploration_id')
                 self._reload_exploration(exploration_id)
+                self.render_json({})
             elif self.payload.get('action') == 'reload_collection':
                 collection_id = self.payload.get('collection_id')
                 self._reload_collection(collection_id)
+                self.render_json({})
             elif self.payload.get('action') == 'clear_search_index':
                 exp_services.clear_search_index()
+                self.render_json({})
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
                 logging.info('[ADMIN] %s saved config property values: %s' %
                              (self.user_id, new_config_property_values))
+                config_properties = config_domain.Registry.get_config_property_schemas()
                 for (name, value) in new_config_property_values.iteritems():
                     config_services.set_property(self.user_id, name, value)
+                    if name == 'whitelisted_email_senders':
+                        check_and_update_config_role(
+                            config_properties[name]['value'], value,
+                            feconf.ROLE_SUPER_ADMIN)
+                    if name == 'admin_usernames':
+                        check_and_update_config_role(
+                            config_properties[name]['value'], value,
+                            feconf.ROLE_ADMIN)
+                    if name == 'email_sender_name':
+                        check_and_update_config_role(
+                            config_properties[name]['value'], value,
+                            feconf.ROLE_SUPER_ADMIN)
+                    if name == 'collection_editor_whitelist':
+                        check_and_update_config_role(
+                            config_properties[name]['value'], value,
+                            feconf.ROLE_COLLECTION_EDITOR)
+                    if name == 'banned_usernames':
+                        check_and_update_config_role(
+                            config_properties[name]['value'], value,
+                            feconf.ROLE_BANNED_USER)
+                    if name == 'moderator_usernames':
+                        check_and_update_config_role(
+                            config_properties[name]['value'], value,
+                            feconf.ROLE_MODERATOR)
+                self.render_json({})
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
                 logging.info('[ADMIN] %s reverted config property: %s' %
                              (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
+                self.render_json({})
             elif self.payload.get('action') == 'start_new_job':
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):
                         klass.enqueue(klass.create_new())
                         break
+                self.render_json({})
             elif self.payload.get('action') == 'cancel_job':
                 job_id = self.payload.get('job_id')
                 job_type = self.payload.get('job_type')
@@ -161,23 +210,44 @@ class AdminHandler(base.BaseHandler):
                     if klass.__name__ == job_type:
                         klass.cancel(job_id, self.user_id)
                         break
+                self.render_json({})
             elif self.payload.get('action') == 'start_computation':
                 computation_type = self.payload.get('computation_type')
                 for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
                     if klass.__name__ == computation_type:
                         klass.start_computation()
                         break
+                self.render_json({})
             elif self.payload.get('action') == 'stop_computation':
                 computation_type = self.payload.get('computation_type')
                 for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
                     if klass.__name__ == computation_type:
                         klass.stop_computation(self.user_id)
                         break
+                self.render_json({})
             elif self.payload.get('action') == 'upload_topic_similarities':
                 data = self.payload.get('data')
                 recommendations_services.update_topic_similarities(data)
+                self.render_json({})
+            elif self.payload.get('action') == 'view_by_role':
+                role = self.payload.get('role')
+                users_by_role = user_services.get_usernames_by_role(role)
+                self.render_json(users_by_role)
+            elif self.payload.get('action') == 'view_role_by_username':
+                user_name = self.payload.get('username')
+                user_id = user_services.get_user_id_from_username(user_name)
+                result = {}
+                result[user_name] = user_services.get_user_role_from_id(
+                    user_id)
+                self.render_json(result)
+            elif self.payload.get('action') == 'update_user_role':
+                user_id = user_services.get_user_id_from_username(
+                    self.payload.get('username'))
+                user_services.update_user_role(
+                    user_id, self.payload.get('role'))
+                # TODO : update it with appropriate reply
+                self.render_json({})
 
-            self.render_json({})
         except Exception as e:
             self.render_json({'error': unicode(e)})
             raise

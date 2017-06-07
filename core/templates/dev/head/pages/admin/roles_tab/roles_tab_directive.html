@@ -6,6 +6,10 @@
 
 <div class="container-fluid">
   <div class="row">
+    <br>
+    <h3 class="text-center text-danger">NOTE: Please don't modify roles from this page yet.</h3>
+  </div>
+  <div class="row">
     <div class="col-md-8">
       <md-card class="oppia-page-card oppia-long-text">
         <form class="form-horizontal" ng-submit="SubmitRoleViewForm(view_form_values)">
@@ -25,7 +29,7 @@
           <div class="form-group" ng-if="view_form_values.method=='role'">
             <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8">
-              <select ng-options="role for role in role_options" ng-model="view_form_values.role" class="form-control">
+              <select ng-options="role_name as role_string for (role_name, role_string) in view_role_options" ng-model="view_form_values.role" class="form-control">
               </select>
             </div>
           </div>
@@ -72,7 +76,7 @@
           <div class="form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8">
-              <select ng-options="role for role in all_roles" ng-model="update_form_values.newrole" class="form-control">
+              <select ng-options="role_name as role_string for (role_name, role_string) in update_role_options" ng-model="update_form_values.newrole" class="form-control">
               </select>
             </div>
           </div>
