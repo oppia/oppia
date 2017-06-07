@@ -57,7 +57,7 @@ describe('Admin router service', function() {
     expect(AdminRouterService.isMiscTabOpen()).toBe(false);
   });
 
-  it('should be able to navigate to the roles tab', function()) {
+  it('should be able to navigate to the roles tab', function() {
     expect(AdminRouterService.isRolesTabOpen()).toBe(false);
     AdminRouterService.showTab('#roles');
     expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);

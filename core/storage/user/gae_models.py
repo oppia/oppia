@@ -109,7 +109,7 @@ class UserSettingsModel(base_models.BaseModel):
             list(UserSettingsModel). The UserSettingsModel instances which
             contain the same role.
         """
-        return cls.query(cls.role==role)
+        return cls.query(cls.role == role)
 
 
 class CompletedActivitiesModel(base_models.BaseModel):

@@ -513,7 +513,7 @@ def get_usernames_by_role(role):
     """
     user_settings = user_models.UserSettingsModel.get_by_role(role)
     result = {}
-    for ind, model in enumerate(user_settings):
+    for model in user_settings.fetch():
         result[model.username] = role
     return result
 

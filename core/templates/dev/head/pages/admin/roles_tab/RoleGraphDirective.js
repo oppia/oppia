@@ -222,7 +222,6 @@ oppia.directive('roleGraph', [
                 $scope.augmentedLinks[i].d = (
                   'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
                   ' ' + endx + ' ' + endy);
-
               }
             }
 
