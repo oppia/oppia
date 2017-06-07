@@ -131,7 +131,8 @@ class BaseJobManager(object):
         Args:
             job_id: str. The id of the job
             additional_job_params: dict(str : int).  Additional parameters on
-                jobs"""
+                jobs
+        """
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -155,7 +156,8 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job
-            metadata: (TODO: Put Data Type). The metadata of the job"""
+            metadata: (TODO: Put Data Type). The metadata of the job
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_STARTED)
@@ -176,7 +178,8 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job
-            output_list: list(str). The output of the job"""
+            output_list: list(str). The output of the job
+        """
             # TODO: Better discription.
 
         _MAX_OUTPUT_LENGTH_CHARS = 900000
@@ -225,7 +228,8 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job
-            error: str. The error to be raised of the job"""
+            error: str. The error to be raised of the job
+        """
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -245,7 +249,8 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job.
-            user_id: str. The id of the user."""
+            user_id: str. The id of the user.
+        """
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -272,7 +277,8 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            Boolean. If the job is active or not."""
+            Boolean. If the job is active or not.
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
@@ -285,7 +291,8 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            Boolean. If the job has finished or not."""
+            Boolean. If the job has finished or not.
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.status_code in [STATUS_CODE_COMPLETED, STATUS_CODE_FAILED]
@@ -295,7 +302,8 @@ class BaseJobManager(object):
         """Cancel all queued or started jobs of this job type.
 
         Args:
-            job_id: str. The id of the job."""
+            job_id: str. The id of the job.
+        """
         unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
             cls.__name__)
         for model in unfinished_job_models:
@@ -1031,7 +1039,8 @@ class BaseContinuousComputationManager(object):
         """
         def _register_end_of_batch_job_transactional():
             """Transactionally change the computation's status when a batch job
-            ends."""
+            ends.
+            """
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
             if (cc_model.status_code ==
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
@@ -1315,7 +1324,8 @@ def get_continuous_computations_info(cc_classes):
 
 def get_stuck_jobs(recency_msecs):
     """Returns a list of jobs which were last updated at most recency_msecs
-    milliseconds ago and have experienced more than one retry."""
+    milliseconds ago and have experienced more than one retry.
+    """
     threshold_time = (
         datetime.datetime.utcnow() -
         datetime.timedelta(0, 0, 0, recency_msecs))
