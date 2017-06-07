@@ -225,7 +225,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
 
 
 class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
-    """Tests for the one-off username length distribution job."""
+    """Tests for the one-off long userbio length job."""
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_A_BIO = 'I am less than 500'
