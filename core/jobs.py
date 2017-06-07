@@ -104,8 +104,10 @@ class BaseJobManager(object):
     @classmethod
     def create_new(cls):
         """Creates a new job of this class type.
+
         Returns:
             The id of this job.
+
         Raises:
             Exception: A job using an abstract base manager tried to directly
                 create a job
@@ -125,6 +127,7 @@ class BaseJobManager(object):
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing.
+
         Args:
             job_id: str. The id of the job
             additional_job_params: dict(str : int).
@@ -149,6 +152,7 @@ class BaseJobManager(object):
     @classmethod
     def register_start(cls, job_id, metadata=None):
         """Marks job as started.
+
         Args:
             job_id: str. The id of the job
             metadata: ---. The metadata of the job"""  # TODO: Put Data Type.
@@ -169,6 +173,7 @@ class BaseJobManager(object):
     @classmethod
     def register_completion(cls, job_id, output_list):
         """Marks a job as completed.
+
         Args:
             job_id: str. The id of the job
             output_list: list(str). The output of the job"""
@@ -217,6 +222,7 @@ class BaseJobManager(object):
     @classmethod
     def register_failure(cls, job_id, error):
         """Marks a job as completed.
+
         Args:
             job_id: str. The id of the job
             error: str. The error to be raised of the job"""
@@ -236,6 +242,7 @@ class BaseJobManager(object):
     @classmethod
     def cancel(cls, job_id, user_id):
         """Marks job as canceled.
+
         Args:
             job_id: str. The id of the job.
             user_id: str. The id of the user."""
@@ -260,8 +267,10 @@ class BaseJobManager(object):
     @classmethod
     def is_active(cls, job_id):
         """Asserts if job is still active.
+
         Args:
             job_id: str. The id of the job.
+
         Returns: Boolean. If the job is active or not."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -270,8 +279,10 @@ class BaseJobManager(object):
     @classmethod
     def has_finished(cls, job_id):
         """Asserts if job has finished.
+
         Args:
             job_id: str. The id of the job.
+
         Returns: Boolean. If the job has finished or not."""
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -280,6 +291,7 @@ class BaseJobManager(object):
     @classmethod
     def cancel_all_unfinished_jobs(cls, user_id):
         """Cancel all queued or started jobs of this job type.
+
         Args:
             job_id: str. The id of the job."""
         unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
@@ -292,6 +304,7 @@ class BaseJobManager(object):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Must be implemented by subclasses.
+
         Args:
             job_id: str. The id of the job.
             additional_job_params: dict(str : int).
@@ -352,10 +365,12 @@ class BaseJobManager(object):
     def _require_valid_transition(
             cls, job_id, old_status_code, new_status_code):
         """Asserts if the transition of the job status code is valid.
+
         Args:
             job_id: str. The id of the job.
             old_status_code: str. Old status code.
             new_status_code: str. New status code.
+
         Raises:
             AttributeError: Invalid status code change for job.
             """
@@ -412,9 +427,11 @@ class BaseDeferredJobManager(BaseJobManager):
         """Function that performs the main business logic of the job.
 
         Needs to be implemented by subclasses.
+
         Args:
             additional_job_params: additional_job_params: dict(str : int).
                 Additional parameters on jobs.
+
         Raises: NotImplementedError
         """
         raise NotImplementedError
@@ -422,10 +439,12 @@ class BaseDeferredJobManager(BaseJobManager):
     @classmethod
     def _run_job(cls, job_id, additional_job_params):
         """Starts the job.
+
         Args:
             job_id: str. The id of the job.
             additional_job_params: dict(str : int).
                 Additional parameters on job.
+
         Raises:
 
             """  # TODO: Finish Raises
@@ -470,6 +489,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
     def run(self, job_id, job_class_str, kwargs):
         """ Runs job pipeline
+
             Args:
                 job_id: str. the id of the job.
                 additional_job_params: dict. Additional params to pass into the
@@ -494,6 +514,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 
     def run(self, job_id, job_class_str, output):
         """ Runs store mapreduce results.
+
             Args:
                 job_id: str. the id of the job.
                 additional_job_params: dict. Additional params to pass into the
@@ -568,6 +589,7 @@ class BaseMapReduceJobManager(BaseJobManager):
           WARNING: The OutputWriter converts mapper output keys to type str.
           So, if you have keys that are of type unicode, you must yield
           "key.encode('utf-8')", rather than "key".
+
           Raises:
             NotImplementedError
         """
@@ -592,6 +614,7 @@ class BaseMapReduceJobManager(BaseJobManager):
           handling values for this key. (It can probably also assume that
           it will be called exactly once for each key with all of the output,
           but this needs to be verified.)
+
          Raises:
             NotImplementedError
         """
@@ -660,6 +683,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         Mapper methods may want to use this as a precomputation check,
         especially if the datastore classes being iterated over are append-only
         event logs.
+
         Returns:
             Bool. If job_queued_msec >= created_on_msec.
         """
@@ -695,6 +719,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
     @classmethod
     def split_input(cls, mapper_spec):
         """Returns data split from mapper_spec as inputs(list)
+
         Args:
             mapper_spec: dict. """  # TODO: Write what is mapper_spec
         params = mapper_spec.params
@@ -725,6 +750,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
     def _get_continuous_computation_class(cls):
         """Returns the ContinuousComputationManager class associated with this
         MapReduce job.
+
         Raises:
             NotImplementedError.
         """
