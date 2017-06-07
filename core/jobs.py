@@ -106,7 +106,7 @@ class BaseJobManager(object):
         """Creates a new job of this class type.
 
         Returns:
-            The id of this job.
+            str. The id of this job.
 
         Raises:
             Exception: A job using an abstract base manager tried to directly
@@ -130,7 +130,8 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job.
-            additional_job_params: dict or None. Additional parameters on jobs.
+            additional_job_params: dict(str : int) or None. Additional
+                parameters on jobs.
         """
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -490,8 +491,8 @@ class BaseDeferredJobManager(BaseJobManager):
 
         Args:
             job_id: str. the id of the job.
-            additional_job_params: dict. Additional params to pass into the
-                job's _run() method.
+            additional_job_params: dict(str : int). Additional params to pass
+                into the job's _run() method.
         """
         taskqueue_services.defer(cls._run_job, job_id, additional_job_params)
 
@@ -503,8 +504,8 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
         Args:
             job_id: str. the id of the job.
-            additional_job_params: dict. Additional params to pass into the
-                job's _run() method.
+            additional_job_params: dict(str : int). Additional params to pass
+                into the job's _run() method.
         """
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
@@ -528,8 +529,8 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 
         Args:
             job_id: str. the id of the job.
-            additional_job_params: dict. Additional params to pass into the
-                job's _run() method.
+            additional_job_params: dict(str : int). Additional params to pass
+                into the job's _run() method.
         """
         job_class = mapreduce_util.for_name(job_class_str)
 
@@ -600,7 +601,8 @@ class BaseMapReduceJobManager(BaseJobManager):
 
 
         Args:
-            item: single element of the type given by entity_class().
+            item: entity_class. single element of the type given by
+                entity_class(). TODO: make sure entity_class is a valid type.
 
         Raises:
             NotImplementedError
@@ -619,13 +621,16 @@ class BaseMapReduceJobManager(BaseJobManager):
         persist it out into the datastore instead and return a reference (and
         dereference it later to load content as needed).
 
+        This code can assume that it is the only process handling values for the
+        given key. 
+
+        TODO: Verify whether it can also assume that it will be called exactly
+        once for each key with all of the output.
+
         Args:
             key: A key value as emitted from the map() function, above.
             values: A list of all values from all mappers that were tagged with
-                the given key. This code can assume that it is the only process
-                handling values for this key. (It can probably also assume that
-                it will be called exactly once for each key with all of the
-                output, but this needs to be verified.)
+                the given key. 
 
         Raises:
             NotImplementedError
@@ -733,7 +738,8 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         """Returns data split from mapper_spec as inputs(list)
 
         Args:
-            mapper_spec: dict. TODO: Write what is mapper_spec
+            mapper_spec: dict. TODO: Write what is mapper_spec, dict from what
+                to what?
         """
         params = mapper_spec.params
         entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
@@ -1243,7 +1249,7 @@ def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
     returned.
 
     Args:
-        recency_msec: the threshold for a recent job, in milliseconds.
+        recency_msec: int. The threshold for a recent job, in milliseconds.
     """
     recent_job_models = job_models.JobModel.get_recent_jobs(
         NUM_JOBS_IN_DASHBOARD_LIMIT, recency_msec)
@@ -1267,7 +1273,7 @@ def get_continuous_computations_info(cc_classes):
     """Returns data about the given computations.
 
     Args:
-        cc_classes: a list of subclasses of BaseContinuousComputationManager.
+        cc_classes: list(BaseContinuousComputationManager) a list of subclasses.
 
     Returns:
         A list of dicts, each representing a continuous computation. Each dict
