@@ -276,7 +276,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            Boolean. If the job is active or not.
+            bool. If the job is active or not.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -290,7 +290,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            Boolean. If the job has finished or not.
+            bool. If the job has finished or not.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -697,7 +697,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         event logs.
 
         Returns:
-            Bool. If job_queued_msec >= created_on_msec.
+            bool. If job_queued_msec >= created_on_msec.
         """
         created_on_msec = utils.get_time_in_millisecs(entity.created_on)
         job_queued_msec = float(context.get().mapreduce_spec.mapper.params[
