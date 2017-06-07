@@ -579,13 +579,12 @@ def has_fully_registered(user_id):
         feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
 
 
-def _create_user(user_id, email, role):
+def create_new_user(user_id, email):
     """Creates a new user.
 
     Args:
         user_id: str. The user id.
         email: str. The user email.
-        role: str. The user role.
 
     Returns:
         UserSettings. The newly-created user settings domain object.
@@ -598,29 +597,10 @@ def _create_user(user_id, email, role):
         raise Exception('User %s already exists.' % user_id)
 
     user_settings = UserSettings(
-        user_id, email, role,
+        user_id, email, feconf.ROLE_EXPLORATION_EDITOR,
         preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
-    return user_settings
-
-
-def get_or_create_user(user_id, email, role):
-    """Returns a UserSettings domain object with given user_id and email.
-    If user does not exist, it creates a new one and returns the new
-    User model.
-
-    Args:
-        user_id: str. The user id.
-        email: str. The user email.
-        role: str. The user role.
-
-    Returns:
-        UserSettings. UserSettings domain object.
-    """
-    user_settings = get_user_settings(user_id, strict=False)
-    if user_settings is None:
-        user_settings = _create_user(user_id, email, role)
     return user_settings
 
 

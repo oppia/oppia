@@ -97,8 +97,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         super(SuggestionQueriesUnitTests, self).setUp()
         # Register users.
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        user_services.get_or_create_user(
-            self.user_id, self.USER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+        user_services.create_new_user(self.user_id, self.USER_EMAIL)
         self.signup(self.USER_EMAIL, self.USERNAME)
         # Open thread with suggestion.
         thread1 = feedback_models.FeedbackThreadModel(
@@ -231,8 +230,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         super(FeedbackThreadUnitTests, self).setUp()
 
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        user_services.get_or_create_user(
-            self.viewer_id, self.VIEWER_EMAIL, feconf.ROLE_EXPLORATION_EDITOR)
+        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def _run_computation(self):
