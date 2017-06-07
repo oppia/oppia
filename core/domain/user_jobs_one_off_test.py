@@ -287,7 +287,6 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         user_services.update_user_bio(user_id_b, self.USER_B_BIO)
-
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
         user_services.update_user_bio(user_id_c, self.USER_C_BIO)
@@ -302,7 +301,6 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         user_id_d = self.get_user_id_from_email(self.USER_D_EMAIL)
         user_services.update_user_bio(user_id_d, self.USER_D_BIO)
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
-
         user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
         user_services.update_user_bio(user_id_c, self.USER_C_BIO)
         result = self._run_one_off_job()
