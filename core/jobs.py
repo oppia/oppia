@@ -176,12 +176,12 @@ class BaseJobManager(object):
     def register_completion(cls, job_id, output_list):
         """Marks a job as completed.
 
+        TODO: Better description.
+
         Args:
             job_id: str. The id of the job.
             output_list: list(str). The output of the job.
         """
-            # TODO: Better discription.
-
         _MAX_OUTPUT_LENGTH_CHARS = 900000
 
         # Ensure that preconditions are met.
@@ -442,9 +442,6 @@ class BaseDeferredJobManager(BaseJobManager):
         Args:
             additional_job_params: dict(str : int). Additional parameters on
                 jobs.
-
-        Raises:
-            NotImplementedError.
         """
         raise NotImplementedError
 
@@ -603,9 +600,6 @@ class BaseMapReduceJobManager(BaseJobManager):
         Args:
             item: entity_class. single element of the type given by
                 entity_class(). TODO: make sure entity_class is a valid type.
-
-        Raises:
-            NotImplementedError
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement map '
@@ -631,9 +625,6 @@ class BaseMapReduceJobManager(BaseJobManager):
             key: A key value as emitted from the map() function, above.
             values: A list of all values from all mappers that were tagged with
                 the given key. 
-
-        Raises:
-            NotImplementedError
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement '
@@ -769,9 +760,6 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
     def _get_continuous_computation_class(cls):
         """Returns the ContinuousComputationManager class associated with this
         MapReduce job.
-
-        Raises:
-            NotImplementedError.
         """
         raise NotImplementedError(
             'Subclasses of BaseMapReduceJobManagerForContinuousComputations '
