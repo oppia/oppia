@@ -249,18 +249,20 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         stringified_output = (
             user_jobs_one_off.LongUserBiosOneOffJob.get_output(
                 job_id))
+
         output = []
-        for output in stringified_output:
+        if stringified_output != []:
             output = ast.literal_eval(stringified_output[0])
             output[0] = int(output[0])
             output[1] = [str(i) for i in output[1]]
-        return output
+            return output
+
 
     def test_null_user_bio(self):
         """Tests the case when userbio is None."""
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         result = self._run_one_off_job()
-        self.assertEqual(result, [])
+        self.assertEqual(result, None)
 
     def test_inbound_limit(self):
         """Tests the case where the userbio is less than 500 characters."""
@@ -268,7 +270,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
         user_services.update_user_bio(user_id_a, self.USER_A_BIO)
         result = self._run_one_off_job()
-        self.assertEqual(result, [])
+        self.assertEqual(result, None)
 
     def test_outbound_limit(self):
         """Tests the case where the userbio is more than 500 characters."""
@@ -294,7 +296,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         if (self.USER_B_USERNAME and self.USER_C_USERNAME) in result[1]:
             pass
         else:
-            raise Exception("Expected User(s) is Missing from the list")
+            raise Exception("Expected User(s) is missing from the list")
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
