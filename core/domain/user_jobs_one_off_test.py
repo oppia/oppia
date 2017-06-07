@@ -296,7 +296,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         if (self.USER_B_USERNAME and self.USER_C_USERNAME) in result[1]:
             pass
         else:
-            raise Exception("Expected User(s) is missing from the list")
+            raise Exception("Expected User(s) missing from the list")
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
