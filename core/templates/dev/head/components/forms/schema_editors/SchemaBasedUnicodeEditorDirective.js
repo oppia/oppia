@@ -115,6 +115,10 @@ oppia.directive('schemaBasedUnicodeEditor', [
             return $sce.trustAsHtml(
               $filter('convertUnicodeWithParamsToHtml')($scope.localValue));
           };
+          $scope.onClickPopupDemo = function() {
+            var popup = document.getElementById('myPopup');
+            popup.classList.toggle('show');
+          }
         }
       ]
     };

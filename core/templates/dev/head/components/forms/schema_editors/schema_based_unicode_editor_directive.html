@@ -10,13 +10,14 @@
   </textarea>
 
   <span ng-if="!getCodingMode() && !getRows()">
-    <input type="text" ng-disabled="isDisabled()" class="form-control"
+    <input type="text" ng-disabled="isDisabled()" class="form-control popup"
            ng-model="$parent.localValue" ng-blur="onInputBlur()"
            ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
            ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" apply-validation="validators()"
-           style="display: inline;">
+           style="display: inline;"
+           onclick="<[onClickPopupDemo()]>">
   </span>
-
+  <span class="popuptext" id="myPopup">Click here to repond!</span>
   <!-- Note that we do not yet support ng-blur for the code editor. -->
   <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
     <div ui-codemirror
