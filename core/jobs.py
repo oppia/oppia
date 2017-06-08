@@ -245,7 +245,7 @@ class BaseJobManager(object):
 
     @classmethod
     def cancel(cls, job_id, user_id):
-        """Marks job as canceled.
+        """Marks a job as canceled.
 
         Args:
             job_id: str. The id of the job.
@@ -271,7 +271,7 @@ class BaseJobManager(object):
 
     @classmethod
     def is_active(cls, job_id):
-        """Asserts if job is still active.
+        """Returns if job is still active.
 
         Args:
             job_id: str. The id of the job.
@@ -285,7 +285,7 @@ class BaseJobManager(object):
 
     @classmethod
     def has_finished(cls, job_id):
-        """Asserts if job has finished.
+        """Returns if job has finished.
 
         Args:
             job_id: str. The id of the job.
