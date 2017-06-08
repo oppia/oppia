@@ -99,9 +99,9 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceJobManager):
         yield (len(item.user_bio), item.username)
 
     @staticmethod
-    def reduce(userbio_length, stringified_username):
+    def reduce(userbio_length, stringified_usernames):
         if int(userbio_length) > 500:
-            yield (userbio_length, stringified_username)
+            yield (userbio_length, stringified_usernames)
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
