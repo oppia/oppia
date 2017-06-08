@@ -450,14 +450,18 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
 
 
 class BaseMapReduceJobManager(BaseJobManager):
-    # The output for this job is a list of individual results. Each item in
-    # the list will be of whatever type is yielded from the 'reduce' method.
-    #
-    # The 'metadata' field in the BaseJob representing a MapReduceJob
-    # is a dict with one key, _OUTPUT_KEY_ROOT_PIPELINE_ID. The corresponding
-    # value is a string representing the ID of the MapReduceJobPipeline
-    # as known to the mapreduce/lib/pipeline internals. This is used
-    # to generate URLs pointing at the pipeline support UI.
+    """Produces a list of results with elements yielded from the reduce method.
+    
+    The output for this job is a list of individual results. Each item in
+    the list will be of whatever type is yielded from the 'reduce' method.
+
+    The 'metadata' field in the BaseJob representing a MapReduceJob is a dict
+    with one key, _OUTPUT_KEY_ROOT_PIPELINE_ID. The corresponding value is a
+    string representing the ID of the MapReduceJobPipeline as known to the
+    mapreduce/lib/pipeline internals. This is used to generate URLs pointing at
+    the pipeline support UI.
+    """
+
     _OUTPUT_KEY_ROOT_PIPELINE_ID = 'root_pipeline_id'
 
     @staticmethod
@@ -571,8 +575,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def _entity_created_before_job_queued(entity):
-        """Checks that the given entity was created before the MR job was
-        queued.
+        """Checks if given entity was created before the MR job was queued.
 
         Mapper methods may want to use this as a precomputation check,
         especially if the datastore classes being iterated over are append-only
@@ -633,9 +636,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        """Returns the ContinuousComputationManager class associated with this
-        MapReduce job.
-        """
+        """Returns the manager class associated with this MapReduce job."""
         raise NotImplementedError(
             'Subclasses of BaseMapReduceJobManagerForContinuousComputations '
             'must implement the _get_continuous_computation_class() method.')
@@ -647,8 +648,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
     @staticmethod
     def _entity_created_before_job_queued(entity):
-        """Checks that the given entity was created before the MR job was
-        queued.
+        """Checks if given entity was created before the MR job was queued.
 
         Mapper methods may want to use this as a precomputation check,
         especially if the datastore classes being iterated over are append-only
@@ -692,16 +692,16 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def get_realtime_id(cls, layer_index, raw_entity_id):
-        """Returns an ID used to identify the element with the given entity id
+        """Returns ID of element associated to given entity of active layer.
+
+        Returns an ID used to identify the element with the given entity id
         in the currently active realtime datastore layer.
         """
         return '%s:%s' % (layer_index, raw_entity_id)
 
     @classmethod
     def delete_layer(cls, layer_index, latest_created_on_datetime):
-        """Deletes all entities in the given layer which were created before
-        the given datetime.
-        """
+        """Deletes all entities in the given layer created before datetime."""
         query = cls.query().filter(cls.realtime_layer == layer_index).filter(
             cls.created_on < latest_created_on_datetime)
         ndb.delete_multi(query.iter(keys_only=True))
@@ -732,6 +732,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
 class BaseContinuousComputationManager(object):
     """This class represents a manager for a continuously-running computation.
+
     Such computations consist of two parts: a batch job to compute summary
     views, and a realtime layer to augment these batch views with additional
     data that has come in since the last batch job results were computed. The
@@ -779,10 +780,12 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _get_realtime_datastore_class(cls):
-        """Returns the datastore class used by the realtime layer, which should
-        subclass BaseRealtimeDatastoreClassForContinuousComputations. See
-        StartExplorationRealtimeModel in core/jobs_test.py for an example
-        of how to do this.
+        """Returns the datastore class used by the realtime layer.
+
+        The layer should subclass
+        BaseRealtimeDatastoreClassForContinuousComputations. See
+        StartExplorationRealtimeModel in core/jobs_test.py for an example of how
+        to do this.
         """
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
@@ -792,6 +795,7 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _get_batch_job_manager_class(cls):
         """Returns the manager class for the continuously-running batch job.
+
         See jobs_test.py for an example of how to do this.
         """
         raise NotImplementedError(
@@ -844,16 +848,14 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def get_active_realtime_layer_id(cls, entity_id):
-        """Returns an ID used to identify the element with the given entity id
-        in the currently active realtime datastore layer.
+        """Returns ID of the element with the given entity in the active layer.
         """
         return cls._get_realtime_datastore_class().get_realtime_id(
             cls._get_active_realtime_index(), entity_id)
 
     @classmethod
     def get_multi_active_realtime_layer_ids(cls, entity_ids):
-        """Returns a list of IDs of elements in the currently active realtime
-        datastore layer corresponding to the given entity ids.
+        """Returns list of IDs of elements with given entities in active layer.
         """
         realtime_datastore_class = cls._get_realtime_datastore_class()
         active_realtime_index = cls._get_active_realtime_index()
@@ -877,8 +879,7 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _clear_inactive_realtime_layer(
             cls, latest_created_on_datetime):
-        """Deletes all entries in the given realtime datastore class whose
-        created_on date is before latest_timestamp.
+        """Deletes all entries in given datastore class created before datetime.
         """
         inactive_realtime_index = 1 - cls._get_active_realtime_index()
         cls._get_realtime_datastore_class().delete_layer(
@@ -898,18 +899,20 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _register_end_of_batch_job_and_return_status(cls):
-        """Processes a 'job finished' event and returns the job's updated status
-        code.
+        """Processes a 'job finished' event.
 
         Note that 'finish' in this context might mean 'completed successfully'
         or 'failed'.
 
         Processing means the following: if the job is currently 'stopping', its
         status is set to 'idle'; otherwise, its status remains as 'running'.
+        
+        Returns:
+            The job's updated status code.
         """
         def _register_end_of_batch_job_transactional():
-            """Transactionally change the computation's status when a batch job
-            ends."""
+            """Transactionally change computation status when a batch job ends.
+            """
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
             if (cc_model.status_code ==
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
@@ -932,11 +935,11 @@ class BaseContinuousComputationManager(object):
     def start_computation(cls):
         """(Re)starts the continuous computation corresponding to this class.
 
-        Raises an Exception if the computation is already running.
+        Raises:
+            Exception if the computation is already running.
         """
         def _start_computation_transactional():
-            """Transactional implementation for marking a continuous
-            computation as started.
+            """Transactionally marks a continuous computation as started.
             """
             cc_model = job_models.ContinuousComputationModel.get(
                 cls.__name__, strict=False)
@@ -975,8 +978,7 @@ class BaseContinuousComputationManager(object):
                 cls._get_batch_job_manager_class().__name__))
 
         def _stop_computation_transactional():
-            """Transactional implementation for marking a continuous
-            computation as stopping/idle.
+            """Transactionally marks a continuous computation as stopping/idle.
             """
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
             # If there is no job currently running, go to IDLE immediately.
@@ -1002,8 +1004,9 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_incoming_event(cls, event_type, *args, **kwargs):
-        """Handle an incoming event by recording it in both realtime datastore
-        layers.
+        """Handle an incoming event.
+
+        Records the event in both realtime datastore layers.
 
         The *args and **kwargs match those passed to the _handle_event() method
         of the corresponding EventHandler subclass.
@@ -1014,12 +1017,16 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _process_job_completion_and_return_status(cls):
-        """Delete all data in the currently-active realtime_datastore class,
-        switch the active class, and return the status.
+        """Delete all data in the currently-active realtime_datastore class.
+
+        Additionally switches the active class.
 
         This seam was created so that tests would be able to override
         on_batch_job_completion() to avoid kicking off the next job
         immediately.
+
+        Returns:
+            Final job status.
         """
         cls._switch_active_realtime_class()
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
@@ -1192,8 +1199,8 @@ def get_continuous_computations_info(cc_classes):
 
 
 def get_stuck_jobs(recency_msecs):
-    """Returns a list of jobs which were last updated at most recency_msecs
-    milliseconds ago and have experienced more than one retry."""
+    """Returns a list of jobs older than given time and with 1+ retry attempts.
+    """
     threshold_time = (
         datetime.datetime.utcnow() -
         datetime.timedelta(0, 0, 0, recency_msecs))
