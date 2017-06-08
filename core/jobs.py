@@ -343,7 +343,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            float. the time the job got queued. TODO: verify type is correct.
+            float. the time the job got queued.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -357,7 +357,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            float. The time the job got started. TODO: verify type is correct.
+            float. The time the job got started.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -371,7 +371,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            float. The time the job got finished. TODO: verify type is correct.
+            float. The time the job got finished.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -385,7 +385,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            str. The metadata of the job. TODO: verify type is correct.
+            str. The metadata of the job.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
