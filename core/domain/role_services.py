@@ -50,7 +50,7 @@ ACTION_VIEW_EXPLORATION_STATS = 'VIEW_EXPLORATION_STATS'
 #   corresponding to 'COLLECTION_EDITOR'.}
 #
 # NOTE FOR DEVELOPERS:
-# - Follow the Playbook in wiki(https://github.com/oppia/oppia/wiki/
+# - Follow the Playbook in wiki (https://github.com/oppia/oppia/wiki/
 #   Instructions-for-editing-roles-or-actions) before making any changes to
 #   this dict.
 #
@@ -73,7 +73,7 @@ PARENT_ROLES = {
 #   value -> list of unique actions.
 #
 # NOTE FOR DEVELOPERS :
-# - Follow the Playbook in wiki(https://github.com/oppia/oppia/wiki/
+# - Follow the Playbook in wiki (https://github.com/oppia/oppia/wiki/
 #   Instructions-for-editing-roles-or-actions) before making any changes to
 #   this dict.
 ROLE_ACTIONS = {
@@ -120,7 +120,7 @@ def get_human_readable_role(role):
 
 
 def get_all_actions(role):
-    """Returns a list of all actions(including inherited actions)
+    """Returns a list of all actions (including inherited actions)
     that can be performed by the given role.
 
     Args:
@@ -204,9 +204,7 @@ def get_role_graph_data():
             link_info['isFallback'] = False
             role_graph['links'].append(link_info)
 
-    role_graph['finalStateIds'] = []
-    for role in PARENT_ROLES:
-        if role not in is_parent:
-            role_graph['finalStateIds'].append(role)
-    print role_graph
+    role_graph['finalStateIds'] = [
+        role for role in PARENT_ROLES if role not in is_parent
+    ]
     return role_graph

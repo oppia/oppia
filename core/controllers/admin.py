@@ -177,8 +177,10 @@ class AdminHandler(base.BaseHandler):
                     config_domain.Registry.get_config_property_schemas())
                 for (name, value) in new_config_property_values.iteritems():
                     config_services.set_property(self.user_id, name, value)
-                    # below checks are for maintaining the sync between roles
+                    # Below checks are for maintaining the sync between roles
                     # in old and new authorization system.
+                    # NOTE: This block of code is going to be removed once the
+                    #   new system takes over.
                     if name == 'whitelisted_email_senders':
                         check_and_update_config_role(
                             config_properties[name]['value'], value,
@@ -246,15 +248,17 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'view_role_by_username':
                 user_name = self.payload.get('username')
                 user_id = user_services.get_user_id_from_username(user_name)
-                result = {}
-                result[user_name] = user_services.get_user_role_from_id(
-                    user_id)
-                self.render_json(result)
+                user_role_dict = {
+                    user_name: user_services.get_user_role_from_id(user_id)
+                }
+                self.render_json(user_role_dict)
             elif self.payload.get('action') == 'update_user_role':
                 user_id = user_services.get_user_id_from_username(
                     self.payload.get('username'))
                 user_services.update_user_role(
                     user_id, self.payload.get('role'))
+                self.render_json({})
+            else:
                 self.render_json({})
 
         except Exception as e:

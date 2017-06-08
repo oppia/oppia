@@ -512,9 +512,10 @@ def get_usernames_by_role(role):
         dict. A dict with username as key and role as value.
     """
     user_settings = user_models.UserSettingsModel.get_by_role(role)
-    result = {}
-    for model in user_settings.fetch():
-        result[model.username] = role
+    result = {
+        model.username: role
+        for model in user_settings.fetch()
+    }
     return result
 
 

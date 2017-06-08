@@ -37,7 +37,7 @@ oppia.directive('adminRolesTab', [
         $scope.graphData = function() {
           return GLOBALS.ROLE_GRAPH_DATA
         }
-        $scope.show_result_roles = 0;
+        $scope.show_result_roles = false;
         $scope.result = {};
         $scope.setStatusMessage('');
 
@@ -56,8 +56,14 @@ oppia.directive('adminRolesTab', [
               role: values.role
             }).then(function(response) {
               $scope.result = response.data;
-              $scope.show_result_roles = 1;
-              $scope.setStatusMessage('Success.');
+              if(Object.keys($scope.result).length == 0) {
+                $scope.show_result_roles = false;
+                $scope.setStatusMessage('No users with this role.');
+              }
+              else {
+                $scope.show_result_roles = true;
+                $scope.setStatusMessage('Success.');
+              }
             }, function(errorResponse) {
               $scope.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
@@ -70,7 +76,7 @@ oppia.directive('adminRolesTab', [
               username: values.username
             }).then(function(response) {
               $scope.result = response.data;
-              $scope.show_result_roles = 1;
+              $scope.show_result_roles = true;
               $scope.setStatusMessage('Success.');
             }, function(errorResponse) {
               $scope.setStatusMessage(
