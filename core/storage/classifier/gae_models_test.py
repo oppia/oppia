@@ -61,7 +61,7 @@ class TrainClassifierJobModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(TrainClassifierJobModelUnitTests, self).setUp()
         classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'exp_id1', 1, 
+            'LDAStringClassifier', 'exp_id1', 1,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name1')
         classifier_models.ClassifierTrainingJobModel.create(
