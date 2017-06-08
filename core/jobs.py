@@ -156,7 +156,7 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job.
-            metadata: str. The metadata of the job.
+            metadata: str or None. The metadata of the job.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
