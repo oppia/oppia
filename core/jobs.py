@@ -383,7 +383,7 @@ class BaseJobManager(object):
             new_status_code: str. New status code.
 
         Raises:
-            AttributeError: Invalid status code change for job.
+            Exception: Invalid status code change for job.
         """
         valid_new_status_codes = VALID_STATUS_CODE_TRANSITIONS[old_status_code]
         if new_status_code not in valid_new_status_codes:
@@ -455,7 +455,7 @@ class BaseDeferredJobManager(BaseJobManager):
                 job.
 
         Raises:
-            TODO: Finish Raises.
+            TODO: Document.
         """
         logging.info(
             'Job %s started at %s' %
@@ -497,7 +497,7 @@ class BaseDeferredJobManager(BaseJobManager):
 class MapReduceJobPipeline(base_handler.PipelineBase):
 
     def run(self, job_id, job_class_str, kwargs):
-        """Runs job pipeline
+        """Runs job pipeline.
 
         Args:
             job_id: str. the id of the job.
@@ -522,7 +522,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 class StoreMapReduceResults(base_handler.PipelineBase):
 
     def run(self, job_id, job_class_str, output):
-        """ Runs store mapreduce results.
+        """Runs store mapreduce results.
 
         Args:
             job_id: str. the id of the job.
@@ -726,7 +726,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
     @classmethod
     def split_input(cls, mapper_spec):
-        """Returns data split from mapper_spec as inputs(list)
+        """Returns data split from mapper_spec as inputs(list).
 
         Args:
             mapper_spec: dict. TODO: Write what is mapper_spec, dict from what
