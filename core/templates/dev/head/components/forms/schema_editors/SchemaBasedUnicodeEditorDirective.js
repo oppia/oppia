@@ -117,11 +117,10 @@ oppia.directive('schemaBasedUnicodeEditor', [
               $filter('convertUnicodeWithParamsToHtml')($scope.localValue));
           };
 
-          $scope.displayPopUpMessage = function() {
-            $timeout(function() {
-              return "Tap here to respond!";
-            }, 1000);
-          };
+          $scope.helperMessageIsShown = false;
+          $timeout(function() {
+            $scope.helperMessageIsShown = true;
+          }, 10000);
         }
       ]
     };
