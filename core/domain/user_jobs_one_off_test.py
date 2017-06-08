@@ -233,7 +233,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
     USER_B_USERNAME = 'b'
     USER_B_BIO = 'Long Bio' * 100
     USER_C_EMAIL = 'c@example.com'
-    USER_C_USERNAME = 'cnone'
+    USER_C_USERNAME = 'c'
     USER_C_BIO = 'Same Bio' * 100
     USER_D_EMAIL = 'd@example.com'
     USER_D_USERNAME = 'd'
@@ -279,7 +279,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         user_services.update_user_bio(user_id_b, self.USER_B_BIO)
         result = self._run_one_off_job()
-        expected_result = [[800, [u'b']]]
+        expected_result = [[800, ['b']]]
         self.assertEqual(result, expected_result)
 
     def test_same_userbio_length(self):
@@ -292,7 +292,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         user_services.update_user_bio(user_id_c, self.USER_C_BIO)
         result = self._run_one_off_job()
         result[0][1].sort()
-        expected_result = [[800, [u'b', u'cnone']]]
+        expected_result = [[800, ['b', 'c']]]
         self.assertEqual(result, expected_result)
 
     def test_diff_userbio_length(self):
@@ -304,7 +304,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
         user_services.update_user_bio(user_id_c, self.USER_C_BIO)
         result = self._run_one_off_job()
-        expected_result = [[800, [u'cnone']], [2400, [u'd']]]
+        expected_result = [[2400, ['d']], [800, ['c']]]
         self.assertEqual(result, expected_result)
 
 
