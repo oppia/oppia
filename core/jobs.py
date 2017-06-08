@@ -1321,19 +1321,20 @@ def get_continuous_computations_info(cc_classes):
     Returns:
         A list of dicts, each representing a continuous computation. Each dict
         has the following keys:
-        - 'computation_type': the type of the computation
-        - 'status_code': the current status of the computation
-        - 'last_started_msec': when a batch job for the computation was last
-              started, in milliseconds since the epoch
-        - 'last_finished_msec': when a batch job for the computation last
-              finished, in milliseconds since the epoch
-        - 'last_stopped_msec': when a batch job for the computation was last
-              stopped, in milliseconds since the epoch
-        - 'active_realtime_layer_index': the index of the active realtime layer
-        - 'is_startable': whether an admin should be allowed to start this
-              computation
-        - 'is_stoppable': whether an admin should be allowed to stop this
-              computation
+          - computation_type: str. The type of the computation.
+          - status_code: str. The current status of the computation.
+          - last_started_msec: int or None. when a batch job for the computation
+                was last started, in milliseconds since the epoch.
+          - last_finished_msec: int or None. when a batch job for the
+                computation last finished, in milliseconds since the epoch.
+          - last_stopped_msec: int or None. When a batch job for the computation
+                was last stopped, in milliseconds since the epoch.
+          - active_realtime_layer_index: int or None. the index of the active
+                realtime layer.
+          - is_startable: bool. whether an admin should be allowed to start this
+                computation.
+          - is_stoppable: bool. whether an admin should be allowed to stop this
+                computation.
     """
     cc_models = job_models.ContinuousComputationModel.get_multi(
         [cc_class.__name__ for cc_class in cc_classes])
