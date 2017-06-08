@@ -343,7 +343,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            int? the time the job got queued. TODO: verify type is correct.
+            float. the time the job got queued. TODO: verify type is correct.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -357,7 +357,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            int? The time the job got started. TODO: verify type is correct.
+            float. The time the job got started. TODO: verify type is correct.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -371,7 +371,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            int? The time the job got finished. TODO: verify type is correct.
+            float. The time the job got finished. TODO: verify type is correct.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -385,7 +385,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            str? The metadata of the job. TODO: verify type is correct.
+            str. The metadata of the job. TODO: verify type is correct.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -1251,20 +1251,26 @@ class BaseContinuousComputationManager(object):
 def _get_job_dict_from_job_model(model):
     """Converts an ndb.Model representing a job to a dict.
 
-    The dict contains the following keys:
-    - 'id': the job id
-    - 'time_started_msec': when the job was started, in milliseconds since the
-          epoch
-    - 'time_finished_msec': when the job was finished, in milliseconds since
-          the epoch
-    - 'status_code': the current status of the job
-    - 'job_type': the type of this job
-    - 'is_cancelable': whether the job can be canceled
-    - 'error': any errors pertaining to this job
-    - 'human_readable_time_started': a human-readable string representing the
-          time the job started, or None if time_started_msec is None.
-    - 'human_readable_time_finished': a human-readable string representing the
-          time the job finished, or None if time_finished_msec is None.
+    Args:
+        model: The model to inspect.
+
+    Returns:
+        A dict with the following keys:
+          - id: str. The job id.
+          - time_started_msec: float. When the job was started, in milliseconds
+                since the epoch.
+          - time_finished_msec: float. When the job was finished, in
+                milliseconds since the epoch.
+          - status_code: str. The current status of the job.
+          - job_type: str. The type of this job.
+          - is_cancelable: bool. Whether the job can be canceled
+          - error: str. Any errors pertaining to this job.
+          - human_readable_time_started: str. A human-readable string
+                representing the time the job started, or None if
+                time_started_msec is None.
+          - human_readable_time_finished: str. A human-readable string
+                representing the time the job finished, or None if
+                time_finished_msec is None.
     """
     return {
         'id': model.id,
@@ -1323,11 +1329,11 @@ def get_continuous_computations_info(cc_classes):
         has the following keys:
           - computation_type: str. The type of the computation.
           - status_code: str. The current status of the computation.
-          - last_started_msec: int or None. when a batch job for the computation
+          - last_started_msec: float or None. when a batch job for the computation
                 was last started, in milliseconds since the epoch.
-          - last_finished_msec: int or None. when a batch job for the
+          - last_finished_msec: float or None. when a batch job for the
                 computation last finished, in milliseconds since the epoch.
-          - last_stopped_msec: int or None. When a batch job for the computation
+          - last_stopped_msec: float or None. When a batch job for the computation
                 was last stopped, in milliseconds since the epoch.
           - active_realtime_layer_index: int or None. the index of the active
                 realtime layer.
