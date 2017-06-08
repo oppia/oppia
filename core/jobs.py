@@ -329,7 +329,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            int? Status code of the job. TODO: verify type is correct.
+            str. Status code of the job.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
