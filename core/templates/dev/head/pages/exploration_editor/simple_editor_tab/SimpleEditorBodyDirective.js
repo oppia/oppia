@@ -32,6 +32,26 @@ oppia.directive('simpleEditorBody', [
             explorationSaveService, explorationRightsService,
             explorationWarningsService, QuestionIdService) {
           $scope.data = SimpleEditorManagerService.getData();
+          $scope.chooseQuestionType = false;
+
+          var INTERACTION_TYPES = [{
+            id: 'MultipleChoiceInput',
+            name: 'Multiple choice'
+          }];
+
+          $scope.getQuestionLabel = function(interactionId) {
+            for(var i = 0; i < INTERACTION_TYPES.length; i++ ) {
+              if(INTERACTION_TYPES[i].id === interactionId) {
+                return INTERACTION_TYPES[i].name
+              }
+            }
+          }
+
+          $scope.getSubfieldId = function(question, subfieldLabel) {
+            return QuestionIdService.getSidebarItemId(
+              question.getId(), subfieldLabel
+            );
+          };
 
           $scope.saveTitle = SimpleEditorManagerService.saveTitle;
           $scope.saveIntroductionHtml = (
@@ -45,6 +65,7 @@ oppia.directive('simpleEditorBody', [
           $scope.canAddNewQuestion = (
             SimpleEditorManagerService.canAddNewQuestion);
           $scope.addState = SimpleEditorManagerService.addState;
+          $scope.changeQuestion = SimpleEditorManagerService.changeQuestion;
           $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
           $scope.canTryToFinishExploration =
             SimpleEditorManagerService.canTryToFinishExploration;
@@ -63,6 +84,8 @@ oppia.directive('simpleEditorBody', [
 
             return false;
           };
+
+
 
           $scope.publishChanges = function() {
             // If exploration is not yet published

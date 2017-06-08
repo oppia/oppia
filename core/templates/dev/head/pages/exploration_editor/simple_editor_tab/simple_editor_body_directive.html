@@ -15,6 +15,13 @@
 
     <div ng-repeat="question in data.questionList.getQuestions() track by $index">
       <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
+      <anchor-header header-id="getSubfieldId(question,'Multiple Choice')"
+                     header-text="<[getQuestionLabel(question.getInteractionId())]>" ng-click="chooseQuestionType = true;">
+      </anchor-header>
+
+      <div ng-show="chooseQuestionType" class="question-type-wrapper" >
+        <button type="button" class="oppia-question-button btn btn-primary" ng-click="changeQuestion('multiple', $index); chooseQuestionType = false;">Multiple Choice Input</button>
+      </div>
 
       <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
                               unique-id="question.getId()"
@@ -41,12 +48,10 @@
 
 
   <div class="advance-btn-wrapper">
-    <div ng-show="chooseQuestionType" class="question-type-wrapper" >
-      <button type="button" class="oppia-question-button btn btn-primary" ng-click="chooseQuestionType = false; addNewQuestion('multiple');">Multiple Choice Input</button>
-    </div>
+
     <span class="advance-btn-description" ng-show="advBtnHovered" ng-if="!chooseQuestionType">Add new question</span>
     <button ng-disabled="!canAddNewQuestion()" type="button"
-            class="btn btn-default advance-btn" ng-click="chooseQuestionType = true; advBtnHovered = false"
+            class="btn btn-default advance-btn" ng-click="addNewQuestion(); advBtnHovered = false"
             ng-mouseenter="advBtnHovered = true" ng-mouseleave="advBtnHovered = false">
       <i class="material-icons md-30">&#xE5CF;</i>
     </button>
@@ -143,12 +148,14 @@
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
     margin: 0 0 20px -30px;
     overflow: hidden;
+    position: absolute;
     width: 200px;
+    z-index: 20;
   }
   simple-editor-body .oppia-question-button {
     background-color: #fff;
     border-color: #fff;
-    border-width: 0px;
+    border-width: 0;
     color: #000;
     height: 55px;
     min-width: 202px;
