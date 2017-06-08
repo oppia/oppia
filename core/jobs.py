@@ -109,8 +109,8 @@ class BaseJobManager(object):
             str. The id of this job.
 
         Raises:
-            Exception: A job using an abstract base manager tried to directly
-                create a job.
+            Exeption: This method (instead of a subclass method) was directly
+                used to create a new job.
         """
         if cls._is_abstract():
             raise Exception(
@@ -325,49 +325,98 @@ class BaseJobManager(object):
 
     @classmethod
     def get_status_code(cls, job_id):
-        """Returns the status code of the the job."""
+        """Returns the status code of the the job.
+
+        Args:
+            job_id: str. The id of the job.
+
+        Returns:
+            int? Status code of the job.
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.status_code
 
     @classmethod
     def get_time_queued_msec(cls, job_id):
-        """Returns the time the job got queued."""
+        """Returns the time the job got queued.
+
+        Args:
+            job_id: str. The id of the job.
+
+        Returns:
+            int? the time the job got queued. TODO: verify type is correct.
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.time_queued_msec
 
     @classmethod
     def get_time_started_msec(cls, job_id):
-        """Returns the time the job got started."""
+        """Returns the time the job got started.
+
+        Args:
+            job_id: str. The id of the job.
+
+        Returns:
+            int? The time the job got started.
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.time_started_msec
 
     @classmethod
     def get_time_finished_msec(cls, job_id):
-        """Returns the time the job got finished."""
+        """Returns the time the job got finished.
+
+        Args:
+            job_id: str. The id of the job.
+
+        Returns:
+            int? The time the job got finished.
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.time_finished_msec
 
     @classmethod
     def get_metadata(cls, job_id):
-        """Returns the metadata of the job."""
+        """Returns the metadata of the job.
+
+        Args:
+            job_id: str. The id of the job.
+
+        Returns:
+            str? The metadata of the job.
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.metadata
 
     @classmethod
     def get_output(cls, job_id):
-        """Returns the output of the job."""
+        """Returns the output of the job.
+
+        Args:
+            job_id: str. The id of the job.
+
+        Returns:
+            Depends on subclass. The output of the job.
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.output
 
     @classmethod
     def get_error(cls, job_id):
-        """Returns the error in the job."""
+        """Returns the error in the job.
+
+        Args:
+            job_id: str. The id of the job.
+
+        Returns:
+            str. The error in the job.
+        """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
         return model.error
@@ -692,7 +741,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         event logs.
 
         Returns:
-            bool. If job_queued_msec >= created_on_msec.
+            bool. Whether job was created before the entity was queued.
         """
         created_on_msec = utils.get_time_in_millisecs(entity.created_on)
         job_queued_msec = float(context.get().mapreduce_spec.mapper.params[
@@ -713,7 +762,14 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
     @classmethod
     def from_json(cls, input_shard_state):
-        """Returns JSON data as list."""
+        """Returns JSON data as list.
+
+        Args:
+            input_shard_state: ? TODO: Document.
+
+        Returns:
+            list of JSON data.
+        """
         return cls(input_readers.DatastoreInputReader.from_json(
             input_shard_state[cls._READER_LIST_PARAM]))
 
