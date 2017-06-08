@@ -141,7 +141,6 @@ oppia.factory('SimpleEditorManagerService', [
       changeQuestion: function(type,index) {
         // This change the type of question
 
-
       },
       canAddNewQuestion: function() {
         // Requirements:
