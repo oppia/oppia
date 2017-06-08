@@ -596,7 +596,6 @@ class BaseMapReduceJobManager(BaseJobManager):
          if you have keys that are of type unicode, you must yield
          "key.encode('utf-8')", rather than "key".
 
-
         Args:
             item: entity_class. single element of the type given by
                 entity_class(). TODO: make sure entity_class is a valid type.
@@ -858,6 +857,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
 class BaseContinuousComputationManager(object):
     """This class represents a manager for a continuously-running computation.
+
     Such computations consist of two parts: a batch job to compute summary
     views, and a realtime layer to augment these batch views with additional
     data that has come in since the last batch job results were computed. The
@@ -918,6 +918,7 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _get_batch_job_manager_class(cls):
         """Returns the manager class for the continuously-running batch job.
+
         See jobs_test.py for an example of how to do this.
         """
         raise NotImplementedError(
