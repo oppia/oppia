@@ -390,7 +390,7 @@
 	"I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "探索是很容易創造的。這些是基於個別學生的意見回饋和全世界上您的學習者體驗趨勢來反應出。",
 	"I18N_SPLASH_SITE_FEEDBACK": "網站回饋",
 	"I18N_SPLASH_SUBTITLE": "Oppia 讓創造互動式課程方面的教導、以及參與變得更容易。",
-	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia 讓您可<a href=\"/dashboard?mode=create\">創造</a>及<a href=\"/library\">分享</a>在廣泛學科裡的探索，一切都藉由您的想像來發揮。",
+	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia 讓您可<a href=\"/creator_dashboard?mode=create\">創造</a>及<a href=\"/library\">分享</a>在廣泛學科裡的探索，一切都藉由您的想像來發揮。",
 	"I18N_SPLASH_TITLE": "打破常規思考。",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "訂閱",
 	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_1": "<strong>歡迎任何人遊玩已發佈的探索並給予意見回饋。</strong>在大眾的幫助之下，我們可以持續改進網站上的課程並盡其可能使它們有效。",
