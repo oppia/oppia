@@ -106,7 +106,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The status of the training job. It can be either NEW, COMPLETE or PENDING
     status = ndb.StringProperty(required=True,
                                 choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
-                                default=feconf.TRAINING_JOB_STATUS_PENDING)
+                                default=feconf.TRAINING_JOB_STATUS_PENDING,
+                                indexed=True)
     # The training data which is to be populated when retrieving the job.
     # The list contains dicts where each dict represents a single training
     # data group.

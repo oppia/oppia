@@ -181,7 +181,7 @@ class TrainClassifierJobDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_training_job_dict = {
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
-            'algorithm_id': "LDAStringClassifier",
+            'algorithm_id': 'LDAStringClassifier',
             'exp_id': 'exp_id1',
             'exp_version_when_created': 1,
             'state_name': 'a state name',
@@ -221,7 +221,7 @@ class TrainClassifierJobDomainTests(test_utils.GenericTestBase):
             'exp_id': 'exp_id1',
             'exp_version_when_created': 1,
             'state_name': 'some state',
-            'algorithm_id': "LDAStringClassifier",
+            'algorithm_id': 'LDAStringClassifier',
             'training_data': training_data,
             'status': 'NEW'
         }
@@ -263,7 +263,7 @@ class TrainClassifierJobDomainTests(test_utils.GenericTestBase):
             training_job.validate()
 
         # Verify validation error is raised when dict is provided for list.
-        training_job_dict['algorithm_id'] = "LDAStringClassifier"
+        training_job_dict['algorithm_id'] = 'LDAStringClassifier'
         training_job_dict['training_data'] = {}
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
