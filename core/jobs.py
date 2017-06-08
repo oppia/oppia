@@ -331,7 +331,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            int? Status code of the job.
+            int? Status code of the job. TODO: verify type is correct.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -359,7 +359,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            int? The time the job got started.
+            int? The time the job got started. TODO: verify type is correct.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -373,7 +373,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            int? The time the job got finished.
+            int? The time the job got finished. TODO: verify type is correct.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -387,7 +387,7 @@ class BaseJobManager(object):
             job_id: str. The id of the job.
 
         Returns:
-            str? The metadata of the job.
+            str? The metadata of the job. TODO: verify type is correct.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -765,7 +765,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         """Returns JSON data as list.
 
         Args:
-            input_shard_state: ? TODO: Document.
+            input_shard_state: ? TODO: verify type is correct.
 
         Returns:
             list of JSON data.
