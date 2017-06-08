@@ -176,8 +176,6 @@ class BaseJobManager(object):
     def register_completion(cls, job_id, output_list):
         """Marks a job as completed.
 
-        TODO: Better description.
-
         Args:
             job_id: str. The id of the job.
             output_list: list(str). The output of the job.
