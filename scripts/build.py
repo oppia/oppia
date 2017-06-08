@@ -28,7 +28,9 @@ REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 
-FILE_EXTENSIONS_TO_IGNORE = ['.py']
+FILE_EXTENSIONS_TO_IGNORE = ('.py')
+FILE_EXTENSIONS_NOT_TO_RENAME = (
+    '.html', '.map', '.woff', '.ttf', '.woff2', '.eof', '.ico', '.txt')
 HASH_BLOCK_SIZE = 2**20
 
 def _minify(source_path, target_path):
@@ -47,13 +49,12 @@ def ensure_directory_exists(f):
 def process_html(filename, target, file_hashes):
     f = open(filename, 'r')
     content = f.read()
-
     for filepath, file_hash in file_hashes.iteritems():
         if filepath.endswith('.html'):
             continue
-        filepath_with_hash = filepath + "?v=" + file_hash
+        file_name, file_extension = os.path.splitext(filepath)
+        filepath_with_hash = file_name + '.' + file_hash + file_extension
         content = content.replace(filepath, filepath_with_hash)
-
     content = REMOVE_WS(' ', content)
     ensure_directory_exists(target)
     d = open(target, 'w+')
@@ -90,7 +91,7 @@ def build_minified_third_party_libs(output_directory):
         sys.exit(1)
 
 
-def copy_files_source_to_target(source, target):
+def copy_files_source_to_target(source, target, file_hashes):
     """Copies all files in source directory to target."""
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Copying into %s' % os.path.join(os.getcwd(), target)
@@ -107,8 +108,16 @@ def copy_files_source_to_target(source, target):
                 continue
             if source not in source_path:
                 continue
-            target_path = source_path.replace(
-                source, target)
+
+            target_path = source_path
+            relative_path = os.path.relpath(source_path, source)
+            if (relative_path in file_hashes and
+                    not filename.endswith(FILE_EXTENSIONS_NOT_TO_RENAME)):
+                file_name, file_extension = os.path.splitext(source_path)
+                target_path = (file_name + '.' + file_hashes[relative_path] +
+                               file_extension)
+
+            target_path = target_path.replace(source, target)
             ensure_directory_exists(target_path)
             shutil.copyfile(source_path, target_path)
 
@@ -195,43 +204,38 @@ def build_files(source, target, file_hashes):
 
 if __name__ == '__main__':
     hashes = dict() # pylint: disable=C0103
-    BUILD_DIR = os.path.join('build')
 
-    # os.path.dirname(path)(in ensure_directory_exists()) returns parent
-    # directory of a path passed as an argument to it. This is as intended
-    # for file paths, but for directory paths we do not want this to happen,
-    # hence we append a trailing slash to it.
-    # Process assets, copy it to build/[cache_slug]/assets
+    # Create hashes for assets, copy folders and files to build/assets
     ASSETS_SRC_DIR = os.path.join('assets', '')
-    ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
-    copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR)
-    hashes.update(get_file_hashes(ASSETS_OUT_DIR))
+    ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
+    #hashes.update(get_file_hashes(ASSETS_SRC_DIR))
+    copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR, hashes)
 
-    # Process third_party resources, copy it to
-    # build/[cache_slug]/third_party/generated
+    # Process third_party resources, create hashes for them and copy them into
+    # build/third_party/generated
+    THIRD_PARTY_GENERATED_PROD_DIR = os.path.join(
+        'third_party', 'generated', '')
     THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
-        BUILD_DIR, 'third_party', 'generated')
-    build_minified_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
-    hashes.update(get_file_hashes(THIRD_PARTY_GENERATED_OUT_DIR))
+        'build', 'third_party', 'generated', '')
+    build_minified_third_party_libs(THIRD_PARTY_GENERATED_PROD_DIR)
+    hashes.update(get_file_hashes(THIRD_PARTY_GENERATED_PROD_DIR))
+    copy_files_source_to_target(
+        THIRD_PARTY_GENERATED_PROD_DIR, THIRD_PARTY_GENERATED_OUT_DIR, hashes)
 
-    # Minify extension static resources, copy it to
-    # build/[cache_slug]/extensions
-    EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
-    EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
-    hashes.update(get_file_hashes(EXTENSIONS_SRC_DIR))
-    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, hashes)
+    # Minify extension static resources, create hashes for them and copy them
+    # into build/extensions
+    EXTENSIONS_DEV_DIR = os.path.join('extensions', '')
+    EXTENSIONS_PROD_DIR = os.path.join('extensions', 'prod', '')
+    EXTENSIONS_OUT_DIR = os.path.join('build', 'extensions', '')
+    hashes.update(get_file_hashes(EXTENSIONS_DEV_DIR))
+    build_files(EXTENSIONS_DEV_DIR, EXTENSIONS_PROD_DIR, hashes)
+    copy_files_source_to_target(EXTENSIONS_PROD_DIR, EXTENSIONS_OUT_DIR, hashes)
 
-    TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
-    TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
-    hashes.update(get_file_hashes(TEMPLATES_HEAD_DIR))
-    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR, hashes)
-
-    # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
-    CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
-    CSS_OUT_DIR = os.path.join(BUILD_DIR, 'css', '')
-    copy_files_source_to_target(CSS_SRC_DIR, CSS_OUT_DIR)
-
-    # Copy core/templates/prod/head/ to build/[cache_slug]/templates/head/
-    TEMPLATES_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
-    TEMPLATES_OUT_DIR = os.path.join(BUILD_DIR, 'templates', 'head', '')
-    copy_files_source_to_target(TEMPLATES_SRC_DIR, TEMPLATES_OUT_DIR)
+    # Minify all template files, create hashes for them and copy them
+    # into build/etemplates/head
+    TEMPLATES_DEV_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
+    TEMPLATES_PROD_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
+    TEMPLATES_OUT_DIR = os.path.join('build', 'templates', 'head', '')
+    hashes.update(get_file_hashes(TEMPLATES_DEV_DIR))
+    build_files(TEMPLATES_DEV_DIR, TEMPLATES_PROD_DIR, hashes)
+    copy_files_source_to_target(TEMPLATES_PROD_DIR, TEMPLATES_OUT_DIR, hashes)

@@ -62,7 +62,9 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
-DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
+DEPENDENCIES_DIR_PREFIX = 'build' if (IS_MINIFIED or not DEV_MODE) else ''
+DEPENDENCIES_TEMPLATES_DIR = (
+    os.path.join(DEPENDENCIES_DIR_PREFIX, 'extensions', 'dependencies'))
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(

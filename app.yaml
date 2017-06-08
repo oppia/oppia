@@ -49,8 +49,7 @@ handlers:
   application_readable: true
   http_headers:
     Cache-Control: 'public, max-age=60'
-- url: /css
-  # NB: not minified. TODO(sll): fix.
+- url: /templates/dev/head/css
   static_dir: core/templates/dev/head/css
   secure: always
 # Serve js scripts under core/templates/dev/head. This regex allows
