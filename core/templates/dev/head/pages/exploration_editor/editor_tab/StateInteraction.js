@@ -328,7 +328,7 @@ oppia.controller('StateInteraction', [
                 } else if (warningMessages.length === 1) {
                   return warningMessages[0];
                 } else {
-                  return '• ' + warningMessages.join('\n• ');
+                  return warningMessages.join(' ');
                 }
               }
 
