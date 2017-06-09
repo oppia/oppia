@@ -502,21 +502,18 @@ def get_user_role_from_id(user_id):
         return feconf.ROLE_GUEST
     return user_settings.role
 
+
 def get_usernames_by_role(role):
-    """Get usernames of all the users with given role.
+    """Get usernames of all the users with given roleId.
 
     Args:
-        role: str. The role of users requested.
+        role: str. The roleId of users requested.
 
     Returns:
-        dict. A dict with username as key and role as value.
+        list(str). List of usernames of users with given roleId.
     """
     user_settings = user_models.UserSettingsModel.get_by_role(role)
-    result = {
-        model.username: role
-        for model in user_settings.fetch()
-    }
-    return result
+    return [user.username for user in user_settings]
 
 
 def _save_user_settings(user_settings):

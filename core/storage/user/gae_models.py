@@ -103,13 +103,13 @@ class UserSettingsModel(base_models.BaseModel):
         """Returns user models with given role.
 
         Args:
-            role: str. Role of users.
+            role: str. The roleId that is being queried for.
 
         Returns:
             list(UserSettingsModel). The UserSettingsModel instances which
-            contain the same role.
+            have the given roleId.
         """
-        return cls.query(cls.role == role)
+        return cls.query(cls.role == role).fetch()
 
 
 class CompletedActivitiesModel(base_models.BaseModel):

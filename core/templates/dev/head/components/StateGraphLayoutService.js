@@ -34,7 +34,7 @@ oppia.factory('StateGraphLayoutService', [
       }
       for (var i = 0; i < links.length; i++) {
         if (links[i].source !== links[i].target &&
-           adjacencyLists[links[i].source].indexOf(links[i].target) === -1) {
+            adjacencyLists[links[i].source].indexOf(links[i].target) === -1) {
           adjacencyLists[links[i].source].push(links[i].target);
         }
       }

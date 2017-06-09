@@ -19,7 +19,7 @@
 oppia.directive('roleGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      restrict: 'A',
+      restrict: 'E',
       scope: {
         // A function returning an object with these keys:
         //  - 'nodes': An object whose keys are node ids and whose values are
@@ -34,7 +34,7 @@ oppia.directive('roleGraph', [
         //  - 'initStateId': The initial state id
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         //             (i.e., those whose interactions are terminal).
-        graphData: '&',
+        graphData: '=',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/roles_tab/' +
@@ -45,12 +45,12 @@ oppia.directive('roleGraph', [
         function(
             $scope, $element, $timeout, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
-          var redrawGraph = function() {
-            if ($scope.graphData()) {
+            var redrawGraph = function() {
+              if ($scope.graphData) {
               $scope.graphLoaded = false;
               $scope.drawGraph(
-                $scope.graphData().nodes, $scope.graphData().links,
-                $scope.graphData().initStateId, $scope.graphData().finalStateIds
+                $scope.graphData.nodes, $scope.graphData.links,
+                $scope.graphData.initStateId, $scope.graphData.finalStateIds
               );
 
               // Wait for the graph to finish loading before showing it again.
@@ -59,12 +59,12 @@ oppia.directive('roleGraph', [
               });
             }
           };
-
+        
           $scope.$on('redrawGraph', function() {
             redrawGraph();
           });
 
-          $scope.$watch('graphData()', redrawGraph, true);
+          $scope.$watch(function() {return $scope.graphData}, redrawGraph, true);
           $(window).resize(redrawGraph);
 
           // A rough upper bound for the width of a single letter, in pixels,

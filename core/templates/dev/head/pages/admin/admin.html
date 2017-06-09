@@ -27,8 +27,8 @@
         UNFINISHED_JOB_DATA: JSON.parse('{{unfinished_job_data|js_string}}'),
         RECENT_JOB_DATA: JSON.parse('{{recent_job_data|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
-        UPDATE_ROLE_OPTIONS: JSON.parse('{{update_role_options|js_string}}'),
-        VIEW_ROLE_OPTIONS: JSON.parse('{{view_role_options|js_string}}'),
+        UPDATABLE_ROLES: JSON.parse('{{updatable_roles|js_string}}'),
+        VIEWABLE_ROLES: JSON.parse('{{viewable_roles|js_string}}'),
         ROLE_GRAPH_DATA: JSON.parse('{{role_graph_data|js_string}}'),
       }
     </script>
@@ -66,7 +66,7 @@
       </admin-config-tab>
 
       <admin-roles-tab ng-if="isRolesTabOpen()"
-                        set-status-message="setStatusMessage">
+                       set-status-message="setStatusMessage">
       </admin-roles-tab>
 
       <admin-misc-tab ng-if="isMiscTabOpen()"
@@ -95,8 +95,6 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/roles_tab/RolesTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/roles_tab/RoleGraphDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/StateGraphLayoutService.js"></script>
-    <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/GraphEditor.js"></script>
-    <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/GraphPropertyEditor.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/misc_tab/AdminMiscTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>

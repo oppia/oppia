@@ -39,6 +39,24 @@ ACTION_UPDATE_FEATURED_ACTIVITIES = 'UPDATE_FEATURED_ACTIVITIES'
 ACTION_VIEW_COLLECTION_RIGHTS = 'VIEW_COLLECTION_RIGHTS'
 ACTION_VIEW_EXPLORATION_STATS = 'VIEW_EXPLORATION_STATS'
 
+# Users can be updated to the following list of roles via admin interface.
+UPDATABLE_ROLES = [
+    feconf.ROLE_ADMIN,
+    feconf.ROLE_BANNED_USER,
+    feconf.ROLE_COLLECTION_EDITOR,
+    feconf.ROLE_EXPLORATION_EDITOR,
+    feconf.ROLE_MODERATOR
+]
+
+# Users can be viewed by following list of roles via admin interface.
+VIEWABLE_ROLES = [
+    feconf.ROLE_ADMIN,
+    feconf.ROLE_BANNED_USER,
+    feconf.ROLE_COLLECTION_EDITOR,
+    feconf.ROLE_MODERATOR,
+    feconf.ROLE_SUPER_ADMIN
+]
+
 # This dict represents how the actions are inherited among different
 # roles in the site.
 #   key -> name of role
@@ -144,36 +162,6 @@ def get_all_actions(role):
     return list(set(role_actions))
 
 
-def get_updatable_roles():
-    """Returns roles to which a user's role can be updated by admin interface.
-
-    Returns:
-        dict. A dict of all roles that a user can be given by admin.
-            key -> roles in format as stored in backed.
-            value -> roles in format to show users.
-    """
-    updatable_roles = {}
-    for role in PARENT_ROLES:
-        if role not in [feconf.ROLE_GUEST]:
-            updatable_roles[role] = get_human_readable_role(role)
-    return updatable_roles
-
-
-def get_viewable_roles():
-    """Returns roles by which users can be searched in admin interface.
-
-    Returns:
-        dict. A dict of all roles by which user's can be searched.
-            key -> roles in format as stored in backend.
-            value -> roles in format to show users.
-    """
-    viewable_roles = {}
-    for role in PARENT_ROLES:
-        if role not in [feconf.ROLE_EXPLORATION_EDITOR, feconf.ROLE_GUEST]:
-            viewable_roles[role] = get_human_readable_role(role)
-    return viewable_roles
-
-
 def get_role_graph_data():
     """Returns dict for displaying roles graph.
 
@@ -201,7 +189,6 @@ def get_role_graph_data():
             is_parent.append(parent_role)
             link_info['source'] = parent_role
             link_info['target'] = role
-            link_info['isFallback'] = False
             role_graph['links'].append(link_info)
 
     role_graph['finalStateIds'] = [
