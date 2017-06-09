@@ -212,7 +212,7 @@ class ClassifierTrainingJob(object):
 
     def __init__(self, job_id, algorithm_id, exp_id, exp_version_when_created,
                  state_name, status, training_data):
-        """Constructs a TrainClassiferJob domain object.
+        """Constructs a ClassifierTrainingJob domain object.
 
         Args:
         job_id: str. The unique id of the classifier training job.
@@ -326,8 +326,6 @@ class ClassifierTrainingJob(object):
             raise utils.ValidationError(
                 'Expected algorithm_id to be a string, received %s' %
                 self.algorithm_id)
-        utils.require_valid_name(
-            self.algorithm_id, 'the algorithm id')
 
         algorithm_ids = [
             classifier_details['algorithm_id'] for classifier_details in

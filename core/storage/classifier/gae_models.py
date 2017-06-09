@@ -100,9 +100,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The exploration_id of the exploration to whose state the model belongs.
     exp_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration version at the time this training job was created.
-    exp_version_when_created = ndb.IntegerProperty(required=True)
+    exp_version_when_created = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True)
+    state_name = ndb.StringProperty(required=True, indexed=True)
     # The status of the training job. It can be either NEW, COMPLETE or PENDING
     status = ndb.StringProperty(required=True,
                                 choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,

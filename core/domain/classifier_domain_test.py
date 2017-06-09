@@ -163,8 +163,8 @@ class ClassifierDataDomainTests(test_utils.GenericTestBase):
             classifier.validate()
 
 
-class TrainClassifierJobDomainTests(test_utils.GenericTestBase):
-    """Test the TrainClassifierJob domain."""
+class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
+    """Test the ClassifierTrainingJob domain."""
 
     def _get_training_job_from_dict(self, training_job_dict):
         training_job = classifier_domain.ClassifierTrainingJob(
@@ -203,7 +203,7 @@ class TrainClassifierJobDomainTests(test_utils.GenericTestBase):
                              observed_training_job.to_dict())
 
     def test_validation(self):
-        """Tests to verify validate method of TrainClassifierJob domain."""
+        """Tests to verify validate method of ClassifierTrainingJob domain."""
 
         # Verify no errors are raised for correct data.
         training_data = [
