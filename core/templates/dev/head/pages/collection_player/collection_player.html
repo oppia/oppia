@@ -133,8 +133,16 @@
                  y="100"
                  height="100"
                  width="100"
-                 ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here.svg')]>" 
+                 ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>" 
                  xlink:href=""></image>
+          <text ng-if="!collectionPlaythrough.hasStartedCollection()" 
+                x="200"
+                y="155"
+                alignment-baseline="middle"
+                font-family="Capriola, Roboto, Arial, sans-serif"
+                font-size="20"
+                fill="#E14738"
+                text-anchor="middle">Start Here!</text>
         </svg>
 
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-mascot">
@@ -220,13 +228,21 @@
                  version="1.1"
                  style="position: absolute; left: 50%; transform: translate(-50%, 195px);"
                  ng-click="scrollToLocation('mobile-path-anchor-' + $index); updateExplorationPreview(node.getExplorationId());">
-              <image ng-if="!collectionPlaythrough.hasStartedCollection() && $index===0" 
-                     x="0"
+              <image ng-if="!collectionPlaythrough.hasStartedCollection() && $index===0"
+                     x="4"
                      y="90"
                      height="80"
                      width="80"
-                     ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here.svg')]>" 
+                     ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>" 
                      xlink:href=""></image>
+              <text ng-if="!collectionPlaythrough.hasStartedCollection() && $index===0"
+                    x="34"
+                    y="137"
+                    alignment-baseline="middle"
+                    font-family="Capriola, Roboto, Arial, sans-serif"
+                    font-size="12"
+                    fill="#E14738"
+                    text-anchor="middle">Start Here!</text>
               <defs>
                 <pattern id="image0<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
                   <circle cx="50"
