@@ -156,7 +156,7 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The id of the job.
-            metadata: str or None. The metadata of the job.
+            metadata: str or None. Additional metadata of the job.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -1330,12 +1330,12 @@ def get_continuous_computations_info(cc_classes):
         has the following keys:
           - computation_type: str. The type of the computation.
           - status_code: str. The current status of the computation.
-          - last_started_msec: float or None. when a batch job for the computation
-                was last started, in milliseconds since the epoch.
+          - last_started_msec: float or None. when a batch job for the
+                computation was last started, in milliseconds since the epoch.
           - last_finished_msec: float or None. when a batch job for the
                 computation last finished, in milliseconds since the epoch.
-          - last_stopped_msec: float or None. When a batch job for the computation
-                was last stopped, in milliseconds since the epoch.
+          - last_stopped_msec: float or None. When a batch job for the
+                computation was last stopped, in milliseconds since the epoch.
           - active_realtime_layer_index: int or None. the index of the active
                 realtime layer.
           - is_startable: bool. whether an admin should be allowed to start this
