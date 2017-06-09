@@ -763,7 +763,8 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         """Returns JSON data as list.
 
         Args:
-            input_shard_state: ? TODO: verify type is correct.
+            input_shard_state: dict(str : str). Must contain the information to
+                be transformed into mapreduce.input_readers.DatastoreInput.
 
         Returns:
             list of JSON data.
