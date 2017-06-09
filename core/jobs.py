@@ -662,7 +662,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         dereference it later to load content as needed).
 
         This code can assume that it is the only process handling values for the
-        given key. 
+        given key.
 
         TODO: Verify whether it can also assume that it will be called exactly
         once for each key with all of the output.
@@ -670,7 +670,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         Args:
             key: A key value as emitted from the map() function, above.
             values: A list of all values from all mappers that were tagged with
-                the given key. 
+                the given key.
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement '
