@@ -117,9 +117,18 @@ oppia.directive('schemaBasedUnicodeEditor', [
               $filter('convertUnicodeWithParamsToHtml')($scope.localValue));
           };
 
+          var textBoxSelectedCounter = 0;
+          $scope.onInputFocus = function() {
+            textBoxSelectedCounter += 1;
+            if ($scope.helperMessageIsShown) {
+              $scope.helperMessageIsShown = false;
+            }
+          };
+
           $scope.helperMessageIsShown = false;
           $timeout(function() {
-            if (deviceInfoService.hasTouchEvents()) {
+            if (deviceInfoService.hasTouchEvents() && (
+                textBoxSelectedCounter == 1)) {
               $scope.helperMessageIsShown = true;
             }
           }, 1000);
