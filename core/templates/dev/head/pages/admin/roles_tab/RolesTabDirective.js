@@ -32,7 +32,10 @@ oppia.directive('adminRolesTab', [
       controller: ['$scope', function($scope) {
         $scope.UPDATABLE_ROLES = GLOBALS.UPDATABLE_ROLES;
         $scope.VIEWABLE_ROLES = GLOBALS.VIEWABLE_ROLES;
-        $scope.graphData = GLOBALS.ROLE_GRAPH_DATA;
+        $scope.graphData = function() {
+          return GLOBALS.ROLE_GRAPH_DATA;
+        }
+        console.log($scope.graphData().links);
         $scope.showResultRoles = false;
         $scope.result = {};
         $scope.setStatusMessage('');

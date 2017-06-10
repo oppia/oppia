@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing static role graph.
+ * @fileoverview Directive for the state graph visualization.
  */
 
 oppia.directive('roleGraph', [
@@ -35,6 +35,25 @@ oppia.directive('roleGraph', [
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         //             (i.e., those whose interactions are terminal).
         graphData: '=',
+        // Id of a second initial state, which will be styled as an initial
+        // state
+        initStateId2: '=',
+        // Object which maps linkProperty to a style
+        linkPropertyMapping: '=',
+        // Object whose keys are node ids and whose values are node colors
+        nodeColors: '=',
+        // A value which is the color of all nodes
+        nodeFill: '@',
+        // Object whose keys are node ids with secondary labels and whose
+        // values are secondary labels. If this is undefined, it means no nodes
+        // have secondary labels.
+        nodeSecondaryLabels: '=',
+        // Function called when node is clicked. Should take a parameter
+        // node.id.
+        onClickFunction: '=',
+        // Object whose keys are ids of nodes, and whose values are the
+        // corresponding node opacities.
+        opacityMap: '=',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/roles_tab/' +
@@ -45,12 +64,14 @@ oppia.directive('roleGraph', [
         function(
             $scope, $element, $timeout, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
-            var redrawGraph = function() {
-              if ($scope.graphData) {
+          var redrawGraph = function() {
+            console.log($scope.graphData().nodes);
+            if ($scope.graphData()) {
               $scope.graphLoaded = false;
+              console.log($scope.graphData().links);
               $scope.drawGraph(
-                $scope.graphData.nodes, $scope.graphData.links,
-                $scope.graphData.initStateId, $scope.graphData.finalStateIds
+                $scope.graphData().nodes, $scope.graphData().links,
+                $scope.graphData().initStateId, $scope.graphData().finalStateIds
               );
 
               // Wait for the graph to finish loading before showing it again.
@@ -59,12 +80,15 @@ oppia.directive('roleGraph', [
               });
             }
           };
-        
+
           $scope.$on('redrawGraph', function() {
             redrawGraph();
           });
 
-          $scope.$watch(function() {return $scope.graphData}, redrawGraph, true);
+          $scope.$watch('graphData()', redrawGraph, true);
+          // If statistics for a different version of the exploration are
+          // loaded, this may change the opacities of the nodes.
+          $scope.$watch('opacityMap', redrawGraph);
           $(window).resize(redrawGraph);
 
           // A rough upper bound for the width of a single letter, in pixels,
@@ -222,26 +246,84 @@ oppia.directive('roleGraph', [
                 $scope.augmentedLinks[i].d = (
                   'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
                   ' ' + endx + ' ' + endy);
+
+                // Style links if link properties and style mappings are
+                // provided
+                if (links[i].hasOwnProperty('linkProperty') &&
+                    $scope.linkPropertyMapping) {
+                  if ($scope.linkPropertyMapping.hasOwnProperty(
+                        links[i].linkProperty)) {
+                    $scope.augmentedLinks[i].style = (
+                      $scope.linkPropertyMapping[links[i].linkProperty]);
+                  }
+                }
               }
             }
 
-            var nodeStrokeWidth = 1;
-            var nodeFillOpacity = 0.5;
-            var nodeFillColor = 'white';
+            var nodeStrokeWidth = '1';
+
+            var getNodeFillOpacity = function(nodeId) {
+              return $scope.opacityMap ? $scope.opacityMap[nodeId] : 0.5;
+            };
+
+            $scope.getNodeTitle = function(node) {
+              var tooltip = node.label;
+              if (node.hasOwnProperty('secondaryLabel')) {
+                tooltip += ' ' + node.secondaryLabel;
+              }
+              return tooltip;
+            };
+
+            $scope.canNavigateToNode = function(nodeId) {
+              //return nodeId !== $scope.currentStateId();
+              return true;
+            };
+
+            $scope.getTruncatedLabel = function(nodeLabel) {
+              return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
+            };
 
             // Update the nodes.
             $scope.nodeList = [];
             for (var nodeId in nodeData) {
               nodeData[nodeId].style = (
                 'stroke-width: ' + nodeStrokeWidth + '; ' +
-                'fill-opacity: ' + nodeFillOpacity + ';' +
-                'fill: ' + nodeFillColor + '; ');
+                'fill-opacity: ' + getNodeFillOpacity(nodeId) + ';');
+
+              if ($scope.nodeFill) {
+                nodeData[nodeId].style += ('fill: ' + $scope.nodeFill + '; ');
+              }
+
+              // Color nodes
+              if ($scope.nodeColors) {
+                nodeData[nodeId].style += (
+                  'fill: ' + $scope.nodeColors[nodeId] + '; ');
+              }
+
+              // Add secondary label if it exists
+              if ($scope.nodeSecondaryLabels) {
+                if ($scope.nodeSecondaryLabels.hasOwnProperty(nodeId)) {
+                  nodeData[nodeId].secondaryLabel = (
+                    $scope.nodeSecondaryLabels[nodeId]);
+                  nodeData[nodeId].height *= 1.1;
+                }
+              }
+
+              var currentNodeIsTerminal = (
+                $scope.finalStateIds.indexOf(nodeId) !== -1);
+
+              nodeData[nodeId].nodeClass = (
+                // currentNodeIsTerminal ? 'terminal-node' :
+                // nodeId === $scope.currentStateId() ? 'current-node' :
+                // nodeId === initStateId ? 'init-node' :
+                // !(nodeData[nodeId].reachable &&
+                //  nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
+                                                       'normal-node');
 
               $scope.nodeList.push(nodeData[nodeId]);
             }
 
             // The translation applied when the graph is first loaded.
-            var origTranslations = [0, 0];
             $scope.overallTransformStr = 'translate(0,0)';
             $scope.innerTransformStr = 'translate(0,0)';
           };
