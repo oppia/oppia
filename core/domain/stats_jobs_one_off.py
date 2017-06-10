@@ -271,10 +271,10 @@ class AnswerModelInteractionConsistencyJob(jobs.BaseMapReduceJobManager):
         interaction_ids = set()
         for stringified_value in stringified_values:
             value_dict = ast.literal_eval(stringified_value)
-            interaction_ids.update(value_dict['interaction_id'])
+            interaction_ids.add(value_dict['interaction_id'])
         if len(interaction_ids) != 1:
             yield (
-                'Expected exploration %d (version %d) and state %d pair to '
+                'Expected exploration %s (version %s) and state %s pair to '
                 'only have 1 interaction ID, but found: %s' % (
                     exploration_id, exploration_version, state_name,
                     interaction_ids))
