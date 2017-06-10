@@ -15,8 +15,6 @@
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-
-// TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithLabelsEditor', [
   '$sce', '$compile', 'alertsService', '$document', 'explorationContextService',
   'OBJECT_EDITOR_URL_PREFIX',

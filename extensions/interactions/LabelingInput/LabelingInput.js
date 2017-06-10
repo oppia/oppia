@@ -64,7 +64,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.correctElements = [];
           $scope.incorrectElements = [];
           $scope.incorrectBoxes = [];
-          $scope.currentDraggedElement = "";
+          $scope.currentDraggedElement = '';
           $scope.currentlyHoveredRegions = [];
           /* Shuffle function to shuffle array to ensure random word bank
           Borrowed from:
@@ -79,11 +79,20 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               }
           }
           $scope.allRegions = imageAndLabels.labeledRegions;
-          $scope.regionsAndBonus = $scope.allRegions.map(function (x){return x.label;}).concat($scope.bonusWords);
-          $scope.regionsAndBonus = $scope.regionsAndBonus.filter(function (x){return x != "";});
+
+          $scope.regionsAndBonus = $scope.allRegions.map(
+            function (x){
+              return x.label;
+          }).concat($scope.bonusWords);
+
+          $scope.regionsAndBonus = $scope.regionsAndBonus.filter(
+            function (x){
+              return x != '';
+          });
           $scope.shuffle($scope.allRegions);
           $scope.shuffle($scope.regionsAndBonus);
           $scope.numRegions = $scope.allRegions.length;
+
           //Ensure no duplicates of elements in our element tracking arrays
           $scope.checkAndRemoveElement = function(name){
             var index = $scope.correctElements.indexOf(name);
@@ -97,6 +106,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             }
             return;
           }
+          //Change the button color based on whether or not it is correct
           $scope.getButtonColor = function(name){
             if (!$scope.submitted){
               return 'primary';
@@ -146,6 +156,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               $scope.runSubmitCheck();
             }
           }
+          //Find where the drop region should be placed
           $scope.getRegionDimensions = function(index) {
             var image = $($element).find('.oppia-image-click-img');
             var labeledRegion = imageAndLabels.labeledRegions[index];
@@ -169,6 +180,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.inlineRegionDisplay = function(){
             return 'inline';
           }
+          //Get the dimensions of the image
           $scope.getImageWidth = function(){
             var image = $($element).find('.oppia-image-click-img');
             return image.width();
