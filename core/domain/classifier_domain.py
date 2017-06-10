@@ -192,7 +192,7 @@ class ClassifierTrainingJob(object):
         state_name: str. The name of the state for which the classifier will be
             generated.
         status: str. The status of the training job request. This can be either
-            PENDING (default value) or COMPLETE.
+            NEW (default value), FAILED, PENDING or COMPLETE.
         training_data: list(dict). The training data that is used for training
             the classifier. This field is populated lazily when the job request
             is picked up by the VM. The list contains dicts where each dict
