@@ -129,7 +129,7 @@ class BaseJobManager(object):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
             additional_job_params: dict(str : int) or None. Additional
                 parameters on jobs.
         """
@@ -155,7 +155,7 @@ class BaseJobManager(object):
         """Marks job as started.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
             metadata: str or None. Additional metadata of the job.
         """
         model = job_models.JobModel.get(job_id, strict=True)
@@ -177,7 +177,7 @@ class BaseJobManager(object):
         """Marks a job as completed.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
             output_list: list(str). The output of the job.
         """
         _MAX_OUTPUT_LENGTH_CHARS = 900000
@@ -225,7 +225,7 @@ class BaseJobManager(object):
         """Marks a job as completed.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
             error: str. The error to be raised of the job.
         """
         # Ensure that preconditions are met.
@@ -246,7 +246,7 @@ class BaseJobManager(object):
         """Marks a job as canceled.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
             user_id: str. The id of the user.
         """
         # Ensure that preconditions are met.
@@ -272,7 +272,7 @@ class BaseJobManager(object):
         """Returns if job is still active.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
 
         Returns:
             bool. If the job is active or not.
@@ -286,7 +286,7 @@ class BaseJobManager(object):
         """Returns if job has finished.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
 
         Returns:
             bool. If the job has finished or not.
@@ -300,7 +300,7 @@ class BaseJobManager(object):
         """Cancel all queued or started jobs of this job type.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
         """
         unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
             cls.__name__)
@@ -314,7 +314,7 @@ class BaseJobManager(object):
         Must be implemented by subclasses.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
             additional_job_params: dict(str : int). Additional parameters on
                 jobs.
         """
@@ -326,7 +326,7 @@ class BaseJobManager(object):
         """Returns the status code of the the job.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
 
         Returns:
             str. Status code of the job.
@@ -340,7 +340,7 @@ class BaseJobManager(object):
         """Returns the time the job got queued.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
 
         Returns:
             float. the time the job got queued.
@@ -354,7 +354,7 @@ class BaseJobManager(object):
         """Returns the time the job got started.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
 
         Returns:
             float. The time the job got started.
@@ -368,7 +368,7 @@ class BaseJobManager(object):
         """Returns the time the job got finished.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
 
         Returns:
             float. The time the job got finished.
@@ -382,7 +382,7 @@ class BaseJobManager(object):
         """Returns the metadata of the job.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
 
         Returns:
             str. The metadata of the job.
@@ -396,7 +396,7 @@ class BaseJobManager(object):
         """Returns the output of the job.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
 
         Returns:
             Depends on subclass. The output of the job.
@@ -410,7 +410,7 @@ class BaseJobManager(object):
         """Returns the error in the job.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
 
         Returns:
             str. The error in the job.
@@ -425,7 +425,7 @@ class BaseJobManager(object):
         """Asserts if the transition of the job status code is valid.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
             old_status_code: str. Old status code.
             new_status_code: str. New status code.
 
@@ -497,7 +497,7 @@ class BaseDeferredJobManager(BaseJobManager):
         """Starts the job.
 
         Args:
-            job_id: str. The id of the job.
+            job_id: str. Assumed to be unique.
             additional_job_params: dict(str : int). Additional parameters on
                 job.
 
