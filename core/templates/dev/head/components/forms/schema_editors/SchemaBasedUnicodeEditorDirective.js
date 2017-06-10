@@ -33,8 +33,8 @@ oppia.directive('schemaBasedUnicodeEditor', [
         'schema_based_unicode_editor_directive.html'),
       restrict: 'E',
       controller: [
-        '$scope', '$filter', '$sce', '$timeout',
-        function($scope, $filter, $sce, $timeout) {
+        '$scope', '$filter', '$sce', '$timeout', 'deviceInfoService',
+        function($scope, $filter, $sce, $timeout, deviceInfoService) {
           if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
             // Flag that is flipped each time the codemirror view is
             // shown. (The codemirror instance needs to be refreshed
@@ -119,8 +119,10 @@ oppia.directive('schemaBasedUnicodeEditor', [
 
           $scope.helperMessageIsShown = false;
           $timeout(function() {
-            $scope.helperMessageIsShown = true;
-          }, 10000);
+            if (deviceInfoService.hasTouchEvents()) {
+              $scope.helperMessageIsShown = true;
+            }
+          }, 1000);
         }
       ]
     };
