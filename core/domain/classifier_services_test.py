@@ -178,7 +178,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the get_classifier_training_job_by_id method."""
 
         with self.assertRaisesRegexp(Exception, (
-            "Entity for class ClassifierTrainingJobModel with id fake_id not found")):
+            'Entity for class ClassifierTrainingJobModel with id fake_id'
+            'not found')):
             classifier_services.get_classifier_training_job_by_id('fake_id')
 
         exp_id = u'1'
@@ -196,7 +197,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the delete_classifier_training_job method."""
 
         with self.assertRaisesRegexp(Exception, (
-            "Entity for class ClassifierTrainingJobModel with id fake_id not found")):
+            'Entity for class ClassifierTrainingJobModel with id fake_id'
+            'not found')):
             classifier_services.get_classifier_training_job_by_id('fake_id')
 
         exp_id = u'1'
@@ -206,7 +208,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             exp_id, 1, [], state_name)
         classifier_services.delete_classifier_training_job(job_id)
         with self.assertRaisesRegexp(Exception, (
-            "Entity for class ClassifierTrainingJobModel with id %s not found" %(
+            'Entity for class ClassifierTrainingJobModel'
+            'with id %s not found' %(
                 job_id))):
             classifier_services.get_classifier_training_job_by_id(job_id)
 
