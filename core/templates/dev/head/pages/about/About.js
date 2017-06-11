@@ -23,13 +23,13 @@ oppia.controller('About', [
     var hash = window.location.hash.slice(1);
     var visibleContent = 'oppia-about-visible-content';
 
-    var activateTab = function activateTab(tabName) {
-      $("a[href='" + tabName + "']").parent().addClass(
+    var activateTab = function(tabName) {
+      $("a[id='" + tabName + "']").parent().addClass(
         activeTabClass
       ).siblings().removeClass(activeTabClass);
       $('.' + tabName).addClass(visibleContent).siblings().removeClass(
         visibleContent);
-    }
+    };
 
     if (hash === 'foundation' || hash === 'license') {
       activateTab('foundation');
@@ -58,16 +58,6 @@ oppia.controller('About', [
       }
     };
 
-    $('.oppia-about-tabs li').on('click', function(evt) {
-      evt.preventDefault();
-      $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
-      var currentAttrVal = $(this).children('a').attr('href');
-      // Update hash
-      window.location.hash = '#' + currentAttrVal;
-      $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(
-        visibleContent);
-    });
-
     var listOfNamesToThank = ['Alex Kauffmann', 'Allison Barros',
                               'Amy Latten', 'Brett Barros',
                               'Crystal Kwok', 'Daniel Hernandez',
@@ -82,6 +72,12 @@ oppia.controller('About', [
                               'Robyn Choo', 'Tricia Ngoon',
                               'Vikrant Nanda', 'Vinamrata Singal',
                               'Yarin Feigenbaum'];
+
+    $scope.onAboutOppiaClick = function(pageName) {
+      // Update hash
+      window.location.hash = '#' + pageName;
+      activateTab(pageName);
+    }
     $scope.listOfNames = listOfNamesToThank
       .slice(0, listOfNamesToThank.length - 1).join(', ') +
       ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];

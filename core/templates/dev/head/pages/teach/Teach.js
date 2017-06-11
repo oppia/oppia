@@ -26,14 +26,14 @@ oppia.controller('Teach', [
     var hash = window.location.hash.slice(1);
     var visibleContent = 'oppia-about-visible-content';
 
-    var activateTab = function activateTab(tabName) {
-      $("a[name='" + tabName + "']").parent().addClass(
+    var activateTab = function(tabName) {
+      $("a[id='" + tabName + "']").parent().addClass(
         activeTabClass
       ).siblings().removeClass(activeTabClass);
       $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-        visibleConten
+        visibleContent
       );
-    }
+    };
 
     if (hash === 'teach') {
       activateTab('teach');
@@ -50,16 +50,11 @@ oppia.controller('Teach', [
       }
     };
 
-    $('.oppia-about-tabs li').on('click', function(evt) {
-      evt.preventDefault();
-      $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
-      var currentAttrVal = $(this).children('a').attr('href');
+    $scope.onOppiaTeachClick = function(pageName) {
       // Update hash
-      window.location.hash = '#' + currentAttrVal;
-      $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(
-        visibleContent
-      );
-    });
+      window.location.hash = '#' + pageName;
+      activateTab(pageName);
+    };
 
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
