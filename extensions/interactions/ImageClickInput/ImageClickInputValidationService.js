@@ -32,6 +32,9 @@ oppia.factory('ImageClickInputValidationService', [
             type: WARNING_TYPES.CRITICAL,
             message: 'Please add an image for the learner to click on.'
           });
+          // If there is no image specified, further warnings don't really
+          // apply.
+          return warningsList;
         }
 
         var areAnyRegionStringsEmpty = false;
@@ -40,7 +43,7 @@ oppia.factory('ImageClickInputValidationService', [
         if (imgAndRegionArgValue.labeledRegions.length == 0) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
-            message: 'Please specify at least one image region to click on.'
+            message: 'Please specify at least one region in the image.'
           });
         }
 
@@ -55,8 +58,7 @@ oppia.factory('ImageClickInputValidationService', [
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
               message: (
-                'The image region strings should consist of characters from ' +
-                '[A-Za-z0-9].')
+                'The region labels should consist of alphanumeric characters.')
             });
           } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
             areAnyRegionStringsDuplicated = true;
@@ -68,13 +70,13 @@ oppia.factory('ImageClickInputValidationService', [
         if (areAnyRegionStringsEmpty) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
-            message: 'Please ensure the image region strings are nonempty.'
+            message: 'Please ensure the region labels are nonempty.'
           });
         }
         if (areAnyRegionStringsDuplicated) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
-            message: 'Please ensure the image region strings are unique.'
+            message: 'Please ensure the region labels are unique.'
           });
         }
         return warningsList;
