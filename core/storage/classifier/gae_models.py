@@ -17,8 +17,10 @@
 from core.platform import models
 
 import feconf
+import utils
 
 from google.appengine.ext import ndb
+
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -82,4 +84,93 @@ class ClassifierDataModel(base_models.BaseModel):
             data_schema_version=data_schema_version)
 
         classifier_data_model_instance.put()
+        return instance_id
+
+
+class ClassifierTrainingJobModel(base_models.BaseModel):
+    """Model for storing classifier training jobs.
+
+    The id of instances of this class has the form
+    {{exp_id}}.{{random_hash_of_16_chars}}
+    """
+
+    # The ID of the algorithm used to create the model.
+    algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES,
+                                      indexed=True)
+    # The exploration_id of the exploration to whose state the model belongs.
+    exp_id = ndb.StringProperty(required=True, indexed=True)
+    # The exploration version at the time this training job was created.
+    exp_version_when_created = ndb.IntegerProperty(required=True, indexed=True)
+    # The name of the state to which the model belongs.
+    state_name = ndb.StringProperty(required=True, indexed=True)
+    # The status of the training job. It can be either NEW, COMPLETE or PENDING
+    status = ndb.StringProperty(required=True,
+                                choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
+                                default=feconf.TRAINING_JOB_STATUS_PENDING,
+                                indexed=True)
+    # The training data which is to be populated when retrieving the job.
+    # The list contains dicts where each dict represents a single training
+    # data group.
+    training_data = ndb.JsonProperty(default=None)
+
+    @classmethod
+    def _generate_id(cls, exp_id):
+        """Generates a unique id for the training job of the form
+        {{exp_id}}.{{random_hash_of_16_chars}}
+
+        Args:
+            exp_id: str. ID of the exploration.
+
+        Returns:
+            ID of the new ClassifierTrainingJobModel instance.
+
+        Raises:
+            Exception: The id generator for ClassifierTrainingJobModel is
+            producing too many collisions.
+        """
+
+        for _ in range(base_models.MAX_RETRIES):
+            new_id = '%s.%s' % (
+                exp_id,
+                utils.convert_to_hash(
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    base_models.ID_LENGTH))
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception(
+            'The id generator for ClassifierTrainingJobModel is producing '
+            'too many collisions.')
+
+    @classmethod
+    def create(
+            cls, algorithm_id, exp_id, exp_version_when_created, training_data,
+            state_name, status=feconf.TRAINING_JOB_STATUS_NEW):
+        """Creates a new ClassifierTrainingJobModel entry.
+
+        Args:
+            algorithm_id: str. ID of the algorithm used to generate the model.
+            exp_id: str. ID of the exploration.
+            exp_version_when_created: int. The exploration version at the time
+                this training job was created.
+            state_name: str. The name of the state to which the classifier
+                belongs.
+            status: str. The status of the training job (NEW by default).
+            training_data: dict. The data used in training phase.
+
+        Returns:
+            ID of the new ClassifierModel entry.
+
+        Raises:
+            Exception: A model with the same ID already exists.
+        """
+
+        instance_id = cls._generate_id(exp_id)
+        training_job_instance = cls(
+            id=instance_id, algorithm_id=algorithm_id, exp_id=exp_id,
+            exp_version_when_created=exp_version_when_created,
+            state_name=state_name, status=status, training_data=training_data
+            )
+
+        training_job_instance.put()
         return instance_id

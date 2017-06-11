@@ -16,6 +16,7 @@
 
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
@@ -52,3 +53,40 @@ class ClassifierDataModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
         self.assertEqual(classifier.classifier_data, {'alpha': 1.0})
         self.assertEqual(classifier.data_schema_version, 1)
+
+
+class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
+    """Test the ClassifierTrainingJobModel class."""
+
+    def setUp(self):
+        super(ClassifierTrainingJobModelUnitTests, self).setUp()
+        classifier_models.ClassifierTrainingJobModel.create(
+            'LDAStringClassifier', 'exp_id1', 1,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name1')
+        classifier_models.ClassifierTrainingJobModel.create(
+            'LDAStringClassifier', 'exp_id2', 2,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name1')
+        classifier_models.ClassifierTrainingJobModel.create(
+            'LDAStringClassifier', 'exp_id3', 3,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name1')
+
+    def test_create_and_get_new_training_job_runs_successfully(self):
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            'LDAStringClassifier', 'exp_id1', 1,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name2')
+
+        training_job = (
+            classifier_models.ClassifierTrainingJobModel.get(job_id))
+
+        self.assertEqual(training_job.algorithm_id, 'LDAStringClassifier')
+        self.assertEqual(training_job.exp_id, 'exp_id1')
+        self.assertEqual(training_job.exp_version_when_created, 1)
+        self.assertEqual(training_job.state_name, 'state_name2')
+        self.assertEqual(training_job.status,
+                         feconf.TRAINING_JOB_STATUS_NEW)
+        self.assertEqual(training_job.training_data,
+                         [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
