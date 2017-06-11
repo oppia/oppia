@@ -264,6 +264,11 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'params': {}
         }])
 
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(sample_answers, ['first answer'])
+
     def test_record_and_retrieve_single_answer(self):
         state_answers = stats_services.get_state_answers(
             self.EXP_ID, self.exploration.version,
@@ -296,6 +301,11 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': {}
         }])
+
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(sample_answers, ['some text'])
 
     def test_record_and_retrieve_single_answer_with_preexisting_entry(self):
         stats_services.record_answer(
@@ -355,6 +365,11 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': {}
         }])
+
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(sample_answers, ['first answer', 'some text'])
 
     def test_record_many_answers(self):
         state_answers = stats_services.get_state_answers(
@@ -416,6 +431,12 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'params': {}
         }])
 
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(sample_answers, [
+            'answer a', 'answer ccc', 'answer bbbbb'])
+
     def test_record_answers_exceeding_one_shard(self):
         # Use a smaller max answer list size so less answers are needed to
         # exceed a shard.
@@ -465,6 +486,11 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             self.assertEqual(state_answers.interaction_id, 'TextInput')
             self.assertEqual(
                 len(state_answers.get_submitted_answer_dict_list()), 600)
+
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertLess(len(sample_answers), 600)
 
     def test_record_many_answers_with_preexisting_entry(self):
         stats_services.record_answer(
@@ -551,3 +577,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': {}
         }])
+
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(sample_answers, [
+            '1 answer', 'answer aaa', 'answer ccccc', 'answer bbbbbbb'])

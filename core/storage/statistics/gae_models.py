@@ -533,6 +533,27 @@ class StateAnswersModel(base_models.BaseModel):
         return cls.get(entity_id, strict=False)
 
     @classmethod
+    def get_master_model(cls, exploration_id, exploration_version, state_name):
+        """Retrieves the master model associated with the specific exploration
+        state. Returns None if no answers have yet been submitted to the
+        specified exploration state.
+
+        Args:
+            exploration_id: str. The exploration ID.
+            exploration_version: int. The version of the exploration to fetch
+                answers for.
+            state_name: str. The name of the state to fetch answers for.
+
+        Returns:
+            StateAnswersModel|None. The master model associated with the
+            specified exploration state, or None if no answers have been
+            submitted to this state.
+        """
+        main_shard = cls._get_model(
+            exploration_id, exploration_version, state_name, 0)
+        return main_shard if main_shard else None
+
+    @classmethod
     def get_all_models(cls, exploration_id, exploration_version, state_name):
         """Retrieves all models and shards associated with the specific
         exploration state. Returns None if no answers have yet been submitted to
@@ -544,8 +565,8 @@ class StateAnswersModel(base_models.BaseModel):
         # shard is added after the master shard is retrieved, it will simply be
         # ignored in the result of this function. It will be included during the
         # next call.
-        main_shard = cls._get_model(
-            exploration_id, exploration_version, state_name, 0)
+        main_shard = cls.get_master_model(
+            exploration_id, exploration_version, state_name)
 
         if main_shard:
             all_models = [main_shard]
@@ -559,40 +580,6 @@ class StateAnswersModel(base_models.BaseModel):
             return all_models
         else:
             return None
-
-    @classmethod
-    def fetch_answers(
-            cls, exploration_id, exploration_version, state_name, limit):
-        """Fetches at most the given number of answers for a specific state of
-        a specific version of the given exploration.
-
-        Args:
-            exploration_id: str. The exploration ID.
-            exploration_version: int. The version of the exploration to fetch
-                answers for.
-            state_name: str. The name of the state to fetch answers for.
-            limit: int. The maximum number of answers to return.
-
-        Returns:
-            list(dict). A list of dicts, where each dict represents an answer
-            submitted to the given state of the given version of the
-            exploration.
-        """
-        answers_models = cls.get_all_models(
-            exploration_id, exploration_version, state_name)
-        if answers_models is None:
-            return []
-
-        remaining_count = limit
-        answer_list = []
-        for model in answers_models:
-            if len(model.submitted_answer_list) < remaining_count:
-                answer_list += model.submitted_answer_list[:remaining_count]
-                remaining_count = 0
-            else:
-                answer_list += model.submitted_answer_list
-                remaining_count -= len(model.submitted_answer_list)
-        return answer_list
 
     @classmethod
     def _insert_submitted_answers_unsafe(
