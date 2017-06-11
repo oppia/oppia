@@ -568,7 +568,7 @@ class StateAnswersModel(base_models.BaseModel):
         main_shard = cls.get_master_model(
             exploration_id, exploration_version, state_name)
 
-        if main_shard:
+        if main_shard is not None:
             all_models = [main_shard]
             if main_shard.shard_count > 0:
                 shard_ids = [
@@ -591,8 +591,8 @@ class StateAnswersModel(base_models.BaseModel):
         """
         # The main shard always needs to be retrieved. At most one other shard
         # needs to be retrieved (the last one).
-        main_shard = cls._get_model(
-            exploration_id, exploration_version, state_name, 0)
+        main_shard = cls.get_master_model(
+            exploration_id, exploration_version, state_name)
         last_shard = main_shard
 
         if not main_shard:
