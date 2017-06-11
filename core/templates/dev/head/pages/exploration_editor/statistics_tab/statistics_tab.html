@@ -14,8 +14,13 @@
         <div class="container">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-              <div state-graph-viz graph-data="statsGraphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stateStats" on-click-function="onClickStateInStatsGraph">
-              </div>
+              <static-graph graph-data="statsGraphData"
+                            node-fill="darkseagreen"
+                            opacity-map="statsGraphOpacities" 
+                            highlight-states="highlightStates"
+                            state-stats="stateStats"
+                            on-click-function="onClickStateInStatsGraph">
+              </static-graph>
             </div>
           </div>
         </div>

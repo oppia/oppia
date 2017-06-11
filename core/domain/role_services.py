@@ -127,7 +127,7 @@ ROLE_ACTIONS = {
 
 
 def get_human_readable_role(role):
-    """converts role to human readable format.
+    """Converts role to human readable format.
 
     Args:
         role: str. The role to convert.
@@ -168,30 +168,21 @@ def get_role_graph_data():
     Returns:
         dict. A dict containing data in following format:
         {
-            finalStateIds: list(str). Roles which have no child.
-            initStateId: str. Role which has no parent.
-            links: list(dict). List of dicts defining edges in graph.
-            nodes: dict. Role as key and human readable format of role as
-                value.
+            links: list(dict(str:str)). List of dicts defing each edge in
+                following format:
+                    {
+                        source: RoleId from which edge is going out.
+                        target: RoleId to which edge is incoming.
+                    }
+            nodes: dict(str:str). Mapping of roleId to its human readable
+                format.
         }
     """
     role_graph = {}
-    is_parent = []
     role_graph['links'] = []
     role_graph['nodes'] = {}
     for role in PARENT_ROLES:
-        if not PARENT_ROLES[role]:
-            role_graph['initStateId'] = role
-
         role_graph['nodes'][role] = get_human_readable_role(role)
-        for parent_role in PARENT_ROLES[role]:
-            link_info = {}
-            is_parent.append(parent_role)
-            link_info['source'] = parent_role
-            link_info['target'] = role
-            role_graph['links'].append(link_info)
-
-    role_graph['finalStateIds'] = [
-        role for role in PARENT_ROLES if role not in is_parent
-    ]
+        for parent in PARENT_ROLES[role]:
+            role_graph['links'].append({'source': parent, 'target': role})
     return role_graph

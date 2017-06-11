@@ -107,14 +107,14 @@ class AdminPage(base.BaseHandler):
             'unfinished_job_data': unfinished_job_data,
             'value_generators_js': jinja2.utils.Markup(
                 editor.get_value_generators_js()),
-            'updatable_roles': [
-                role_services.get_human_readable_role(role)
+            'updatable_roles': {
+                role: role_services.get_human_readable_role(role)
                 for role in role_services.UPDATABLE_ROLES
-            ],
-            'viewable_roles': [
-                role_services.get_human_readable_role(role)
+            },
+            'viewable_roles': {
+                role: role_services.get_human_readable_role(role)
                 for role in role_services.VIEWABLE_ROLES
-            ],
+            },
             'role_graph_data': role_services.get_role_graph_data()
         })
 
@@ -282,16 +282,18 @@ class AdminRoleHandler(base.BaseHandler):
         elif view_method == 'username':
             username = self.request.params['username']
             userid = user_services.get_user_id_from_username(username)
-            user_role_dict = {
-                username: user_services.get_user_role_from_id(userid)
-            }
-            self.render_json(user_role_dict)
+            if userid is None:
+                self.render_json({})
+            else:
+                user_role_dict = {
+                    username: user_services.get_user_role_from_id(userid)
+                }
+                self.render_json(user_role_dict)
         else:
-            self.render({'error': 'Invalid method to view'})
+            self.render_json({'error': 'Invalid method to view'})
 
     @require_super_admin
     def post(self):
-
         try:
             userid = user_services.get_user_id_from_username(
                 self.payload.get('username'))

@@ -16,12 +16,12 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
-oppia.directive('roleGraph', [
+oppia.directive('staticGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        // A function returning an object with these keys:
+        // An object with these keys:
         //  - 'nodes': An object whose keys are node ids and whose values are
         //             node labels
         //  - 'links': A list of objects with keys:
@@ -56,8 +56,7 @@ oppia.directive('roleGraph', [
         opacityMap: '=',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/roles_tab/' +
-        'role_graph_directive.html'),
+        '/components/static_graph_directive.html'),
       controller: [
         '$scope', '$element', '$timeout', '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
@@ -65,13 +64,11 @@ oppia.directive('roleGraph', [
             $scope, $element, $timeout, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var redrawGraph = function() {
-            console.log($scope.graphData().nodes);
-            if ($scope.graphData()) {
+            if ($scope.graphData) {
               $scope.graphLoaded = false;
-              console.log($scope.graphData().links);
               $scope.drawGraph(
-                $scope.graphData().nodes, $scope.graphData().links,
-                $scope.graphData().initStateId, $scope.graphData().finalStateIds
+                $scope.graphData.nodes, $scope.graphData.links,
+                $scope.graphData.initStateId, $scope.graphData.finalStateIds
               );
 
               // Wait for the graph to finish loading before showing it again.
@@ -85,7 +82,10 @@ oppia.directive('roleGraph', [
             redrawGraph();
           });
 
-          $scope.$watch('graphData()', redrawGraph, true);
+          $scope.$watch(
+            function() {
+              return $scope.graphData;
+            }, redrawGraph, true);
           // If statistics for a different version of the exploration are
           // loaded, this may change the opacities of the nodes.
           $scope.$watch('opacityMap', redrawGraph);
@@ -322,10 +322,6 @@ oppia.directive('roleGraph', [
 
               $scope.nodeList.push(nodeData[nodeId]);
             }
-
-            // The translation applied when the graph is first loaded.
-            $scope.overallTransformStr = 'translate(0,0)';
-            $scope.innerTransformStr = 'translate(0,0)';
           };
         }
       ]

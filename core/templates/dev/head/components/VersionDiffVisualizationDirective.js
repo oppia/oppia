@@ -155,13 +155,11 @@ oppia.directive('versionDiffVisualization', [
 
         $scope.v1InitStateId = $scope.getDiffData().v1InitStateId;
 
-        $scope.diffGraphData = function() {
-          return {
-            nodes: diffGraphNodes,
-            links: $scope.getDiffData().links,
-            initStateId: $scope.getDiffData().v2InitStateId,
-            finalStateIds: $scope.getDiffData().finalStateIds
-          }
+        $scope.diffGraphData = {
+          nodes: diffGraphNodes,
+          links: $scope.getDiffData().links,
+          initStateId: $scope.getDiffData().v2InitStateId,
+          finalStateIds: $scope.getDiffData().finalStateIds
         };
 
         // Generate the legend graph
@@ -187,9 +185,6 @@ oppia.directive('versionDiffVisualization', [
           }
         }
         $scope.legendGraph.finalStateIds = [_lastUsedStateType];
-        $scope.legendGraphData = function () {
-          return $scope.legendGraph;
-        }
         // Opens the modal showing the history diff for a given state.
         // stateId is the unique ID assigned to a state during the
         // calculation of the state graph.

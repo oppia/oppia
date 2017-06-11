@@ -18,10 +18,10 @@
 
 oppia.directive('adminRolesTab', [
   '$http', 'ADMIN_ROLE_HANDLER_URL', 'AdminTaskManagerService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'ADMIN_SHOW_UPDATE_ROLE',
   function(
     $http, ADMIN_ROLE_HANDLER_URL, AdminTaskManagerService,
-    UrlInterpolationService) {
+    UrlInterpolationService, ADMIN_SHOW_UPDATE_ROLE) {
     return {
       restrict: 'E',
       scope: {
@@ -32,13 +32,33 @@ oppia.directive('adminRolesTab', [
       controller: ['$scope', function($scope) {
         $scope.UPDATABLE_ROLES = GLOBALS.UPDATABLE_ROLES;
         $scope.VIEWABLE_ROLES = GLOBALS.VIEWABLE_ROLES;
-        $scope.graphData = function() {
-          return GLOBALS.ROLE_GRAPH_DATA;
-        }
-        console.log($scope.graphData().links);
+        $scope.graphData = GLOBALS.ROLE_GRAPH_DATA;
         $scope.showResultRoles = false;
         $scope.result = {};
         $scope.setStatusMessage('');
+        $scope.showUpdateForm = ADMIN_SHOW_UPDATE_ROLE;
+
+        // Calculating initStateId and finalStateIds for graphData
+        // Since role graph is acyclic, node with no incoming edge
+        // is initState and nodes with no outgoing edge are finalStates.
+        var hasIncomingEdge = [];
+        var hasOutgoingEdge = [];
+        for (var i = 0; i < $scope.graphData.links.length; i++) {
+          hasIncomingEdge.push($scope.graphData.links[i].target);
+          hasOutgoingEdge.push($scope.graphData.links[i].source);
+        }
+        var finalStateIds = [];
+        for (var i in $scope.graphData.nodes) {
+          if ($scope.graphData.nodes.hasOwnProperty(i)) {
+            if (hasIncomingEdge.indexOf(i) == -1) {
+              $scope.graphData.initStateId = i;
+            }
+            if (hasOutgoingEdge.indexOf(i) == -1) {
+              finalStateIds.push(i);
+            }
+          }
+        }
+        $scope.graphData.finalStateIds = finalStateIds;
 
         $scope.submitRoleViewForm = function(values) {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -56,19 +76,25 @@ oppia.directive('adminRolesTab', [
               username: values.username
             }
           }).then(function(response) {
-              $scope.result = response.data;
-              if (Object.keys($scope.result).length == 0) {
-                $scope.showResultRoles = false;
-                $scope.setStatusMessage('No results.');
-              }
-              else {
-                $scope.showResultRoles = true;
-                $scope.setStatusMessage('Success.');
-              }
-            }, function(errorResponse) {
-              $scope.setStatusMessage(
+            $scope.result = response.data;
+            if (Object.keys($scope.result).length == 0) {
+              $scope.showResultRoles = false;
+              $scope.setStatusMessage('No results.');
+            }
+            else {
+              $scope.showResultRoles = true;
+              $scope.setStatusMessage('Success.');
+            }
+          }, function(errorResponse) {
+            $scope.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
-            });
+          });
+          if($scope.viewFormValues.username) {
+            $scope.viewFormValues.username = '';
+          }
+          if($scope.viewFormValues.role) {
+            $scope.viewFormValues.role = '';
+          }
           AdminTaskManagerService.finishTask();
         }
 
@@ -76,17 +102,21 @@ oppia.directive('adminRolesTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-
+          $scope.form.updateRoleForm.$setPristine();
+          // if($scope.updateFormValues.username) {
+          //   $scope.updateFormValues.username = '';
+          // }
+          //$scope.updateFormValues.newRole = '';
+          
           $scope.setStatusMessage('Updating User Role');
-
           AdminTaskManagerService.startTask();
           $http.post(ADMIN_ROLE_HANDLER_URL, {
-            role: values.newrole,
+            role: values.newRole,
             username: values.username
           }).then(function() {
             $scope.setStatusMessage(
               'Role of ' + values.username +
-              ' successfully updated to ' + values.newrole);
+              ' successfully updated to ' + values.newRole);
           }, function(errorResponse) {
             $scope.setStatusMessage(
               'Server error: ' + errorResponse.data.error);

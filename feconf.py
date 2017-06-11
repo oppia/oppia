@@ -951,7 +951,8 @@ SITE_NAME = 'Oppia.org'
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
 
-# Following are the constants for the roles.
+# Following are the constants for the roleIds. RoleIds are human
+# readable roles with underscores instead of spaces.
 ROLE_GUEST = 'GUEST'
 ROLE_BANNED_USER = 'BANNED_USER'
 ROLE_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
