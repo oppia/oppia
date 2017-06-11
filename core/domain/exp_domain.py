@@ -30,7 +30,6 @@ import string
 from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import trigger_registry
 import feconf
@@ -717,13 +716,13 @@ class Solution(object):
             solution_dict['correct_answer'],
             solution_dict['explanation'])
 
-    def validate(self, id):
+    def validate(self, interaction_id):
         if not isinstance(self.answer_boolean, bool):
             raise utils.ValidationError(
                 'Expected answer_boolean to be bool, received %s' %
                 self.answer_boolean)
         interaction_registry.Registry.get_interaction_by_id(
-            id).normalize_answer(self.correct_answer)
+            interaction_id).normalize_answer(self.correct_answer)
         if not isinstance(self.explanation, basestring):
             raise utils.ValidationError(
                 'Expected explanation to be a string, received %s' %
