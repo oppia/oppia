@@ -1811,6 +1811,20 @@ class Exploration(object):
                             'does not exist in this exploration'
                             % param_change.name)
 
+            for hint in interaction.hints:
+                hint.validate()
+
+            if interaction.hints:
+                if interaction.solution:
+                    Solution.from_dict(
+                        interaction.solution).validate(interaction.id)
+                else:
+                    raise utils.ValidationError(
+                        'Solution must be specified if hint(s) are specified')
+            elif interaction.solution:
+                raise utils.ValidationError(
+                    'Hint(s) must be specified if solution is specified')
+
         # Check that state names required by gadgets exist.
         state_names_required_by_gadgets = set(
             self.skin_instance.get_state_names_required_by_gadgets())
