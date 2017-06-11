@@ -689,7 +689,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }])
         self._assert_validation_error(
             exploration,
-            'Solution must be specified if hint\(s\) are specified')
+            r'Solution must be specified if hint\(s\) are specified')
         solution = {
             'answer_boolean': False,
             'correct_answer': 'helloworld!',
