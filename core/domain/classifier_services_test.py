@@ -74,21 +74,21 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
 
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
-
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
+    # def test_string_classifier_classification(self):
+    #     """All these responses trigger the string classifier."""
+    #
+    #     with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'it\'s a permutation of 3 elements'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'There are 3 options for the first ball, and 2 for the '
+    #                 'remaining two. So 3*2=6.'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('abc acb bac bca cbb cba'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('dunno, just guessed'))
 
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""
@@ -173,3 +173,78 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, test_state_name)
         self.assertEqual(classifier.id, classifier_id)
+
+    def test_retrieval_of_classifier_training_jobs(self):
+        """Test the get_classifier_training_job_by_id method."""
+
+        with self.assertRaisesRegexp(Exception, (
+            "Entity for class ClassifierTrainingJobModel with id fake_id not found")):
+            classifier_services.get_classifier_training_job_by_id('fake_id')
+
+        exp_id = u'1'
+        state_name = 'Home'
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            exp_id, 1, [], state_name)
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.exp_id, exp_id)
+        self.assertEqual(classifier_training_job.state_name, state_name)
+        self.assertEqual(classifier_training_job.status, 'NEW')
+
+    def test_deletion_of_classifier_training_jobs(self):
+        """Test the delete_classifier_training_job method."""
+
+        with self.assertRaisesRegexp(Exception, (
+            "Entity for class ClassifierTrainingJobModel with id fake_id not found")):
+            classifier_services.get_classifier_training_job_by_id('fake_id')
+
+        exp_id = u'1'
+        state_name = 'Home'
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            exp_id, 1, [], state_name)
+        classifier_services.delete_classifier_training_job(job_id)
+        with self.assertRaisesRegexp(Exception, (
+            "Entity for class ClassifierTrainingJobModel with id %s not found" %(
+                job_id))):
+            classifier_services.get_classifier_training_job_by_id(job_id)
+
+    def test_update_of_classifier_training_jobs(self):
+        """Test the save_classifier_training_job method."""
+
+        exp_id = u'1'
+        state_name = 'Home'
+        status = 'NEW'
+        test_state_name = 'State'
+        test_status = 'PENDING'
+        training_data = [
+            {
+                'answer_group_index': 1,
+                'answers': ['a1', 'a2']
+            },
+            {
+                'answer_group_index': 2,
+                'answers': ['a2', 'a3']
+            }
+        ]
+        classifier_training_job = classifier_domain.ClassifierTrainingJob(
+            'job_id1',
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            exp_id, 1, state_name, status, training_data)
+        job_id = classifier_services.save_classifier_training_job(
+            classifier_training_job)
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.exp_id, exp_id)
+        self.assertEqual(classifier_training_job.state_name, state_name)
+        self.assertEqual(classifier_training_job.status, status)
+        classifier_training_job.update_state_name(test_state_name)
+        classifier_training_job.update_status(test_status)
+        classifier_services.save_classifier_training_job(
+            classifier_training_job)
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.exp_id, exp_id)
+        self.assertEqual(classifier_training_job.state_name, test_state_name)
+        self.assertEqual(classifier_training_job.status, test_status)

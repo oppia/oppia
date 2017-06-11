@@ -277,6 +277,27 @@ class ClassifierTrainingJob(object):
     def training_data(self):
         return self._training_data
 
+    def update_state_name(self, state_name):
+        """Updates the state_name attribute of the ClassifierTrainingJob domain
+        object.
+
+        Args:
+            state_name: str. The name of the updated state to which the
+            classifier training job belongs.
+        """
+
+        self._state_name = state_name
+
+    def update_status(self, status):
+        """Updates the status attribute of the ClassifierTrainingJob domain
+        object.
+
+        Args:
+            status: str. The status of the classifier training job.
+        """
+
+        self._status = status
+
     def to_dict(self):
         """Constructs a dict representation of training job domain object.
 
