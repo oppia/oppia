@@ -19,6 +19,55 @@
 oppia.controller('About', [
   '$scope', 'UrlInterpolationService',
   function($scope, UrlInterpolationService) {
+    var activeTabClass = 'oppia-about-tabs-active';
+    var hash = window.location.hash.slice(1);
+    var visibleContent = 'oppia-about-visible-content';
+
+    var activateTab = function activateTab(tabName) {
+      $("a[href='" + tabName + "']").parent().addClass(
+        activeTabClass
+      ).siblings().removeClass(activeTabClass);
+      $('.' + tabName).addClass(visibleContent).siblings().removeClass(
+        visibleContent);
+    }
+
+    if (hash === 'foundation' || hash === 'license') {
+      activateTab('foundation');
+    }
+
+    if (hash === 'credits') {
+      activateTab('credits');
+    }
+
+    if (hash === 'about') {
+      activateTab('about');
+    }
+
+    window.onhashchange = function() {
+      var hashChange = window.location.hash.slice(1);
+      if (hashChange === 'foundation' || hashChange === 'license') {
+        activateTab('foundation');
+        // Ensure page goes to the license section
+        if (hashChange === 'license') {
+          location.reload(true);
+        }
+      } else if (hashChange === 'credits') {
+        activateTab('credits');
+      } else if (hashChange === 'about') {
+        activateTab('about');
+      }
+    };
+
+    $('.oppia-about-tabs li').on('click', function(evt) {
+      evt.preventDefault();
+      $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
+      var currentAttrVal = $(this).children('a').attr('href');
+      // Update hash
+      window.location.hash = '#' + currentAttrVal;
+      $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(
+        visibleContent);
+    });
+
     var listOfNamesToThank = ['Alex Kauffmann', 'Allison Barros',
                               'Amy Latten', 'Brett Barros',
                               'Crystal Kwok', 'Daniel Hernandez',
