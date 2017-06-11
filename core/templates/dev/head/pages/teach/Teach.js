@@ -22,6 +22,45 @@ oppia.controller('Teach', [
   function(
       $scope, $timeout, $window, siteAnalyticsService,
       UrlInterpolationService) {
+    var activeTabClass = 'oppia-about-tabs-active';
+    var hash = window.location.hash.slice(1);
+    var visibleContent = 'oppia-about-visible-content';
+
+    var activateTab = function activateTab(tabName) {
+      $("a[name='" + tabName + "']").parent().addClass(
+        activeTabClass
+      ).siblings().removeClass(activeTabClass);
+      $('.' + tabName).addClass(visibleContent).siblings().removeClass(
+        visibleConten
+      );
+    }
+
+    if (hash === 'teach') {
+      activateTab('teach');
+    } else if (hash === 'playbook') {
+      activateTab('playbook');
+    }
+
+    window.onhashchange = function() {
+      var hashChange = window.location.hash.slice(1);
+      if (hashChange === 'teach') {
+        activateTab('teach');
+      } else if (hashChange === 'playbook') {
+        activateTab('playbook');
+      }
+    };
+
+    $('.oppia-about-tabs li').on('click', function(evt) {
+      evt.preventDefault();
+      $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
+      var currentAttrVal = $(this).children('a').attr('href');
+      // Update hash
+      window.location.hash = '#' + currentAttrVal;
+      $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(
+        visibleContent
+      );
+    });
+
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     $scope.onApplyToTeachWithOppia = function() {
