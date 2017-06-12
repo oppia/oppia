@@ -310,6 +310,18 @@ class StateHitEventHandler(base.BaseHandler):
             logging.error('Unexpected StateHit event for the END state.')
 
 
+class HintViewEventHandler(base.BaseHandler):
+    """Tracks a learner viewing a hint."""
+
+    @require_playable
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        state_name = self.payload.get('state_name')
+        hint_index = self.payload.get('hint_index')
+        event_services.HintViewEventHandler.record(
+            exploration_id, state_name, hint_index)
+
+
 class ClassifyHandler(base.BaseHandler):
     """Stateless handler that performs a classify() operation server-side and
     returns the corresponding classification result, which is a dict containing

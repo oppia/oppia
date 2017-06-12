@@ -160,6 +160,14 @@ class StateHitEventHandler(BaseEventHandler):
             params, play_type)
 
 
+class HintViewEventHandler(BaseEventHandler):
+    """Event handler for recording hint viewed event."""
+    @classmethod
+    def _handle_event(cls, exp_id, state_name, hint_index):
+        stats_models.HintViewEventLogEntryModel.increment_hint_count(
+            exp_id, state_name, hint_index)
+
+
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):
     """Event handler for recording new feedback thread creation events."""
 

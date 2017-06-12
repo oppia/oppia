@@ -2182,7 +2182,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'fallbacks': [],
                     'hints': [],
                     'id': None,
-                    'solution': {}
+                    'solution': {},
                 },
                 'param_changes': [],
             }

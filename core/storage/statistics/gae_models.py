@@ -356,6 +356,29 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             old_rating=old_rating).put()
 
 
+class HintViewEventLogEntryModel(base_models.BaseModel):
+    """Event triggered by learner viewing a Hint."""
+    view_count = ndb.IntegerProperty(default=0, indexed=False)
+
+    @classmethod
+    def _get_entity_id(
+            cls, exploration_id, state_name, hint_index):
+        return ':'.join([
+            exploration_id, state_name, str(hint_index)])
+
+    @classmethod
+    def increment_hint_count(cls, exp_id, state_name, hint_index):
+        """Increments Hint view count."""
+        instance_id = cls._get_entity_id(exp_id, state_name, hint_index)
+        instance = cls.get(instance_id, strict=False)
+        if not instance:
+            # create new instance
+            instance = cls(id=instance_id, view_count=0)
+        else:
+            instance.view_count += 1
+        instance.put()
+
+
 class StateHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student getting to a particular state. The
     definitions of the fields are as follows:
