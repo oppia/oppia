@@ -83,6 +83,15 @@ oppia.controller('Library', [
         // Pause is necessary to ensure all elements have loaded.
         $timeout(initCarousels, 390);
 
+
+        // Check if actual and expected widths are the same.
+        // If not produce an error that would be catched by e2e tests.
+        $timeout(function () {
+          if ($('exploration-summary-tile').width() != LIBRARY_TILE_WIDTH) {
+            console.error(
+              'The actual width of tile is different than the expected width.');
+          }
+        }, 3000)
         // The following initializes the tracker to have all
         // elements flush left.
         // Transforms the group names into translation ids
