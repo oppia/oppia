@@ -683,6 +683,10 @@ class AnswerGroup(object):
         """Rule validation. Verifies that all rule classes are valid, and that
         the AnswerGroup only has one classifier rule.
 
+        Args:
+            exp_param_specs_dict: dict. A dict of specified parameters used in
+                the exploration.
+
         Raises:
             ValidationError: One or more attributes of the Content are invalid
             or contains more than one classifier rule.
@@ -976,6 +980,10 @@ class InteractionInstance(object):
     def validate(self, exp_param_specs_dict):
         """Validates various properties of the InteractionInstance.
 
+        Args:
+            exp_param_specs_dict: dict.  A dict of specified parameters used in
+                the exploration.
+
         Raises:
             ValidationError: One or more attributes of the InteractionInstance
             are invalid.
@@ -1239,10 +1247,13 @@ class SkinInstance(object):
 
     def __init__(self, skin_id, skin_customizations):
         """Initializes SkinInstance with any customizations provided.
-
         If no customizations are necessary, skin_customizations may be set to
         None, in which case defaults will be generated that provide empty
         gadget panels for each panel specified in the skin.
+
+        Args:
+            skin_id: str. The id of the skin.
+            skin_customizations: dict. The customization dictionary.
         """
         # TODO(sll): Deprecate this property; it is not used.
         self.skin_id = skin_id
@@ -1275,7 +1286,11 @@ class SkinInstance(object):
 
     @staticmethod
     def _get_default_skin_customizations():
-        """Generates default skin customizations when none are specified."""
+        """Generates default skin customizations when none are specified.
+
+        Returns:
+            dict. The default skin costumizations.
+        """
         return {
             'panels_contents': {
                 panel_name: []
@@ -1284,14 +1299,18 @@ class SkinInstance(object):
         }
 
     def validate_gadget_panel(self, panel_name, gadget_list):
-        """
-        Validate proper fit given space requirements specified by
+        """Validate proper fit given space requirements specified by
         feconf.PANELS_PROPERTIES.
 
         Args:
-        - panel_name: str. Unique name that identifies this panel in the skin.
-            This should correspond to an entry in feconf.PANELS_PROPERTIES.
-        - gadget_list: list of GadgetInstance instances.
+            panel_name: str. Unique name that identifies this panel in the 
+                skin. This should correspond to an entry in
+                feconf.PANELS_PROPERTIES.
+            gadget_list: list(GadgetInstance). List of GadgetInstance
+                instances.
+
+        Raises:
+            ValidationError: Space requirements does not fit.
         """
         # If the panel contains no gadgets, max() will raise an error,
         # so we return early.
@@ -1350,8 +1369,12 @@ class SkinInstance(object):
 
     def validate(self):
         """Validates that gadgets fit the skin panel dimensions, and that the
-        gadgets themselves are valid."""
+        gadgets themselves are valid.
 
+        Raises:
+            ValidationError: One or more attributes of the SkinInstance are
+            invalid.
+        """
         # A list to validate each gadget_instance.name is unique.
         gadget_instance_names = []
 
@@ -1377,7 +1400,11 @@ class SkinInstance(object):
                 gadget_instance_names.append(gadget_instance.name)
 
     def to_dict(self):
-        """Returns SkinInstance data represented in dict form."""
+        """Returns a dict representing this SkinInstance domain object.
+
+        Returns:
+            dict. A dict mapping all fields of SkinInstance instance.
+        """
         return {
             'skin_id': self.skin_id,
             'skin_customizations': {
@@ -1393,14 +1420,25 @@ class SkinInstance(object):
 
     @classmethod
     def from_dict(cls, skin_dict):
-        """Returns SkinInstance instance given dict form."""
+        """Return a SkinInstance domain object from a dict.
+
+        Args:
+            content_dict: dict. The dict representation of SkinInstance object.
+
+        Returns:
+            SkinInstance. The corresponding SkinInstance domain object.
+        """
         return SkinInstance(
             skin_dict['skin_id'],
             skin_dict['skin_customizations'])
 
     def get_state_names_required_by_gadgets(self):
         """Returns a list of strings representing State names required by
-        GadgetInstances in this skin."""
+        GadgetInstances in this skin.
+
+        Returns:
+            list(str). List of State names required.
+        """
         state_names = set()
         for gadget_instances in self.panel_contents_dict.values():
             for gadget_instance in gadget_instances:
@@ -1429,6 +1467,17 @@ class State(object):
 
     def __init__(self, content, param_changes, interaction,
                  classifier_model_id=None):
+        """Initializes a State domain object.
+
+        Args:
+            content: list(Content). The content displayed to the reader in this
+                state. This list must have only one element.
+            param_changes: list(ParamChange). Parameter changes associated with
+                this state.
+            interaction: InteractionInstance. The interaction instance
+                associated with this state.
+            classifier_model_id: str. The classifier model id.
+        """
         # The content displayed to the reader in this state.
         self.content = [Content(item.type, item.value) for item in content]
         # Parameter changes associated with this state.
@@ -1444,6 +1493,16 @@ class State(object):
         self.classifier_model_id = classifier_model_id
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
+        """Validates various properties of the State.
+
+        Args:
+            exp_param_specs_dict: dict. A dict of specified parameters used in
+                this exploration.
+            allow_null_interaction. bool. If this state allow null interaction.
+
+        Raises:
+            ValidationError: One or more attributes of the State are invalid.
+        """
         if not isinstance(self.content, list):
             raise utils.ValidationError(
                 'Expected state content to be a list, received %s'
@@ -1493,15 +1552,32 @@ class State(object):
         return False
 
     def update_content(self, content_list):
+        """Update the list of Content of this state.
+
+        Args:
+            content_list. list(Content). List of contents. The content
+                attribute is set as the first element of content_list.
+        """
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = [Content.from_dict(content_list[0])]
 
     def update_param_changes(self, param_change_dicts):
+        """Update the param_changes dict attribute.
+
+        Args:
+            param_change_dicts. list(dict). List of param_change dicts that
+                represent ParamChange domain object.
+        """
         self.param_changes = [
             param_domain.ParamChange.from_dict(param_change_dict)
             for param_change_dict in param_change_dicts]
 
     def update_interaction_id(self, interaction_id):
+        """Update the interaction id attribute.
+
+        Args:
+            interaction_id. str. The new interaction id to be set.
+        """
         self.interaction.id = interaction_id
         # TODO(sll): This should also clear interaction.answer_groups (except
         # for the default rule). This is somewhat mitigated because the client
@@ -1509,9 +1585,20 @@ class State(object):
         # fix it.
 
     def update_interaction_customization_args(self, customization_args):
+        """Update the customization_args of InteractionInstance domain object.
+
+        Args:
+            customization_args. dict. The new customization_args to be set.
+        """
         self.interaction.customization_args = customization_args
 
     def update_interaction_answer_groups(self, answer_groups_list):
+        """Update the list of AnswerGroup in IteractioInstancen domain object.
+
+        Args:
+            answer_groups_list. list(dict). List of dicts that represent
+                AnswerGroup domain object.
+        """
         if not isinstance(answer_groups_list, list):
             raise Exception(
                 'Expected interaction_answer_groups to be a list, received %s'
@@ -1567,6 +1654,12 @@ class State(object):
         self.interaction.answer_groups = interaction_answer_groups
 
     def update_interaction_default_outcome(self, default_outcome_dict):
+        """Update the default_outcome of InteractionInstance domain object.
+
+        Args:
+            default_outcome_dict. dict. Dict that represent Outcome domain
+                object.
+        """
         if default_outcome_dict:
             if not isinstance(default_outcome_dict, dict):
                 raise Exception(
@@ -1582,6 +1675,14 @@ class State(object):
 
     def update_interaction_confirmed_unclassified_answers(
             self, confirmed_unclassified_answers):
+        """Update the confirmed_unclassified_answers of IteractionInstance
+        domain object.
+
+        Args:
+            confirmed_unclassified_answers. list(AnswerGroup). The new list of
+                answers which have been confirmed to be associated with the
+                default outcome.
+        """
         if not isinstance(confirmed_unclassified_answers, list):
             raise Exception(
                 'Expected confirmed_unclassified_answers to be a list,'
@@ -1590,6 +1691,12 @@ class State(object):
             confirmed_unclassified_answers)
 
     def update_interaction_fallbacks(self, fallbacks_list):
+        """Update the fallbacks of IteractionInstance domain object.
+
+        Args:
+            confirmed_unclassified_answers. list(dict). List of dicts that
+                represent Fallback domain object.
+        """
         if not isinstance(fallbacks_list, list):
             raise Exception(
                 'Expected fallbacks_list to be a list, received %s'
@@ -1599,6 +1706,11 @@ class State(object):
             for fallback_dict in fallbacks_list]
 
     def to_dict(self):
+        """Returns a dict representing this State domain object.
+
+        Returns:
+            dict. A dict mapping all fields of State instance.
+        """
         return {
             'content': [item.to_dict() for item in self.content],
             'param_changes': [param_change.to_dict()
@@ -1609,6 +1721,14 @@ class State(object):
 
     @classmethod
     def from_dict(cls, state_dict):
+        """Return a State domain object from a dict.
+
+        Args:
+            state_dict: dict. The dict representation of State object.
+
+        Returns:
+            State. The corresponding State domain object.
+        """
         return cls(
             [Content.from_dict(item)
              for item in state_dict['content']],
@@ -1621,6 +1741,15 @@ class State(object):
     @classmethod
     def create_default_state(
             cls, default_dest_state_name, is_initial_state=False):
+        """Return a State domain object with default value.
+
+        Args:
+            default_dest_state_name: dict. The default destination state.
+            is_initial_state: bool. If the State is an initial state.
+
+        Returns:
+            State. The corresponding State domain object.
+        """
         text_str = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
@@ -2998,10 +3127,31 @@ class ExplorationSummary(object):
                  exploration_model_created_on,
                  exploration_model_last_updated,
                  first_published_msec):
-        """'ratings' is a dict whose keys are '1', '2', '3', '4', '5' and whose
-        values are nonnegative integers representing frequency counts. Note
-        that the keys need to be strings in order for this dict to be
-        JSON-serializable.
+        """Initializes a ExplorationSummary domain object.
+
+        Args:
+        exploration_id: str. The exploration id.
+        title: str. The exploration title.
+        category: str. The exploration category.
+        objective: str. The exploration objective.
+        language_code: str. The code that represents the exploration language.
+        tags: list(str). List of tags.
+        ratings: dict. Dict whose keys are '1', '2', '3', '4', '5' and whose
+            values are nonnegative integers representing frequency counts. Note
+            that the keys need to be strings in order for this dict to be
+            JSON-serializable.
+        scaled_average_rating:
+        status:
+        community_owned:
+        owner_ids:
+        editor_ids:
+        viewer_ids:
+        contributor_ids:
+        contributors_summary:
+        version:
+        exploration_model_created_on:
+        exploration_model_last_updated:
+        first_published_msec:
         """
         self.id = exploration_id
         self.title = title
