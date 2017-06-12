@@ -350,7 +350,7 @@ class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
                     num_submits = fallback.trigger.customization_args['num_submits']
                     feedback = (
                         fallback.outcome.feedback[0]
-                        if len(fallback.outcome.feedback) > 0 else '')
+                        if len(fallback.outcome.feedback) > 0 else 'ERROR')
                     yield (
                         '%s: %s' % (
                             item.id,
