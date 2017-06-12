@@ -230,14 +230,15 @@ def delete_classifier(classifier_id):
 
 def get_classifier_training_job_from_model(classifier_training_job_model):
     """Gets a classifier training job domain object from a classifier
-       training job model.
+    training job model.
 
     Args:
-        classifier_training_job_model: Classifier training job instance in
-            datastore.
+        classifier_training_job_model: ClassifierTrainingJobModel. Classifier
+            training job instance in datastore.
 
     Returns:
-        classifier_training_job: Domain object for the classifier training job.
+        classifier_training_job: ClassifierTrainingJob. Domain object for the
+            classifier training job.
     """
     return classifier_domain.ClassifierTrainingJob(
         classifier_training_job_model.id,
@@ -249,13 +250,14 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job_model.training_data)
 
 def get_classifier_training_job_by_id(job_id):
-    """Gets a classifier training job from a job_id.
+    """Gets a classifier training job by a job_id.
 
     Args:
         job_id: str. ID of the classifier training job.
 
     Returns:
-        classifier_training_job: Domain object for the classifier training job.
+        classifier_training_job: ClassifierTrainingJob. Domain object for the
+            classifier training job.
 
     Raises:
         Exception: Entity for class ClassifierTrainingJobModel with id not
@@ -270,10 +272,11 @@ def get_classifier_training_job_by_id(job_id):
 
 def _create_classifier_training_job(classifier_training_job):
     """Creates classifier training job model in the datastore given a
-       classifier training job domain object.
+    classifier training job domain object.
 
     Args:
-        classifier_training_job: Domain object for the classifier training job.
+        classifier_training_job: ClassifierTrainingJob. Domain object for the
+            classifier training job.
 
     Returns:
         job_id: str. ID of the classifier training job.
@@ -289,15 +292,15 @@ def _create_classifier_training_job(classifier_training_job):
 def _update_classifier_training_job(classifier_training_job_model, state_name,
                                     status):
     """Updates classifier training job model in the datastore given a
-       classifier training job domain object.
+    classifier training job domain object.
 
     Args:
-        classifier_training_job_model: Classifier training job model instance
-            in datastore.
+        classifier_training_job_model: ClassifierTrainingJobModel. Classifier
+            training job model instance in datastore.
         state_name: The name of the state.
         status: The status of the job.
 
-    Note: All of the proeprties of a classifier training job are immutable,
+    Note: All of the properties of a classifier training job are immutable,
         except for state_name and status.
     """
     classifier_training_job_model.state_name = state_name
@@ -305,7 +308,9 @@ def _update_classifier_training_job(classifier_training_job_model, state_name,
     classifier_training_job_model.put()
 
 
-def save_classifier_training_job(classifier_training_job):
+def save_classifier_training_job(algorithm_id, exp_id, exp_version_when_created,
+                                 state_name, status, training_data,
+                                 job_id="None"):
     """Checks for the existence of the model.
     If the model exists, it is updated using _update_classifier_training_job
         method.
@@ -313,21 +318,35 @@ def save_classifier_training_job(classifier_training_job):
         _create_classifier_training_job method.
 
     Args:
-        classifier_training_job: Domain object for the classifier training job.
+        algorithm_id: str. ID of the algorithm used to generate the model.
+        exp_id: str. ID of the exploration.
+        exp_version_when_created: int. The exploration version at the time
+            this training job was created.
+        state_name: str. The name of the state to which the classifier
+            belongs.
+        status: str. The status of the training job (NEW by default).
+        training_data: dict. The data used in training phase.
+        job_id: str. The optional job_id which decides to create/update
+            classifier.
 
     Returns:
         job_id: str. ID of the classifier training job.
     """
-    job_id = classifier_training_job.job_id
     classifier_training_job_model = (
         classifier_models.ClassifierTrainingJobModel.get(job_id, False))
-    classifier_training_job.validate()
     if classifier_training_job_model is None:
+        classifier_training_job = classifier_domain.ClassifierTrainingJob(
+            'job_id_dummy', algorithm_id, exp_id, exp_version_when_created,
+            state_name, status, training_data)
+        classifier_training_job.validate()
         job_id = _create_classifier_training_job(classifier_training_job)
     else:
+        classifier_training_job = classifier_domain.ClassifierTrainingJob(
+            job_id, algorithm_id, exp_id, exp_version_when_created,
+            state_name, status, training_data)
+        classifier_training_job.validate()
         _update_classifier_training_job(classifier_training_job_model,
-                                        classifier_training_job.state_name,
-                                        classifier_training_job.status)
+                                        state_name, status)
     return job_id
 
 
@@ -339,4 +358,5 @@ def delete_classifier_training_job(job_id):
     """
     classifier_training_job_model = (
         classifier_models.ClassifierTrainingJobModel.get(job_id))
-    classifier_training_job_model.delete()
+    if classifier_training_job_model is not None:
+        classifier_training_job_model.delete()
