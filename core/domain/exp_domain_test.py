@@ -685,7 +685,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_interaction_hints([{
             'hint_text': 'hint one',
-            'views': 10,
         }])
         self._assert_validation_error(
             exploration,
@@ -696,9 +695,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'explanation': 'hello_world is a string',
         }
         init_state.interaction.solution = solution
-        init_state.increment_hint_views(0)
-        # Hint view is incremented.
-        self.assertEquals(init_state.interaction.hints[0].views, 11)
         exploration.validate()
 
         # Add hint and delete hint
@@ -711,25 +707,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             len(init_state.interaction.hints),
             2)
-
-        exploration.add_states(['state 1'])
-        state_1 = exploration.states['state 1']
-        state_1.interaction.id = 'TextInput'
-        state_1.add_hint('hint #1 for state 1')
-        state_1.add_hint('hint #2 for state 1')
-        state_1.interaction.solution = solution
-        state_1.increment_hint_views(0)
-        state_1.increment_hint_views(0)
-        state_1.increment_hint_views(1)
-        exploration.add_states(['state 2'])
-        state_2 = exploration.states['state 2']
-        state_2.interaction.id = 'TextInput'
-        state_2.add_hint('hint #1 for state 2')
-        state_2.interaction.solution = solution
-        state_2.increment_hint_views(0)
-        state_2.increment_hint_views(0)
-        state_2.increment_hint_views(0)
-
         exploration.validate()
 
     def test_solution_validation(self):
@@ -2207,7 +2184,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'fallbacks': [],
                     'hints': [],
                     'id': None,
-                    'solution': {}
+                    'solution': {},
                 },
                 'param_changes': [],
             }

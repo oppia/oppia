@@ -661,47 +661,39 @@ class Fallback(object):
 
 class Hint(object):
     """Value object representing a hint."""
-    def __init__(self, hint_text, views):
+    def __init__(self, hint_text):
         self.hint_text = html_cleaner.clean(hint_text)
-        self.views = views
 
     def to_dict(self):
         return {
             'hint_text': self.hint_text,
-            'views': self.views,
         }
 
     @classmethod
     def from_dict(cls, hint_dict):
-        return cls(
-            html_cleaner.clean(hint_dict['hint_text']),
-            hint_dict['views'])
+        return cls(html_cleaner.clean(hint_dict['hint_text']))
 
     def validate(self):
         if not isinstance(self.hint_text, basestring):
             raise utils.ValidationError(
                 'Expected hint text to be a string, received %s' %
                 self.hint_text)
-        if not isinstance(self.views, int):
-            raise utils.ValidationError(
-                'Expected views to be an integer, received %s' %
-                self.views)
 
 
 class Solution(object):
     """Value object representing a solution.
 
-    A solution consists of answer_is_exclusive, correct_answer and an explanation.
-    answer_is_exclusive when True indicates that it is the only correct answer and
-    False indicates that it is one possible answer. correct_answer records the
-    answer to progress to the next card and explanation is a string containing
-    an explanation for the solution.
+    A solution consists of answer_is_exclusive, correct_answer and an
+    explanation.answer_is_exclusive when True indicates that it is the only
+    correct answer and False indicates that it is one possible answer.
+    correct_answer records the answer to progress to the next card and
+    explanation is a string containing an explanation for the solution.
     """
     def __init__(self, answer_is_exclusive, correct_answer, explanation):
         self.answer_is_exclusive = answer_is_exclusive
         self.correct_answer = (
             html_cleaner.clean(correct_answer)
-            if type(correct_answer) == str else correct_answer)
+            if isinstance(correct_answer, str) else correct_answer)
         self.explanation = html_cleaner.clean(explanation)
 
     def to_dict(self):
@@ -716,7 +708,7 @@ class Solution(object):
         return cls(
             solution_dict['answer_is_exclusive'],
             (html_cleaner.clean(solution_dict['correct_answer'])
-             if type(solution_dict['correct_answer']) == str
+             if isinstance(solution_dict['correct_answer'], str)
              else solution_dict['correct_answer']),
             html_cleaner.clean(solution_dict['explanation']))
 
@@ -874,7 +866,16 @@ class InteractionInstance(object):
         for hint in self.hints:
             hint.validate()
 
-        Solution.from_dict(self.solution).validate(self.id)
+        if self.hints:
+            if self.solution:
+                Solution.from_dict(
+                    self.solution).validate(self.id)
+            else:
+                raise utils.ValidationError(
+                    'Solution must be specified if hint(s) are specified')
+        elif self.solution:
+            raise utils.ValidationError(
+                'Hint(s) must be specified if solution is specified')
 
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
@@ -1411,19 +1412,12 @@ class State(object):
             solution_dict)
 
     def add_hint(self, hint_text):
-        self.interaction.hints.append(Hint(hint_text, 0))
+        self.interaction.hints.append(Hint(hint_text))
 
     def delete_hint(self, index):
         if index >= len(self.interaction.hints):
             raise IndexError('Hint index out of range')
         del self.interaction.hints[index]
-
-    def increment_hint_views(self, index):
-        if index >= len(self.interaction.hints):
-            raise IndexError('Hint index out of range')
-        hint = self.interaction.hints[index]
-        hint.views += 1
-
 
     def to_dict(self):
         return {
@@ -1582,13 +1576,17 @@ class Exploration(object):
                 Outcome.from_dict(idict['default_outcome'])
                 if idict['default_outcome'] is not None else None)
 
+            solution = (
+                Solution.from_dict(idict['solution'])
+                if idict['solution'] else {})
+
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,
                 idict['confirmed_unclassified_answers'],
                 [Fallback.from_dict(f) for f in idict['fallbacks']],
                 [Hint.from_dict(h) for h in idict['hints']],
-                Solution.from_dict(idict['solution']))
+                solution)
 
             exploration.states[state_name] = state
 
@@ -1800,20 +1798,6 @@ class Exploration(object):
                             'The parameter %s was used in a fallback, but it '
                             'does not exist in this exploration'
                             % param_change.name)
-
-            for hint in interaction.hints:
-                hint.validate()
-
-            if interaction.hints:
-                if interaction.solution:
-                    Solution.from_dict(
-                        interaction.solution).validate(interaction.id)
-                else:
-                    raise utils.ValidationError(
-                        'Solution must be specified if hint(s) are specified')
-            elif interaction.solution:
-                raise utils.ValidationError(
-                    'Hint(s) must be specified if solution is specified')
 
         # Check that state names required by gadgets exist.
         state_names_required_by_gadgets = set(
