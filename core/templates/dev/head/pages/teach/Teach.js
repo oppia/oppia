@@ -22,6 +22,10 @@ oppia.controller('Teach', [
   function(
       $scope, $timeout, $window, siteAnalyticsService,
       UrlInterpolationService) {
+    // Define constants
+    $scope.TAB_ID_TEACH = 'teach';
+    $scope.TAB_ID_PLAYBOOK = 'playbook';
+
     var activeTabClass = 'oppia-about-tabs-active';
     var hash = window.location.hash.slice(1);
     var visibleContent = 'oppia-about-visible-content';
@@ -35,25 +39,25 @@ oppia.controller('Teach', [
       );
     };
 
-    if (hash === 'teach') {
-      activateTab('teach');
-    } else if (hash === 'playbook') {
-      activateTab('playbook');
+    if (hash === $scope.TAB_ID_TEACH) {
+      activateTab($scope.TAB_ID_TEACH);
+    } else if (hash === $scope.TAB_ID_PLAYBOOK) {
+      activateTab($scope.TAB_ID_PLAYBOOK);
     }
 
     window.onhashchange = function() {
       var hashChange = window.location.hash.slice(1);
-      if (hashChange === 'teach') {
-        activateTab('teach');
-      } else if (hashChange === 'playbook') {
-        activateTab('playbook');
+      if (hashChange === $scope.TAB_ID_TEACH) {
+        activateTab($scope.TAB_ID_TEACH);
+      } else if (hashChange === $scope.TAB_ID_PLAYBOOK) {
+        activateTab($scope.TAB_ID_PLAYBOOK);
       }
     };
 
-    $scope.onOppiaTeachClick = function(pageName) {
+    $scope.onTabClick = function(tabName) {
       // Update hash
-      window.location.hash = '#' + pageName;
-      activateTab(pageName);
+      window.location.hash = '#' + tabName;
+      activateTab(tabName);
     };
 
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;

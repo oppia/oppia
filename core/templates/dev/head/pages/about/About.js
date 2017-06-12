@@ -19,6 +19,11 @@
 oppia.controller('About', [
   '$scope', 'UrlInterpolationService',
   function($scope, UrlInterpolationService) {
+    // Define constants
+    $scope.TAB_ID_ABOUT = 'about';
+    $scope.TAB_ID_FOUNDATION = 'foundation';
+    $scope.TAB_ID_CREDITS = 'credits';
+
     var activeTabClass = 'oppia-about-tabs-active';
     var hash = window.location.hash.slice(1);
     var visibleContent = 'oppia-about-visible-content';
@@ -32,30 +37,30 @@ oppia.controller('About', [
       );
     };
 
-    if (hash === 'foundation' || hash === 'license') {
-      activateTab('foundation');
+    if (hash === $scope.TAB_ID_FOUNDATION || hash === 'license') {
+      activateTab($scope.TAB_ID_FOUNDATION);
     }
 
-    if (hash === 'credits') {
-      activateTab('credits');
+    if (hash === $scope.TAB_ID_CREDITS) {
+      activateTab($scope.TAB_ID_CREDITS);
     }
 
-    if (hash === 'about') {
-      activateTab('about');
+    if (hash === $scope.TAB_ID_ABOUT) {
+      activateTab($scope.TAB_ID_ABOUT);
     }
 
     window.onhashchange = function() {
       var hashChange = window.location.hash.slice(1);
-      if (hashChange === 'foundation' || hashChange === 'license') {
-        activateTab('foundation');
+      if (hashChange === $scope.TAB_ID_FOUNDATION || hashChange === 'license') {
+        activateTab($scope.TAB_ID_FOUNDATION);
         // Ensure page goes to the license section
         if (hashChange === 'license') {
           location.reload(true);
         }
-      } else if (hashChange === 'credits') {
-        activateTab('credits');
-      } else if (hashChange === 'about') {
-        activateTab('about');
+      } else if (hashChange === $scope.TAB_ID_CREDITS) {
+        activateTab($scope.TAB_ID_CREDITS);
+      } else if (hashChange === $scope.TAB_ID_ABOUT) {
+        activateTab($scope.TAB_ID_ABOUT);
       }
     };
 
@@ -74,11 +79,11 @@ oppia.controller('About', [
                               'Vikrant Nanda', 'Vinamrata Singal',
                               'Yarin Feigenbaum'];
 
-    $scope.onAboutOppiaClick = function(pageName) {
+    $scope.onTabClick = function(tabName) {
       // Update hash
-      window.location.hash = '#' + pageName;
-      activateTab(pageName);
-    }
+      window.location.hash = '#' + tabName;
+      activateTab(tabName);
+    };
     $scope.listOfNames = listOfNamesToThank
       .slice(0, listOfNamesToThank.length - 1).join(', ') +
       ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
