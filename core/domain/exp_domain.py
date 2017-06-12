@@ -662,7 +662,7 @@ class Fallback(object):
 class Hint(object):
     """Value object representing a hint."""
     def __init__(self, hint_text, views):
-        self.hint_text = hint_text
+        self.hint_text = html_cleaner.clean(hint_text)
         self.views = views
 
     def to_dict(self):
@@ -674,7 +674,7 @@ class Hint(object):
     @classmethod
     def from_dict(cls, hint_dict):
         return cls(
-            hint_dict['hint_text'],
+            html_cleaner.clean(hint_dict['hint_text']),
             hint_dict['views'])
 
     def validate(self):
@@ -691,20 +691,22 @@ class Hint(object):
 class Solution(object):
     """Value object representing a solution.
 
-    A solution consists of answer_boolean, correct_answer and an explanation.
-    answer_boolean when True indicates that it is the only correct answer and
+    A solution consists of answer_is_exclusive, correct_answer and an explanation.
+    answer_is_exclusive when True indicates that it is the only correct answer and
     False indicates that it is one possible answer. correct_answer records the
     answer to progress to the next card and explanation is a string containing
     an explanation for the solution.
     """
-    def __init__(self, answer_boolean, correct_answer, explanation):
-        self.answer_boolean = answer_boolean
-        self.correct_answer = correct_answer
-        self.explanation = explanation
+    def __init__(self, answer_is_exclusive, correct_answer, explanation):
+        self.answer_is_exclusive = answer_is_exclusive
+        self.correct_answer = (
+            html_cleaner.clean(correct_answer)
+            if type(correct_answer) == str else correct_answer)
+        self.explanation = html_cleaner.clean(explanation)
 
     def to_dict(self):
         return {
-            'answer_boolean': self.answer_boolean,
+            'answer_is_exclusive': self.answer_is_exclusive,
             'correct_answer': self.correct_answer,
             'explanation': self.explanation,
         }
@@ -712,17 +714,22 @@ class Solution(object):
     @classmethod
     def from_dict(cls, solution_dict):
         return cls(
-            solution_dict['answer_boolean'],
-            solution_dict['correct_answer'],
-            solution_dict['explanation'])
+            solution_dict['answer_is_exclusive'],
+            (html_cleaner.clean(solution_dict['correct_answer'])
+             if type(solution_dict['correct_answer']) == str
+             else solution_dict['correct_answer']),
+            html_cleaner.clean(solution_dict['explanation']))
 
     def validate(self, interaction_id):
-        if not isinstance(self.answer_boolean, bool):
+        if not isinstance(self.answer_is_exclusive, bool):
             raise utils.ValidationError(
-                'Expected answer_boolean to be bool, received %s' %
-                self.answer_boolean)
+                'Expected answer_is_exclusive to be bool, received %s' %
+                self.answer_is_exclusive)
         interaction_registry.Registry.get_interaction_by_id(
             interaction_id).normalize_answer(self.correct_answer)
+        if self.explanation == '':
+            raise utils.ValidationError(
+                'Explanation must not be an empty string')
         if not isinstance(self.explanation, basestring):
             raise utils.ValidationError(
                 'Expected explanation to be a string, received %s' %
@@ -867,10 +874,7 @@ class InteractionInstance(object):
         for hint in self.hints:
             hint.validate()
 
-        if not isinstance(self.solution, dict):
-            raise utils.ValidationError(
-                'Expected solution to be a dict, received %s'
-                % self.solution)
+        Solution.from_dict(self.solution).validate(self.id)
 
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
@@ -1584,7 +1588,7 @@ class Exploration(object):
                 idict['confirmed_unclassified_answers'],
                 [Fallback.from_dict(f) for f in idict['fallbacks']],
                 [Hint.from_dict(h) for h in idict['hints']],
-                idict['solution'])
+                Solution.from_dict(idict['solution']))
 
             exploration.states[state_name] = state
 

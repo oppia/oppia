@@ -691,7 +691,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             r'Solution must be specified if hint\(s\) are specified')
         solution = {
-            'answer_boolean': False,
+            'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': 'hello_world is a string',
         }
@@ -742,7 +742,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.add_hint('hint #1')
         solution = {
-            'answer_boolean': False,
+            'answer_is_exclusive': False,
             'correct_answer': [0, 0],
             'explanation': 'hello_world is a string',
         }
@@ -752,7 +752,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
         solution = {
-            'answer_boolean': False,
+            'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': 'hello_world is a string',
         }
