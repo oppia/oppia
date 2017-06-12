@@ -344,7 +344,6 @@ class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
 
         exploration = exp_services.get_exploration_from_model(item)
         exp_rights = rights_manager.get_exploration_rights(item.id)
-
         if exp_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
             for state_name, state in exploration.states.iteritems():
                 for fallback in state.interaction.fallbacks:
