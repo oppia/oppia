@@ -53,21 +53,10 @@ class LearnerDashboardHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        incomplete_exp_summaries, num_deleted_incomplete_exps = (
-            learner_progress_services.get_incomplete_exp_summaries(
-                self.user_id))
-
-        completed_exp_summaries, num_deleted_completed_exps = (
-            learner_progress_services.get_completed_exp_summaries(self.user_id))
-
-        (completed_collection_summaries, num_deleted_completed_collections,
-         completed_to_incomplete_collections) = (
-             learner_progress_services.get_completed_collection_summaries(
-                 self.user_id))
-
-        incomplete_collection_summaries, num_deleted_incomplete_collections = (
-            learner_progress_services.get_incomplete_collection_summaries(
-                self.user_id))
+        (incomplete_exp_summaries, incomplete_collection_summaries,
+         completed_exp_summaries, completed_collection_summaries,
+         number_of_deleted_activities, completed_to_incomplete_collections) = (
+             learner_progress_services.get_activity_progress(self.user_id))
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
@@ -107,12 +96,7 @@ class LearnerDashboardHandler(base.BaseHandler):
             'completed_collections_list': completed_collection_summary_dicts,
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
             'incomplete_collections_list': incomplete_collection_summary_dicts,
-            'number_of_deleted_activities': {
-                'incomplete_explorations': num_deleted_incomplete_exps,
-                'incomplete_collections': num_deleted_incomplete_collections,
-                'completed_explorations': num_deleted_completed_exps,
-                'completed_collections': num_deleted_completed_collections
-            },
+            'number_of_deleted_activities': number_of_deleted_activities,
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
             'subscription_list': subscription_list
