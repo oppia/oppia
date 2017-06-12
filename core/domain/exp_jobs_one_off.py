@@ -347,7 +347,8 @@ class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
         if exp_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
             for state_name, state in exploration.states.iteritems():
                 for fallback in state.interaction.fallbacks:
-                    num_submits = fallback.trigger.customization_args['num_submits']
+                    num_submits = (
+                        fallback.trigger.customization_args['num_submits'])
                     feedback = (
                         fallback.outcome.feedback[0]
                         if len(fallback.outcome.feedback) > 0 else 'ERROR')
