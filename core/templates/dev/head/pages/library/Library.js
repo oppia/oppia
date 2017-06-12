@@ -29,10 +29,11 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 oppia.controller('Library', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
   'urlService', 'ALL_CATEGORIES', 'searchService', 'windowDimensionsService',
-  'UrlInterpolationService', 'LIBRARY_PAGE_MODES', function(
+  'UrlInterpolationService', 'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH',
+  function(
       $scope, $http, $rootScope, $window, $timeout, i18nIdService,
       urlService, ALL_CATEGORIES, searchService, windowDimensionsService,
-      UrlInterpolationService, LIBRARY_PAGE_MODES) {
+      UrlInterpolationService, LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -46,9 +47,6 @@ oppia.controller('Library', [
 
     $scope.pageMode = GLOBALS.PAGE_MODE;
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
-    // Below is the width of each tile (width + margins), which can be found
-    // in components/summary_tile/exploration_summary_tile_directive.html
-    var tileDisplayWidth = 0;
 
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
@@ -81,16 +79,8 @@ oppia.controller('Library', [
 
         $rootScope.loadingMessage = '';
 
-        // Pause is necessary to ensure all elements have loaded, same for
-        // initCarousels.
-        // TODO(sll): On small screens, the tiles do not have a defined width.
-        // The use of 214 here is a hack, and the underlying problem of the
-        // tiles not having a defined width on small screens needs to be fixed.
-        $timeout(function() {
-          tileDisplayWidth = $('exploration-summary-tile').width() || 214;
-        }, 20);
-
         // Initialize the carousel(s) on the library index page.
+        // Pause is necessary to ensure all elements have loaded.
         $timeout(initCarousels, 390);
 
         // The following initializes the tracker to have all
@@ -126,14 +116,14 @@ oppia.controller('Library', [
       }
 
       var windowWidth = $(window).width() * 0.85;
-      // The number 20 is added to tileDisplayWidth in order to compensate
+      // The number 20 is added to LIBRARY_TILE_WIDTH in order to compensate
       // for padding and margins. 20 is just an arbitrary number.
       $scope.tileDisplayCount = Math.min(
-        Math.floor(windowWidth / (tileDisplayWidth + 20)),
+        Math.floor(windowWidth / (LIBRARY_TILE_WIDTH + 20)),
         MAX_NUM_TILES_PER_ROW);
 
       $('.oppia-library-carousel').css({
-        width: ($scope.tileDisplayCount * tileDisplayWidth) + 'px'
+        width: ($scope.tileDisplayCount * LIBRARY_TILE_WIDTH) + 'px'
       });
 
       // The following determines whether to enable left scroll after resize.
@@ -141,7 +131,7 @@ oppia.controller('Library', [
         var carouselJQuerySelector = (
           '.oppia-library-carousel-tiles:eq(n)'.replace('n', i));
         var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
-        var index = Math.ceil(carouselScrollPositionPx / tileDisplayWidth);
+        var index = Math.ceil(carouselScrollPositionPx / LIBRARY_TILE_WIDTH);
         $scope.leftmostCardIndices[i] = index;
       }
     };
@@ -178,7 +168,7 @@ oppia.controller('Library', [
       }
 
       var newScrollPositionPx = carouselScrollPositionPx +
-        ($scope.tileDisplayCount * tileDisplayWidth * direction);
+        ($scope.tileDisplayCount * LIBRARY_TILE_WIDTH * direction);
 
       $(carouselJQuerySelector).animate({
         scrollLeft: newScrollPositionPx
