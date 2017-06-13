@@ -19,6 +19,45 @@
 oppia.controller('About', [
   '$scope', 'UrlInterpolationService',
   function($scope, UrlInterpolationService) {
+    var activeTabClass = 'oppia-about-tabs-active';
+    var hash = window.location.hash.slice(1);
+    var visibleContent = 'oppia-about-visible-content';
+
+    var activateTab = function(tabName) {
+      $("a[id='" + tabName + "']").parent().addClass(
+        activeTabClass
+      ).siblings().removeClass(activeTabClass);
+      $('.' + tabName).addClass(visibleContent).siblings().removeClass(
+        visibleContent);
+    };
+
+    if (hash === 'foundation' || hash === 'license') {
+      activateTab('foundation');
+    }
+
+    if (hash === 'credits') {
+      activateTab('credits');
+    }
+
+    if (hash === 'about') {
+      activateTab('about');
+    }
+
+    window.onhashchange = function() {
+      var hashChange = window.location.hash.slice(1);
+      if (hashChange === 'foundation' || hashChange === 'license') {
+        activateTab('foundation');
+        // Ensure page goes to the license section
+        if (hashChange === 'license') {
+          location.reload(true);
+        }
+      } else if (hashChange === 'credits') {
+        activateTab('credits');
+      } else if (hashChange === 'about') {
+        activateTab('about');
+      }
+    };
+
     var listOfNamesToThank = ['Alex Kauffmann', 'Allison Barros',
                               'Amy Latten', 'Brett Barros',
                               'Crystal Kwok', 'Daniel Hernandez',
@@ -33,6 +72,12 @@ oppia.controller('About', [
                               'Robyn Choo', 'Tricia Ngoon',
                               'Vikrant Nanda', 'Vinamrata Singal',
                               'Yarin Feigenbaum'];
+
+    $scope.onAboutOppiaClick = function(pageName) {
+      // Update hash
+      window.location.hash = '#' + pageName;
+      activateTab(pageName);
+    }
     $scope.listOfNames = listOfNamesToThank
       .slice(0, listOfNamesToThank.length - 1).join(', ') +
       ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
