@@ -26,13 +26,13 @@
         <div class="about-nav md-tab">
           <ul class="oppia-about-tabs">
             <li class="oppia-about-tabs-active">
-              <a class="oppia-about-tabs-text" href="about" translate="I18N_ABOUT_PAGE_TABS_ABOUT"></a>
+              <a ng-click="onTabClick(TAB_ID_ABOUT)" href="" class="oppia-about-tabs-text" id="about" translate="I18N_ABOUT_PAGE_TABS_ABOUT"></a>
             </li>
             <li>
-              <a class="oppia-about-tabs-text" href="foundation" name="foundation" translate="I18N_ABOUT_PAGE_TABS_FOUNDATION"></a>
+              <a ng-click="onTabClick(TAB_ID_FOUNDATION)" href="" class="oppia-about-tabs-text" id="foundation" translate="I18N_ABOUT_PAGE_TABS_FOUNDATION"></a>
             </li>
             <li>
-              <a class="oppia-about-tabs-text" href="credits" name="credits" translate="I18N_ABOUT_PAGE_TABS_CREDITS"></a>
+              <a ng-click="onTabClick(TAB_ID_CREDITS)" href="" class="oppia-about-tabs-text" id="credits" translate="I18N_ABOUT_PAGE_TABS_CREDITS"></a>
             </li>
           </ul>
         </div>
@@ -98,7 +98,7 @@
               <h3 translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4_HEADING"></h3>
               <p translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4">
               </p>
-              <a name="license">
+              <a id="license">
                 <h1 style="padding-top: 70px; margin-top: -80px;"></h1>
               </a>
               <h3 translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING"></h3>
@@ -422,46 +422,6 @@
   </div>
   <div class="oppia-footer-padding-below-banner">
   </div>
-  <script>
-    $(document).ready(function() {
-      var activeTabClass = 'oppia-about-tabs-active';
-      var hash = window.location.hash.slice(1);
-      var visibleContent = 'oppia-about-visible-content';
-
-      function activateTab(tabName) {
-        $("a[name='" + tabName + "']").parent().addClass(
-          activeTabClass
-        ).siblings().removeClass(activeTabClass);
-        $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-          visibleContent);
-      }
-
-      if (hash === 'foundation' || hash === 'license') {
-        activateTab('foundation');
-      }
-
-      if (hash === 'credits') {
-        activateTab('credits');
-      }
-
-      window.onhashchange = function() {
-        var hashChange = window.location.hash.slice(1);
-        if (hashChange === 'foundation') {
-          activateTab('foundation');
-        } else if (hashChange === 'credits') {
-          activateTab('credits');
-        }
-      };
-
-      $('.oppia-about-tabs li').on('click', function(evt) {
-        evt.preventDefault();
-        $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
-        var currentAttrVal = $(this).children('a').attr('href');
-        $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(
-          visibleContent);
-      });
-    });
-  </script>
   <style>
     .oppia-about-foundation-tab-anchor {
       background-color: #009788;
