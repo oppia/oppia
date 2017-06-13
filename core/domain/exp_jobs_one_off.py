@@ -343,17 +343,22 @@ class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
             return
 
         exploration = exp_services.get_exploration_from_model(item)
-        for state_name, state in exploration.states.iteritems():
-            for fallback in state.interaction.fallbacks:
-                num_submits = fallback.trigger.customization_args['num_submits']
-                feedback = fallback.outcome.feedback[0]
-                yield (
-                    '%s: %s' % (
-                        item.id,
-                        state_name.encode('utf-8')),
-                    '%s: %s' % (
-                        num_submits['value'],
-                        feedback.encode('utf-8')))
+        exp_rights = rights_manager.get_exploration_rights(item.id)
+        if exp_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+            for state_name, state in exploration.states.iteritems():
+                for fallback in state.interaction.fallbacks:
+                    num_submits = (
+                        fallback.trigger.customization_args['num_submits'])
+                    feedback = (
+                        fallback.outcome.feedback[0]
+                        if len(fallback.outcome.feedback) > 0 else 'ERROR')
+                    yield (
+                        '%s: %s' % (
+                            item.id,
+                            state_name.encode('utf-8')),
+                        '%s: %s' % (
+                            num_submits['value'],
+                            feedback.encode('utf-8')))
 
     @staticmethod
     def reduce(key, values):
