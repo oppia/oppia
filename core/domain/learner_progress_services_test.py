@@ -17,6 +17,7 @@
 """Tests for learner progress services."""
 
 import datetime
+from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import learner_progress_services
@@ -59,7 +60,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Save a few collections.
         self.save_new_default_collection(
-            self.COL_ID_0, self.owner_id, title='Bridges in England',
+            self.COL_ID_0, self.owner_id, title='Bridges',
             category='Architecture')
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title='Introduce Oppia',
@@ -459,17 +460,44 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         completed_exploration_summaries = activity_progress[2]
         completed_collection_summaries = activity_progress[3]
 
-        exp_0_summary = exp_services.get_exploration_summary_by_id(
-            self.EXP_ID_0)
-        exp_1_summary = exp_services.get_exploration_summary_by_id(
-            self.EXP_ID_1)
-        col_0_summary = collection_services.get_collection_summary_by_id(
-            self.COL_ID_0)
-        col_1_summary = collection_services.get_collection_summary_by_id(
-            self.COL_ID_1)
-
         self.assertEqual(len(incomplete_exploration_summaries), 1)
         self.assertEqual(len(incomplete_collection_summaries), 1)
         self.assertEqual(len(completed_exploration_summaries), 1)
         self.assertEqual(len(completed_collection_summaries), 1)
 
+        self.assertEqual(
+            incomplete_exploration_summaries[0].title, 'Sillat Suomi')
+        self.assertEqual(
+            incomplete_collection_summaries[0].title, 'Introduce Oppia')
+        self.assertEqual(
+            completed_exploration_summaries[0].title, 'Bridges in England')
+        self.assertEqual(
+            completed_collection_summaries[0].title, 'Bridges')
+
+        # Delete an exploration.
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
+        # Add an exploration to a collection that has already been completed.
+        collection_services.update_collection(
+            self.owner_id, self.COL_ID_0, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID_2
+            }], 'Add new exploration')
+
+        # Get the progress of the user.
+        activity_progress = learner_progress_services.get_activity_progress(
+            self.user_id)
+
+        # Check that the exploration is no longer present in the incomplete
+        # section.
+        self.assertEqual(len(activity_progress[0]), 0)
+        # Check that the dashboard records the exploration deleted.
+        self.assertEqual(activity_progress[4]['incomplete_explorations'], 1)
+
+        incomplete_collection_summaries = activity_progress[1]
+
+        # Check that the collection to which a new exploration has been added
+        # has been moved to the incomplete section.
+        self.assertEqual(len(incomplete_collection_summaries), 2)
+        self.assertEqual(incomplete_collection_summaries[1].title, 'Bridges')
+        # Check that the dashboard has recorded the change in the collection.
+        self.assertEqual(activity_progress[5], ['Bridges'])
