@@ -18,5 +18,5 @@ var constants = {
     "Statistics", "Trigonometry", "Welcome"],
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
-  "LIBRARY_TILE_WIDTH": 208
+  "LIBRARY_TILE_WIDTH_PX": 208
 };
