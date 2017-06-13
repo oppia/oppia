@@ -93,7 +93,10 @@
     <div class="col-md-4">
       <md-card class="oppia-page-card oppia-long-text" style="">
         <legend class="text-center">Role Hierarchy</legend>
-         <static-graph graph-data="graphData" node-fill="white"></static-graph> 
+          <role-graph graph-data="graphData"
+                        node-fill="white"
+                        graph-data-loaded="graphDataLoaded">
+          </role-graph> 
       </md-card>
     </div>
   </div>

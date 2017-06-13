@@ -16,7 +16,7 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
-oppia.directive('staticGraph', [
+oppia.directive('roleGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -35,62 +35,19 @@ oppia.directive('staticGraph', [
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         //             (i.e., those whose interactions are terminal).
         graphData: '=',
-        // Id of a second initial state, which will be styled as an initial
-        // state
-        initStateId2: '=',
-        // Object which maps linkProperty to a style
-        linkPropertyMapping: '=',
-        // Object whose keys are node ids and whose values are node colors
-        nodeColors: '=',
         // A value which is the color of all nodes
         nodeFill: '@',
-        // Object whose keys are node ids with secondary labels and whose
-        // values are secondary labels. If this is undefined, it means no nodes
-        // have secondary labels.
-        nodeSecondaryLabels: '=',
-        // Function called when node is clicked. Should take a parameter
-        // node.id.
-        onClickFunction: '=',
-        // Object whose keys are ids of nodes, and whose values are the
-        // corresponding node opacities.
-        opacityMap: '=',
+        // A boolean value to signify whether graphData is completely loaded.
+        graphDataLoaded: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/static_graph_directive.html'),
+        '/pages/admin/roles_tab/role_graph_directive.html'),
       controller: [
         '$scope', '$element', '$timeout', '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
             $scope, $element, $timeout, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
-          var redrawGraph = function() {
-            if ($scope.graphData) {
-              $scope.graphLoaded = false;
-              $scope.drawGraph(
-                $scope.graphData.nodes, $scope.graphData.links,
-                $scope.graphData.initStateId, $scope.graphData.finalStateIds
-              );
-
-              // Wait for the graph to finish loading before showing it again.
-              $timeout(function() {
-                $scope.graphLoaded = true;
-              });
-            }
-          };
-
-          $scope.$on('redrawGraph', function() {
-            redrawGraph();
-          });
-
-          $scope.$watch(
-            function() {
-              return $scope.graphData;
-            }, redrawGraph, true);
-          // If statistics for a different version of the exploration are
-          // loaded, this may change the opacities of the nodes.
-          $scope.$watch('opacityMap', redrawGraph);
-          $(window).resize(redrawGraph);
-
           // A rough upper bound for the width of a single letter, in pixels,
           // to use as a scaling factor to determine the width of graph nodes.
           // This is not an entirely accurate description because it also takes
@@ -106,44 +63,6 @@ oppia.directive('staticGraph', [
             return {
               h: $element.height(),
               w: $element.width()
-            };
-          };
-
-          // Returns the closest number to `value` in the range
-          // [bound1, bound2].
-          var clamp = function(value, bound1, bound2) {
-            var minValue = Math.min(bound1, bound2);
-            var maxValue = Math.max(bound1, bound2);
-            return Math.min(Math.max(value, minValue), maxValue);
-          };
-
-          var getGraphBoundaries = function(nodeData) {
-            var INFINITY = 1e30;
-            var BORDER_PADDING = 5;
-
-            var leftEdge = INFINITY;
-            var topEdge = INFINITY;
-            var bottomEdge = -INFINITY;
-            var rightEdge = -INFINITY;
-
-            for (var nodeId in nodeData) {
-              leftEdge = Math.min(
-                nodeData[nodeId].x0 - BORDER_PADDING, leftEdge);
-              topEdge = Math.min(
-                nodeData[nodeId].y0 - BORDER_PADDING, topEdge);
-              rightEdge = Math.max(
-                nodeData[nodeId].x0 + BORDER_PADDING + nodeData[nodeId].width,
-                rightEdge);
-              bottomEdge = Math.max(
-                nodeData[nodeId].y0 + BORDER_PADDING + nodeData[nodeId].height,
-                bottomEdge);
-            }
-
-            return {
-              bottom: bottomEdge,
-              left: leftEdge,
-              right: rightEdge,
-              top: topEdge
             };
           };
 
@@ -186,7 +105,8 @@ oppia.directive('staticGraph', [
             $scope.VIEWPORT_X = -Math.max(1000, $scope.GRAPH_WIDTH * 2);
             $scope.VIEWPORT_Y = -Math.max(1000, $scope.GRAPH_HEIGHT * 2);
 
-            var graphBounds = getGraphBoundaries(nodeData);
+            var graphBounds = StateGraphLayoutService.getGraphBoundaries(
+              nodeData);
 
             $scope.augmentedLinks = links.map(function(link) {
               return {
@@ -261,22 +181,10 @@ oppia.directive('staticGraph', [
             }
 
             var nodeStrokeWidth = '1';
-
-            var getNodeFillOpacity = function(nodeId) {
-              return $scope.opacityMap ? $scope.opacityMap[nodeId] : 0.5;
-            };
+            var nodeFillOpacity = 0.5;
 
             $scope.getNodeTitle = function(node) {
-              var tooltip = node.label;
-              if (node.hasOwnProperty('secondaryLabel')) {
-                tooltip += ' ' + node.secondaryLabel;
-              }
-              return tooltip;
-            };
-
-            $scope.canNavigateToNode = function(nodeId) {
-              //return nodeId !== $scope.currentStateId();
-              return true;
+              return node.label;
             };
 
             $scope.getTruncatedLabel = function(nodeLabel) {
@@ -288,41 +196,26 @@ oppia.directive('staticGraph', [
             for (var nodeId in nodeData) {
               nodeData[nodeId].style = (
                 'stroke-width: ' + nodeStrokeWidth + '; ' +
-                'fill-opacity: ' + getNodeFillOpacity(nodeId) + ';');
-
+                'fill-opacity: ' + nodeFillOpacity + ';');
               if ($scope.nodeFill) {
                 nodeData[nodeId].style += ('fill: ' + $scope.nodeFill + '; ');
               }
-
-              // Color nodes
-              if ($scope.nodeColors) {
-                nodeData[nodeId].style += (
-                  'fill: ' + $scope.nodeColors[nodeId] + '; ');
-              }
-
-              // Add secondary label if it exists
-              if ($scope.nodeSecondaryLabels) {
-                if ($scope.nodeSecondaryLabels.hasOwnProperty(nodeId)) {
-                  nodeData[nodeId].secondaryLabel = (
-                    $scope.nodeSecondaryLabels[nodeId]);
-                  nodeData[nodeId].height *= 1.1;
-                }
-              }
-
-              var currentNodeIsTerminal = (
-                $scope.finalStateIds.indexOf(nodeId) !== -1);
-
-              nodeData[nodeId].nodeClass = (
-                // currentNodeIsTerminal ? 'terminal-node' :
-                // nodeId === $scope.currentStateId() ? 'current-node' :
-                // nodeId === initStateId ? 'init-node' :
-                // !(nodeData[nodeId].reachable &&
-                //  nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
-                                                       'normal-node');
-
               $scope.nodeList.push(nodeData[nodeId]);
             }
           };
+
+          if($scope.graphDataLoaded) {
+            console.log('hello');
+            $scope.drawGraph(
+              $scope.graphData.nodes, $scope.graphData.links,
+              $scope.graphData.initStateId, $scope.graphData.finalStateIds
+            );
+          }
+          $(window).resize($scope.drawGraph(
+              $scope.graphData.nodes, $scope.graphData.links,
+              $scope.graphData.initStateId, $scope.graphData.finalStateIds
+            )
+          );
         }
       ]
     };

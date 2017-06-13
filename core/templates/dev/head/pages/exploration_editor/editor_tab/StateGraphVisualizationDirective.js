@@ -127,36 +127,6 @@ oppia.directive('stateGraphViz', [
             return Math.min(Math.max(value, minValue), maxValue);
           };
 
-          var getGraphBoundaries = function(nodeData) {
-            var INFINITY = 1e30;
-            var BORDER_PADDING = 5;
-
-            var leftEdge = INFINITY;
-            var topEdge = INFINITY;
-            var bottomEdge = -INFINITY;
-            var rightEdge = -INFINITY;
-
-            for (var nodeId in nodeData) {
-              leftEdge = Math.min(
-                nodeData[nodeId].x0 - BORDER_PADDING, leftEdge);
-              topEdge = Math.min(
-                nodeData[nodeId].y0 - BORDER_PADDING, topEdge);
-              rightEdge = Math.max(
-                nodeData[nodeId].x0 + BORDER_PADDING + nodeData[nodeId].width,
-                rightEdge);
-              bottomEdge = Math.max(
-                nodeData[nodeId].y0 + BORDER_PADDING + nodeData[nodeId].height,
-                bottomEdge);
-            }
-
-            return {
-              bottom: bottomEdge,
-              left: leftEdge,
-              right: rightEdge,
-              top: topEdge
-            };
-          };
-
           $scope.getGraphHeightInPixels = function() {
             return Math.max($scope.GRAPH_HEIGHT, 300);
           };
@@ -196,7 +166,8 @@ oppia.directive('stateGraphViz', [
             $scope.VIEWPORT_X = -Math.max(1000, $scope.GRAPH_WIDTH * 2);
             $scope.VIEWPORT_Y = -Math.max(1000, $scope.GRAPH_HEIGHT * 2);
 
-            var graphBounds = getGraphBoundaries(nodeData);
+            var graphBounds = StateGraphLayoutService.getGraphBoundaries(
+              nodeData);
 
             $scope.augmentedLinks = links.map(function(link) {
               return {

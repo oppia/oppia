@@ -38,6 +38,7 @@ oppia.directive('adminRolesTab', [
         $scope.setStatusMessage('');
         $scope.showUpdateForm = ADMIN_SHOW_UPDATE_ROLE;
 
+        $scope.graphDataLoaded = false;
         // Calculating initStateId and finalStateIds for graphData
         // Since role graph is acyclic, node with no incoming edge
         // is initState and nodes with no outgoing edge are finalStates.
@@ -59,6 +60,7 @@ oppia.directive('adminRolesTab', [
           }
         }
         $scope.graphData.finalStateIds = finalStateIds;
+        $scope.graphDataLoaded = true;
 
         $scope.submitRoleViewForm = function(values) {
           if (AdminTaskManagerService.isTaskRunning()) {

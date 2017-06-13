@@ -1,68 +1,4 @@
-<!-- NOTE TO DEVELOPERS: The svg defs needed for this directive are
-included at the bottom of exploration_editor.html. In order for the
-elements to render properly in Firefox, there cannot be multiple defs
-with the same id on the page. -->
 
-<style>
-  .oppia-graph-viz .pannable-rect {
-    cursor: move;
-    fill: none;
-    fill-opacity: 0;
-    pointer-events: all;
-  }
-  .oppia-graph-viz path.link {
-    fill: none;
-    stroke: rgb(179, 179, 179);
-    stroke-width: 3px;
-  }
-  .oppia-graph-viz text {
-    font: 12px sans-serif;
-    pointer-events: none;
-  }
-  .oppia-graph-viz text.shadow {
-    stroke: #fff;
-    stroke-width: 3px;
-    stroke-opacity: .8;
-  }
-  .oppia-graph-viz .node rect {
-    fill: #fff;
-    pointer-events: all;
-    stroke: rgb(0, 0, 0);
-    -moz-transition: all 0.15s;
-    -webkit-transition: all 0.15s;
-    -o-transition: all 0.15s;
-    transition: all 0.15s;
-  }
-  .oppia-graph-viz .node rect.terminal-node {
-    fill: green; /* terminal nodes are green to signify them */
-  }
-  .oppia-graph-viz .node rect.bad-node {
-    fill: #F35F55;
-  }
-  .oppia-graph-viz .node rect.current-node:hover,
-  .oppia-graph-viz .node rect.init-node:hover,
-  .oppia-graph-viz .node rect.terminal-node:hover,
-  .oppia-graph-viz .node rect.bad-node:hover,
-  .oppia-graph-viz .node rect.normal-node:hover {
-    fill: #C8C4C4;
-  }
-  .oppia-graph-viz .clickable {
-    cursor: pointer;
-  }
-  .oppia-graph-viz .legend-bar {
-    fill: url('#nodegradient');
-    stroke: black;
-    stroke-width: 0.5;
-  }
-
-  .oppia-state-graph-container .oppia-graph-resize-button {
-    border: 0;
-    padding: 9px 10px 6px 10px;
-    position: absolute;
-    right: 2px;
-    top: 2px;
-  }
-</style>
 
 <div style="height: <[getGraphHeightInPixels()]>px;" ng-show="graphLoaded">
   <button ng-if="!!onMaximizeFunction" ng-click="onMaximizeFunction()"
@@ -155,4 +91,65 @@ with the same id on the page. -->
       </g>
     </g>
   </svg>
+<style>
+  .oppia-graph-viz .pannable-rect {
+    cursor: move;
+    fill: none;
+    fill-opacity: 0;
+    pointer-events: all;
+  }
+  .oppia-graph-viz path.link {
+    fill: none;
+    stroke: rgb(179, 179, 179);
+    stroke-width: 3px;
+  }
+  .oppia-graph-viz text {
+    font: 12px sans-serif;
+    pointer-events: none;
+  }
+  .oppia-graph-viz text.shadow {
+    stroke: #fff;
+    stroke-width: 3px;
+    stroke-opacity: .8;
+  }
+  .oppia-graph-viz .node rect {
+    fill: #fff;
+    pointer-events: all;
+    stroke: rgb(0, 0, 0);
+    -moz-transition: all 0.15s;
+    -webkit-transition: all 0.15s;
+    -o-transition: all 0.15s;
+    transition: all 0.15s;
+  }
+  .oppia-graph-viz .node rect.terminal-node {
+    fill: green; /* terminal nodes are green to signify them */
+  }
+  .oppia-graph-viz .node rect.bad-node {
+    fill: #F35F55;
+  }
+  .oppia-graph-viz .node rect.current-node:hover,
+  .oppia-graph-viz .node rect.init-node:hover,
+  .oppia-graph-viz .node rect.terminal-node:hover,
+  .oppia-graph-viz .node rect.bad-node:hover,
+  .oppia-graph-viz .node rect.normal-node:hover {
+    fill: #C8C4C4;
+  }
+  .oppia-graph-viz .clickable {
+    cursor: pointer;
+  }
+  .oppia-graph-viz .legend-bar {
+    fill: url('#nodegradient');
+    stroke: black;
+    stroke-width: 0.5;
+  }
+
+  .oppia-state-graph-container .oppia-graph-resize-button {
+    border: 0;
+    padding: 9px 10px 6px 10px;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+  }
+</style>
+
 </div>
