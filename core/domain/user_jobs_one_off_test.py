@@ -1144,21 +1144,21 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     def test_create_user_with_different_roles_and_run_migration_job(self):
-        USER_IDS = [
+        user_ids = [
             'user_id1', 'user_id2', 'user_id3', 'user_id4',
             'user_id5', 'user_id6', 'user_id7', 'user_id8'
         ]
-        USER_EMAILS = [
+        user_emails = [
             'user1@example.com', 'user2@example.com', 'user3@example.com',
             'user4@example.com', 'user5@example.com', 'user6@example.com',
             'user7@example.com', 'user8@example.com'
         ]
-        USER_NAMES = [
+        user_names = [
             'user1', 'user2', 'user3', 'user4', 'user5', 'user6',
             'user7', 'user8'
         ]
 
-        for uid, uemail, uname in zip(USER_IDS, USER_EMAILS, USER_NAMES):
+        for uid, uemail, uname in zip(user_ids, user_emails, user_names):
             user_services.create_new_user(uid, uemail)
             user_services.set_username(uid, uname)
 

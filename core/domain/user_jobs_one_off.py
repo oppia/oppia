@@ -340,31 +340,31 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(user_model):
-        ADMIN_USERNAMES = config_domain.Registry.get_config_property(
+        admin_usernames = config_domain.Registry.get_config_property(
             'admin_usernames')
-        MODERATOR_USERNAMES = config_domain.Registry.get_config_property(
+        moderator_usernames = config_domain.Registry.get_config_property(
             'moderator_usernames')
-        BANNED_USERNAMES = config_domain.Registry.get_config_property(
+        banned_usernames = config_domain.Registry.get_config_property(
             'banned_usernames')
-        COLLECTION_EDITORS = config_domain.Registry.get_config_property(
+        collection_editors = config_domain.Registry.get_config_property(
             'collection_editor_whitelist')
-        EMAIL_SENDERS = config_domain.Registry.get_config_property(
+        email_senders = config_domain.Registry.get_config_property(
             'whitelisted_email_senders')
 
         try:
-            if user_model.username in ADMIN_USERNAMES.value:
+            if user_model.username in admin_usernames.value:
                 user_services.update_user_role(
                     user_model.id, feconf.ROLE_ADMIN)
-            elif user_model.username in MODERATOR_USERNAMES.value:
+            elif user_model.username in moderator_usernames.value:
                 user_services.update_user_role(
                     user_model.id, feconf.ROLE_MODERATOR)
-            elif user_model.username in BANNED_USERNAMES.value:
+            elif user_model.username in banned_usernames.value:
                 user_services.update_user_role(
                     user_model.id, feconf.ROLE_BANNED_USER)
-            elif user_model.username in COLLECTION_EDITORS.value:
+            elif user_model.username in collection_editors.value:
                 user_services.update_user_role(
                     user_model.id, feconf.ROLE_COLLECTION_EDITOR)
-            elif user_model.username in EMAIL_SENDERS.value:
+            elif user_model.username in email_senders.value:
                 user_services.update_user_role(
                     user_model.id, feconf.ROLE_SUPER_ADMIN)
             else:
