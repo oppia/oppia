@@ -22,6 +22,8 @@ import re
 
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
+from core.domain import config_services
 from core.domain import exp_services
 from core.domain import event_services
 from core.domain import feedback_services
@@ -1138,3 +1140,76 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNone(owner_settings.last_created_an_exploration)
         self.assertIsNone(owner_settings.last_edited_an_exploration)
+
+
+class UserRoleMigrationOneOffJobTests(test_utils.GenericTestBase):
+
+    def test_create_user_with_different_roles_and_run_migration_job(self):
+        USER_IDS = [
+            'user_id1', 'user_id2', 'user_id3', 'user_id4',
+            'user_id5', 'user_id6', 'user_id7', 'user_id8'
+        ]
+        USER_EMAILS = [
+            'user1@example.com', 'user2@example.com', 'user3@example.com',
+            'user4@example.com', 'user5@example.com', 'user6@example.com',
+            'user7@example.com', 'user8@example.com'
+        ]
+        USER_NAMES = [
+            'user1', 'user2', 'user3', 'user4', 'user5', 'user6',
+            'user7', 'user8'
+        ]
+
+        for uid, uemail, uname in zip(USER_IDS, USER_EMAILS, USER_NAMES):
+            user_services.create_new_user(uid, uemail)
+            user_services.set_username(uid, uname)
+
+        super_admin_usernames = ['user1']
+        admin_usernames = ['user2', 'user3']
+        moderator_usernames = ['user4', 'user5']
+        banned_usernames = ['user6']
+        collection_editor_usernames = ['user7']
+        exploration_editor_usernames = ['user8']
+
+        self.set_config_property(
+            config_domain.ADMIN_USERNAMES, admin_usernames)
+        self.set_config_property(
+            config_domain.MODERATOR_USERNAMES, moderator_usernames)
+        self.set_config_property(
+            config_domain.WHITELISTED_EMAIL_SENDERS, super_admin_usernames)
+        self.set_config_property(
+            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
+            collection_editor_usernames)
+        self.set_config_property(
+            config_domain.BANNED_USERNAMES, banned_usernames)
+
+        job_id = (
+            user_jobs_one_off.UserRolesMigrationOneOffJob.create_new())
+        user_jobs_one_off.UserRolesMigrationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        admins_by_role = user_services.get_usernames_by_role(
+            feconf.ROLE_ADMIN)
+        super_admins_by_role = user_services.get_usernames_by_role(
+            feconf.ROLE_SUPER_ADMIN)
+        moderators_by_role = user_services.get_usernames_by_role(
+            feconf.ROLE_MODERATOR)
+        banned_users_by_role = user_services.get_usernames_by_role(
+            feconf.ROLE_BANNED_USER)
+        collection_editors_by_role = user_services.get_usernames_by_role(
+            feconf.ROLE_COLLECTION_EDITOR)
+        exploration_editors_by_role = user_services.get_usernames_by_role(
+            feconf.ROLE_EXPLORATION_EDITOR)
+
+        self.assertEqual(
+            set(admin_usernames), set(admins_by_role))
+        self.assertEqual(
+            set(moderator_usernames), set(moderators_by_role))
+        self.assertEqual(
+            set(super_admin_usernames), set(super_admins_by_role))
+        self.assertEqual(
+            set(banned_usernames), set(banned_users_by_role))
+        self.assertEqual(
+            set(collection_editor_usernames), set(collection_editors_by_role))
+        self.assertEqual(
+            set(exploration_editor_usernames),
+            set(exploration_editors_by_role))
