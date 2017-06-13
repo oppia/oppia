@@ -17,11 +17,13 @@
 import ast
 
 from core import jobs
+from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import feconf
 import utils
 
 (exp_models, collection_models, feedback_models, user_models) = (
@@ -324,3 +326,50 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, stringified_values):
         pass
+
+
+class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
+    """A one time job to attach a new field (representing role of user) to the
+    UserSettingsModel. The job will load all existing users from the datastore,
+    look for the role to assign them and then store them back thus updating the
+    table schema and adding appropiate roles to users.
+    """
+    @classmethod
+    def entity_class_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_model):
+        ADMIN_USERNAMES = config_domain.Registry.get_config_property(
+            'admin_usernames')
+        MODERATOR_USERNAMES = config_domain.Registry.get_config_property(
+            'moderator_usernames')
+        BANNED_USERNAMES = config_domain.Registry.get_config_property(
+            'banned_usernames')
+        COLLECTION_EDITORS = config_domain.Registry.get_config_property(
+            'collection_editor_whitelist')
+        EMAIL_SENDERS = config_domain.Registry.get_config_property(
+            'whitelisted_email_senders')
+
+        if user_model.username in ADMIN_USERNAMES:
+            user_services.update_user_role(user_model.id, feconf.ROLE_ADMIN)
+        elif user_model.username in MODERATOR_USERNAMES:
+            user_services.update_user_role(
+                user_model.id, feconf.ROLE_MODERATOR)
+        elif user_model.username in BANNED_USERNAMES:
+            user_services.update_user_role(
+                user_model.id, feconf.ROLE_BANNED_USER)
+        elif user_model.username in COLLECTION_EDITORS:
+            user_services.update_user_role(
+                user_model.id, feconf.ROLE_COLLECTION_EDITOR)
+        elif user_model.username in EMAIL_SENDERS:
+            user_services.update_user_role(
+                user_model.id, feconf.ROLE_SUPER_ADMIN)
+        else:
+            user_services.update_user_role(
+                user_model.id, feconf.ROLE_EXPLORATION_EDITOR)
+        yield(user_model.username, 'Role successfully attached.')
+
+    @staticmethod
+    def reduce(key, value):
+        yield(key, value)
