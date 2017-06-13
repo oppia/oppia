@@ -206,10 +206,38 @@ class AdminHandler(base.BaseHandler):
                             feconf.ROLE_MODERATOR)
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
+                config_property = config_domain.Registry.get_config_property(
+                    config_property_id)
+                config_value = config_property.value
                 logging.info('[ADMIN] %s reverted config property: %s' %
                              (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
+
+                # Below checks are for maintaining the sync between roles
+                # in old and new authorization system.
+                # NOTE: This block of code is going to be removed once the
+                #   new system takes over.
+                if config_property_id == 'whitelisted_email_senders':
+                    check_and_update_config_role(
+                        config_value, config_property.default_value,
+                        feconf.ROLE_SUPER_ADMIN)
+                if config_property_id == 'admin_usernames':
+                    check_and_update_config_role(
+                        config_value, config_property.default_value,
+                        feconf.ROLE_ADMIN)
+                if config_property_id == 'collection_editor_whitelist':
+                    check_and_update_config_role(
+                        config_value, config_property.default_value,
+                        feconf.ROLE_COLLECTION_EDITOR)
+                if config_property_id == 'banned_usernames':
+                    check_and_update_config_role(
+                        config_value, config_property.default_value,
+                        feconf.ROLE_BANNED_USER)
+                if config_property_id == 'moderator_usernames':
+                    check_and_update_config_role(
+                        config_value, config_property.default_value,
+                        feconf.ROLE_MODERATOR)
             elif self.payload.get('action') == 'start_new_job':
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):
