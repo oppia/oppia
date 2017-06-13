@@ -22,7 +22,6 @@ import re
 
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
 from core.domain import event_services
@@ -1169,17 +1168,17 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
         banned_usernames = ['user6']
         collection_editor_usernames = ['user7', 'user8']
 
-        self.set_config_property(
-            config_domain.ADMIN_USERNAMES, admin_usernames)
-        self.set_config_property(
-            config_domain.MODERATOR_USERNAMES, moderator_usernames)
-        self.set_config_property(
-            config_domain.WHITELISTED_EMAIL_SENDERS, super_admin_usernames)
-        self.set_config_property(
-            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
+        config_services.set_property(
+            'admin_id', 'admin_usernames', admin_usernames)
+        config_services.set_property(
+            'admin_id', 'moderator_usernames', moderator_usernames)
+        config_services.set_property(
+            'admin_id', 'banned_usernames', banned_usernames)
+        config_services.set_property(
+            'admin_id', 'collection_editor_whitelist',
             collection_editor_usernames)
-        self.set_config_property(
-            config_domain.BANNED_USERNAMES, banned_usernames)
+        config_services.set_property(
+            'admin_id', 'whitelisted_email_senders', super_admin_usernames)
 
         job_id = (
             user_jobs_one_off.UserRolesMigrationOneOffJob.create_new())
