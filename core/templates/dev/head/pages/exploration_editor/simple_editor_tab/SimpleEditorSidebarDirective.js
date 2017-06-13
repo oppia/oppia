@@ -36,7 +36,16 @@ oppia.directive('simpleEditorSidebar', [
             'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
           $scope.questionList = SimpleEditorManagerService.getQuestionList();
           $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
-
+          $scope.modes = {
+            READONLY:'READONLY',
+            EDIT:'EDIT'
+          };
+          var editButtonTexts = {
+            DONE:'Done',
+            EDIT:'Edit'
+          };
+          $scope.mode = $scope.modes.READONLY;
+          $scope.editButtonText = editButtonTexts.EDIT;
           $scope.getSidebarItemId = function(question, subfieldLabel) {
             return QuestionIdService.getSidebarItemId(
               question.getId(), subfieldLabel
@@ -60,6 +69,20 @@ oppia.directive('simpleEditorSidebar', [
           $scope.$on('SimpleEditorSidebarToggleCollapse', function() {
             $scope.$apply();
           });
+
+          $scope.toggleEditMode = function(){
+            if($scope.mode === $scope.modes.READONLY){
+              $scope.mode = $scope.modes.EDIT;
+              $scope.editButtonText = editButtonTexts.DONE;
+            }else{
+              $scope.mode = $scope.modes.READONLY;
+              $scope.editButtonText = editButtonTexts.EDIT;
+            }
+          };
+
+          $scope.deleteQuestion = function(question){
+            SimpleEditorManagerService.deleteQuestion(question);
+          };
         }
       ]
     };

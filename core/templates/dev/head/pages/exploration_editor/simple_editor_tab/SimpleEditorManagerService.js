@@ -138,6 +138,34 @@ oppia.factory('SimpleEditorManagerService', [
         data.questionList.addQuestion(QuestionObjectFactory.create(
           lastStateName, stateData.interaction, ''));
       },
+      deleteQuestion: function(question){
+        var stateName = question.getStateName();
+        var state = SimpleEditorShimService.getState(stateName);
+        var content = state.content;
+        var nextStateName = state.interaction.answerGroups[0].outcome.dest;
+        var nextState = SimpleEditorShimService.getState(nextStateName);
+        var allStateNames = SimpleEditorShimService.getAllStateNames();
+        for(var i = 0; i < allStateNames.length;i++){
+          var currentState = SimpleEditorShimService.getState(allStateNames[i]);
+          var newAnswerGroups = currentState.interaction.answerGroups;
+          var hasAnswerGroupsChanged = false;
+          for(var j = 0; j < currentState.interaction.answerGroups.length;j++){
+            if(currentState.interaction.answerGroups[j].outcome.dest == 
+            stateName){
+              newAnswerGroups[j].outcome.dest = nextStateName;
+              hasAnswerGroupsChanged = true;
+            }
+          }
+          if(hasAnswerGroupsChanged){
+            SimpleEditorShimService
+              .saveAnswerGroups(allStateNames[i],newAnswerGroups);
+          }
+        }
+        if(nextState != null){
+          SimpleEditorShimService.saveStateContent(nextStateName,content);
+        }
+        SimpleEditorShimService.deleteState(stateName);
+      },
       canAddNewQuestion: function() {
         // Requirements:
         // - If this is the first question, there must already be an

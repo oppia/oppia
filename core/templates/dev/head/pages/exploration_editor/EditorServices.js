@@ -925,6 +925,25 @@ oppia.factory('explorationStatesService', [
       var conversionFunction = BACKEND_CONVERSIONS[backendName];
       return conversionFunction(frontendValue);
     };
+    
+    var finallyDelete = function(deleteStateName){
+      _states.deleteState(deleteStateName);
+
+      changeListService.deleteState(deleteStateName);
+
+      if (editorContextService.getActiveStateName() === deleteStateName) {
+        editorContextService.setActiveStateName(
+              explorationInitStateNameService.savedMemento);
+      }
+
+      $location.path('/gui/' + editorContextService.getActiveStateName());
+      $rootScope.$broadcast('refreshGraph');
+          // This ensures that if the deletion changes rules in the current
+          // state, they get updated in the view.
+      $rootScope.$broadcast('refreshStateEditor');
+          // This state name is removed from gadget's visibilty settings.
+      explorationGadgetsService.handleStateDeletion(deleteStateName);
+    }
 
     // TODO(sll): Add unit tests for all get/save methods.
     return {
@@ -1092,24 +1111,10 @@ oppia.factory('explorationStatesService', [
               };
             }
           ]
-        }).result.then(function(deleteStateName) {
-          _states.deleteState(deleteStateName);
-
-          changeListService.deleteState(deleteStateName);
-
-          if (editorContextService.getActiveStateName() === deleteStateName) {
-            editorContextService.setActiveStateName(
-              explorationInitStateNameService.savedMemento);
-          }
-
-          $location.path('/gui/' + editorContextService.getActiveStateName());
-          $rootScope.$broadcast('refreshGraph');
-          // This ensures that if the deletion changes rules in the current
-          // state, they get updated in the view.
-          $rootScope.$broadcast('refreshStateEditor');
-          // This state name is removed from gadget's visibilty settings.
-          explorationGadgetsService.handleStateDeletion(deleteStateName);
-        });
+        }).result.then(finallyDelete(deleteStateName));
+      },
+      reallyDelete: function(deleteStateName){
+        return finallyDelete(deleteStateName);
       },
       renameState: function(oldStateName, newStateName) {
         newStateName = $filter('normalizeWhitespace')(newStateName);

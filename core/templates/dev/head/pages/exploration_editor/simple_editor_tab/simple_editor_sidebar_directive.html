@@ -1,4 +1,5 @@
 <div class="sidebar">
+  <button class="md-button" ng-click="toggleEditMode()">{{editButtonText}}</button>
   <ul>
     <li id="<[ID_PREFIX + 'title']>"
         ng-click="scrollToHeader('title')" class="sidebar-item sidebar-header">
@@ -12,13 +13,16 @@
 
     <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
       <div id="<[ID_PREFIX + question.getId()]>" class="sidebar-item-header">
-        <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons">
+        <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons" ng-hide="mode===modes.EDIT">
           <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
+        </i>
+        <i ng-click="deleteQuestion(question)" class="delete-icon material-icons" ng-hide="mode===modes.READONLY">
+          <['&#xE872;']>
         </i>
         <strong ng-click="scrollToQuestion(question)">Question <[$index + 1]></strong>
       </div>
 
-      <ul ng-show="question.isCollapsed()">
+      <ul ng-show="question.isCollapsed() && (mode===modes.READONLY)">
         <li class="sidebar-item sidebar-item-indented"
             ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index"
             ng-click="scrollToField(question, subfieldLabel)"
@@ -115,5 +119,11 @@
     position: relative;
     text-indent: 30px;
     width: 220px;
+  }
+  simple-editor-sidebar .md-button {
+    color : currentColor;
+  }
+  simple-editor-sidebar .md-button:not([disabled]):hover {
+    background-color: rgba(158, 158, 158, 0.2);
   }
 </style>
