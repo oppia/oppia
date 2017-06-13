@@ -17,6 +17,8 @@
 """Tests for learner progress services."""
 
 import datetime
+from core.domain import collection_services
+from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.platform import models
 from core.tests import test_utils
@@ -433,3 +435,41 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
+    def test_get_activity_progress(self):
+        # Add an entity to each of the sections.
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_0)
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_0)
+
+        state_name = 'state name'
+        version = 1
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+        learner_progress_services.mark_collection_as_incomplete(
+            self.user_id, self.COL_ID_1)
+
+        # Get the progress of the user.
+        activity_progress = learner_progress_services.get_activity_progress(
+            self.user_id)
+
+        incomplete_exploration_summaries = activity_progress[0]
+        incomplete_collection_summaries = activity_progress[1]
+        completed_exploration_summaries = activity_progress[2]
+        completed_collection_summaries = activity_progress[3]
+
+        exp_0_summary = exp_services.get_exploration_summary_by_id(
+            self.EXP_ID_0)
+        exp_1_summary = exp_services.get_exploration_summary_by_id(
+            self.EXP_ID_1)
+        col_0_summary = collection_services.get_collection_summary_by_id(
+            self.COL_ID_0)
+        col_1_summary = collection_services.get_collection_summary_by_id(
+            self.COL_ID_1)
+
+        self.assertEqual(len(incomplete_exploration_summaries), 1)
+        self.assertEqual(len(incomplete_collection_summaries), 1)
+        self.assertEqual(len(completed_exploration_summaries), 1)
+        self.assertEqual(len(completed_collection_summaries), 1)
+
