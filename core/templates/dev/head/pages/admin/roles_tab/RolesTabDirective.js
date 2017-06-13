@@ -37,6 +37,9 @@ oppia.directive('adminRolesTab', [
         $scope.result = {};
         $scope.setStatusMessage('');
         $scope.showUpdateForm = ADMIN_SHOW_UPDATE_ROLE;
+        $scope.viewFormValues = {};
+        $scope.updateFormValues = {};
+        $scope.viewFormValues.method = 'role';
 
         $scope.graphDataLoaded = false;
         // Calculating initStateId and finalStateIds for graphData
@@ -49,13 +52,13 @@ oppia.directive('adminRolesTab', [
           hasOutgoingEdge.push($scope.graphData.links[i].source);
         }
         var finalStateIds = [];
-        for (var i in $scope.graphData.nodes) {
-          if ($scope.graphData.nodes.hasOwnProperty(i)) {
-            if (hasIncomingEdge.indexOf(i) == -1) {
-              $scope.graphData.initStateId = i;
+        for (var role in $scope.graphData.nodes) {
+          if ($scope.graphData.nodes.hasOwnProperty(role)) {
+            if (hasIncomingEdge.indexOf(role) == -1) {
+              $scope.graphData.initStateId = role;
             }
-            if (hasOutgoingEdge.indexOf(i) == -1) {
-              finalStateIds.push(i);
+            if (hasOutgoingEdge.indexOf(role) == -1) {
+              finalStateIds.push(role);
             }
           }
         }
@@ -87,16 +90,12 @@ oppia.directive('adminRolesTab', [
               $scope.showResultRoles = true;
               $scope.setStatusMessage('Success.');
             }
+            $scope.viewFormValues.username = '';
+            $scope.viewFormValues.role = '';
           }, function(errorResponse) {
             $scope.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
-          if($scope.viewFormValues.username) {
-            $scope.viewFormValues.username = '';
-          }
-          if($scope.viewFormValues.role) {
-            $scope.viewFormValues.role = '';
-          }
           AdminTaskManagerService.finishTask();
         }
 
@@ -104,11 +103,6 @@ oppia.directive('adminRolesTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          $scope.form.updateRoleForm.$setPristine();
-          // if($scope.updateFormValues.username) {
-          //   $scope.updateFormValues.username = '';
-          // }
-          //$scope.updateFormValues.newRole = '';
           
           $scope.setStatusMessage('Updating User Role');
           AdminTaskManagerService.startTask();
@@ -119,6 +113,8 @@ oppia.directive('adminRolesTab', [
             $scope.setStatusMessage(
               'Role of ' + values.username +
               ' successfully updated to ' + values.newRole);
+            $scope.updateFormValues.username = '';
+            $scope.updateFormValues.newRole = '';
           }, function(errorResponse) {
             $scope.setStatusMessage(
               'Server error: ' + errorResponse.data.error);

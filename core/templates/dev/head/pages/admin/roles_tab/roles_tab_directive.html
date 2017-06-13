@@ -6,20 +6,16 @@
 
 <div class="container-fluid">
   <div class="row">
-    <br>
-    <h3 class="text-center text-danger">NOTE: Roles can't be modified from here yet.</h3>
-  </div>
-  <div class="row">
     <div class="col-md-8">
       <md-card class="oppia-page-card oppia-long-text">
-        <form class="form-horizontal" name="form.viewRoleForm" ng-submit="submitRoleViewForm(viewFormValues)">
+        <form class="form-horizontal" name="viewRoleForm" ng-submit="submitRoleViewForm(viewFormValues)">
           <legend class="text-center">View User Roles</legend>
           <div class="form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left" for="viewFormValues.method">
               Select Method
             </label>
             <div class="col-md-8">
-              <select ng-init="viewFormValues.method = 'role'" ng-model="viewFormValues.method" class="form-control">
+              <select ng-model="viewFormValues.method" class="form-control">
                   <option value="role">By Role</option>
                   <option value="username">By Username</option>
               </select>
@@ -68,7 +64,7 @@
       </md-card>
 
       <md-card class="oppia-page-card oppia-long-text" ng-if="showUpdateForm">
-        <form class="form-horizontal" name="form.updateRoleForm" ng-submit="submitUpdateRoleForm(updateFormValues)">
+        <form class="form-horizontal" name="updateRoleForm" ng-submit="submitUpdateRoleForm(updateFormValues)">
           <legend class="text-center">Update Role</legend>            
           <div class="form-group">
               <label class="col-md-4 col-lg-4 col-sm-4 control-label">Enter Username</label>
