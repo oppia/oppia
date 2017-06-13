@@ -351,24 +351,28 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
         EMAIL_SENDERS = config_domain.Registry.get_config_property(
             'whitelisted_email_senders')
 
-        if user_model.username in ADMIN_USERNAMES.value:
-            user_services.update_user_role(user_model.id, feconf.ROLE_ADMIN)
-        elif user_model.username in MODERATOR_USERNAMES.value:
-            user_services.update_user_role(
-                user_model.id, feconf.ROLE_MODERATOR)
-        elif user_model.username in BANNED_USERNAMES.value:
-            user_services.update_user_role(
-                user_model.id, feconf.ROLE_BANNED_USER)
-        elif user_model.username in COLLECTION_EDITORS.value:
-            user_services.update_user_role(
-                user_model.id, feconf.ROLE_COLLECTION_EDITOR)
-        elif user_model.username in EMAIL_SENDERS.value:
-            user_services.update_user_role(
-                user_model.id, feconf.ROLE_SUPER_ADMIN)
-        else:
-            user_services.update_user_role(
-                user_model.id, feconf.ROLE_EXPLORATION_EDITOR)
-        yield(user_model.username, 'Role successfully attached.')
+        try:
+            if user_model.username in ADMIN_USERNAMES.value:
+                user_services.update_user_role(
+                    user_model.id, feconf.ROLE_ADMIN)
+            elif user_model.username in MODERATOR_USERNAMES.value:
+                user_services.update_user_role(
+                    user_model.id, feconf.ROLE_MODERATOR)
+            elif user_model.username in BANNED_USERNAMES.value:
+                user_services.update_user_role(
+                    user_model.id, feconf.ROLE_BANNED_USER)
+            elif user_model.username in COLLECTION_EDITORS.value:
+                user_services.update_user_role(
+                    user_model.id, feconf.ROLE_COLLECTION_EDITOR)
+            elif user_model.username in EMAIL_SENDERS.value:
+                user_services.update_user_role(
+                    user_model.id, feconf.ROLE_SUPER_ADMIN)
+            else:
+                user_services.update_user_role(
+                    user_model.id, feconf.ROLE_EXPLORATION_EDITOR)
+            yield(user_model.username, 'Role successfully attached.')
+        except Exception:
+            yield(user_model.username, 'Some error ocurred.')
 
     @staticmethod
     def reduce(key, value):
