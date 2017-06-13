@@ -335,7 +335,7 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
     table schema and adding appropiate roles to users.
     """
     @classmethod
-    def entity_class_to_map_over(cls):
+    def entity_classes_to_map_over(cls):
         return [user_models.UserSettingsModel]
 
     @staticmethod
@@ -351,18 +351,18 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
         EMAIL_SENDERS = config_domain.Registry.get_config_property(
             'whitelisted_email_senders')
 
-        if user_model.username in ADMIN_USERNAMES:
+        if user_model.username in ADMIN_USERNAMES.value:
             user_services.update_user_role(user_model.id, feconf.ROLE_ADMIN)
-        elif user_model.username in MODERATOR_USERNAMES:
+        elif user_model.username in MODERATOR_USERNAMES.value:
             user_services.update_user_role(
                 user_model.id, feconf.ROLE_MODERATOR)
-        elif user_model.username in BANNED_USERNAMES:
+        elif user_model.username in BANNED_USERNAMES.value:
             user_services.update_user_role(
                 user_model.id, feconf.ROLE_BANNED_USER)
-        elif user_model.username in COLLECTION_EDITORS:
+        elif user_model.username in COLLECTION_EDITORS.value:
             user_services.update_user_role(
                 user_model.id, feconf.ROLE_COLLECTION_EDITOR)
-        elif user_model.username in EMAIL_SENDERS:
+        elif user_model.username in EMAIL_SENDERS.value:
             user_services.update_user_role(
                 user_model.id, feconf.ROLE_SUPER_ADMIN)
         else:
