@@ -671,7 +671,7 @@ class Hint(object):
 
     @classmethod
     def from_dict(cls, hint_dict):
-        return cls(html_cleaner.clean(hint_dict['hint_text']))
+        return cls(hint_dict['hint_text'])
 
     def validate(self):
         if not isinstance(self.hint_text, basestring):
@@ -684,16 +684,18 @@ class Solution(object):
     """Value object representing a solution.
 
     A solution consists of answer_is_exclusive, correct_answer and an
-    explanation.answer_is_exclusive when True indicates that it is the only
-    correct answer and False indicates that it is one possible answer.
-    correct_answer records the answer to progress to the next card and
-    explanation is a string containing an explanation for the solution.
+    explanation.When answer_is_exclusive is True, this indicates that it is
+    the only correct answer; when it is False, this indicates that it is one
+    possible answer. correct_answer records an answer that enables the learner
+    to progress to the next card and explanation is an HTML string containing
+    an explanation for the solution.
     """
-    def __init__(self, answer_is_exclusive, correct_answer, explanation):
+    def __init__(self, interaction_id, answer_is_exclusive,
+                correct_answer, explanation):
         self.answer_is_exclusive = answer_is_exclusive
         self.correct_answer = (
-            html_cleaner.clean(correct_answer)
-            if isinstance(correct_answer, str) else correct_answer)
+            interaction_registry.Registry.get_interaction_by_id(
+                interaction_id).normalize_answer(correct_answer))
         self.explanation = html_cleaner.clean(explanation)
 
     def to_dict(self):
@@ -704,13 +706,14 @@ class Solution(object):
         }
 
     @classmethod
-    def from_dict(cls, solution_dict):
+    def from_dict(cls, interaction_id, solution_dict):
         return cls(
+            interaction_id,
             solution_dict['answer_is_exclusive'],
-            (html_cleaner.clean(solution_dict['correct_answer'])
-             if isinstance(solution_dict['correct_answer'], str)
-             else solution_dict['correct_answer']),
-            html_cleaner.clean(solution_dict['explanation']))
+            interaction_registry.Registry.get_interaction_by_id(
+                interaction_id).normalize_answer(
+                solution_dict['correct_answer']),
+            solution_dict['explanation'])
 
     def validate(self, interaction_id):
         if not isinstance(self.answer_is_exclusive, bool):
@@ -719,7 +722,7 @@ class Solution(object):
                 self.answer_is_exclusive)
         interaction_registry.Registry.get_interaction_by_id(
             interaction_id).normalize_answer(self.correct_answer)
-        if self.explanation == '':
+        if not self.explanation:
             raise utils.ValidationError(
                 'Explanation must not be an empty string')
         if not isinstance(self.explanation, basestring):
@@ -869,7 +872,7 @@ class InteractionInstance(object):
         if self.hints:
             if self.solution:
                 Solution.from_dict(
-                    self.solution).validate(self.id)
+                    self.id, self.solution).validate(self.id)
             else:
                 raise utils.ValidationError(
                     'Solution must be specified if hint(s) are specified')
@@ -1415,7 +1418,7 @@ class State(object):
         self.interaction.hints.append(Hint(hint_text))
 
     def delete_hint(self, index):
-        if index >= len(self.interaction.hints):
+        if index < 0 or index >= len(self.interaction.hints):
             raise IndexError('Hint index out of range')
         del self.interaction.hints[index]
 
