@@ -691,7 +691,7 @@ class Solution(object):
     an explanation for the solution.
     """
     def __init__(self, interaction_id, answer_is_exclusive,
-                correct_answer, explanation):
+                 correct_answer, explanation):
         self.answer_is_exclusive = answer_is_exclusive
         self.correct_answer = (
             interaction_registry.Registry.get_interaction_by_id(
@@ -712,7 +712,7 @@ class Solution(object):
             solution_dict['answer_is_exclusive'],
             interaction_registry.Registry.get_interaction_by_id(
                 interaction_id).normalize_answer(
-                solution_dict['correct_answer']),
+                    solution_dict['correct_answer']),
             solution_dict['explanation'])
 
     def validate(self, interaction_id):
@@ -1412,7 +1412,7 @@ class State(object):
                 'Expected solution to be a dict, received %s'
                 % solution_dict)
         self.interaction.solution = Solution.from_dict(
-            solution_dict)
+            self.interaction.id, solution_dict)
 
     def add_hint(self, hint_text):
         self.interaction.hints.append(Hint(hint_text))
@@ -1580,7 +1580,7 @@ class Exploration(object):
                 if idict['default_outcome'] is not None else None)
 
             solution = (
-                Solution.from_dict(idict['solution'])
+                Solution.from_dict(idict['id'], idict['solution'])
                 if idict['solution'] else {})
 
             state.interaction = InteractionInstance(
