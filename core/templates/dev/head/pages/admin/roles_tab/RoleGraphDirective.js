@@ -35,8 +35,6 @@ oppia.directive('roleGraph', [
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         //             (i.e., those whose interactions are terminal).
         graphData: '=',
-        // A value which is the color of all nodes
-        nodeFill: '@',
         // A boolean value to signify whether graphData is completely loaded.
         graphDataLoaded: '@'
       },
@@ -96,92 +94,8 @@ oppia.directive('roleGraph', [
               }
             }
 
-            // These constants correspond to the rectangle that, when clicked
-            // and dragged, translates the graph. Its height, width, and x and
-            // y offsets are set to arbitrary large values so that the
-            // draggable area extends beyond the graph.
-            $scope.VIEWPORT_WIDTH = Math.max(10000, $scope.GRAPH_WIDTH * 5);
-            $scope.VIEWPORT_HEIGHT = Math.max(10000, $scope.GRAPH_HEIGHT * 5);
-            $scope.VIEWPORT_X = -Math.max(1000, $scope.GRAPH_WIDTH * 2);
-            $scope.VIEWPORT_Y = -Math.max(1000, $scope.GRAPH_HEIGHT * 2);
-
-            var graphBounds = StateGraphLayoutService.getGraphBoundaries(
-              nodeData);
-
-            $scope.augmentedLinks = links.map(function(link) {
-              return {
-                source: angular.copy(nodeData[link.source]),
-                target: angular.copy(nodeData[link.target])
-              };
-            });
-
-            for (var i = 0; i < $scope.augmentedLinks.length; i++) {
-              var link = $scope.augmentedLinks[i];
-              if (link.source.label !== link.target.label) {
-                var sourcex = link.source.xLabel;
-                var sourcey = link.source.yLabel;
-                var targetx = link.target.xLabel;
-                var targety = link.target.yLabel;
-
-                if (sourcex === targetx && sourcey === targety) {
-                  // TODO(sll): Investigate why this happens.
-                  return;
-                }
-
-                var sourceWidth = link.source.width;
-                var sourceHeight = link.source.height;
-                var targetWidth = link.target.width;
-                var targetHeight = link.target.height;
-
-                var dx = targetx - sourcex;
-                var dy = targety - sourcey;
-
-                /* Fractional amount of truncation to be applied to the end of
-                   each link. */
-                var startCutoff = (sourceWidth / 2) / Math.abs(dx);
-                var endCutoff = (targetWidth / 2) / Math.abs(dx);
-                if (dx === 0 || dy !== 0) {
-                  startCutoff = (
-                    (dx === 0) ? (sourceHeight / 2) / Math.abs(dy) :
-                    Math.min(startCutoff, (sourceHeight / 2) / Math.abs(dy)));
-                  endCutoff = (
-                    (dx === 0) ? (targetHeight / 2) / Math.abs(dy) :
-                    Math.min(endCutoff, (targetHeight / 2) / Math.abs(dy)));
-                }
-
-                var dxperp = targety - sourcey;
-                var dyperp = sourcex - targetx;
-                var norm = Math.sqrt(dxperp * dxperp + dyperp * dyperp);
-                dxperp /= norm;
-                dyperp /= norm;
-
-                var midx = sourcex + dx / 2 + dxperp * (sourceHeight / 4);
-                var midy = sourcey + dy / 2 + dyperp * (targetHeight / 4);
-                var startx = sourcex + startCutoff * dx;
-                var starty = sourcey + startCutoff * dy;
-                var endx = targetx - endCutoff * dx;
-                var endy = targety - endCutoff * dy;
-
-                // Draw a quadratic bezier curve.
-                $scope.augmentedLinks[i].d = (
-                  'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
-                  ' ' + endx + ' ' + endy);
-
-                // Style links if link properties and style mappings are
-                // provided
-                if (links[i].hasOwnProperty('linkProperty') &&
-                    $scope.linkPropertyMapping) {
-                  if ($scope.linkPropertyMapping.hasOwnProperty(
-                        links[i].linkProperty)) {
-                    $scope.augmentedLinks[i].style = (
-                      $scope.linkPropertyMapping[links[i].linkProperty]);
-                  }
-                }
-              }
-            }
-
-            var nodeStrokeWidth = '1';
-            var nodeFillOpacity = 0.5;
+            $scope.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
+              nodeData, links);
 
             $scope.getNodeTitle = function(node) {
               return node.label;
@@ -191,31 +105,19 @@ oppia.directive('roleGraph', [
               return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
             };
 
-            // Update the nodes.
+            // creating list of nodes to display.
             $scope.nodeList = [];
             for (var nodeId in nodeData) {
-              nodeData[nodeId].style = (
-                'stroke-width: ' + nodeStrokeWidth + '; ' +
-                'fill-opacity: ' + nodeFillOpacity + ';');
-              if ($scope.nodeFill) {
-                nodeData[nodeId].style += ('fill: ' + $scope.nodeFill + '; ');
-              }
               $scope.nodeList.push(nodeData[nodeId]);
             }
           };
 
-          if($scope.graphDataLoaded) {
-            console.log('hello');
+          if ($scope.graphDataLoaded) {
             $scope.drawGraph(
               $scope.graphData.nodes, $scope.graphData.links,
               $scope.graphData.initStateId, $scope.graphData.finalStateIds
             );
           }
-          $(window).resize($scope.drawGraph(
-              $scope.graphData.nodes, $scope.graphData.links,
-              $scope.graphData.initStateId, $scope.graphData.finalStateIds
-            )
-          );
         }
       ]
     };

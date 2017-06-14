@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.tests import test_utils
+import feconf
 
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
@@ -98,3 +99,39 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         response = self.testapp.get('/about')
         self.assertIn(new_config_value, response.body)
+
+
+class AdminRoleHandlerTest(test_utils.GenericTestBase):
+    """Checks the user role handling on the admin page."""
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(AdminRoleHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+    def test_view_role(self):
+        # create a few users.
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        response_dict = self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {'username': 'user1', 'agreed_to_terms': True},
+            csrf_token=csrf_token, expect_errors=False,
+            expected_status_int=200)
+        self.assertEqual(response_dict['code'], 200)
+
+        response_dict = self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {'username': 'user2', 'agreed_to_terms': True},
+            csrf_token=csrf_token, expect_errors=False,
+            expected_status_int=200)
+        self.assertEqual(response_dict['code'], 200)
+
+        response_dict = self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {'username': 'user3', 'agreed_to_terms': True},
+            csrf_token=csrf_token, expect_errors=False,
+            expected_status_int=200)
+        self.assertEqual(response_dict['code'], 200)

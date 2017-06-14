@@ -459,6 +459,70 @@ oppia.factory('StateGraphLayoutService', [
           right: rightEdge,
           top: topEdge
         };
+      },
+      getAugmentedLinks: function(nodeData, node_links) {
+        var links = angular.copy(node_links);
+        var augmentedLinks = links.map(function(link) {
+          return {
+            source: angular.copy(nodeData[link.source]),
+            target: angular.copy(nodeData[link.target])
+            };
+          });
+
+        for (var i = 0; i < augmentedLinks.length; i++) {
+          var link = augmentedLinks[i];
+          if (link.source.label !== link.target.label) {
+            var sourcex = link.source.xLabel;
+            var sourcey = link.source.yLabel;
+            var targetx = link.target.xLabel;
+            var targety = link.target.yLabel;
+
+            if (sourcex === targetx && sourcey === targety) {
+              // TODO(sll): Investigate why this happens.
+              return;
+            }
+
+            var sourceWidth = link.source.width;
+            var sourceHeight = link.source.height;
+            var targetWidth = link.target.width;
+            var targetHeight = link.target.height;
+
+            var dx = targetx - sourcex;
+            var dy = targety - sourcey;
+
+            /* Fractional amount of truncation to be applied to the end of
+               each link. */
+            var startCutoff = (sourceWidth / 2) / Math.abs(dx);
+            var endCutoff = (targetWidth / 2) / Math.abs(dx);
+            if (dx === 0 || dy !== 0) {
+              startCutoff = (
+                (dx === 0) ? (sourceHeight / 2) / Math.abs(dy) :
+                Math.min(startCutoff, (sourceHeight / 2) / Math.abs(dy)));
+              endCutoff = (
+                (dx === 0) ? (targetHeight / 2) / Math.abs(dy) :
+                Math.min(endCutoff, (targetHeight / 2) / Math.abs(dy)));
+            }
+
+            var dxperp = targety - sourcey;
+            var dyperp = sourcex - targetx;
+            var norm = Math.sqrt(dxperp * dxperp + dyperp * dyperp);
+            dxperp /= norm;
+            dyperp /= norm;
+
+            var midx = sourcex + dx / 2 + dxperp * (sourceHeight / 4);
+            var midy = sourcey + dy / 2 + dyperp * (targetHeight / 4);
+            var startx = sourcex + startCutoff * dx;
+            var starty = sourcey + startCutoff * dy;
+            var endx = targetx - endCutoff * dx;
+            var endy = targety - endCutoff * dy;
+
+            // Draw a quadratic bezier curve.
+            augmentedLinks[i].d = (
+              'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
+              ' ' + endx + ' ' + endy);
+          }
+        }
+        return augmentedLinks;
       }
     };
   }
