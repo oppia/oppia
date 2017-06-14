@@ -705,13 +705,13 @@ def get_activity_progress(user_id):
             len(incomplete_exploration_ids) +
             len(incomplete_collection_ids) + len(completed_exploration_ids):])
 
-    incomplete_exploration_summaries = (
+    incomplete_exp_summaries = (
         [exp_services.get_exploration_summary_from_model(model)
          if model else None for model in incomplete_exploration_models])
     incomplete_collection_summaries = (
         [collection_services.get_collection_summary_from_model(model)
          if model else None for model in incomplete_collection_models])
-    completed_exploration_summaries = (
+    completed_exp_summaries = (
         [exp_services.get_exploration_summary_from_model(model)
          if model else None for model in completed_exploration_models])
     completed_collection_summaries = (
@@ -720,12 +720,12 @@ def get_activity_progress(user_id):
 
     filtered_incomplete_exp_summaries, num_deleted_incomplete_exps = (
         get_filtered_incomplete_exp_summaries(
-            user_id, incomplete_exploration_summaries,
+            user_id, incomplete_exp_summaries,
             incomplete_exploration_ids))
 
     filtered_completed_exp_summaries, num_deleted_completed_exps = (
         get_filtered_completed_exp_summaries(
-            user_id, completed_exploration_summaries,
+            user_id, completed_exp_summaries,
             completed_exploration_ids))
 
     (filtered_completed_collection_summaries,

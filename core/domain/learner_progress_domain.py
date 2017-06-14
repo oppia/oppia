@@ -19,12 +19,11 @@
 class LearnerProgress(object):
     """Domain object for the progress of the learner."""
 
-    def __init__(self, user_id, incomplete_exploration_summaries,
-                 incomplete_collection_summaries,
-                 completed_exploration_summaries,
+    def __init__(self, user_id, incomplete_exp_summaries,
+                 incomplete_collection_summaries, completed_exp_summaries,
                  completed_collection_summaries):
         self.id = user_id
-        self.incomplete_exploration_summaries = incomplete_exploration_summaries
+        self.incomplete_exp_summaries = incomplete_exp_summaries
         self.incomplete_collection_summaries = incomplete_collection_summaries
-        self.completed_exploration_summaries = completed_exploration_summaries
+        self.completed_exp_summaries = completed_exp_summaries
         self.completed_collection_summaries = completed_collection_summaries

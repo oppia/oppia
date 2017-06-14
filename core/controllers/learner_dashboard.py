@@ -59,11 +59,11 @@ class LearnerDashboardHandler(base.BaseHandler):
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
-                learner_progress.completed_exploration_summaries))
+                learner_progress.completed_exp_summaries))
 
         incomplete_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
-                learner_progress.incomplete_exploration_summaries))
+                learner_progress.incomplete_exp_summaries))
 
         completed_collection_summary_dicts = (
             learner_progress_services.get_collection_summary_dicts(

@@ -455,26 +455,26 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         activity_progress = learner_progress_services.get_activity_progress(
             self.user_id)
 
-        incomplete_exploration_summaries = (
-            activity_progress[0].incomplete_exploration_summaries)
+        incomplete_exp_summaries = (
+            activity_progress[0].incomplete_exp_summaries)
         incomplete_collection_summaries = (
             activity_progress[0].incomplete_collection_summaries)
-        completed_exploration_summaries = (
-            activity_progress[0].completed_exploration_summaries)
+        completed_exp_summaries = (
+            activity_progress[0].completed_exp_summaries)
         completed_collection_summaries = (
             activity_progress[0].completed_collection_summaries)
 
-        self.assertEqual(len(incomplete_exploration_summaries), 1)
+        self.assertEqual(len(incomplete_exp_summaries), 1)
         self.assertEqual(len(incomplete_collection_summaries), 1)
-        self.assertEqual(len(completed_exploration_summaries), 1)
+        self.assertEqual(len(completed_exp_summaries), 1)
         self.assertEqual(len(completed_collection_summaries), 1)
 
         self.assertEqual(
-            incomplete_exploration_summaries[0].title, 'Sillat Suomi')
+            incomplete_exp_summaries[0].title, 'Sillat Suomi')
         self.assertEqual(
             incomplete_collection_summaries[0].title, 'Introduce Oppia')
         self.assertEqual(
-            completed_exploration_summaries[0].title, 'Bridges in England')
+            completed_exp_summaries[0].title, 'Bridges in England')
         self.assertEqual(
             completed_collection_summaries[0].title, 'Bridges')
 
@@ -494,7 +494,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Check that the exploration is no longer present in the incomplete
         # section.
         self.assertEqual(
-            len(activity_progress[0].incomplete_exploration_summaries), 0)
+            len(activity_progress[0].incomplete_exp_summaries), 0)
         # Check that the dashboard records the exploration deleted.
         self.assertEqual(activity_progress[1]['incomplete_explorations'], 1)
 
