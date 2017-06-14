@@ -244,7 +244,7 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job_model.id,
         classifier_training_job_model.algorithm_id,
         classifier_training_job_model.exp_id,
-        classifier_training_job_model.exp_version_when_created,
+        classifier_training_job_model.exp_version,
         classifier_training_job_model.state_name,
         classifier_training_job_model.status,
         classifier_training_job_model.training_data)
@@ -283,7 +283,7 @@ def _create_classifier_training_job(classifier_training_job):
     """
     job_id = classifier_models.ClassifierTrainingJobModel.create(
         classifier_training_job.algorithm_id, classifier_training_job.exp_id,
-        classifier_training_job.exp_version_when_created,
+        classifier_training_job.exp_version,
         classifier_training_job.training_data,
         classifier_training_job.state_name)
     return job_id
@@ -308,7 +308,7 @@ def _update_classifier_training_job(classifier_training_job_model, state_name,
     classifier_training_job_model.put()
 
 
-def save_classifier_training_job(algorithm_id, exp_id, exp_version_when_created,
+def save_classifier_training_job(algorithm_id, exp_id, exp_version,
                                  state_name, status, training_data,
                                  job_id="None"):
     """Checks for the existence of the model.
@@ -320,7 +320,7 @@ def save_classifier_training_job(algorithm_id, exp_id, exp_version_when_created,
     Args:
         algorithm_id: str. ID of the algorithm used to generate the model.
         exp_id: str. ID of the exploration.
-        exp_version_when_created: int. The exploration version at the time
+        exp_version: int. The exploration version at the time
             this training job was created.
         state_name: str. The name of the state to which the classifier
             belongs.
@@ -336,13 +336,13 @@ def save_classifier_training_job(algorithm_id, exp_id, exp_version_when_created,
         classifier_models.ClassifierTrainingJobModel.get(job_id, False))
     if classifier_training_job_model is None:
         classifier_training_job = classifier_domain.ClassifierTrainingJob(
-            'job_id_dummy', algorithm_id, exp_id, exp_version_when_created,
+            'job_id_dummy', algorithm_id, exp_id, exp_version,
             state_name, status, training_data)
         classifier_training_job.validate()
         job_id = _create_classifier_training_job(classifier_training_job)
     else:
         classifier_training_job = classifier_domain.ClassifierTrainingJob(
-            job_id, algorithm_id, exp_id, exp_version_when_created,
+            job_id, algorithm_id, exp_id, exp_version,
             state_name, status, training_data)
         classifier_training_job.validate()
         _update_classifier_training_job(classifier_training_job_model,
