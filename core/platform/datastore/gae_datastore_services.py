@@ -19,12 +19,12 @@
 from google.appengine.ext import ndb
 
 def fetch_multiple_entities_by_keys(keys):
-	"""Fetches the entities from the datastore corresponding to the keys."""
+    """Fetches the entities from the datastore corresponding to the keys."""
 
-	return ndb.get_multi(keys)
+    return ndb.get_multi(keys)
 
 
 def get_keys_from_ids_and_model(entity_ids, model_name):
-	"""Returns the list of keys corresponding to the ids and the model."""
+    """Returns the list of keys corresponding to the ids and the model."""
 
-	return [ndb.Key(model_name, entity_id) for entity_id in entity_ids]
+    return [ndb.Key(model_name, entity_id) for entity_id in entity_ids]
