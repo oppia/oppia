@@ -192,16 +192,13 @@ class BaseJobManager(object):
         model.time_finished_msec = utils.get_current_time_in_millisecs()
 
         # TODO(bhenning): Add tests for this.
-        output_str_list = [str(output_value) for output_value in output_list]
-
-        # De-duplicate the lines of output since it's not very useful to repeat
+        # Consolidate the lines of output since it's not very useful to repeat
         # them.
-        counter = collections.Counter(list(output_str_list))
-        output_str_frequency_list = [
-            (output_str, counter[output_str]) for output_str in counter]
+        output_str_frequencies = collections.Counter(
+            str(output_value) for output_value in output_list)
         output_str_list = [
-            line if freq == 1 else '%s (%d times)' % (line, freq)
-            for (line, freq) in output_str_frequency_list
+            output_str if freq == 1 else '%s (%d times)' % (output_str, freq)
+            for (output_str, freq) in output_str_frequencies.iteritems()
         ]
 
         cutoff_index = 0
