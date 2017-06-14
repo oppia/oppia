@@ -131,7 +131,7 @@ class BaseJobManager(object):
         Args:
             job_id: str. Should come from the create_new class method.
             additional_job_params: dict(str : int) or None. Additional
-                parameters on jobs.
+                parameters for the job.
         """
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -483,8 +483,6 @@ class BaseDeferredJobManager(BaseJobManager):
     @classmethod
     def _run(cls, additional_job_params):
         """Function that performs the main business logic of the job.
-
-        Needs to be implemented by subclasses.
 
         Args:
             additional_job_params: dict(str : int). Additional parameters on
