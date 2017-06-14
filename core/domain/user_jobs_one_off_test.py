@@ -1162,8 +1162,7 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
             user_services.create_new_user(uid, uemail)
             user_services.set_username(uid, uname)
 
-        super_admin_usernames = ['user1']
-        admin_usernames = ['user2', 'user3']
+        admin_usernames = ['user1', 'user2', 'user3']
         moderator_usernames = ['user4', 'user5']
         banned_usernames = ['user6']
         collection_editor_usernames = ['user7', 'user8']
@@ -1177,8 +1176,6 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
         config_services.set_property(
             'admin_id', 'collection_editor_whitelist',
             collection_editor_usernames)
-        config_services.set_property(
-            'admin_id', 'whitelisted_email_senders', super_admin_usernames)
 
         job_id = (
             user_jobs_one_off.UserRolesMigrationOneOffJob.create_new())
@@ -1187,8 +1184,6 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         admins_by_role = user_services.get_usernames_by_role(
             feconf.ROLE_ADMIN)
-        super_admins_by_role = user_services.get_usernames_by_role(
-            feconf.ROLE_SUPER_ADMIN)
         moderators_by_role = user_services.get_usernames_by_role(
             feconf.ROLE_MODERATOR)
         banned_users_by_role = user_services.get_usernames_by_role(
@@ -1200,8 +1195,6 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
             set(admin_usernames), set(admins_by_role))
         self.assertEqual(
             set(moderator_usernames), set(moderators_by_role))
-        self.assertEqual(
-            set(super_admin_usernames), set(super_admins_by_role))
         self.assertEqual(
             set(banned_usernames), set(banned_users_by_role))
         self.assertEqual(
