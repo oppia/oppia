@@ -187,7 +187,7 @@ class AdminHandler(base.BaseHandler):
                     if name == 'whitelisted_email_senders':
                         check_and_update_config_role(
                             config_properties[name]['value'], value,
-                            feconf.ROLE_SUPER_ADMIN)
+                            feconf.ROLE_ADMIN)
                     if name == 'admin_usernames':
                         check_and_update_config_role(
                             config_properties[name]['value'], value,
@@ -221,7 +221,7 @@ class AdminHandler(base.BaseHandler):
                 if config_property_id == 'whitelisted_email_senders':
                     check_and_update_config_role(
                         config_value, config_property.default_value,
-                        feconf.ROLE_SUPER_ADMIN)
+                        feconf.ROLE_ADMIN)
                 if config_property_id == 'admin_usernames':
                     check_and_update_config_role(
                         config_value, config_property.default_value,
