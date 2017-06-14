@@ -192,7 +192,7 @@ class BaseJobManager(object):
         model.time_finished_msec = utils.get_current_time_in_millisecs()
 
         # TODO(bhenning): Add tests for this.
-        output_str_list = ['%s' % output_value for output_value in output_list]
+        output_str_list = [str(output_value) for output_value in output_list]
 
         # De-duplicate the lines of output since it's not very useful to repeat
         # them.
