@@ -455,10 +455,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         activity_progress = learner_progress_services.get_activity_progress(
             self.user_id)
 
-        incomplete_exploration_summaries = activity_progress[0]
-        incomplete_collection_summaries = activity_progress[1]
-        completed_exploration_summaries = activity_progress[2]
-        completed_collection_summaries = activity_progress[3]
+        incomplete_exploration_summaries = (
+            activity_progress[0].incomplete_exploration_summaries)
+        incomplete_collection_summaries = (
+            activity_progress[0].incomplete_collection_summaries)
+        completed_exploration_summaries = (
+            activity_progress[0].completed_exploration_summaries)
+        completed_collection_summaries = (
+            activity_progress[0].completed_collection_summaries)
 
         self.assertEqual(len(incomplete_exploration_summaries), 1)
         self.assertEqual(len(incomplete_collection_summaries), 1)
@@ -489,15 +493,17 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Check that the exploration is no longer present in the incomplete
         # section.
-        self.assertEqual(len(activity_progress[0]), 0)
+        self.assertEqual(
+            len(activity_progress[0].incomplete_exploration_summaries), 0)
         # Check that the dashboard records the exploration deleted.
-        self.assertEqual(activity_progress[4]['incomplete_explorations'], 1)
+        self.assertEqual(activity_progress[1]['incomplete_explorations'], 1)
 
-        incomplete_collection_summaries = activity_progress[1]
+        incomplete_collection_summaries = (
+            activity_progress[0].incomplete_collection_summaries)
 
         # Check that the collection to which a new exploration has been added
         # has been moved to the incomplete section.
         self.assertEqual(len(incomplete_collection_summaries), 2)
         self.assertEqual(incomplete_collection_summaries[1].title, 'Bridges')
         # Check that the dashboard has recorded the change in the collection.
-        self.assertEqual(activity_progress[5], ['Bridges'])
+        self.assertEqual(activity_progress[2], ['Bridges'])

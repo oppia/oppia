@@ -53,25 +53,24 @@ class LearnerDashboardHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        (incomplete_exp_summaries, incomplete_collection_summaries,
-         completed_exp_summaries, completed_collection_summaries,
-         number_of_deleted_activities, completed_to_incomplete_collections) = (
+        (learner_progress, number_of_deleted_activities,
+         completed_to_incomplete_collections) = (
              learner_progress_services.get_activity_progress(self.user_id))
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
-                completed_exp_summaries))
+                learner_progress.completed_exploration_summaries))
 
         incomplete_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
-                incomplete_exp_summaries))
+                learner_progress.incomplete_exploration_summaries))
 
         completed_collection_summary_dicts = (
             learner_progress_services.get_collection_summary_dicts(
-                completed_collection_summaries))
+                learner_progress.completed_collection_summaries))
         incomplete_collection_summary_dicts = (
             learner_progress_services.get_collection_summary_dicts(
-                incomplete_collection_summaries))
+                learner_progress.incomplete_collection_summaries))
 
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))

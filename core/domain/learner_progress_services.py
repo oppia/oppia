@@ -18,13 +18,15 @@
 
 from core.domain import collection_services
 from core.domain import exp_services
+from core.domain import learner_progress_domain
 from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
-from google.appengine.ext import ndb
+
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 
 def get_completed_activities_from_model(completed_activities_model):
@@ -658,14 +660,8 @@ def get_activity_progress(user_id):
         user_id: str. The id of the learner.
 
     Returns:
-        list(ExplorationSummary). The summary domain objects correspoding to the
-            explorations currently in progress.
-        list(ExplorationSummary). The summary domain objects correspoding to the
-            explorations completed by the user.
-        list(CollectionSummary). The summary domain objects correspoding to the
-            collections currently in progress.
-        list(CollectionSummary). The summary domain objects correspoding to the
-            collections completed by the user.
+        LearnerProgress. The learner progress domain object corresponding to the
+            particular learner.
         dict. The number of entities that are no longer present.
         list(str). The titles of the collections to which new explorations have
             been added.
@@ -677,19 +673,19 @@ def get_activity_progress(user_id):
     completed_exploration_ids = get_all_completed_exp_ids(user_id)
 
     incomplete_exploration_keys = (
-        [ndb.Key('ExpSummaryModel', exploration_id)
-         for exploration_id in incomplete_exploration_ids])
+        datastore_services.get_keys_from_ids_and_model(
+            incomplete_exploration_ids, 'ExpSummaryModel'))
     incomplete_collection_keys = (
-        [ndb.Key('CollectionSummaryModel', collection_id)
-         for collection_id in incomplete_collection_ids])
+        datastore_services.get_keys_from_ids_and_model(
+            incomplete_collection_ids, 'CollectionSummaryModel'))
     completed_exploration_keys = (
-        [ndb.Key('ExpSummaryModel', exploration_id)
-         for exploration_id in completed_exploration_ids])
+        datastore_services.get_keys_from_ids_and_model(
+            completed_exploration_ids, 'ExpSummaryModel'))
     completed_collection_keys = (
-        [ndb.Key('CollectionSummaryModel', collection_id)
-         for collection_id in completed_collection_ids])
+        datastore_services.get_keys_from_ids_and_model(
+            completed_collection_ids, 'CollectionSummaryModel'))
 
-    activity_models = ndb.get_multi(
+    activity_models = datastore_services.fetch_multiple_entities_by_keys(
         incomplete_exploration_keys + incomplete_collection_keys +
         completed_exploration_keys + completed_collection_keys)
 
@@ -757,9 +753,11 @@ def get_activity_progress(user_id):
         'completed_collections': num_deleted_completed_collections
     }
 
-    return (filtered_incomplete_exp_summaries,
-            filtered_incomplete_collection_summaries,
-            filtered_completed_exp_summaries,
-            filtered_completed_collection_summaries,
-            number_of_deleted_activities,
+    learner_progress = learner_progress_domain.LearnerProgress(
+        user_id, filtered_incomplete_exp_summaries,
+        filtered_incomplete_collection_summaries,
+        filtered_completed_exp_summaries,
+        filtered_completed_collection_summaries)
+
+    return (learner_progress, number_of_deleted_activities,
             completed_to_incomplete_collections)
