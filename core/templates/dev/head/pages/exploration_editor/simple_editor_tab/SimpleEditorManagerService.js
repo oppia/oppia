@@ -23,9 +23,11 @@
 oppia.factory('SimpleEditorManagerService', [
   'StatesToQuestionsService', 'SimpleEditorShimService',
   'QuestionObjectFactory', 'QuestionListObjectFactory', 'OutcomeObjectFactory',
+  'explorationInitStateNameService',
   function(
       StatesToQuestionsService, SimpleEditorShimService,
-      QuestionObjectFactory, QuestionListObjectFactory, OutcomeObjectFactory) {
+      QuestionObjectFactory, QuestionListObjectFactory, OutcomeObjectFactory,
+      explorationInitStateNameService) {
     var data = {
       title: null,
       introductionHtml: null,
@@ -59,6 +61,14 @@ oppia.factory('SimpleEditorManagerService', [
       }
       return 'Question ' + minimumStateNumber;
     };
+
+    var makeStateEndExploration = function(stateName){
+      SimpleEditorShimService.saveInteractionId(
+        stateName, END_EXPLORATION_INTERACTION.ID);
+      SimpleEditorShimService.saveCustomizationArgs(
+        stateName, END_EXPLORATION_INTERACTION.CUSTOMIZATION_ARGS);
+      SimpleEditorShimService.saveDefaultOutcome(stateName, null);
+    }
 
     return {
       // Attempts to initialize the local data variables. Returns true if
@@ -139,12 +149,25 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, stateData.interaction, ''));
       },
       deleteQuestion: function(question){
+        // - Change destination of answer groups that point to it.
+        // - Move content stored in present state to next state if it exists.
+        // - Delete the state.
         var stateName = question.getStateName();
         var state = SimpleEditorShimService.getState(stateName);
-        var content = state.content;
+        // If it's the last question in the list, make it EndExploration.
+        if(state.interaction.answerGroups.length == 0){
+          makeStateEndExploration(stateName);
+          data.questionList.removeQuestion(question);
+          return;
+        }
         var nextStateName = state.interaction.answerGroups[0].outcome.dest;
-        var nextState = SimpleEditorShimService.getState(nextStateName);
         var allStateNames = SimpleEditorShimService.getAllStateNames();
+        // Change init state name, if init_state is being deleted.
+        if(SimpleEditorShimService.getInitStateName() == stateName){
+          explorationInitStateNameService.displayed = nextStateName;
+          explorationInitStateNameService.saveDisplayedValue(nextStateName);
+        }
+
         for(var i = 0; i < allStateNames.length;i++){
           var currentState = SimpleEditorShimService.getState(allStateNames[i]);
           var newAnswerGroups = currentState.interaction.answerGroups;
@@ -159,12 +182,14 @@ oppia.factory('SimpleEditorManagerService', [
           if(hasAnswerGroupsChanged){
             SimpleEditorShimService
               .saveAnswerGroups(allStateNames[i],newAnswerGroups);
+            data.questionList.getBindableQuestion(allStateNames[i])
+              .setAnswerGroups(newAnswerGroups);
           }
         }
-        if(nextState != null){
-          SimpleEditorShimService.saveStateContent(nextStateName,content);
-        }
+
+        SimpleEditorShimService.saveStateContent(nextStateName, state.content);
         SimpleEditorShimService.deleteState(stateName);
+        data.questionList.removeQuestion(question);
       },
       canAddNewQuestion: function() {
         // Requirements:
@@ -186,11 +211,7 @@ oppia.factory('SimpleEditorManagerService', [
       addState: function() {
         var newStateName = getNewStateName();
         SimpleEditorShimService.addState(newStateName);
-        SimpleEditorShimService.saveInteractionId(
-          newStateName, END_EXPLORATION_INTERACTION.ID);
-        SimpleEditorShimService.saveCustomizationArgs(
-          newStateName, END_EXPLORATION_INTERACTION.CUSTOMIZATION_ARGS);
-        SimpleEditorShimService.saveDefaultOutcome(newStateName, null);
+        makeStateEndExploration(newStateName);
         return newStateName;
       }
     };
