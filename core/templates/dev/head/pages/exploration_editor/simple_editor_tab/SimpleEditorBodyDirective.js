@@ -39,10 +39,10 @@ oppia.directive('simpleEditorBody', [
             name: 'Multiple choice'
           }];
 
-          $scope.getQuestionLabel = function(interactionId) {
-            for(var i = 0; i < INTERACTION_TYPES.length; i++ ) {
+          $scope.getQuestionTypeLabel = function(interactionId) {
+            for( var i = 0; i < INTERACTION_TYPES.length; i++) {
               if(INTERACTION_TYPES[i].id === interactionId) {
-                return INTERACTION_TYPES[i].name
+                return INTERACTION_TYPES[i].name;
               }
             }
           }
@@ -84,8 +84,6 @@ oppia.directive('simpleEditorBody', [
 
             return false;
           };
-
-
 
           $scope.publishChanges = function() {
             // If exploration is not yet published

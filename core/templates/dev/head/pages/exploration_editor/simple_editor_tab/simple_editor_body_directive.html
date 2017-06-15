@@ -16,10 +16,10 @@
     <div ng-repeat="question in data.questionList.getQuestions() track by $index">
       <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
       <anchor-header header-id="getSubfieldId(question,'Multiple Choice')"
-                     header-text="<[getQuestionLabel(question.getInteractionId())]>" ng-click="chooseQuestionType = true;">
+                     header-text="<[getQuestionTypeLabel(question.getInteractionId())]>" ng-click="chooseQuestionType = true;">
       </anchor-header>
 
-      <div ng-show="chooseQuestionType" class="question-type-wrapper" >
+      <div ng-show="chooseQuestionType" class="question-type-wrapper">
         <button type="button" class="oppia-question-button btn btn-primary" ng-click="changeQuestion('multiple', $index); chooseQuestionType = false;">Multiple Choice Input</button>
       </div>
 
@@ -45,10 +45,7 @@
     </div>
   </div>
 
-
-
   <div class="advance-btn-wrapper">
-
     <span class="advance-btn-description" ng-show="advBtnHovered" ng-if="!chooseQuestionType">Add new question</span>
     <button ng-disabled="!canAddNewQuestion()" type="button"
             class="btn btn-default advance-btn" ng-click="addNewQuestion(); advBtnHovered = false"
