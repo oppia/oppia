@@ -16,7 +16,6 @@
 
 from core.controllers import base
 from core.tests import test_utils
-from core.domain import user_services
 import feconf
 
 

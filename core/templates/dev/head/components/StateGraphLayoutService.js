@@ -460,14 +460,14 @@ oppia.factory('StateGraphLayoutService', [
           top: topEdge
         };
       },
-      getAugmentedLinks: function(nodeData, node_links) {
+      getAugmentedLinks: function(nodeData, nodeLinks) {
         var links = angular.copy(node_links);
         var augmentedLinks = links.map(function(link) {
           return {
             source: angular.copy(nodeData[link.source]),
             target: angular.copy(nodeData[link.target])
-            };
-          });
+          };
+        });
 
         for (var i = 0; i < augmentedLinks.length; i++) {
           var link = augmentedLinks[i];
