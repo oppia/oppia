@@ -106,7 +106,7 @@
         </exploration-summary-tile>
       </div>
 
-      <div class="conversation-skin-back-to-collection-container">
+      <div ng-if="collectionSummary !== null" class="conversation-skin-back-to-collection-container">
         <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
       </div>
     </div>
@@ -150,6 +150,7 @@ otherwise they will interfere with the iframed conversation skin directive.
   /* All classes below should start with .conversation-skin */
   .conversation-skin-back-to-collection-container {
     margin-top: 25px;
+    margin-bottom: 92px;
     text-align: center;
   }
 
