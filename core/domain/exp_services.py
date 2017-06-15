@@ -236,6 +236,21 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             return None
 
 
+def does_exploration_exists(exploration_id):
+    """Returns true if the exploration exists.
+
+    Args:
+        exploration_id: str. The id of the exploration to be checked.
+
+    Returns:
+        bool. The value is true if the exploration exists.
+    """
+    exploration_model = exp_models.ExplorationModel.get(
+        exploration_id, strict=False)
+
+    return True if exploration_model else False
+
+
 def get_exploration_summary_by_id(exploration_id):
     """Returns a domain object representing an exploration summary.
 
@@ -684,6 +699,14 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS):
                     state.update_interaction_fallbacks(change.new_value)
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                    state.update_interaction_hints(change.new_value)
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    state.update_interaction_solution(change.new_value)
             elif change.cmd == exp_domain.CMD_ADD_GADGET:
                 exploration.add_gadget(change.gadget_dict, change.panel)
             elif change.cmd == exp_domain.CMD_RENAME_GADGET:
