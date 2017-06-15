@@ -21,9 +21,9 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'activity', 'base_model', 'classifier', 'collection', 'config', 'email',
-    'exploration', 'feedback', 'file', 'job', 'recommendations', 'statistics',
-    'user')
+    'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
+    'email', 'exploration', 'feedback', 'file', 'job', 'recommendations',
+    'statistics', 'user')
 
 
 class _Platform(object):
@@ -53,6 +53,9 @@ class _Gae(_Platform):
             if name == NAMES.activity:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
+            elif name == NAMES.audit:
+                from core.storage.audit import gae_models as audit_models
+                returned_models.append(audit_models)
             elif name == NAMES.base_model:
                 from core.storage.base_model import gae_models as base_models
                 returned_models.append(base_models)

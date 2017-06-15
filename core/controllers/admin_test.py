@@ -118,7 +118,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.signup(user_email, user_name)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        # Check normal user has expected role.
+        # Check normal user has expected role. Viewing by username.
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'method': 'username', 'username': 'user1'})
@@ -135,6 +135,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             expected_status_int=200)
         self.assertEqual(response_dict, {})
 
+        # Viewing by role.
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'method': 'role', 'role': feconf.ROLE_MODERATOR})

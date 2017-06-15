@@ -963,3 +963,8 @@ ROLE_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_MODERATOR = 'MODERATOR'
 ROLE_ADMIN = 'ADMIN'
 ROLE_SUPER_ADMIN = 'SUPER_ADMIN'
+
+# Intent of the User making query to role structure via admin interface. Used
+# to store audit data regarding queries to roleIds.
+VIEW_ROLE = 'View user roles.'
+UPDATE_ROLE = 'Update user role.'

@@ -19,7 +19,10 @@ inheritance, Actions permitted to the roles and the functions needed to
 access roles and actions.
 """
 
+from core.platform import models
 import feconf
+
+(audit_models,) = models.Registry.import_models([models.NAMES.audit])
 
 # Actions that can be performed in the system.
 ACTION_ACCESS_ADMIN_PAGE = 'ACCESS_ADMIN_PAGE'
@@ -186,3 +189,10 @@ def get_role_graph_data():
         for parent in PARENT_ROLES[role]:
             role_graph['links'].append({'source': parent, 'target': role})
     return role_graph
+
+
+def store_role_query(user_id, intent, method=None, role=None, username=None):
+    """Stores the query to role structure in RoleQueryAuditModel."""
+    audit_models.RoleQueryAuditModel(
+        user_id=user_id, intent=intent,
+        view_method=method, role=role, username=username).put()
