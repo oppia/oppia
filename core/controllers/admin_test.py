@@ -129,7 +129,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            {'role': feconf.ROLE_MODERATOR, 'username': user_name[2]},
+            {'role': feconf.ROLE_MODERATOR, 'username': user_name},
             csrf_token=csrf_token, expect_errors=False,
             expected_status_int=200)
         self.assertEqual(response_dict, {})
@@ -138,5 +138,5 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'method': 'role', 'role': feconf.ROLE_MODERATOR})
-        self.assertEqual(response_dict, {})
+        self.assertEqual(response_dict, {'user1': feconf.ROLE_MODERATOR})
         self.logout()
