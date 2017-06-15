@@ -67,9 +67,9 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
-        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.get_or_create_user(self.viewer_id, self.VIEWER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
+        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -595,7 +595,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
   New state:
     classifier_model_id: null
@@ -615,7 +617,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -658,7 +662,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
   Renamed state:
     classifier_model_id: null
@@ -678,7 +684,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -790,7 +798,9 @@ interaction:
     feedback: []
     param_changes: []
   fallbacks: []
+  hints: []
   id: TextInput
+  solution: {}
 param_changes: []
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -813,7 +823,9 @@ interaction:
     feedback: []
     param_changes: []
   fallbacks: []
+  hints: []
   id: TextInput
+  solution: {}
 param_changes: []
 """)
     }
@@ -837,7 +849,9 @@ interaction:
     feedback: []
     param_changes: []
   fallbacks: []
+  hints: []
   id: TextInput
+  solution: {}
 param_changes: []
 """)
     }
@@ -2550,7 +2564,9 @@ states:
           value: []
       default_outcome: null
       fallbacks: []
+      hints: []
       id: EndExploration
+      solution: {}
     param_changes: []
   %s:
     classifier_model_id: null
@@ -2568,7 +2584,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: Continue
+      solution: {}
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -2814,8 +2832,8 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         super(SuggestionActionUnitTests, self).setUp()
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        user_services.get_or_create_user(self.user_id, self.USER_EMAIL)
-        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
+        user_services.create_new_user(self.user_id, self.USER_EMAIL)
+        user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
         self.signup(self.USER_EMAIL, self.USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         with self.swap(feedback_models.FeedbackThreadModel,

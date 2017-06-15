@@ -7,4 +7,7 @@ or
 <form class="form-inline" ng-class="{'has-error': searchQueryHasError}" ng-submit="addExploration()">
   <input class="form-control protractor-test-add-exploration-input" style="width: 430px" ng-model="newExplorationId" type="text" placeholder="Enter exploration id to be added, or search explorations by name" typeahead="exploration for exploration in fetchTypeaheadResults($viewValue)" ng-model-options="{ debounce: 300 }">
   <button class="btn btn-success protractor-test-add-exploration-button" type="submit" ng-disabled="!newExplorationId">Add Existing Exploration</button>
+  <span class="help-block" style="font-size: smaller" ng-if="isMalformedId(newExplorationId)">
+    <em>The trailing '#' is not part of the ID.</em>
+  </span>
 </form>

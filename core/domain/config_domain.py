@@ -18,6 +18,8 @@
 
 from core.domain import user_services
 from core.platform import models
+
+import feconf
 import schema_utils
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
@@ -33,6 +35,24 @@ SET_OF_STRINGS_SCHEMA = {
     'validators': [{
         'id': 'is_uniquified',
     }],
+}
+
+VMID_SHARED_SECRET_KEY_SCHEMA = {
+    'type': 'list',
+    'items': {
+        'type': 'dict',
+        'properties': [{
+            'name': 'vm_id',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'shared_secret_key',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
 }
 
 BOOL_SCHEMA = {
@@ -257,3 +277,11 @@ PROMO_BAR_ENABLED = ConfigProperty(
 PROMO_BAR_MESSAGE = ConfigProperty(
     'promo_bar_message', UNICODE_SCHEMA,
     'The message to show to all users if the promo bar is enabled', '')
+
+VMID_SHARED_SECRET_KEY_MAPPING = ConfigProperty(
+    'vmid_shared_secret_key_mapping', VMID_SHARED_SECRET_KEY_SCHEMA,
+    'VMID and shared secret key corresponding to that VM',
+    [{
+        'vm_id': feconf.DEFAULT_VM_ID,
+        'shared_secret_key': feconf.DEFAULT_VM_SHARED_SECRET
+    }])

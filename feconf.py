@@ -72,8 +72,23 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 
 # A mapping of interaction ids to their default classifier.
 INTERACTION_CLASSIFIER_MAPPING = {
-    'TextInput': 'LDAStringClassifier'
+    'TextInput': {
+        'algorithm_id': 'LDAStringClassifier',
+        'current_data_schema_version': 1
+    }
 }
+
+TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
+TRAINING_JOB_STATUS_FAILED = 'FAILED'
+TRAINING_JOB_STATUS_NEW = 'NEW'
+TRAINING_JOB_STATUS_PENDING = 'PENDING'
+
+ALLOWED_TRAINING_JOB_STATUSES = [
+    TRAINING_JOB_STATUS_COMPLETE,
+    TRAINING_JOB_STATUS_FAILED,
+    TRAINING_JOB_STATUS_NEW,
+    TRAINING_JOB_STATUS_PENDING
+]
 
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
@@ -112,7 +127,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 9
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 10
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -154,6 +169,11 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
+
+# Default ID of VM which is used for training classifier.
+DEFAULT_VM_ID = 'vm_default'
+# Shared secret key for default VM.
+DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -508,10 +528,10 @@ EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-DASHBOARD_URL = '/dashboard'
-DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
-DASHBOARD_DATA_URL = '/dashboardhandler/data'
-DASHBOARD_EXPLORATION_STATS_PREFIX = '/dashboardhandler/explorationstats'
+CREATOR_DASHBOARD_URL = '/creator_dashboard'
+DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
+CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
+DASHBOARD_EXPLORATION_STATS_PREFIX = '/creatordashboardhandler/explorationstats'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
@@ -527,6 +547,7 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
+LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -560,9 +581,10 @@ NAV_MODE_BLOG = 'blog'
 NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
-NAV_MODE_DASHBOARD = 'dashboard'
+NAV_MODE_CREATOR_DASHBOARD = 'creator_dashboard'
 NAV_MODE_DONATE = 'donate'
 NAV_MODE_EXPLORE = 'explore'
+NAV_MODE_LEARNER_DASHBOARD = 'learner_dashboard'
 NAV_MODE_LIBRARY = 'library'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
@@ -900,7 +922,7 @@ CONTACT_PAGE_DESCRIPTION = (
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
-DASHBOARD_PAGE_DESCRIPTION = (
+CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
 DONATE_PAGE_DESCRIPTION = (
@@ -942,3 +964,12 @@ SITE_NAME = 'Oppia.org'
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
+
+# Following are the constants for the roles.
+ROLE_GUEST = 'GUEST'
+ROLE_BANNED_USER = 'BANNED_USER'
+ROLE_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
+ROLE_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_MODERATOR = 'MODERATOR'
+ROLE_ADMIN = 'ADMIN'
+ROLE_SUPER_ADMIN = 'SUPER_ADMIN'

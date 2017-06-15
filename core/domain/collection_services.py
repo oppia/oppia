@@ -226,6 +226,21 @@ def get_collection_by_id(collection_id, strict=True, version=None):
             return None
 
 
+def does_collection_exists(collection_id):
+    """Returns true if the exploration exists.
+
+    Args:
+        exploration_id: str. The id of the exploration to be checked.
+
+    Returns:
+        bool. The value is true if the exploration exists.
+    """
+    collection_model = collection_models.CollectionModel.get(
+        collection_id, strict=False)
+
+    return True if collection_model else False
+
+
 def get_collection_summary_by_id(collection_id):
     """Returns a domain object representing a collection summary.
 

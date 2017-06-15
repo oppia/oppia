@@ -3,7 +3,7 @@
     {% if not user_is_logged_in %}
       <!-- User must complete the registration process. -->
       <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
-              ng-click="onRedirectToLogin('/dashboard?mode=create')">
+              ng-click="onRedirectToLogin('/creator_dashboard?mode=create')">
         <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_CREATE"></span>
       </button>
     {% else %}
