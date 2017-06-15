@@ -341,9 +341,8 @@ def save_classifier_training_job(algorithm_id, exp_id, exp_version,
         classifier_training_job.validate()
         job_id = _create_classifier_training_job(classifier_training_job)
     else:
-        classifier_training_job = classifier_domain.ClassifierTrainingJob(
-            job_id, algorithm_id, exp_id, exp_version,
-            state_name, status, training_data)
+        classifier_training_job = get_classifier_training_job_from_model(
+            classifier_training_job_model)
         classifier_training_job.validate()
         _update_classifier_training_job(classifier_training_job_model,
                                         state_name, status)
