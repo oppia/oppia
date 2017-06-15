@@ -461,7 +461,7 @@ oppia.factory('StateGraphLayoutService', [
         };
       },
       getAugmentedLinks: function(nodeData, nodeLinks) {
-        var links = angular.copy(node_links);
+        var links = angular.copy(nodeLinks);
         var augmentedLinks = links.map(function(link) {
           return {
             source: angular.copy(nodeData[link.source]),
