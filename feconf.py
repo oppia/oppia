@@ -510,6 +510,7 @@ TASK_URL_SUGGESTION_EMAILS = (
 
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
+ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
 EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'

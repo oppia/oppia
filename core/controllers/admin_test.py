@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.tests import test_utils
+from core.domain import user_services
 import feconf
 
 
@@ -108,30 +109,34 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         """Complete the signup process for self.ADMIN_EMAIL."""
         super(AdminRoleHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
 
-    def test_view_role(self):
-        # create a few users.
-        response = self.testapp.get(feconf.SIGNUP_URL)
-        self.assertEqual(response.status_int, 200)
+    def test_view_and_update_role(self):
+        user_email = 'user1@example.com'
+        user_name = 'user1'
+
+        self.signup(user_email, user_name)
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        # Check normal user has expected role.
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'method': 'username', 'username': 'user1'})
+        self.assertEqual(
+            response_dict, {'user1': feconf.ROLE_EXPLORATION_EDITOR})
+
+        # Check role correctly gets updated.
+        response = self.testapp.get(feconf.ADMIN_URL)
         csrf_token = self.get_csrf_token_from_response(response)
-
         response_dict = self.post_json(
-            feconf.SIGNUP_DATA_URL,
-            {'username': 'user1', 'agreed_to_terms': True},
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'role': feconf.ROLE_MODERATOR, 'username': user_name[2]},
             csrf_token=csrf_token, expect_errors=False,
             expected_status_int=200)
-        self.assertEqual(response_dict['code'], 200)
+        self.assertEqual(response_dict, {})
 
-        response_dict = self.post_json(
-            feconf.SIGNUP_DATA_URL,
-            {'username': 'user2', 'agreed_to_terms': True},
-            csrf_token=csrf_token, expect_errors=False,
-            expected_status_int=200)
-        self.assertEqual(response_dict['code'], 200)
-
-        response_dict = self.post_json(
-            feconf.SIGNUP_DATA_URL,
-            {'username': 'user3', 'agreed_to_terms': True},
-            csrf_token=csrf_token, expect_errors=False,
-            expected_status_int=200)
-        self.assertEqual(response_dict['code'], 200)
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'method': 'role', 'role': feconf.ROLE_MODERATOR})
+        self.assertEqual(response_dict, {})
+        self.logout()
