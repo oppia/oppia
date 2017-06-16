@@ -31,30 +31,62 @@ oppia.directive('filepathEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
-        // Reset the component each time the value changes (e.g. if this is part
-        // of an editable list).
+        // Reset the component each time the value changes
+        // (e.g. if this is part of an editable list).
         $scope.$watch('$parent.value', function(newValue) {
-          $scope.localValue = {
-            label: newValue || ''
-          };
-          $scope.imageUploaderIsActive = false;
-        });
-
-        $scope.explorationId = explorationContextService.getExplorationId();
-
-        $scope.validate = function(localValue) {
-          return localValue.label && localValue.label.length > 0;
-        };
-
-        $scope.$watch('localValue.label', function(newValue) {
           if (newValue) {
-            alertsService.clearWarnings();
-            $scope.localValue = {
-              label: newValue
-            };
-            $scope.$parent.value = newValue;
+            $scope.setSavedImageUrl(newValue, false);
           }
         });
+
+        $scope.validate = function(state) {
+          return state.state === 'saved' &&
+                 state.savedUrl &&
+                 state.savedUrl.length > 0;
+        };
+
+        $scope.isNoImageUploaded = function() {
+          return !$scope.state || $scope.state.state === 'empty';
+        };
+
+        $scope.isImageUploaded = function() {
+          return $scope.state && $scope.state.state === 'uploaded';
+        };
+
+        $scope.isImageSaved = function() {
+          return $scope.state && $scope.state.state === 'saved';
+        };
+
+        $scope.setEmptyState = function() {
+          $scope.state = {state: 'empty'};
+        };
+
+        $scope.setUploadedFile = function(file) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+              $scope.state = {
+                state: 'uploaded',
+                uploadedFile: file,
+                uploadedImageData: e.target.result,
+                originalWidth: this.naturalWidth,
+                originalHeight: this.naturalHeight
+              };
+              $scope.$apply();
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        };
+
+        $scope.setSavedImageUrl = function(url, updateParent) {
+          $scope.state = {state: 'saved', savedUrl: url};
+          if (updateParent) {
+            alertsService.clearWarnings();
+            $scope.$parent.value = url;
+          }
+        };
 
         $scope.getPreviewUrl = function(filepath) {
           var encodedFilepath = window.encodeURIComponent(filepath);
@@ -62,78 +94,55 @@ oppia.directive('filepathEditor', [
             '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
         };
 
-        $scope.resetImageUploader = function() {
-          $scope.currentFile = null;
-          $scope.currentFilename = null;
-          $scope.imagePreview = null;
-        };
-
-        $scope.openImageUploader = function() {
-          $scope.resetImageUploader();
-          $scope.uploadWarning = null;
-          $scope.imageUploaderIsActive = true;
-        };
-
-        $scope.closeImageUploader = function() {
-          $scope.imageUploaderIsActive = false;
-        };
-
         $scope.onFileChanged = function(file, filename) {
           if (!file || !file.size || !file.type.match('image.*')) {
             $scope.uploadWarning = 'This file is not recognized as an image.';
-            $scope.resetImageUploader();
+            $scope.setEmptyState();
             $scope.$apply();
             return;
           }
 
-          var imageNotSupported = (!file.type.match('image.jpeg') &&
-              !file.type.match('image.gif') && !file.type.match('image.jpg') &&
-              !file.type.match('image.png'));
-          
-          if (imageNotSupported) {
+          if (!file.type.match('image.jpeg') &&
+              !file.type.match('image.gif') &&
+              !file.type.match('image.jpg') &&
+              !file.type.match('image.png')) {
             $scope.uploadWarning = 'This image format is not supported.';
-            $scope.resetImageUploader();
+            $scope.setEmptyState();
             $scope.$apply();
             return;
           }
 
-          $scope.currentFile = file;
-          $scope.currentFilename = filename;
+          if (file.size / 1048576 > 1) {
+            var currentSize = parseInt(file.size / 1048576) + ' MB';
+            $scope.uploadWarning = 
+                'The maximum allowed file size is 1 MB' +
+                ' (' + currentSize+ ' given).';
+            $scope.setEmptyState();
+            $scope.$apply();
+            return;
+          }
+
           $scope.uploadWarning = null;
-
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            $scope.$apply(function() {
-              $scope.imagePreview = e.target.result;
-            });
-          };
-          reader.readAsDataURL(file);
-
+          $scope.setUploadedFile(file);
           $scope.$apply();
         };
 
-        $scope.saveUploadedFile = function(file, filename) {
+        $scope.discardUploadedFile = function() {
+          $scope.setEmptyState();
+        };
+
+        $scope.saveUploadedFile = function() {
           alertsService.clearWarnings();
 
-          if (!file || !file.size) {
-            alertsService.addWarning('Empty file detected.');
-            return;
-          }
-          if (!file.type.match('image.*')) {
-            alertsService.addWarning(
-              'This file is not recognized as an image.');
-            return;
-          }
-
-          if (!filename) {
-            alertsService.addWarning('Filename must not be empty.');
+          if (!$scope.state.uploadedFile) {
+            alertsService.addWarning('No image file detected.');
             return;
           }
 
           var form = new FormData();
-          form.append('image', file);
+          form.append('image', $scope.state.uploadedFile);
           form.append('payload', JSON.stringify({
-            filename: filename
+            filename: $scope.generateImageFilename()
           }));
           form.append('csrf_token', GLOBALS.csrf_token);
 
@@ -150,10 +159,7 @@ oppia.directive('filepathEditor', [
             },
             dataType: 'text'
           }).done(function(data) {
-            var inputElement = $('#newImage');
-            $scope.filepaths.push(data.filepath);
-            $scope.closeImageUploader();
-            $scope.localValue.label = data.filepath;
+            $scope.setSavedImageUrl(data.filepath, true);
             $scope.$apply();
           }).fail(function(data) {
             // Remove the XSSI prefix.
@@ -165,13 +171,28 @@ oppia.directive('filepathEditor', [
           });
         };
 
-        $scope.filepathsLoaded = false;
-        $http.get(
-          '/createhandler/resource_list/' + $scope.explorationId
-        ).then(function(response) {
-          $scope.filepaths = response.data.filepaths;
-          $scope.filepathsLoaded = true;
-        });
+        $scope.generateImageFilename = function() {
+          var format = '';
+          var chunks = $scope.state.uploadedFile.name.split('.');
+          if (chunks.length > 1) {
+            format = '.' + chunks.pop();
+          }
+          var date = new Date();
+          return 'img_' +
+              date.getFullYear() +
+              ('0' + (date.getMonth() + 1)).slice(-2) +
+              ('0' + date.getDate()).slice(-2) +
+              ('0' + date.getHours()).slice(-2) +
+              ('0' + date.getMinutes()).slice(-2) +
+              ('0' + date.getSeconds()).slice(-2) +
+              '_' +
+              Math.random().toString(36).substr(2, 10) +
+              format;
+        };
+
+        $scope.explorationId = explorationContextService.getExplorationId();
+        $scope.uploadWarning = null;
+        $scope.setEmptyState();
       }]
     };
   }

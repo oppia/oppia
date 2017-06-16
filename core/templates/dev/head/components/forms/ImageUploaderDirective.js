@@ -24,6 +24,7 @@ oppia.directive('imageUploader', [
       scope: {
         height: '@',
         onFileChanged: '=',
+        errorMessage: '@',
         width: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
