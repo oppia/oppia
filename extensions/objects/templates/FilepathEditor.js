@@ -116,7 +116,7 @@ oppia.directive('filepathEditor', [
             var currentSize = parseInt(file.size / 1048576) + ' MB';
             $scope.uploadWarning = 
                 'The maximum allowed file size is 1 MB' +
-                ' (' + currentSize+ ' given).';
+                ' (' + currentSize + ' given).';
             $scope.setEmptyState();
             $scope.$apply();
             return;
