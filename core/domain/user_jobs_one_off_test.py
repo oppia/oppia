@@ -1205,5 +1205,5 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
             set(banned_usernames), set(banned_users_by_role))
         self.assertEqual(
             set(collection_editor_usernames), set(collection_editors_by_role))
-        self.assertIn(
-            set(exploration_editor_usernames), set(exploration_editors_by_role))
+        for user in exploration_editor_usernames:
+            self.assertIn(user, exploration_editors_by_role)

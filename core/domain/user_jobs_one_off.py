@@ -350,7 +350,7 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
             'collection_editor_whitelist')
         email_senders = config_domain.Registry.get_config_property(
             'whitelisted_email_senders')
-        admin_usernames.extend(email_senders)
+        admin_usernames.value.extend(email_senders.value)
 
         try:
             if user_model.username in admin_usernames.value:
