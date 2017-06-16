@@ -289,21 +289,18 @@ def _create_classifier_training_job(classifier_training_job):
     return job_id
 
 
-def _update_classifier_training_job(classifier_training_job_model, state_name,
-                                    status):
+def _update_classifier_training_job(classifier_training_job_model, status):
     """Updates classifier training job model in the datastore given a
     classifier training job domain object.
 
     Args:
         classifier_training_job_model: ClassifierTrainingJobModel. Classifier
             training job model instance in datastore.
-        state_name: The name of the state.
         status: The status of the job.
 
     Note: All of the properties of a classifier training job are immutable,
-        except for state_name and status.
+        except for status.
     """
-    classifier_training_job_model.state_name = state_name
     classifier_training_job_model.status = status
     classifier_training_job_model.put()
 
@@ -345,7 +342,7 @@ def save_classifier_training_job(algorithm_id, exp_id, exp_version,
             classifier_training_job_model)
         classifier_training_job.validate()
         _update_classifier_training_job(classifier_training_job_model,
-                                        state_name, status)
+                                        status)
     return job_id
 
 

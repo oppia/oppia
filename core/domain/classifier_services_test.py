@@ -220,7 +220,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exp_id = u'1'
         state_name = 'Home'
         status = 'NEW'
-        test_state_name = 'State'
         test_status = 'PENDING'
         training_data = [
             {
@@ -239,9 +238,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.exp_id, exp_id)
-        self.assertEqual(classifier_training_job.state_name, state_name)
         self.assertEqual(classifier_training_job.status, status)
-        classifier_training_job.update_state_name(test_state_name)
         classifier_training_job.update_status(test_status)
         # Updating existing job.
         classifier_services.save_classifier_training_job(
@@ -255,5 +252,4 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.exp_id, exp_id)
-        self.assertEqual(classifier_training_job.state_name, test_state_name)
         self.assertEqual(classifier_training_job.status, test_status)
