@@ -15,6 +15,7 @@
 """Jobs for queries personalized to individual users."""
 
 import ast
+import logging
 
 from core import jobs
 from core.domain import config_domain
@@ -370,6 +371,7 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
                     user_model.id, feconf.ROLE_EXPLORATION_EDITOR)
             yield ('success ', 'Role successfully attached.')
         except Exception as e:
+            logging.error('Exception raised: %s' % e)
             yield (user_model.username, unicode(e))
 
     @staticmethod
