@@ -546,8 +546,9 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
         Args:
             job_id: str. Should come from the create_new class method.
-            additional_job_params: dict(str : int). Additional params to pass
-                into the job's _run() method.
+            job_class_str: str.
+            kwargs: dict(str : object). Extra arguments used to build the
+                MapreducePipeline.
         """
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
@@ -571,8 +572,8 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 
         Args:
             job_id: str. Should come from the create_new class method.
-            additional_job_params: dict(str : int). Additional params to pass
-                into the job's _run() method.
+            job_class_str: str.
+            output: str.
         """
         job_class = mapreduce_util.for_name(job_class_str)
 
