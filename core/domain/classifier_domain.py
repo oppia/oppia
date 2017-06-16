@@ -187,7 +187,7 @@ class ClassifierTrainingJob(object):
             generating the classifier.
         exp_id: str. The id of the exploration that contains the state
             for which the classifier will be generated.
-        exp_version_when_created: str. The version of the exploration when
+        exp_version: str. The version of the exploration when
             the training job was generated.
         state_name: str. The name of the state for which the classifier will be
             generated.
@@ -210,7 +210,7 @@ class ClassifierTrainingJob(object):
 
     """
 
-    def __init__(self, job_id, algorithm_id, exp_id, exp_version_when_created,
+    def __init__(self, job_id, algorithm_id, exp_id, exp_version,
                  state_name, status, training_data):
         """Constructs a ClassifierTrainingJob domain object.
 
@@ -220,7 +220,7 @@ class ClassifierTrainingJob(object):
             generating the classifier.
         exp_id: str. The id of the exploration id that contains the state
             for which classifier will be generated.
-        exp_version_when_created: str. The version of the exploration when
+        exp_version: str. The version of the exploration when
             the training job was generated.
         state_name: str. The name of the state for which the classifier will be
             generated.
@@ -244,7 +244,7 @@ class ClassifierTrainingJob(object):
         self._job_id = job_id
         self._algorithm_id = algorithm_id
         self._exp_id = exp_id
-        self._exp_version_when_created = exp_version_when_created
+        self._exp_version = exp_version
         self._state_name = state_name
         self._status = status
         self._training_data = copy.deepcopy(training_data)
@@ -262,8 +262,8 @@ class ClassifierTrainingJob(object):
         return self._exp_id
 
     @property
-    def exp_version_when_created(self):
-        return self._exp_version_when_created
+    def exp_version(self):
+        return self._exp_version
 
     @property
     def state_name(self):
@@ -277,6 +277,16 @@ class ClassifierTrainingJob(object):
     def training_data(self):
         return self._training_data
 
+    def update_status(self, status):
+        """Updates the status attribute of the ClassifierTrainingJob domain
+        object.
+
+        Args:
+            status: str. The status of the classifier training job.
+        """
+
+        self._status = status
+
     def to_dict(self):
         """Constructs a dict representation of training job domain object.
 
@@ -288,7 +298,7 @@ class ClassifierTrainingJob(object):
             'job_id': self._job_id,
             'algorithm_id': self._algorithm_id,
             'exp_id': self._exp_id,
-            'exp_version_when_created': self._exp_version_when_created,
+            'exp_version': self._exp_version,
             'state_name': self._state_name,
             'status': self._status,
             'training_data': self._training_data
@@ -306,10 +316,10 @@ class ClassifierTrainingJob(object):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
 
-        if not isinstance(self.exp_version_when_created, int):
+        if not isinstance(self.exp_version, int):
             raise utils.ValidationError(
-                'Expected exp_version_when_created to be an int, received %s' %
-                self.exp_version_when_created)
+                'Expected exp_version to be an int, received %s' %
+                self.exp_version)
 
         if not isinstance(self.state_name, basestring):
             raise utils.ValidationError(
@@ -320,7 +330,7 @@ class ClassifierTrainingJob(object):
             raise utils.ValidationError(
                 'Expected status to be in %s, received %s' %
                 feconf.ALLOWED_TRAINING_JOB_STATUSES,
-                self.exp_version_when_created)
+                self.exp_version)
 
         if not isinstance(self.algorithm_id, basestring):
             raise utils.ValidationError(
