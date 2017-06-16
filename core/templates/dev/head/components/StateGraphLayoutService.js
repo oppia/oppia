@@ -523,6 +523,38 @@ oppia.factory('StateGraphLayoutService', [
           }
         }
         return augmentedLinks;
+      },
+      modifyPositionValues: function(nodeData, graph_width, graph_height) {
+        var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
+        var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];  
+
+        // Change the position values in nodeData to use pixels.
+        for (var nodeId in nodeData) {
+          for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
+            nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
+              graph_width *
+              nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
+            nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
+              graph_height *
+              nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
+          }
+        }
+        return nodeData;
+      },
+      getGraphWidth: function(maxNodesPerRow, maxNodeLabelLength) {
+        // A rough upper bound for the width of a single letter, in pixels,
+        // to use as a scaling factor to determine the width of graph nodes.
+        // This is not an entirely accurate description because it also takes
+        // into account the horizontal whitespace between graph nodes.
+        var letterWidthInPixels = 10.5;          
+        return maxNodesPerRow*maxNodeLabelLength*letterWidthInPixels;
+      },
+      getGraphHeight: function(nodeData) {
+        var maxDepth = 0;
+        for (var nodeId in nodeData) {
+          maxDepth = Math.max(maxDepth, nodeData[nodeId].depth);
+        }
+        return 70.0 * (maxDepth + 1);
       }
     };
   }

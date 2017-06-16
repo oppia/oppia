@@ -504,13 +504,13 @@ def get_user_role_from_id(user_id):
 
 
 def get_usernames_by_role(role):
-    """Get usernames of all the users with given roleId.
+    """Get usernames of all the users with given role Id.
 
     Args:
-        role: str. The roleId of users requested.
+        role: str. The role Id of users requested.
 
     Returns:
-        list(str). List of usernames of users with given roleId.
+        list(str). List of usernames of users with given role Id.
     """
     user_settings = user_models.UserSettingsModel.get_by_role(role)
     return [user.username for user in user_settings]

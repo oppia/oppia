@@ -104,17 +104,6 @@ oppia.directive('stateGraphViz', [
           $scope.$watch('opacityMap', redrawGraph);
           $(window).resize(redrawGraph);
 
-          // A rough upper bound for the width of a single letter, in pixels,
-          // to use as a scaling factor to determine the width of graph nodes.
-          // This is not an entirely accurate description because it also takes
-          // into account the horizontal whitespace between graph nodes.
-          var LETTER_WIDTH_IN_PIXELS = 10.5;
-          var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
-          var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
-          $scope.GRAPH_WIDTH = (
-            MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * LETTER_WIDTH_IN_PIXELS
-            );
-
           var getElementDimensions = function() {
             return {
               h: $element.height(),
@@ -142,23 +131,12 @@ oppia.directive('stateGraphViz', [
             var nodeData = StateGraphLayoutService.computeLayout(
               nodes, links, initStateId, angular.copy(finalStateIds));
 
-            var maxDepth = 0;
-            for (var nodeId in nodeData) {
-              maxDepth = Math.max(maxDepth, nodeData[nodeId].depth);
-            }
-            $scope.GRAPH_HEIGHT = 70.0 * (maxDepth + 1);
+            $scope.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
+              MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH)
+            $scope.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(nodeData)
 
-            // Change the position values in nodeData to use pixels.
-            for (var nodeId in nodeData) {
-              for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
-                nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
-                  $scope.GRAPH_WIDTH *
-                  nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
-                nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
-                  $scope.GRAPH_HEIGHT *
-                  nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
-              }
-            }
+            nodeData = StateGraphLayoutService.modifyPositionValues(
+              nodeData, $scope.GRAPH_WIDTH, $scope.GRAPH_HEIGHT);
 
             // These constants correspond to the rectangle that, when clicked
             // and dragged, translates the graph. Its height, width, and x and

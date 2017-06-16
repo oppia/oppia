@@ -103,11 +103,11 @@ class UserSettingsModel(base_models.BaseModel):
         """Returns user models with given role.
 
         Args:
-            role: str. The roleId that is being queried for.
+            role: str. The role Id that is being queried for.
 
         Returns:
             list(UserSettingsModel). The UserSettingsModel instances which
-            have the given roleId.
+            have the given role Id.
         """
         return cls.query(cls.role == role).fetch()
 

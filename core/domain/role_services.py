@@ -174,10 +174,10 @@ def get_role_graph_data():
             links: list(dict(str:str)). List of dicts defing each edge in
                 following format:
                     {
-                        source: RoleId from which edge is going out.
-                        target: RoleId to which edge is incoming.
+                        source: Role Id from which edge is going out.
+                        target: Role Id to which edge is incoming.
                     }
-            nodes: dict(str:str). Mapping of roleId to its human readable
+            nodes: dict(str:str). Mapping of role Id to its human readable
                 format.
         }
     """

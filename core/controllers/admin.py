@@ -54,6 +54,31 @@ def require_super_admin(handler):
     return test_super_admin
 
 
+def check_and_update_config_role(old_list, new_list, role):
+    """Changes roles for users in old_list and new_list. If user belongs to
+    new_list but not in old list, its role is changed to specified role. If a
+    user belongs to old list but not new list, its role is changed to
+    exploration editor.
+
+    Args:
+        old_list: list(str). Existing list of usernames with given
+            role.
+        new_list: list(str). Updated list of usernames with given role.
+        role: str. The role to be used for users in these lists.
+    """
+    for username in old_list:
+        if username not in new_list:
+            user_services.update_user_role(
+                user_services.get_user_id_from_username(username),
+                feconf.ROLE_EXPLORATION_EDITOR)
+
+    for username in new_list:
+        if username not in old_list:
+            user_services.update_user_role(
+                user_services.get_user_id_from_username(username),
+                role)
+
+
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
     @require_super_admin
@@ -126,6 +151,29 @@ class AdminHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    role_sync_dict = {
+        'WHITELISTED_EMAIL_SENDERS': {
+            'name': 'whitelisted_email_senders',
+            'role': feconf.ROLE_ADMIN
+        },
+        'ADMIN_USERNAMES': {
+            'name': 'admin_usernames',
+            'role': feconf.ROLE_ADMIN
+        },
+        'COLLECTION_EDITOR_WHITELIST': {
+            'name': 'collection_editor_whitelist',
+            'role': feconf.ROLE_COLLECTION_EDITOR
+        },
+        'BANNED_USERNAMES': {
+            'name': 'banned_usernames',
+            'role': feconf.ROLE_BANNED_USER
+        },
+        'MODERATOR_USERNAMES': {
+            'name': 'moderator_usernames',
+            'role': feconf.ROLE_MODERATOR
+        }
+    }
+
     @require_super_admin
     def get(self):
         """Handles GET requests."""
@@ -138,30 +186,6 @@ class AdminHandler(base.BaseHandler):
     @require_super_admin
     def post(self):
         """Handles POST requests."""
-        def check_and_update_config_role(old_list, new_list, role):
-            """This function is used to update the role in user settings when
-            a role is changed using config domain. If a user is removed from
-            old_list, its role is changed to exploration editor. If a new user
-            is added to new_list, its role is changed to role
-
-            Args:
-                old_list: list(str). Existing list of usernames with given
-                    role.
-                new_list: list(str). Updated list of usernames with given role.
-                role: str. The role to be used for users in these lists.
-            """
-            for username in old_list:
-                if username not in new_list:
-                    user_services.update_user_role(
-                        user_services.get_user_id_from_username(username),
-                        feconf.ROLE_EXPLORATION_EDITOR)
-
-            for username in new_list:
-                if username not in old_list:
-                    user_services.update_user_role(
-                        user_services.get_user_id_from_username(username),
-                        role)
-
         try:
             if self.payload.get('action') == 'reload_exploration':
                 exploration_id = self.payload.get('exploration_id')
@@ -182,28 +206,33 @@ class AdminHandler(base.BaseHandler):
                     config_services.set_property(self.user_id, name, value)
                     # Below checks are for maintaining the sync between roles
                     # in old and new authorization system.
-                    # NOTE: This block of code is going to be removed once the
-                    #   new system takes over.
-                    if name == 'whitelisted_email_senders':
-                        check_and_update_config_role(
-                            config_properties[name]['value'], value,
-                            feconf.ROLE_ADMIN)
-                    if name == 'admin_usernames':
-                        check_and_update_config_role(
-                            config_properties[name]['value'], value,
-                            feconf.ROLE_ADMIN)
-                    if name == 'collection_editor_whitelist':
-                        check_and_update_config_role(
-                            config_properties[name]['value'], value,
-                            feconf.ROLE_COLLECTION_EDITOR)
-                    if name == 'banned_usernames':
-                        check_and_update_config_role(
-                            config_properties[name]['value'], value,
-                            feconf.ROLE_BANNED_USER)
-                    if name == 'moderator_usernames':
-                        check_and_update_config_role(
-                            config_properties[name]['value'], value,
-                            feconf.ROLE_MODERATOR)
+                    # TODO (1995YogeshSharma): Remove this block of code once
+                    # the new system takes over.
+                    for key in self.role_sync_dict:
+                        if name == self.role_sync_dict[key]['name']:
+                            check_and_update_config_role(
+                                config_properties[name]['value'], value,
+                                self.role_sync_dict[key]['role'])
+                    # if name == 'whitelisted_email_senders':
+                    #     check_and_update_config_role(
+                    #         config_properties[name]['value'], value,
+                    #         feconf.ROLE_ADMIN)
+                    # if name == 'admin_usernames':
+                    #     check_and_update_config_role(
+                    #         config_properties[name]['value'], value,
+                    #         feconf.ROLE_ADMIN)
+                    # if name == 'collection_editor_whitelist':
+                    #     check_and_update_config_role(
+                    #         config_properties[name]['value'], value,
+                    #         feconf.ROLE_COLLECTION_EDITOR)
+                    # if name == 'banned_usernames':
+                    #     check_and_update_config_role(
+                    #         config_properties[name]['value'], value,
+                    #         feconf.ROLE_BANNED_USER)
+                    # if name == 'moderator_usernames':
+                    #     check_and_update_config_role(
+                    #         config_properties[name]['value'], value,
+                    #         feconf.ROLE_MODERATOR)
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
                 config_property = config_domain.Registry.get_config_property(
@@ -216,28 +245,34 @@ class AdminHandler(base.BaseHandler):
 
                 # Below checks are for maintaining the sync between roles
                 # in old and new authorization system.
-                # NOTE: This block of code is going to be removed once the
-                #   new system takes over.
-                if config_property_id == 'whitelisted_email_senders':
-                    check_and_update_config_role(
-                        config_value, config_property.default_value,
-                        feconf.ROLE_ADMIN)
-                if config_property_id == 'admin_usernames':
-                    check_and_update_config_role(
-                        config_value, config_property.default_value,
-                        feconf.ROLE_ADMIN)
-                if config_property_id == 'collection_editor_whitelist':
-                    check_and_update_config_role(
-                        config_value, config_property.default_value,
-                        feconf.ROLE_COLLECTION_EDITOR)
-                if config_property_id == 'banned_usernames':
-                    check_and_update_config_role(
-                        config_value, config_property.default_value,
-                        feconf.ROLE_BANNED_USER)
-                if config_property_id == 'moderator_usernames':
-                    check_and_update_config_role(
-                        config_value, config_property.default_value,
-                        feconf.ROLE_MODERATOR)
+                # TODO (1995YogeshSharma): Remove this block of code once
+                # the new system takes over.
+                for key in self.role_sync_dict:
+                    if config_property_id == self.role_sync_dict[key]['name']:
+                        check_and_update_config_role(
+                            config_value, config_property.default_value,
+                            self.role_sync_dict[key]['role'])
+
+                # if config_property_id == 'whitelisted_email_senders':
+                #     check_and_update_config_role(
+                #         config_value, config_property.default_value,
+                #         feconf.ROLE_ADMIN)
+                # if config_property_id == 'admin_usernames':
+                #     check_and_update_config_role(
+                #         config_value, config_property.default_value,
+                #         feconf.ROLE_ADMIN)
+                # if config_property_id == 'collection_editor_whitelist':
+                #     check_and_update_config_role(
+                #         config_value, config_property.default_value,
+                #         feconf.ROLE_COLLECTION_EDITOR)
+                # if config_property_id == 'banned_usernames':
+                #     check_and_update_config_role(
+                #         config_value, config_property.default_value,
+                #         feconf.ROLE_BANNED_USER)
+                # if config_property_id == 'moderator_usernames':
+                #     check_and_update_config_role(
+                #         config_value, config_property.default_value,
+                #         feconf.ROLE_MODERATOR)
             elif self.payload.get('action') == 'start_new_job':
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):
@@ -300,26 +335,27 @@ class AdminRoleHandler(base.BaseHandler):
     def get(self):
         view_method = self.request.params['method']
 
-        if view_method == 'role':
-            role = self.request.params['role']
+        if view_method == feconf.VIEW_METHOD_ROLE:
+            role = self.request.params[feconf.VIEW_METHOD_ROLE]
             users_by_role = {
                 username: role
                 for username in user_services.get_usernames_by_role(role)
             }
             role_services.store_role_query(
-                self.user_id, feconf.VIEW_ROLE, method='role', role=role)
+                self.user_id, feconf.VIEW_ROLE, method=feconf.VIEW_METHOD_ROLE,
+                role=role)
             self.render_json(users_by_role)
-        elif view_method == 'username':
-            username = self.request.params['username']
-            userid = user_services.get_user_id_from_username(username)
+        elif view_method == feconf.VIEW_METHOD_USERNAME:
+            username = self.request.params[feconf.VIEW_METHOD_USERNAME]
+            user_id = user_services.get_user_id_from_username(username)
             role_services.store_role_query(
-                self.user_id, feconf.VIEW_ROLE, method='username',
-                username=username)
-            if userid is None:
+                self.user_id, feconf.VIEW_ROLE,
+                method=feconf.VIEW_METHOD_USERNAME, username=username)
+            if user_id is None:
                 self.render_json({})
             else:
                 user_role_dict = {
-                    username: user_services.get_user_role_from_id(userid)
+                    username: user_services.get_user_role_from_id(user_id)
                 }
                 self.render_json(user_role_dict)
         else:
@@ -330,8 +366,8 @@ class AdminRoleHandler(base.BaseHandler):
         try:
             username = self.payload.get('username')
             role = self.payload.get('role')
-            userid = user_services.get_user_id_from_username(username)
-            user_services.update_user_role(userid, role)
+            user_id = user_services.get_user_id_from_username(username)
+            user_services.update_user_role(user_id, role)
             role_services.store_role_query(
                 self.user_id, feconf.UPDATE_ROLE, role=role,
                 username=username)
