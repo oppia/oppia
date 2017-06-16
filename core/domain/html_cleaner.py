@@ -21,6 +21,7 @@ import urlparse
 
 import bleach
 
+from bs4 import BeautifulSoup
 from core.domain import rte_component_registry
 
 
@@ -107,3 +108,29 @@ def strip_html_tags(html):
         stripped out.
     """
     return bleach.clean(html, tags=[], attributes={}, strip=True)
+
+
+def get_rte_components(html_string):
+    """Extracts the RTE components from an HTML string.
+
+    Args:
+        html: str. An HTML string.
+
+    Returns:
+        list. A list of dictionaries, each representing an RTE component.
+        Each dict contains component 'id' and 'customization_args'.
+    """
+    components = []
+    soup = BeautifulSoup(html_string, 'html.parser')
+    oppia_custom_tags = (
+        rte_component_registry.Registry.get_tag_list_with_attrs())
+    for tag_name in oppia_custom_tags:
+        component_tags = soup.find_all(tag_name)
+        for component_tag in component_tags:
+            component = {'id': tag_name}
+            customization_args = {}
+            for attr in oppia_custom_tags[tag_name]:
+                customization_args[attr] = component_tag[attr]
+            component['customization_args'] = customization_args
+            components.append(component)
+    return components
