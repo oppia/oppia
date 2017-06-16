@@ -941,7 +941,7 @@ oppia.factory('explorationStatesService', [
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
       $rootScope.$broadcast('refreshStateEditor');
-          // This state name is removed from gadget's visibilty settings.
+          // This state name is removed from gadget's visibility settings.
       explorationGadgetsService.handleStateDeletion(deleteStateName);
     }
 
