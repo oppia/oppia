@@ -1,10 +1,11 @@
 <div class="image-uploader-drop-area">
-  <div class="image-uploader-text" translate="I18N_DIRECTIVES_DRAG_IMAGE_HERE"></div><label for="image-file-input" translate="I18N_DIRECTIVES_UPLOAD" class="upload-label-button"></label><div class="image-uploader-text" translate="I18N_DIRECTIVES_OR_SELECT_FILE"></div>
+  <div class="image-uploader-text" translate="I18N_DIRECTIVES_DRAG_IMAGE_HERE"></div>
   <br>
   <span ng-if="errorMessage" class="image-uploader-error-message">
     <i class="material-icons">&#xE002;</i>
     <[errorMessage]>
   </span>
+  <label for="image-file-input" translate="I18N_DIRECTIVES_UPLOAD_A_FILE" class="upload-label-button"></label>
   <input type="file" id='image-file-input' class="image-uploader-file-input" ng-class="fileInputClassName">
 </div>
 
@@ -16,7 +17,8 @@
     text-align: center;
     height: 200px;
     width: 100%;
-    padding-top: 70px;
+    padding-top: 74px;
+    position: relative;
   }
 
   .image-uploader-text {
@@ -26,6 +28,10 @@
     margin: 0 auto;
     text-align: center;
     width: 100%;
+  }
+
+  .image-uploader-is-active {
+    background-color: #bbb;
   }
 
   .image-uploader-file-input {
@@ -38,19 +44,22 @@
   }
 
   label.upload-label-button {
+    position: absolute;
+    right: 8px;
+    bottom: 6px;
     padding: 4px 8px;
-    margin: 0px 4px;
     border: solid #707070 1px;
     font-size: 16px;
+    font-weight: normal;
     background: grey;
     display: inline;
     border-radius: 2px;
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #F2F2F2), color-stop(1, #CFCFCF));
-    background-image: -o-linear-gradient(bottom, #F2F2F2 0%, #CFCFCF 100%);
-    background-image: -moz-linear-gradient(bottom, #F2F2F2 0%, #CFCFCF 100%);
-    background-image: -webkit-linear-gradient(bottom, #F2F2F2 0%, #CFCFCF 100%);
-    background-image: -ms-linear-gradient(bottom, #F2F2F2 0%, #CFCFCF 100%);
-    background-image: linear-gradient(to bottom, #F2F2F2 0%, #CFCFCF 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #F2F2F2), color-stop(1, #BFBFBF));
+    background-image: -o-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
+    background-image: -moz-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
+    background-image: -webkit-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
+    background-image: -ms-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
+    background-image: linear-gradient(to bottom, #F2F2F2 0%, #BFBFBF 100%);
     cursor: default;
     text-align: center;
   }
@@ -69,7 +78,6 @@
   label.upload-label-button:active {
     border: solid #2c628b 1px;
     padding: 4px 8px;
-    margin: 0px 4px;
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #E5F4FC), color-stop(0.5, #C4E5F6), color-stop(0.51, #98D0EF), color-stop(1, #68B3DB));
     background-image: -o-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
     background-image: -moz-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
@@ -79,20 +87,15 @@
   }
 
   .image-uploader-error-message {
-    margin-top: 18px;
+    margin-top: 10px;
     display: inline-block;
     padding: 4px;
     color: red;
-    border: 1px solid red;
     font-size: 16
   }
 
   .image-uploader-error-message i {
     margin-right: 4px;
     font-size: 16px;
-  }
-
-  .image-uploader-is-active {
-    background: red;
   }
 </style>
