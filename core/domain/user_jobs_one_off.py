@@ -368,9 +368,9 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
             else:
                 user_services.update_user_role(
                     user_model.id, feconf.ROLE_EXPLORATION_EDITOR)
-            yield(user_model.username, 'Role successfully attached.')
-        except Exception:
-            yield(user_model.username, 'Some error ocurred.')
+            yield ('success ', 'Role successfully attached.')
+        except Exception as e:
+            yield (user_model.username, unicode(e))
 
     @staticmethod
     def reduce(key, value):

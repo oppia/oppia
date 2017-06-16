@@ -1142,8 +1142,11 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
 
 class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
-
     def test_create_user_with_different_roles_and_run_migration_job(self):
+        """Tests the working of roles migration job. A sample set of users
+        is created with varying roles. The migration job is run and resulted
+        change in roles is tested against expected values.
+        """
         user_ids = [
             'user_id1', 'user_id2', 'user_id3', 'user_id4',
             'user_id5', 'user_id6', 'user_id7', 'user_id8'
@@ -1165,7 +1168,8 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
         admin_usernames = ['user1', 'user2', 'user3']
         moderator_usernames = ['user4', 'user5']
         banned_usernames = ['user6']
-        collection_editor_usernames = ['user7', 'user8']
+        collection_editor_usernames = ['user7']
+        exploration_editor_usernames = ['user8']
 
         config_services.set_property(
             'admin_id', 'admin_usernames', admin_usernames)
@@ -1190,6 +1194,8 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.ROLE_BANNED_USER)
         collection_editors_by_role = user_services.get_usernames_by_role(
             feconf.ROLE_COLLECTION_EDITOR)
+        exploration_editors_by_role = user_services.get_usernames_by_role(
+            feconf.ROLE_EXPLORATION_EDITOR)
 
         self.assertEqual(
             set(admin_usernames), set(admins_by_role))
@@ -1199,3 +1205,5 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
             set(banned_usernames), set(banned_users_by_role))
         self.assertEqual(
             set(collection_editor_usernames), set(collection_editors_by_role))
+        self.assertIn(
+            set(exploration_editor_usernames), set(exploration_editors_by_role))
