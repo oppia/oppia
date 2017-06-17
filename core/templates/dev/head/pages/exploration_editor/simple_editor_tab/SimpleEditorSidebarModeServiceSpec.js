@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the SimpleEditorSidebarModeService.js
  */
 
-describe('Simple Editor Sidebar Mode Service', function(){
+describe('Simple Editor Sidebar Mode Service', function() {
   var simpleEditorSidebarModeService;
 
   beforeEach(module('oppia'));
@@ -25,42 +25,42 @@ describe('Simple Editor Sidebar Mode Service', function(){
       .get('SimpleEditorSidebarModeService');
   }));
 
-  describe('isSidebarInReadonlyMode',function(){
-    it('should return true when mode is set to readonly',function(){
+  describe('isSidebarInReadonlyMode', function() {
+    it('should return true when mode is set to readonly', function() {
       simpleEditorSidebarModeService.setModeToReadonly();
       expect(simpleEditorSidebarModeService.isSidebarInReadonlyMode())
         .toBe(true);
     });
 
-    it('should return false when mode is set to edit',function(){
+    it('should return false when mode is set to edit', function() {
       simpleEditorSidebarModeService.setModeToEdit();
       expect(simpleEditorSidebarModeService.isSidebarInReadonlyMode())
         .toBe(false);
     });
   });
 
-  describe('isSidebarInEditMode', function(){
-    it('should return false when mode is set to readonly',function(){
+  describe('isSidebarInEditMode', function() {
+    it('should return false when mode is set to readonly', function() {
       simpleEditorSidebarModeService.setModeToReadonly();
       expect(simpleEditorSidebarModeService.isSidebarInEditMode()).toBe(false);
     });
 
-    it('should return true when mode is set to edit',function(){
+    it('should return true when mode is set to edit', function() {
       simpleEditorSidebarModeService.setModeToEdit();
       expect(simpleEditorSidebarModeService.isSidebarInEditMode()).toBe(true);
     });
   });
 
-  describe('setModeToReadonly', function(){
-    it('should set the mode to readonly', function(){
+  describe('setModeToReadonly', function() {
+    it('should set the mode to readonly', function() {
       simpleEditorSidebarModeService.setModeToReadonly();
       expect(simpleEditorSidebarModeService.isSidebarInReadonlyMode())
         .toBe(true);
     });
   });
-  
-  describe('setModeToEdit', function(){
-    it('should set the mode to edit', function(){
+
+  describe('setModeToEdit', function() {
+    it('should set the mode to edit', function() {
       simpleEditorSidebarModeService.setModeToEdit();
       expect(simpleEditorSidebarModeService.isSidebarInEditMode()).toBe(true);
     });

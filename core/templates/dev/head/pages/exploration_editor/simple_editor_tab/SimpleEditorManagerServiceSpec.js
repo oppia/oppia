@@ -376,67 +376,71 @@ describe('Simple Editor Manager Service', function() {
       })).toBe(true);
   });
 
-  describe('deleteQuestion', function () {
+  describe('deleteQuestion', function() {
     var stateNameOfQuestionToDelete;
     var questionToDelete;
     var nextStateName;
 
-    beforeEach(function(){
+    beforeEach(function() {
       simpleEditorManagerService.tryToInit();
       stateNameOfQuestionToDelete = 'Question 1';
       nextStateName = 'Question 2';
-      expect(function(){simpleEditorManagerService.getQuestionList()
-        .getBindableQuestion(stateNameOfQuestionToDelete)}).not.toThrowError();
+      expect(function() {
+        simpleEditorManagerService.getQuestionList()
+          .getBindableQuestion(stateNameOfQuestionToDelete);
+      }).not.toThrowError();
       questionToDelete = questionList
         .getBindableQuestion(stateNameOfQuestionToDelete);
       expect(explorationStatesService.hasState(stateNameOfQuestionToDelete))
         .toBe(true);
     });
 
-    it('should remove question from question list', function () {
+    it('should remove question from question list', function() {
       simpleEditorManagerService.deleteQuestion(questionToDelete);
       expect(simpleEditorManagerService.getQuestionList().getQuestions()
         .indexOf(questionToDelete)).toEqual(-1);
     });
 
-    it('should remove the corresponding state', function(){
+    it('should remove the corresponding state', function() {
       simpleEditorManagerService.deleteQuestion(questionToDelete);
       expect(explorationStatesService.hasState(stateNameOfQuestionToDelete))
         .toBe(false);
     });
 
     it('should change the destination of states that point to it to' +
-      'next state.', function(){
+      'next state.', function() {
       var stateThatPointToIt = 'Introduction';
       simpleEditorManagerService.deleteQuestion(questionToDelete);
       var expectedDestination = simpleEditorShimService
-          .getState(stateThatPointToIt).interaction
-            .answerGroups[0].outcome.dest;
+        .getState(stateThatPointToIt).interaction.answerGroups[0].outcome.dest;
       expect(expectedDestination).toEqual(nextStateName);
     });
 
     it('should change the destination of questions that point to it to' +
-      'next question',function(){
+      'next question', function() {
       var stateThatPointToIt = 'Introduction';
       var questionThatPointToIt = questionList
         .getBindableQuestion(stateThatPointToIt);
       simpleEditorManagerService.deleteQuestion(questionToDelete);
       var expectedDestination = simpleEditorManagerService.getQuestionList()
-        .getBindableQuestion(stateThatPointToIt)._answerGroups[0].outcome.dest;
+        .getBindableQuestion(stateThatPointToIt).getAnswerGroups()[0]
+          .outcome.dest;
       expect(expectedDestination).toEqual(nextStateName);
     });
 
-    it('should change the init state name to next state if question ' + 
-      'corresponding to initial state is deleted', function() {
-      questionToDelete = questionList.getBindableQuestion(data.init_state_name);
+    it('should change the init state name to next state if question' +
+      ' corresponding to initial state is deleted', function() {
+      questionToDelete = questionList
+        .getBindableQuestion(data.init_state_name);
       nextStateName = data.states[data.init_state_name].interaction
         .answer_groups[0].outcome.dest;
       simpleEditorManagerService.deleteQuestion(questionToDelete);
-      expect(simpleEditorShimService.getInitStateName()).toEqual(nextStateName);
+      expect(simpleEditorShimService.getInitStateName())
+        .toEqual(nextStateName);
     });
 
-    it('should move the content stored in corresponding state to next state', 
-      function(){
+    it('should move the content stored in corresponding state to next state',
+      function() {
         var content = simpleEditorShimService
           .getState(stateNameOfQuestionToDelete).content;
         simpleEditorManagerService.deleteQuestion(questionToDelete);
@@ -446,7 +450,6 @@ describe('Simple Editor Manager Service', function() {
       });
   });
 
-  
   it('should add new state', function() {
     simpleEditorManagerService.tryToInit();
     var newStateName = simpleEditorManagerService.addState();

@@ -629,7 +629,7 @@ oppia.factory('explorationPropertyService', [
       // Validates the given value and returns a boolean stating whether it
       // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
       // behavior is to always return true.
-      _isValid: function(value) {
+      _isValid: function() {
         return true;
       },
       // Normalizes the displayed value. Then, if the memento and the displayed
@@ -925,25 +925,25 @@ oppia.factory('explorationStatesService', [
       var conversionFunction = BACKEND_CONVERSIONS[backendName];
       return conversionFunction(frontendValue);
     };
-    
-    var finallyDelete = function(deleteStateName){
+
+    var finallyDelete = function(deleteStateName) {
       _states.deleteState(deleteStateName);
 
       changeListService.deleteState(deleteStateName);
 
       if (editorContextService.getActiveStateName() === deleteStateName) {
         editorContextService.setActiveStateName(
-              explorationInitStateNameService.savedMemento);
+          explorationInitStateNameService.savedMemento);
       }
 
       $location.path('/gui/' + editorContextService.getActiveStateName());
       $rootScope.$broadcast('refreshGraph');
-          // This ensures that if the deletion changes rules in the current
-          // state, they get updated in the view.
+      // This ensures that if the deletion changes rules in the current
+      // state, they get updated in the view.
       $rootScope.$broadcast('refreshStateEditor');
-          // This state name is removed from gadget's visibility settings.
+      // This state name is removed from gadget's visibility settings.
       explorationGadgetsService.handleStateDeletion(deleteStateName);
-    }
+    };
 
     // TODO(sll): Add unit tests for all get/save methods.
     return {
@@ -1111,9 +1111,9 @@ oppia.factory('explorationStatesService', [
               };
             }
           ]
-        }).result.then(finallyDelete(deleteStateName));
+        }).result.then(finallyDelete);
       },
-      reallyDelete: function(deleteStateName){
+      reallyDelete: function(deleteStateName) {
         return finallyDelete(deleteStateName);
       },
       renameState: function(oldStateName, newStateName) {
@@ -1193,7 +1193,7 @@ oppia.factory('statePropertyService', [
       // Validates the given value and returns a boolean stating whether it
       // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
       // behavior is to always return true.
-      _isValid: function(value) {
+      _isValid: function() {
         return true;
       },
       // Creates a new entry in the change list, and updates the memento to the

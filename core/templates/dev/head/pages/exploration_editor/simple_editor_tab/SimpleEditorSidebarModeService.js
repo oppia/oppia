@@ -13,14 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service that acts as a "go-between" between the
- * simple-editor-related services and the rest of the exploration editor,
- * analogous to how the BackendApiServices bridge the frontend communications
- * with the backend. All communication of data from the simple editor to other
- * services (load, fetch, set, etc.) should pass through this service.
+ * @fileoverview It keeps track of sidebar mode in simple editor. It provides
+ * two modes 1)Readonly 2)Edit.
  */
 
-oppia.factory('SimpleEditorSidebarModeService',[function(){
+oppia.factory('SimpleEditorSidebarModeService', [function() {
   var SIDEBAR_MODE_READONLY = 'readonly';
   var SIDEBAR_MODE_EDIT = 'edit';
 
