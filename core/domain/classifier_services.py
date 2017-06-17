@@ -185,12 +185,12 @@ def _check_re_training_conditions(state, classifier_training_job):
     if len(old_training_data) != len(new_training_data):
         # Check for outcome mismatch.
         if len(new_training_data) > len(old_training_data):
-            flag = True
+            flag = False
             for (answer_group_index, answer_group) in enumerate(
                     old_training_data):
                 if answer_group['answer_group_index'] != new_training_data[
                         answer_group_index]['answer_group_index']:
-                    flag = False
+                    flag = True
             if flag:
                 delete_classifier_training_job(state.classifier_model_id)
                 return True
@@ -226,11 +226,15 @@ def get_training_data_from_state(state):
         if classifier_rule_spec_index is not None:
             classifier_rule_spec = answer_group.rule_specs[
                 classifier_rule_spec_index]
+            answers = []
+            for doc in classifier_rule_spec.inputs['training_data']:
+                answers.extend([doc])
             training_data.extend([{
                 'answer_group_index': answer_group_index,
-                'answers': ([doc] for doc in classifier_rule_spec.inputs[
-                    'training_data'])
+                'answers': answers
             }])
+    for answer_group in training_data:
+        print answer_group['answer_group_index']
     return training_data
 
 
@@ -413,7 +417,7 @@ def _update_classifier_training_job(classifier_training_job_model, status):
 
 
 def save_classifier_training_job(algorithm_id, exp_id, exp_version,
-                                 state_name, training_data, status="None",
+                                 state_name, training_data, status="NEW",
                                  job_id="None"):
     """Checks for the existence of the model.
     If the model exists, it is updated using _update_classifier_training_job
