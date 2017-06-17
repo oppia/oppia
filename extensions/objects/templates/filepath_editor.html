@@ -1,4 +1,4 @@
-<div ng-model="state" ui-validate="'validate($value)'">
+<div ng-model="data" ui-validate="'validate($value)'">
   <div class="filepath-editor-image-container">
     <div ng-if="isNoImageUploaded()">
       <image-uploader
@@ -7,13 +7,13 @@
       </image-uploader>
     </div>
     <div ng-if="isImageUploaded()">
-      <img ng-src="<[state.uploadedImageData]>"/>
+      <img ng-src="<[data.metadata.uploadedImageData]>">
     </div>
     <div ng-if="isImageSaved()">
       <i class="material-icons filepath-editor-trash"
-         ng-click="setEmptyState()"
+         ng-click="clearScopeData()"
          title="Delete this image">&#xE872;</i>
-      <img ng-src="<[getPreviewUrl(state.savedUrl)]>"/>
+      <img ng-src="<[getSavedImageTrustedResourceUrl()]>">
     </div>
   </div>
   <div ng-if="isImageUploaded()" class="filepath-editor-save-box">
@@ -33,11 +33,11 @@
     text-align: center;
   }
   .filepath-editor-trash {
+    color: black;
     position: absolute;
     right: 6px;
-    top: 6px;
-    color: black;
     text-shadow: 0px 0px 1px #fff;
+    top: 6px;
   }
   .filepath-editor-save-box {
     margin-top: 6px;

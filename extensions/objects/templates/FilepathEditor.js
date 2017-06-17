@@ -31,6 +31,22 @@ oppia.directive('filepathEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
+        $scope.MODE_EMPTY = 1;
+        $scope.MODE_UPLOADED = 2;
+        $scope.MODE_SAVED = 3;
+
+        // This variable holds all the data needed for the image upload flow.
+        // It's always guaranteed to have the 'mode' and 'metadata' properties.
+        // When mode is UPLOADED, there will be metadata about the uploaded img,
+        // and when mode is SAVED, there will be metadata about the saved img.
+        $scope.clearScopeData = function() {
+          $scope.data = {
+            mode: $scope.MODE_EMPTY,
+            metadata: {}
+          };
+        };
+        $scope.clearScopeData();
+
         // Reset the component each time the value changes
         // (e.g. if this is part of an editable list).
         $scope.$watch('$parent.value', function(newValue) {
@@ -39,26 +55,22 @@ oppia.directive('filepathEditor', [
           }
         });
 
-        $scope.validate = function(state) {
-          return state.state === 'saved' &&
-                 state.savedUrl &&
-                 state.savedUrl.length > 0;
+        $scope.validate = function(data) {
+          return data.mode === $scope.MODE_SAVED &&
+                 data.metadata.savedUrl &&
+                 data.metadata.savedUrl.length > 0;
         };
 
         $scope.isNoImageUploaded = function() {
-          return !$scope.state || $scope.state.state === 'empty';
+          return $scope.data.mode === $scope.MODE_EMPTY;
         };
 
         $scope.isImageUploaded = function() {
-          return $scope.state && $scope.state.state === 'uploaded';
+          return $scope.data.mode === $scope.MODE_UPLOADED;
         };
 
         $scope.isImageSaved = function() {
-          return $scope.state && $scope.state.state === 'saved';
-        };
-
-        $scope.setEmptyState = function() {
-          $scope.state = {state: 'empty'};
+          return $scope.data.mode === $scope.MODE_SAVED;
         };
 
         $scope.setUploadedFile = function(file) {
@@ -66,12 +78,12 @@ oppia.directive('filepathEditor', [
           reader.onload = function(e) {
             var img = new Image();
             img.onload = function() {
-              $scope.state = {
-                state: 'uploaded',
-                uploadedFile: file,
-                uploadedImageData: e.target.result,
-                originalWidth: this.naturalWidth,
-                originalHeight: this.naturalHeight
+              $scope.data = {
+                mode: $scope.MODE_UPLOADED,
+                metadata: {
+                  uploadedFile: file,
+                  uploadedImageData: e.target.result
+                }
               };
               $scope.$apply();
             };
@@ -81,23 +93,30 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.setSavedImageUrl = function(url, updateParent) {
-          $scope.state = {state: 'saved', savedUrl: url};
+          $scope.data = {
+            mode: $scope.MODE_SAVED,
+            metadata: {savedUrl: url}
+          };
           if (updateParent) {
             alertsService.clearWarnings();
             $scope.$parent.value = url;
           }
         };
 
-        $scope.getPreviewUrl = function(filepath) {
-          var encodedFilepath = window.encodeURIComponent(filepath);
-          return $sce.trustAsResourceUrl(
-            '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+        $scope.getSavedImageTrustedResourceUrl = function() {
+          if ($scope.data.mode === $scope.MODE_SAVED) {
+            var encodedFilepath = window.encodeURIComponent(
+              $scope.data.metadata.savedUrl);
+            return $sce.trustAsResourceUrl(
+              '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+          }
+          return null;
         };
 
         $scope.onFileChanged = function(file, filename) {
           if (!file || !file.size || !file.type.match('image.*')) {
             $scope.uploadWarning = 'This file is not recognized as an image.';
-            $scope.setEmptyState();
+            $scope.clearScopeData();
             $scope.$apply();
             return;
           }
@@ -107,17 +126,18 @@ oppia.directive('filepathEditor', [
               !file.type.match('image.jpg') &&
               !file.type.match('image.png')) {
             $scope.uploadWarning = 'This image format is not supported.';
-            $scope.setEmptyState();
+            $scope.clearScopeData();
             $scope.$apply();
             return;
           }
 
-          if (file.size / 1048576 > 1) {
-            var currentSize = parseInt(file.size / 1048576) + ' MB';
+          var ONE_MB_IN_BYTES = 1048576;
+          if (file.size / ONE_MB_IN_BYTES > 1) {
+            var currentSize = parseInt(file.size / ONE_MB_IN_BYTES) + ' MB';
             $scope.uploadWarning = 
                 'The maximum allowed file size is 1 MB' +
                 ' (' + currentSize + ' given).';
-            $scope.setEmptyState();
+            $scope.clearScopeData();
             $scope.$apply();
             return;
           }
@@ -128,19 +148,19 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.discardUploadedFile = function() {
-          $scope.setEmptyState();
+          $scope.clearScopeData();
         };
 
         $scope.saveUploadedFile = function() {
           alertsService.clearWarnings();
 
-          if (!$scope.state.uploadedFile) {
+          if (!$scope.data.metadata.uploadedFile) {
             alertsService.addWarning('No image file detected.');
             return;
           }
 
           var form = new FormData();
-          form.append('image', $scope.state.uploadedFile);
+          form.append('image', $scope.data.metadata.uploadedFile);
           form.append('payload', JSON.stringify({
             filename: $scope.generateImageFilename()
           }));
@@ -173,7 +193,7 @@ oppia.directive('filepathEditor', [
 
         $scope.generateImageFilename = function() {
           var format = '';
-          var chunks = $scope.state.uploadedFile.name.split('.');
+          var chunks = $scope.data.metadata.uploadedFile.name.split('.');
           if (chunks.length > 1) {
             format = '.' + chunks.pop();
           }
@@ -182,6 +202,7 @@ oppia.directive('filepathEditor', [
               date.getFullYear() +
               ('0' + (date.getMonth() + 1)).slice(-2) +
               ('0' + date.getDate()).slice(-2) +
+              '_' +
               ('0' + date.getHours()).slice(-2) +
               ('0' + date.getMinutes()).slice(-2) +
               ('0' + date.getSeconds()).slice(-2) +
@@ -192,7 +213,7 @@ oppia.directive('filepathEditor', [
 
         $scope.explorationId = explorationContextService.getExplorationId();
         $scope.uploadWarning = null;
-        $scope.setEmptyState();
+        $scope.clearScopeData();
       }]
     };
   }

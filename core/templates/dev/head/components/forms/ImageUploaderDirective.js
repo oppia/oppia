@@ -54,12 +54,10 @@ oppia.directive('imageUploader', [
         // we want to prevent the browser from applying normal drag-and-drop
         // logic, which is to load the image in the browser tab.
         $(window).bind('dragover', function(e) {
-          e = e || event;
           e.preventDefault();
         });
 
         $(window).bind('drop', function(e) {
-          e = e || event;
           e.preventDefault();
         });
 
