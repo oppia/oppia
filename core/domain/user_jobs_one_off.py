@@ -349,9 +349,6 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
             'banned_usernames')
         collection_editors = config_domain.Registry.get_config_property(
             'collection_editor_whitelist')
-        email_senders = config_domain.Registry.get_config_property(
-            'whitelisted_email_senders')
-        admin_usernames.value.extend(email_senders.value)
 
         try:
             if user_model.username in admin_usernames.value:
