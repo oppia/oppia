@@ -92,7 +92,9 @@ exports.config = {
       'protractor/loginFlow.js',
       'protractor/libraryPagesTour.js',
       'protractor/collections.js',
-      'protractor/explorationFeedback.js'
+      'protractor/explorationFeedback.js',
+      'protractor/subscriptions.js',
+      'protractor/suggestions.js'
     ],
 
     i18n: [
@@ -168,7 +170,7 @@ exports.config = {
       }));
     }
 
-    var SpecReporter = require('jasmine-spec-reporter');
+    var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'all',
       displaySpecDuration: true

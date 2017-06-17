@@ -3,6 +3,15 @@
 </script>
 
 <script type="text/ng-template" id="components/feedback">
+  <style>
+    feedback-popup .oppia-feedback-popover-textarea {
+      border: 1px solid rgba(0,0,0,0.2);
+      margin-top: 4px;
+      padding: 4px;
+      resize: none;
+      width: 200px;
+    }
+  </style>
   <div style="min-width: 200px;">
     <div ng-show="!feedbackSubmitted">
       <button type="button" class="oppia-close-popover-button" ng-click="closePopover()">

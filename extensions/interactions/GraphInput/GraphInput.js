@@ -31,61 +31,62 @@ oppia.directive('oppiaInteractiveGraphInput', [
         onSubmit: '&'
       },
       templateUrl: 'interaction/GraphInput',
-      controller: ['$scope', '$element', '$attrs',
-          function($scope, $element, $attrs) {
-        $scope.errorMessage = '';
-        $scope.graph = {
-          vertices: [],
-          edges: [],
-          isDirected: false,
-          isWeighted: false,
-          isLabeled: false
-        };
-
-        $scope.submitGraph = function() {
-          // Here, angular.copy is needed to strip $$hashkey from the graph.
-          $scope.onSubmit({
-            answer: angular.copy($scope.graph),
-            rulesService: graphInputRulesService
-          });
-        };
-        $scope.resetGraph = function() {
-          updateGraphFromJSON($attrs.graphWithValue);
-        };
-
-        var init = function() {
-          updateGraphFromJSON($attrs.graphWithValue);
-          var stringToBool = function(str) {
-            return (str === 'true');
+      controller: [
+        '$scope', '$element', '$attrs',
+        function($scope, $element, $attrs) {
+          $scope.errorMessage = '';
+          $scope.graph = {
+            vertices: [],
+            edges: [],
+            isDirected: false,
+            isWeighted: false,
+            isLabeled: false
           };
-          $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
-          $scope.canDeleteVertex = stringToBool(
-            $attrs.canDeleteVertexWithValue);
-          $scope.canEditVertexLabel = stringToBool(
-            $attrs.canEditVertexLabelWithValue);
-          $scope.canMoveVertex = stringToBool($attrs.canMoveVertexWithValue);
-          $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
-          $scope.canDeleteEdge = stringToBool($attrs.canDeleteEdgeWithValue);
-          $scope.canEditEdgeWeight = stringToBool(
-            $attrs.canEditEdgeWeightWithValue);
-        };
 
-        // TODO(czxcjx): Write this function
-        var checkValidGraph = function(graph) {
-          return Boolean(graph);
-        };
+          $scope.submitGraph = function() {
+            // Here, angular.copy is needed to strip $$hashkey from the graph.
+            $scope.onSubmit({
+              answer: angular.copy($scope.graph),
+              rulesService: graphInputRulesService
+            });
+          };
+          $scope.resetGraph = function() {
+            updateGraphFromJSON($attrs.graphWithValue);
+          };
 
-        var updateGraphFromJSON = function(jsonGraph) {
-          var newGraph = oppiaHtmlEscaper.escapedJsonToObj(jsonGraph);
-          if (checkValidGraph(newGraph)) {
-            $scope.graph = newGraph;
-          } else {
-            $scope.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
-          }
-        };
+          var init = function() {
+            updateGraphFromJSON($attrs.graphWithValue);
+            var stringToBool = function(str) {
+              return (str === 'true');
+            };
+            $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
+            $scope.canDeleteVertex = stringToBool(
+              $attrs.canDeleteVertexWithValue);
+            $scope.canEditVertexLabel = stringToBool(
+              $attrs.canEditVertexLabelWithValue);
+            $scope.canMoveVertex = stringToBool($attrs.canMoveVertexWithValue);
+            $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
+            $scope.canDeleteEdge = stringToBool($attrs.canDeleteEdgeWithValue);
+            $scope.canEditEdgeWeight = stringToBool(
+              $attrs.canEditEdgeWeightWithValue);
+          };
 
-        init();
-      }]
+          // TODO(czxcjx): Write this function
+          var checkValidGraph = function(graph) {
+            return Boolean(graph);
+          };
+
+          var updateGraphFromJSON = function(jsonGraph) {
+            var newGraph = oppiaHtmlEscaper.escapedJsonToObj(jsonGraph);
+            if (checkValidGraph(newGraph)) {
+              $scope.graph = newGraph;
+            } else {
+              $scope.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
+            }
+          };
+
+          init();
+        }]
     };
   }
 ]);
@@ -139,7 +140,7 @@ oppia.factory('graphDetailService', [function() {
 
 oppia.directive('oppiaResponseGraphInput', [
   'oppiaHtmlEscaper', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
-      function(oppiaHtmlEscaper, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
+  function(oppiaHtmlEscaper, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
     return {
       restrict: 'E',
       scope: {},
@@ -200,8 +201,9 @@ oppia.directive('graphViz', function() {
       canEditOptions: '='
     },
     templateUrl: 'graphViz/graphVizSvg',
-    controller: ['$scope', '$element', '$attrs', '$document', 'focusService',
-                 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+    controller: [
+      '$scope', '$element', '$attrs', '$document', 'focusService',
+      'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
       function($scope, $element, $attrs, $document, focusService,
           graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
         var _MODES = {
@@ -269,6 +271,7 @@ oppia.directive('graphViz', function() {
               y: $scope.state.mouseY,
               label: ''
             });
+            setMode(_MODES.MOVE);
           }
           if ($scope.state.hoveredVertex === null) {
             $scope.state.selectedVertex = null;
@@ -334,14 +337,17 @@ oppia.directive('graphViz', function() {
           }
           $scope.graph[option] = !$scope.graph[option];
         };
-        $scope.setMode = function(mode, $event) {
-          // Prevents new vertex from being added in add edge mode
-          $event.preventDefault();
-          $event.stopPropagation();
+
+        var setMode = function(mode) {
           $scope.state.currentMode = mode;
           $scope.state.addEdgeVertex = null;
           $scope.state.selectedVertex = null;
           $scope.state.selectedEdge = null;
+        };
+        $scope.onClickModeButton = function(mode, $event) {
+          $event.preventDefault();
+          $event.stopPropagation();
+          setMode(mode);
         };
 
         // TODO(czx): Consider if there's a neat way to write a reset()
@@ -647,7 +653,7 @@ oppia.factory('graphUtilsService', [function() {
         if (!isVisited[nextVertex]) {
           this.markAccessible(nextVertex, adjacencyLists, isVisited);
         }
-      };
+      }
     },
 
     findCycle: function(
@@ -736,188 +742,189 @@ oppia.factory('graphUtilsService', [function() {
 }]);
 
 oppia.factory('graphInputRulesService', [
-    'graphUtilsService', function(graphUtilsService) {
-  /**
-   * @param {object} graph - A graph object.
-   * @return {boolean} Whether the graph is strongly connected.
-   */
-  var isStronglyConnected = function(graph) {
-    // Uses depth first search on each vertex to try and visit every other
-    // vertex in both the normal and inverted adjacency lists.
-    if (graph.vertices.length === 0) {
-      return true;
-    }
+  'graphUtilsService', function(graphUtilsService) {
+    /**
+     * @param {object} graph - A graph object.
+     * @return {boolean} Whether the graph is strongly connected.
+     */
+    var isStronglyConnected = function(graph) {
+      // Uses depth first search on each vertex to try and visit every other
+      // vertex in both the normal and inverted adjacency lists.
+      if (graph.vertices.length === 0) {
+        return true;
+      }
 
-    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
-      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
-    var invertedAdjacencyLists = graphUtilsService.constructAdjacencyLists(
-      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.INVERTED);
+      var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+      var invertedAdjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.INVERTED);
 
-    var isVisited = graph.vertices.map(function() {
-      return false;
-    });
-    graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
-    var isAnyVertexUnreachable = isVisited.some(function(visited) {
-      return visited === false;
-    });
-
-    var isVisitedInReverse = graph.vertices.map(function() {
-      return false;
-    });
-    graphUtilsService.markAccessible(
-      0, invertedAdjacencyLists, isVisitedInReverse);
-    var isAnyVertexUnreachableInReverse =
-      isVisitedInReverse.some(function(visited) {
+      var isVisited = graph.vertices.map(function() {
+        return false;
+      });
+      graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
+      var isAnyVertexUnreachable = isVisited.some(function(visited) {
         return visited === false;
       });
 
-    return !isAnyVertexUnreachable && !isAnyVertexUnreachableInReverse;
-  };
-
-  /**
-   * @param {object} graph - A graph object.
-   * @return {boolean} Whether the graph is weakly connected.
-   */
-  var isWeaklyConnected = function(graph) {
-    // Generates adjacency lists assuming graph is undirected, then uses depth
-    // first search on node 0 to try to reach every other vertex
-    if (graph.vertices.length === 0) {
-      return true;
-    }
-
-    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
-      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.UNDIRECTED);
-    var isVisited = graph.vertices.map(function() {
-      return false;
-    });
-    graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
-    return isVisited.every(function(visited) {
-      return visited === true;
-    });
-  };
-
-  /**
-   * @param {object} graph - A graph object.
-   * @return {boolean} Whether the graph is acyclic.
-   */
-  var isAcyclic = function(graph) {
-    // Uses depth first search to ensure that we never have an edge to an
-    // ancestor in the search tree.
-
-    var isVisited = graph.vertices.map(function() {
-      return graphUtilsService.DFS_STATUS.UNVISITED;
-    });
-    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
-      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
-    for (var startVertex = 0;
-         startVertex < graph.vertices.length;
-         startVertex++) {
-      if (isVisited[startVertex] === graphUtilsService.DFS_STATUS.UNVISITED) {
-        if (graphUtilsService.findCycle(
-            startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  };
-
-  /**
-   * @param {object} graph - A graph object.
-   * @return {boolean} Whether the graph is acyclic.
-   */
-  var isRegular = function(graph) {
-    // Checks that every vertex has outdegree and indegree equal to the first
-    if (graph.vertices.length === 0) {
-      return true;
-    }
-
-    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
-      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
-    var outdegreeCounts = adjacencyLists.map(function(list) {
-      return list.length;
-    });
-    var indegreeCounts = adjacencyLists.map(function() {
-      return 0;
-    });
-    adjacencyLists.forEach(function(list) {
-      list.forEach(function(destination) {
-        indegreeCounts[destination]++;
+      var isVisitedInReverse = graph.vertices.map(function() {
+        return false;
       });
-    });
-
-    var areIndegreeCountsEqual = indegreeCounts.every(function(indegree) {
-      return indegree === indegreeCounts[0];
-    });
-    var areOutdegreeCountsEqual = outdegreeCounts.every(function(outdegree) {
-      return outdegree === outdegreeCounts[0];
-    });
-    return areIndegreeCountsEqual && areOutdegreeCountsEqual;
-  };
-
-  var isIsomorphic = function(graph1, graph2) {
-    if (graph1.vertices.length !== graph2.vertices.length) {
-      return false;
-    }
-
-    var adj1 = graphUtilsService.constructAdjacencyMatrix(graph1);
-    var adj2 = graphUtilsService.constructAdjacencyMatrix(graph2);
-
-    // Check that for every vertex from the first graph there is a vertex in the
-    // second graph with the same sum of weights of outgoing edges
-    var degrees1 = adj1.map(function(value) {
-      return value.reduce(function(prev, cur) {
-        return prev + cur;
-      });
-    }).sort();
-
-    var degrees2 = adj2.map(function(value) {
-      return value.reduce(function(prev, cur) {
-        return prev + cur;
-      });
-    }).sort();
-
-    if (!angular.equals(degrees1, degrees2)) {
-      return false;
-    }
-
-    // Check against every permutation of vectices.
-    var numVertices = graph2.vertices.length;
-    var permutation = [];
-    for (var i = 0; i < numVertices; i++) {
-      permutation.push(i);
-    }
-    while (permutation !== null) {
-      var doLabelsMatch = (!graph1.isLabeled && !graph2.isLabeled) ||
-        graph2.vertices.every(function(vertex, index) {
-          return vertex.label === graph1.vertices[permutation[index]].label;
+      graphUtilsService.markAccessible(
+        0, invertedAdjacencyLists, isVisitedInReverse);
+      var isAnyVertexUnreachableInReverse =
+        isVisitedInReverse.some(function(visited) {
+          return visited === false;
         });
-      if (doLabelsMatch &&
-          graphUtilsService.areAdjacencyMatricesEqualWithPermutation(
-          adj1, adj2, permutation)) {
+
+      return !isAnyVertexUnreachable && !isAnyVertexUnreachableInReverse;
+    };
+
+    /**
+     * @param {object} graph - A graph object.
+     * @return {boolean} Whether the graph is weakly connected.
+     */
+    var isWeaklyConnected = function(graph) {
+      // Generates adjacency lists assuming graph is undirected, then uses depth
+      // first search on node 0 to try to reach every other vertex
+      if (graph.vertices.length === 0) {
         return true;
       }
-      permutation = graphUtilsService.nextPermutation(permutation);
-    }
-    return false;
-  };
 
-  return {
-    HasGraphProperty: function(answer, inputs) {
-      if (inputs.p === 'strongly_connected') {
-        return isStronglyConnected(answer);
-      } else if (inputs.p === 'weakly_connected') {
-        return isWeaklyConnected(answer);
-      } else if (inputs.p === 'acyclic') {
-        return isAcyclic(answer);
-      } else if (inputs.p === 'regular') {
-        return isRegular(answer);
-      } else {
+      var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.UNDIRECTED);
+      var isVisited = graph.vertices.map(function() {
+        return false;
+      });
+      graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
+      return isVisited.every(function(visited) {
+        return visited === true;
+      });
+    };
+
+    /**
+     * @param {object} graph - A graph object.
+     * @return {boolean} Whether the graph is acyclic.
+     */
+    var isAcyclic = function(graph) {
+      // Uses depth first search to ensure that we never have an edge to an
+      // ancestor in the search tree.
+
+      var isVisited = graph.vertices.map(function() {
+        return graphUtilsService.DFS_STATUS.UNVISITED;
+      });
+      var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+      for (var startVertex = 0;
+           startVertex < graph.vertices.length;
+           startVertex++) {
+        if (isVisited[startVertex] === graphUtilsService.DFS_STATUS.UNVISITED) {
+          if (graphUtilsService.findCycle(
+              startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    };
+
+    /**
+     * @param {object} graph - A graph object.
+     * @return {boolean} Whether the graph is acyclic.
+     */
+    var isRegular = function(graph) {
+      // Checks that every vertex has outdegree and indegree equal to the first
+      if (graph.vertices.length === 0) {
+        return true;
+      }
+
+      var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+      var outdegreeCounts = adjacencyLists.map(function(list) {
+        return list.length;
+      });
+      var indegreeCounts = adjacencyLists.map(function() {
+        return 0;
+      });
+      adjacencyLists.forEach(function(list) {
+        list.forEach(function(destination) {
+          indegreeCounts[destination]++;
+        });
+      });
+
+      var areIndegreeCountsEqual = indegreeCounts.every(function(indegree) {
+        return indegree === indegreeCounts[0];
+      });
+      var areOutdegreeCountsEqual = outdegreeCounts.every(function(outdegree) {
+        return outdegree === outdegreeCounts[0];
+      });
+      return areIndegreeCountsEqual && areOutdegreeCountsEqual;
+    };
+
+    var isIsomorphic = function(graph1, graph2) {
+      if (graph1.vertices.length !== graph2.vertices.length) {
         return false;
       }
-    },
-    IsIsomorphicTo: function(answer, inputs) {
-      return isIsomorphic(answer, inputs.g);
-    }
-  };
-}]);
+
+      var adj1 = graphUtilsService.constructAdjacencyMatrix(graph1);
+      var adj2 = graphUtilsService.constructAdjacencyMatrix(graph2);
+
+      // Check that for every vertex from the first graph there is a vertex in
+      // the second graph with the same sum of weights of outgoing edges
+      var degrees1 = adj1.map(function(value) {
+        return value.reduce(function(prev, cur) {
+          return prev + cur;
+        });
+      }).sort();
+
+      var degrees2 = adj2.map(function(value) {
+        return value.reduce(function(prev, cur) {
+          return prev + cur;
+        });
+      }).sort();
+
+      if (!angular.equals(degrees1, degrees2)) {
+        return false;
+      }
+
+      // Check against every permutation of vectices.
+      var numVertices = graph2.vertices.length;
+      var permutation = [];
+      for (var i = 0; i < numVertices; i++) {
+        permutation.push(i);
+      }
+      while (permutation !== null) {
+        var doLabelsMatch = (!graph1.isLabeled && !graph2.isLabeled) ||
+          graph2.vertices.every(function(vertex, index) {
+            return vertex.label === graph1.vertices[permutation[index]].label;
+          });
+        if (doLabelsMatch &&
+            graphUtilsService.areAdjacencyMatricesEqualWithPermutation(
+            adj1, adj2, permutation)) {
+          return true;
+        }
+        permutation = graphUtilsService.nextPermutation(permutation);
+      }
+      return false;
+    };
+
+    return {
+      HasGraphProperty: function(answer, inputs) {
+        if (inputs.p === 'strongly_connected') {
+          return isStronglyConnected(answer);
+        } else if (inputs.p === 'weakly_connected') {
+          return isWeaklyConnected(answer);
+        } else if (inputs.p === 'acyclic') {
+          return isAcyclic(answer);
+        } else if (inputs.p === 'regular') {
+          return isRegular(answer);
+        } else {
+          return false;
+        }
+      },
+      IsIsomorphicTo: function(answer, inputs) {
+        return isIsomorphic(answer, inputs.g);
+      }
+    };
+  }
+]);

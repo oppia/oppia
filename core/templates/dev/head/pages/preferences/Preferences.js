@@ -97,13 +97,25 @@ oppia.controller('Preferences', [
         'preferred_site_language_code', preferredSiteLanguageCode);
     };
 
+    $scope.showUsernamePopover = function(creatorUsername) {
+      // The popover on the subscription card is only shown if the length of
+      // the creator username is greater than 10 and the user hovers over
+      // the truncated username.
+      if (creatorUsername.length > 10) {
+        return 'mouseenter';
+      } else {
+        return 'none';
+      }
+    };
+
     $scope.saveEmailPreferences = function(
       canReceiveEmailUpdates, canReceiveEditorRoleEmail,
-      canReceiveFeedbackMessageEmail) {
+      canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail) {
       var data = {
         can_receive_email_updates: canReceiveEmailUpdates,
         can_receive_editor_role_email: canReceiveEditorRoleEmail,
-        can_receive_feedback_message_email: canReceiveFeedbackMessageEmail
+        can_receive_feedback_message_email: canReceiveFeedbackMessageEmail,
+        can_receive_subscription_email: canReceiveSubscriptionEmail
       };
       _saveDataItem('email_preferences', data);
     };
@@ -193,9 +205,11 @@ oppia.controller('Preferences', [
       $scope.profilePictureDataUrl = data.profile_picture_data_url;
       $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
       $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
+      $scope.canReceiveSubscriptionEmail = data.can_receive_subscription_email;
       $scope.canReceiveFeedbackMessageEmail = (
         data.can_receive_feedback_message_email);
       $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
+      $scope.subscriptionList = data.subscription_list;
       $scope.hasPageLoaded = true;
       _forceSelect2Refresh();
     });

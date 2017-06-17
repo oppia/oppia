@@ -24,7 +24,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models, email_models) = models.Registry.import_models([
+    models.NAMES.feedback, models.NAMES.email])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -379,6 +380,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         super(FeedbackMessageEmailTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.signup('b@example.com', 'B')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_default_exploration(
@@ -459,9 +462,26 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 expected_feedback_message_dict2)
             self.assertEqual(model.retries, 0)
 
-    def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
+    def test_email_is_not_sent_recipient_has_muted_emails_globally(self):
         user_services.update_email_preferences(
-            self.editor_id, True, False, False)
+            self.editor_id, True, False, False, False)
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'some text')
+
+            # Note: the job in the taskqueue represents the realtime
+            # event emitted by create_thread().
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
+
+    def test_email_is_not_sent_recipient_has_muted_this_exploration(self):
+        user_services.set_email_preferences_for_exploration(
+            self.editor_id, self.exploration.id,
+            mute_feedback_notifications=True)
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
@@ -617,7 +637,38 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
+    def test_that_reply_to_id_is_created(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'A message')
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
 
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.user_id_b, None, None,
+                'user b message')
+            # Check that reply_to id is created for user A.
+            model = email_models.FeedbackEmailReplyToIdModel.get(
+                self.user_id_a, self.exploration.id, thread_id)
+            cross_model = (
+                email_models.FeedbackEmailReplyToIdModel.get_by_reply_to_id(
+                    model.reply_to_id))
+            self.assertEqual(model, cross_model)
+            self.assertEqual(cross_model.user_id, self.user_id_a)
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.user_id_a, None, None,
+                'user a message')
+            # Check that reply_to id is created for user B.
+            model = email_models.FeedbackEmailReplyToIdModel.get(
+                self.user_id_b, self.exploration.id, thread_id)
+            cross_model = (
+                email_models.FeedbackEmailReplyToIdModel.get_by_reply_to_id(
+                    model.reply_to_id))
+            self.assertEqual(model, cross_model)
+            self.assertEqual(cross_model.user_id, self.user_id_b)
 
 
 class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
@@ -641,12 +692,16 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
-            'You\'ve received 1 new message on your Oppia explorations:<br>'
-            '<ul><li>Title: some text<br></li></ul>'
+            'You\'ve received a new message on your Oppia explorations:<br>'
+            '<ul>'
+            '<li><a href="https://www.oppia.org/create/A#/feedback">Title</a>:'
+            '<br>'
+            '<ul><li>some text<br></li>'
+            '</ul></li></ul>'
             'You can view and reply to your messages from your '
             '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
             '<br>'
-            'Thanks, and happy teaching!<br>'
+            '<br>Thanks, and happy teaching!<br>'
             '<br>'
             'Best wishes,<br>'
             'The Oppia Team<br>'
@@ -657,9 +712,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi editor,\n'
             '\n'
-            'You\'ve received 1 new message on your Oppia explorations:\n'
-            '- Title: some text\n'
-            'You can view and reply to your messages from your dashboard.'
+            'You\'ve received a new message on your Oppia explorations:\n'
+            '- Title:\n'
+            '- some text\n'
+            'You can view and reply to your messages from your dashboard.\n'
             '\n'
             'Thanks, and happy teaching!\n'
             '\n'
@@ -696,13 +752,17 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
-            'You\'ve received 1 new message on your Oppia explorations:<br>'
-            '<ul><li>Title: some text<br></li>'
-            '<li>Title: more text<br></li></ul>'
+            'You\'ve received 2 new messages on your Oppia explorations:<br>'
+            '<ul>'
+            '<li><a href="https://www.oppia.org/create/A#/feedback">Title</a>:'
+            '<br>'
+            '<ul><li>some text<br></li>'
+            '<li>more text<br></li>'
+            '</ul></li></ul>'
             'You can view and reply to your messages from your '
             '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
             '<br>'
-            'Thanks, and happy teaching!<br>'
+            '<br>Thanks, and happy teaching!<br>'
             '<br>'
             'Best wishes,<br>'
             'The Oppia Team<br>'
@@ -713,10 +773,11 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi editor,\n'
             '\n'
-            'You\'ve received 1 new message on your Oppia explorations:\n'
-            '- Title: some text\n'
-            '- Title: more text\n'
-            'You can view and reply to your messages from your dashboard.'
+            'You\'ve received 2 new messages on your Oppia explorations:\n'
+            '- Title:\n'
+            '- some text\n'
+            '- more text\n'
+            'You can view and reply to your messages from your dashboard.\n'
             '\n'
             'Thanks, and happy teaching!\n'
             '\n'
@@ -839,6 +900,21 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[0].body.decode(),
                 expected_email_text_body)
+
+    def test_email_is_not_sent_recipient_has_muted_this_exploration(self):
+        user_services.set_email_preferences_for_exploration(
+            self.editor_id, self.exploration.id,
+            mute_suggestion_notifications=True)
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_suggestion(
+                self.exploration.id, self.new_user_id, self.exploration.version,
+                'state', 'description', {'type': 'text', 'value': 'text'})
+
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
 
     def test_correct_email_is_sent_for_multiple_recipients(self):
         rights_manager.assign_role_for_exploration(

@@ -36,6 +36,7 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
+  'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -47,7 +48,8 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService) {
+      autosaveInfoModalsService, siteAnalyticsService,
+      UserEmailPreferencesService, ParamChangesObjectFactory) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -101,7 +103,8 @@ oppia.controller('ExplorationEditor', [
         explorationInitStateNameService.init(data.init_state_name);
         explorationTagsService.init(data.tags);
         explorationParamSpecsService.init(data.param_specs);
-        explorationParamChangesService.init(data.param_changes || []);
+        explorationParamChangesService.init(
+          ParamChangesObjectFactory.createFromBackendList(data.param_changes));
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
@@ -123,6 +126,9 @@ oppia.controller('ExplorationEditor', [
           data.rights.viewer_names, data.rights.status,
           data.rights.cloned_from, data.rights.community_owned,
           data.rights.viewable_if_private);
+        UserEmailPreferencesService.init(
+          data.email_preferences.mute_feedback_notifications,
+          data.email_preferences.mute_suggestion_notifications);
 
         if (GLOBALS.can_edit) {
           editabilityService.markEditable();
@@ -395,4 +401,3 @@ oppia.controller('ExplorationEditor', [
     $scope.$on('openEditorTutorial', $scope.startTutorial);
   }
 ]);
-

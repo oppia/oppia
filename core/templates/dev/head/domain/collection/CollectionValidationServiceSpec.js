@@ -226,38 +226,40 @@ describe('Collection validation service', function() {
   });
 
   it('should allow private and public explorations in a private collection',
-      function() {
-    expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
-    expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
-    var node0 = _getCollectionNode('exp_id0');
-    var node1 = _getCollectionNode('exp_id1');
-    var node2 = _getCollectionNode('exp_id2');
-    node0.getAcquiredSkillList().addSkill('skill0');
-    node1.getPrerequisiteSkillList().addSkill('skill0');
-    node1.getAcquiredSkillList().addSkill('skill1');
-    node2.getPrerequisiteSkillList().addSkill('skill1');
-    var issues = _findPrivateValidationIssues();
-    expect(issues).toEqual([]);
-  });
+    function() {
+      expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
+      expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
+      var node0 = _getCollectionNode('exp_id0');
+      var node1 = _getCollectionNode('exp_id1');
+      var node2 = _getCollectionNode('exp_id2');
+      node0.getAcquiredSkillList().addSkill('skill0');
+      node1.getPrerequisiteSkillList().addSkill('skill0');
+      node1.getAcquiredSkillList().addSkill('skill1');
+      node2.getPrerequisiteSkillList().addSkill('skill1');
+      var issues = _findPrivateValidationIssues();
+      expect(issues).toEqual([]);
+    }
+  );
 
   it('should not allow private explorations in a public collection',
-      function() {
-    expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
-    var node1 = _getCollectionNode('exp_id1');
-    var node0 = _getCollectionNode('exp_id0');
-    node0.getAcquiredSkillList().addSkill('skill0');
-    node1.getPrerequisiteSkillList().addSkill('skill0');
+    function() {
+      expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
+      var node1 = _getCollectionNode('exp_id1');
+      var node0 = _getCollectionNode('exp_id0');
+      node0.getAcquiredSkillList().addSkill('skill0');
+      node1.getPrerequisiteSkillList().addSkill('skill0');
 
-    var issues = _findPublicValidationIssues();
-    expect(issues).toEqual([
-      'Private explorations cannot be added to a public collection: exp_id0'
-    ]);
+      var issues = _findPublicValidationIssues();
+      expect(issues).toEqual([
+        'Private explorations cannot be added to a public collection: exp_id0'
+      ]);
 
-    node1.getPrerequisiteSkillList().removeSkillByName('skill0');
-    expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
-    issues = _findPublicValidationIssues();
-    expect(issues).toEqual([]);
-  });
+      node1.getPrerequisiteSkillList().removeSkillByName('skill0');
+      expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
+      issues = _findPublicValidationIssues();
+      expect(issues).toEqual([]);
+    }
+  );
 
   it('should be able to detect multiple validation issues', function() {
     expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);

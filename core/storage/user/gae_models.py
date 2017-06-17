@@ -32,7 +32,6 @@ class UserSettingsModel(base_models.BaseModel):
     """
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
-
     # Identifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.
@@ -72,13 +71,28 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
-        """Returns whether or a given normalized_username is taken."""
+        """Returns whether or not a given normalized_username is taken.
+
+        Args:
+            normalized_username: str. The given user's normalized username.
+
+        Returns:
+            bool. Whether the normalized_username has already been taken.
+         """
         return bool(cls.get_all().filter(
             cls.normalized_username == normalized_username).get())
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
-        """Returns a user model given a normalized username"""
+        """Returns a user model given a normalized username.
+
+        Args:
+            normalized_username: str. The user's normalized username.
+
+        Returns:
+            UserSettingsModel. The UserSettingsModel instance which contains
+            the same normalized_username.
+        """
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
 
@@ -107,17 +121,14 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     # The user's preference for receiving general site updates. This is set to
     # None if the user has never set a preference.
     site_updates = ndb.BooleanProperty(indexed=True)
-
     # The user's preference for receiving email when user is added as a member
     # in exploration. This is set to True when user has never set a preference.
     editor_role_notifications = ndb.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
-
     # The user's preference for receiving email when user receives feedback
     # message for his/her exploration.
     feedback_message_notifications = ndb.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
-
     # The user's preference for receiving email when a creator, to which this
     # user has subscribed, publishes an exploration.
     subscription_notifications = ndb.BooleanProperty(
@@ -167,7 +178,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     Values for total plays and average ratings are recorded by aggregating over
     all explorations owned by a user.
     Impact scores are calculated over explorations for which a user
-    is listed as a contributor
+    is listed as a contributor.
 
     The impact score for a particular user is defined as:
     Sum of (
@@ -181,16 +192,12 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     """
     # The impact score.
     impact_score = ndb.FloatProperty(indexed=True)
-
     # The total plays of all the explorations.
     total_plays = ndb.IntegerProperty(indexed=True, default=0)
-
     # The average of average ratings of all explorations.
     average_ratings = ndb.FloatProperty(indexed=True)
-
     # The number of ratings of all explorations.
     num_ratings = ndb.IntegerProperty(indexed=True, default=0)
-
     # A list which stores history of creator stats.
     # Each item in the list is a Json object keyed by a datetime string and
     # value as another Json object containing key-value pairs to be stored.
@@ -209,7 +216,6 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     #  },
     # ]
     weekly_creator_stats_list = ndb.JsonProperty(repeated=True)
-
     # The version of dashboard stats schema.
     schema_version = (
         ndb.IntegerProperty(
@@ -219,8 +225,14 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_or_create(cls, user_id):
-        """Creates a new UserStatsModel instance, if it does not already
-        exist.
+        """Creates a new UserStatsModel instance, if it does not already exist.
+
+        Args:
+            user_id: str. The user_id to be associated with the UserStatsModel.
+
+        Returns:
+            UserStatsModel. Either an existing one which matches the
+            given user_id, or the newly created one if it did not already exist.
         """
         entity = cls.get(user_id, strict=False)
         if not entity:
@@ -234,33 +246,24 @@ class ExplorationUserDataModel(base_models.BaseModel):
     Instances of this class have keys of the form
     [USER_ID].[EXPLORATION_ID]
     """
-
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
-
     # The exploration id.
     exploration_id = ndb.StringProperty(required=True, indexed=True)
-
     # The rating (1-5) the user assigned to the exploration. Note that this
     # represents a rating given on completion of the exploration.
     rating = ndb.IntegerProperty(default=None, indexed=True)
-
     # When the most recent rating was awarded, or None if not rated.
     rated_on = ndb.DateTimeProperty(default=None, indexed=False)
-
     # List of uncommitted changes made by the user to the exploration.
     draft_change_list = ndb.JsonProperty(default=None)
-
     # Timestamp of when the change list was last updated.
     draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
-
     # The exploration version that this change list applied to.
     draft_change_list_exp_version = ndb.IntegerProperty(default=None)
-
     # The user's preference for receiving suggestion emails for this exploration
     mute_suggestion_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
-
     # The user's preference for receiving feedback emails for this exploration
     mute_feedback_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
@@ -271,10 +274,18 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, exploration_id):
-        """Creates a new ExplorationUserDataModel entry and returns it.
+        """Creates a new ExplorationUserDataModel instance and returns it.
 
         Note that the client is responsible for actually saving this entity to
         the datastore.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            ExplorationUserDataModel. The newly created
+            ExplorationUserDataModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(
@@ -282,10 +293,38 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, user_id, exploration_id):
-        """Gets the ExplorationUserDataModel for the given ids."""
+        """Gets the ExplorationUserDataModel for the given user and exploration
+         ids.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            ExplorationUserDataModel. The ExplorationUserDataModel instance
+            which matches with the given user_id and exploration_id.
+        """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
             instance_id, strict=False)
+
+    @classmethod
+    def get_multi(cls, user_ids, exploration_id):
+        """Gets the ExplorationUserDataModel for the given user and exploration
+         ids.
+
+        Args:
+            user_ids: list(str). A list of user_ids.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            ExplorationUserDataModel. The ExplorationUserDataModel instance
+            which matches with the given user_ids and exploration_id.
+        """
+        instance_ids = (
+            cls._generate_id(user_id, exploration_id) for user_id in user_ids)
+        return super(ExplorationUserDataModel, cls).get_multi(
+            instance_ids)
 
 
 class CollectionProgressModel(base_models.BaseModel):
@@ -301,7 +340,6 @@ class CollectionProgressModel(base_models.BaseModel):
     the data store, otherwise it should remove the instance of the completion
     model.
     """
-
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The collection id.
@@ -316,10 +354,18 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, collection_id):
-        """Creates a new CollectionProgressModel entry and returns it.
+        """Creates a new CollectionProgressModel instance and returns it.
 
         Note: the client is responsible for actually saving this entity to the
         datastore.
+
+        Args:
+            user_id: str. The id of the user.
+            collection_id: str. The id of the collection.
+
+        Returns:
+            CollectionProgressModel. The newly created CollectionProgressModel
+            instance.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return cls(
@@ -327,17 +373,35 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, user_id, collection_id):
-        """Gets the CollectionProgressModel for the given ids."""
+        """Gets the CollectionProgressModel for the given user and collection
+        ids.
 
+        Args:
+            user_id: str. The id of the user.
+            collection_id: str. The id of the collection.
+
+        Returns:
+            CollectionProgressModel. The CollectionProgressModel instance which
+            matches the given user_id and collection_id.
+        """
         instance_id = cls._generate_id(user_id, collection_id)
         return super(CollectionProgressModel, cls).get(
             instance_id, strict=False)
 
     @classmethod
     def get_or_create(cls, user_id, collection_id):
-        """Gets the CollectionProgressModel for the given ids, or creates a new
-        entry with the given ids if no such instance yet exists within the data
-        store.
+        """Gets the CollectionProgressModel for the given user and collection
+        ids, or creates a new instance with if no such instance yet exists
+        within the datastore.
+
+        Args:
+            user_id: str. The id of the user.
+            collection_id: str. The id of the collection.
+
+        Returns:
+            CollectionProgressModel. Either an existing one which
+            matches the given user_id and collection_id, or the newly created
+            one if it does not already exist.
         """
         instance_model = cls.get(user_id, collection_id)
         if instance_model:
@@ -391,6 +455,26 @@ class UserQueryModel(base_models.BaseModel):
 
     @classmethod
     def fetch_page(cls, page_size, cursor):
+        """Fetches a list of all query_models sorted by creation date.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            cursor: str or None. The list of returned entities starts from this
+                datastore cursor.
+
+        Returns:
+            3-tuple of (query_models, cursor, more) as described in fetch_page()
+            at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            where:
+                query_models: List of UserQueryModel instances.
+                next_cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are probably more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
         cursor = Cursor(urlsafe=cursor)
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).

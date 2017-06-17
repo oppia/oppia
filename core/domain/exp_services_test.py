@@ -514,6 +514,18 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(retrieved_exp_summary.category, 'A new category')
         self.assertEqual(retrieved_exp_summary.contributor_ids, [self.owner_id])
 
+    def test_update_exploration_by_migration_bot(self):
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='end')
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Did migration.')
+
 
 class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
 
@@ -570,6 +582,7 @@ skin_customizations:
     bottom: []
 states:
   %s:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -589,6 +602,7 @@ states:
       id: TextInput
     param_changes: []
   New state:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -631,6 +645,7 @@ skin_customizations:
     bottom: []
 states:
   %s:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -650,6 +665,7 @@ states:
       id: TextInput
     param_changes: []
   Renamed state:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -762,7 +778,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     are state names and whose values are YAML strings representing the state's
     contents."""
 
-    _SAMPLE_INIT_STATE_CONTENT = ("""content:
+    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -784,7 +801,8 @@ param_changes: []
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""content:
+        'New state': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -807,7 +825,8 @@ param_changes: []
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""content:
+        'Renamed state': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -916,6 +935,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'feedback': ['Try again'],
                 'param_changes': []
             },
+            'correct': False,
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
@@ -2377,6 +2397,7 @@ skin_customizations:
     bottom: []
 states:
   END:
+    classifier_model_id: null
     content:
     - type: text
       value: Congratulations, you have finished!
@@ -2391,6 +2412,7 @@ states:
       id: EndExploration
     param_changes: []
   %s:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -2617,7 +2639,6 @@ title: Old Title
         # The converted exploration should be up-to-date and properly
         # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
-
 
 class SuggestionActionUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion action functions in exp_services."""

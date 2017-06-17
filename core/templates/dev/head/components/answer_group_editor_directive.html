@@ -1,11 +1,55 @@
 <script type="text/ng-template" id="inline/answer_group_editor">
+  <style>
+    answer-group-editor .oppia-rule-header {
+      color: rgb(120, 120, 120);
+      overflow: hidden;
+      padding-left: 0;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    answer-group-editor .oppia-multiple-choice-rule p {
+      display: inline;
+    }
+    answer-group-editor .oppia-multiple-choice-rule p::before {
+      content: ' ';
+    }
+    answer-group-editor .oppia-add-rule-button {
+      background-color: rgba(165,165,165,0.9);
+      border: 0;
+      border-radius: 0;
+      color: white;
+      opacity: 0.9;
+      padding: 7px;
+      width: 100%;
+    }
+
+    answer-group-editor .oppia-add-rule-button:active,
+    answer-group-editor .oppia-add-rule-button:focus,
+    answer-group-editor .oppia-add-rule-button:hover {
+      background-color: rgba(165,165,165,1);
+      color: white;
+      opacity: 1;
+    }
+    answer-group-editor .oppia-delete-rule-button {
+      cursor: pointer;
+      opacity: 0.5;
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      width: 20px;
+    }
+    answer-group-editor .oppia-delete-rule-button:hover {
+      opacity: 1;
+    }
+  </style>
+ 
   <div style="height: 100%;">
     <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
     <div ng-if="rules">
       <strong>
         If the learner's answer...
       </strong>
-      <ul class="nav nav-stacked nav-pills" role="tablist" ng-model="rules">
+      <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist" ng-model="rules">
         <li ng-repeat="rule in rules" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
           <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
             <div class="oppia-rule-header">
