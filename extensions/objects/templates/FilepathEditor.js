@@ -37,8 +37,20 @@ oppia.directive('filepathEditor', [
 
         // This variable holds all the data needed for the image upload flow.
         // It's always guaranteed to have the 'mode' and 'metadata' properties.
-        // When mode is UPLOADED, there will be metadata about the uploaded img,
-        // and when mode is SAVED, there will be metadata about the saved img.
+        //
+        // See below a description of the metadata field for each mode.
+        //
+        // If mode is MODE_EMPTY, metadata is:
+        //   {}
+        // If mode is MODE_UPLOADED, metadata is:
+        //   {
+        //     uploadedFile: <a File object>,
+        //     uploadedImageData: <binary data corresponding to the image>
+        //   }
+        // If mode is MODE_SAVED, metadata is:
+        //   {
+        //     savedUrl: <File name of the Oppia resource for the image>
+        //   }
         $scope.clearScopeData = function() {
           $scope.data = {
             mode: $scope.MODE_EMPTY,
