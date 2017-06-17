@@ -90,6 +90,9 @@ ALLOWED_TRAINING_JOB_STATUSES = [
     TRAINING_JOB_STATUS_PENDING
 ]
 
+# The minimum number of modified samples to re-train a classifier.
+MIN_SAMPLE_TO_RETRAIN = 10
+
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
 

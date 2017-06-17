@@ -127,6 +127,113 @@ def classify_string_classifier_rule(state, normalized_answer):
     return None
 
 
+def add_to_trainining_queue(exploration):
+    """Checks all states of the exploration for re-training conditions and
+    creates ClassifierTrainingJob instances accordingly.
+
+    Args:
+        exploration: Domain object for an exploration.
+
+    Returns:
+        exploration: Domain object for an exploration.
+    """
+    states = exploration.states
+    for state_name in states:
+        state = states[state_name]
+        if state.can_undergo_classification():
+            if state.classifier_model_id is None:
+                training_data = get_training_data_from_state(state)
+                algorithm_id = state.interaction.id
+                exp_id = exploration.id
+                exp_version = exploration.version
+                job_id = save_classifier_training_job(
+                    algorithm_id, exp_id, exp_version, state_name,
+                    training_data)
+                exploration.states[state_name].classifier_model_id = (
+                    job_id)
+            else:
+                classifier_training_job = get_classifier_training_job_by_id(
+                    state.classifier_model_id)
+                if _check_re_training_conditions(state,
+                                                 classifier_training_job):
+                    training_data = get_training_data_from_state(state)
+                    algorithm_id = state.interaction.id
+                    exp_id = exploration.id
+                    exp_version = exploration.version
+                    job_id = save_classifier_training_job(
+                        algorithm_id, exp_id, exp_version, state_name,
+                        training_data)
+                    exploration.states[state_name].classifier_model_id = (
+                        job_id)
+    return exploration
+
+
+def _check_re_training_conditions(state, classifier_training_job):
+    """Checks whether the classifier needs to be trained again.
+
+    Args:
+        state: The current State domain object of the exploration.
+        classifier_training_job: The retrieved ClassifierTrainingJob Domain
+            object.
+
+    Returns: bool. True/False
+    """
+    new_training_data = get_training_data_from_state(state)
+    old_training_data = classifier_training_job.training_data
+
+    # Check for addition/deletion of answer groups.
+    if len(old_training_data) != len(new_training_data):
+        # Check for outcome mismatch.
+        if len(new_training_data) > len(old_training_data):
+            flag = True
+            for (answer_group_index, answer_group) in enumerate(
+                    old_training_data):
+                if answer_group['answer_group_index'] != new_training_data[
+                        answer_group_index]['answer_group_index']:
+                    flag = False
+            if flag:
+                delete_classifier_training_job(state.classifier_model_id)
+                return True
+        return True
+    # Check for change in number of training samples.
+    else:
+        diff = 0
+        for (answer_group_index, answer_group) in enumerate(
+                old_training_data):
+            diff += abs(len(answer_group['answers']) - len(
+                new_training_data[answer_group_index]['answers']))
+        if diff > feconf.MIN_SAMPLE_TO_RETRAIN:
+            return True
+
+        # No re-training condition satisfied.
+        return False
+
+
+def get_training_data_from_state(state):
+    """Retrieves training data from the State domain object.
+
+    Args:
+        state: Domain object for a state.
+
+    Returns:
+        training_data: list. The training data for the job.
+    """
+    training_data = []
+    for (answer_group_index, answer_group) in enumerate(
+            state.interaction.answer_groups):
+        classifier_rule_spec_index = (
+            answer_group.get_classifier_rule_index())
+        if classifier_rule_spec_index is not None:
+            classifier_rule_spec = answer_group.rule_specs[
+                classifier_rule_spec_index]
+            training_data.extend([{
+                'answer_group_index': answer_group_index,
+                'answers': ([doc] for doc in classifier_rule_spec.inputs[
+                    'training_data'])
+            }])
+    return training_data
+
+
 def get_classifier_from_model(classifier_data_model):
     """Gets a classifier domain object from a classifier data model.
 
@@ -306,7 +413,7 @@ def _update_classifier_training_job(classifier_training_job_model, status):
 
 
 def save_classifier_training_job(algorithm_id, exp_id, exp_version,
-                                 state_name, status, training_data,
+                                 state_name, training_data, status="None",
                                  job_id="None"):
     """Checks for the existence of the model.
     If the model exists, it is updated using _update_classifier_training_job

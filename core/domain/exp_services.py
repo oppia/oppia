@@ -32,6 +32,7 @@ import StringIO
 import zipfile
 
 from core.domain import activity_services
+from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import feedback_services
@@ -806,6 +807,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 'Trying to update version %s of exploration from version %s, '
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
+
+    exploration = classifier_services.add_to_trainining_queue(exploration)
 
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
