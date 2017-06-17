@@ -2438,11 +2438,10 @@ class Exploration(object):
             interaction = state_dict['interaction']
             if 'hints' not in interaction:
                 interaction['hints'] = []
-                if 'fallbacks' in interaction:
-                    for fallback in interaction['fallbacks']:
-                        if fallback['outcome']['feedback']:
-                            interaction['hints'].append(
-                                Hint(fallback['outcome']['feedback'][0]).to_dict())
+                for fallback in interaction['fallbacks']:
+                    if fallback['outcome']['feedback']:
+                        interaction['hints'].append(
+                            Hint(fallback['outcome']['feedback'][0]).to_dict())
             if 'solution' not in interaction:
                 interaction['solution'] = {}
         return states_dict
