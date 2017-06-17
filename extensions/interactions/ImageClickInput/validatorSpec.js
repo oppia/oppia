@@ -162,3 +162,4 @@ describe('ImageClickInputValidationService', function() {
       }]);
     });
 });
+

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 describe('LabelingInputValidationService', function() {
-  var WARNING_TYPES, validator;
+  var WARNING_TYPES, validatorService;
 
   var currentState;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
@@ -25,8 +25,7 @@ describe('LabelingInputValidationService', function() {
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
     var filter = $injector.get('$filter');
-    validator = filter('LabelingInputValidationService');
-
+    validatorService = filter('LabelingInputValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     currentState = 'First State';
@@ -69,19 +68,19 @@ describe('LabelingInputValidationService', function() {
     function() {
       goodAnswerGroups[0].rules = [];
       expect(function() {
-        validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+        validatorService.getAllWarnings(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrow(
         'Expected customization arguments to have property: imageAndLabels');
     });
 
   it('should expect an image path customization argument', function() {
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
 
     customizationArguments.imageAndLabels.value.imagePath = '';
-    warnings = validator(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -95,7 +94,7 @@ describe('LabelingInputValidationService', function() {
     function() {
       var regions = customizationArguments.imageAndLabels.value.labeledRegions;
       regions[1].label = '';
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -104,7 +103,7 @@ describe('LabelingInputValidationService', function() {
       }]);
 
       regions[1].label = 'FirstLabel';
-      warnings = validator(
+      warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -113,7 +112,7 @@ describe('LabelingInputValidationService', function() {
       }]);
 
       regions[0].label = '@';
-      warnings = validator(
+      warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -124,7 +123,7 @@ describe('LabelingInputValidationService', function() {
 
       customizationArguments.imageAndLabels.value.labeledRegions = [];
       goodAnswerGroups[0].rules = [];
-      warnings = validator(
+      warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -135,7 +134,7 @@ describe('LabelingInputValidationService', function() {
 
   it('should expect rule types to reference valid region labels', function() {
     goodAnswerGroups[0].rules[0].inputs.x = 'FakeLabel';
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -147,13 +146,13 @@ describe('LabelingInputValidationService', function() {
 
   it('should expect a non-confusing and non-null default outcome',
     function() {
-      var warnings = validator(currentState, customizationArguments, [], null);
+      var warnings = validatorService.getAllWarnings(currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Please add a rule to cover what should happen if none of ' +
           'the given regions are clicked.'
       }]);
-      warnings = validator(
+      warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], badOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
