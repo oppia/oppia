@@ -233,9 +233,9 @@ class AnswerModelInteractionConsistencyJob(jobs.BaseMapReduceJobManager):
                         'interaction_id': str. the corresponding interaction ID.
                     }
         """
-        combined_key = '%s:%s:%s' % (
+        combined_key = u'%s:%s:%s' % (
             item.exploration_id, item.exploration_version, item.state_name)
-        yield (combined_key, {
+        yield (combined_key.encode('utf-8'), {
             'exploration_id': item.exploration_id,
             'exploration_version': item.exploration_version,
             'state_name': item.state_name,
