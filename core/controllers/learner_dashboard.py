@@ -57,8 +57,6 @@ class LearnerDashboardHandler(base.BaseHandler):
          completed_to_incomplete_collections) = (
              learner_progress_services.get_activity_progress(self.user_id))
 
-        print "Hello", learner_progress.incomplete_exp_summaries
-
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.completed_exp_summaries))
