@@ -233,7 +233,7 @@ class AnswerModelInteractionConsistencyJob(jobs.BaseMapReduceJobManager):
                         'interaction_id': str. the corresponding interaction ID.
                     }
         """
-        combined_key = '%s-%s-%s' % (
+        combined_key = '%s:%s:%s' % (
             item.exploration_id, item.exploration_version, item.state_name)
         yield (combined_key, {
             'exploration_id': item.exploration_id,
@@ -241,7 +241,6 @@ class AnswerModelInteractionConsistencyJob(jobs.BaseMapReduceJobManager):
             'state_name': item.state_name,
             'interaction_id': item.interaction_id
         })
-
 
     @staticmethod
     def reduce(key, stringified_values): # pylint: disable=unused-argument
@@ -316,7 +315,7 @@ class PurgeNewAnswersAuditJob(jobs.BaseMapReduceJobManager):
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         if item.interaction_id not in interaction_ids:
-            removal_key = '%s-%s' % (
+            removal_key = '%s:%s' % (
                 PurgeNewAnswersAuditJob._ANSWER_BUCKET_REMOVED_KEY,
                 item.interaction_id)
             yield (removal_key, {
@@ -325,7 +324,6 @@ class PurgeNewAnswersAuditJob(jobs.BaseMapReduceJobManager):
             })
         else:
             yield (PurgeNewAnswersAuditJob._ANSWER_BUCKET_RETAINED_KEY, {})
-
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -397,18 +395,19 @@ class PurgeNewAnswersJob(jobs.BaseMapReduceJobManager):
         """
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
-        if item.interaction_id not in interaction_ids:
+        item_id = item.id
+        interaction_id = item.interaction_id
+        if interaction_id not in interaction_ids:
             item.delete()
-            removal_key = '%s-%s' % (
+            removal_key = '%s:%s' % (
                 PurgeNewAnswersJob._ANSWER_BUCKET_REMOVED_KEY,
                 item.interaction_id)
             yield (removal_key, {
-                'item_id': item.id,
-                'interaction_id': item.interaction_id
+                'item_id': item_id,
+                'interaction_id': interaction_id
             })
         else:
             yield (PurgeNewAnswersJob._ANSWER_BUCKET_RETAINED_KEY, {})
-
 
     @staticmethod
     def reduce(key, stringified_values):
