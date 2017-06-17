@@ -446,12 +446,12 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 self.exploration.init_state_name, 'TextInput',
                 submitted_answer_list * 200)
 
-            # Verify more than 1 shard was stored. The index shard (shard_id 0)
-            # is not included in the shard count.
-            model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-                self.exploration.id, str(self.exploration.version),
-                self.exploration.init_state_name, '0'))
-            self.assertEqual(model.shard_count, 1)
+            # Verify that more than 1 shard was stored. The index shard
+            # (shard_id 0) is not included in the shard count.
+            master_model = stats_models.StateAnswersModel.get_master_model(
+                self.exploration.id, self.exploration.version,
+                self.exploration.init_state_name)
+            self.assertGreater(master_model.shard_count, 0)
 
             # The order of the answers returned depends on the size of the
             # answers.
