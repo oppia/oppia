@@ -152,10 +152,7 @@ def add_to_trainining_queue(exploration):
                 exploration.states[state_name].classifier_model_id = (
                     job_id)
             else:
-                classifier_training_job = get_classifier_training_job_by_id(
-                    state.classifier_model_id)
-                if check_re_training_conditions(state,
-                                                classifier_training_job):
+                if check_re_training_conditions(state):
                     training_data = get_training_data_from_state(state)
                     algorithm_id = state.interaction.id
                     exp_id = exploration.id
@@ -168,16 +165,16 @@ def add_to_trainining_queue(exploration):
     return exploration
 
 
-def check_re_training_conditions(state, classifier_training_job):
+def check_re_training_conditions(state):
     """Checks whether the classifier needs to be trained again.
 
     Args:
         state: The current State domain object of the exploration.
-        classifier_training_job: The retrieved ClassifierTrainingJob Domain
-            object.
 
     Returns: bool. True/False
     """
+    classifier_training_job = get_classifier_training_job_by_id(
+        state.classifier_model_id)
     new_training_data = get_training_data_from_state(state)
     old_training_data = classifier_training_job.training_data
 
@@ -190,7 +187,6 @@ def check_re_training_conditions(state, classifier_training_job):
     # Check for outcome mismatch.
     if flag and (len(new_training_data) > len(old_training_data)):
         delete_classifier_training_job(state.classifier_model_id)
-        state.classifier_model_id = None
         return True
 
     # Check for addition/deletion of answer groups (without Outcome mismatch).
