@@ -59,7 +59,6 @@
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "মূল্যায়ন",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "অমীমাংসিত উত্তরসমূহ",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "চিত্র এখানে টেনে আনুন",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "বা একটি চিত্রের ফাইল নির্বাচন:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "অন্বেষণ নিষ্ক্রিয় আছে",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "দুঃখিত, কিন্তু যে অন্বেষণে আপনি ক্লিক করেছেন তা বর্তমানে নিষ্ক্রিয় আছে। অনুগ্রহ করে একটু পরে আবার চেষ্টা করুন।",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "অন্বেষণ নিষ্ক্রিয় আছে - Oppia",

@@ -101,7 +101,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Note",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Réponses non résolues",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Faire glisser l’image ici",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "ou sélectionner un fichier image :",
+	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Sélectionner un fichier image",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Exploration désactivée",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Désolé, mais l’exploration sur laquelle vous avez cliqué est désactivée pour le moment. Veuillez réessayer ultérieurement.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Exploration désactivée — Oppia",

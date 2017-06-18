@@ -102,7 +102,6 @@
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "रेटिंग",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "अनसुलझे जवाब",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "यहाँ छवि को खींचें",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "या एक छवि फ़ाइल को चुने:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "निर्योग्य एक्सप्लोरेशन",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "माफ़ कीजिये,ये एक निर्योग्य एक्सप्लोरेशन है। बाद में पुन: प्रयास करें ।",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "निर्योग्य एक्सप्लोरेशन - Oppia",
