@@ -27,10 +27,12 @@ oppia.directive('simpleEditorBody', [
       controller: [
         '$scope', 'SimpleEditorManagerService',
         'explorationSaveService', 'explorationRightsService',
-        'explorationWarningsService', 'QuestionIdService', 'StatesToQuestionsService',
+        'explorationWarningsService', 'QuestionIdService',
+        'StatesToQuestionsService',
         function($scope, SimpleEditorManagerService,
             explorationSaveService, explorationRightsService,
-            explorationWarningsService, QuestionIdService, StatesToQuestionsService) {
+            explorationWarningsService, QuestionIdService,
+            StatesToQuestionsService) {
           $scope.data = SimpleEditorManagerService.getData();
           $scope.chooseQuestionType = false;
           $scope.modalWrapperVisible = false;
@@ -40,7 +42,8 @@ oppia.directive('simpleEditorBody', [
             name: 'Multiple choice'
           }];
 
-          $scope.getQuestionTypeLabel = StatesToQuestionsService.getQuestionTypeLabel;
+          $scope.getQuestionTypeLabel = (
+            StatesToQuestionsService.getQuestionTypeLabel);
 
           $scope.getSubfieldId = function(question, subfieldLabel) {
             return QuestionIdService.getSidebarItemId(

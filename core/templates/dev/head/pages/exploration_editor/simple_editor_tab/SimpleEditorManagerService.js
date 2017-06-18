@@ -23,11 +23,11 @@
 oppia.factory('SimpleEditorManagerService', [
   'StatesToQuestionsService', 'SimpleEditorShimService',
   'QuestionObjectFactory', 'QuestionListObjectFactory', 'OutcomeObjectFactory',
-  'AnswerGroupObjectFactory', 'OutcomeObjectFactory', 'RuleObjectFactory',
+  'AnswerGroupObjectFactory', 'RuleObjectFactory',
   function(
       StatesToQuestionsService, SimpleEditorShimService,
       QuestionObjectFactory, QuestionListObjectFactory, OutcomeObjectFactory,
-      AnswerGroupObjectFactory, OutcomeObjectFactory, RuleObjectFactory) {
+      AnswerGroupObjectFactory, RuleObjectFactory) {
     var data = {
       title: null,
       introductionHtml: null,
@@ -140,27 +140,29 @@ oppia.factory('SimpleEditorManagerService', [
         data.questionList.addQuestion(QuestionObjectFactory.create(
           lastStateName, stateData.interaction, ''));
       },
-      changeQuestion: function(type,index) {
-
-        var currentStateName = (index === 0 ? "Introduction" : "Question "+index);
-        var nextStateName = "Question "+(index+1);
-        var currentInteractionId = data.questionList._questions[index]._interactionId;
+      changeQuestion: function(type, index) {
+        var currentStateName = (
+          index === 0 ? 'Introduction' : 'Question ' + index);
+        var nextStateName = 'Question ' + (index + 1);
+        var currentInteractionId = (
+          data.questionList._questions[index]._interactionId);
 
         // Update Question Type If interactionId is not same.
         if(type != currentInteractionId) {
-          var newAnswerGroups=[];
+          var newAnswerGroups = [];
           if(type === 'MultipleChoiceInput') {
             SimpleEditorShimService.saveInteractionId(
               currentStateName, DEFAULT_INTERACTION.ID);
             SimpleEditorShimService.saveCustomizationArgs(
               currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-                RuleObjectFactory.createNew('Equals', {
-                  x: 0
-                })
-              ], OutcomeObjectFactory.createEmpty(nextStateName), false));
+            newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+              RuleObjectFactory.createNew('Equals', {
+                x: 0
+              })
+            ], OutcomeObjectFactory.createEmpty(nextStateName), false));
           }
-          SimpleEditorShimService.saveAnswerGroups(currentStateName, newAnswerGroups);
+          SimpleEditorShimService.saveAnswerGroups(currentStateName
+            , newAnswerGroups);
         }
         // Update the Question Set.
         var questions = StatesToQuestionsService.getQuestions();
@@ -168,7 +170,6 @@ oppia.factory('SimpleEditorManagerService', [
           return false;
         }
         data.questionList = QuestionListObjectFactory.create(questions);
-
       },
       canAddNewQuestion: function() {
         // Requirements:
@@ -182,7 +183,7 @@ oppia.factory('SimpleEditorManagerService', [
           return data.questionList.getLastQuestion().hasAnswerGroups();
         }
       },
-      canTryToFinishExploration: function() {orrect:
+      canTryToFinishExploration: function() {
         return (
           this.canAddNewQuestion() &&
           data.questionList.getQuestionCount() > 2);
