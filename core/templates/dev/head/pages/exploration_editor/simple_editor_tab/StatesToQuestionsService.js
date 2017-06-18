@@ -160,15 +160,16 @@ oppia.factory('StatesToQuestionsService', [
         // The interaction ID for that last state should be null or
         // EndExploration.
         var state = SimpleEditorShimService.getState(missingStateNames[0]);
-        var interactionId = state.interaction.id;            SimpleEditorShimService.saveInteractionId(
+        var interactionId = state.interaction.id;
+        SimpleEditorShimService.saveInteractionId(
               currentStateName, DEFAULT_INTERACTION.ID);
-            SimpleEditorShimService.saveCustomizationArgs(
+        SimpleEditorShimService.saveCustomizationArgs(
               currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+        newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
                 RuleObjectFactory.createNew('Equals', {
                   x: 0
                 })
-              ], OutcomeObjectFactory.createEmpty(nextStateName), false));
+        ], OutcomeObjectFactory.createEmpty(nextStateName), false));
         if (interactionId && interactionId !== INTERACTION_ID_END_EXPLORATION) {
           return null;
         }
