@@ -1397,6 +1397,9 @@ class State(object):
             hint_list = []
             for fallback in self.interaction.fallbacks:
                 if fallback.outcome.feedback:
+                    # If a fallback outcome has a non-empty feedback list
+                    # the feedback is converted to a Hint. It may contain
+                    # only one list item.
                     hint_list.append(
                         Hint(fallback.outcome.feedback[0]).to_dict())
             self.update_interaction_hints(hint_list)
