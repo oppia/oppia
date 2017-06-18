@@ -18,7 +18,6 @@
 	"I18N_DASHBOARD_EXPLORATIONS": "الاكتشافات",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "أرسل تعليقا",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "سحب صورة هنا",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "أو اختيار ملف صورة:",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "عذرا، لكن التنقيب الذي نقرت علىه معطل حاليا. الرجاء معاودة المحاولة في وقت لاحق.",
 	"I18N_ERROR_HEADER_400": "خطأ 400",
 	"I18N_ERROR_HEADER_401": "خطأ 401",

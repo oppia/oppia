@@ -20,7 +20,6 @@
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Avoin palaute",
 	"I18N_DASHBOARD_SUBSCRIBERS": "Tilaajat",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Pudota kuva tähän",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "tai valitse kuvatiedosto:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Toimintakyvytön tutkimus",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Anteeksi, mutta tutkimus jtoa klikkasit on tällä hetkellä toimintakyvytön. Ole hyvä, ja yritä myöhemmin uudelleen.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Toimintakyvytön tutkimus",
