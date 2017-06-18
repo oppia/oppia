@@ -211,6 +211,7 @@ oppia.directive('multipleChoiceEditor', [
               newAnswerGroups[0].rules[0].inputs.x = 0;
             }
 
+
             $scope.saveAnswerGroups({
               newValue: newAnswerGroups
             });
@@ -250,6 +251,7 @@ oppia.directive('multipleChoiceEditor', [
                 newValue: newAnswerGroups
               });
 
+              console.log(newAnswerGroups);
               // Focus on the "response to correct answer" field, since it is
               // likely to need changing.
               $scope.$broadcast('openEditorHtmlField', {

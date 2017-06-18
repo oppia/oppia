@@ -33,6 +33,7 @@ oppia.factory('StatesToQuestionsService', [
       }
     );
 
+
     // Check that the outcome has:
     // - A feedback array with exactly one element.
     // - A destination that is a self-loop (if expectSelfLoop is
@@ -159,7 +160,15 @@ oppia.factory('StatesToQuestionsService', [
         // The interaction ID for that last state should be null or
         // EndExploration.
         var state = SimpleEditorShimService.getState(missingStateNames[0]);
-        var interactionId = state.interaction.id;
+        var interactionId = state.interaction.id;            SimpleEditorShimService.saveInteractionId(
+              currentStateName, DEFAULT_INTERACTION.ID);
+            SimpleEditorShimService.saveCustomizationArgs(
+              currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+                RuleObjectFactory.createNew('Equals', {
+                  x: 0
+                })
+              ], OutcomeObjectFactory.createEmpty(nextStateName), false));
         if (interactionId && interactionId !== INTERACTION_ID_END_EXPLORATION) {
           return null;
         }
@@ -174,6 +183,13 @@ oppia.factory('StatesToQuestionsService', [
       // current set of states to a list of questions.
       getQuestions: function() {
         return getQuestions();
+      },
+      getQuestionTypeLabel: function(interactionId) {
+        for( var i = 0; i < SUPPORTED_INTERACTION_TYPES.length; i++) {
+          if(SUPPORTED_INTERACTION_TYPES[i].id === interactionId) {
+            return SUPPORTED_INTERACTION_TYPES[i].name;
+          }
+        }
       }
     };
   }

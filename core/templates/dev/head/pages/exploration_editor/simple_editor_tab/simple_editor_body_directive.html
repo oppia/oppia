@@ -20,7 +20,7 @@
       </anchor-header>
 
       <div ng-show="chooseQuestionType && $parent.modalWrapperVisible" class="question-type-wrapper">
-        <button type="button" class="oppia-question-button btn btn-primary" ng-click="changeQuestion('multiple', $index); chooseQuestionType = false; $parent.modalWrapperVisible= false;">Multiple Choice Input</button>
+        <button type="button" class="oppia-question-button btn btn-primary" ng-click="changeQuestion('MultipleChoiceInput', $index); chooseQuestionType = false; $parent.modalWrapperVisible= false;">Multiple Choice Input</button>
       </div>
 
       <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"

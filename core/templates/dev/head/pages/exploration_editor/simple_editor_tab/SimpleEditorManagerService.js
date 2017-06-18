@@ -23,9 +23,11 @@
 oppia.factory('SimpleEditorManagerService', [
   'StatesToQuestionsService', 'SimpleEditorShimService',
   'QuestionObjectFactory', 'QuestionListObjectFactory', 'OutcomeObjectFactory',
+  'AnswerGroupObjectFactory', 'OutcomeObjectFactory', 'RuleObjectFactory',
   function(
       StatesToQuestionsService, SimpleEditorShimService,
-      QuestionObjectFactory, QuestionListObjectFactory, OutcomeObjectFactory) {
+      QuestionObjectFactory, QuestionListObjectFactory, OutcomeObjectFactory,
+      AnswerGroupObjectFactory, OutcomeObjectFactory, RuleObjectFactory) {
     var data = {
       title: null,
       introductionHtml: null,
@@ -139,47 +141,34 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, stateData.interaction, ''));
       },
       changeQuestion: function(type,index) {
-        // Get Stated based on the index passed.
-        var allStateNames = SimpleEditorShimService.getAllStateNames();
-        var currentState = SimpleEditorShimService.getState(allStateNames[index]);
-        var nextStateName = SimpleEditorShimService.getState(allStateNames[index+1]).name;
-        var currentInteractionId = currentState.interaction.id;
-        var currentStateName = currentState.name;
-        //var currentStateName = "Question "+index;
 
-        console.log(SimpleEditorShimService.getAllStateNames());
-        console.log(currentStateName);
+        var currentStateName = (index === 0 ? "Introduction" : "Question "+index);
+        var nextStateName = "Question "+(index+1);
+        var currentInteractionId = data.questionList._questions[index]._interactionId;
 
-        //Only Change Question If Intreaction ID Is not same
-        //If question is last then save outcome to end exploration
+        // Update Question Type If interactionId is not same.
         if(type != currentInteractionId) {
-
-
-        SimpleEditorShimService.saveInteractionId(
-          currentStateName, DEFAULT_INTERACTION.ID);
-        SimpleEditorShimService.saveCustomizationArgs(
-          currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-
-            var default_answer_groups = [{
-              correct: false,
-              outcome: {
-                dest: nextStateName,
-                feedback: ['<p></p>'],
-                param_changes: []
-              },
-              rules: [{
-                type: 'Equals',
-                inputs: {
+          var newAnswerGroups=[];
+          if(type === 'MultipleChoiceInput') {
+            SimpleEditorShimService.saveInteractionId(
+              currentStateName, DEFAULT_INTERACTION.ID);
+            SimpleEditorShimService.saveCustomizationArgs(
+              currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+                RuleObjectFactory.createNew('Equals', {
                   x: 0
-                }
-              }]
-            }];
-
-          //Get Correct Answer Group To Save.
-        SimpleEditorShimService.saveAnswerGroups(
-            currentStateName, default_answer_groups);
-
+                })
+              ], OutcomeObjectFactory.createEmpty(nextStateName), false));
+          }
+          SimpleEditorShimService.saveAnswerGroups(currentStateName, newAnswerGroups);
         }
+        // Update the Question Set.
+        var questions = StatesToQuestionsService.getQuestions();
+        if (!questions) {
+          return false;
+        }
+        data.questionList = QuestionListObjectFactory.create(questions);
+
       },
       canAddNewQuestion: function() {
         // Requirements:
