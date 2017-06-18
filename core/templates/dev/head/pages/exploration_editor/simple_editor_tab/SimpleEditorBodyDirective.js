@@ -33,6 +33,7 @@ oppia.directive('simpleEditorBody', [
             explorationWarningsService, QuestionIdService) {
           $scope.data = SimpleEditorManagerService.getData();
           $scope.chooseQuestionType = false;
+          $scope.modalWrapperVisible = false;
 
           var INTERACTION_TYPES = [{
             id: 'MultipleChoiceInput',

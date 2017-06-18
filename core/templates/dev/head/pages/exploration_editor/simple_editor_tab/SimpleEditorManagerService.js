@@ -139,8 +139,47 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, stateData.interaction, ''));
       },
       changeQuestion: function(type,index) {
-        // This change the type of question
+        // Get Stated based on the index passed.
+        var allStateNames = SimpleEditorShimService.getAllStateNames();
+        var currentState = SimpleEditorShimService.getState(allStateNames[index]);
+        var nextStateName = SimpleEditorShimService.getState(allStateNames[index+1]).name;
+        var currentInteractionId = currentState.interaction.id;
+        var currentStateName = currentState.name;
+        //var currentStateName = "Question "+index;
 
+        console.log(SimpleEditorShimService.getAllStateNames());
+        console.log(currentStateName);
+
+        //Only Change Question If Intreaction ID Is not same
+        //If question is last then save outcome to end exploration
+        if(type != currentInteractionId) {
+
+
+        SimpleEditorShimService.saveInteractionId(
+          currentStateName, DEFAULT_INTERACTION.ID);
+        SimpleEditorShimService.saveCustomizationArgs(
+          currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+
+            var default_answer_groups = [{
+              correct: false,
+              outcome: {
+                dest: nextStateName,
+                feedback: ['<p></p>'],
+                param_changes: []
+              },
+              rules: [{
+                type: 'Equals',
+                inputs: {
+                  x: 0
+                }
+              }]
+            }];
+
+          //Get Correct Answer Group To Save.
+        SimpleEditorShimService.saveAnswerGroups(
+            currentStateName, default_answer_groups);
+
+        }
       },
       canAddNewQuestion: function() {
         // Requirements:
@@ -154,7 +193,7 @@ oppia.factory('SimpleEditorManagerService', [
           return data.questionList.getLastQuestion().hasAnswerGroups();
         }
       },
-      canTryToFinishExploration: function() {
+      canTryToFinishExploration: function() {orrect:
         return (
           this.canAddNewQuestion() &&
           data.questionList.getQuestionCount() > 2);
