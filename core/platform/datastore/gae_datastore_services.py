@@ -23,20 +23,27 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
     and models.
 
     Args:
-        ids_and_models: list(list(model_name, entity_ids)). The ids and their
-            corresponding models for which we have to fetch entities.
+        ids_and_models: list(tuple(str, list(str))). The ids and their
+            corresponding model names for which we have to fetch entities.
 
     Returns:
-        list(Model instance). The model instances corresponding to the
+        list(list(nbd.Model)). The model instances corresponding to the ids and
+            models. The model instances are grouped by the model type.
     """
     entity_keys = []
-    for ids_and_model in ids_and_models:
-        model_name = ids_and_model[0]
-        entity_ids = ids_and_model[1]
-
+    for (model_name, entity_ids) in ids_and_models:
         # Add the keys to the list of keys whose entities we have to fetch.
         entity_keys = (
             entity_keys +
             [ndb.Key(model_name, entity_id) for entity_id in entity_ids])
 
-    return ndb.get_multi(entity_keys)
+    all_models = ndb.get_multi(entity_keys)
+    all_models_grouped_by_model_type = []
+
+    start_index = 0
+    for (model_name, entity_ids) in ids_and_models:
+        all_models_grouped_by_model_type.append(
+            all_models[start_index:start_index + len(entity_ids)])
+        start_index = start_index + len(entity_ids)
+
+    return all_models_grouped_by_model_type

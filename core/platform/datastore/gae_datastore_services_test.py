@@ -57,12 +57,12 @@ class FetchMultipleEntitiesTests(test_utils.GenericTestBase):
         summary_models = (
             gae_datastore_services.fetch_multiple_entities_by_ids_and_models(
                 [
-                    ['ExpSummaryModel', [self.EXP_ID_0, self.EXP_ID_1]],
-                    ['CollectionSummaryModel', [self.COL_ID_0, self.COL_ID_1]]
+                    ('ExpSummaryModel', [self.EXP_ID_0, self.EXP_ID_1]),
+                    ('CollectionSummaryModel', [self.COL_ID_0, self.COL_ID_1])
                 ]))
 
-        exploration_summary_models = summary_models[:2]
-        collection_summary_models = summary_models[2:]
+        exploration_summary_models = summary_models[0]
+        collection_summary_models = summary_models[1]
 
         exploration_summaries = (
             [exp_services.get_exploration_summary_from_model(model)
