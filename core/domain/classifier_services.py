@@ -154,8 +154,8 @@ def add_to_trainining_queue(exploration):
             else:
                 classifier_training_job = get_classifier_training_job_by_id(
                     state.classifier_model_id)
-                if _check_re_training_conditions(state,
-                                                 classifier_training_job):
+                if check_re_training_conditions(state,
+                                                classifier_training_job):
                     training_data = get_training_data_from_state(state)
                     algorithm_id = state.interaction.id
                     exp_id = exploration.id
@@ -168,7 +168,7 @@ def add_to_trainining_queue(exploration):
     return exploration
 
 
-def _check_re_training_conditions(state, classifier_training_job):
+def check_re_training_conditions(state, classifier_training_job):
     """Checks whether the classifier needs to be trained again.
 
     Args:
@@ -181,20 +181,22 @@ def _check_re_training_conditions(state, classifier_training_job):
     new_training_data = get_training_data_from_state(state)
     old_training_data = classifier_training_job.training_data
 
-    # Check for addition/deletion of answer groups.
-    if len(old_training_data) != len(new_training_data):
-        # Check for outcome mismatch.
-        if len(new_training_data) > len(old_training_data):
-            flag = False
-            for (answer_group_index, answer_group) in enumerate(
-                    old_training_data):
-                if answer_group['answer_group_index'] != new_training_data[
-                        answer_group_index]['answer_group_index']:
-                    flag = True
-            if flag:
-                delete_classifier_training_job(state.classifier_model_id)
-                return True
+    flag = False
+    for (answer_group_index, answer_group) in enumerate(
+            old_training_data):
+        if answer_group['feedback'] != new_training_data[
+                answer_group_index]['feedback']:
+            flag = True
+    # Check for outcome mismatch.
+    if flag and (len(new_training_data) > len(old_training_data)):
+        delete_classifier_training_job(state.classifier_model_id)
+        state.classifier_model_id = None
         return True
+
+    # Check for addition/deletion of answer groups (without Outcome mismatch).
+    elif (not flag) and (len(new_training_data) != len(old_training_data)):
+        return True
+
     # Check for change in number of training samples.
     else:
         diff = 0
@@ -231,10 +233,11 @@ def get_training_data_from_state(state):
                 answers.extend([doc])
             training_data.extend([{
                 'answer_group_index': answer_group_index,
+                'feedback': answer_group.outcome.feedback,
                 'answers': answers
             }])
     for answer_group in training_data:
-        print answer_group['answer_group_index']
+        print answer_group['feedback']
     return training_data
 
 
