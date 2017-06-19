@@ -101,7 +101,8 @@ describe('Answer classification service with string classifier disabled',
             feedback: [],
             param_changes: []
           },
-          fallbacks: []
+          fallbacks: [],
+          hints: []
         },
         param_changes: []
       });
@@ -212,7 +213,8 @@ describe('Answer classification service with string classifier disabled',
             feedback: [],
             param_changes: []
           },
-          fallbacks: []
+          fallbacks: [],
+          hints: []
         },
         param_changes: []
       });
@@ -308,7 +310,8 @@ describe('Answer classification service with string classifier enabled',
             feedback: [],
             param_changes: []
           },
-          fallbacks: []
+          fallbacks: [],
+          hints: []
         },
         param_changes: []
       });
