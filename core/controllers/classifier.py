@@ -21,20 +21,22 @@ from core.domain import classifier_services
 import feconf
 import hashlib
 import hmac
+import json
 
 def validate_request(handler):
     """Decorator that checks if the incoming request for storing trained
     classifier is valid."""
     def test_is_valid(self, **kwargs):
-        signature = self.request.pop('signature')
-        vm_id = self.request.pop('vm_id')
+        signature = self.request.get('signature')
+        vm_id = self.request.get('vm_id')
+        message = self.request.get('payload')
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         generated_signature = hmac.new(
-            secret, self.request, digestmod=hashlib.sha256).hexdigest()
+            secret, message, digestmod=hashlib.sha256).hexdigest()
         if generated_signature != signature:
-            response['status_int'] = 401
+            return self.UnauthorizedUserException
         if vm_id == 'vm_default' and not feconf.DEV_MODE:
-            response['status_int'] = 401
+            return self.UnauthorizedUserException
         return handler(self, **kwargs)
 
     return test_is_valid
@@ -43,6 +45,9 @@ class TrainedClassifierHandler(base.BaseHandler):
     """This handler stores thre result of the training job in datastore and
     updates the status of the job.
     """
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
     @validate_request
     def post(self):
         """Handles POST requests."""
@@ -73,6 +78,8 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_training_job.status,
             classifier_training_job.job_id)
         if classifier_id:
-            response['status_int'] = 200
+            self.response['status_int'] = 200
+            return self.response
         else:
-            response['status_int'] = 400
+            self.response['status_int'] = 400
+            return self.response

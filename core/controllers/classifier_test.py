@@ -26,7 +26,6 @@ import hashlib
 import hmac
 import json
 import os
-import requests
 
 def get_training_data_from_state(state):
     """Retrieves training data from the State domain object."""
@@ -91,10 +90,5 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         payload = self.job_result_dict
         payload['vm_id'] = feconf.DEFAULT_VM_ID
         payload['signature'] = generate_signature(payload)
-        request_url = feconf.STORE_TRAINED_CLASSIFIER_MODEL_HANDLER
-        request_url = "%s:%s/%s" % (
-            'https://localhost',
-            8181,
-            feconf.STORE_TRAINED_CLASSIFIER_MODEL_HANDLER)
-        response = requests.post(request_url, json=payload)
+        response = self.post_json('/ml/trainedclassifierhandler', payload)
         self.assertEqual(response['status_int'], 200)
