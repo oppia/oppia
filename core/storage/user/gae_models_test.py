@@ -77,7 +77,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             draft_change_list={'new_content': {}},
             draft_change_list_last_updated=self.DATETIME_OBJECT,
             draft_change_list_exp_version=3,
-            draft_change_list_id = 1).put()
+            draft_change_list_id=1).put()
 
     def test_create_success(self):
         user_models.ExplorationUserDataModel.create(
