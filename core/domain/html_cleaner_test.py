@@ -152,24 +152,24 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         expected_components = [
             {
                 'customization_args': {
-                    'text-with-value': u'&quot;Link&quot;',
-                    'url-with-value': u'&quot;https://www.example.com&quot;'},
+                    'text-with-value': u'Link',
+                    'url-with-value': u'https://www.example.com'},
                 'id': 'oppia-noninteractive-link'
             },
             {
                 'customization_args': {
-                    'start-with-value': u'0',
-                    'end-with-value': u'0',
+                    'start-with-value': 0,
+                    'end-with-value': 0,
                     'video_id-with-value': (
-                        u'&quot;https://www.youtube.com/watch?'
-                        u'v=Ntcw0H0hwPU&quot;'),
-                    'autoplay-with-value': u'false'
+                        u'https://www.youtube.com/watch?'
+                        u'v=Ntcw0H0hwPU'),
+                    'autoplay-with-value': False
                 },
                 'id': 'oppia-noninteractive-video'
             },
             {
                 'customization_args': {
-                    'raw_latex-with-value': u'&quot;\\frac{x}{y}&quot;'
+                    'raw_latex-with-value': u'\\frac{x}{y}'
                 },
                 'id': 'oppia-noninteractive-math'
             }

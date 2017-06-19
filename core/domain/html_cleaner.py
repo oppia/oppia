@@ -18,6 +18,8 @@
 
 import logging
 import urlparse
+from HTMLParser import HTMLParser
+import json
 
 import bleach
 
@@ -117,9 +119,12 @@ def get_rte_components(html_string):
         html: str. An HTML string.
 
     Returns:
-        list. A list of dictionaries, each representing an RTE component.
-        Each dict contains component 'id' and 'customization_args'.
+        list(dict). A list of dictionaries, each representing an RTE component.
+        Each dict in the list contains:
+        - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
+        - customization_args: dict. Customization arg specs for the component.
     """
+    parser = HTMLParser()
     components = []
     soup = BeautifulSoup(html_string, 'html.parser')
     oppia_custom_tags = (
@@ -130,7 +135,12 @@ def get_rte_components(html_string):
             component = {'id': tag_name}
             customization_args = {}
             for attr in oppia_custom_tags[tag_name]:
-                customization_args[attr] = component_tag[attr]
+                # Unescape special HTML characters such as '&quot;'
+                attr_val = parser.unescape(component_tag[attr])
+                # Adds escapes so that things like '\frac' aren't
+                # interpreted as special characters.
+                attr_val = attr_val.encode('unicode_escape')
+                customization_args[attr] = json.loads(attr_val)
             component['customization_args'] = customization_args
             components.append(component)
     return components
