@@ -33,10 +33,10 @@ oppia.directive('adminRolesTab', [
         $scope.UPDATABLE_ROLES = GLOBALS.UPDATABLE_ROLES;
         $scope.VIEWABLE_ROLES = GLOBALS.VIEWABLE_ROLES;
         $scope.graphData = GLOBALS.ROLE_GRAPH_DATA;
-        $scope.showResultRoles = false;
+        $scope.resultRolesVisible = false;
         $scope.result = {};
         $scope.setStatusMessage('');
-        $scope.showUpdateForm = ADMIN_SHOW_UPDATE_ROLE;
+        $scope.isUpdateFormVisible = ADMIN_SHOW_UPDATE_ROLE;
         $scope.viewFormValues = {};
         $scope.updateFormValues = {};
         $scope.viewFormValues.method = 'role';
@@ -83,11 +83,11 @@ oppia.directive('adminRolesTab', [
           }).then(function(response) {
             $scope.result = response.data;
             if (Object.keys($scope.result).length == 0) {
-              $scope.showResultRoles = false;
+              $scope.resultRolesVisible = false;
               $scope.setStatusMessage('No results.');
             }
             else {
-              $scope.showResultRoles = true;
+              $scope.resultRolesVisible = true;
               $scope.setStatusMessage('Success.');
             }
             $scope.viewFormValues.username = '';

@@ -1,10 +1,13 @@
 <style>
-    .form-horizontal .control-label {
-        text-align: left;
-    }
+  .roles-tab .form-horizontal .control-label {
+    text-align: left;
+  }
+  .roles-tab .view-results-table {
+    margin-top: 20px;
+  }
 </style>
 
-<div class="container-fluid">
+<div class="container-fluid roles-tab">
   <div class="row">
     <div class="col-md-8">
       <md-card class="oppia-page-card oppia-long-text">
@@ -33,20 +36,19 @@
           <div class="form-group" ng-if="viewFormValues.method==='username'">
             <label class="col-md-4 col-lg-4 col-sm-4 control-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8">
-              <input type="text" name="username" placeholder="Enter username" ng-model="viewFormValues.username" class="form-control" />
+              <input type="text" name="username" placeholder="Enter username" ng-model="viewFormValues.username" class="form-control">
             </div>
           </div>
 
           <button type="submit" class="btn btn-success"
                   ng-disabled="(viewFormValues.method==='role' && !viewFormValues.role) || (viewFormValues.method==='username' && !viewFormValues.username)"
                   value="view role">
-                  View Role
+            View Role
           </button>
         </form>
 
-        <div ng-show="showResultRoles">
-          <br/>
-          <table class="table text-center">
+        <div ng-show="resultRolesVisible">
+          <table class="table text-center view-results-table">
             <thead>
               <tr>
                 <td><strong>Username</strong></td>
@@ -63,13 +65,13 @@
         </div>
       </md-card>
 
-      <md-card class="oppia-page-card oppia-long-text" ng-if="showUpdateForm">
+      <md-card class="oppia-page-card oppia-long-text" ng-if="isUpdateFormVisible">
         <form class="form-horizontal" name="updateRoleForm" ng-submit="submitUpdateRoleForm(updateFormValues)">
           <legend class="text-center">Update Role</legend>            
           <div class="form-group">
               <label class="col-md-4 col-lg-4 col-sm-4 control-label">Enter Username</label>
               <div class="col-md-8 col-lg-8 col-sm-8">
-                <input type="text" placeholder="Enter username" ng-model="updateFormValues.username" class="form-control" />
+                <input type="text" placeholder="Enter username" ng-model="updateFormValues.username" class="form-control">
               </div>
           </div>
 

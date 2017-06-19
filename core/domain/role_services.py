@@ -19,6 +19,10 @@ inheritance, Actions permitted to the roles and the functions needed to
 access roles and actions.
 """
 
+import math
+import random
+import time
+
 from core.platform import models
 import feconf
 
@@ -42,7 +46,7 @@ ACTION_UPDATE_FEATURED_ACTIVITIES = 'UPDATE_FEATURED_ACTIVITIES'
 ACTION_VIEW_COLLECTION_RIGHTS = 'VIEW_COLLECTION_RIGHTS'
 ACTION_VIEW_EXPLORATION_STATS = 'VIEW_EXPLORATION_STATS'
 
-# Users can be updated to the following list of roles via admin interface.
+# Users can be updated to the following list of role Ids via admin interface.
 UPDATABLE_ROLES = [
     feconf.ROLE_ADMIN,
     feconf.ROLE_BANNED_USER,
@@ -51,7 +55,7 @@ UPDATABLE_ROLES = [
     feconf.ROLE_MODERATOR
 ]
 
-# Users can be viewed by following list of roles via admin interface.
+# Users can be viewed by following list of role Ids via admin interface.
 VIEWABLE_ROLES = [
     feconf.ROLE_ADMIN,
     feconf.ROLE_BANNED_USER,
@@ -59,6 +63,18 @@ VIEWABLE_ROLES = [
     feconf.ROLE_MODERATOR,
     feconf.ROLE_SUPER_ADMIN
 ]
+
+# The string corresponding to role Ids that should be visible to admin.
+HUMAN_READABLE_ROLES = {
+    feconf.ROLE_ADMIN: 'admin',
+    feconf.ROLE_BANNED_USER: 'banned user',
+    feconf.ROLE_COLLECTION_EDITOR: 'collection editor',
+    feconf.ROLE_EXPLORATION_EDITOR: 'exploration editor',
+    feconf.ROLE_GUEST: 'guest',
+    feconf.ROLE_MODERATOR: 'moderator',
+    feconf.ROLE_SUPER_ADMIN: 'super admin'
+}
+
 
 # This dict represents how the actions are inherited among different
 # roles in the site.
@@ -129,17 +145,6 @@ ROLE_ACTIONS = {
 }
 
 
-def get_human_readable_role(role):
-    """Converts role to human readable format.
-
-    Args:
-        role: str. The role to convert.
-    Returns:
-        str. Role in human readable format.
-    """
-    return role.lower().replace('_', ' ')
-
-
 def get_all_actions(role):
     """Returns a list of all actions (including inherited actions)
     that can be performed by the given role.
@@ -185,14 +190,19 @@ def get_role_graph_data():
     role_graph['links'] = []
     role_graph['nodes'] = {}
     for role in PARENT_ROLES:
-        role_graph['nodes'][role] = get_human_readable_role(role)
+        role_graph['nodes'][role] = HUMAN_READABLE_ROLES[role]
         for parent in PARENT_ROLES[role]:
             role_graph['links'].append({'source': parent, 'target': role})
     return role_graph
 
 
-def store_role_query(user_id, intent, method=None, role=None, username=None):
+def store_role_query(user_id, intent, role=None, username=None):
     """Stores the query to role structure in RoleQueryAuditModel."""
+    model_id = (
+        str(user_id) + "." + str(int(math.floor(time.time()))) +
+        str(intent) + str(random.randint(0, 1000))
+    )
+
     audit_models.RoleQueryAuditModel(
-        user_id=user_id, intent=intent,
-        view_method=method, role=role, username=username).put()
+        model_id, user_id, intent,
+        role=role, username=username).put()

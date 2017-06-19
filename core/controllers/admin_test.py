@@ -140,3 +140,24 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             {'method': 'role', 'role': feconf.ROLE_MODERATOR})
         self.assertEqual(response_dict, {'user1': feconf.ROLE_MODERATOR})
         self.logout()
+
+    def test_invalid_username_in_view_and_update_role(self):
+        username = 'myinvaliduser'
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        # Trying to view role of non-existent user.
+        response = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'method': 'username', 'username': username},
+            expect_errors=True)
+        self.assertEqual(response['code'], 400)
+
+        # Trying to update role of non-existent user.
+        response = self.testapp.get(feconf.ADMIN_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.post_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'role': feconf.ROLE_MODERATOR, 'username': username},
+            csrf_token=csrf_token, expect_errors=True,
+            expected_status_int=400)

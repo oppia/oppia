@@ -952,8 +952,7 @@ SITE_NAME = 'Oppia.org'
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
 
-# Following are the constants for the role Ids. Role Ids are human
-# readable roles with underscores instead of spaces.
+# Following are the constants for the role Ids.
 # To check the role updation from /admin#roles, set ADMIN_SHOW_UPDATE_ROLE
 # constant in Admin.js to true.
 ROLE_GUEST = 'GUEST'
@@ -966,8 +965,9 @@ ROLE_SUPER_ADMIN = 'SUPER_ADMIN'
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role Ids.
-VIEW_ROLE = 'View user roles.'
-UPDATE_ROLE = 'Update user role.'
+ROLE_ACTION_UPDATE = 'Update.'
+ROLE_ACTION_VIEW_BY_USERNAME = 'View by username.'
+ROLE_ACTION_VIEW_BY_ROLE = 'View by role.'
 
 VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'
