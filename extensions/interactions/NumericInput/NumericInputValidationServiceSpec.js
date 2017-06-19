@@ -110,5 +110,5 @@ describe('NumericInputValidationService', function() {
         message: 'Rule 2 from answer group 1 will never be matched ' +
           'because it is made redundant by rule 1 from answer group 1.'
       }]);
-  });
+    });
 });
