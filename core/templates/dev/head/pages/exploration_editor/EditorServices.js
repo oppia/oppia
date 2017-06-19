@@ -1279,11 +1279,11 @@ oppia.factory('stateFallbacksService', [
 
 // A data service that stores the current interaction hints.
 oppia.factory('stateHintsService', [
-    'statePropertyService', function(statePropertyService) {
-        var child = Object.create(statePropertyService);
-        child.setterMethodKey = 'saveHints';
-        return child;
-    }
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveHints';
+    return child;
+  }
 ]);
 
 // Data service for keeping track of gadget data and location across panels.

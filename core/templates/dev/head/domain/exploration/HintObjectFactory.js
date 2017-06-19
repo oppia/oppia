@@ -18,24 +18,23 @@
  */
 
 oppia.factory('HintObjectFactory', function() {
-        var Hint = function(hint_text) {
-            this.hint_text = hint_text;
-        };
+  var Hint = function(hintText) {
+    this.hint_text = hintText;
+  };
 
-        Hint.prototype.toBackendDict = function() {
-            return {
-                hint_text: this.hint_text
-            };
-        };
+  Hint.prototype.toBackendDict = function() {
+    return {
+      hint_text: this.hint_text
+    };
+  };
 
-        Hint.createFromBackendDict = function(hintBackendDict) {
-            return new Hint(hintBackendDict.hint_text);
-        };
+  Hint.createFromBackendDict = function(hintBackendDict) {
+    return new Hint(hintBackendDict.hint_text);
+  };
 
-        Hint.createDefault = function(hint_text) {
-            return new Hint(hint_text);
-        };
+  Hint.createDefault = function(hintText) {
+    return new Hint(hintText);
+  };
 
-        return Hint;
-    }
-);
+  return Hint;
+});
