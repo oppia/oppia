@@ -627,7 +627,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Return a list of reference to the datastore classes to map over."""
+        """Return a list of datastore class references to map over."""
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement '
             'entity_classes_to_map_over()')
