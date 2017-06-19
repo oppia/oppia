@@ -306,7 +306,7 @@ def _update_classifier_training_job(classifier_training_job_model, status):
 
 
 def save_classifier_training_job(algorithm_id, exp_id, exp_version,
-                                 state_name, status, training_data,
+                                 state_name, training_data, status="NEW",
                                  job_id="None"):
     """Checks for the existence of the model.
     If the model exists, it is updated using _update_classifier_training_job
