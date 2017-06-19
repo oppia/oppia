@@ -1766,6 +1766,36 @@ class Exploration(object):
                  states_schema_version, init_state_name, states_dict,
                  param_specs_dict, param_changes_list, version,
                  created_on=None, last_updated=None):
+        """Initializes a Exploration domain object.
+
+        Args:
+            exploration_id: str. The exploration id.
+            title: str. The exploration title.
+            category: str. The category of the exploration.
+            objective: str. The objective of the exploration.
+            language_code: str. The language code of the exploration.
+            tags: list(str). The tags given to the exploration. 
+            blurb: str. The blurb of the exploration.
+            author_notes: str. The author notes.
+            skin_customizations: dict. The customization dictionary of
+                SkinInstance domain object.
+            states_schema_version: int. Tbe schema version of the exploration. 
+            init_state_name: str. The name for the initial state of the
+                exploration.
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+            param_specs_dict: dict. A dict where each key-value pair represents
+                respectively, a param spec name and a dict used to initialize a
+                ParamSpec domain object.
+            param_changes_list: list(dict). List of dict where each dict is
+                used to initialize a ParamChange domain object.
+            version: int. The version of the exploration.
+            created_on: datetime.datetime. Date and time when the exploration
+                is created.
+            last_updated: datetime.datetime. Date and time when the exploration
+                was last updated.
+        """
         self.id = exploration_id
         self.title = title
         self.category = category
@@ -1802,6 +1832,19 @@ class Exploration(object):
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
+        """Returns a Exploration domain object with default values.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+            title: str. The exploration title.
+            category: str. The category of the exploration.
+            objective: str. The objective of the exploration.
+            language_code: str. The language code of the exploration.
+
+        Returns:
+            Exploration. The Exploration domain object with default
+            values.
+        """
         init_state_dict = State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
@@ -1819,6 +1862,20 @@ class Exploration(object):
             cls, exploration_dict,
             exploration_version=0, exploration_created_on=None,
             exploration_last_updated=None):
+        """Return a Exploration domain object from a dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of Exploration
+                object.
+            exploration_version: int. The version of the exploration.
+            exploration_created_on: datetime.datetime. Date and time when the
+                exploration is created.
+            exploration_last_updated: datetime.datetime. Date and time when the
+                exploration was last updated.
+
+        Returns:
+            Exploration. The corresponding Exploration domain object.
+        """
         # NOTE TO DEVELOPERS: It is absolutely ESSENTIAL this conversion to and
         # from an ExplorationModel/dictionary MUST be exhaustive and complete.
         exploration = cls.create_default_exploration(
@@ -1907,12 +1964,22 @@ class Exploration(object):
 
     @classmethod
     def _require_valid_state_name(cls, name):
+        """Validates name string.
+
+        Args:
+            name: str. The name to validate.
+        """
         utils.require_valid_name(name, 'a state name')
 
     def validate(self, strict=False):
-        """Validates the exploration before it is committed to storage.
+        """Validates various properties of the Exploration.
 
-        If strict is True, performs advanced validation.
+        Args:
+            strict: bool. If True more properties are validated.
+
+        Raises:
+            ValidationError: One or more attributes of the Exploration are
+            invalid.
         """
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
@@ -2155,7 +2222,12 @@ class Exploration(object):
                     'exploration: %s' % warning_str)
 
     def _verify_all_states_reachable(self):
-        """Verifies that all states are reachable from the initial state."""
+        """Verifies that all states are reachable from the initial state.
+
+        Raises:
+            ValidationError: One or more states are not reachable from the
+            initial state of the Exploration.
+        """
         # This queue stores state names.
         processed_queue = []
         curr_queue = [self.init_state_name]
@@ -2189,6 +2261,10 @@ class Exploration(object):
     def _verify_no_dead_ends(self):
         """Verifies that all states can reach a terminal state without using
         fallbacks.
+
+        Raises:
+            ValidationError: If is impossible to complete the exploration from
+                a state.
         """
         # This queue stores state names.
         processed_queue = []
@@ -2227,64 +2303,140 @@ class Exploration(object):
     # Derived attributes of an exploration,
     @property
     def init_state(self):
-        """The state which forms the start of this exploration."""
+        """The state which forms the start of this exploration.
+
+        Returns:
+            State. The corresponding State domain object.
+        """
         return self.states[self.init_state_name]
 
     @property
     def param_specs_dict(self):
-        """A dict of param specs, each represented as Python dicts."""
+        """A dict of param specs, each represented as Python dicts.
+
+        Returns:
+            dict. Dict of para specs.
+        """
         return {ps_name: ps_val.to_dict()
                 for (ps_name, ps_val) in self.param_specs.iteritems()}
 
     @property
     def param_change_dicts(self):
-        """A list of param changes, represented as JSONifiable Python dicts."""
+        """A list of param changes, represented as JSONifiable Python dicts.
+
+        Returns:
+            lsit(dict). List of param changes dict.
+        """
         return [param_change.to_dict() for param_change in self.param_changes]
 
     @classmethod
     def is_demo_exploration_id(cls, exploration_id):
-        """Whether the given exploration id is a demo exploration."""
+        """Whether the given exploration id is a demo exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Returns:
+            bool. True is the corresponding exploration is a demo exploration.
+        """
         return exploration_id in feconf.DEMO_EXPLORATIONS
 
     @property
     def is_demo(self):
-        """Whether the exploration is one of the demo explorations."""
+        """Whether the exploration is one of the demo explorations.
+
+        Returns:
+            bool. True is the current exploration is a demo exploration.
+        """
         return self.is_demo_exploration_id(self.id)
 
     def update_title(self, title):
+        """Update the exploration title.
+
+        Args:
+            title: str. The exploration title to set.
+        """
         self.title = title
 
     def update_category(self, category):
+        """Update the exploration category.
+
+        Args:
+            category: str. The exploration category to set.
+        """
         self.category = category
 
     def update_objective(self, objective):
+        """Update the exploration objective.
+
+        Args:
+            objective: str. The exploration objective to set.
+        """
         self.objective = objective
 
     def update_language_code(self, language_code):
+        """Update the exploration language code.
+
+        Args:
+            language_code: str. The exploration language code to set.
+        """
         self.language_code = language_code
 
     def update_tags(self, tags):
+        """Update the tags of the exploration.
+
+        Args:
+            tags: list(str). List of tags to set.
+        """
         self.tags = tags
 
     def update_blurb(self, blurb):
+        """Update the blurb of the exploration. 
+
+        Args:
+            blurb: str. The blurb to set.
+        """
         self.blurb = blurb
 
     def update_author_notes(self, author_notes):
+        """Update the author notes of the exploration.
+
+        Args:
+            author_notes: str. The author notes to set.
+        """
         self.author_notes = author_notes
 
     def update_param_specs(self, param_specs_dict):
+        """Update the param spec dict.
+
+        Args:
+            param_specs_dict: dict. A dict where each key-value pair represents
+                respectively, a param spec name and a dict used to initialize a
+                ParamSpec domain object.
+        """
         self.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val)
             for (ps_name, ps_val) in param_specs_dict.iteritems()
         }
 
     def update_param_changes(self, param_changes_list):
+        """Update the param change dict.
+
+        Args:
+           param_changes_list: list(dict). List of dict where each dict is
+                used to initialize a ParamChange domain object.
+        """
         self.param_changes = [
             param_domain.ParamChange.from_dict(param_change)
             for param_change in param_changes_list
         ]
 
     def update_init_state_name(self, init_state_name):
+        """Update the name for the initial state of the exploration
+
+        Args:
+            init_state_name: str. The name of the initial state to set.
+        """
         if init_state_name not in self.states:
             raise Exception(
                 'Invalid new initial state name: %s; '
@@ -2294,7 +2446,14 @@ class Exploration(object):
 
     # Methods relating to states.
     def add_states(self, state_names):
-        """Adds multiple states to the exploration."""
+        """Adds multiple states to the exploration.
+        
+        Args:
+            state_names: list(str). List of state names to add.
+
+        Raises:
+            ValueError: A state name is alredy in states dict.
+        """
         for state_name in state_names:
             if state_name in self.states:
                 raise ValueError('Duplicate state name %s' % state_name)
@@ -2303,7 +2462,16 @@ class Exploration(object):
             self.states[state_name] = State.create_default_state(state_name)
 
     def rename_state(self, old_state_name, new_state_name):
-        """Renames the given state."""
+        """Renames the given state.
+        
+        Args:
+            old_state_names: str. The old state name to set.
+            new_state_names: str. The new state name to be set.
+
+        Raises:
+            ValueError: The old state name does not exist or the new state name
+            is already in states dict.
+        """
         if old_state_name not in self.states:
             raise ValueError('State %s does not exist' % old_state_name)
         if (old_state_name != new_state_name and
@@ -2332,7 +2500,15 @@ class Exploration(object):
                     outcome.dest = new_state_name
 
     def delete_state(self, state_name):
-        """Deletes the given state."""
+        """Deletes the given state.
+        
+        Args:
+            state_names: str. The state name to be deleted.
+
+        Raises:
+            ValueError: The state does not exist or is the initial state of the
+            exploration.
+        """
         if state_name not in self.states:
             raise ValueError('State %s does not exist' % state_name)
 
@@ -2353,7 +2529,13 @@ class Exploration(object):
 
     # Methods relating to gadgets.
     def add_gadget(self, gadget_dict, panel):
-        """Adds a gadget to the associated panel."""
+        """Adds a gadget to the associated panel.
+
+        Args:
+            gadget_dict: dict. The dict representation of GadgetInstance
+                object.
+            panel: str. The panel name.
+        """
         gadget_instance = GadgetInstance(
             gadget_dict['gadget_type'], gadget_dict['gadget_name'],
             gadget_dict['visible_in_states'],
@@ -2363,7 +2545,16 @@ class Exploration(object):
             gadget_instance)
 
     def rename_gadget(self, old_gadget_name, new_gadget_name):
-        """Renames the given gadget."""
+        """Renames the given gadget.
+
+        Args:
+            old_gadget_name: str. The old gadget name to set.
+            new_gadget_name: str. The new gadget name to be set.
+
+        Raises:
+            ValueError: The old gadget name does not exist or the new gadget
+            name already exists.
+        """
         if old_gadget_name not in self.get_all_gadget_names():
             raise ValueError('Gadget %s does not exist.' % old_gadget_name)
         if (old_gadget_name != new_gadget_name and
@@ -2379,7 +2570,14 @@ class Exploration(object):
         gadget_instance.name = new_gadget_name
 
     def delete_gadget(self, gadget_name):
-        """Deletes the given gadget."""
+        """Deletes the given gadget.
+        
+        Args:
+            gadget_name: str. The gadget name to be deleted.
+
+        Raises:
+            ValueError: The gadget does not exist.
+        """
         if gadget_name not in self.get_all_gadget_names():
             raise ValueError('Gadget %s does not exist.' % gadget_name)
 
@@ -2394,7 +2592,17 @@ class Exploration(object):
         del self.skin_instance.panel_contents_dict[panel][gadget_index]
 
     def get_gadget_instance_by_name(self, gadget_name):
-        """Returns the GadgetInstance with the given name."""
+        """Returns the GadgetInstance with the given name.
+
+        Args:
+            gadget_name: str. The gadget name to return.
+
+        Returns:
+            GadgetInstance. The corresponding GadgetInstance domain object.
+
+        Raises:
+            ValueError: The gadget does not exist.
+        """
         for gadget_instances in (
                 self.skin_instance.panel_contents_dict.itervalues()):
             for gadget_instance in gadget_instances:
@@ -2403,7 +2611,11 @@ class Exploration(object):
         raise ValueError('Gadget %s does not exist.' % gadget_name)
 
     def get_all_gadget_names(self):
-        """Convenience method to query against current gadget names."""
+        """Convenience method to query against current gadget names.
+        
+        Returns:
+            list(GadgetInstance). The list of all gadget names.
+        """
         gadget_names = set()
         for gadget_instances in (
                 self.skin_instance.panel_contents_dict.itervalues()):
@@ -2412,7 +2624,17 @@ class Exploration(object):
         return sorted(gadget_names)
 
     def _get_panel_for_gadget(self, gadget_name):
-        """Returns the panel name for the given GadgetInstance."""
+        """Returns the panel name for the given GadgetInstance.
+
+        Args:
+            gadget_name: str. The gadget name.
+
+        Returns:
+            str. The corresponding panel name.
+
+        Raises:
+            ValueError: The gadget does not exist.
+        """
         for panel, gadget_instances in (
                 self.skin_instance.panel_contents_dict.iteritems()):
             for gadget_instance in gadget_instances:
@@ -2423,7 +2645,12 @@ class Exploration(object):
     def _update_gadget_visibilities_for_renamed_state(
             self, old_state_name, new_state_name):
         """Updates the visible_in_states property for gadget instances
-        visible in the renamed state."""
+        visible in the renamed state.
+
+        Args:
+            old_gadget_name: str. The old gadget name to set.
+            new_gadget_name: str. The new gadget name to be set.
+        """
         affected_gadget_instances = (
             self._get_gadget_instances_visible_in_state(old_state_name))
 
@@ -2436,7 +2663,11 @@ class Exploration(object):
 
     def _update_gadget_visibilities_for_deleted_state(self, state_name):
         """Updates the visible_in_states property for gadget instances
-        visible in the deleted state."""
+        visible in the deleted state.
+        
+        Args:
+            gadget_name: str. The gadget name to delete.
+        """
         affected_gadget_instances = (
             self._get_gadget_instances_visible_in_state(state_name))
 
@@ -2453,7 +2684,11 @@ class Exploration(object):
 
     def _get_gadget_instances_visible_in_state(self, state_name):
         """Helper function to retrieve gadget instances visible in
-        a given state."""
+        a given state.
+
+        Args:
+            state_name: str. The state name where search.
+        """
         visible_gadget_instances = []
         for gadget_instances in (
                 self.skin_instance.panel_contents_dict.itervalues()):
@@ -2468,8 +2703,12 @@ class Exploration(object):
         schema version 1 and does not contain any old constructs, such as
         widgets. This is a complete migration of everything previous to the
         schema versioning update to the earliest versioned schema.
-
         Note that the states_dict being passed in is modified in-place.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
         """
         # ensure widgets are renamed to be interactions
         for _, state_defn in states_dict.iteritems():
@@ -2490,8 +2729,12 @@ class Exploration(object):
         implicit 'END' state, but version 2 does not. As a result, the
         conversion process involves introducing a proper ending state for all
         explorations previously designed under this assumption.
-
         Note that the states_dict being passed in is modified in-place.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
         """
         # The name of the implicit END state before the migration. Needed here
         # to migrate old explorations which expect that implicit END state.
@@ -2555,8 +2798,12 @@ class Exploration(object):
     def _convert_states_v2_dict_to_v3_dict(cls, states_dict):
         """Converts from version 2 to 3. Version 3 introduces a triggers list
         within interactions.
-
         Note that the states_dict being passed in is modified in-place.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
         """
         # Ensure all states interactions have a triggers list.
         for sdict in states_dict.values():
@@ -2574,8 +2821,12 @@ class Exploration(object):
         containing just that single rule. Default rules have their destination
         state name and feedback copied to the default_outcome portion of an
         interaction instance.
-
         Note that the states_dict being passed in is modified in-place.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -2663,8 +2914,12 @@ class Exploration(object):
     def _convert_states_v4_dict_to_v5_dict(cls, states_dict):
         """Converts from version 4 to 5. Version 5 removes the triggers list
         within interactions, and replaces it with a fallbacks list.
-
         Note that the states_dict being passed in is modified in-place.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
         """
         # Ensure all states interactions have a fallbacks list.
         for state_dict in states_dict.values():
@@ -2681,6 +2936,11 @@ class Exploration(object):
         """Converts from version 5 to 6. Version 6 introduces a list of
         confirmed unclassified answers. Those are answers which are confirmed
         to be associated with the default outcome during classification.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -2693,6 +2953,11 @@ class Exploration(object):
     def _convert_states_v6_dict_to_v7_dict(cls, states_dict):
         """Converts from version 6 to 7. Version 7 forces all CodeRepl
         interactions to use Python.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -2708,6 +2973,11 @@ class Exploration(object):
     def _convert_states_v7_dict_to_v8_dict(cls, states_dict):
         """Converts from version 7 to 8. Version 8 contains classifier
         model id.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
         """
         for state_dict in states_dict.values():
             state_dict['classifier_model_id'] = None
@@ -2717,6 +2987,11 @@ class Exploration(object):
     def _convert_states_v8_dict_to_v9_dict(cls, states_dict):
         """Converts from version 8 to 9. Version 9 contains 'correct'
         field in answer groups.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
         """
         for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
@@ -2730,9 +3005,17 @@ class Exploration(object):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
-
         Note that the versioned_exploration_states being passed in is modified
         in-place.
+
+        Args:
+            versioned_exploration_states: dict. A dict with two keys:
+                -states_schema_version: int. The states schema version for the
+                    exploration.
+                -states: dict. The dict of states comprising the exploration.
+                    The keys in this dict are state names. 
+            current_states_schema_version: int. The current states
+                schema version. 
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
@@ -2751,7 +3034,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
-        """Converts a v1 exploration dict into a v2 exploration dict."""
+        """Converts a v1 exploration dict into a v2 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v1.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v2."""
         exploration_dict['schema_version'] = 2
         exploration_dict['init_state_name'] = (
             exploration_dict['states'][0]['name'])
@@ -2766,7 +3057,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v2_dict_to_v3_dict(cls, exploration_dict):
-        """Converts a v2 exploration dict into a v3 exploration dict."""
+        """Converts a v2 exploration dict into a v3 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v2.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v3"""
         exploration_dict['schema_version'] = 3
 
         exploration_dict['objective'] = ''
@@ -2779,7 +3078,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v3_dict_to_v4_dict(cls, exploration_dict):
-        """Converts a v3 exploration dict into a v4 exploration dict."""
+        """Converts a v3 exploration dict into a v4 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v3.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v4"""
         exploration_dict['schema_version'] = 4
 
         for _, state_defn in exploration_dict['states'].iteritems():
@@ -2794,7 +3101,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v4_dict_to_v5_dict(cls, exploration_dict):
-        """Converts a v4 exploration dict into a v5 exploration dict."""
+        """Converts a v4 exploration dict into a v5 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v4.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v5"""
         exploration_dict['schema_version'] = 5
 
         # Rename the 'skill_tags' field to 'tags'.
@@ -2813,7 +3128,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v5_dict_to_v6_dict(cls, exploration_dict):
-        """Converts a v5 exploration dict into a v6 exploration dict."""
+        """Converts a v5 exploration dict into a v6 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v5.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v6"""
         exploration_dict['schema_version'] = 6
 
         # Ensure this exploration is up-to-date with states schema v3.
@@ -2832,7 +3155,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v6_dict_to_v7_dict(cls, exploration_dict):
-        """Converts a v6 exploration dict into a v7 exploration dict."""
+        """Converts a v6 exploration dict into a v7 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v6.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v7"""
         exploration_dict['schema_version'] = 7
 
         # Ensure this exploration is up-to-date with states schema v4.
@@ -2847,7 +3178,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v7_dict_to_v8_dict(cls, exploration_dict):
-        """Converts a v7 exploration dict into a v8 exploration dict."""
+        """Converts a v7 exploration dict into a v8 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v7.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v8"""
         exploration_dict['schema_version'] = 8
 
         # Ensure this exploration is up-to-date with states schema v5.
@@ -2862,7 +3201,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v8_dict_to_v9_dict(cls, exploration_dict):
-        """Converts a v8 exploration dict into a v9 exploration dict."""
+        """Converts a v8 exploration dict into a v9 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v8.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v9"""
         exploration_dict['schema_version'] = 9
 
         # Ensure this exploration is up-to-date with states schema v6.
@@ -2877,7 +3224,17 @@ class Exploration(object):
 
     @classmethod
     def _convert_v9_dict_to_v10_dict(cls, exploration_dict, title, category):
-        """Converts a v9 exploration dict into a v10 exploration dict."""
+        """Converts a v9 exploration dict into a v10 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v9.
+            title: str. The exploration title.
+            category: str. The exploration category.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v10"""
 
         exploration_dict['schema_version'] = 10
 
@@ -2910,7 +3267,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v10_dict_to_v11_dict(cls, exploration_dict):
-        """Converts a v10 exploration dict into a v11 exploration dict."""
+        """Converts a v10 exploration dict into a v11 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v10.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v11"""
 
         exploration_dict['schema_version'] = 11
 
@@ -2923,7 +3288,15 @@ class Exploration(object):
 
     @classmethod
     def _convert_v11_dict_to_v12_dict(cls, exploration_dict):
-        """Converts a v11 exploration dict into a v12 exploration dict."""
+        """Converts a v11 exploration dict into a v12 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of a exploration
+                with schema version v11.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v12"""
 
         exploration_dict['schema_version'] = 12
 
@@ -2937,6 +3310,22 @@ class Exploration(object):
     @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
+        """Return the YAML content of the exploration in the latest schema
+        format.
+
+        Args:
+            yaml_content: str. The YAML representation of the exploration.
+            title: str. The exploration title.
+            category: str. The exploration category.
+
+        Returns:
+            str. The YAML representation of the exploration, in the latest
+                schema format.
+
+        Raises:
+            Exception: 'yaml_content' or the exploration schema version is not
+            valid.
+        """
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -3016,6 +3405,16 @@ class Exploration(object):
     def from_yaml(cls, exploration_id, yaml_content):
         """Creates and returns exploration from a YAML text string for YAML
         schema versions 10 and later.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+            yaml_content: str. The YAML representation of the exploration.
+
+        Returns:
+            Exploration. The corresponding exploration domain object.
+
+        Raises:
+            Exception: Incorrect YAML version.
         """
         migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict = migration_result[0]
@@ -3034,6 +3433,18 @@ class Exploration(object):
     def from_untitled_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string. This is
         for importing explorations using YAML schema version 9 or earlier.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+            title: str. The exploration title.
+            category: str. The exploration category.
+            yaml_content: str. The YAML representation of the exploration.
+
+        Returns:
+            Exploration. The corresponding exploration domain object.
+
+        Raises:
+            Exception: Incorrect YAML version.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
             yaml_content, title, category)
@@ -3050,6 +3461,11 @@ class Exploration(object):
         return Exploration.from_dict(exploration_dict)
 
     def to_yaml(self):
+        """Convert the exploration domain object into YAML string.
+
+        Returns:
+            str. The YAML representation of this exploration.
+        """
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
 
@@ -3062,6 +3478,9 @@ class Exploration(object):
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
         necessary information to represent the exploration.
+
+        Returns:
+            dict. A dict mapping all fields of Exploration instance.
         """
         return copy.deepcopy({
             'id': self.id,
@@ -3085,6 +3504,12 @@ class Exploration(object):
     def to_player_dict(self):
         """Returns a copy of the exploration suitable for inclusion in the
         learner view.
+
+        Returns:
+            dict. A dict mapping some fields of Exploration instance. The
+            fields inserted in the dict (as key) are: init_state_name
+            param_changes, param_specs, skin_customizations, states, title,
+            and language_code.
         """
         return {
             'init_state_name': self.init_state_name,
@@ -3101,7 +3526,11 @@ class Exploration(object):
         }
 
     def get_gadget_types(self):
-        """Get all gadget types used in this exploration."""
+        """Get all gadget types used in this exploration.
+
+        Returns:
+            set(str). The collection of gadget types.
+        """
         result = set()
         for gadget_instances in (
                 self.skin_instance.panel_contents_dict.itervalues()):
@@ -3111,7 +3540,11 @@ class Exploration(object):
         return sorted(result)
 
     def get_interaction_ids(self):
-        """Get all interaction ids used in this exploration."""
+        """Get all interaction ids used in this exploration.
+
+        Returns:
+            list(str). The list of interaction ids.
+        """
         return list(set([
             state.interaction.id for state in self.states.itervalues()
             if state.interaction.id is not None]))
@@ -3140,18 +3573,26 @@ class ExplorationSummary(object):
             values are nonnegative integers representing frequency counts. Note
             that the keys need to be strings in order for this dict to be
             JSON-serializable.
-        scaled_average_rating:
-        status:
-        community_owned:
-        owner_ids:
-        editor_ids:
-        viewer_ids:
-        contributor_ids:
-        contributors_summary:
-        version:
-        exploration_model_created_on:
-        exploration_model_last_updated:
-        first_published_msec:
+        scaled_average_rating: float. The average rating.
+        status: str. The status of the exploration.
+        community_owned: bool. Whether the exploration is community-owned.
+        owner_ids: list(str). List of the user ids who are the owner of
+            this exploration.
+        editor_ids: list(str). List of the user ids of the users who have
+			access to edit this exploration.
+		viewer_ids: lsit(str). List of the user ids of the users who have
+			view this exploration.
+		contributor_ids: list(str). List of the user ids of the user who
+			have contributed to  this exploration.
+		contributors_summary: dict. The summary given by the contributors
+			to the exploration, user id as the key and summary as value.
+		version: int. The version of the exploration.
+        exploration_model_created_on: datetime.datetime. Date and time when
+			the exploration model is created.
+		exploration_model_last_updated: datetime.datetime. Date and time
+			when the exploration model was last updated.
+        first_published_msec: int. Time in milliseconds, when the exploration
+            was first published.
         """
         self.id = exploration_id
         self.title = title
@@ -3180,9 +3621,9 @@ class ExplorationSummary(object):
         Returns:
             A metadata dict for the given exploration summary.
             The metadata dict has three keys:
-                'id': the exploration id
-                'title': the exploration title
-                'objective': the exploration objective
+                'id': the exploration id;
+                'title': the exploration title;
+                'objective': the exploration objective.
         """
         return {
             'id': self.id,
