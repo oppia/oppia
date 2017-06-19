@@ -19,7 +19,6 @@
 	"I18N_DASHBOARD_EXPLORATIONS": "تجارب من",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "بازخورد باز",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "تصویر را به اینجا بکشید",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "یا یک فایل(پرونده) تصویری انتخاب کنید:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "تجارب غیر فعال",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "با عرض پوزش, اما تجربه ای که بر روی آن کلیک میکنید هم اکنون غیر فعال است. لطفا بعداً دوباره امتحان کنید.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "اکتشاف غیر فعال - Oppia",
