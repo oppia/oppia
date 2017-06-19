@@ -120,6 +120,10 @@ oppia.controller('Preferences', [
       _saveDataItem('email_preferences', data);
     };
 
+    $scope.saveDefaultDashboard = function(defaultDashboard) {
+      _saveDataItem('default_dashboard', defaultDashboard);
+    }
+
     $scope.savePreferredLanguageCodes = function(preferredLanguageCodes) {
       _saveDataItem('preferred_language_codes', preferredLanguageCodes);
     };
@@ -203,6 +207,7 @@ oppia.controller('Preferences', [
       $scope.subjectInterests = data.subject_interests;
       $scope.preferredLanguageCodes = data.preferred_language_codes;
       $scope.profilePictureDataUrl = data.profile_picture_data_url;
+      $scope.defaultDashboard = data.default_dashboard;
       $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
       $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
       $scope.canReceiveSubscriptionEmail = data.can_receive_subscription_email;

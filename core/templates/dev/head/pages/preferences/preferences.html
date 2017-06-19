@@ -68,6 +68,16 @@
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2">Preferred Dashboard</label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <input type="radio" ng-model="defaultDashboard" value="creator" ng-change="saveDefaultDashboard(defaultDashboard)"> Creator Dashboard<br>
+              <input type="radio" ng-model="defaultDashboard" value="learner" ng-change="saveDefaultDashboard(defaultDashboard)"> Learner Dashboard<br>
+            </div>`
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
