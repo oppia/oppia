@@ -471,15 +471,13 @@ def get_filtered_completed_exp_summaries(exploration_summaries,
                 objects of the completed explorations.
         - list(str). The ids of the explorations that are no longer present.
     """
-    index = 0
     nonexistent_completed_exp_ids = []
     filtered_completed_exp_summaries = []
-    for exploration_summary in exploration_summaries:
+    for index, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary is None:
             nonexistent_completed_exp_ids.append(exploration_ids[index])
         else:
             filtered_completed_exp_summaries.append(exploration_summary)
-        index = index + 1
 
     return filtered_completed_exp_summaries, nonexistent_completed_exp_ids
 
@@ -531,7 +529,6 @@ def get_filtered_completed_collection_summaries(user_id, collection_summaries,
             collections which have been moved to the in progress section on
             account of new explorations being added to them.
     """
-    index = 0
     nonexistent_completed_collection_ids = []
     completed_to_incomplete_collections = []
     filtered_completed_collection_summaries = []
@@ -543,7 +540,7 @@ def get_filtered_completed_collection_summaries(user_id, collection_summaries,
         collection_services.get_explorations_completed_in_collections(
             user_id, collection_ids))
 
-    for collection_summary in collection_summaries:
+    for index, collection_summary in enumerate(collection_summaries):
         if collection_summary is None:
             nonexistent_completed_collection_ids.append(collection_ids[index])
         else:
@@ -559,7 +556,6 @@ def get_filtered_completed_collection_summaries(user_id, collection_summaries,
             else:
                 filtered_completed_collection_summaries.append(
                     collection_summary)
-        index = index + 1
 
     return (filtered_completed_collection_summaries,
             nonexistent_completed_collection_ids,
@@ -607,15 +603,13 @@ def get_filtered_incomplete_exp_summaries(exploration_summaries,
             objects of the incomplete explorations.
         - list(str). The ids of the explorations that are no longer present.
     """
-    index = 0
     nonexistent_incomplete_exp_ids = []
     filtered_incomplete_exp_summaries = []
-    for exploration_summary in exploration_summaries:
+    for index, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary is None:
             nonexistent_incomplete_exp_ids.append(exploration_ids[index])
         else:
             filtered_incomplete_exp_summaries.append(exploration_summary)
-        index = index + 1
 
     return filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids
 
@@ -661,15 +655,13 @@ def get_filtered_incomplete_collection_summaries(collection_summaries,
         - int. The number of explorations deleted from the list as they are no
             longer present.
     """
-    index = 0
     nonexistent_incomplete_collection_ids = []
     filtered_incomplete_collection_summaries = []
-    for collection_summary in collection_summaries:
+    for index, collection_summary in enumerate(collection_summaries):
         if collection_summary is None:
             nonexistent_incomplete_collection_ids.append(collection_ids[index])
         else:
             filtered_incomplete_collection_summaries.append(collection_summary)
-        index = index + 1
 
     return (filtered_incomplete_collection_summaries,
             nonexistent_incomplete_collection_ids)
