@@ -1782,7 +1782,7 @@ class Exploration(object):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-        # Check that all fallbacks and hints are valid.
+        # Check that all fallbacks are valid.
         for state in self.states.values():
             interaction = state.interaction
 
