@@ -34,7 +34,7 @@
                               add-state="addState()">
       </multiple-choice-editor>
 
-      <!-- TODO(sll): Update this condition when control of individual field visibility is added. modalWrapperVisible = false; -->
+      <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
       <div ng-if="!$last">
         <anchor-header header-id="getSubfieldId(question, 'Bridge text')"
                        header-text="Bridge text"></anchor-header>
@@ -152,19 +152,18 @@
     z-index: 20;
   }
   simple-editor-body .oppia-question-button {
-    background-color: #fff;
-    border-color: #fff;
-    border-width: 0;
-    color: #000;
+    background-color: black;
+    border-color: black;
+    color: black;
     height: 55px;
     min-width: 202px;
   }
   simple-editor-body .oppia-question-button:hover,.oppia-question-button:focus {
     background-color: #e4e4e4;
-    color: #000;
+    color: black;
   }
   simple-editor-body .modal-wrapper {
-    background: rgba(0,0,0,0);
+    background: transparent;
     height: 100%;
     left: 0;
     position: absolute;
