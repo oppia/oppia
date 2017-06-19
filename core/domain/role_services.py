@@ -199,10 +199,10 @@ def get_role_graph_data():
 def store_role_query(user_id, intent, role=None, username=None):
     """Stores the query to role structure in RoleQueryAuditModel."""
     model_id = (
-        str(user_id) + "." + str(int(math.floor(time.time()))) +
-        str(intent) + str(random.randint(0, 1000))
+        str(user_id) + '.' + str(int(math.floor(time.time()))) + '.' +
+        str(intent) + '.' + str(random.randint(0, 1000))
     )
 
     audit_models.RoleQueryAuditModel(
-        model_id, user_id, intent,
+        model_id=model_id, user_id=user_id, intent=intent,
         role=role, username=username).put()

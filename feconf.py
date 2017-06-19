@@ -965,9 +965,9 @@ ROLE_SUPER_ADMIN = 'SUPER_ADMIN'
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role Ids.
-ROLE_ACTION_UPDATE = 'Update.'
-ROLE_ACTION_VIEW_BY_USERNAME = 'View by username.'
-ROLE_ACTION_VIEW_BY_ROLE = 'View by role.'
+ROLE_ACTION_UPDATE = 'update'
+ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
+ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
 VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'

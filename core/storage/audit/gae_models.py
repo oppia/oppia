@@ -16,6 +16,10 @@
 
 """Models for storing the audit logs."""
 
+import math
+import random
+import time
+
 import feconf
 from core.platform import models
 from google.appengine.ext import ndb
@@ -28,10 +32,10 @@ class RoleQueryAuditModel(base_models.BaseModel):
     interface.
 
     Instances of this class are keyed by a custom Id
-    (user_id.timestamp_in_sec.intent.random_number)
+    [user_id].[timestamp_in_sec].[intent].[random_number]
     """
     # The id used to key this model.
-    id = ndb.StringProperty(required=True)
+    model_id = ndb.StringProperty(required=True)
     # The user_id of the user making query.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The intent of making query (viewing (by role or username)
