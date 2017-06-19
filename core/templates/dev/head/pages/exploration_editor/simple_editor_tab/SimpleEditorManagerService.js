@@ -21,13 +21,12 @@
  */
 
 oppia.factory('SimpleEditorManagerService', [
-  'StatesToQuestionsService', 'SimpleEditorShimService',
-  'QuestionObjectFactory', 'QuestionListObjectFactory', 'OutcomeObjectFactory',
-  'AnswerGroupObjectFactory', 'RuleObjectFactory',
-  function(
-      StatesToQuestionsService, SimpleEditorShimService,
-      QuestionObjectFactory, QuestionListObjectFactory, OutcomeObjectFactory,
-      AnswerGroupObjectFactory, RuleObjectFactory) {
+  'AnswerGroupObjectFactory', 'OutcomeObjectFactory', 'QuestionObjectFactory',
+  'QuestionListObjectFactory', 'RuleObjectFactory', 'StatesToQuestionsService',
+   'SimpleEditorShimService', function(
+      AnswerGroupObjectFactory, OutcomeObjectFactory, QuestionObjectFactory,
+      QuestionListObjectFactory, RuleObjectFactory, StatesToQuestionsService,
+      SimpleEditorShimService) {
     var data = {
       title: null,
       introductionHtml: null,
@@ -51,6 +50,9 @@ oppia.factory('SimpleEditorManagerService', [
         }
       }
     };
+
+    var chooseQuestionType = false;
+    var modalWrapperVisible = false;
 
     var getNewStateName = function() {
       var allStateNames = data.questionList.getAllStateNames();
@@ -148,18 +150,21 @@ oppia.factory('SimpleEditorManagerService', [
           data.questionList._questions[index]._interactionId);
 
         // Update Question Type If interactionId is not same.
-        if(type != currentInteractionId) {
+        if(type === currentInteractionId) {
           var newAnswerGroups = [];
-          if(type === 'MultipleChoiceInput') {
-            SimpleEditorShimService.saveInteractionId(
-              currentStateName, DEFAULT_INTERACTION.ID);
-            SimpleEditorShimService.saveCustomizationArgs(
-              currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-            newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-              RuleObjectFactory.createNew('Equals', {
-                x: 0
-              })
-            ], OutcomeObjectFactory.createEmpty(nextStateName), false));
+
+          switch (type) {
+            case 'MultipleChoiceInput':
+              SimpleEditorShimService.saveInteractionId(
+                currentStateName, DEFAULT_INTERACTION.ID);
+              SimpleEditorShimService.saveCustomizationArgs(
+                currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+                RuleObjectFactory.createNew('Equals', {
+                  x: 0
+                })
+              ], OutcomeObjectFactory.createEmpty(nextStateName), false));
+              break;
           }
           SimpleEditorShimService.saveAnswerGroups(currentStateName
             , newAnswerGroups);

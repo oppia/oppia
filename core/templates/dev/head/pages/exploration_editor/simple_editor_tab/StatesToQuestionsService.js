@@ -33,7 +33,6 @@ oppia.factory('StatesToQuestionsService', [
       }
     );
 
-
     // Check that the outcome has:
     // - A feedback array with exactly one element.
     // - A destination that is a self-loop (if expectSelfLoop is

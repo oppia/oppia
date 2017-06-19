@@ -28,8 +28,7 @@ oppia.directive('simpleEditorBody', [
         '$scope', 'SimpleEditorManagerService',
         'explorationSaveService', 'explorationRightsService',
         'explorationWarningsService', 'QuestionIdService',
-        'StatesToQuestionsService',
-        function($scope, SimpleEditorManagerService,
+        'StatesToQuestionsService', function($scope, SimpleEditorManagerService,
             explorationSaveService, explorationRightsService,
             explorationWarningsService, QuestionIdService,
             StatesToQuestionsService) {
