@@ -236,21 +236,6 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             return None
 
 
-def does_exploration_exists(exploration_id):
-    """Returns true if the exploration exists.
-
-    Args:
-        exploration_id: str. The id of the exploration to be checked.
-
-    Returns:
-        bool. The value is true if the exploration exists.
-    """
-    exploration_model = exp_models.ExplorationModel.get(
-        exploration_id, strict=False)
-
-    return True if exploration_model else False
-
-
 def get_exploration_summary_by_id(exploration_id):
     """Returns a domain object representing an exploration summary.
 
