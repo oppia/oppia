@@ -14,14 +14,16 @@
 
 """Controllers for communicating with the VM for training classifiers."""
 
+import hashlib
+import hmac
+
 from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import config_domain
 
 import feconf
-import hashlib
-import hmac
-import json
+
 
 def validate_request(handler):
     """Decorator that checks if the incoming request for storing trained
@@ -30,7 +32,8 @@ def validate_request(handler):
         signature = self.request.get('signature')
         vm_id = self.request.get('vm_id')
         message = self.request.get('payload')
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        secret = str(config_domain.VMID_SHARED_SECRET_KEY_MAPPING.default_value[
+            0].get('shared_secret_key'))
         generated_signature = hmac.new(
             secret, message, digestmod=hashlib.sha256).hexdigest()
         if generated_signature != signature:
@@ -66,7 +69,7 @@ class TrainedClassifierHandler(base.BaseHandler):
         classifier = classifier_domain.ClassifierData(
             job_id, exp_id, exp_version, state_name, algorithm_id,
             classifier_data, data_schema_version)
-        classifier_id = save_classifier(classifier)
+        classifier_id = classifier_services.save_classifier(classifier)
         classifier_training_job.update_status(
             feconf.TRAINING_JOB_STATUS_COMPLETE)
         classifier_services.save_classifier_training_job(
@@ -78,8 +81,6 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_training_job.status,
             classifier_training_job.job_id)
         if classifier_id:
-            self.response['status_int'] = 200
-            return self.response
+            return self.render_json({})
         else:
-            self.response['status_int'] = 400
-            return self.response
+            return self.InternalErrorException
