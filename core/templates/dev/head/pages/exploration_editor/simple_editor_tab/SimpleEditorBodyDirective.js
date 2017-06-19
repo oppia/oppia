@@ -70,6 +70,11 @@ oppia.directive('simpleEditorBody', [
           $scope.getSubfieldId = function(question, label) {
             return QuestionIdService.getSubfieldId(question.getId(), label);
           };
+
+          $scope.setModalVisibility = function(value) {
+            $scope.modalWrapperVisible = value;
+          };
+
           $scope.isExplorationFinishable = function() {
             if (explorationRightsService.isPrivate()) {
               if (!explorationWarningsService.countWarnings()) {

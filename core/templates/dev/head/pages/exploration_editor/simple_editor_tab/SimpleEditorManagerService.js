@@ -23,7 +23,7 @@
 oppia.factory('SimpleEditorManagerService', [
   'AnswerGroupObjectFactory', 'OutcomeObjectFactory', 'QuestionObjectFactory',
   'QuestionListObjectFactory', 'RuleObjectFactory', 'StatesToQuestionsService',
-   'SimpleEditorShimService', function(
+  'SimpleEditorShimService', function(
       AnswerGroupObjectFactory, OutcomeObjectFactory, QuestionObjectFactory,
       QuestionListObjectFactory, RuleObjectFactory, StatesToQuestionsService,
       SimpleEditorShimService) {
