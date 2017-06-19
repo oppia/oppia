@@ -92,10 +92,12 @@ class BaseJobManager(object):
 
     Note that the enqueue(), register_start(), register_completion(),
     register_failure() and cancel() methods in this class batch the following
-    operations: (a) pre- and post-hooks, (b) updating the status of the job in
-    the datastore, and (c) actually performing the operation. Each entire batch
-    is not run in a transaction, but subclasses can still perform (a) or (c)
-    transactionally if they wish to.
+    operations:
+        (a) Running pre- and post-hooks
+        (b) Updating the status of the job in the datastore
+        (c) Performing the operation.
+    Each entire batch is not run in a transaction, but subclasses can still
+    perform (a) or (c) transactionally if they wish to.
     """
     @classmethod
     def _is_abstract(cls):
