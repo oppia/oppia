@@ -15,17 +15,16 @@
 """Tests for the controllers that communicate with VM for training
 classifiers."""
 
-from core.controllers import base
-from core.domain import classifier_domain
-from core.domain import classifier_services
-from core.domain import exp_domain
-from core.tests import test_utils
-
-import feconf
 import hashlib
 import hmac
 import json
 import os
+
+from core.domain import classifier_services
+from core.domain import exp_domain
+from core.tests import test_utils
+import feconf
+
 
 def get_training_data_from_state(state):
     """Retrieves training data from the State domain object."""
@@ -46,9 +45,10 @@ def get_training_data_from_state(state):
             }])
     return training_data
 
+
 def generate_signature(data):
     """Generates digital signature for given data."""
-    msg = json.dumps(data)
+    msg = json.dumps(sorted(data))
     key = feconf.DEFAULT_VM_SHARED_SECRET
     return hmac.new(key, msg, digestmod=hashlib.sha256).hexdigest()
 
@@ -77,13 +77,31 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             state.interaction.id]['algorithm_id']
         training_data = get_training_data_from_state(state)
+        classifier_data = {
+            '_alpha': 0.1,
+            '_beta': 0.001,
+            '_prediction_threshold': 0.5,
+            '_training_iterations': 25,
+            '_prediction_iterations': 5,
+            '_num_labels': 10,
+            '_num_docs': 12,
+            '_num_words': 20,
+            '_label_to_id': {'text': 1},
+            '_word_to_id': {'hello': 2},
+            '_w_dp': [],
+            '_b_dl': [],
+            '_l_dp': [],
+            '_c_dl': [],
+            '_c_lw': [],
+            '_c_l': []
+        }
         job_id = classifier_services.save_classifier_training_job(
             algorithm_id, self.exp_id, self.exploration.version,
             'Home', training_data)
 
         self.job_result_dict = {
             'job_id' : job_id,
-            'classifier_data' : training_data
+            'classifier_data' : classifier_data
         }
 
     def test_trained_classifier_handler(self):

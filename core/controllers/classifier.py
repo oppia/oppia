@@ -16,6 +16,7 @@
 
 import hashlib
 import hmac
+import json
 
 from core.controllers import base
 from core.domain import classifier_domain
@@ -29,17 +30,20 @@ def validate_request(handler):
     """Decorator that checks if the incoming request for storing trained
     classifier is valid."""
     def test_is_valid(self, **kwargs):
-        signature = self.request.get('signature')
-        vm_id = self.request.get('vm_id')
         message = self.request.get('payload')
+        message = json.loads(message)
+        signature = message.get('signature')
+        vm_id = message.get('vm_id')
+        message.pop('signature')
+        message = json.dumps(sorted(message))
         secret = str(config_domain.VMID_SHARED_SECRET_KEY_MAPPING.default_value[
             0].get('shared_secret_key'))
         generated_signature = hmac.new(
             secret, message, digestmod=hashlib.sha256).hexdigest()
         if generated_signature != signature:
-            return self.UnauthorizedUserException
+            raise self.UnauthorizedUserException
         if vm_id == 'vm_default' and not feconf.DEV_MODE:
-            return self.UnauthorizedUserException
+            raise self.UnauthorizedUserException
         return handler(self, **kwargs)
 
     return test_is_valid
@@ -81,6 +85,6 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_training_job.status,
             classifier_training_job.job_id)
         if classifier_id:
-            return self.render_json({})
+            return self.render_json({'status_int' : 200})
         else:
             return self.InternalErrorException
