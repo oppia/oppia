@@ -2186,7 +2186,8 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-add-interaction-button,
 .oppia-add-response-button,
-.oppia-add-fallback-button {
+.oppia-add-fallback-button,
+.oppia-add-hint-button {
   background-color: rgba(5,140,166,0.9);
   border: 0;
   border-radius: 0;
@@ -2204,7 +2205,10 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-response-button:hover,
 .oppia-add-fallback-button:active,
 .oppia-add-fallback-button:focus,
-.oppia-add-fallback-button:hover {
+.oppia-add-fallback-button:hover,
+.oppia-add-hint-button:active,
+.oppia-add-hint-button:focus,
+.oppia-add-hint-button:hover {
   background-color: rgba(5,140,166,1);
   color: white;
   opacity: 1;
@@ -2341,7 +2345,7 @@ pre.oppia-pre-wrapped-text {
   z-index: 1;
 }
 
-.oppia-rule-sort-handle, .oppia-fallback-sort-handle {
+.oppia-rule-sort-handle, .oppia-fallback-sort-handle, .oppia-hint-sort-handle {
   cursor: move;
   left: 10px;
   margin-left: 5px;
