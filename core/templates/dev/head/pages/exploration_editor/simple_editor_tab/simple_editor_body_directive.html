@@ -16,11 +16,11 @@
     <div ng-repeat="question in data.questionList.getQuestions() track by $index">
       <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
       <anchor-header header-id="getSubfieldId(question,'Multiple Choice')"
-                     header-text="<[getQuestionTypeLabel(question.getInteractionId())]> &#x25BC;" ng-click="chooseQuestionType = true; setModalVisibility(true);">
+                     header-text="<[getQuestionTypeLabel(question.getInteractionId())]> &#x25BC;" ng-click="enableChooseQuestion(); setModalVisible()">
       </anchor-header>
 
       <div ng-show="chooseQuestionType && $parent.modalWrapperVisible" class="question-type-wrapper">
-        <button type="button" class="oppia-question-button btn btn-primary" ng-click="changeQuestion('MultipleChoiceInput', $index); chooseQuestionType = false; setModalVisibility(false);">Multiple Choice Input</button>
+        <button type="button" class="oppia-question-button btn btn-primary" ng-click="changeQuestion('MultipleChoiceInput', $index); disableChooseQuestion(); setModalHidden()">Multiple Choice Input</button>
       </div>
 
       <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
@@ -63,7 +63,7 @@
     </button>
   </div>
 </div>
-<div ng-show="modalWrapperVisible" ng-click="setModalVisibility(false); " class="modal-wrapper">
+<div ng-show="modalWrapperVisible" ng-click="setModalHidden()" class="modal-wrapper">
 </div>
 
 <style>
@@ -152,14 +152,15 @@
     z-index: 20;
   }
   simple-editor-body .oppia-question-button {
-    background-color: black;
-    border-color: black;
+    background-color: white;
+    border-color: white;
     color: black;
     height: 55px;
     min-width: 202px;
   }
   simple-editor-body .oppia-question-button:hover,.oppia-question-button:focus {
     background-color: #e4e4e4;
+    border-color: #e4e4e4;
     color: black;
   }
   simple-editor-body .modal-wrapper {
@@ -167,7 +168,7 @@
     height: 100%;
     left: 0;
     position: absolute;
-    top: 0px;
+    top: 0;
     width: 100%;
     z-index: 1;
   }

@@ -71,8 +71,19 @@ oppia.directive('simpleEditorBody', [
             return QuestionIdService.getSubfieldId(question.getId(), label);
           };
 
-          $scope.setModalVisibility = function(value) {
-            $scope.modalWrapperVisible = value;
+          $scope.setModalVisible = function() {
+            $scope.modalWrapperVisible = true;
+          };
+          $scope.setModalHidden = function() {
+            $scope.modalWrapperVisible = false;
+          };
+
+          $scope.enableChooseQuestion = function() {
+            $scope.chooseQuestionType = true;
+          };
+
+          $scope.disableChooseQuestion = function() {
+            $scope.chooseQuestionType = false;
           };
 
           $scope.isExplorationFinishable = function() {

@@ -145,12 +145,15 @@ oppia.factory('SimpleEditorManagerService', [
       changeQuestion: function(type, index) {
         var currentStateName = (
           index === 0 ? 'Introduction' : 'Question ' + index);
+        var questionCount = data.questionList._questions.length;
+        var answerGroupsLength = (
+          data.questionList._questions[index]._answerGroups.length);
         var nextStateName = 'Question ' + (index + 1);
         var currentInteractionId = (
           data.questionList._questions[index]._interactionId);
 
         // Update Question Type If interactionId is not same.
-        if(type === currentInteractionId) {
+        if(type !== currentInteractionId) {
           var newAnswerGroups = [];
 
           switch (type) {
@@ -166,8 +169,10 @@ oppia.factory('SimpleEditorManagerService', [
               ], OutcomeObjectFactory.createEmpty(nextStateName), false));
               break;
           }
-          SimpleEditorShimService.saveAnswerGroups(currentStateName
-            , newAnswerGroups);
+          if(answerGroupsLength !== 0 && index !== questionCount - 1) {
+            SimpleEditorShimService.saveAnswerGroups(currentStateName
+              , newAnswerGroups);
+          }
         }
         // Update the Question Set.
         var questions = StatesToQuestionsService.getQuestions();
