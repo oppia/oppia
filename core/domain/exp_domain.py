@@ -1394,6 +1394,16 @@ class State(object):
         self.interaction.fallbacks = [
             Fallback.from_dict(fallback_dict)
             for fallback_dict in fallbacks_list]
+        if self.interaction.fallbacks:
+            hint_list = []
+            for fallback in self.interaction.fallbacks:
+                if fallback.outcome.feedback:
+                    # If a fallback outcome has a non-empty feedback list
+                    # the feedback is converted to a Hint. It may contain
+                    # only one list item.
+                    hint_list.append(
+                        Hint(fallback.outcome.feedback[0]).to_dict())
+            self.update_interaction_hints(hint_list)
 
     def update_interaction_hints(self, hints_list):
         if not isinstance(hints_list, list):
@@ -1782,7 +1792,7 @@ class Exploration(object):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-        # Check that all fallbacks are valid.
+        # Check that all fallbacks and hints are valid.
         for state in self.states.values():
             interaction = state.interaction
 
@@ -2432,6 +2442,10 @@ class Exploration(object):
             interaction = state_dict['interaction']
             if 'hints' not in interaction:
                 interaction['hints'] = []
+                for fallback in interaction['fallbacks']:
+                    if fallback['outcome']['feedback']:
+                        interaction['hints'].append(
+                            Hint(fallback['outcome']['feedback'][0]).to_dict())
             if 'solution' not in interaction:
                 interaction['solution'] = {}
         return states_dict
