@@ -46,7 +46,6 @@ oppia.directive('roleGraph', [
         function(
             $scope, $element, $timeout, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
-
           var getElementDimensions = function() {
             return {
               h: $element.height(),
@@ -67,8 +66,9 @@ oppia.directive('roleGraph', [
               nodes, links, initStateId, angular.copy(finalStateIds));
 
             $scope.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
-              MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH)
-            $scope.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(nodeData)
+              MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH);
+            $scope.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
+              nodeData);
 
             nodeData = StateGraphLayoutService.modifyPositionValues(
               nodeData, $scope.GRAPH_WIDTH, $scope.GRAPH_HEIGHT);

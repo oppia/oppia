@@ -524,7 +524,7 @@ oppia.factory('StateGraphLayoutService', [
         }
         return augmentedLinks;
       },
-      modifyPositionValues: function(nodeData, graph_width, graph_height) {
+      modifyPositionValues: function(nodeData, graphWidth, graphHeight) {
         var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
         var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];  
 
@@ -532,10 +532,10 @@ oppia.factory('StateGraphLayoutService', [
         for (var nodeId in nodeData) {
           for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
             nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
-              graph_width *
+              graphWidth *
               nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
             nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
-              graph_height *
+              graphHeight *
               nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
           }
         }
@@ -547,7 +547,7 @@ oppia.factory('StateGraphLayoutService', [
         // This is not an entirely accurate description because it also takes
         // into account the horizontal whitespace between graph nodes.
         var letterWidthInPixels = 10.5;          
-        return maxNodesPerRow*maxNodeLabelLength*letterWidthInPixels;
+        return maxNodesPerRow * maxNodeLabelLength * letterWidthInPixels;
       },
       getGraphHeight: function(nodeData) {
         var maxDepth = 0;
