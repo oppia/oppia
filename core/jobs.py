@@ -601,6 +601,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
 
     def write(self, data):
+        # TODO(brianrodri): !
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
             '%s\n' % json.dumps(data))
 
@@ -619,6 +620,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def get_mapper_param(param_name):
+        # TODO(brianrodri): !
         mapper_params = context.get().mapreduce_spec.mapper.params
         if param_name not in mapper_params:
             raise Exception(
@@ -679,6 +681,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @classmethod
     def _real_enqueue(cls, job_id, additional_job_params):
+        # TODO(brianrodri): !
         entity_class_types = cls.entity_classes_to_map_over()
         entity_class_names = [
             '%s.%s' % (
@@ -889,6 +892,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def _is_valid_realtime_id(cls, realtime_id):
+        # TODO(brianrodri): !
         return realtime_id.startswith('0:') or realtime_id.startswith('1:')
 
     @classmethod
