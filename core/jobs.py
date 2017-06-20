@@ -154,7 +154,7 @@ class BaseJobManager(object):
 
     @classmethod
     def register_start(cls, job_id, metadata=None):
-        """Marks job as started.
+        """Marks a job as started.
 
         Args:
             job_id: str. Should come from the create_new class method.
