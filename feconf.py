@@ -78,6 +78,18 @@ INTERACTION_CLASSIFIER_MAPPING = {
     }
 }
 
+TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
+TRAINING_JOB_STATUS_FAILED = 'FAILED'
+TRAINING_JOB_STATUS_NEW = 'NEW'
+TRAINING_JOB_STATUS_PENDING = 'PENDING'
+
+ALLOWED_TRAINING_JOB_STATUSES = [
+    TRAINING_JOB_STATUS_COMPLETE,
+    TRAINING_JOB_STATUS_FAILED,
+    TRAINING_JOB_STATUS_NEW,
+    TRAINING_JOB_STATUS_PENDING
+]
+
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
 
@@ -115,7 +127,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 9
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 10
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -535,6 +547,7 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
+LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -571,6 +584,7 @@ NAV_MODE_CREATE = 'create'
 NAV_MODE_CREATOR_DASHBOARD = 'creator_dashboard'
 NAV_MODE_DONATE = 'donate'
 NAV_MODE_EXPLORE = 'explore'
+NAV_MODE_LEARNER_DASHBOARD = 'learner_dashboard'
 NAV_MODE_LIBRARY = 'library'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'

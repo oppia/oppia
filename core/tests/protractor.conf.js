@@ -85,6 +85,10 @@ exports.config = {
       'protractor/publicationAndLibrary.js'
     ],
 
+    learnerDashboard: [
+      'protractor/learnerDashboard.js',
+    ],
+
     users: [
       'protractor/userManagement.js',
       'protractor/loginFlow.js',

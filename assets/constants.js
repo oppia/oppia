@@ -17,5 +17,6 @@ var constants = {
     "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
     "Statistics", "Trigonometry", "Welcome"],
   "DISABLED_EXPLORATION_IDS": ["5"],
-  "TESTING_CONSTANT": "test"
+  "TESTING_CONSTANT": "test",
+  "LIBRARY_TILE_WIDTH_PX": 208
 };

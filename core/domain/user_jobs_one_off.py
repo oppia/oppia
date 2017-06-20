@@ -87,6 +87,23 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
         yield (key, len(username_counter))
 
 
+class LongUserBiosOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for calculating the length of user_bios."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        yield (len(item.user_bio), item.username)
+
+    @staticmethod
+    def reduce(userbio_length, stringified_usernames):
+        if int(userbio_length) > 500:
+            yield (userbio_length, stringified_usernames)
+
+
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for subscribing users to explorations, collections, and
     feedback threads.

@@ -26,6 +26,7 @@ from core.controllers import custom_landing_pages
 from core.controllers import email_dashboard
 from core.controllers import editor
 from core.controllers import feedback
+from core.controllers import learner_dashboard
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
@@ -205,6 +206,12 @@ URLS = MAPREDUCE_HANDLERS + [
         creator_dashboard.UploadExploration),
     get_redirect_route(
         r'/my_explorations', creator_dashboard.CreatorDashboardRedirectPage),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_URL,
+        learner_dashboard.LearnerDashboardPage),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
+        learner_dashboard.LearnerDashboardHandler),
 
     get_redirect_route(
         r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,

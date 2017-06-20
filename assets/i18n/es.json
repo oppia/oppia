@@ -61,7 +61,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Calificación",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Respuestas sin resolver",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Arrastra una imagen aquí",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "o selecciona un archivo de imagen:",
+	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Selecciona un archivo",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Exploración deshabilitada",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Disculpa, pero la exploración que clickeaste está deshabilidada por ahora. Por favor, prueba de nuevo más tarde.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Exploración deshabilitada - Oppia",

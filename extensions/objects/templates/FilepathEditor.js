@@ -31,109 +31,150 @@ oppia.directive('filepathEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
-        // Reset the component each time the value changes (e.g. if this is part
-        // of an editable list).
-        $scope.$watch('$parent.value', function(newValue) {
-          $scope.localValue = {
-            label: newValue || ''
+        $scope.MODE_EMPTY = 1;
+        $scope.MODE_UPLOADED = 2;
+        $scope.MODE_SAVED = 3;
+
+        // This variable holds all the data needed for the image upload flow.
+        // It's always guaranteed to have the 'mode' and 'metadata' properties.
+        //
+        // See below a description of the metadata field for each mode.
+        //
+        // If mode is MODE_EMPTY, metadata is:
+        //   {}
+        // If mode is MODE_UPLOADED, metadata is:
+        //   {
+        //     uploadedFile: <a File object>,
+        //     uploadedImageData: <binary data corresponding to the image>
+        //   }
+        // If mode is MODE_SAVED, metadata is:
+        //   {
+        //     savedUrl: <File name of the Oppia resource for the image>
+        //   }
+        $scope.clearScopeData = function() {
+          $scope.data = {
+            mode: $scope.MODE_EMPTY,
+            metadata: {}
           };
-          $scope.imageUploaderIsActive = false;
-        });
-
-        $scope.explorationId = explorationContextService.getExplorationId();
-
-        $scope.validate = function(localValue) {
-          return localValue.label && localValue.label.length > 0;
         };
+        $scope.clearScopeData();
 
-        $scope.$watch('localValue.label', function(newValue) {
+        // Reset the component each time the value changes
+        // (e.g. if this is part of an editable list).
+        $scope.$watch('$parent.value', function(newValue) {
           if (newValue) {
-            alertsService.clearWarnings();
-            $scope.localValue = {
-              label: newValue
-            };
-            $scope.$parent.value = newValue;
+            $scope.setSavedImageUrl(newValue, false);
           }
         });
 
-        $scope.getPreviewUrl = function(filepath) {
-          var encodedFilepath = window.encodeURIComponent(filepath);
-          return $sce.trustAsResourceUrl(
-            '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+        $scope.validate = function(data) {
+          return data.mode === $scope.MODE_SAVED &&
+                 data.metadata.savedUrl &&
+                 data.metadata.savedUrl.length > 0;
         };
 
-        $scope.resetImageUploader = function() {
-          $scope.currentFile = null;
-          $scope.currentFilename = null;
-          $scope.imagePreview = null;
+        $scope.isNoImageUploaded = function() {
+          return $scope.data.mode === $scope.MODE_EMPTY;
         };
 
-        $scope.openImageUploader = function() {
-          $scope.resetImageUploader();
-          $scope.uploadWarning = null;
-          $scope.imageUploaderIsActive = true;
+        $scope.isImageUploaded = function() {
+          return $scope.data.mode === $scope.MODE_UPLOADED;
         };
 
-        $scope.closeImageUploader = function() {
-          $scope.imageUploaderIsActive = false;
+        $scope.isImageSaved = function() {
+          return $scope.data.mode === $scope.MODE_SAVED;
+        };
+
+        $scope.setUploadedFile = function(file) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+              $scope.data = {
+                mode: $scope.MODE_UPLOADED,
+                metadata: {
+                  uploadedFile: file,
+                  uploadedImageData: e.target.result
+                }
+              };
+              $scope.$apply();
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        };
+
+        $scope.setSavedImageUrl = function(url, updateParent) {
+          $scope.data = {
+            mode: $scope.MODE_SAVED,
+            metadata: {savedUrl: url}
+          };
+          if (updateParent) {
+            alertsService.clearWarnings();
+            $scope.$parent.value = url;
+          }
+        };
+
+        $scope.getSavedImageTrustedResourceUrl = function() {
+          if ($scope.data.mode === $scope.MODE_SAVED) {
+            var encodedFilepath = window.encodeURIComponent(
+              $scope.data.metadata.savedUrl);
+            return $sce.trustAsResourceUrl(
+              '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+          }
+          return null;
         };
 
         $scope.onFileChanged = function(file, filename) {
           if (!file || !file.size || !file.type.match('image.*')) {
             $scope.uploadWarning = 'This file is not recognized as an image.';
-            $scope.resetImageUploader();
+            $scope.clearScopeData();
             $scope.$apply();
             return;
           }
 
-          var imageNotSupported = (!file.type.match('image.jpeg') &&
-              !file.type.match('image.gif') && !file.type.match('image.jpg') &&
-              !file.type.match('image.png'));
-          
-          if (imageNotSupported) {
+          if (!file.type.match('image.jpeg') &&
+              !file.type.match('image.gif') &&
+              !file.type.match('image.jpg') &&
+              !file.type.match('image.png')) {
             $scope.uploadWarning = 'This image format is not supported.';
-            $scope.resetImageUploader();
+            $scope.clearScopeData();
             $scope.$apply();
             return;
           }
 
-          $scope.currentFile = file;
-          $scope.currentFilename = filename;
+          var ONE_MB_IN_BYTES = 1048576;
+          if (file.size / ONE_MB_IN_BYTES > 1) {
+            var currentSize = parseInt(file.size / ONE_MB_IN_BYTES) + ' MB';
+            $scope.uploadWarning = 
+                'The maximum allowed file size is 1 MB' +
+                ' (' + currentSize + ' given).';
+            $scope.clearScopeData();
+            $scope.$apply();
+            return;
+          }
+
           $scope.uploadWarning = null;
-
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            $scope.$apply(function() {
-              $scope.imagePreview = e.target.result;
-            });
-          };
-          reader.readAsDataURL(file);
-
+          $scope.setUploadedFile(file);
           $scope.$apply();
         };
 
-        $scope.saveUploadedFile = function(file, filename) {
+        $scope.discardUploadedFile = function() {
+          $scope.clearScopeData();
+        };
+
+        $scope.saveUploadedFile = function() {
           alertsService.clearWarnings();
 
-          if (!file || !file.size) {
-            alertsService.addWarning('Empty file detected.');
-            return;
-          }
-          if (!file.type.match('image.*')) {
-            alertsService.addWarning(
-              'This file is not recognized as an image.');
-            return;
-          }
-
-          if (!filename) {
-            alertsService.addWarning('Filename must not be empty.');
+          if (!$scope.data.metadata.uploadedFile) {
+            alertsService.addWarning('No image file detected.');
             return;
           }
 
           var form = new FormData();
-          form.append('image', file);
+          form.append('image', $scope.data.metadata.uploadedFile);
           form.append('payload', JSON.stringify({
-            filename: filename
+            filename: $scope.generateImageFilename()
           }));
           form.append('csrf_token', GLOBALS.csrf_token);
 
@@ -150,10 +191,7 @@ oppia.directive('filepathEditor', [
             },
             dataType: 'text'
           }).done(function(data) {
-            var inputElement = $('#newImage');
-            $scope.filepaths.push(data.filepath);
-            $scope.closeImageUploader();
-            $scope.localValue.label = data.filepath;
+            $scope.setSavedImageUrl(data.filepath, true);
             $scope.$apply();
           }).fail(function(data) {
             // Remove the XSSI prefix.
@@ -165,13 +203,29 @@ oppia.directive('filepathEditor', [
           });
         };
 
-        $scope.filepathsLoaded = false;
-        $http.get(
-          '/createhandler/resource_list/' + $scope.explorationId
-        ).then(function(response) {
-          $scope.filepaths = response.data.filepaths;
-          $scope.filepathsLoaded = true;
-        });
+        $scope.generateImageFilename = function() {
+          var format = '';
+          var chunks = $scope.data.metadata.uploadedFile.name.split('.');
+          if (chunks.length > 1) {
+            format = '.' + chunks.pop();
+          }
+          var date = new Date();
+          return 'img_' +
+              date.getFullYear() +
+              ('0' + (date.getMonth() + 1)).slice(-2) +
+              ('0' + date.getDate()).slice(-2) +
+              '_' +
+              ('0' + date.getHours()).slice(-2) +
+              ('0' + date.getMinutes()).slice(-2) +
+              ('0' + date.getSeconds()).slice(-2) +
+              '_' +
+              Math.random().toString(36).substr(2, 10) +
+              format;
+        };
+
+        $scope.explorationId = explorationContextService.getExplorationId();
+        $scope.uploadWarning = null;
+        $scope.clearScopeData();
       }]
     };
   }
