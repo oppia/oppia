@@ -363,3 +363,34 @@ class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class FallbacksToHintsOneOffJob(jobs.BaseMapReduceJobManager):
+    """Job that converts existing Fallbacks to Hints for explorations with
+    state schema version 10.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        if item.states_schema_version != 10:
+            return
+        exploration = exp_services.get_exploration_from_model(item)
+        for state_name, state in exploration.states.iteritems():
+            interaction = state.interaction
+            if interaction.fallbacks and not interaction.hints:
+                for fallback in interaction.fallbacks:
+                    if fallback.outcome.feedback:
+                        state.interaction.hints.append(
+                            exp_domain.Hint(fallback.outcome.feedback[0]))
+        exp_services._save_exploration(
+            feconf.MIGRATION_BOT_USERNAME, exploration,
+            'Fallbacks to Hints migration', [])
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
