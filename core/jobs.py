@@ -621,7 +621,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def get_mapper_param(param_name):
-        """TODO(thatbrod)."""
+        """TODO(brianrodri)."""
         mapper_params = context.get().mapreduce_spec.mapper.params
         if param_name not in mapper_params:
             raise Exception(
@@ -668,8 +668,8 @@ class BaseMapReduceJobManager(BaseJobManager):
         This code can assume that it is the only process handling values for the
         given key.
 
-        TODO: Verify whether it can also assume that it will be called exactly
-        once for each key with all of the output.
+        TODO(brianrodri): Verify whether it can also assume that it will be
+        called exactly once for each key with all of the output.
 
         Args:
             key: A key value as emitted from the map() function, above.
@@ -682,7 +682,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @classmethod
     def _real_enqueue(cls, job_id, additional_job_params):
-        """TODO(thatbrod)."""
+        """TODO(brianrodri)."""
         entity_class_types = cls.entity_classes_to_map_over()
         entity_class_names = [
             '%s.%s' % (
@@ -904,12 +904,12 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def _is_valid_realtime_id(cls, realtime_id):
-        """TODO(thatbrod)."""
+        """Returns whether a realtime_id can be stored."""
         return realtime_id.startswith('0:') or realtime_id.startswith('1:')
 
     @classmethod
     def get(cls, entity_id, strict=True):
-        """TODO(thatbrod)."""
+        """TODO(brianrodri)."""
         if not cls._is_valid_realtime_id(entity_id):
             raise ValueError('Invalid realtime id: %s' % entity_id)
 
@@ -918,7 +918,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         ).get(entity_id, strict=strict)
 
     def put(self):
-        """TODO(thatbrod)."""
+        """TODO(brianrodri)."""
         if (self.realtime_layer is None or
                 str(self.realtime_layer) != self.id[0]):
             raise Exception(
@@ -1007,7 +1007,8 @@ class BaseContinuousComputationManager(object):
 
         This method should be implemented by subclasses. The args are the
         same as those sent to the event handler corresponding to the event
-        type. Note that there may be more than one event type.
+        type, so check that for documentation. Note that there may be more than
+        one event type.
 
         IMPORTANT: This method only gets called as part of the dequeue process
         from a deferred task queue. Developers should expect a delay to occur
@@ -1030,6 +1031,7 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _get_active_realtime_index(cls):
+        """TODO(brianrodri)."""
         def _get_active_realtime_index_transactional():
             cc_model = job_models.ContinuousComputationModel.get(
                 cls.__name__, strict=False)
@@ -1065,6 +1067,7 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _switch_active_realtime_class(cls):
+        """TODO(brianrodri)."""
         def _switch_active_realtime_class_transactional():
             cc_model = job_models.ContinuousComputationModel.get(
                 cls.__name__)
@@ -1076,8 +1079,7 @@ class BaseContinuousComputationManager(object):
             _switch_active_realtime_class_transactional)
 
     @classmethod
-    def _clear_inactive_realtime_layer(
-            cls, latest_created_on_datetime):
+    def _clear_inactive_realtime_layer(cls, latest_created_on_datetime):
         """Deletes all entries in the given realtime datastore class whose
         created_on date is before latest_timestamp.
         """
@@ -1134,7 +1136,8 @@ class BaseContinuousComputationManager(object):
     def start_computation(cls):
         """(Re)starts the continuous computation corresponding to this class.
 
-        Raises an Exception if the computation is already running.
+        Raises:
+            Exception: if the computation is already running.
         """
         def _start_computation_transactional():
             """Transactional implementation for marking a continuous
@@ -1217,11 +1220,14 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _process_job_completion_and_return_status(cls):
         """Delete all data in the currently-active realtime_datastore class,
-        switch the active class, and return the status.
+        switch the active class.
 
         This seam was created so that tests would be able to override
         on_batch_job_completion() to avoid kicking off the next job
         immediately.
+
+        Returns:
+            str. The final status of the job.
         """
         cls._switch_active_realtime_class()
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
