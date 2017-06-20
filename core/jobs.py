@@ -603,7 +603,6 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
 
     def write(self, data):
-        """TODO(brianrodri)."""
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
             '%s\n' % json.dumps(data))
 
@@ -638,7 +637,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def map(item):
-        """Implements the map function.  Must be declared @staticmethod.
+        """Implements the map function. Must be declared @staticmethod.
 
          This function may yield as many times as appropriate (including zero)
          to return key/value 2-tuples. For example, to get a count of all
@@ -658,7 +657,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def reduce(key, values):
-        """Implements the reduce function.  Must be declared @staticmethod.
+        """Implements the reduce function. Must be declared @staticmethod.
 
         This function should yield a JSON string. All emitted outputs from all
         reducers will be collected in an array and set into the output value
