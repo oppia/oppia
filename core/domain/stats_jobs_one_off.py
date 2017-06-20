@@ -18,6 +18,7 @@ import ast
 import collections
 
 from core import jobs
+from core.domain import interaction_registry
 from core.domain import stats_jobs_continuous
 from core.platform import models
 
@@ -195,3 +196,247 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                     'all: %s sum:%s' % (
                         key, state_name, all_state_hit[state_name],
                         sum_state_hit[state_name]),)
+
+
+class AnswerModelInteractionConsistencyJob(jobs.BaseMapReduceJobManager):
+    """A one-off job to check the consistency of internal answer model state.
+
+    Verifies that all (exploration_id, exploration_version, state_name) tuples
+    correspond to exactly one interaction ID across all submitted answer
+    buckets. This job is used as a preliminary audit before running
+    PurgeNewAnswersJob to ensure that job does not leave any remaining buckets
+    after purging.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswersModel.
+
+        Yields:
+            tuple. a 2-tuple in the form
+                ('exploration_id-exploration_version-state_name', value).
+                'exploration_id': str. the id of the exploration.
+                'exploration_version': number. the version of the exploration.
+                'state_name': str. the name of the corresponding state.
+                'value': a dict, whose structure is as follows:
+                    {
+                        'exploration_id': str. the id of the exploration.
+                        'exploration_version': number. the version of the
+                            exploration.
+                        'state_name': str. the name of the corresponding state.
+                        'interaction_id': str. the corresponding interaction ID.
+                    }
+        """
+        combined_key = u'%s:%s:%s' % (
+            item.exploration_id, item.exploration_version, item.state_name)
+        yield (combined_key.encode('utf-8'), {
+            'exploration_id': item.exploration_id,
+            'exploration_version': item.exploration_version,
+            'state_name': item.state_name,
+            'interaction_id': item.interaction_id
+        })
+
+    @staticmethod
+    def reduce(key, stringified_values): # pylint: disable=unused-argument
+        """Outputs information about the current state of answers.
+
+        Args:
+            key: str. The combined exploration ID-version-state name mapped to
+                the stringified_values.
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringified_values
+                would be of the form:
+                    {
+                        'exploration_id': str. the id of the exploration.
+                        'exploration_version': number. the version of the
+                            exploration.
+                        'state_name': str. the name of the corresponding state.
+                        'interaction_id': str. the corresponding interaction ID.
+                    }
+
+        Yields:
+            tuple(str). A 1-tuple whose only element is an error message.
+        """
+        first_value_dict = ast.literal_eval(stringified_values[0])
+        exploration_id = first_value_dict['exploration_id']
+        exploration_version = first_value_dict['exploration_version']
+        state_name = first_value_dict['state_name']
+        interaction_ids = set()
+        for stringified_value in stringified_values:
+            value_dict = ast.literal_eval(stringified_value)
+            interaction_ids.add(value_dict['interaction_id'])
+        if len(interaction_ids) != 1:
+            yield (
+                'Expected exploration %s (version %s) and state %s pair to '
+                'only have 1 interaction ID, but found: %s' % (
+                    exploration_id, exploration_version, state_name,
+                    interaction_ids))
+
+
+class PurgeNewAnswersAuditJob(jobs.BaseMapReduceJobManager):
+    """A pre-purge audit job.
+
+    This job performs the exact same work as PurgeNewAnswersJob without the
+    actual deletion. This should be run before the deletion to ensure only the
+    expected answer buckets are removed.
+    """
+    _ANSWER_BUCKET_REMOVED_KEY = 'removed_answer_bucket'
+    _ANSWER_BUCKET_RETAINED_KEY = 'retained_answer_bucket'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function and yields all answer buckets associated
+        with interactions that no longer exist.
+
+        Args:
+            item: StateAnswersModel.
+
+        Yields:
+            tuple. a 2-tuple in the form
+                (output_key, value).
+                'output_key': str. either _ANSWER_BUCKET_RETAINED_KEY or
+                    _ANSWER_BUCKET_REMOVED_KEY with an interaction ID appended.
+                'value': a dict, whose structure is as follows:
+                    {
+                        'item_id': str. the id of the mapped model.
+                        'interaction_id': str. the corresponding interaction ID.
+                    }
+        """
+        interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+        if item.interaction_id not in interaction_ids:
+            removal_key = '%s:%s' % (
+                PurgeNewAnswersAuditJob._ANSWER_BUCKET_REMOVED_KEY,
+                item.interaction_id)
+            yield (removal_key, {
+                'item_id': item.id,
+                'interaction_id': item.interaction_id
+            })
+        else:
+            yield (PurgeNewAnswersAuditJob._ANSWER_BUCKET_RETAINED_KEY, {})
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        """Outputs results about which answer buckets would be removed if the
+        actual PurgeNewAnswersJob were run.
+
+        Args:
+            key: str. Either _ANSWER_BUCKET_RETAINED_KEY or
+                _ANSWER_BUCKET_REMOVED_KEY with an interaction ID appended.
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringified_values
+                would be of the form:
+                    {
+                        'item_id': str. the id of the mapped model.
+                        'interaction_id': str. the corresponding interaction ID.
+                    }
+
+        Yields:
+            tuple(str). A 1-tuple whose only element is an output message.
+        """
+        if key.startswith(PurgeNewAnswersAuditJob._ANSWER_BUCKET_REMOVED_KEY):
+            first_value_dict = ast.literal_eval(stringified_values[0])
+            interaction_id = first_value_dict['interaction_id']
+            item_ids = [
+                ast.literal_eval(stringified_value)['item_id']
+                for stringified_value in stringified_values]
+            yield (
+                'Will remove %d answer buckets corresponding to purged '
+                'interaction %s: %s' % (
+                    len(stringified_values), interaction_id, item_ids))
+        else:
+            yield (
+                'Will retain %d answer buckets corresponding to current '
+                'interactions' % len(stringified_values))
+
+
+class PurgeNewAnswersJob(jobs.BaseMapReduceJobManager):
+    """A one-off purge job for answers.
+
+    Purges all answers from StateAnswersModel which correspond to interactions
+    that are no longer being used by Oppia, such as FileReadInput and
+    TarFileReadInput. See #3284 for additional context.
+    """
+    _ANSWER_BUCKET_REMOVED_KEY = 'removed_answer_bucket'
+    _ANSWER_BUCKET_RETAINED_KEY = 'retained_answer_bucket'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function and removes all answer buckets associated
+        with interactions that no longer exist.
+
+        Args:
+            item: StateAnswersModel.
+
+        Yields:
+            tuple. a 2-tuple in the form
+                (output_key, value).
+                'output_key': str. either _ANSWER_BUCKET_RETAINED_KEY or
+                    _ANSWER_BUCKET_REMOVED_KEY with an interaction ID appended.
+                'value': a dict, whose structure is as follows:
+                    {
+                        'item_id': str. the id of the mapped model.
+                        'interaction_id': str. the corresponding interaction ID.
+                    }
+        """
+        interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+        item_id = item.id
+        interaction_id = item.interaction_id
+        if interaction_id not in interaction_ids:
+            item.delete()
+            removal_key = '%s:%s' % (
+                PurgeNewAnswersJob._ANSWER_BUCKET_REMOVED_KEY,
+                item.interaction_id)
+            yield (removal_key, {
+                'item_id': item_id,
+                'interaction_id': interaction_id
+            })
+        else:
+            yield (PurgeNewAnswersJob._ANSWER_BUCKET_RETAINED_KEY, {})
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        """Outputs results about which answer buckets were removed.
+
+        Args:
+            key: str. Either _ANSWER_BUCKET_RETAINED_KEY or
+                _ANSWER_BUCKET_REMOVED_KEY with an interaction ID appended.
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringified_values
+                would be of the form:
+                    {
+                        'item_id': str. the id of the mapped model.
+                        'interaction_id': str. the corresponding interaction ID.
+                    }
+
+        Yields:
+            tuple(str). A 1-tuple whose only element is an output message.
+        """
+        if key.startswith(PurgeNewAnswersJob._ANSWER_BUCKET_REMOVED_KEY):
+            first_value_dict = ast.literal_eval(stringified_values[0])
+            interaction_id = first_value_dict['interaction_id']
+            item_ids = [
+                ast.literal_eval(stringified_value)['item_id']
+                for stringified_value in stringified_values]
+            yield (
+                'Removed %d answer buckets corresponding to purged interaction '
+                '%s: %s' % (len(stringified_values), interaction_id, item_ids))
+        else:
+            yield (
+                'Retained %d answer buckets corresponding to current '
+                'interactions' % len(stringified_values))
