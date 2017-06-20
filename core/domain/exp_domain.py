@@ -44,6 +44,7 @@ import utils
 # logged using the key 'widget_handlers'. These need to be migrated to
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
+STATE_PROPERTY_CLASSIFIER_MODEL_ID = 'classifier_model_id'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
@@ -191,6 +192,7 @@ class ExplorationChange(object):
 
     STATE_PROPERTIES = (
         STATE_PROPERTY_PARAM_CHANGES,
+        STATE_PROPERTY_CLASSIFIER_MODEL_ID,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -1299,6 +1301,9 @@ class State(object):
         self.param_changes = [
             param_domain.ParamChange.from_dict(param_change_dict)
             for param_change_dict in param_change_dicts]
+
+    def update_classifier_model_id(self, classifier_model_id):
+        self.classifier_model_id = classifier_model_id
 
     def update_interaction_id(self, interaction_id):
         self.interaction.id = interaction_id

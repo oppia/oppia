@@ -170,6 +170,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job = classifier_domain.ClassifierTrainingJob(
             training_job_dict['job_id'],
             training_job_dict['algorithm_id'],
+            training_job_dict['committer_id'],
             training_job_dict['exp_id'],
             training_job_dict['exp_version'],
             training_job_dict['state_name'],
@@ -182,6 +183,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         expected_training_job_dict = {
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
             'algorithm_id': 'LDAStringClassifier',
+            'committer_id': 'committer_id1',
             'exp_id': 'exp_id1',
             'exp_version': 1,
             'state_name': 'a state name',
@@ -218,6 +220,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         ]
         training_job_dict = {
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
+            'committer_id': 'committer_id1',
             'exp_id': 'exp_id1',
             'exp_version': 1,
             'state_name': 'some state',

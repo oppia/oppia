@@ -185,6 +185,7 @@ class ClassifierTrainingJob(object):
         job_id: str. The unique id of the classifier training job.
         algorithm_id: str. The id of the algorithm that will be used for
             generating the classifier.
+        committer_id: str. The id of the user who creates the job instance.
         exp_id: str. The id of the exploration that contains the state
             for which the classifier will be generated.
         exp_version: str. The version of the exploration when
@@ -210,7 +211,7 @@ class ClassifierTrainingJob(object):
 
     """
 
-    def __init__(self, job_id, algorithm_id, exp_id, exp_version,
+    def __init__(self, job_id, algorithm_id, committer_id, exp_id, exp_version,
                  state_name, status, training_data):
         """Constructs a ClassifierTrainingJob domain object.
 
@@ -218,6 +219,7 @@ class ClassifierTrainingJob(object):
         job_id: str. The unique id of the classifier training job.
         algorithm_id: str. The id of the algorithm that will be used for
             generating the classifier.
+        committer_id: str. The id of the user who creates the job instance.
         exp_id: str. The id of the exploration id that contains the state
             for which classifier will be generated.
         exp_version: str. The version of the exploration when
@@ -243,6 +245,7 @@ class ClassifierTrainingJob(object):
         """
         self._job_id = job_id
         self._algorithm_id = algorithm_id
+        self._committer_id = committer_id
         self._exp_id = exp_id
         self._exp_version = exp_version
         self._state_name = state_name
@@ -256,6 +259,10 @@ class ClassifierTrainingJob(object):
     @property
     def algorithm_id(self):
         return self._algorithm_id
+
+    @property
+    def committer_id(self):
+        return self._committer_id
 
     @property
     def exp_id(self):
@@ -297,6 +304,7 @@ class ClassifierTrainingJob(object):
         return {
             'job_id': self._job_id,
             'algorithm_id': self._algorithm_id,
+            'committer_id': self._committer_id,
             'exp_id': self._exp_id,
             'exp_version': self._exp_version,
             'state_name': self._state_name,
@@ -311,6 +319,10 @@ class ClassifierTrainingJob(object):
         if not isinstance(self.job_id, basestring):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.job_id)
+
+        if not isinstance(self.committer_id, basestring):
+            raise utils.ValidationError(
+                'Expected id to be a string, received %s' % self.committer_id)
 
         if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(

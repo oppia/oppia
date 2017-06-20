@@ -182,16 +182,18 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'not found')):
             classifier_services.get_classifier_training_job_by_id('fake_id')
 
+        committer_id = 'committer_id1'
         exp_id = u'1'
         state_name = 'Home'
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            exp_id, 1, [], state_name)
+            committer_id, exp_id, 1, [], state_name)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.algorithm_id,
                          feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
                              'algorithm_id'])
+        self.assertEqual(classifier_training_job.committer_id, committer_id)
         self.assertEqual(classifier_training_job.exp_id, exp_id)
         self.assertEqual(classifier_training_job.exp_version, 1)
         self.assertEqual(classifier_training_job.training_data, [])
@@ -201,11 +203,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def test_deletion_of_classifier_training_jobs(self):
         """Test the delete_classifier_training_job method."""
 
+        committer_id = 'committer_id1'
         exp_id = u'1'
         state_name = 'Home'
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            exp_id, 1, [], state_name)
+            committer_id, exp_id, 1, [], state_name)
         self.assertTrue(job_id)
         classifier_services.delete_classifier_training_job(job_id)
         with self.assertRaisesRegexp(Exception, (
@@ -217,6 +220,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def test_update_of_classifier_training_jobs(self):
         """Test the save_classifier_training_job method."""
 
+        committer_id = 'committer_id1'
         exp_id = u'1'
         state_name = 'Home'
         test_status = 'PENDING'
@@ -233,7 +237,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # Job does not exist yet.
         job_id = classifier_services.save_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            exp_id, 1, state_name, training_data)
+            committer_id, exp_id, 1, state_name, training_data)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.exp_id, exp_id)
@@ -242,6 +246,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # Updating existing job.
         classifier_services.save_classifier_training_job(
             classifier_training_job.algorithm_id,
+            classifier_training_job.committer_id,
             classifier_training_job.exp_id,
             classifier_training_job.exp_version,
             classifier_training_job.state_name,

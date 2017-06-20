@@ -22,6 +22,7 @@ from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import config_domain
+from core.domain import exp_services
 
 import feconf
 
@@ -66,6 +67,7 @@ class TrainedClassifierHandler(base.BaseHandler):
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         state_name = classifier_training_job.state_name
+        committer_id = classifier_training_job.committer_id
         exp_id = classifier_training_job.exp_id
         exp_version = classifier_training_job.exp_version
         algorithm_id = classifier_training_job.algorithm_id
@@ -77,10 +79,20 @@ class TrainedClassifierHandler(base.BaseHandler):
             job_id, exp_id, exp_version, state_name, algorithm_id,
             classifier_data, data_schema_version)
         classifier_id = classifier_services.save_classifier(classifier)
+
+        change_list = [{
+            'cmd': 'edit_state_property',
+            'state_name': state_name,
+            'property_name': 'classifier_model_id',
+            'new_value': classifier_id
+        }]
+        exp_services.update_exploration(committer_id, exp_id, change_list, '')
+
         classifier_training_job.update_status(
             feconf.TRAINING_JOB_STATUS_COMPLETE)
         classifier_services.save_classifier_training_job(
             classifier_training_job.algorithm_id,
+            classifier_training_job.committer_id,
             classifier_training_job.exp_id,
             classifier_training_job.exp_version,
             classifier_training_job.state_name,

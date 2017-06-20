@@ -97,6 +97,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The ID of the algorithm used to create the model.
     algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES,
                                       indexed=True)
+    # The ID of the user who creates the job instance.
+    committer_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration_id of the exploration to whose state the model belongs.
     exp_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration version at the time this training job was created.
@@ -144,12 +146,13 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, algorithm_id, exp_id, exp_version, training_data,
+            cls, algorithm_id, committer_id, exp_id, exp_version, training_data,
             state_name, status=feconf.TRAINING_JOB_STATUS_NEW):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
             algorithm_id: str. ID of the algorithm used to generate the model.
+            committer_id: str. ID of the user who created the model.
             exp_id: str. ID of the exploration.
             exp_version: int. The exploration version at the time
                 this training job was created.
@@ -167,7 +170,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         instance_id = cls._generate_id(exp_id)
         training_job_instance = cls(
-            id=instance_id, algorithm_id=algorithm_id, exp_id=exp_id,
+            id=instance_id, algorithm_id=algorithm_id,
+            committer_id=committer_id,
+            exp_id=exp_id,
             exp_version=exp_version,
             state_name=state_name, status=status, training_data=training_data
             )

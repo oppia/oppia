@@ -21,7 +21,7 @@ import json
 import os
 
 from core.domain import classifier_services
-from core.domain import exp_domain
+from core.domain import exp_services
 from core.tests import test_utils
 import feconf
 
@@ -59,6 +59,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(TrainedClassifierHandlerTest, self).setUp()
 
+        committer_id = 'committer_id1'
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
         self.category = 'Test'
@@ -67,11 +68,11 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         with open(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
 
-        self.exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.exp_id,
-            self.title,
-            self.category,
-            self.yaml_content)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            committer_id, self.yaml_content, self.exp_id,
+            assets_list)
+        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
 
         state = self.exploration.states['Home']
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
@@ -98,7 +99,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.classifier_data = {key: classifier_data[key] for key in sorted(
             classifier_data)}
         self.job_id = classifier_services.save_classifier_training_job(
-            algorithm_id, self.exp_id, self.exploration.version,
+            algorithm_id, committer_id, self.exp_id, self.exploration.version,
             'Home', training_data)
 
         self.job_result_dict = {
@@ -121,6 +122,11 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(classifier.state_name, 'Home')
         self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
         self.assertEqual(classifier.classifier_data, self.classifier_data)
+
+        # Test if the State is updated with classifier_model_id
+        state = exp_services.get_exploration_by_id(classifier.exp_id).states[
+            classifier.state_name]
+        self.assertTrue(state.classifier_model_id, not None)
 
         # Turn off DEV_MODE.
         with self.swap(feconf, 'DEV_MODE', False):
