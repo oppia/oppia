@@ -576,8 +576,8 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 
         Args:
             job_id: str. Should come from the create_new class method.
-            job_class_str: str.
-            output: str.
+            job_class_str: str. TODO(brianrodri).
+            output: str. TODO(brianrodri).
         """
         job_class = mapreduce_util.for_name(job_class_str)
 
@@ -624,7 +624,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         """TODO(brianrodri).
 
         Args:
-            param_name: str.
+            param_name: str. TODO(brianrodri).
 
         Returns:
             TODO(brianrodri).
@@ -655,8 +655,8 @@ class BaseMapReduceJobManager(BaseJobManager):
          "key.encode('utf-8')", rather than "key".
 
         Args:
-            item: entity_class. Single element of the type given by
-                entity_class(). TODO: make sure entity_class is a valid type.
+            item: type(entity_class()). Single element of the type given by
+            entity_class().
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement map '
@@ -801,8 +801,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         """Returns data split from mapper_spec as inputs(list).
 
         Args:
-            mapper_spec: dict. TODO: Write what is mapper_spec, dict from what
-                to what?
+            mapper_spec: dict(? : ?). TODO(brianrodri).
         """
         params = mapper_spec.params
         entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
@@ -1300,19 +1299,19 @@ def _get_job_dict_from_job_model(model):
 
     Returns:
         A dict with the following keys:
-          - id: str. The job id.
-          - time_started_msec: float. When the job was started, in milliseconds
+            id: str. Should come from the create_new class method.
+            time_started_msec: float. When the job was started, in milliseconds
                 since the epoch.
-          - time_finished_msec: float. When the job was finished, in
+            time_finished_msec: float. When the job was finished, in
                 milliseconds since the epoch.
-          - status_code: str. The current status of the job.
-          - job_type: str. The type of this job.
-          - is_cancelable: bool. Whether the job can be canceled
-          - error: str. Any errors pertaining to this job.
-          - human_readable_time_started: str. A human-readable string
+            status_code: str. The current status of the job.
+            job_type: str. The type of this job.
+            is_cancelable: bool. Whether the job can be canceled
+            error: str. Any errors pertaining to this job.
+            human_readable_time_started: str. A human-readable string
                 representing the time the job started, or None if
                 time_started_msec is None.
-          - human_readable_time_finished: str. A human-readable string
+            human_readable_time_finished: str. A human-readable string
                 representing the time the job finished, or None if
                 time_finished_msec is None.
     """
@@ -1366,24 +1365,25 @@ def get_continuous_computations_info(cc_classes):
     """Returns data about the given computations.
 
     Args:
-        cc_classes: list(BaseContinuousComputationManager) a list of subclasses.
+        cc_classes: list(BaseContinuousComputationManager). List of subclass
+            computations.
 
     Returns:
-        A list of dicts, each representing a continuous computation. Each dict
-        has the following keys:
-          - computation_type: str. The type of the computation.
-          - status_code: str. The current status of the computation.
-          - last_started_msec: float or None. When a batch job for the
+        A list of dicts, each representing a continuous computation using the
+        following keys:
+            computation_type: str. The type of the computation.
+            status_code: str. The current status of the computation.
+            last_started_msec: float or None. When a batch job for the
                 computation was last started, in milliseconds since the epoch.
-          - last_finished_msec: float or None. When a batch job for the
+            last_finished_msec: float or None. When a batch job for the
                 computation last finished, in milliseconds since the epoch.
-          - last_stopped_msec: float or None. When a batch job for the
+            last_stopped_msec: float or None. When a batch job for the
                 computation was last stopped, in milliseconds since the epoch.
-          - active_realtime_layer_index: int or None. The index of the active
+            active_realtime_layer_index: int or None. The index of the active
                 realtime layer.
-          - is_startable: bool. Whether an admin should be allowed to start this
+            is_startable: bool. Whether an admin should be allowed to start this
                 computation.
-          - is_stoppable: bool. Whether an admin should be allowed to stop this
+            is_stoppable: bool. Whether an admin should be allowed to stop this
                 computation.
     """
     cc_models = job_models.ContinuousComputationModel.get_multi(
