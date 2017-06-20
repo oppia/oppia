@@ -303,6 +303,7 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. Should come from the create_new class method.
+            user_id: str. The id of the user.
         """
         unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
             cls.__name__)
@@ -312,8 +313,6 @@ class BaseJobManager(object):
     @classmethod
     def _real_enqueue(cls, job_id, additional_job_params):
         """Does the actual work of enqueueing a job for deferred execution.
-
-        Must be implemented by subclasses.
 
         Args:
             job_id: str. Should come from the create_new class method.
@@ -345,7 +344,7 @@ class BaseJobManager(object):
             job_id: str. Should come from the create_new class method.
 
         Returns:
-            float. the time the job got queued.
+            float. The time the job got queued.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -656,7 +655,7 @@ class BaseMapReduceJobManager(BaseJobManager):
          "key.encode('utf-8')", rather than "key".
 
         Args:
-            item: entity_class. single element of the type given by
+            item: entity_class. Single element of the type given by
                 entity_class(). TODO: make sure entity_class is a valid type.
         """
         raise NotImplementedError(
@@ -1374,17 +1373,17 @@ def get_continuous_computations_info(cc_classes):
         has the following keys:
           - computation_type: str. The type of the computation.
           - status_code: str. The current status of the computation.
-          - last_started_msec: float or None. when a batch job for the
+          - last_started_msec: float or None. When a batch job for the
                 computation was last started, in milliseconds since the epoch.
-          - last_finished_msec: float or None. when a batch job for the
+          - last_finished_msec: float or None. When a batch job for the
                 computation last finished, in milliseconds since the epoch.
           - last_stopped_msec: float or None. When a batch job for the
                 computation was last stopped, in milliseconds since the epoch.
-          - active_realtime_layer_index: int or None. the index of the active
+          - active_realtime_layer_index: int or None. The index of the active
                 realtime layer.
-          - is_startable: bool. whether an admin should be allowed to start this
+          - is_startable: bool. Whether an admin should be allowed to start this
                 computation.
-          - is_stoppable: bool. whether an admin should be allowed to stop this
+          - is_stoppable: bool. Whether an admin should be allowed to stop this
                 computation.
     """
     cc_models = job_models.ContinuousComputationModel.get_multi(
