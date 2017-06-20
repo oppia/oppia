@@ -1249,13 +1249,14 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_batch_job_completion(cls):
-        """Called when a batch job completes."""
+        """Marks itself complete and prepares for next job."""
         job_status = cls._process_job_completion_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job_after_previous_one_ends()
 
     @classmethod
     def on_batch_job_canceled(cls):
+        """Marks itself idle."""
         logging.info('Job %s canceled.' % cls.__name__)
         # The job should already be stopping, and should therefore be marked
         # idle.
@@ -1267,6 +1268,7 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_batch_job_failure(cls):
+        """Gives up and delegates responsibility to previous job."""
         # TODO(sll): Alert the site admin via email.
         logging.error('Job %s failed.' % cls.__name__)
         job_status = cls._register_end_of_batch_job_and_return_status()
