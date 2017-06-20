@@ -895,8 +895,8 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         in the currently active realtime datastore layer.
 
         Args:
-            layer_index: int.
-            raw_entity_id: int.
+            layer_index: int. TODO(brianrodri).
+            raw_entity_id: int. TODO(brianrodri).
 
         Returns:
             A unique, hashable object for all inputs.
@@ -909,7 +909,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         the given datetime.
 
         Args:
-            layer_index: int.
+            layer_index: int. TODO(brianrodri).
             latest_created_on_datetime: int. Expected to come from %s.
         """
         query = cls.query().filter(cls.realtime_layer == layer_index).filter(
@@ -1226,8 +1226,8 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_incoming_event(cls, event_type, *args, **kwargs):
-        """Handle an incoming event by recording it in both realtime datastore
-        layers.
+        """Handle an incoming event with the given type by recording it in both
+        realtime datastore layers.
 
         The *args and **kwargs match those passed to the _handle_event() method
         of the corresponding EventHandler subclass.
@@ -1275,10 +1275,8 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_batch_job_canceled(cls):
-        """Marks itself idle."""
+        """Marks as idle because the job should already be stopping."""
         logging.info('Job %s canceled.' % cls.__name__)
-        # The job should already be stopping, and should therefore be marked
-        # idle.
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status != job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE:
             logging.error(
@@ -1287,7 +1285,7 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_batch_job_failure(cls):
-        """Gives up and delegates responsibility to previous job."""
+        """Gives up on job and delegates responsibility to previous job."""
         # TODO(sll): Alert the site admin via email.
         logging.error('Job %s failed.' % cls.__name__)
         job_status = cls._register_end_of_batch_job_and_return_status()
