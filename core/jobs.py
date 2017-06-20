@@ -502,7 +502,8 @@ class BaseDeferredJobManager(BaseJobManager):
                 job.
 
         Raises:
-            TODO(brianrodri).
+            PermanentTaskFailure: signaling that no further work can be
+                scheduled.
         """
         logging.info(
             'Job %s started at %s' %
@@ -621,7 +622,14 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def get_mapper_param(param_name):
-        """TODO(brianrodri)."""
+        """TODO(brianrodri).
+
+        Args:
+            param_name: str.
+
+        Returns:
+            TODO(brianrodri).
+        """
         mapper_params = context.get().mapreduce_spec.mapper.params
         if param_name not in mapper_params:
             raise Exception(
@@ -682,7 +690,12 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @classmethod
     def _real_enqueue(cls, job_id, additional_job_params):
-        """TODO(brianrodri)."""
+        """TODO(brianrodri).
+
+        Args:
+            job_id: str. TODO(brianrodri).
+            additional_job_params: dict(str : int). TODO(brianrodri).
+        """
         entity_class_types = cls.entity_classes_to_map_over()
         entity_class_names = [
             '%s.%s' % (
@@ -909,7 +922,12 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def get(cls, entity_id, strict=True):
-        """TODO(brianrodri)."""
+        """TODO(brianrodri).
+
+        Args:
+            entity_id: int. TODO(brianrodri).
+            strict: bool. TODO(brianrodri).
+        """
         if not cls._is_valid_realtime_id(entity_id):
             raise ValueError('Invalid realtime id: %s' % entity_id)
 
