@@ -180,7 +180,7 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. Should come from the create_new class method.
-            output_list: list(str). The output of the job.
+            output_list: list(object). The output produced by the job.
         """
         _MAX_OUTPUT_LENGTH_CHARS = 900000
 
@@ -656,7 +656,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         Args:
             item: type(entity_class()). Single element of the type given by
-            entity_class().
+                entity_class().
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement map '
@@ -908,7 +908,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
         Args:
             layer_index: int. TODO(brianrodri).
-            latest_created_on_datetime: int. Expected to come from %s.
+            latest_created_on_datetime: int. TODO(brianrodri).
         """
         query = cls.query().filter(cls.realtime_layer == layer_index).filter(
             cls.created_on < latest_created_on_datetime)
