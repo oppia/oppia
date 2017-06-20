@@ -30,6 +30,7 @@ from core.domain import recommendations_jobs_one_off
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
+    user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     exp_jobs_one_off.IndexAllExplorationsJobManager,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
@@ -47,7 +48,8 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
-    collection_jobs_one_off.CollectionMigrationJob]
+    collection_jobs_one_off.CollectionMigrationJob,
+    exp_jobs_one_off.FallbackOneOffJob]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.

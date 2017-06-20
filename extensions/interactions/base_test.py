@@ -212,11 +212,17 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 feconf.INTERACTIONS_DIR, interaction_id)
             self.assertTrue(os.path.isdir(interaction_dir))
 
-            # In this directory there should only be a config .py file, an
-            # html file, a JS file, a validator.js file,  a directory named
-            # 'static' that contains (at least) a .png thumbnail file,
-            # (optionally) a JS test spec file, (optionally) a JS test spec
-            # file for rules, and (optionally) a protractor.js file.
+            # In this directory there should only be the following files:
+            #  Required:
+            #    * A python file called {InteractionName}.py.
+            #    * An html file called {InteractionName}.html.
+            #    * A JS file called {InteractionName}.js.
+            #    * A JS file called {InteractionName}ValidationService.js
+            #    * A directory named 'static' containing at least a .png file.
+            #  Optional:
+            #    * A JS file called {InteractionName}ValidationServiceSpecs.js
+            #    * A JS file called {InteractionName}RulesServiceSpecs.js
+            #    * A JS file called protractor.js.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
@@ -230,7 +236,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, 'validatorSpec.js')))
+                    interaction_dir,
+                    '%sValidationServiceSpec.js' % interaction_id)))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -258,7 +265,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             html_file = os.path.join(
                 interaction_dir, '%s.html' % interaction_id)
             js_file = os.path.join(interaction_dir, '%s.js' % interaction_id)
-            validator_js_file = os.path.join(interaction_dir, 'validator.js')
+            validation_service_js_file = os.path.join(
+                interaction_dir, '%sValidationService.js' % interaction_id)
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
@@ -279,8 +287,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
-            validator_js_file_content = utils.get_file_contents(
-                validator_js_file)
+            validation_service_js_file_content = utils.get_file_contents(
+                validation_service_js_file)
 
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id, js_file_content)
@@ -300,15 +308,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 html_file_content)
             self.assertIn(
                 '<script src="{{cache_slug}}/extensions/interactions/%s/'
-                'validator.js"></script>' % interaction_id,
+                '%sValidationService.js"></script>' % (
+                    interaction_id, interaction_id),
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
             self.assertIn(
                 '%sValidationService' % interaction_id,
-                validator_js_file_content)
-            self.assertNotIn('<script>', validator_js_file_content)
-            self.assertNotIn('</script>', validator_js_file_content)
+                validation_service_js_file_content)
+            self.assertNotIn('<script>', validation_service_js_file_content)
+            self.assertNotIn('</script>', validation_service_js_file_content)
 
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)

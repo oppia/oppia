@@ -816,12 +816,11 @@ oppia.factory('urlService', ['$window', function($window) {
 // Service for computing the window dimensions.
 oppia.factory('windowDimensionsService', ['$window', function($window) {
   var onResizeHooks = [];
-
-  $window.onresize = function() {
+  angular.element($window).bind('resize', function() {
     onResizeHooks.forEach(function(hookFn) {
       hookFn();
     });
-  };
+  });
   return {
     getWidth: function() {
       return (
@@ -837,6 +836,23 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
     }
   };
 }]);
+
+// Service for enabling a background mask that leaves navigation visible.
+oppia.factory('BackgroundMaskService', function() {
+  var maskIsActive = false;
+
+  return {
+    isMaskActive: function() {
+      return maskIsActive;
+    },
+    activateMask: function() {
+      maskIsActive = true;
+    },
+    deactivateMask: function() {
+      maskIsActive = false;
+    }
+  };
+});
 
 // Service for sending events to Google Analytics.
 //

@@ -52,6 +52,8 @@ STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
 STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
 STATE_PROPERTY_INTERACTION_FALLBACKS = 'fallbacks'
+STATE_PROPERTY_INTERACTION_HINTS = 'hints'
+STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
 # These two properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -197,6 +199,8 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_FALLBACKS,
+        STATE_PROPERTY_INTERACTION_HINTS,
+        STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
 
     GADGET_PROPERTIES = (
@@ -386,7 +390,7 @@ class RuleSpec(object):
                 this RuleSpec. Each element of the list represents a single
                 parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
-                    1: The typed object instance for that paramter (e.g. Real).
+                    1: The typed object instance for that parameter (e.g. Real).
             exp_param_specs_dict: A dict of specified parameters used in this
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type). RuleSpec
@@ -655,6 +659,78 @@ class Fallback(object):
         self.outcome.validate()
 
 
+class Hint(object):
+    """Value object representing a hint."""
+    def __init__(self, hint_text):
+        self.hint_text = html_cleaner.clean(hint_text)
+
+    def to_dict(self):
+        return {
+            'hint_text': self.hint_text,
+        }
+
+    @classmethod
+    def from_dict(cls, hint_dict):
+        return cls(hint_dict['hint_text'])
+
+    def validate(self):
+        if not isinstance(self.hint_text, basestring):
+            raise utils.ValidationError(
+                'Expected hint text to be a string, received %s' %
+                self.hint_text)
+
+
+class Solution(object):
+    """Value object representing a solution.
+
+    A solution consists of answer_is_exclusive, correct_answer and an
+    explanation.When answer_is_exclusive is True, this indicates that it is
+    the only correct answer; when it is False, this indicates that it is one
+    possible answer. correct_answer records an answer that enables the learner
+    to progress to the next card and explanation is an HTML string containing
+    an explanation for the solution.
+    """
+    def __init__(self, interaction_id, answer_is_exclusive,
+                 correct_answer, explanation):
+        self.answer_is_exclusive = answer_is_exclusive
+        self.correct_answer = (
+            interaction_registry.Registry.get_interaction_by_id(
+                interaction_id).normalize_answer(correct_answer))
+        self.explanation = html_cleaner.clean(explanation)
+
+    def to_dict(self):
+        return {
+            'answer_is_exclusive': self.answer_is_exclusive,
+            'correct_answer': self.correct_answer,
+            'explanation': self.explanation,
+        }
+
+    @classmethod
+    def from_dict(cls, interaction_id, solution_dict):
+        return cls(
+            interaction_id,
+            solution_dict['answer_is_exclusive'],
+            interaction_registry.Registry.get_interaction_by_id(
+                interaction_id).normalize_answer(
+                    solution_dict['correct_answer']),
+            solution_dict['explanation'])
+
+    def validate(self, interaction_id):
+        if not isinstance(self.answer_is_exclusive, bool):
+            raise utils.ValidationError(
+                'Expected answer_is_exclusive to be bool, received %s' %
+                self.answer_is_exclusive)
+        interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).normalize_answer(self.correct_answer)
+        if not self.explanation:
+            raise utils.ValidationError(
+                'Explanation must not be an empty string')
+        if not isinstance(self.explanation, basestring):
+            raise utils.ValidationError(
+                'Expected explanation to be a string, received %s' %
+                self.explanation)
+
+
 class InteractionInstance(object):
     """Value object for an instance of an interaction."""
 
@@ -678,6 +754,8 @@ class InteractionInstance(object):
             'confirmed_unclassified_answers': (
                 self.confirmed_unclassified_answers),
             'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
+            'hints': [hint.to_dict() for hint in self.hints],
+            'solution': self.solution,
         }
 
     @classmethod
@@ -692,11 +770,14 @@ class InteractionInstance(object):
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
             interaction_dict['confirmed_unclassified_answers'],
-            [Fallback.from_dict(f) for f in interaction_dict['fallbacks']])
+            [Fallback.from_dict(f) for f in interaction_dict['fallbacks']],
+            [Hint.from_dict(h) for h in interaction_dict['hints']],
+            interaction_dict['solution'])
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
-            default_outcome, confirmed_unclassified_answers, fallbacks):
+            default_outcome, confirmed_unclassified_answers,
+            fallbacks, hints, solution):
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
@@ -708,6 +789,8 @@ class InteractionInstance(object):
         self.default_outcome = default_outcome
         self.confirmed_unclassified_answers = confirmed_unclassified_answers
         self.fallbacks = fallbacks
+        self.hints = hints
+        self.solution = solution
 
     @property
     def is_terminal(self):
@@ -779,12 +862,30 @@ class InteractionInstance(object):
         for fallback in self.fallbacks:
             fallback.validate()
 
+        if not isinstance(self.hints, list):
+            raise utils.ValidationError(
+                'Expected hints to be a list, received %s'
+                % self.hints)
+        for hint in self.hints:
+            hint.validate()
+
+        if self.hints:
+            if self.solution:
+                Solution.from_dict(
+                    self.id, self.solution).validate(self.id)
+            else:
+                raise utils.ValidationError(
+                    'Solution must be specified if hint(s) are specified')
+        elif self.solution:
+            raise utils.ValidationError(
+                'Hint(s) must be specified if solution is specified')
+
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
         return cls(
             cls._DEFAULT_INTERACTION_ID,
             {}, [],
-            Outcome(default_dest_state_name, [], {}), [], []
+            Outcome(default_dest_state_name, [], {}), [], [], [], {}
         )
 
 
@@ -1120,6 +1221,8 @@ class State(object):
         },
         'confirmed_unclassified_answers': [],
         'fallbacks': [],
+        'hints': [],
+        'solution': {},
     }
 
     def __init__(self, content, param_changes, interaction,
@@ -1135,7 +1238,8 @@ class State(object):
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
             interaction.answer_groups, interaction.default_outcome,
-            interaction.confirmed_unclassified_answers, interaction.fallbacks)
+            interaction.confirmed_unclassified_answers, interaction.fallbacks,
+            interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
@@ -1292,6 +1396,31 @@ class State(object):
         self.interaction.fallbacks = [
             Fallback.from_dict(fallback_dict)
             for fallback_dict in fallbacks_list]
+
+    def update_interaction_hints(self, hints_list):
+        if not isinstance(hints_list, list):
+            raise Exception(
+                'Expected hints_list to be a list, received %s'
+                % hints_list)
+        self.interaction.hints = [
+            Hint.from_dict(hint_dict)
+            for hint_dict in hints_list]
+
+    def update_interaction_solution(self, solution_dict):
+        if not isinstance(solution_dict, dict):
+            raise Exception(
+                'Expected solution to be a dict, received %s'
+                % solution_dict)
+        self.interaction.solution = Solution.from_dict(
+            self.interaction.id, solution_dict)
+
+    def add_hint(self, hint_text):
+        self.interaction.hints.append(Hint(hint_text))
+
+    def delete_hint(self, index):
+        if index < 0 or index >= len(self.interaction.hints):
+            raise IndexError('Hint index out of range')
+        del self.interaction.hints[index]
 
     def to_dict(self):
         return {
@@ -1450,11 +1579,17 @@ class Exploration(object):
                 Outcome.from_dict(idict['default_outcome'])
                 if idict['default_outcome'] is not None else None)
 
+            solution = (
+                Solution.from_dict(idict['id'], idict['solution'])
+                if idict['solution'] else {})
+
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,
                 idict['confirmed_unclassified_answers'],
-                [Fallback.from_dict(f) for f in idict['fallbacks']])
+                [Fallback.from_dict(f) for f in idict['fallbacks']],
+                [Hint.from_dict(h) for h in idict['hints']],
+                solution)
 
             exploration.states[state_name] = state
 
@@ -1649,7 +1784,7 @@ class Exploration(object):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-        # Check that all fallbacks are valid.
+        # Check that all fallbacks and hints are valid.
         for state in self.states.values():
             interaction = state.interaction
 
@@ -2291,6 +2426,19 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v9_dict_to_v10_dict(cls, states_dict):
+        """Converts from version 9 to 10. Version 10 contains hints
+        and solution in each interaction.
+        """
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
+            if 'hints' not in interaction:
+                interaction['hints'] = []
+            if 'solution' not in interaction:
+                interaction['solution'] = {}
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -2312,7 +2460,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 12
+    CURRENT_EXP_SCHEMA_VERSION = 13
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2501,6 +2649,19 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v12_dict_to_v13_dict(cls, exploration_dict):
+        """Converts a v12 exploration dict into a v13 exploration dict."""
+
+        exploration_dict['schema_version'] = 13
+
+        exploration_dict['states'] = cls._convert_states_v9_dict_to_v10_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 10
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         try:
@@ -2574,6 +2735,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v11_dict_to_v12_dict(
                 exploration_dict)
             exploration_schema_version = 12
+
+        if exploration_schema_version == 12:
+            exploration_dict = cls._convert_v12_dict_to_v13_dict(
+                exploration_dict)
+            exploration_schema_version = 13
 
 
         return (exploration_dict, initial_schema_version)
