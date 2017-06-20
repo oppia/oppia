@@ -366,7 +366,7 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
             else:
                 user_services.update_user_role(
                     user_model.id, feconf.ROLE_EXPLORATION_EDITOR)
-            yield ('success ', 1)
+            yield ('success', 1)
         except Exception as e:
             logging.error('Exception raised: %s' % e)
             yield (user_model.username, unicode(e))
