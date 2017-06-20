@@ -873,6 +873,7 @@ class InteractionInstance(object):
             if self.solution:
                 Solution.from_dict(
                     self.id, self.solution).validate(self.id)
+
         elif self.solution:
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')

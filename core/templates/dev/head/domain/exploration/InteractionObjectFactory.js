@@ -18,17 +18,20 @@
  */
 
 oppia.factory('InteractionObjectFactory', [
-  'AnswerGroupObjectFactory', 'FallbackObjectFactory', 'OutcomeObjectFactory',
+  'AnswerGroupObjectFactory', 'FallbackObjectFactory',
+  'OutcomeObjectFactory', 'HintObjectFactory',
   function(
-    AnswerGroupObjectFactory, FallbackObjectFactory, OutcomeObjectFactory) {
+    AnswerGroupObjectFactory, FallbackObjectFactory,
+    OutcomeObjectFactory, HintObjectFactory) {
     var Interaction = function(
         answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
-        defaultOutcome, fallbacks, id) {
+        defaultOutcome, fallbacks, hints, id) {
       this.answerGroups = answerGroups;
       this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
       this.customizationArgs = customizationArgs;
       this.defaultOutcome = defaultOutcome;
       this.fallbacks = fallbacks;
+      this.hints = hints;
       this.id = id;
     };
 
@@ -44,7 +47,9 @@ oppia.factory('InteractionObjectFactory', [
         fallbacks: this.fallbacks.map(function(fallback) {
           return fallback.toBackendDict();
         }),
-        hints: [],
+        hints: this.hints.map(function(hint) {
+          return hint.toBackendDict();
+        }),
         id: this.id,
         solution: {}
       };
@@ -64,6 +69,7 @@ oppia.factory('InteractionObjectFactory', [
         interactionDict.customization_args,
         defaultOutcome,
         generateFallbacksFromBackend(interactionDict.fallbacks),
+        generateHintsFromBackend(interactionDict.hints),
         interactionDict.id);
     };
 
@@ -78,6 +84,12 @@ oppia.factory('InteractionObjectFactory', [
     var generateFallbacksFromBackend = function(fallbackBackendDicts) {
       return fallbackBackendDicts.map(function(fallbackBackendDict) {
         return FallbackObjectFactory.createFromBackendDict(fallbackBackendDict);
+      });
+    };
+
+    var generateHintsFromBackend = function(hintBackendDicts) {
+      return hintBackendDicts.map(function(hintBackendDict) {
+        return HintObjectFactory.createFromBackendDict(hintBackendDict);
       });
     };
 
