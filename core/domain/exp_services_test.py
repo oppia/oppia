@@ -2958,13 +2958,15 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID1,
             draft_change_list=self.draft_change_list,
             draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=2).put()
+            draft_change_list_exp_version=2,
+            draft_change_list_id=2).put()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_ID, self.EXP_ID2), user_id=self.USER_ID,
             exploration_id=self.EXP_ID2,
             draft_change_list=self.draft_change_list,
             draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=4).put()
+            draft_change_list_exp_version=4,
+            draft_change_list_id=10).put()
         # Exploration with no draft.
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_ID, self.EXP_ID3), user_id=self.USER_ID,
@@ -3009,6 +3011,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_user_data.draft_change_list_last_updated,
                          self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
+        self.assertEqual(exp_user_data.draft_change_list_id, 3)
 
     def test_create_or_update_draft_when_newer_draft_exists(self):
         exp_services.create_or_update_draft(
@@ -3022,6 +3025,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exp_user_data.draft_change_list_last_updated, self.DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 2)
+        self.assertEqual(exp_user_data.draft_change_list_id, 2)
 
     def test_create_or_update_draft_when_draft_does_not_exist(self):
         exp_services.create_or_update_draft(
@@ -3035,6 +3039,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_user_data.draft_change_list_last_updated,
                          self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
+        self.assertEqual(exp_user_data.draft_change_list_id, 1)
 
     def test_get_exp_with_draft_applied_when_draft_exists(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
