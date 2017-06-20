@@ -37,6 +37,16 @@ oppia.factory('UrlInterpolationService', [
       return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
     };
 
+    var getUrlWithSlug = function(resourcePath) {
+        validateResourcePath(resourcePath);
+        console.log(resourcePath);
+        hash = hashes[resourcePath.substring(1)];
+        splitedPath = resourcePath.split('.');
+        splitedPath.splice(splitedPath.length - 1, 0, hash);
+        resourcePath = splitedPath.join('.');
+        return resourcePath;
+    };
+
     return {
       /**
        * Given a formatted URL, interpolates the URL by inserting values the URL
@@ -143,7 +153,7 @@ oppia.factory('UrlInterpolationService', [
        */
       getStaticImageUrl: function(imagePath) {
         validateResourcePath(imagePath);
-        return getCachePrefixedUrl('/assets/images' + imagePath);
+        return getCachePrefixedUrl('/assets' + getUrlWithSlug('/images' + imagePath));
       },
 
       /**
@@ -155,8 +165,8 @@ oppia.factory('UrlInterpolationService', [
           alertsService.fatalWarning(
             'Empty gadgetType passed in getGadgetImgUrl.');
         }
-        return getCachePrefixedUrl('/extensions/gadgets/' + gadgetType +
-          '/static/images/' + gadgetType + '.png');
+        return getCachePrefixedUrl('/extensions' + getUrlWithSlug('/gadgets/' +
+          gadgetType + '/static/images/' + gadgetType + '.png'));
       },
 
       /**
@@ -168,8 +178,8 @@ oppia.factory('UrlInterpolationService', [
           alertsService.fatalWarning(
             'Empty interactionId passed in getInteractionThumbnailImageUrl.');
         }
-        return getCachePrefixedUrl('/extensions/interactions/' +
-          interactionId + '/static/' + interactionId + '.png');
+        return getCachePrefixedUrl('/extensions' + getUrlWithSlug(
+          '/interactions/' + interactionId + '/static/' + interactionId + '.png'));
       },
 
       /**
@@ -179,7 +189,12 @@ oppia.factory('UrlInterpolationService', [
        */
       getDirectiveTemplateUrl: function(path) {
         validateResourcePath(path);
-        return GLOBALS.TEMPLATE_DIR_PREFIX + path;
+        return GLOBALS.TEMPLATE_DIR_PREFIX + getUrlWithSlug(path);
+      },
+
+      getTranslateJsonUrl: function(jsonPath) {
+        validateResourcePath(jsonPath);
+        return getCachePrefixedUrl('/assets' + getUrlWithSlug(jsonPath));
       }
     };
   }

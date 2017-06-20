@@ -20,7 +20,8 @@ import shutil
 import subprocess
 import sys
 import hashlib
-
+import json
+from pprint import pprint
 
 HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
 OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
@@ -31,6 +32,12 @@ YUICOMPRESSOR_DIR = os.path.join(
 FILE_EXTENSIONS_TO_IGNORE = ('.py')
 FILE_EXTENSIONS_NOT_TO_RENAME = (
     '.html', '.map', '.woff', '.ttf', '.woff2', '.eof', '.ico', '.txt')
+FOLDERS_PROVIDED_TO_FRONTEND = (os.path.join('images', ''),
+                                os.path.join('i18n', ''))
+FILE_ENDINGS_TO_RENAME = ('directive.html',
+                          'modal.html',
+                          '.png')
+
 HASH_BLOCK_SIZE = 2**20
 
 def _minify(source_path, target_path):
@@ -110,11 +117,12 @@ def copy_files_source_to_target(source, target, file_hashes):
                 continue
 
             target_path = source_path
-            relative_path = os.path.relpath(source_path, source)
-            if (relative_path in file_hashes and
-                    not filename.endswith(FILE_EXTENSIONS_NOT_TO_RENAME)):
-                file_name, file_extension = os.path.splitext(source_path)
-                target_path = (file_name + '.' + file_hashes[relative_path] +
+            relative_filepath = os.path.relpath(source_path, source)
+            if (not relative_filepath.endswith(FILE_EXTENSIONS_NOT_TO_RENAME) or
+                    relative_filepath.endswith(FILE_ENDINGS_TO_RENAME)):
+                filepath, file_extension = os.path.splitext(source_path)
+                target_path = (filepath + '.' +
+                               file_hashes[relative_filepath]+
                                file_extension)
 
             target_path = target_path.replace(source, target)
@@ -159,11 +167,39 @@ def get_file_hashes(folder_path):
         for directory in dirs:
             print 'Processing %s' % os.path.join(root, directory)
         for filename in files:
-            file_path = os.path.join(root, filename)
-            relative_file_path = os.path.relpath(file_path, folder_path)
-            file_hashes[relative_file_path] = generate_file_md5(file_path)
+            filepath = os.path.join(root, filename)
+            relative_filepath = os.path.relpath(filepath, folder_path)
+            file_hashes[relative_filepath] = generate_file_md5(filepath)
 
     return file_hashes
+
+
+def filter_hashes(hashes):
+    filtered_hashes = dict()
+    for filepath, file_hash in hashes.iteritems():
+        for folder in FOLDERS_PROVIDED_TO_FRONTEND:
+            if folder in filepath:
+                filtered_hashes[filepath] = file_hash
+        for ending in FILE_ENDINGS_TO_RENAME:
+            if filepath.endswith(ending):
+                filtered_hashes[filepath] = file_hash
+    return filtered_hashes
+
+
+def save_hashes_as_json(filepath, hashes):
+    filtered_hashes = filter_hashes(hashes)
+
+    hashes_json = json.dumps(filtered_hashes)
+    with open(filepath, 'w') as f:
+        f.write("var hashes = " + hashes_json)
+
+    file_hash = generate_file_md5(filepath)
+    relative_filepath = os.path.relpath(filepath, os.path.join(os.path.curdir, 'build'))
+    file_name, file_extension = os.path.splitext(filepath)
+    filepath_with_hash = file_name + '.' + file_hash + file_extension
+    os.rename(filepath, filepath_with_hash)
+
+    hashes[relative_filepath] = file_hash
 
 
 def build_files(source, target, file_hashes):
@@ -208,7 +244,7 @@ if __name__ == '__main__':
     # Create hashes for assets, copy folders and files to build/assets
     ASSETS_SRC_DIR = os.path.join('assets', '')
     ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
-    #hashes.update(get_file_hashes(ASSETS_SRC_DIR))
+    hashes.update(get_file_hashes(ASSETS_SRC_DIR))
     copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR, hashes)
 
     # Process third_party resources, create hashes for them and copy them into
@@ -232,10 +268,14 @@ if __name__ == '__main__':
     copy_files_source_to_target(EXTENSIONS_PROD_DIR, EXTENSIONS_OUT_DIR, hashes)
 
     # Minify all template files, create hashes for them and copy them
-    # into build/etemplates/head
+    # into build/templates/head
     TEMPLATES_DEV_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
     TEMPLATES_PROD_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
     TEMPLATES_OUT_DIR = os.path.join('build', 'templates', 'head', '')
     hashes.update(get_file_hashes(TEMPLATES_DEV_DIR))
+
+    HASHES_JSON = os.path.join('build', 'assets', 'hashes.js')
+    save_hashes_as_json(HASHES_JSON, hashes)
+    pprint(hashes)
     build_files(TEMPLATES_DEV_DIR, TEMPLATES_PROD_DIR, hashes)
     copy_files_source_to_target(TEMPLATES_PROD_DIR, TEMPLATES_OUT_DIR, hashes)

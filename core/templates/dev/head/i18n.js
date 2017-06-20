@@ -37,6 +37,26 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_LOADING: 'Loading'
 });
 
+oppia.factory('customLoader', ['$http', '$q', 'UrlInterpolationService',
+  function ($http, $q, UrlInterpolationService) {
+    return function (options) {
+      var fileUrl = [
+        options.prefix,
+        options.key,
+        options.suffix
+      ].join('');
+      return $http({
+        url: UrlInterpolationService.getTranslateJsonUrl(fileUrl),
+        method: 'GET'
+      }).then(function(result) {
+          return result.data;
+        }, function () {
+          return $q.reject(options.key);
+      });
+    };
+  }
+]);
+
 oppia.controller('I18nFooter', [
   '$http', '$rootScope', '$scope', '$translate', '$timeout',
   function($http, $rootScope, $scope, $translate, $timeout) {
@@ -84,8 +104,8 @@ oppia.config([
     $translateProvider
       .registerAvailableLanguageKeys(
         availableLanguageKeys, availableLanguageKeysMap)
-      .useStaticFilesLoader({
-        prefix: GLOBALS.ASSET_DIR_PREFIX + '/assets/i18n/',
+      .useLoader('customLoader', {
+        prefix: '/i18n/',
         suffix: '.json'
       })
       // The use of default translation improves the loading time when English
