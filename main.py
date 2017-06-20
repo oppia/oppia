@@ -79,8 +79,6 @@ class HomePageRedirectHandler(base.BaseHandler):
             user_contributions = user_services.get_user_contributions(
                 self.user_id)
 
-            print "Yolo", user_settings.default_dashboard
-
             if not user_settings.default_dashboard:
                 # 'Creator' is a user who has created or edited an exploration.
                 user_is_creator = user_contributions and (
