@@ -48,7 +48,7 @@ def get_training_data_from_state(state):
 
 def generate_signature(data):
     """Generates digital signature for given data."""
-    msg = json.dumps(sorted(data))
+    msg = json.dumps({key: data[key] for key in sorted(data)})
     key = feconf.DEFAULT_VM_SHARED_SECRET
     return hmac.new(key, msg, digestmod=hashlib.sha256).hexdigest()
 
@@ -95,18 +95,39 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             '_c_lw': [],
             '_c_l': []
         }
-        job_id = classifier_services.save_classifier_training_job(
+        self.classifier_data = {key: classifier_data[key] for key in sorted(
+            classifier_data)}
+        self.job_id = classifier_services.save_classifier_training_job(
             algorithm_id, self.exp_id, self.exploration.version,
             'Home', training_data)
 
         self.job_result_dict = {
-            'job_id' : job_id,
-            'classifier_data' : classifier_data
+            'job_id' : self.job_id,
+            'classifier_data' : self.classifier_data
         }
 
     def test_trained_classifier_handler(self):
         payload = self.job_result_dict
         payload['vm_id'] = feconf.DEFAULT_VM_ID
         payload['signature'] = generate_signature(payload)
-        response = self.post_json('/ml/trainedclassifierhandler', payload)
-        self.assertEqual(response['status_int'], 200)
+
+        # Normal end-to-end test.
+        self.post_json('/ml/trainedclassifierhandler', payload,
+                       expect_errors=False, expected_status_int=200)
+        classifier = classifier_services.get_classifier_by_id(
+            self.job_id)
+        self.assertEqual(classifier.id, self.job_id)
+        self.assertEqual(classifier.exp_id, self.exp_id)
+        self.assertEqual(classifier.state_name, 'Home')
+        self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
+        self.assertEqual(classifier.classifier_data, self.classifier_data)
+
+        # Turn off DEV_MODE.
+        with self.swap(feconf, 'DEV_MODE', False):
+            self.post_json('/ml/trainedclassifierhandler', payload,
+                           expect_errors=True, expected_status_int=401)
+
+        # Altering data to result in different signatures.
+        payload['job_id'] = 'different_job_id'
+        self.post_json('/ml/trainedclassifierhandler', payload,
+                       expect_errors=True, expected_status_int=401)

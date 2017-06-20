@@ -35,9 +35,12 @@ def validate_request(handler):
         signature = message.get('signature')
         vm_id = message.get('vm_id')
         message.pop('signature')
-        message = json.dumps(sorted(message))
-        secret = str(config_domain.VMID_SHARED_SECRET_KEY_MAPPING.default_value[
-            0].get('shared_secret_key'))
+        message['classifier_data'] = {key: message['classifier_data'][
+            key] for key in sorted(message['classifier_data'])}
+        message = json.dumps({key: message[key] for key in sorted(message)})
+        secret = str([val['shared_secret_key'] for val in (
+            config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value) if val[
+                'vm_id'] == vm_id][0])
         generated_signature = hmac.new(
             secret, message, digestmod=hashlib.sha256).hexdigest()
         if generated_signature != signature:
@@ -49,7 +52,7 @@ def validate_request(handler):
     return test_is_valid
 
 class TrainedClassifierHandler(base.BaseHandler):
-    """This handler stores thre result of the training job in datastore and
+    """This handler stores the result of the training job in datastore and
     updates the status of the job.
     """
 
@@ -85,6 +88,6 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_training_job.status,
             classifier_training_job.job_id)
         if classifier_id:
-            return self.render_json({'status_int' : 200})
+            return self.render_json({})
         else:
             return self.InternalErrorException
