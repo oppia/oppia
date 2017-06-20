@@ -601,7 +601,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
 
     def write(self, data):
-        # TODO(brianrodri): !
+        """TODO(thatbrod)."""
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
             '%s\n' % json.dumps(data))
 
@@ -620,7 +620,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def get_mapper_param(param_name):
-        # TODO(brianrodri): !
+        """TODO(thatbrod)."""
         mapper_params = context.get().mapreduce_spec.mapper.params
         if param_name not in mapper_params:
             raise Exception(
@@ -681,7 +681,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @classmethod
     def _real_enqueue(cls, job_id, additional_job_params):
-        # TODO(brianrodri): !
+        """TODO(thatbrod)."""
         entity_class_types = cls.entity_classes_to_map_over()
         entity_class_names = [
             '%s.%s' % (
@@ -808,7 +808,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         return inputs
 
     @classmethod
-    def validate(cls, mapper_spec):
+    def validate(cls, unused_mapper_spec):
         return True  # TODO
 
 
@@ -878,6 +878,13 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     def get_realtime_id(cls, layer_index, raw_entity_id):
         """Returns an ID used to identify the element with the given entity id
         in the currently active realtime datastore layer.
+
+        Args:
+            layer_index: int.
+            raw_entity_id: int.
+
+        Returns:
+            A unique, hashable object for all inputs.
         """
         return '%s:%s' % (layer_index, raw_entity_id)
 
@@ -885,6 +892,10 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     def delete_layer(cls, layer_index, latest_created_on_datetime):
         """Deletes all entities in the given layer which were created before
         the given datetime.
+
+        Args:
+            layer_index: int.
+            latest_created_on_datetime: int. Expected to come from %s.
         """
         query = cls.query().filter(cls.realtime_layer == layer_index).filter(
             cls.created_on < latest_created_on_datetime)
@@ -892,11 +903,12 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def _is_valid_realtime_id(cls, realtime_id):
-        # TODO(brianrodri): !
+        """TODO(thatbrod)."""
         return realtime_id.startswith('0:') or realtime_id.startswith('1:')
 
     @classmethod
     def get(cls, entity_id, strict=True):
+        """TODO(thatbrod)."""
         if not cls._is_valid_realtime_id(entity_id):
             raise ValueError('Invalid realtime id: %s' % entity_id)
 
@@ -905,6 +917,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         ).get(entity_id, strict=strict)
 
     def put(self):
+        """TODO(thatbrod)."""
         if (self.realtime_layer is None or
                 str(self.realtime_layer) != self.id[0]):
             raise Exception(
