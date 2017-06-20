@@ -502,7 +502,7 @@ class BaseDeferredJobManager(BaseJobManager):
                 job.
 
         Raises:
-            TODO: Document.
+            TODO(brianrodri).
         """
         logging.info(
             'Job %s started at %s' %
@@ -544,7 +544,7 @@ class BaseDeferredJobManager(BaseJobManager):
 class MapReduceJobPipeline(base_handler.PipelineBase):
 
     def run(self, job_id, job_class_str, kwargs):
-        """Runs job pipeline.
+        """Returns corountine which runs job pipeline and stores results.
 
         Args:
             job_id: str. Should come from the create_new class method.
@@ -562,8 +562,10 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
         yield StoreMapReduceResults(job_id, job_class_str, output)
 
     def finalized(self):
-        # Suppress the default Pipeline behavior of sending email.
-        # TODO(sll): Should mark-as-done be here instead?
+        """Suppresses the default pipeline behavior of sending email.
+
+        TODO(sll): Should mark-as-done be here instead?
+        """
         pass
 
 
@@ -601,7 +603,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
 
     def write(self, data):
-        """TODO(thatbrod)."""
+        """TODO(brianrodri)."""
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
             '%s\n' % json.dumps(data))
 
