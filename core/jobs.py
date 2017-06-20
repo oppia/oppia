@@ -693,8 +693,9 @@ class BaseMapReduceJobManager(BaseJobManager):
         """TODO(brianrodri).
 
         Args:
-            job_id: str. TODO(brianrodri).
-            additional_job_params: dict(str : int). TODO(brianrodri).
+            job_id: str. Should come from the create_new class method.
+            additional_job_params: dict(str : int). Additional params to pass
+                into the job's _run() method.
         """
         entity_class_types = cls.entity_classes_to_map_over()
         entity_class_names = [
