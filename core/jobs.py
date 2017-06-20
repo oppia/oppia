@@ -224,7 +224,7 @@ class BaseJobManager(object):
 
     @classmethod
     def register_failure(cls, job_id, error):
-        """Marks a job as completed.
+        """Marks a job as failed.
 
         Args:
             job_id: str. Should come from the create_new class method.
