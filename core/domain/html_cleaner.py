@@ -16,14 +16,14 @@
 
 """HTML sanitizing service."""
 
+import HTMLParser
+import json
 import logging
 import urlparse
-from HTMLParser import HTMLParser
-import json
 
 import bleach
+import bs4
 
-from bs4 import BeautifulSoup
 from core.domain import rte_component_registry
 
 
@@ -124,17 +124,17 @@ def get_rte_components(html_string):
         - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
         - customization_args: dict. Customization arg specs for the component.
     """
-    parser = HTMLParser()
+    parser = HTMLParser.HTMLParser()
     components = []
-    soup = BeautifulSoup(html_string, 'html.parser')
-    oppia_custom_tags = (
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
+    oppia_custom_tag_attrs = (
         rte_component_registry.Registry.get_tag_list_with_attrs())
-    for tag_name in oppia_custom_tags:
+    for tag_name in oppia_custom_tag_attrs:
         component_tags = soup.find_all(tag_name)
         for component_tag in component_tags:
             component = {'id': tag_name}
             customization_args = {}
-            for attr in oppia_custom_tags[tag_name]:
+            for attr in oppia_custom_tag_attrs[tag_name]:
                 # Unescape special HTML characters such as '&quot;'
                 attr_val = parser.unescape(component_tag[attr])
                 # Adds escapes so that things like '\frac' aren't
