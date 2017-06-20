@@ -36,9 +36,7 @@ def validate_request(handler):
         signature = message.get('signature')
         vm_id = message.get('vm_id')
         message.pop('signature')
-        message['classifier_data'] = {key: message['classifier_data'][
-            key] for key in sorted(message['classifier_data'])}
-        message = json.dumps({key: message[key] for key in sorted(message)})
+        message = json.dumps(message, sort_keys=True)
         secret = str([val['shared_secret_key'] for val in (
             config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value) if val[
                 'vm_id'] == vm_id][0])

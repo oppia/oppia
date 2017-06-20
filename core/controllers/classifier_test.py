@@ -48,7 +48,7 @@ def get_training_data_from_state(state):
 
 def generate_signature(data):
     """Generates digital signature for given data."""
-    msg = json.dumps({key: data[key] for key in sorted(data)})
+    msg = json.dumps(data, sort_keys=True)
     key = feconf.DEFAULT_VM_SHARED_SECRET
     return hmac.new(key, msg, digestmod=hashlib.sha256).hexdigest()
 
@@ -78,7 +78,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             state.interaction.id]['algorithm_id']
         training_data = get_training_data_from_state(state)
-        classifier_data = {
+        self.classifier_data = {
             '_alpha': 0.1,
             '_beta': 0.001,
             '_prediction_threshold': 0.5,
@@ -96,8 +96,6 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             '_c_lw': [],
             '_c_l': []
         }
-        self.classifier_data = {key: classifier_data[key] for key in sorted(
-            classifier_data)}
         self.job_id = classifier_services.save_classifier_training_job(
             algorithm_id, committer_id, self.exp_id, self.exploration.version,
             'Home', training_data)
