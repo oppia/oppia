@@ -18,6 +18,7 @@
 
 import ast
 import logging
+import copy
 
 from core import jobs
 from core.domain import exp_domain
@@ -368,6 +369,8 @@ class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
 class FallbacksToHintsOneOffJob(jobs.BaseMapReduceJobManager):
     """Job that converts existing Fallbacks to Hints for explorations with
     state schema version 10.
+
+    IMPORTANT: The GAE memcache must be flushed after running this job.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -379,18 +382,42 @@ class FallbacksToHintsOneOffJob(jobs.BaseMapReduceJobManager):
             return
         if item.states_schema_version != 10:
             return
-        exploration = exp_services.get_exploration_from_model(item)
+        exploration = exp_services.get_exploration_by_id(item.id)
+        is_public = rights_manager.is_exploration_public(item.id)
+        if not is_public:
+            return
         for state_name, state in exploration.states.iteritems():
             interaction = state.interaction
+            hint_list = []
+            hint_object_list = []
+            change_list = [{
+                'new_value': [],
+                'state_name': '',
+                'old_value': [],
+                'cmd': 'edit_state_property',
+                'property_name': 'hints'}]
+
             if interaction.fallbacks and not interaction.hints:
                 for fallback in interaction.fallbacks:
                     if fallback.outcome.feedback:
-                        state.interaction.hints.append(
-                            exp_domain.Hint(fallback.outcome.feedback[0]))
-        exp_services._save_exploration(
-            feconf.MIGRATION_BOT_USERNAME, exploration,
-            'Fallbacks to Hints migration', [])
+                        hint_list.append(
+                            exp_domain.Hint(
+                                fallback.outcome.feedback[0]).to_dict())
+                        hint_object_list.append(
+                            exp_domain.Hint(
+                                fallback.outcome.feedback[0]))
+                    else:
+                        return
+            else:
+                return
+            change_list[0]['new_value'] = hint_list
+            change_list[0]['state_name'] = state_name
+            exp_services.update_exploration(
+                feconf.MIGRATION_BOT_USERNAME,
+                exploration.id,
+                change_list,
+                'Fallbacks to Hints migration.' if is_public else None)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        pass
