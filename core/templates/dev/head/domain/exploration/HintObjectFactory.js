@@ -19,12 +19,12 @@
 
 oppia.factory('HintObjectFactory', function() {
   var Hint = function(hintText) {
-    this.hint_text = hintText;
+    this.hintText = hintText;
   };
 
   Hint.prototype.toBackendDict = function() {
     return {
-      hint_text: this.hint_text
+      hint_text: this.hintText
     };
   };
 
