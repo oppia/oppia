@@ -32,7 +32,7 @@ oppia.factory('HintObjectFactory', function() {
     return new Hint(hintBackendDict.hint_text);
   };
 
-  Hint.createDefault = function(hintText) {
+  Hint.createNew = function(hintText) {
     return new Hint(hintText);
   };
 

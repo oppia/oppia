@@ -78,7 +78,7 @@ oppia.controller('StateHints', [
               ui_config: {}
             };
 
-            $scope.tmpHint = HintObjectFactory.createDefault('');
+            $scope.tmpHint = {};
 
             $scope.addHintForm = {};
 
@@ -87,7 +87,8 @@ oppia.controller('StateHints', [
             $scope.saveHint = function() {
               // Close the modal and save it afterwards.
               $modalInstance.close({
-                hint: angular.copy($scope.tmpHint)
+                hint: angular.copy(
+                  HintObjectFactory.createNew($scope.tmpHint.hintText))
               });
             };
 
