@@ -45,15 +45,26 @@ class BaseValueGenerator(object):
 
     @classmethod
     def get_html_template(cls):
+        """Returns the HTML template for the class.
+
+        Returns:
+            The HTML template corresponding to the class,
+        """
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
             '%s.html' % cls.__name__))
 
     @classmethod
     def get_js_template(cls):
-        # NB: These generators should use only Angular templating. The
-        # variables they have access to are generatorId, initArgs,
-        # customizationArgs and objType.
+        """Returns the JavaScript template for the class.
+
+        Returns:
+            The JS template corresponding to the class,
+
+        NB: These generators should use only Angular templating. The
+        variables they have access to are generatorId, initArgs,
+        customizationArgs and objType.
+        """
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
             '%s.js' % cls.__name__))
@@ -67,13 +78,20 @@ class BaseValueGenerator(object):
 
 
 class Registry(object):
-    """Registry of all value generators."""
+    """Maintains a registry of all the value generators.
 
-    # Dict mapping value generator class names to their classes.
+    Attributes:
+        value_generators_dict: Dictionary mapping value generator class names
+                    to their classes.
+    """
+
     value_generators_dict = {}
 
     @classmethod
     def _refresh_registry(cls):
+        """Refreshes the dictionary mapping between generator_id and the
+        corresponding generator classes.
+        """
         cls.value_generators_dict.clear()
 
         # Assemble all generators in
@@ -108,7 +126,18 @@ class Registry(object):
         """Gets a generator class by its id.
 
         Refreshes once if the generator is not found; subsequently, throws an
-        error."""
+        error.
+
+        Args:
+            generator_id: An id corresponding to a generator class.
+
+        Returns:
+            A generator class mapping to the generator id given.
+
+        Throws:
+            KeyError: An error occured during accessing
+            cls.value_generators_dict[generator_id]
+        """
         if generator_id not in cls.value_generators_dict:
             cls._refresh_registry()
         return cls.value_generators_dict[generator_id]
