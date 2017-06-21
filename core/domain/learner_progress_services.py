@@ -18,12 +18,15 @@
 
 from core.domain import collection_services
 from core.domain import exp_services
+from core.domain import learner_progress_domain
 from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
+
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 
 def get_completed_activities_from_model(completed_activities_model):
@@ -331,6 +334,32 @@ def remove_collection_from_completed_list(user_id, collection_id):
             save_completed_activities(activities_completed)
 
 
+def remove_entity_ids_from_completed_list(user_id, exploration_ids,
+                                          collection_ids):
+    """Removes the collections from the completed list of the user.
+
+    Args:
+        user_id: str. The id of the user.
+        exploration_ids: list(str). The ids of the explorations to be removed.
+        collection_ids: list(str). The ids of the collections to be removed.
+    """
+    completed_activities_model = (
+        user_models.CompletedActivitiesModel.get(
+            user_id, strict=False))
+
+    if completed_activities_model:
+        activities_completed = get_completed_activities_from_model(
+            completed_activities_model)
+
+        for exploration_id in exploration_ids:
+            activities_completed.remove_exploration_id(exploration_id)
+
+        for collection_id in collection_ids:
+            activities_completed.remove_collection_id(collection_id)
+
+        save_completed_activities(activities_completed)
+
+
 def remove_exp_from_incomplete_list(user_id, exploration_id):
     """Removes the exploration from the incomplete list of the user
     (if present).
@@ -374,6 +403,33 @@ def remove_collection_from_incomplete_list(user_id, collection_id):
             save_incomplete_activities(incomplete_activities)
 
 
+def remove_entity_ids_from_incomplete_list(user_id, exploration_ids=None,
+                                           collection_ids=None):
+    """Removes the collections and explorations from the incomplete list of the
+    user.
+
+    Args:
+        user_id: str. The id of the user.
+        collection_ids: list(str). The ids of the collections to be removed.
+        exploration_ids: list(str). The ids of the explorations to be removed.
+    """
+    incomplete_activities_model = (
+        user_models.IncompleteActivitiesModel.get(
+            user_id, strict=False))
+
+    if incomplete_activities_model:
+        incomplete_activities = get_incomplete_activities_from_model(
+            incomplete_activities_model)
+
+        for exploration_id in exploration_ids:
+            incomplete_activities.remove_exploration_id(exploration_id)
+
+        for collection_id in collection_ids:
+            incomplete_activities.remove_collection_id(collection_id)
+
+        save_incomplete_activities(incomplete_activities)
+
+
 def get_all_completed_exp_ids(user_id):
     """Returns a list with the ids of all the explorations completed by the
     user.
@@ -398,29 +454,32 @@ def get_all_completed_exp_ids(user_id):
         return []
 
 
-def get_completed_exp_summaries(user_id):
+def get_filtered_completed_exp_summaries(exploration_summaries,
+                                         exploration_ids):
     """Returns a list of summaries of the completed exploration ids and the
     number of explorations deleted from the list as they are no longer present.
 
     Args:
-        user_id: str. The id of the learner.
+        exploration_summaries: list(ExplorationSummary). The list of exploration
+            summary domain objects to be filtered.
+        exploration_ids: list(str). The ids of the explorations corresponding to
+            the exploration summary domain objects.
 
     Returns:
-        list(ExplorationSummary). List of ExplorationSummary domain objects of
-            the completed explorations.
-        int. The number of explorations deleted from the list as they are no
-            longer present.
+        tuple. A 2-tuple whose elements are as follows:
+        - list(ExplorationSummary). Filtered list of ExplorationSummary domain
+                objects of the completed explorations.
+        - list(str). The ids of the explorations that are no longer present.
     """
-    completed_exploration_ids = get_all_completed_exp_ids(user_id)
+    nonexistent_completed_exp_ids = []
+    filtered_completed_exp_summaries = []
+    for index, exploration_summary in enumerate(exploration_summaries):
+        if exploration_summary is None:
+            nonexistent_completed_exp_ids.append(exploration_ids[index])
+        else:
+            filtered_completed_exp_summaries.append(exploration_summary)
 
-    number_deleted = 0
-    for exploration_id in completed_exploration_ids:
-        if not exp_services.does_exploration_exists(exploration_id):
-            number_deleted = number_deleted + 1
-            remove_exp_from_completed_list(user_id, exploration_id)
-
-    return exp_services.get_exploration_summaries_matching_ids(
-        completed_exploration_ids), number_deleted
+    return filtered_completed_exp_summaries, nonexistent_completed_exp_ids
 
 
 def get_all_completed_collection_ids(user_id):
@@ -447,7 +506,8 @@ def get_all_completed_collection_ids(user_id):
         return []
 
 
-def get_completed_collection_summaries(user_id):
+def get_filtered_completed_collection_summaries(user_id, collection_summaries,
+                                                collection_ids):
     """Returns a list of summaries of the completed collection ids, the
     number of collections deleted from the list as they are no longer present
     and the number of collections being shifted to the incomplete section on
@@ -455,33 +515,51 @@ def get_completed_collection_summaries(user_id):
 
     Args:
         user_id: str. The id of the learner.
+        collection_summaries: list(CollectionSummary). The list of collection
+            summary domain objects to be filtered.
+        collection_ids: list(str). The ids of the collection corresponding to
+            the collection summary domain objects.
 
     Returns:
-        list(CollectionSummary). A list with the summary domain objects of the
-            completed collections.
-        int. The number of explorations deleted from the list as they are no
-            longer present.
-        int. The number of collections moved to the incomplete section on
+        tuple. A 3-tuple whose elements are as follows:
+        - list(CollectionSummary). A filtered list with the summary domain
+            objects of the completed collections.
+        - list(str). The ids of the collections that are no longer present.
+        - list(CollectionSummary). The summaries corresponding to those
+            collections which have been moved to the in progress section on
             account of new explorations being added to them.
     """
-    completed_collection_ids = get_all_completed_collection_ids(user_id)
-
-    number_deleted = 0
+    nonexistent_completed_collection_ids = []
     completed_to_incomplete_collections = []
-    for collection_id in completed_collection_ids:
-        if not collection_services.does_collection_exists(collection_id):
-            number_deleted = number_deleted + 1
-            remove_collection_from_completed_list(user_id, collection_id)
-        elif collection_services.get_next_exploration_ids_to_complete_by_user(
-                user_id, collection_id):
-            remove_collection_from_completed_list(user_id, collection_id)
-            mark_collection_as_incomplete(user_id, collection_id)
-            completed_to_incomplete_collections.append(
-                collection_services.get_collection_titles_and_categories(
-                    [collection_id])[collection_id]['title'])
+    filtered_completed_collection_summaries = []
 
-    return collection_services.get_collection_summaries_matching_ids(
-        completed_collection_ids), number_deleted, completed_to_incomplete_collections # pylint: disable=line-too-long
+    completed_collections = collection_services.get_multiple_collections_by_id(
+        collection_ids, strict=False)
+
+    exploration_ids_completed_in_collections = (
+        collection_services.get_explorations_completed_in_collections(
+            user_id, collection_ids))
+
+    for index, collection_summary in enumerate(collection_summaries):
+        if collection_summary is None:
+            nonexistent_completed_collection_ids.append(collection_ids[index])
+        else:
+            completed_exploration_ids = (
+                exploration_ids_completed_in_collections[index])
+            collection_model = completed_collections[collection_ids[index]]
+            if collection_model.get_next_exploration_ids(
+                    completed_exploration_ids):
+                collection_id = collection_summary.id
+                remove_collection_from_completed_list(user_id, collection_id)
+                mark_collection_as_incomplete(user_id, collection_id)
+                completed_to_incomplete_collections.append(collection_summary)
+            else:
+                filtered_completed_collection_summaries.append(
+                    collection_summary)
+
+    return (filtered_completed_collection_summaries,
+            nonexistent_completed_collection_ids,
+            completed_to_incomplete_collections)
 
 
 def get_all_incomplete_exp_ids(user_id):
@@ -508,29 +586,32 @@ def get_all_incomplete_exp_ids(user_id):
         return []
 
 
-def get_incomplete_exp_summaries(user_id):
+def get_filtered_incomplete_exp_summaries(exploration_summaries,
+                                          exploration_ids):
     """Returns a list of summaries of the incomplete exploration ids and the
     number of explorations deleted from the list as they are no longer present.
 
     Args:
-        user_id: str. The id of the learner.
+        exploration_summaries: list(ExplorationSummary). The list of exploration
+            summary domain objects to be filtered.
+        exploration_ids: list(str). The ids of the explorations corresponding to
+            the exploration summary domain objects.
 
     Returns:
-        list(ExplorationSummary). List of ExplorationSummary domain objects of
-            the incomplete explorations.
-        int. The number of explorations deleted from the list as they are no
-            longer present.
+        tuple. A 2-tuple whose elements are as follows:
+        - list(ExplorationSummary). Filtered list of ExplorationSummary domain
+            objects of the incomplete explorations.
+        - list(str). The ids of the explorations that are no longer present.
     """
-    incomplete_exploration_ids = get_all_incomplete_exp_ids(user_id)
+    nonexistent_incomplete_exp_ids = []
+    filtered_incomplete_exp_summaries = []
+    for index, exploration_summary in enumerate(exploration_summaries):
+        if exploration_summary is None:
+            nonexistent_incomplete_exp_ids.append(exploration_ids[index])
+        else:
+            filtered_incomplete_exp_summaries.append(exploration_summary)
 
-    number_deleted = 0
-    for exploration_id in incomplete_exploration_ids:
-        if not exp_services.does_exploration_exists(exploration_id):
-            number_deleted = number_deleted + 1
-            remove_exp_from_incomplete_list(user_id, exploration_id)
-
-    return exp_services.get_exploration_summaries_matching_ids(
-        incomplete_exploration_ids), number_deleted
+    return filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids
 
 
 def get_all_incomplete_collection_ids(user_id):
@@ -556,29 +637,34 @@ def get_all_incomplete_collection_ids(user_id):
         return []
 
 
-def get_incomplete_collection_summaries(user_id):
+def get_filtered_incomplete_collection_summaries(collection_summaries,
+                                                 collection_ids):
     """Returns a list of summaries of the incomplete collection ids and the
     number of collections deleted from the list as they are no longer present.
 
     Args:
-        user_id: str. The id of the learner.
+        collection_summaries: list(CollectionSummary). The list of collection
+            summary domain objects to be filtered.
+        collection_ids: list(str). The ids of the collection corresponding to
+            the collection summary domain objects.
 
     Returns:
-        list(CollectionSummary). A list with the summary domain objects of the
-            incomplete collections.
-        int. The number of explorations deleted from the list as they are no
+        tuple. A 2-tuple whose elements are as follows:
+        - list(CollectionSummary). A filtered list with the summary domain
+            objects of the incomplete collections.
+        - int. The number of explorations deleted from the list as they are no
             longer present.
     """
-    incomplete_collection_ids = get_all_incomplete_collection_ids(user_id)
+    nonexistent_incomplete_collection_ids = []
+    filtered_incomplete_collection_summaries = []
+    for index, collection_summary in enumerate(collection_summaries):
+        if collection_summary is None:
+            nonexistent_incomplete_collection_ids.append(collection_ids[index])
+        else:
+            filtered_incomplete_collection_summaries.append(collection_summary)
 
-    number_deleted = 0
-    for collection_id in incomplete_collection_ids:
-        if not collection_services.does_collection_exists(collection_id):
-            number_deleted = number_deleted + 1
-            remove_collection_from_incomplete_list(user_id, collection_id)
-
-    return collection_services.get_collection_summaries_matching_ids(
-        incomplete_collection_ids), number_deleted
+    return (filtered_incomplete_collection_summaries,
+            nonexistent_incomplete_collection_ids)
 
 
 def get_collection_summary_dicts(collection_summaries):
@@ -616,3 +702,131 @@ def get_collection_summary_dicts(collection_summaries):
         })
 
     return summary_dicts
+
+
+def get_activity_progress(user_id):
+    """Returns the progress of the learners - the explorations and collections
+    completed by the user and those in progress.
+
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        LearnerProgress. The learner progress domain object corresponding to the
+            particular learner.
+        dict. The numbers of entities that are no longer present. It contains
+            four keys:
+            - incomplete_explorations: int. The number of incomplete
+                explorations no longer present.
+            - incomplete_collections: int. The number of incomplete collections
+                no longer present.
+            - completed_explorations: int. The number of completed explorations
+                no longer present.
+            - completed_collections: int. The number of completed collections no
+                longer present.
+        list(str). The titles of the collections to which new explorations have
+            been added.
+
+    """
+    learner_progress_models = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [
+                ('CompletedActivitiesModel', [user_id]),
+                ('IncompleteActivitiesModel', [user_id])
+            ]))
+
+    # If completed model is present.
+    if learner_progress_models[0][0]:
+        activities_completed = get_completed_activities_from_model(
+            learner_progress_models[0][0])
+        completed_exploration_ids = activities_completed.exploration_ids
+        completed_collection_ids = activities_completed.collection_ids
+    else:
+        completed_collection_ids = []
+        completed_exploration_ids = []
+
+    # If incomplete model is present.
+    if learner_progress_models[1][0]:
+        incomplete_activities = get_incomplete_activities_from_model(
+            learner_progress_models[1][0])
+        incomplete_exploration_ids = incomplete_activities.exploration_ids
+        incomplete_collection_ids = incomplete_activities.collection_ids
+    else:
+        incomplete_exploration_ids = []
+        incomplete_collection_ids = []
+
+    activity_models = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [
+                ('ExpSummaryModel', incomplete_exploration_ids),
+                ('CollectionSummaryModel', incomplete_collection_ids),
+                ('ExpSummaryModel', completed_exploration_ids),
+                ('CollectionSummaryModel', completed_collection_ids)
+            ]))
+
+    incomplete_exploration_models = activity_models[0]
+    incomplete_collection_models = activity_models[1]
+    completed_exploration_models = activity_models[2]
+    completed_collection_models = activity_models[3]
+
+    incomplete_exp_summaries = (
+        [exp_services.get_exploration_summary_from_model(model)
+         if model else None for model in incomplete_exploration_models])
+    incomplete_collection_summaries = (
+        [collection_services.get_collection_summary_from_model(model)
+         if model else None for model in incomplete_collection_models])
+    completed_exp_summaries = (
+        [exp_services.get_exploration_summary_from_model(model)
+         if model else None for model in completed_exploration_models])
+    completed_collection_summaries = (
+        [collection_services.get_collection_summary_from_model(model)
+         if model else None for model in completed_collection_models])
+
+    filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids = (
+        get_filtered_incomplete_exp_summaries(
+            incomplete_exp_summaries, incomplete_exploration_ids))
+
+    filtered_completed_exp_summaries, nonexistent_completed_exp_ids = (
+        get_filtered_completed_exp_summaries(
+            completed_exp_summaries, completed_exploration_ids))
+
+    (filtered_completed_collection_summaries,
+     nonexistent_completed_collection_ids,
+     completed_to_incomplete_collection_summaries) = (
+         get_filtered_completed_collection_summaries(
+             user_id, completed_collection_summaries, completed_collection_ids))
+
+    completed_to_incomplete_collection_titles = []
+    for collection_summary in completed_to_incomplete_collection_summaries:
+        incomplete_collection_summaries.append(collection_summary)
+        completed_to_incomplete_collection_titles.append(
+            collection_summary.title)
+        incomplete_collection_ids.append(collection_summary.id)
+
+    (filtered_incomplete_collection_summaries,
+     nonexistent_incomplete_collection_ids) = (
+         get_filtered_incomplete_collection_summaries(
+             incomplete_collection_summaries, incomplete_collection_ids))
+
+    number_of_deleted_activities = {
+        'incomplete_explorations': len(nonexistent_incomplete_exp_ids),
+        'incomplete_collections': len(nonexistent_incomplete_collection_ids),
+        'completed_explorations': len(nonexistent_completed_exp_ids),
+        'completed_collections': len(nonexistent_completed_collection_ids)
+    }
+
+    remove_entity_ids_from_incomplete_list(
+        user_id, nonexistent_incomplete_exp_ids,
+        nonexistent_incomplete_collection_ids)
+    remove_entity_ids_from_completed_list(
+        user_id, nonexistent_completed_exp_ids,
+        nonexistent_completed_collection_ids)
+
+    learner_progress = learner_progress_domain.LearnerProgress(
+        filtered_incomplete_exp_summaries,
+        filtered_incomplete_collection_summaries,
+        filtered_completed_exp_summaries,
+        filtered_completed_collection_summaries)
+
+    return (learner_progress, number_of_deleted_activities,
+            completed_to_incomplete_collection_titles)

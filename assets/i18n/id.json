@@ -34,7 +34,6 @@
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Peringkat",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Pertanyaan belum terjawab",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Tarik gambar ke sini",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "atau pilih file gambar:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Eksplorasi Nonaktif",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Maaf, eksplorasi yang anda pilih sedang nonaktif. Mohon coba lagi lain kali.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Eksplorasi Nonaktif - Oppia",

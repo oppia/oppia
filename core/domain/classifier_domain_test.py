@@ -171,7 +171,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job_dict['job_id'],
             training_job_dict['algorithm_id'],
             training_job_dict['exp_id'],
-            training_job_dict['exp_version_when_created'],
+            training_job_dict['exp_version'],
             training_job_dict['state_name'],
             training_job_dict['status'],
             training_job_dict['training_data'])
@@ -183,7 +183,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
             'algorithm_id': 'LDAStringClassifier',
             'exp_id': 'exp_id1',
-            'exp_version_when_created': 1,
+            'exp_version': 1,
             'state_name': 'a state name',
             'status': 'NEW',
             'training_data': [
@@ -219,7 +219,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job_dict = {
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
             'exp_id': 'exp_id1',
-            'exp_version_when_created': 1,
+            'exp_version': 1,
             'state_name': 'some state',
             'algorithm_id': 'LDAStringClassifier',
             'training_data': training_data,
@@ -237,16 +237,16 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job.validate()
 
         # Verify validation error is raised when string is provided for
-        # exp_version_when_created instead of int.
+        # exp_version instead of int.
         training_job_dict['job_id'] = 'exp_id1.SOME_RANDOM_STRING'
-        training_job_dict['exp_version_when_created'] = 'abc'
+        training_job_dict['exp_version'] = 'abc'
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_version_when_created to be an int')):
+            'Expected exp_version to be an int')):
             training_job.validate()
 
         # Verify validation error is raised when invalid state_name is provided.
-        training_job_dict['exp_version_when_created'] = 1
+        training_job_dict['exp_version'] = 1
         training_job_dict['state_name'] = 'A string #'
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (

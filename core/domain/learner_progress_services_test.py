@@ -17,6 +17,9 @@
 """Tests for learner progress services."""
 
 import datetime
+from core.domain import collection_domain
+from core.domain import collection_services
+from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.platform import models
 from core.tests import test_utils
@@ -57,7 +60,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Save a few collections.
         self.save_new_default_collection(
-            self.COL_ID_0, self.owner_id, title='Bridges in England',
+            self.COL_ID_0, self.owner_id, title='Bridges',
             category='Architecture')
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title='Introduce Oppia',
@@ -433,3 +436,74 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
+    def test_get_activity_progress(self):
+        # Add an entity to each of the sections.
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_0)
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_0)
+
+        state_name = 'state name'
+        version = 1
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+        learner_progress_services.mark_collection_as_incomplete(
+            self.user_id, self.COL_ID_1)
+
+        # Get the progress of the user.
+        activity_progress = learner_progress_services.get_activity_progress(
+            self.user_id)
+
+        incomplete_exp_summaries = (
+            activity_progress[0].incomplete_exp_summaries)
+        incomplete_collection_summaries = (
+            activity_progress[0].incomplete_collection_summaries)
+        completed_exp_summaries = (
+            activity_progress[0].completed_exp_summaries)
+        completed_collection_summaries = (
+            activity_progress[0].completed_collection_summaries)
+
+        self.assertEqual(len(incomplete_exp_summaries), 1)
+        self.assertEqual(len(incomplete_collection_summaries), 1)
+        self.assertEqual(len(completed_exp_summaries), 1)
+        self.assertEqual(len(completed_collection_summaries), 1)
+
+        self.assertEqual(
+            incomplete_exp_summaries[0].title, 'Sillat Suomi')
+        self.assertEqual(
+            incomplete_collection_summaries[0].title, 'Introduce Oppia')
+        self.assertEqual(
+            completed_exp_summaries[0].title, 'Bridges in England')
+        self.assertEqual(
+            completed_collection_summaries[0].title, 'Bridges')
+
+        # Delete an exploration.
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
+        # Add an exploration to a collection that has already been completed.
+        collection_services.update_collection(
+            self.owner_id, self.COL_ID_0, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID_2
+            }], 'Add new exploration')
+
+        # Get the progress of the user.
+        activity_progress = learner_progress_services.get_activity_progress(
+            self.user_id)
+
+        # Check that the exploration is no longer present in the incomplete
+        # section.
+        self.assertEqual(
+            len(activity_progress[0].incomplete_exp_summaries), 0)
+        # Check that the dashboard records the exploration deleted.
+        self.assertEqual(activity_progress[1]['incomplete_explorations'], 1)
+
+        incomplete_collection_summaries = (
+            activity_progress[0].incomplete_collection_summaries)
+
+        # Check that the collection to which a new exploration has been added
+        # has been moved to the incomplete section.
+        self.assertEqual(len(incomplete_collection_summaries), 2)
+        self.assertEqual(incomplete_collection_summaries[1].title, 'Bridges')
+        # Check that the dashboard has recorded the change in the collection.
+        self.assertEqual(activity_progress[2], ['Bridges'])

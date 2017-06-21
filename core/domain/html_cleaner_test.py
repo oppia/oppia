@@ -126,3 +126,57 @@ class HtmlStripperUnitTests(test_utils.GenericTestBase):
 
         for datum in test_data:
             self.assertEqual(html_cleaner.strip_html_tags(datum[0]), datum[1])
+
+
+class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
+    '''Test the RTE component extractor.'''
+
+    def test_get_rte_components(self):
+        test_data = (
+            '<p>Test text&nbsp;'
+            '<oppia-noninteractive-math '
+            'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
+            '</oppia-noninteractive-math></p><p>&nbsp;'
+            '<oppia-noninteractive-link '
+            'text-with-value="&amp;quot;Link&amp;quot;" '
+            'url-with-value="&amp;quot;https://www.example.com&amp;quot;">'
+            '</oppia-noninteractive-link>.</p>'
+            '<p>Video</p>'
+            '<p><oppia-noninteractive-video autoplay-with-value="false" '
+            'end-with-value="0" start-with-value="0" '
+            'video_id-with-value="&amp;quot;'
+            'https://www.youtube.com/watch?v=Ntcw0H0hwPU&amp;quot;">'
+            '</oppia-noninteractive-video><br></p>'
+        )
+
+        expected_components = [
+            {
+                'customization_args': {
+                    'text-with-value': u'Link',
+                    'url-with-value': u'https://www.example.com'},
+                'id': 'oppia-noninteractive-link'
+            },
+            {
+                'customization_args': {
+                    'start-with-value': 0,
+                    'end-with-value': 0,
+                    'video_id-with-value': (
+                        u'https://www.youtube.com/watch?'
+                        u'v=Ntcw0H0hwPU'),
+                    'autoplay-with-value': False
+                },
+                'id': 'oppia-noninteractive-video'
+            },
+            {
+                'customization_args': {
+                    'raw_latex-with-value': u'\\frac{x}{y}'
+                },
+                'id': 'oppia-noninteractive-math'
+            }
+        ]
+
+        components = html_cleaner.get_rte_components(test_data)
+
+        self.assertEqual(len(components), len(expected_components))
+        for component in components:
+            self.assertIn(component, expected_components)

@@ -84,7 +84,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(training_job.algorithm_id, 'LDAStringClassifier')
         self.assertEqual(training_job.exp_id, 'exp_id1')
-        self.assertEqual(training_job.exp_version_when_created, 1)
+        self.assertEqual(training_job.exp_version, 1)
         self.assertEqual(training_job.state_name, 'state_name2')
         self.assertEqual(training_job.status,
                          feconf.TRAINING_JOB_STATUS_NEW)

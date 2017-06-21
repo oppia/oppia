@@ -19,7 +19,7 @@
 	"I18N_DASHBOARD_EXPLORATIONS": "Explorações",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Feedback aberto",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Arraste a imagem aqui",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "ou selecione um arquivo de imagem:",
+	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Selecione um arquivo de imagem",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Exploração desabilitada",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Desculpe, mas a exploração que você clicou está desativada no momento. Por favor, tente novamente mais tarde.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Exploração Desabilitada - Oppia",
