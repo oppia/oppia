@@ -289,7 +289,7 @@ class ExplorationHandler(EditorHandler):
             if exp_user_data and exp_user_data.draft_change_list_exp_version
             else None)
         draft_id = (exp_user_data.draft_change_list_id if exp_user_data
-                         and exp_user_data.draft_change_list_id else 0)
+                    and exp_user_data.draft_change_list_id else 0)
         exploration_email_preferences = (
             user_services.get_email_preferences_for_exploration(
                 self.user_id, exploration_id))
@@ -959,7 +959,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.user_id, exploration_id)
         draft_id = (exp_user_data.draft_change_list_id if exp_user_data
-                         and exp_user_data.draft_change_list_id else 0)
+                    and exp_user_data.draft_change_list_id else 0)
         # If the value passed here is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
