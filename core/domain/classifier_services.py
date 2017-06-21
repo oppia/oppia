@@ -310,7 +310,7 @@ def _update_classifier_training_job(classifier_training_job_model, status):
 
 def save_classifier_training_job(algorithm_id, committer_id, exp_id,
                                  exp_version, state_name, training_data,
-                                 status="NEW", job_id="None"):
+                                 status='NEW', job_id='None'):
     """Checks for the existence of the model.
     If the model exists, it is updated using _update_classifier_training_job
         method.
@@ -319,7 +319,8 @@ def save_classifier_training_job(algorithm_id, committer_id, exp_id,
 
     Args:
         algorithm_id: str. ID of the algorithm used to generate the model.
-        committer_id: str. ID of the user who created the job instance.
+        committer_id: str. ID of the user who created the exploration to
+            which the job belongs.
         exp_id: str. ID of the exploration.
         exp_version: int. The exploration version at the time
             this training job was created.

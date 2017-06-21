@@ -185,7 +185,8 @@ class ClassifierTrainingJob(object):
         job_id: str. The unique id of the classifier training job.
         algorithm_id: str. The id of the algorithm that will be used for
             generating the classifier.
-        committer_id: str. The id of the user who creates the job instance.
+        committer_id: str. The id of the user who created the exploration to
+            which the job belongs.
         exp_id: str. The id of the exploration that contains the state
             for which the classifier will be generated.
         exp_version: str. The version of the exploration when
@@ -219,7 +220,8 @@ class ClassifierTrainingJob(object):
         job_id: str. The unique id of the classifier training job.
         algorithm_id: str. The id of the algorithm that will be used for
             generating the classifier.
-        committer_id: str. The id of the user who creates the job instance.
+        committer_id: str. The id of the user who created the exploration to
+            which the job belongs.
         exp_id: str. The id of the exploration id that contains the state
             for which classifier will be generated.
         exp_version: str. The version of the exploration when

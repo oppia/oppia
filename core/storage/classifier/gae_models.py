@@ -97,7 +97,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The ID of the algorithm used to create the model.
     algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES,
                                       indexed=True)
-    # The ID of the user who creates the job instance.
+    # The ID of the user who created the exploration to which the job belongs.
     committer_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration_id of the exploration to whose state the model belongs.
     exp_id = ndb.StringProperty(required=True, indexed=True)
@@ -152,7 +152,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         Args:
             algorithm_id: str. ID of the algorithm used to generate the model.
-            committer_id: str. ID of the user who created the model.
+            committer_id: str. ID of the user who created the exploration to
+                which the job belongs.
             exp_id: str. ID of the exploration.
             exp_version: int. The exploration version at the time
                 this training job was created.

@@ -241,7 +241,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.exp_id, exp_id)
-        self.assertEqual(classifier_training_job.status, "NEW")
+        self.assertEqual(classifier_training_job.status, 'NEW')
         classifier_training_job.update_status(test_status)
         # Updating existing job.
         classifier_services.save_classifier_training_job(

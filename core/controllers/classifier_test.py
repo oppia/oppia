@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -105,13 +105,13 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             'classifier_data' : self.classifier_data
         }
 
-    def test_trained_classifier_handler(self):
-        payload = self.job_result_dict
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        payload['signature'] = generate_signature(payload)
+        self.payload = self.job_result_dict
+        self.payload['vm_id'] = feconf.DEFAULT_VM_ID
+        self.payload['signature'] = generate_signature(self.payload)
 
+    def test_trained_classifier_handler(self):
         # Normal end-to-end test.
-        self.post_json('/ml/trainedclassifierhandler', payload,
+        self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=False, expected_status_int=200)
         classifier = classifier_services.get_classifier_by_id(
             self.job_id)
@@ -124,14 +124,16 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         # Test if the State is updated with classifier_model_id
         state = exp_services.get_exploration_by_id(classifier.exp_id).states[
             classifier.state_name]
-        self.assertTrue(state.classifier_model_id, not None)
+        self.assertEqual(state.classifier_model_id, self.job_id)
 
+    def test_error_on_dev_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.
         with self.swap(feconf, 'DEV_MODE', False):
-            self.post_json('/ml/trainedclassifierhandler', payload,
+            self.post_json('/ml/trainedclassifierhandler', self.payload,
                            expect_errors=True, expected_status_int=401)
 
+    def test_error_on_different_signatures(self):
         # Altering data to result in different signatures.
-        payload['job_id'] = 'different_job_id'
-        self.post_json('/ml/trainedclassifierhandler', payload,
+        self.payload['job_id'] = 'different_job_id'
+        self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=True, expected_status_int=401)
