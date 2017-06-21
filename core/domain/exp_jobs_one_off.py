@@ -18,7 +18,6 @@
 
 import ast
 import logging
-import copy
 
 from core import jobs
 from core.domain import exp_domain
