@@ -18,7 +18,7 @@
 	"I18N_DASHBOARD_COLLECTIONS": "Coleções",
 	"I18N_DASHBOARD_EXPLORATIONS": "Explorações",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Feedback aberto",
-	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Arraste a imagem aqui",
+	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Arraste uma imagem para esta área",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Selecione um arquivo de imagem",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Exploração desabilitada",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Desculpe, mas a exploração que você clicou está desativada no momento. Por favor, tente novamente mais tarde.",
