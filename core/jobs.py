@@ -548,7 +548,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
         Args:
             job_id: str. Should come from the create_new class method.
-            job_class_str: str.
+            job_class_str: str. Should uniquely identify each type of job.
             kwargs: dict(str : object). Extra arguments used to build the
                 MapreducePipeline.
         """
@@ -576,8 +576,8 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 
         Args:
             job_id: str. Should come from the create_new class method.
-            job_class_str: str. TODO(brianrodri).
-            output: str. TODO(brianrodri).
+            job_class_str: str. Should uniquely identify each type of job.
+            output: str. The output produced by the job.
         """
         job_class = mapreduce_util.for_name(job_class_str)
 
@@ -689,7 +689,8 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @classmethod
     def _real_enqueue(cls, job_id, additional_job_params):
-        """TODO(brianrodri).
+        """Configures, creates, and queues the pipeline for the given job and
+        params.
 
         Args:
             job_id: str. Should come from the create_new class method.
@@ -698,8 +699,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         """
         entity_class_types = cls.entity_classes_to_map_over()
         entity_class_names = [
-            '%s.%s' % (
-                entity_class_type.__module__, entity_class_type.__name__)
+            '%s.%s' % (entity_class_type.__module__, entity_class_type.__name__)
             for entity_class_type in entity_class_types]
 
         kwargs = {
@@ -882,7 +882,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     the 0 or 1 indicates the realtime layer that the entity is in.
 
     NOTE TO DEVELOPERS: Ensure that you wrap the id with get_realtime_id()
-    when doing creations, gets, puts and queries, in order to ensure that the
+    when doing creations, gets, puts, and queries; in order to ensure that the
     relevant layer prefix gets appended.
     """
     realtime_layer = ndb.IntegerProperty(required=True, choices=[0, 1])
@@ -893,7 +893,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         in the currently active realtime datastore layer.
 
         Args:
-            layer_index: int. TODO(brianrodri).
+            layer_index: int. The realtime layer id, should be either 0 or 1.
             raw_entity_id: int. TODO(brianrodri).
 
         Returns:
