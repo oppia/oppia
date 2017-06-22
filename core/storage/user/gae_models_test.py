@@ -17,8 +17,29 @@
 import datetime
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
+
+class UserSettingsModelTest(test_utils.GenericTestBase):
+    """Tests for UserSettingsModel class."""
+    user_email = 'user@example.com'
+    user_role = feconf.ROLE_ID_ADMIN
+    user2_email = 'user2@example.com'
+    user2_role = feconf.ROLE_ID_BANNED_USER
+
+    def setUp(self):
+        super(UserSettingsModelTest, self).setUp()
+        user_models.UserSettingsModel(
+            email=self.user_email, role=self.user_role).put()
+        user_models.UserSettingsModel(
+            email=self.user2_email, role=self.user2_role).put()
+
+    def test_get_by_role(self):
+        user = user_models.UserSettingsModel.get_by_role(
+            feconf.ROLE_ID_ADMIN)
+        self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
