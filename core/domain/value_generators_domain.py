@@ -81,7 +81,7 @@ class Registry(object):
     """Maintains a registry of all the value generators.
 
     Attributes:
-        value_generators_dict: dict(str : BaseValueGenerator. Dictionary
+        value_generators_dict: dict(str : BaseValueGenerator). Dictionary
             mapping value generator class names to their classes.
     """
     value_generators_dict = {}
