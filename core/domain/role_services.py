@@ -23,7 +23,6 @@ import math
 import random
 import time
 
-import user_services
 from core.platform import models
 import feconf
 
@@ -265,19 +264,6 @@ def get_max_priority_role(role_list):
             resultant_role = role
             priority_num = PRIORITY_NUMBER_DICT[role]
     return resultant_role
-
-
-def assign_roles(changed_user_roles):
-    """Assigns roles to users based on given dict.
-
-    Args:
-        changed_user_roles: dict(str:str). Dict mapping usernames to roles.
-            These are the changes that have to be applied to roles.
-    """
-    for username in changed_user_roles:
-        user_services.update_user_role(
-            user_services.get_user_id_from_username(username),
-            changed_user_roles[username])
 
 
 def get_role_changes(old_config_properties, new_config_properties):

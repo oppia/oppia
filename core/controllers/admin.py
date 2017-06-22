@@ -54,6 +54,19 @@ def require_super_admin(handler):
     return test_super_admin
 
 
+def assign_roles(changed_user_roles):
+    """Assigns roles to users based on given dict.
+
+    Args:
+        changed_user_roles: dict(str:str). Dict mapping usernames to roles.
+            These are the changes that have to be applied to roles.
+    """
+    for username in changed_user_roles:
+        user_services.update_user_role(
+            user_services.get_user_id_from_username(username),
+            changed_user_roles[username])
+
+
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
     @require_super_admin
@@ -166,7 +179,7 @@ class AdminHandler(base.BaseHandler):
                         for name, value in config_properties.iteritems()
                     },
                     new_config_property_values)
-                role_services.assign_roles(role_change_dict)
+                assign_roles(role_change_dict)
 
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
@@ -193,7 +206,7 @@ class AdminHandler(base.BaseHandler):
                         for name, value in new_config_properties.iteritems()
                     }
                 )
-                role_services.assign_roles(role_change_dict)
+                assign_roles(role_change_dict)
             elif self.payload.get('action') == 'start_new_job':
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):
