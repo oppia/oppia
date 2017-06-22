@@ -288,15 +288,15 @@ class ExplorationHandler(EditorHandler):
                 exploration_id, exp_user_data.draft_change_list_exp_version)
             if exp_user_data and exp_user_data.draft_change_list_exp_version
             else None)
-        draft_id = (exp_user_data.draft_change_list_id if exp_user_data
-                    and exp_user_data.draft_change_list_id else 0)
+        draft_change_list_id = (exp_user_data.draft_change_list_id
+            if exp_user_data else 0)
         exploration_email_preferences = (
             user_services.get_email_preferences_for_exploration(
                 self.user_id, exploration_id))
         editor_dict = {
             'category': exploration.category,
+            'draft_change_list_id': draft_change_list_id,
             'exploration_id': exploration_id,
-            'draft_id': draft_id,
             'init_state_name': exploration.init_state_name,
             'language_code': exploration.language_code,
             'objective': exploration.objective,
@@ -958,15 +958,15 @@ class EditorAutosaveHandler(ExplorationHandler):
             raise self.InvalidInputException(e)
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.user_id, exploration_id)
-        draft_id = (exp_user_data.draft_change_list_id if exp_user_data
-                    and exp_user_data.draft_change_list_id else 0)
+        draft_change_list_id = (exp_user_data.draft_change_list_id
+            if exp_user_data else 0)
         # If the value passed here is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
         self.render_json({
+            'draft_change_list_id': draft_change_list_id,
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
-                exploration_id, version),
-            'draft_id': draft_id})
+                exploration_id, version)})
 
     @require_editor
     def post(self, exploration_id):
