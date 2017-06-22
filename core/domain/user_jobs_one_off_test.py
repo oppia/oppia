@@ -1166,7 +1166,7 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
             user_services.set_username(uid, uname)
 
         admin_usernames = ['user1', 'user2', 'user3']
-        moderator_usernames = ['user4', 'user5']
+        moderator_usernames = ['user4', 'user5', 'user2']
         banned_usernames = ['user6']
         collection_editor_usernames = ['user7', 'user3']
 
