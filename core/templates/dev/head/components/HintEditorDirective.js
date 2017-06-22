@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,12 +22,11 @@ oppia.directive('hintEditor', [
       restrict: 'E',
       scope: {
         hint: '=',
-        index: '=',
+        getIndex: '&index',
         getOnSaveFn: '&onSave'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'hint_editor_directive.html'),
+        '/components/' + 'hint_editor_directive.html'),
       controller: [
         '$scope', 'editabilityService', function($scope, editabilityService) {
           $scope.isEditable = editabilityService.isEditable();

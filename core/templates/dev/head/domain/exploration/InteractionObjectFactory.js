@@ -19,10 +19,10 @@
 
 oppia.factory('InteractionObjectFactory', [
   'AnswerGroupObjectFactory', 'FallbackObjectFactory',
-  'OutcomeObjectFactory', 'HintObjectFactory',
+  'HintObjectFactory', 'OutcomeObjectFactory',
   function(
     AnswerGroupObjectFactory, FallbackObjectFactory,
-    OutcomeObjectFactory, HintObjectFactory) {
+    HintObjectFactory, OutcomeObjectFactory) {
     var Interaction = function(
         answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
         defaultOutcome, fallbacks, hints, id) {
