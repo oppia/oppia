@@ -21,6 +21,7 @@ from core import jobs
 from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -350,22 +351,19 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
         collection_editors = config_domain.Registry.get_config_property(
             'collection_editor_whitelist')
 
+        user_roles = [feconf.ROLE_ID_EXPLORATION_EDITOR]
+        if user_model.username in admin_usernames.value:
+            user_roles.append(feconf.ROLE_ID_ADMIN)
+        if user_model.username in moderator_usernames.value:
+            user_roles.append(feconf.ROLE_ID_MODERATOR)
+        if user_model.username in banned_usernames.value:
+            user_roles.append(feconf.ROLE_ID_BANNED_USER)
+        if user_model.username in collection_editors.value:
+            user_roles.append(feconf.ROLE_ID_COLLECTION_EDITOR)
+        user_role = role_services.get_max_priority_role(user_roles)
+
         try:
-            if user_model.username in admin_usernames.value:
-                user_services.update_user_role(
-                    user_model.id, feconf.ROLE_ADMIN)
-            elif user_model.username in moderator_usernames.value:
-                user_services.update_user_role(
-                    user_model.id, feconf.ROLE_MODERATOR)
-            elif user_model.username in banned_usernames.value:
-                user_services.update_user_role(
-                    user_model.id, feconf.ROLE_BANNED_USER)
-            elif user_model.username in collection_editors.value:
-                user_services.update_user_role(
-                    user_model.id, feconf.ROLE_COLLECTION_EDITOR)
-            else:
-                user_services.update_user_role(
-                    user_model.id, feconf.ROLE_EXPLORATION_EDITOR)
+            user_services.update_user_role(user_model.id, user_role)
             yield ('success', 1)
         except Exception as e:
             logging.error('Exception raised: %s' % e)

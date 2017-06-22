@@ -1168,8 +1168,7 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
         admin_usernames = ['user1', 'user2', 'user3']
         moderator_usernames = ['user4', 'user5']
         banned_usernames = ['user6']
-        collection_editor_usernames = ['user7']
-        exploration_editor_usernames = ['user8']
+        collection_editor_usernames = ['user7', 'user3']
 
         config_services.set_property(
             'admin_id', 'admin_usernames', admin_usernames)
@@ -1186,24 +1185,24 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserRolesMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        admins_by_role = user_services.get_usernames_by_role(
-            feconf.ROLE_ADMIN)
-        moderators_by_role = user_services.get_usernames_by_role(
-            feconf.ROLE_MODERATOR)
-        banned_users_by_role = user_services.get_usernames_by_role(
-            feconf.ROLE_BANNED_USER)
-        collection_editors_by_role = user_services.get_usernames_by_role(
-            feconf.ROLE_COLLECTION_EDITOR)
-        exploration_editors_by_role = user_services.get_usernames_by_role(
-            feconf.ROLE_EXPLORATION_EDITOR)
+        user_final_roles = {}
+        for username in user_names:
+            user_final_roles[username] = user_services.get_user_role_from_id(
+                user_services.get_user_id_from_username(username))
 
         self.assertEqual(
-            set(admin_usernames), set(admins_by_role))
+            user_final_roles['user1'], feconf.ROLE_ID_ADMIN)
         self.assertEqual(
-            set(moderator_usernames), set(moderators_by_role))
+            user_final_roles['user2'], feconf.ROLE_ID_ADMIN)
         self.assertEqual(
-            set(banned_usernames), set(banned_users_by_role))
+            user_final_roles['user3'], feconf.ROLE_ID_ADMIN)
         self.assertEqual(
-            set(collection_editor_usernames), set(collection_editors_by_role))
-        for user in exploration_editor_usernames:
-            self.assertIn(user, exploration_editors_by_role)
+            user_final_roles['user4'], feconf.ROLE_ID_MODERATOR)
+        self.assertEqual(
+            user_final_roles['user5'], feconf.ROLE_ID_MODERATOR)
+        self.assertEqual(
+            user_final_roles['user6'], feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(
+            user_final_roles['user7'], feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_final_roles['user8'], feconf.ROLE_ID_EXPLORATION_EDITOR)
