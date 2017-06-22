@@ -122,14 +122,14 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'method': 'username', 'username': 'user1'})
         self.assertEqual(
-            response_dict, {'user1': feconf.ROLE_EXPLORATION_EDITOR})
+            response_dict, {'user1': feconf.ROLE_ID_EXPLORATION_EDITOR})
 
         # Check role correctly gets updated.
         response = self.testapp.get(feconf.ADMIN_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            {'role': feconf.ROLE_MODERATOR, 'username': user_name},
+            {'role': feconf.ROLE_ID_MODERATOR, 'username': user_name},
             csrf_token=csrf_token, expect_errors=False,
             expected_status_int=200)
         self.assertEqual(response_dict, {})
@@ -137,8 +137,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         # Viewing by role.
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            {'method': 'role', 'role': feconf.ROLE_MODERATOR})
-        self.assertEqual(response_dict, {'user1': feconf.ROLE_MODERATOR})
+            {'method': 'role', 'role': feconf.ROLE_ID_MODERATOR})
+        self.assertEqual(response_dict, {'user1': feconf.ROLE_ID_MODERATOR})
         self.logout()
 
     def test_invalid_username_in_view_and_update_role(self):
@@ -158,6 +158,6 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
         response = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            {'role': feconf.ROLE_MODERATOR, 'username': username},
+            {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
             csrf_token=csrf_token, expect_errors=True,
             expected_status_int=400)

@@ -37,32 +37,6 @@ import utils
 
 current_user_services = models.Registry.import_current_user_services()
 
-# This dict maps the roles in current authorization system to roles in new
-# authorization.
-# TODO (1995YogeshSharma): Remove this once new system takes over.
-ROLE_SYNC_DICT = {
-    'WHITELISTED_EMAIL_SENDERS': {
-        'name': 'whitelisted_email_senders',
-        'role': feconf.ROLE_ADMIN
-    },
-    'ADMIN_USERNAMES': {
-        'name': 'admin_usernames',
-        'role': feconf.ROLE_ADMIN
-    },
-    'COLLECTION_EDITOR_WHITELIST': {
-        'name': 'collection_editor_whitelist',
-        'role': feconf.ROLE_COLLECTION_EDITOR
-    },
-    'BANNED_USERNAMES': {
-        'name': 'banned_usernames',
-        'role': feconf.ROLE_BANNED_USER
-    },
-    'MODERATOR_USERNAMES': {
-        'name': 'moderator_usernames',
-        'role': feconf.ROLE_MODERATOR
-    }
-}
-
 
 def require_super_admin(handler):
     """Decorator that checks if the current user is a super admin."""
@@ -78,31 +52,6 @@ def require_super_admin(handler):
         return handler(self, **kwargs)
 
     return test_super_admin
-
-
-def check_and_update_config_role(old_list, new_list, role):
-    """Changes roles for users in old_list and new_list. If user belongs to
-    new_list but not in old list, its role is changed to specified role. If a
-    user belongs to old list but not new list, its role is changed to
-    exploration editor.
-
-    Args:
-        old_list: list(str). Existing list of usernames with given
-            role.
-        new_list: list(str). Updated list of usernames with given role.
-        role: str. The role to be used for users in these lists.
-    """
-    for username in old_list:
-        if username not in new_list:
-            user_services.update_user_role(
-                user_services.get_user_id_from_username(username),
-                feconf.ROLE_EXPLORATION_EDITOR)
-
-    for username in new_list:
-        if username not in old_list:
-            user_services.update_user_role(
-                user_services.get_user_id_from_username(username),
-                role)
 
 
 class AdminPage(base.BaseHandler):
@@ -207,34 +156,44 @@ class AdminHandler(base.BaseHandler):
                     config_domain.Registry.get_config_property_schemas())
                 for (name, value) in new_config_property_values.iteritems():
                     config_services.set_property(self.user_id, name, value)
-                    # Below check is for maintaining the sync between roles
-                    # in old and new authorization system.
-                    # TODO (1995YogeshSharma): Remove this block of code once
-                    # the new system takes over.
-                    for key in ROLE_SYNC_DICT:
-                        if name == ROLE_SYNC_DICT[key]['name']:
-                            check_and_update_config_role(
-                                config_properties[name]['value'], value,
-                                ROLE_SYNC_DICT[key]['role'])
+                # For maintaining sync between old and new role system when
+                # roles are changed from config tab.
+                # TODO (1995YogeshSharma): Remove this once new system takes
+                # over.
+                role_change_dict = role_services.get_role_changes(
+                    {
+                        name: value['value']
+                        for name, value in config_properties.iteritems()
+                    },
+                    new_config_property_values)
+                role_services.assign_roles(role_change_dict)
+
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
-                config_property = config_domain.Registry.get_config_property(
-                    config_property_id)
-                config_value = config_property.value
+                config_properties = (
+                    config_domain.Registry.get_config_property_schemas())
                 logging.info('[ADMIN] %s reverted config property: %s' %
                              (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
+                new_config_properties = (
+                    config_domain.Registry.get_config_property_schemas())
 
-                # Below check is for maintaining the sync between roles
-                # in old and new authorization system.
+                # For maintaining the sync between roles in old and new
+                # authorization system.
                 # TODO (1995YogeshSharma): Remove this block of code once
                 # the new system takes over.
-                for key in ROLE_SYNC_DICT:
-                    if config_property_id == ROLE_SYNC_DICT[key]['name']:
-                        check_and_update_config_role(
-                            config_value, config_property.default_value,
-                            ROLE_SYNC_DICT[key]['role'])
+                role_change_dict = role_services.get_role_changes(
+                    {
+                        name: value['value']
+                        for name, value in config_properties.iteritems()
+                    },
+                    {
+                        name: value['value']
+                        for name, value in new_config_properties.iteritems()
+                    }
+                )
+                role_services.assign_roles(role_change_dict)
             elif self.payload.get('action') == 'start_new_job':
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):
@@ -297,22 +256,22 @@ class AdminRoleHandler(base.BaseHandler):
 
     @require_super_admin
     def get(self):
-        view_method = self.request.params['method']
+        view_method = self.request.get('method')
 
         if view_method == feconf.VIEW_METHOD_ROLE:
-            role = self.request.params[feconf.VIEW_METHOD_ROLE]
+            role = self.request.get(feconf.VIEW_METHOD_ROLE)
             users_by_role = {
                 username: role
                 for username in user_services.get_usernames_by_role(role)
             }
-            role_services.store_role_query(
+            role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_ROLE,
                 role=role)
             self.render_json(users_by_role)
         elif view_method == feconf.VIEW_METHOD_USERNAME:
-            username = self.request.params[feconf.VIEW_METHOD_USERNAME]
+            username = self.request.get(feconf.VIEW_METHOD_USERNAME)
             user_id = user_services.get_user_id_from_username(username)
-            role_services.store_role_query(
+            role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_USERNAME,
                 username=username)
             if user_id is None:
@@ -334,7 +293,7 @@ class AdminRoleHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'User with given username does not exist.')
         user_services.update_user_role(user_id, role)
-        role_services.store_role_query(
+        role_services.log_role_query(
             self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
             username=username)
         self.render_json({})

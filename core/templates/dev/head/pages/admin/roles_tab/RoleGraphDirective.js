@@ -27,13 +27,8 @@ oppia.directive('roleGraph', [
         //  - 'links': A list of objects with keys:
         //            'source': id of source node
         //            'target': id of target node
-        //            'linkProperty': property of link which determines how
-        //              it is styled (styles in linkPropertyMapping). If
-        //              linkProperty or corresponding linkPropertyMatching
-        //              is undefined, link style defaults to the gray arrow.
         //  - 'initStateId': The initial state id
         //  - 'finalStateIds': The list of ids corresponding to terminal states
-        //             (i.e., those whose interactions are terminal).
         graphData: '=',
         // A boolean value to signify whether graphData is completely loaded.
         graphDataLoaded: '@'

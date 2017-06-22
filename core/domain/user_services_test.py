@@ -327,17 +327,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 
-        user_services.update_user_role(user_ids[0], feconf.ROLE_MODERATOR)
-        user_services.update_user_role(user_ids[1], feconf.ROLE_MODERATOR)
-        user_services.update_user_role(user_ids[2], feconf.ROLE_BANNED_USER)
-        user_services.update_user_role(user_ids[3], feconf.ROLE_BANNED_USER)
+        user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[2], feconf.ROLE_ID_BANNED_USER)
+        user_services.update_user_role(user_ids[3], feconf.ROLE_ID_BANNED_USER)
 
         self.assertEqual(
-            set(user_services.get_usernames_by_role(feconf.ROLE_MODERATOR)),
+            set(user_services.get_usernames_by_role(feconf.ROLE_ID_MODERATOR)),
             set(['name1', 'name2']))
 
         self.assertEqual(
-            set(user_services.get_usernames_by_role(feconf.ROLE_BANNED_USER)),
+            set(user_services.get_usernames_by_role(feconf.ROLE_ID_BANNED_USER)),
             set(['name3', 'name4']))
 
     def test_update_user_role(self):
@@ -349,11 +349,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.set_username(user_id, user_name)
 
         self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_EXPLORATION_EDITOR)
+                         feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-        user_services.update_user_role(user_id, feconf.ROLE_COLLECTION_EDITOR)
+        user_services.update_user_role(user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_COLLECTION_EDITOR)
+                         feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [

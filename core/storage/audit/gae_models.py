@@ -31,7 +31,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
     [user_id].[timestamp_in_sec].[intent].[random_number]
     """
     # The id used to key this model.
-    model_id = ndb.StringProperty(required=True)
+    id = ndb.StringProperty(required=True)
     # The user_id of the user making query.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The intent of making query (viewing (by role or username)
@@ -40,8 +40,8 @@ class RoleQueryAuditModel(base_models.BaseModel):
         feconf.ROLE_ACTION_UPDATE,
         feconf.ROLE_ACTION_VIEW_BY_ROLE,
         feconf.ROLE_ACTION_VIEW_BY_USERNAME
-    ])
+    ], indexed=True)
     # The role being queried for.
-    role = ndb.StringProperty(default=None)
+    role = ndb.StringProperty(default=None, indexed=True)
     # The username in the query.
-    username = ndb.StringProperty(default=None)
+    username = ndb.StringProperty(default=None, indexed=True)
