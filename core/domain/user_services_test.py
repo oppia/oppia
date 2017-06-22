@@ -31,6 +31,7 @@ import utils
 
 from google.appengine.api import urlfetch
 
+
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
@@ -337,7 +338,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             set(['name1', 'name2']))
 
         self.assertEqual(
-            set(user_services.get_usernames_by_role(feconf.ROLE_ID_BANNED_USER)),
+            set(user_services.get_usernames_by_role(
+                feconf.ROLE_ID_BANNED_USER)),
             set(['name3', 'name4']))
 
     def test_update_user_role(self):
@@ -351,7 +353,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_services.get_user_role_from_id(user_id),
                          feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-        user_services.update_user_role(user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         self.assertEqual(user_services.get_user_role_from_id(user_id),
                          feconf.ROLE_ID_COLLECTION_EDITOR)
 
