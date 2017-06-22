@@ -14,7 +14,7 @@
         </div>
 
         <strong>Hint #<[getIndex()]> is...</strong>
-          <span angular-html-bind="hint.hint_text"></span>
+        <span angular-html-bind="hint.hintText"></span>
       </div>
     </div>
   </div>
@@ -26,9 +26,9 @@
           ng-submit="saveThisHint()">
       <div class="oppia-rule-details-header">
         <strong>Hint #<[getIndex()]> is...</strong>
-          <schema-based-editor schema="HINT_FORM_SCHEMA"
-                               local-value="hint.hint_text">
-          </schema-based-editor>
+        <schema-based-editor schema="HINT_FORM_SCHEMA"
+                             local-value="hint.hintText">
+        </schema-based-editor>
       </div>
     </form>
 

@@ -43,8 +43,8 @@ oppia.controller('StateHints', [
 
     $scope.getHintSummary = function(hint) {
       var hintAsPlainText = (
-        hint.hint_text.length ?
-          $filter('convertToPlainText')(hint.hint_text) : '');
+        hint.hintText.length ?
+          $filter('convertToPlainText')(hint.hintText) : '');
       return hintAsPlainText;
     };
 
@@ -78,7 +78,7 @@ oppia.controller('StateHints', [
               ui_config: {}
             };
 
-            $scope.tmpHint = HintObjectFactory.createDefault('');
+            $scope.tmpHint = '';
 
             $scope.addHintForm = {};
 
@@ -87,7 +87,8 @@ oppia.controller('StateHints', [
             $scope.saveHint = function() {
               // Close the modal and save it afterwards.
               $modalInstance.close({
-                hint: angular.copy($scope.tmpHint)
+                hint: angular.copy(
+                  HintObjectFactory.createNew($scope.tmpHint))
               });
             };
 
