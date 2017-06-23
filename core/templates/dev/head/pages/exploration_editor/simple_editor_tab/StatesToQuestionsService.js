@@ -48,7 +48,7 @@ oppia.factory('StatesToQuestionsService', [
       );
     };
 
-    // Invariants to check:        SimpleEditorShimService.getNumQuestions();
+    // Invariants to check:
     // - The exploration is linear.
     // - The paramChanges for all states are empty.
     // - The states in the chain use only allowed interaction IDs, with the
@@ -161,13 +161,13 @@ oppia.factory('StatesToQuestionsService', [
         var state = SimpleEditorShimService.getState(missingStateNames[0]);
         var interactionId = state.interaction.id;
         SimpleEditorShimService.saveInteractionId(
-              currentStateName, DEFAULT_INTERACTION.ID);
+          currentStateName, DEFAULT_INTERACTION.ID);
         SimpleEditorShimService.saveCustomizationArgs(
-              currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+          currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
         newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-                RuleObjectFactory.createNew('Equals', {
-                  x: 0
-                })
+          RuleObjectFactory.createNew('Equals', {
+            x: 0
+          })
         ], OutcomeObjectFactory.createEmpty(nextStateName), false));
         if (interactionId && interactionId !== INTERACTION_ID_END_EXPLORATION) {
           return null;
