@@ -18,13 +18,13 @@
 
 oppia.controller('StateHints', [
   '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
-  'alertsService', 'INTERACTION_SPECS', 'stateHintsService',
-  'explorationStatesService', 'stateInteractionIdService',
+  'ENABLE_HINT_EDITOR', 'alertsService', 'INTERACTION_SPECS',
+  'stateHintsService', 'explorationStatesService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory',
   function(
     $scope, $rootScope, $modal, $filter, editorContextService,
-    alertsService, INTERACTION_SPECS, stateHintsService,
-    explorationStatesService, stateInteractionIdService,
+    ENABLE_HINT_EDITOR, alertsService, INTERACTION_SPECS,
+    stateHintsService, explorationStatesService, stateInteractionIdService,
     UrlInterpolationService, HintObjectFactory) {
     $scope.editorContextService = editorContextService;
     $scope.stateHintsService = stateHintsService;
@@ -32,6 +32,8 @@ oppia.controller('StateHints', [
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/drag_dots.png');
+
+    $scope.isHintEditorEnabled = ENABLE_HINT_EDITOR;
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateHintsService.init(
