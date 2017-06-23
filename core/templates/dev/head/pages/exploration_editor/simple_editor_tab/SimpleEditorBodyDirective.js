@@ -28,21 +28,20 @@ oppia.directive('simpleEditorBody', [
         '$scope', 'SimpleEditorManagerService',
         'explorationSaveService', 'explorationRightsService',
         'explorationWarningsService', 'QuestionIdService',
-        'StatesToQuestionsService', function($scope, SimpleEditorManagerService,
-            explorationSaveService, explorationRightsService,
-            explorationWarningsService, QuestionIdService,
-            StatesToQuestionsService) {
+        'StatesToQuestionsService',
+        function($scope, SimpleEditorManagerService, explorationSaveService,
+          explorationRightsService, explorationWarningsService,
+          QuestionIdService, StatesToQuestionsService) {
           $scope.data = SimpleEditorManagerService.getData();
-          $scope.chooseQuestionType = false;
-          $scope.modalWrapperVisible = false;
+
 
           var INTERACTION_TYPES = [{
             id: 'MultipleChoiceInput',
             name: 'Multiple choice'
           }];
 
-          $scope.getQuestionTypeLabel = (
-            StatesToQuestionsService.getQuestionTypeLabel);
+          $scope.getHumanReadableQuestionType = (
+            StatesToQuestionsService.getHumanReadableQuestionType);
 
           $scope.getSubfieldId = function(question, subfieldLabel) {
             return QuestionIdService.getSidebarItemId(
@@ -69,21 +68,6 @@ oppia.directive('simpleEditorBody', [
 
           $scope.getSubfieldId = function(question, label) {
             return QuestionIdService.getSubfieldId(question.getId(), label);
-          };
-
-          $scope.setModalVisible = function() {
-            $scope.modalWrapperVisible = true;
-          };
-          $scope.setModalHidden = function() {
-            $scope.modalWrapperVisible = false;
-          };
-
-          $scope.enableChooseQuestion = function() {
-            $scope.chooseQuestionType = true;
-          };
-
-          $scope.disableChooseQuestion = function() {
-            $scope.chooseQuestionType = false;
           };
 
           $scope.isExplorationFinishable = function() {

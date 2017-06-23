@@ -184,10 +184,10 @@ oppia.factory('StatesToQuestionsService', [
       getQuestions: function() {
         return getQuestions();
       },
-      getQuestionTypeLabel: function(interactionId) {
-        for( var i = 0; i < SUPPORTED_INTERACTION_TYPES.length; i++) {
-          if(SUPPORTED_INTERACTION_TYPES[i].id === interactionId) {
-            return SUPPORTED_INTERACTION_TYPES[i].name;
+      getHumanReadableQuestionType: function(interactionId) {
+        for( supportedInteraction of SUPPORTED_INTERACTION_TYPES) {
+          if(supportedInteraction.id === interactionId) {
+            return supportedInteraction.name;
           }
         }
       }

@@ -51,9 +51,6 @@ oppia.factory('SimpleEditorManagerService', [
       }
     };
 
-    var chooseQuestionType = false;
-    var modalWrapperVisible = false;
-
     var getNewStateName = function() {
       var allStateNames = data.questionList.getAllStateNames();
 
@@ -142,21 +139,22 @@ oppia.factory('SimpleEditorManagerService', [
         data.questionList.addQuestion(QuestionObjectFactory.create(
           lastStateName, stateData.interaction, ''));
       },
-      changeQuestion: function(type, index) {
-        var currentStateName = (
-          index === 0 ? 'Introduction' : 'Question ' + index);
+      changeQuestion: function(newQuestionType, index) {
+        var currentStateName = data.questionList.getAllStateNames()[index];
+        var nextStateName = data.questionList.getAllStateNames()[index + 1];
         var questionCount = data.questionList._questions.length;
+        console.log(questionCount);
         var answerGroupsLength = (
           data.questionList._questions[index]._answerGroups.length);
-        var nextStateName = 'Question ' + (index + 1);
+
         var currentInteractionId = (
           data.questionList._questions[index]._interactionId);
 
         // Update Question Type If interactionId is not same.
-        if(type !== currentInteractionId) {
+        if(newQuestionType !== currentInteractionId) {
           var newAnswerGroups = [];
 
-          switch (type) {
+          switch (newQuestionType) {
             case 'MultipleChoiceInput':
               SimpleEditorShimService.saveInteractionId(
                 currentStateName, DEFAULT_INTERACTION.ID);
@@ -170,15 +168,12 @@ oppia.factory('SimpleEditorManagerService', [
               break;
           }
           if(answerGroupsLength !== 0 && index !== questionCount - 1) {
-            SimpleEditorShimService.saveAnswerGroups(currentStateName
-              , newAnswerGroups);
+            SimpleEditorShimService.saveAnswerGroups(
+              currentStateName, newAnswerGroups);
           }
         }
         // Update the Question Set.
         var questions = StatesToQuestionsService.getQuestions();
-        if (!questions) {
-          return false;
-        }
         data.questionList = QuestionListObjectFactory.create(questions);
       },
       canAddNewQuestion: function() {

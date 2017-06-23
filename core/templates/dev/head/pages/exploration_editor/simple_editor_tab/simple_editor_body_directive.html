@@ -15,12 +15,14 @@
 
     <div ng-repeat="question in data.questionList.getQuestions() track by $index">
       <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
-      <anchor-header header-id="getSubfieldId(question,'Multiple Choice')"
-                     header-text="<[getQuestionTypeLabel(question.getInteractionId())]> &#x25BC;" ng-click="enableChooseQuestion(); setModalVisible()">
-      </anchor-header>
-
-      <div ng-show="chooseQuestionType && $parent.modalWrapperVisible" class="question-type-wrapper">
-        <button type="button" class="oppia-question-button btn btn-primary" ng-click="changeQuestion('MultipleChoiceInput', $index); disableChooseQuestion(); setModalHidden()">Multiple Choice Input</button>
+      <div class="dropdown">
+        <anchor-header header-id="getSubfieldId(question, getHumanReadableQuestionType(question.getInteractionId()))"
+                       header-text="<[getHumanReadableQuestionType(question.getInteractionId())]> &#x25BC;"
+                       class="dropdown-toggle oppia-choose-question-dropdown" data-toggle="dropdown">
+        </anchor-header>
+        <ul class="dropdown-menu oppia-question-list-menu" >
+          <li ng-click="changeQuestion('MultipleChoiceInput', $index); ">Multiple Choice Input</li>
+        </ul>
       </div>
 
       <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
@@ -46,7 +48,7 @@
   </div>
 
   <div class="advance-btn-wrapper">
-    <span class="advance-btn-description" ng-show="advBtnHovered" ng-if="!chooseQuestionType">Add new question</span>
+    <span class="advance-btn-description" ng-show="advBtnHovered">Add new question</span>
     <button ng-disabled="!canAddNewQuestion()" type="button"
             class="btn btn-default advance-btn" ng-click="addNewQuestion(); advBtnHovered = false"
             ng-mouseenter="advBtnHovered = true" ng-mouseleave="advBtnHovered = false">
@@ -54,7 +56,7 @@
     </button>
   </div>
   <div class="advance-btn-wrapper end-exploration-btn-wrapper">
-    <span class="advance-btn-description" ng-show="finishBtnHovered" ng-if="!chooseQuestionType">Finish exploration</span>
+    <span class="advance-btn-description" ng-show="finishBtnHovered">Finish exploration</span>
     <button ng-show="canTryToFinishExploration()" ng-disabled="!isExplorationFinishable()" type="button"
             class="btn btn-default advance-btn"
             ng-click="publishChanges(); finishBtnHovered = false"
@@ -63,7 +65,7 @@
     </button>
   </div>
 </div>
-<div ng-show="modalWrapperVisible" ng-click="setModalHidden()" class="modal-wrapper">
+
 </div>
 
 <style>
@@ -141,35 +143,38 @@
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
   }
 
-  simple-editor-body .question-type-wrapper {
-    background-color: white;
-    border-radius: 4px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-    margin: 0 0 20px -30px;
-    overflow: hidden;
-    position: absolute;
-    width: 200px;
-    z-index: 20;
-  }
-  simple-editor-body .oppia-question-button {
-    background-color: white;
-    border-color: white;
-    color: black;
-    height: 55px;
-    min-width: 202px;
-  }
-  simple-editor-body .oppia-question-button:hover,.oppia-question-button:focus {
-    background-color: #e4e4e4;
-    border-color: #e4e4e4;
-    color: black;
-  }
-  simple-editor-body .modal-wrapper {
+  .oppia-choose-question-dropdown {
     background: transparent;
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 1;
+    padding: 0;
   }
+  .oppia-choose-question-dropdown:hover {
+    cursor: pointer;
+  }
+  .oppia-choose-question-dropdown h3 {
+      margin-top: 18px;
+  }
+  .oppia-choose-question-dropdown:actve{
+    background: none;
+    outline: none;
+    border-style: outset;
+  }
+  .oppia-question-list-menu {
+    background-color: #fff;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    padding: 1px;
+    width: 200px;
+  }
+  .oppia-question-list-menu li {
+    background-color: #fff;
+    border-color: #fff;
+    color: #000;
+    font-size: 16px;
+    padding: 15px 19px;
+  }
+  .oppia-question-list-menu li:hover {
+    background-color: #efecec;
+  }
+
 </style>

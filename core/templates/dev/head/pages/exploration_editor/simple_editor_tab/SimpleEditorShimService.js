@@ -46,6 +46,15 @@ oppia.factory('SimpleEditorShimService', [
       getContentHtml: function(stateName) {
         return this.getState(stateName).content[0].value;
       },
+      getNumQuestions: function() {
+        return explorationStatesService.getStateNames();
+      },
+      getAnswerGrouplength: function(stateName) {
+        return angular.copy(explorationStatesService.getState(stateName));
+      },
+      currentInteractionId: function(stateName) {
+        return this.getState(stateName).content[0].value;
+      },
       saveTitle: function(newTitle) {
         explorationTitleService.displayed = newTitle;
         explorationTitleService.saveDisplayedValue();
