@@ -160,15 +160,6 @@ oppia.factory('StatesToQuestionsService', [
         // EndExploration.
         var state = SimpleEditorShimService.getState(missingStateNames[0]);
         var interactionId = state.interaction.id;
-        SimpleEditorShimService.saveInteractionId(
-          currentStateName, DEFAULT_INTERACTION.ID);
-        SimpleEditorShimService.saveCustomizationArgs(
-          currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-        newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-          RuleObjectFactory.createNew('Equals', {
-            x: 0
-          })
-        ], OutcomeObjectFactory.createEmpty(nextStateName), false));
         if (interactionId && interactionId !== INTERACTION_ID_END_EXPLORATION) {
           return null;
         }
@@ -187,7 +178,7 @@ oppia.factory('StatesToQuestionsService', [
       getHumanReadableQuestionType: function(interactionId) {
         for (key in SUPPORTED_INTERACTION_TYPES) {
           if(SUPPORTED_INTERACTION_TYPES[key].id === interactionId) {
-            return supportedInteraction[key].name;
+            return SUPPORTED_INTERACTION_TYPES[key].name;
           }
         }
       }

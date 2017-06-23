@@ -150,7 +150,7 @@ oppia.factory('SimpleEditorManagerService', [
           QuestionListObjectFactory.doesLastQuestionHaveAnswerGroups);
 
         // Update Question Type If interactionId is not same.
-        if (newQuestionType === currentInteractionId) {
+        if (newQuestionType !== currentInteractionId) {
           var newAnswerGroups = [];
           switch (newQuestionType) {
             case 'MultipleChoiceInput':
