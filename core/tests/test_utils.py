@@ -519,8 +519,8 @@ class TestBase(unittest.TestCase):
             owner_id: int. Owner id for the newly created collection.
 
         Returns:
-            Collection. Newly created collection containing corresponding exploration
-            details.
+            Collection. Newly created collection containing corresponding
+            exploration details.
         """
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective,
