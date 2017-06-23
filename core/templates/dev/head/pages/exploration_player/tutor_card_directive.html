@@ -74,6 +74,14 @@
           <div class="protractor-test-conversation-input"
                angular-html-bind="activeCard.interactionHtml">
           </div>
+          <div style="text-align: right">
+            <md-button class="hint-button"
+                       tooltip="Click here for a hint!"
+                       ng-click="showHint()"
+                       ng-disabled="!isHintAvailable()">
+              Hint <i class="fa fa-lightbulb-o"></i>
+            </md-button>
+          </div>
         </div>
       </div>
     </div>
@@ -119,8 +127,19 @@
   }
 
   .conversation-skin-tutor-card .instructions-button {
-      background: inherit;
-      border: none;
+    background: inherit;
+    border: none;
+  }
+
+  .conversation-skin-tutor-card .hint-button {
+    background-color: #0D48A1;
+    color: #ffffff;
+    border: none;
+  }
+
+  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
+  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
+    background-color: #115FD4;
   }
 
   .conversation-skin-tutor-card.animate-card-width {
@@ -222,7 +241,7 @@
   }
 
   @media screen and (max-width: 959px) {
-    .conversation-skin-tutor-card .instructions-button {
+    .conversation-skin-tutor-card .instructions-button .hint-button {
       background-color: #0D48A1;
       color: #ffffff;
       padding: 6px 12px;
@@ -233,7 +252,9 @@
     }
 
     .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover {
+    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover,
+    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
+    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
       background-color: #115FD4;
     }
   }

@@ -64,6 +64,9 @@ oppia.directive('answerFeedbackPair', [
                   $scope.data.learnerAnswer, interaction.id,
                   interaction.customizationArgs));
             }
+            if ($scope.data.learnerAnswer === '(Asked for a hint)') {
+              return $scope.data.learnerAnswer;
+            }
             return shortAnswerHtml;
           };
         }

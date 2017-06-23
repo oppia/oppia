@@ -49,13 +49,13 @@ oppia.directive('tutorCard', [
         '/pages/exploration_player/' +
         'tutor_card_directive.html'),
       controller: [
-        '$scope', 'oppiaPlayerService',
+        '$scope', '$timeout', 'oppiaPlayerService',
         'playerPositionService', 'playerTranscriptService',
         'ExplorationPlayerStateService', 'windowDimensionsService',
         'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         function(
-          $scope, oppiaPlayerService,
+          $scope, $timeout, oppiaPlayerService,
           playerPositionService, playerTranscriptService,
           ExplorationPlayerStateService, windowDimensionsService,
           urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
@@ -76,11 +76,36 @@ oppia.directive('tutorCard', [
             $scope.interactionInstructions = (
               ExplorationPlayerStateService.getInteractionInstructions(
                 $scope.activeCard.stateName));
+
+            $timeout(function() {
+              $scope.isCurrentHintUsable = true;
+            }, 10000);
           };
 
           $scope.arePreviousResponsesShown = false;
 
           $scope.waitingForOppiaFeedback = false;
+
+          $scope.isCurrentHintUsable = false;
+
+          $scope.isHintAvailable = function() {
+            var numOfAttempts = (
+              playerTranscriptService.getNumSubmitsForLastCard());
+            var hintIsAvailable = $scope.isCurrentHintUsable;
+            return hintIsAvailable;
+          };
+
+          $scope.showHint = function() {
+            playerTranscriptService.addNewAnswer('(Asked for a hint)');
+            $timeout(function() {
+              $scope.$broadcast('oppiaFeedbackAvailable');
+              playerTranscriptService.addNewFeedback('Bleh.');
+            }, 600);
+            $scope.isCurrentHintUsable = false;
+            $timeout(function() {
+              $scope.isCurrentHintUsable = true;
+            }, 10000);
+          };
 
           $scope.isIframed = urlService.isIframed();
 
