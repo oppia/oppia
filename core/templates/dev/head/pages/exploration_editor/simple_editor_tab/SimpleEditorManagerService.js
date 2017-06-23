@@ -142,8 +142,7 @@ oppia.factory('SimpleEditorManagerService', [
       changeQuestion: function(newQuestionType, index) {
         var currentStateName = data.questionList.getAllStateNames()[index];
         var nextStateName = data.questionList.getAllStateNames()[index + 1];
-        var questionCount = (
-          SimpleEditorShimService.getNumQuestions());
+        var questionCount = data.questionList.getQuestionCount();
         var currentInteractionId = (
           SimpleEditorShimService.currentInteractionId(currentStateName));
         var doesLastQuestionHaveAnswerGroups = (

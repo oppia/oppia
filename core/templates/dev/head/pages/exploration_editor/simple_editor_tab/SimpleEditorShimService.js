@@ -46,9 +46,6 @@ oppia.factory('SimpleEditorShimService', [
       getContentHtml: function(stateName) {
         return this.getState(stateName).content[0].value;
       },
-      getNumQuestions: function() {
-        return this.getAllStateNames().length;
-      },
       currentInteractionId: function(stateName) {
         return this.getState(stateName).interaction.id;
       },
