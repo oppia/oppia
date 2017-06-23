@@ -19,6 +19,19 @@
             ng-click="reloadAllExplorations()">
       Reload All Explorations
     </button>
+    <h3>Reload dummy explorations</h3>
+    <span class="col-lg-4 col-md-4 col-sm-4 row">
+      <input class="form-control" style="width:80%"
+      ng-model= "DummyExplorationCount" placeholder="No. of explorations to load">
+      </input>
+    </span>
+    <span class="col-lg-2 col-md-2 col-sm-2">
+      <button type="button"
+            class="btn btn-default"
+            ng-click="reloadDummyExplorations()">
+            Reload Dummy Explorations
+      </button>
+    </span>
   </div>
 </md-card>
 
