@@ -686,9 +686,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_hints([{
             'hint_text': 'hint one',
         }])
-        self._assert_validation_error(
-            exploration,
-            r'Solution must be specified if hint\(s\) are specified')
+
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',

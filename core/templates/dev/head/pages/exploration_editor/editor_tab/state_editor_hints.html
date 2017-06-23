@@ -1,0 +1,102 @@
+<div ng-controller="StateHints">
+  <div ng-if="!isCurrentInteractionLinear() && isHintEditorEnabled">
+    <div class="oppia-editor-header">
+      <strong>Hints</strong>
+    </div>
+
+    <md-card class="oppia-editor-card-with-avatar">
+      <div class="oppia-editor-card-body">
+        <div ng-if="stateHintsService.displayed.length > 0">
+          <!-- An HTML element marked ui-sortable should contain only one element,
+          and this element should have an ng-repeat defined on it. See the
+          ui-sortable documentation for more details. -->
+          <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
+              ui-sortable="HINT_LIST_SORTABLE_OPTIONS"
+              ng-model="stateHintsService.displayed">
+            <!-- Note that adding "track by $index" here seems to mess up the final
+            index in the stop() event handler. -->
+            <li ng-repeat="hint in stateHintsService.displayed"
+                ng-class="{'active': activeHintIndex === $index}"
+                class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
+                style="margin-top: 0;">
+              <span class="oppia-hint-sort-handle"
+                    ng-if="stateHintsService.displayed.length > 1"
+                    ng-mousedown="changeActiveHintIndex(null)">
+                <img ng-if="editabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
+              </span>
+              <a ng-click="changeActiveHintIndex($index)"
+                 class="oppia-rule-tab"
+                 ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}">
+                <response-header index="$index"
+                                 summary="getHintSummary(hint)"
+                                 short-summary="getHintSummary(hint)"
+                                 is-active="$index === activeHintIndex"
+                                 on-delete-fn="deleteHint">
+                </response-header>
+              </a>
+
+              <div ng-if="activeHintIndex === $index">
+                <div class="oppia-editor-card-section">
+                  <hint-editor hint="hint"
+                               index="$index + 1"
+                               on-save="onComponentSave">
+                  </hint-editor>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </md-card>
+
+    <md-card style="margin: 0; padding: 0;">
+      <div ng-if="editabilityService.isEditableOutsideTutorialMode()">
+        <button type="button" class="btn btn-default btn-lg oppia-add-hint-button" ng-click="openAddHintModal()">
+          + Add Hint
+        </button>
+      </div>
+    </md-card>
+  </div>
+</div>
+
+<script type="text/ng-template" id="modals/addHint">
+  <div class="modal-header">
+    <h3>Add Hint</h3>
+  </div>
+
+  <div class="modal-body">
+    <form name="addHintForm.hintTextForm"
+          class="form-inline">
+      <div class="oppia-rule-details-header">
+        <strong>Hint #<[hintIndex]> is...</strong>
+        <schema-based-editor schema="HINT_FORM_SCHEMA" local-value="tmpHint">
+        </schema-based-editor>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success" ng-click="saveHint()">Save Hint</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/deleteHint">
+  <div class="modal-header">
+    <h3>Delete Hint</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      Are you sure you want to delete this hint?
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+      <button class="btn btn-danger"
+              ng-click="reallyDelete()">
+        Delete Hint
+      </button>
+  </div>
+</script>
