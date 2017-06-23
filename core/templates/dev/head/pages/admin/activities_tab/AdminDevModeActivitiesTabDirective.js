@@ -104,26 +104,26 @@ oppia.directive('adminDevModeActivitiesTab', [
           }
         };
 
-      $scope.reloadDummyExplorations = function(){
-        // Create a dummy exploration with random title.
-        AdminTaskManagerService.startTask();
-        $scope.setStatusMessage('Processing...');
-        for (var i = 0; i < $scope.DummyExplorationCount; ++i) {
-        var title = ['Hulk Neuroscience',
-        'Quantum Starks',
-        'Wonder Anatomy',
-        'Elvish, language of "Lord of the Rings',
-        'The Science of Superheroes'
-        ];
-        var randomTiltle = Math.floor(Math.random()*title.length);
-        $http.post('/contributehandler/create_new', {
-          title: title[randomTiltle],
-        }).then(function(response) {
-        $scope.setStatusMessage('Dummy explorations reloaded.');
-        });
-        }
-        AdminTaskManagerService.finishTask();
-};
+        $scope.reloadDummyExplorations = function(){
+          // Create a dummy exploration with random title.
+          AdminTaskManagerService.startTask();
+          $scope.setStatusMessage('Processing...');
+          for (var i = 0; i < $scope.DummyExplorationCount; ++i) {
+            var title = ['Hulk Neuroscience',
+                         'Quantum Starks',
+                         'Wonder Anatomy',
+                         'Elvish, language of "Lord of the Rings',
+                         'The Science of Superheroes'
+            ];
+            var randomTitle = Math.floor( Math.random() * title.length);
+            $http.post('/contributehandler/create_new', {
+              title: title[randomTitle],
+            }).then(function(response) {
+              $scope.setStatusMessage('Dummy explorations reloaded.');
+            });
+          }
+          AdminTaskManagerService.finishTask();
+        };
 
         $scope.reloadCollection = function(collectionId) {
           if (AdminTaskManagerService.isTaskRunning()) {
