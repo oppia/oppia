@@ -21,13 +21,13 @@
  */
 
 oppia.factory('SimpleEditorManagerService', [
-  'StatesToQuestionsService', 'SimpleEditorShimService',
-  'QuestionObjectFactory', 'QuestionListObjectFactory', 'OutcomeObjectFactory',
-  'explorationInitStateNameService',
+  'explorationInitStateNameService', 'OutcomeObjectFactory',
+  'QuestionListObjectFactory', 'QuestionObjectFactory',
+  'SimpleEditorShimService', 'StatesToQuestionsService',
   function(
-      StatesToQuestionsService, SimpleEditorShimService,
-      QuestionObjectFactory, QuestionListObjectFactory, OutcomeObjectFactory,
-      explorationInitStateNameService) {
+    explorationInitStateNameService, OutcomeObjectFactory,
+    QuestionListObjectFactory, QuestionObjectFactory,
+    SimpleEditorShimService, StatesToQuestionsService) {
     var data = {
       title: null,
       introductionHtml: null,
@@ -62,6 +62,7 @@ oppia.factory('SimpleEditorManagerService', [
       return 'Question ' + minimumStateNumber;
     };
 
+    // It overwrites values so that they match properties of a terminal state.
     var makeStateTerminal = function(stateName) {
       SimpleEditorShimService.saveInteractionId(
         stateName, END_EXPLORATION_INTERACTION.ID);

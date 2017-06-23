@@ -49,7 +49,7 @@ oppia.factory('QuestionListObjectFactory', [function() {
     if (index !== -1) {
       return this._questions.splice(index, 1);
     }
-    throw Error('Cannot find question : ' + question);
+    throw Error('Cannot find question: ' + question);
   };
 
   QuestionList.prototype.doesLastQuestionHaveAnswerGroups = function() {

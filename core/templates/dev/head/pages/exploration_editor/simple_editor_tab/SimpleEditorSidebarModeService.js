@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview It keeps track of sidebar mode in simple editor. It provides
- * two modes 1)Readonly 2)Edit.
+ * two modes: ReadOnly and Edit.
  */
 
 oppia.factory('SimpleEditorSidebarModeService', [function() {
