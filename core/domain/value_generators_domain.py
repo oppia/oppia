@@ -134,7 +134,7 @@ class Registry(object):
             class(BaseValueGenerator). A generator class mapping to the
                 generator id given.
 
-        Throws:
+        Raises:
             KeyError: The given generator_id is invalid.
         """
         if generator_id not in cls.value_generators_dict:
