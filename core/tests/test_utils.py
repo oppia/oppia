@@ -511,16 +511,16 @@ class TestBase(unittest.TestCase):
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
 
-            """Creates a collection and save exploration details in it.
+        """Creates a collection and save exploration details in it.
 
-            Args:
-                collection_id: int. Id for the newly created collection.
-                owner_id: int. Owner id for the newly created collection.
+        Args:
+            collection_id: int. Id for the newly created collection.
+            owner_id: int. Owner id for the newly created collection.
 
-            Returns:
-                Newly created collection containing corresponding exploration
-                details.
-            """
+        Returns:
+            Newly created collection containing corresponding exploration
+            details.
+        """
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective,
             language_code=language_code)
