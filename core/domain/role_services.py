@@ -282,24 +282,21 @@ def get_role_changes(old_config_properties, new_config_properties):
     changed_user_roles = {}
     resultant_changed_roles = {}
 
-    for new_name, new_value in new_config_properties.iteritems():
-        for old_name, old_value in old_config_properties.iteritems():
-            if old_name == new_name:
-                for key in ROLE_SYNC_DICT:
-                    if new_name == ROLE_SYNC_DICT[key]['name']:
-                        for username in new_value:
-                            if username not in changed_user_roles:
-                                changed_user_roles[username] = []
-                            changed_user_roles[username].append(
-                                ROLE_SYNC_DICT[key]['role'])
-                        for username in old_value:
-                            if username not in changed_user_roles:
-                                changed_user_roles[username] = []
-                            changed_user_roles[username].append(
-                                feconf.ROLE_ID_EXPLORATION_EDITOR)
+    for key in ROLE_SYNC_DICT:
+        new_config_values = new_config_properties[ROLE_SYNC_DICT[key]['name']]
+        old_config_values = old_config_properties[ROLE_SYNC_DICT[key]['name']]
+        for username in new_config_values:
+            if username not in changed_user_roles:
+                changed_user_roles[username] = []
+            changed_user_roles[username].append(ROLE_SYNC_DICT[key]['role'])
+        for username in old_config_values:
+            if username not in changed_user_roles:
+                changed_user_roles[username] = []
+            changed_user_roles[username].append(
+                feconf.ROLE_ID_EXPLORATION_EDITOR)
+
     for username in changed_user_roles:
-        if changed_user_roles[username] is not None:
-            resultant_changed_roles[username] = get_max_priority_role(
-                changed_user_roles[username])
+        resultant_changed_roles[username] = get_max_priority_role(
+            changed_user_roles[username])
 
     return resultant_changed_roles

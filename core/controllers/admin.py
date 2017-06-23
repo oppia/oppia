@@ -61,10 +61,9 @@ def assign_roles(changed_user_roles):
         changed_user_roles: dict(str:str). Dict mapping usernames to roles.
             These are the changes that have to be applied to roles.
     """
-    for username in changed_user_roles:
+    for username, role in changed_user_roles.iteritems():
         user_services.update_user_role(
-            user_services.get_user_id_from_username(username),
-            changed_user_roles[username])
+            user_services.get_user_id_from_username(username), role)
 
 
 class AdminPage(base.BaseHandler):
