@@ -73,13 +73,13 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.request = None
 
     def set_return_values(self, content='', status_code=200, headers=None):
-        """Sets the content, status code and headers that the urlfetch mock
+        """ Sets the content, status code and headers that the urlfetch mock
         should return with.
 
         Args:
             content: str. The content to return in subsequent calls to the
             urlfetch mock.
-            status_code: status_code for return_values.
+            status_code: int. status_code for return_values.
             headers: headers to return_values.
         """
         self.return_values['content'] = content
@@ -87,7 +87,7 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.return_values['headers'] = headers
 
     def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
-        """Simulates a url fetch.
+        """ Simulates a url fetch.
 
         Args:
             request: Request object for the mock url.
@@ -158,7 +158,7 @@ class TestBase(unittest.TestCase):
     }
 
     def _get_unicode_test_string(self, suffix):
-        """Supply a test string that has unicode characters in it.
+        """ Supply a test string that has unicode characters in it.
 
         Args:
             suffix: str. The suffix to UNICODE_TEST_STRING.
@@ -229,10 +229,11 @@ class TestBase(unittest.TestCase):
         self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
-        """Sets the environment variables to simulate a login.
+        """ Sets the environment variables to simulate a login.
 
         Args:
             email: str. Sets the USER_EMAIL to be email.
+            is_super_admin: bool. Sets the USER_IS_ADMIN to be is_super_admin.
         """
         os.environ['USER_EMAIL'] = email
         os.environ['USER_ID'] = self.get_user_id_from_email(email)
@@ -388,7 +389,7 @@ class TestBase(unittest.TestCase):
             config_domain.MODERATOR_USERNAMES, moderator_usernames)
 
     def get_current_logged_in_user_id(self):
-        """Gets the user_id of the current logged-in user.
+        """ Gets the user_id of the current logged-in user.
 
         Returns:
             str. Returns USER_ID from the environment variable.
@@ -396,7 +397,7 @@ class TestBase(unittest.TestCase):
         return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
-        """Gets the user_id corresponding to the given email.
+        """ Gets the user_id corresponding to the given email.
 
         Args:
             email: str. Valid email stored in the database.
@@ -408,10 +409,10 @@ class TestBase(unittest.TestCase):
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
-        """Saves a new default exploration written by owner_id.
+        """ Saves a new default exploration written by owner_id.
 
         Returns:
-            The exploration domain object.
+            Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category='A category')
@@ -424,10 +425,10 @@ class TestBase(unittest.TestCase):
             language_code=feconf.DEFAULT_LANGUAGE_CODE,
             end_state_name=None,
             interaction_id='TextInput'):
-        """Saves a new strictly-validated exploration.
+        """ Saves a new strictly-validated exploration.
 
         Returns:
-            The exploration domain object.
+            Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
@@ -493,10 +494,10 @@ class TestBase(unittest.TestCase):
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
-        """Saves a new default collection written by owner_id.
+        """ Saves a new default collection written by owner_id.
 
         Returns:
-            The collection domain object.
+            Collection. The collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title=title, category=category, objective=objective,
@@ -511,14 +512,14 @@ class TestBase(unittest.TestCase):
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
 
-        """Creates a collection and save exploration details in it.
+        """ Creates a collection and save exploration details in it.
 
         Args:
             collection_id: int. Id for the newly created collection.
             owner_id: int. Owner id for the newly created collection.
 
         Returns:
-            Newly created collection containing corresponding exploration
+            Collection. Newly created collection containing corresponding exploration
             details.
         """
         collection = collection_domain.Collection.create_default_collection(
@@ -661,7 +662,7 @@ class AppEngineTestBase(TestBase):
     @contextlib.contextmanager
     def urlfetch_mock(
             self, content='', status_code=200, headers=None):
-        """Enables the custom urlfetch mock (URLFetchServiceMock) within the
+        """ Enables the custom urlfetch mock (URLFetchServiceMock) within the
         context of a 'with' statement.
 
         This mock is currently used for signup to prevent external HTTP
@@ -765,7 +766,7 @@ class FunctionWrapper(object):
     """
 
     def __init__(self, func):
-        """Creates a new FunctionWrapper instance.
+        """ Creates a new FunctionWrapper instance.
 
         Args:
             func: a callable, or data descriptor. If it's a descriptor, its
@@ -801,7 +802,7 @@ class FunctionWrapper(object):
         return self
 
     def pre_call_hook(self, args):
-        """Override this to do tasks that should be executed before the
+        """ Override this to do tasks that should be executed before the
         actual function call.
 
         Args:
@@ -810,7 +811,7 @@ class FunctionWrapper(object):
         pass
 
     def post_call_hook(self, args, result):
-        """Override this to do tasks that should be executed after the
+        """ Override this to do tasks that should be executed after the
         actual function call.
 
         Args:
@@ -878,9 +879,12 @@ class FailingFunction(FunctionWrapper):
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
-        """Method that is called each time before the actual function call
+        """ Method that is called each time before the actual function call
         to check if the exception is to be raised based on the number of
-        tries before success
+        tries before success.
+
+        Args:
+            args: Set of arguments this function accepts.
         """
         self._times_called += 1
         call_should_fail = (
