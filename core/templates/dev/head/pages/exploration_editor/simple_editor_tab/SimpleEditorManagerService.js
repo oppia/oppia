@@ -142,18 +142,16 @@ oppia.factory('SimpleEditorManagerService', [
       changeQuestion: function(newQuestionType, index) {
         var currentStateName = data.questionList.getAllStateNames()[index];
         var nextStateName = data.questionList.getAllStateNames()[index + 1];
-        var questionCount = data.questionList._questions.length;
-        console.log(questionCount);
-        var answerGroupsLength = (
-          data.questionList._questions[index]._answerGroups.length);
-
+        var questionCount = (
+          SimpleEditorShimService.getNumQuestions());
         var currentInteractionId = (
-          data.questionList._questions[index]._interactionId);
+          SimpleEditorShimService.currentInteractionId(currentStateName));
+        var doesLastQuestionHaveAnswerGroups = (
+          QuestionListObjectFactory.doesLastQuestionHaveAnswerGroups);
 
         // Update Question Type If interactionId is not same.
-        if(newQuestionType !== currentInteractionId) {
+        if (newQuestionType === currentInteractionId) {
           var newAnswerGroups = [];
-
           switch (newQuestionType) {
             case 'MultipleChoiceInput':
               SimpleEditorShimService.saveInteractionId(
@@ -167,14 +165,14 @@ oppia.factory('SimpleEditorManagerService', [
               ], OutcomeObjectFactory.createEmpty(nextStateName), false));
               break;
           }
-          if(answerGroupsLength !== 0 && index !== questionCount - 1) {
+          if(doesLastQuestionHaveAnswerGroups && index !== questionCount - 1) {
             SimpleEditorShimService.saveAnswerGroups(
               currentStateName, newAnswerGroups);
           }
         }
-        // Update the Question Set.
+        // Update the question.
         var questions = StatesToQuestionsService.getQuestions();
-        data.questionList = QuestionListObjectFactory.create(questions);
+        data.questionList.updateQuestion(index,questions[index]);
       },
       canAddNewQuestion: function() {
         // Requirements:

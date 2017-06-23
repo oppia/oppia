@@ -48,7 +48,7 @@ oppia.factory('StatesToQuestionsService', [
       );
     };
 
-    // Invariants to check:
+    // Invariants to check:        SimpleEditorShimService.getNumQuestions();
     // - The exploration is linear.
     // - The paramChanges for all states are empty.
     // - The states in the chain use only allowed interaction IDs, with the
@@ -185,9 +185,9 @@ oppia.factory('StatesToQuestionsService', [
         return getQuestions();
       },
       getHumanReadableQuestionType: function(interactionId) {
-        for( supportedInteraction of SUPPORTED_INTERACTION_TYPES) {
-          if(supportedInteraction.id === interactionId) {
-            return supportedInteraction.name;
+        for (key in SUPPORTED_INTERACTION_TYPES) {
+          if(SUPPORTED_INTERACTION_TYPES[key].id === interactionId) {
+            return supportedInteraction[key].name;
           }
         }
       }

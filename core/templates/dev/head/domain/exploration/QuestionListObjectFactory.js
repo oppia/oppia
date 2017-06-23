@@ -35,6 +35,10 @@ oppia.factory('QuestionListObjectFactory', [function() {
     this._questions.push(question);
   };
 
+  QuestionList.prototype.updateQuestion = function(index, question) {
+    this._questions[index] = question;
+  };
+
   QuestionList.prototype.doesLastQuestionHaveAnswerGroups = function() {
     return this._questions[this._questions.length - 1].hasAnswerGroups();
   };
