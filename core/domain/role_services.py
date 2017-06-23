@@ -283,17 +283,21 @@ def get_role_changes(old_config_properties, new_config_properties):
     resultant_changed_roles = {}
 
     for key in ROLE_SYNC_DICT:
-        new_config_values = new_config_properties[ROLE_SYNC_DICT[key]['name']]
-        old_config_values = old_config_properties[ROLE_SYNC_DICT[key]['name']]
-        for username in new_config_values:
-            if username not in changed_user_roles:
-                changed_user_roles[username] = []
-            changed_user_roles[username].append(ROLE_SYNC_DICT[key]['role'])
-        for username in old_config_values:
-            if username not in changed_user_roles:
-                changed_user_roles[username] = []
-            changed_user_roles[username].append(
-                feconf.ROLE_ID_EXPLORATION_EDITOR)
+        if ROLE_SYNC_DICT[key]['name'] in new_config_properties:
+            new_config_values = (
+                new_config_properties[ROLE_SYNC_DICT[key]['name']])
+            old_config_values = (
+                old_config_properties[ROLE_SYNC_DICT[key]['name']])
+            for username in new_config_values:
+                if username not in changed_user_roles:
+                    changed_user_roles[username] = []
+                changed_user_roles[username].append(
+                    ROLE_SYNC_DICT[key]['role'])
+            for username in old_config_values:
+                if username not in changed_user_roles:
+                    changed_user_roles[username] = []
+                changed_user_roles[username].append(
+                    feconf.ROLE_ID_EXPLORATION_EDITOR)
 
     for username in changed_user_roles:
         resultant_changed_roles[username] = get_max_priority_role(
