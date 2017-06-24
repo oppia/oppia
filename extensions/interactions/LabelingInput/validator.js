@@ -85,39 +85,17 @@ oppia.factory('LabelingInputValidationService', [
     var warningsList = [];
 
     warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    warningsList = warningsList.concat(
       baseInteractionValidationService.getAnswerGroupWarnings(
         answerGroups, stateName));
 
-    var seenRegionStrings = [];
-      if (customizationArgs.imageAndLabels.value.labeledRegions.length === 0) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: 'Please specify at least one image region to click on.'
-        });
-      }
-
-      for (var i = 0;
-           i < customizationArgs.imageAndLabels.value.labeledRegions.length;
-           i++) {
-        var regionLabel = (
-          customizationArgs.imageAndLabels.value.labeledRegions[i].label);
-
-        var ALPHANUMERIC_REGEX = /^[A-Za-z0-9\s]+$/;
-        if (regionLabel.trim().length === 0) {
-          areAnyRegionStringsEmpty = true;
-        } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'The image region strings should consist of characters from ' +
-              '[A-Za-z0-9] and spaces.')
-          });
-        } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
-          areAnyRegionStringsDuplicated = true;
-        } else {
-          seenRegionStrings.push(regionLabel);
-        }
-      }
+    var imgAndRegionArgValue = customizationArgs.imageAndLabels.value;
+    var seenRegionStrings = imgAndRegionArgValue.labeledRegions.map(
+      function(region) {
+        return region.label;
+      });
 
     // Check that each rule refers to a valid region string.
     for (var i = 0; i < answerGroups.length; i++) {
