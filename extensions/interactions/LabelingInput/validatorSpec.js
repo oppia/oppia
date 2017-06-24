@@ -25,7 +25,7 @@ describe('LabelingInputValidationService', function() {
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
     var filter = $injector.get('$filter');
-    validatorService = filter('LabelingInputValidationService');
+    validatorService = $injector.get('LabelingInputValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     currentState = 'First State';
