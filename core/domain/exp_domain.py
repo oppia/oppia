@@ -27,6 +27,7 @@ import logging
 import re
 import string
 
+from constants import constants
 from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
@@ -1638,7 +1639,7 @@ class Exploration(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
         if not any([self.language_code == lc['code']
-                    for lc in feconf.ALL_LANGUAGE_CODES]):
+                    for lc in constants.ALL_LANGUAGE_CODES]):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 

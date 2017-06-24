@@ -25,6 +25,7 @@ import copy
 import re
 import string
 
+from constants import constants
 import feconf
 import utils
 
@@ -931,7 +932,7 @@ class Collection(object):
                 'A language must be specified (in the \'Settings\' tab).')
 
         if not any([self.language_code == lc['code']
-                    for lc in feconf.ALL_LANGUAGE_CODES]):
+                    for lc in constants.ALL_LANGUAGE_CODES]):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 

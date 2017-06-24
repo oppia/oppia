@@ -14,6 +14,7 @@
 
 """Controllers for the learner dashboard."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import learner_progress_services
@@ -46,7 +47,7 @@ class LearnerDashboardPage(base.BaseHandler):
 class LearnerDashboardHandler(base.BaseHandler):
     """Provides data for the user's learner dashboard page."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""

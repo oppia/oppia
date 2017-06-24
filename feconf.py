@@ -191,8 +191,6 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
 INVALID_NAME_CHARS = u':#/|_%<>[]{}\ufffd\\' + chr(127)
 for ind in range(32):
     INVALID_NAME_CHARS += chr(ind)
-# Prefix for data sent from the server to the client via JSON.
-XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 # A regular expression for alphanumeric words separated by single spaces.
@@ -271,18 +269,11 @@ DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
 # Whether to require an email to be sent, following a moderator action.
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
-# Whether to allow custom event reporting to Google Analytics.
-CAN_SEND_ANALYTICS_EVENTS = False
 # Timespan in minutes before allowing duplicate emails.
 DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
 # dashboard is rounded off to.
 AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
-# Whether to enable the promo bar functionality. This does not actually turn on
-# the promo bar, as that is gated by a config value (see config_domain). This
-# merely avoids checking for whether the promo bar is enabled for every Oppia
-# page visited.
-ENABLE_PROMO_BAR = True
 # Whether to enable maintenance mode on the site. For non-admins, this redirects
 # all HTTP requests to the maintenance page. This is the only check which
 # determines whether the site is in maintenance mode to avoid queries to the
@@ -561,11 +552,9 @@ PREFERENCES_DATA_URL = '/preferenceshandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
-SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
-SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -650,71 +639,10 @@ USER_QUERY_STATUS_FAILED = 'failed'
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 
-DEFAULT_COLOR = '#a33f40'
-DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
-
-# List of supported default categories. For now, each category has a specific
-# color associated with it. Each category also has a thumbnail icon whose
-# filename is "{{CategoryName}}.svg".
-CATEGORIES_TO_COLORS = {
-    'Mathematics': '#cd672b',
-    'Algebra': '#cd672b',
-    'Arithmetic': '#d68453',
-    'Calculus': '#b86330',
-    'Logic': '#d68453',
-    'Combinatorics': '#cf5935',
-    'Graph Theory': '#cf5935',
-    'Probability': '#cf5935',
-    'Statistics': '#cd672b',
-    'Geometry': '#d46949',
-    'Trigonometry': '#d46949',
-
-    'Algorithms': '#d0982a',
-    'Computing': '#bb8b2f',
-    'Programming': '#d9aa53',
-
-    'Astronomy': '#879d6c',
-    'Biology': '#97a766',
-    'Chemistry': '#aab883',
-    'Engineering': '#8b9862',
-    'Environment': '#aba86d',
-    'Medicine': '#97a766',
-    'Physics': '#879d6c',
-
-    'Architecture': '#6e3466',
-    'Art': '#895a83',
-    'Music': '#6a3862',
-    'Philosophy': '#613968',
-    'Poetry': '#7f507f',
-
-    'English': '#193a69',
-    'Languages': '#1b4174',
-    'Latin': '#3d5a89',
-    'Reading': '#193a69',
-    'Spanish': '#405185',
-    'Gaulish': '#1b4174',
-
-    'Business': '#387163',
-    'Economics': '#5d8b7f',
-    'Geography': '#3c6d62',
-    'Government': '#538270',
-    'History': '#3d6b52',
-    'Law': '#538270',
-
-    'Education': '#942e20',
-    'Puzzles': '#a8554a',
-    'Sport': '#893327',
-    'Welcome': '#992a2b',
-}
-
 # Types of activities that can be created with Oppia.
 ACTIVITY_TYPE_EXPLORATION = 'exploration'
 ACTIVITY_TYPE_COLLECTION = 'collection'
 ALL_ACTIVITY_TYPES = [ACTIVITY_TYPE_EXPLORATION, ACTIVITY_TYPE_COLLECTION]
-
-# A sorted list of default categories for which icons and background colours
-# exist.
-ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
 
 # These categories are shown in the library navbar.
 SEARCH_DROPDOWN_CATEGORIES = sorted([
@@ -768,142 +696,10 @@ LIBRARY_PAGE_MODE_INDEX = 'index'
 # Page mode for the search results page.
 LIBRARY_PAGE_MODE_SEARCH = 'search'
 
-# List of supported language codes. Each description has a
-# parenthetical part that may be stripped out to give a shorter
-# description.
-ALL_LANGUAGE_CODES = [{
-    'code': 'en', 'description': u'English',
-}, {
-    'code': 'ar', 'description': u'العربية (Arabic)',
-}, {
-    'code': 'bg', 'description': u'български (Bulgarian)',
-}, {
-    'code': 'ca', 'description': u'català (Catalan)',
-}, {
-    'code': 'zh', 'description': u'中文 (Chinese)',
-}, {
-    'code': 'hr', 'description': u'hrvatski (Croatian)',
-}, {
-    'code': 'cs', 'description': u'čeština (Czech)',
-}, {
-    'code': 'da', 'description': u'dansk (Danish)',
-}, {
-    'code': 'nl', 'description': u'Nederlands (Dutch)',
-}, {
-    'code': 'tl', 'description': u'Filipino (Filipino)',
-}, {
-    'code': 'fi', 'description': u'suomi (Finnish)',
-}, {
-    'code': 'fr', 'description': u'français (French)',
-}, {
-    'code': 'de', 'description': u'Deutsch (German)',
-}, {
-    'code': 'el', 'description': u'ελληνικά (Greek)',
-}, {
-    'code': 'he', 'description': u'עברית (Hebrew)',
-}, {
-    'code': 'hi', 'description': u'हिन्दी (Hindi)',
-}, {
-    'code': 'hu', 'description': u'magyar (Hungarian)',
-}, {
-    'code': 'id', 'description': u'Bahasa Indonesia (Indonesian)',
-}, {
-    'code': 'it', 'description': u'italiano (Italian)',
-}, {
-    'code': 'ja', 'description': u'日本語 (Japanese)',
-}, {
-    'code': 'ko', 'description': u'한국어 (Korean)',
-}, {
-    'code': 'lv', 'description': u'latviešu (Latvian)',
-}, {
-    'code': 'lt', 'description': u'lietuvių (Lithuanian)',
-}, {
-    'code': 'no', 'description': u'Norsk (Norwegian)',
-}, {
-    'code': 'fa', 'description': u'فارسی (Persian)',
-}, {
-    'code': 'pl', 'description': u'polski (Polish)',
-}, {
-    'code': 'pt', 'description': u'português (Portuguese)',
-}, {
-    'code': 'ro', 'description': u'română (Romanian)',
-}, {
-    'code': 'ru', 'description': u'русский (Russian)',
-}, {
-    'code': 'sr', 'description': u'српски (Serbian)',
-}, {
-    'code': 'sk', 'description': u'slovenčina (Slovak)',
-}, {
-    'code': 'sl', 'description': u'slovenščina (Slovenian)',
-}, {
-    'code': 'es', 'description': u'español (Spanish)',
-}, {
-    'code': 'sv', 'description': u'svenska (Swedish)',
-}, {
-    'code': 'th', 'description': u'ภาษาไทย (Thai)',
-}, {
-    'code': 'tr', 'description': u'Türkçe (Turkish)',
-}, {
-    'code': 'uk', 'description': u'українська (Ukrainian)',
-}, {
-    'code': 'vi', 'description': u'Tiếng Việt (Vietnamese)',
-}]
-
 # Defaults for topic similarities
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
-# NOTE TO DEVELOPERS: While adding another language, please ensure that the
-# languages are in alphabetical order.
-SUPPORTED_SITE_LANGUAGES = [{
-    'id': 'id',
-    'text': 'Bahasa Indonesia'
-}, {
-    'id': 'en',
-    'text': 'English'
-}, {
-    'id': 'de',
-    'text': 'Deutsch'
-}, {
-    'id': 'fr',
-    'text': 'français'
-}, {
-    'id': 'nl',
-    'text': 'Nederlands'
-}, {
-    'id': 'es',
-    'text': 'Español'
-}, {
-    'id': 'hu',
-    'text': 'magyar'
-}, {
-    'id': 'pt',
-    'text': 'Português'
-}, {
-    'id': 'pt-br',
-    'text': 'Português (Brasil)'
-}, {
-    'id': 'mk',
-    'text': 'македонски јазик'
-}, {
-    'id': 'vi',
-    'text': 'Tiếng Việt'
-}, {
-    'id': 'hi',
-    'text': 'हिन्दी'
-}, {
-    'id': 'bn',
-    'text': 'বাংলা'
-}, {
-    'id': 'tr',
-    'text': 'Türkçe'
-}, {
-    'id': 'zh-hans',
-    'text': '中文(简体)'
-}, {
-    'id': 'zh-hant',
-    'text': '中文(繁體)'
-}]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 
@@ -959,11 +755,6 @@ TERMS_PAGE_DESCRIPTION = (
     'distributing learning material.')
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
-SITE_NAME = 'Oppia.org'
-
-# The type of the response returned by a handler when an exception is raised.
-HANDLER_TYPE_HTML = 'html'
-HANDLER_TYPE_JSON = 'json'
 
 # Following are the constants for the roles.
 ROLE_GUEST = 'GUEST'

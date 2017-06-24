@@ -16,6 +16,7 @@
 activities.
 """
 
+from constants import constants
 from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -67,7 +68,7 @@ class NotificationsDashboardPage(base.BaseHandler):
 class NotificationsDashboardHandler(base.BaseHandler):
     """Provides data for the user notifications dashboard."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
@@ -138,7 +139,7 @@ class CreatorDashboardPage(base.BaseHandler):
 class CreatorDashboardHandler(base.BaseHandler):
     """Provides data for the user's creator dashboard page."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
@@ -147,9 +148,9 @@ class CreatorDashboardHandler(base.BaseHandler):
 
         def _get_intro_card_color(category):
             return (
-                feconf.CATEGORIES_TO_COLORS[category] if
-                category in feconf.CATEGORIES_TO_COLORS else
-                feconf.DEFAULT_COLOR)
+                constants.CATEGORIES_TO_COLORS[category] if
+                category in constants.CATEGORIES_TO_COLORS else
+                constants.DEFAULT_COLOR)
 
         def _round_average_ratings(rating):
             return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
@@ -261,7 +262,7 @@ class CreatorDashboardHandler(base.BaseHandler):
 class NotificationsHandler(base.BaseHandler):
     """Provides data about unseen notifications."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""

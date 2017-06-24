@@ -26,6 +26,7 @@ import unittest
 
 import webtest
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -226,9 +227,9 @@ class TestBase(unittest.TestCase):
 
         self.assertEqual(
             json_response.content_type, 'application/javascript')
-        self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
+        self.assertTrue(json_response.body.startswith(constants.XSSI_PREFIX))
 
-        return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
+        return json.loads(json_response.body[len(constants.XSSI_PREFIX):])
 
     def get_json(self, url, params=None, expect_errors=False):
         """Get a JSON response, transformed to a Python object."""
