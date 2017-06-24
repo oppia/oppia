@@ -24,6 +24,7 @@ oppia.directive('imageUploader', [
       scope: {
         height: '@',
         onFileChanged: '=',
+        errorMessage: '@',
         width: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -31,7 +32,8 @@ oppia.directive('imageUploader', [
       link: function(scope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
-          $(elt).removeClass('image-uploader-is-active');
+          $('.image-uploader-drop-area').removeClass(
+              'image-uploader-is-active');
         };
 
         $(elt).bind('drop', function(e) {
@@ -43,10 +45,21 @@ oppia.directive('imageUploader', [
 
         $(elt).bind('dragover', function(e) {
           e.preventDefault();
-          $(elt).addClass('image-uploader-is-active');
+          $('.image-uploader-drop-area').addClass('image-uploader-is-active');
         });
 
         $(elt).bind('dragleave', onDragEnd);
+
+        // If the user accidentally drops an image outside of the image-uploader
+        // we want to prevent the browser from applying normal drag-and-drop
+        // logic, which is to load the image in the browser tab.
+        $(window).bind('dragover', function(e) {
+          e.preventDefault();
+        });
+
+        $(window).bind('drop', function(e) {
+          e.preventDefault();
+        });
 
         // We generate a random class name to distinguish this input from
         // others in the DOM.

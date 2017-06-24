@@ -44,7 +44,9 @@ oppia.factory('InteractionObjectFactory', [
         fallbacks: this.fallbacks.map(function(fallback) {
           return fallback.toBackendDict();
         }),
-        id: this.id
+        hints: [],
+        id: this.id,
+        solution: {}
       };
     };
 

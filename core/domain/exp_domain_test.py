@@ -59,7 +59,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: null
+      solution: {}
     param_changes: []
   New state:
     classifier_model_id: null
@@ -84,7 +86,9 @@ states:
             num_submits:
               value: 42
           trigger_type: NthResubmission
+      hints: []
       id: null
+      solution: {}
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -195,7 +199,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
   New state:
     classifier_model_id: null
@@ -215,7 +221,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
   Second state:
     classifier_model_id: null
@@ -235,7 +243,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -523,6 +533,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.fallbacks = []
         exploration.validate()
 
+        interaction.hints = {}
+        self._assert_validation_error(
+            exploration, 'Expected hints to be a list')
+
         # Validate AnswerGroup.
         answer_group.rule_specs = {}
         self._assert_validation_error(
@@ -659,6 +673,67 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'outcome': base_outcome,
         }])
+        exploration.validate()
+
+    def test_hints_validation(self):
+        """Test validation of state hints."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.objective = 'Objective'
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        exploration.validate()
+
+        init_state.update_interaction_hints([{
+            'hint_text': 'hint one',
+        }])
+        self._assert_validation_error(
+            exploration,
+            r'Solution must be specified if hint\(s\) are specified')
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': 'hello_world is a string',
+        }
+        init_state.interaction.solution = solution
+        exploration.validate()
+
+        # Add hint and delete hint
+        init_state.add_hint('new hint')
+        self.assertEquals(
+            init_state.interaction.hints[1].hint_text,
+            'new hint')
+        init_state.add_hint('hint three')
+        init_state.delete_hint(1)
+        self.assertEquals(
+            len(init_state.interaction.hints),
+            2)
+        exploration.validate()
+
+    def test_solution_validation(self):
+        """Test validation of state solution."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.objective = 'Objective'
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        exploration.validate()
+
+        init_state.add_hint('hint #1')
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': [0, 0],
+            'explanation': 'hello_world is a string',
+        }
+        init_state.interaction.solution = solution
+        # Object type of answer must match that of correct_answer
+        with self.assertRaises(AssertionError):
+            exploration.validate()
+
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'hello_world!',
+            'explanation': 'hello_world is a string',
+        }
+        init_state.interaction.solution = solution
         exploration.validate()
 
     def test_tag_validation(self):
@@ -936,7 +1011,9 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                 },
                 'fallbacks': [],
+                'hints': [],
                 'id': None,
+                'solution': {},
             },
             'param_changes': [],
         }
@@ -1907,7 +1984,97 @@ states_schema_version: 9
 tags: []
 title: Title
 """)
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V12
+
+    YAML_CONTENT_V13 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 13
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: {}
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+states_schema_version: 10
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V13
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -1981,6 +2148,12 @@ title: Title
             'eid', self.YAML_CONTENT_V12)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v13(self):
+        """Test direct loading from a v13 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V13)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
 
@@ -2009,7 +2182,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'param_changes': [],
                     },
                     'fallbacks': [],
+                    'hints': [],
                     'id': None,
+                    'solution': {},
                 },
                 'param_changes': [],
             }

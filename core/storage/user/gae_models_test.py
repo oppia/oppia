@@ -76,7 +76,8 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             rated_on=self.DATETIME_OBJECT,
             draft_change_list={'new_content': {}},
             draft_change_list_last_updated=self.DATETIME_OBJECT,
-            draft_change_list_exp_version=3).put()
+            draft_change_list_exp_version=3,
+            draft_change_list_id=1).put()
 
     def test_create_success(self):
         user_models.ExplorationUserDataModel.create(
@@ -100,6 +101,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.draft_change_list_last_updated,
                          self.DATETIME_OBJECT)
         self.assertEqual(retrieved_object.draft_change_list_exp_version, 3)
+        self.assertEqual(retrieved_object.draft_change_list_id, 1)
 
     def test_get_failure(self):
         retrieved_object = user_models.ExplorationUserDataModel.get(

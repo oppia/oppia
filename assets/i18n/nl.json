@@ -19,7 +19,6 @@
 	"I18N_DASHBOARD_EXPLORATIONS": "Verkenningen",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Terugkoppeling openen",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Sleep hier een afbeelding",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "of selecteer een afbeeldingsbestand:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Verkenning uitgeschakeld",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "De verkenning waar u op hebt geklikt is helaas uitgeschakeld. Probeer het later opnieuw.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Uitgeschakelde verkenning - Oppia",

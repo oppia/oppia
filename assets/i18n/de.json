@@ -101,7 +101,6 @@
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Bewertung",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Unerledigte Antworten",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Bild hier ablegen",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "oder wähle eine Bilddatei aus:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Deaktivierte Erforschung",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Leider ist die angeklickte Erforschung derzeit deaktiviert. Bitte später erneut versuchen.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Deaktivierte Erforschung – Oppia",
