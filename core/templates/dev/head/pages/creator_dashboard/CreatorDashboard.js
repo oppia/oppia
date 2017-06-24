@@ -187,12 +187,22 @@ oppia.controller('CreatorDashboard', [
         controller: [
           '$scope', '$modalInstance', '$http',
           function($scope, $modalInstance, $http) {
+            $scope.defaultDashboardSelected = false;
 
             $scope.setDashboard = function(defaultDashboard) {
               $http.put(_PREFERENCES_DATA_URL, {
                 update_type: 'default_dashboard',
                 data: defaultDashboard
               });
+              if (defaultDashboard === 'creator') {
+                $scope.defaultDashboardName = 'Creator Dashboard';
+              } else {
+                $scope.defaultDashboardName = 'Learner Dashboard';
+              }
+              $scope.defaultDashboardSelected = true;
+            };
+
+            $scope.close = function() {
               $modalInstance.close();
             };
           }
