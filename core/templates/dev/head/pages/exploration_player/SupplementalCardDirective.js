@@ -28,13 +28,13 @@ oppia.directive('supplementalCard', [
         '/pages/exploration_player/' +
         'supplemental_card_directive.html'),
       controller: [
-        '$scope', '$window', 'oppiaPlayerService',
+        '$scope', '$timeout', '$window', 'oppiaPlayerService',
         'playerPositionService', 'playerTranscriptService',
         'ExplorationObjectFactory', 'windowDimensionsService',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'EVENT_ACTIVE_CARD_CHANGED', 'CONTINUE_BUTTON_FOCUS_LABEL',
         function(
-          $scope, $window, oppiaPlayerService,
+          $scope, $timeout, $window, oppiaPlayerService,
           playerPositionService, playerTranscriptService,
           ExplorationObjectFactory, windowDimensionsService,
           CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
@@ -46,6 +46,13 @@ oppia.directive('supplementalCard', [
             }
             $scope.activeCard = playerTranscriptService.getCard(index);
             $scope.clearHelpCard();
+            $scope.isCurrentHintUsable = false;
+            $scope.promiseForHint = $timeout(function () {
+              $scope.isCurrentHintUsable = true;
+            }, 10000);
+
+            $scope.currentInteractionHints = oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).hints;
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
@@ -60,6 +67,42 @@ oppia.directive('supplementalCard', [
           $scope.clearHelpCard = function() {
             $scope.helpCardHtml = null;
             $scope.helpCardHasContinueButton = false;
+          };
+
+          $scope.isCurrentHintUsable = false;
+
+          $scope.allHintsExhausted = false;
+
+          $scope.promiseForHint = null;
+
+          $scope.hintButtonClicks = 0;
+
+          $scope.showHint = function() {
+            var hints = $scope.currentInteractionHints;
+            if ($scope.hintButtonClicks < hints.length) {
+              var currentHint = hints[$scope.hintButtonClicks].hintText;
+              playerTranscriptService.addNewAnswer('(Asked for a hint)');
+              playerTranscriptService.addNewFeedback(currentHint);
+              $scope.helpCardHtml = currentHint;
+              $scope.isCurrentHintUsable = false;
+              $scope.promiseForHint = $timeout(function() {
+                $scope.isCurrentHintUsable = true;
+              }, 10000);
+
+              if ($scope.hintButtonClicks === hints.length - 1) {
+                $scope.isCurrentHintUsable = false;
+                $scope.allHintsExhausted = true;
+                $scope.hintButtonClicks = 0;
+              } else {
+                $scope.hintButtonClicks += 1;
+              }
+            }
+          };
+
+          $scope.isHintAvailable = function() {
+            var hintIsAvailable = (
+              $scope.isCurrentHintUsable && !$scope.allHintsExhausted);
+            return hintIsAvailable;
           };
 
           $scope.isViewportNarrow = function() {
@@ -90,11 +133,17 @@ oppia.directive('supplementalCard', [
 
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
             updateActiveCard();
+            $scope.allHintsExhausted = false;
           });
 
           $scope.$on('helpCardAvailable', function(event, helpCard) {
             $scope.helpCardHtml = helpCard.helpCardHtml;
             $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
+          });
+
+          $scope.$on('stayOnSameCard', function() {
+            $timeout.cancel($scope.promiseForHint);
+            $scope.isCurrentHintUsable = true;
           });
 
           updateActiveCard();

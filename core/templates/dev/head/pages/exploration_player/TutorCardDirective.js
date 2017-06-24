@@ -76,10 +76,13 @@ oppia.directive('tutorCard', [
             $scope.interactionInstructions = (
               ExplorationPlayerStateService.getInteractionInstructions(
                 $scope.activeCard.stateName));
-
-            $timeout(function() {
+            $scope.isCurrentHintUsable = false;
+            $scope.promiseForHint = $timeout(function () {
               $scope.isCurrentHintUsable = true;
             }, 10000);
+
+            $scope.currentInteractionHints = oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).hints;
           };
 
           $scope.arePreviousResponsesShown = false;
@@ -88,23 +91,40 @@ oppia.directive('tutorCard', [
 
           $scope.isCurrentHintUsable = false;
 
-          $scope.isHintAvailable = function() {
-            var numOfAttempts = (
-              playerTranscriptService.getNumSubmitsForLastCard());
-            var hintIsAvailable = $scope.isCurrentHintUsable;
-            return hintIsAvailable;
-          };
+          $scope.allHintsExhausted = false;
+
+          $scope.promiseForHint = null;
+
+          $scope.hintButtonClicks = 0;
 
           $scope.showHint = function() {
-            playerTranscriptService.addNewAnswer('(Asked for a hint)');
-            $timeout(function() {
-              $scope.$broadcast('oppiaFeedbackAvailable');
-              playerTranscriptService.addNewFeedback('Bleh.');
-            }, 600);
-            $scope.isCurrentHintUsable = false;
-            $timeout(function() {
-              $scope.isCurrentHintUsable = true;
-            }, 10000);
+            var hints = $scope.currentInteractionHints;
+            if ($scope.hintButtonClicks < hints.length) {
+              var currentHint = hints[$scope.hintButtonClicks].hintText;
+              playerTranscriptService.addNewAnswer('(Asked for a hint)');
+              $timeout(function() {
+                $scope.waitingForOppiaFeedback = false;
+                playerTranscriptService.addNewFeedback(currentHint);
+              }, 600);
+              $scope.isCurrentHintUsable = false;
+              $scope.promiseForHint = $timeout(function() {
+                $scope.isCurrentHintUsable = true;
+              }, 10000);
+
+              if ($scope.hintButtonClicks === hints.length - 1) {
+                $scope.isCurrentHintUsable = false;
+                $scope.allHintsExhausted = true;
+                $scope.hintButtonClicks = 0;
+              } else {
+                $scope.hintButtonClicks += 1;
+              }
+            }
+          };
+
+          $scope.isHintAvailable = function() {
+            var hintIsAvailable = (
+              $scope.isCurrentHintUsable && !$scope.allHintsExhausted);
+            return hintIsAvailable;
           };
 
           $scope.isIframed = urlService.isIframed();
@@ -155,10 +175,16 @@ oppia.directive('tutorCard', [
 
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
             updateActiveCard();
+            $scope.allHintsExhausted = false;
           });
 
           $scope.$on('oppiaFeedbackAvailable', function() {
             $scope.waitingForOppiaFeedback = false;
+          });
+
+          $scope.$on('stayOnSameCard', function() {
+            $timeout.cancel($scope.promiseForHint);
+            $scope.isCurrentHintUsable = true;
           });
 
           updateActiveCard();
