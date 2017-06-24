@@ -197,6 +197,7 @@ class RecentUpdatesMRJobManager(
     @staticmethod
     def map(item):
         """Implements the map function (generator).
+        Computes most recent activity commits and feedbacks of a spcecific user.
 
         Args:
             item: The parameter passed to this function is a single element of
@@ -471,6 +472,7 @@ class UserStatsMRJobManager(
     @staticmethod
     def map(item):
         """Implements the map function (generator).
+        Computes exploration data for every contributor and owner of the exploration.
 
         Args:
             item: The parameter passed to this function is a single element of
