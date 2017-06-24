@@ -1,63 +1,49 @@
-<style>
-  .filepath-editor-image-upload-reset-button {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-</style>
-
-<div ng-model="localValue" ui-validate="'validate($value)'">
-  <div ng-show="!imageUploaderIsActive">
-    <div ng-if="!filepathsLoaded">
-      <span class="text-align: center; width: 50px;">
-        Loading...
-      </span>
-    </div>
-
-    <div ng-repeat="filepath in filepaths track by $index">
-      <label>
-        <input type="radio" ng-model="localValue.label"
-               name="choiceGroup" id="<[filepath]>"
-               value="<[filepath]>">
-        <[filepath]>
-      </label>
-    </div>
-    <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>"/>
-
-    <br><br>
-    <button type="button" class="btn btn-default" ng-click="openImageUploader()">Upload a new image</button>
-  </div>
-
-  <div ng-if="imageUploaderIsActive" style="border: 1px solid black; padding: 5px;">
-    <div class="oppia-warning">
-      Before uploading any images, please ensure that they are compatible with the <a href="/about#license" target="_blank">license terms</a> of this site (the link opens in a new window).
-    </div>
-
-    <br>
-
-    <div ng-if="!currentFile">
-      <image-uploader on-file-changed="onFileChanged">
+<div ng-model="data" ui-validate="'validate($value)'">
+  <div class="filepath-editor-image-container">
+    <div ng-if="isNoImageUploaded()">
+      <image-uploader
+        on-file-changed="onFileChanged"
+        error-message="<[uploadWarning]>">
       </image-uploader>
-
-      <div ng-if="uploadWarning" style="color: red;">
-        <br>
-        <strong>Error:</strong> <[uploadWarning]>
-      </div>
     </div>
-
-    <div ng-if="currentFile" style="position: relative;">
-      <button class="btn btn-default filepath-editor-image-upload-reset-button" ng-click="resetImageUploader()">
-        <span><i class="material-icons">&#xE14C;</i></span>
-      </button>
-
-      <img ng-src="<[imagePreview]>" style="display: block; margin-left: auto; margin-right: auto;">
+    <div ng-if="isImageUploaded()">
+      <img ng-src="<[data.metadata.uploadedImageData]>">
     </div>
-
-    <br>
-    Choose a filename:
-    <input type="text" ng-model="currentFilename" class="protractor-test-file-name">
-
-    <button type="button" class="btn btn-success" ng-click="saveUploadedFile(currentFile, currentFilename)" ng-disabled="!currentFile || !currentFilename">Save</button>
-    <button type="button" class="btn btn-default" ng-click="closeImageUploader()">Cancel</button>
+    <div ng-if="isImageSaved()">
+      <i class="material-icons filepath-editor-trash"
+         ng-click="clearScopeData()"
+         title="Delete this image">&#xE872;</i>
+      <img ng-src="<[getSavedImageTrustedResourceUrl()]>">
+    </div>
+  </div>
+  <div ng-if="isImageUploaded()" class="filepath-editor-save-box">
+    <button type="button"
+            class="btn btn-success filepath-editor-use"
+            ng-click="saveUploadedFile()">Use This Image</button>
+    <button type="button"
+            class="btn btn-default filepath-editor-discard"
+            ng-click="discardUploadedFile()">Discard</button>
   </div>
 </div>
+
+<style>
+  .filepath-editor-image-container {
+    border: 1px dotted #888;
+    position: relative;
+    text-align: center;
+  }
+  .filepath-editor-trash {
+    color: black;
+    position: absolute;
+    right: 6px;
+    text-shadow: 0px 0px 1px #fff;
+    top: 6px;
+  }
+  .filepath-editor-save-box {
+    margin-top: 6px;
+    text-align: right;
+  }
+  .filepath-editor-save-box button {
+    margin-left: 6px;
+  }
+</style>

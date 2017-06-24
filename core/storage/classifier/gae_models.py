@@ -100,7 +100,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The exploration_id of the exploration to whose state the model belongs.
     exp_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration version at the time this training job was created.
-    exp_version_when_created = ndb.IntegerProperty(required=True, indexed=True)
+    exp_version = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
     # The status of the training job. It can be either NEW, COMPLETE or PENDING
@@ -144,14 +144,14 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, algorithm_id, exp_id, exp_version_when_created, training_data,
+            cls, algorithm_id, exp_id, exp_version, training_data,
             state_name, status=feconf.TRAINING_JOB_STATUS_NEW):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
             algorithm_id: str. ID of the algorithm used to generate the model.
             exp_id: str. ID of the exploration.
-            exp_version_when_created: int. The exploration version at the time
+            exp_version: int. The exploration version at the time
                 this training job was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
@@ -168,7 +168,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         instance_id = cls._generate_id(exp_id)
         training_job_instance = cls(
             id=instance_id, algorithm_id=algorithm_id, exp_id=exp_id,
-            exp_version_when_created=exp_version_when_created,
+            exp_version=exp_version,
             state_name=state_name, status=status, training_data=training_data
             )
 

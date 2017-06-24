@@ -50,7 +50,6 @@
 	"I18N_DASHBOARD_SUBSCRIBERS": "구독자",
 	"I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED": "최근 업데이트",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "그림을 여기로 끌어놓으십시오",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "아니면 그림 파일을 선택하십시오:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "사용할 수 없는 탐험",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "죄송합니다, 클릭하신 탐험은 현재 사용할 수 없습니다. 나중에 다시 시도해 주세요.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "사용할 수 없는 탐험 - Oppia",
