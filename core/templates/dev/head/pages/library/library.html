@@ -204,6 +204,18 @@
     </div>
   </div>
 
+  <script type="text/ng-template" id="modals/setDashboard">
+    <div class="modal-body oppia-set-dashboard-modal">
+      <p style="padding-top: 30px; padding-bottom: 20px; text-align: center;">
+        Hi! We recently launched the learner dashboard. Keeping track of what you've learned will be easier than ever!
+      </p>
+      <div style="text-align: center;">
+        <button type="button" class="btn oppia-set-dashboard-modal-button oppia-transition-200" ng-click="setDashboard('creator')">Set creator dashboard as default</button>
+        <button type="button" class="btn oppia-set-dashboard-modal-button oppia-transition-200" ng-click="setDashboard('learner')">Set learner dashboard as default</button>
+      </div>
+    </div>
+  </script>
+
   {% include 'pages/library/search_results_directive.html' %}
 
 {% endblock %}

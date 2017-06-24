@@ -1493,6 +1493,48 @@ textarea {
   position: relative;
 }
 
+.oppia-set-dashboard .modal-dialog {
+  width: 60%;
+  height: 195px;
+}
+
+.oppia-set-dashboard .modal-content {
+  border-radius: 0;
+  height: 195px;
+}
+
+.oppia-set-dashboard-modal {
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  margin: 0 auto;
+  width: 95%;
+}
+
+.oppia-set-dashboard-modal-button {
+  background-color: #015c53;
+  border-radius: 0;
+  color: #fff;
+  margin: 10px;
+  text-transform: uppercase;
+  width: 350px;
+}
+
+.oppia-set-dashboard-modal-button:hover,
+.oppia-set-dashboard-modal-button:focus,
+.oppia-set-dashboard-modal-button:active {
+  background-color: rgba(5, 190, 178, 1);
+  color: #fff;
+}
+
+@media (max-width: 1361px) {
+  .oppia-set-dashboard .modal-dialog {
+    height: 255px;
+  }
+
+  .oppia-set-dashboard .modal-content {
+    height: 255px;
+  }
+}
+
 .oppia-dashboard-aggregated-stats {
   padding-top: 55px;
 }
@@ -1643,6 +1685,7 @@ span.sort-explorations-select .sort-order {
 .oppia-dashboard-intro-picture {
   width: 400px;
 }
+
 .oppia-dashboard-intro-button {
   background-color: #015c53;
   border-radius: 0;
@@ -1653,6 +1696,7 @@ span.sort-explorations-select .sort-order {
   text-transform: uppercase;
   width: 200px;
 }
+
 .oppia-dashboard-intro-button:hover,
 .oppia-dashboard-intro-button:focus,
 .oppia-dashboard-intro-button:active {
