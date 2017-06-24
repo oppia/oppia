@@ -21,6 +21,15 @@
   <div class="protractor-test-conversation-input"
        angular-html-bind="activeCard.interactionHtml">
   </div>
+    <div ng-if="currentInteractionHints.length" style="text-align: right; padding: 8px">
+      <span tooltip="<[!isHintAvailable() ? 'Please try answering the question first.' : 'Click here for a hint!']>">
+        <md-button class="hint-button"
+                   ng-click="showHint()"
+                   ng-disabled="!isHintAvailable()">
+          Hint <i class="fa fa-lightbulb-o"></i>
+        </md-button>
+      </span>
+    </div>
 </div>
 
 <style>
@@ -77,5 +86,19 @@
     top: 2px;
     width: 24px;
     z-index: 200;
+  }
+
+  .conversation-skin-supplemental-card {
+    background-color: #ffffff;
+  }
+  .conversation-skin-supplemental-card .hint-button {
+    background-color: #0D48A1;
+    border: none;
+    color: #ffffff;
+  }
+
+  .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:focus,
+  .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:hover {
+    background-color: #115FD4;
   }
 </style>
