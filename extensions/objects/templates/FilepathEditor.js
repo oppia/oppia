@@ -272,7 +272,6 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.resizeRatio = 1;
-        $scope.isUserCropping = false;
         $scope.explorationId = explorationContextService.getExplorationId();
         $scope.clearScopeData();
       }]
