@@ -266,6 +266,7 @@ oppia.factory('changeListService', [
       content: true,
       default_outcome: true,
       fallbacks: true,
+      hints: true,
       param_changes: true,
       state_name: true,
       widget_customization_args: true,
@@ -852,6 +853,11 @@ oppia.factory('explorationStatesService', [
           return fallback.toBackendDict();
         });
       },
+      hints: function(hints) {
+        return hints.map(function(hint) {
+          return hint.toBackendDict();
+        });
+      },
       param_changes: function(paramChanges) {
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
@@ -868,6 +874,7 @@ oppia.factory('explorationStatesService', [
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
       fallbacks: ['interaction', 'fallbacks'],
+      hints: ['interaction', 'hints'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs']
     };
@@ -881,7 +888,6 @@ oppia.factory('explorationStatesService', [
 
     var getStatePropertyMemento = function(stateName, backendName) {
       var accessorList = PROPERTY_REF_DATA[backendName];
-
       var propertyRef = _states.getState(stateName);
       accessorList.forEach(function(key) {
         propertyRef = propertyRef[key];
@@ -1011,6 +1017,12 @@ oppia.factory('explorationStatesService', [
       },
       saveFallbacks: function(stateName, newFallbacks) {
         saveStateProperty(stateName, 'fallbacks', newFallbacks);
+      },
+      getHintsMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'hints')
+      },
+      saveHints: function(stateName, newHints) {
+        saveStateProperty(stateName, 'hints', newHints);
       },
       isInitialized: function() {
         return _states != null;
@@ -1216,7 +1228,6 @@ oppia.factory('statePropertyService', [
 
         var setterFunc = explorationStatesService[this.setterMethodKey];
         setterFunc(this.stateName, angular.copy(this.displayed));
-
         this.savedMemento = angular.copy(this.displayed);
       },
       // Reverts the displayed value to the saved memento.
@@ -1264,6 +1275,15 @@ oppia.factory('stateFallbacksService', [
   'statePropertyService', function(statePropertyService) {
     var child = Object.create(statePropertyService);
     child.setterMethodKey = 'saveFallbacks';
+    return child;
+  }
+]);
+
+// A data service that stores the current interaction hints.
+oppia.factory('stateHintsService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveHints';
     return child;
   }
 ]);

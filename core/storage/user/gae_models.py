@@ -98,6 +98,19 @@ class UserSettingsModel(base_models.BaseModel):
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
 
+    @classmethod
+    def get_by_role(cls, role):
+        """Returns user models with given role.
+
+        Args:
+            role: str. The role Id that is being queried for.
+
+        Returns:
+            list(UserSettingsModel). The UserSettingsModel instances which
+            have the given role Id.
+        """
+        return cls.query(cls.role == role).fetch()
+
 
 class CompletedActivitiesModel(base_models.BaseModel):
     """Keeps track of all the explorations and collections completed by the
