@@ -36,11 +36,37 @@ oppia.directive('imageUploader', [
               'image-uploader-is-active');
         };
 
+        var validateUploadedFile = function(file, filename) {
+          if (!file || !file.size || !file.type.match('image.*')) {
+            return 'This file is not recognized as an image.';
+          }
+
+          if (!file.type.match('image.jpeg') &&
+              !file.type.match('image.gif') &&
+              !file.type.match('image.jpg') &&
+              !file.type.match('image.png')) {
+            return 'This image format is not supported.';
+          }
+
+          var ONE_MB_IN_BYTES = 1048576;
+          if (file.size / ONE_MB_IN_BYTES > 1) {
+            var currentSize = parseInt(file.size / ONE_MB_IN_BYTES) + ' MB';
+            return 'The maximum allowed file size is 1 MB' +
+                   ' (' + currentSize + ' given).';
+          }
+
+          return null;
+        };
+
         $(elt).bind('drop', function(e) {
           onDragEnd(e);
-          scope.onFileChanged(
-            e.originalEvent.dataTransfer.files[0],
-            e.originalEvent.dataTransfer.files[0].name);
+          var file = e.originalEvent.dataTransfer.files[0];
+          scope.errorMessage = validateUploadedFile(file, file.name);
+          if (!scope.errorMessage) {
+            // Only fire this event if validations pass.
+            scope.onFileChanged(file, file.name);
+          }
+          scope.$apply();
         });
 
         $(elt).bind('dragover', function(e) {
@@ -67,9 +93,14 @@ oppia.directive('imageUploader', [
           'image-uploader-file-input' + IdGenerationService.generateNewId());
         angular.element(document).on(
           'change', '.' + scope.fileInputClassName, function(evt) {
-            scope.onFileChanged(
-              evt.currentTarget.files[0],
-              evt.target.value.split(/(\\|\/)/g).pop());
+            var file = evt.currentTarget.files[0];
+            var filename = evt.target.value.split(/(\\|\/)/g).pop();
+            scope.errorMessage = validateUploadedFile(file, filename);
+            if (!scope.errorMessage) {
+              // Only fire this event if validations pass.
+              scope.onFileChanged(file, filename);
+            }
+            scope.$apply();
           }
         );
       }
