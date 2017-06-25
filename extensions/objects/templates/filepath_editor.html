@@ -1,4 +1,6 @@
-<div ng-model="data" ui-validate="'validate($value)'">
+<div ng-model="data"
+     ui-validate="'validate($value)'"
+     ng-attr-style="<[getMainContainerStyles()]>">
   <div ng-if="isImageUploaded()" class="filepath-editor-img-toolbar">
     <div class="filepath-editor-img-toolbar-resize">
       Resize to:
@@ -13,6 +15,9 @@
       <span><[calculateTargetImageDimensions().width]></span>
       x
       <span><[calculateTargetImageDimensions().height]></span>
+      <i class="material-icons"
+         ng-if="getImageSizeHelp() !== null"
+         title="<[getImageSizeHelp()]>">&#xE887;</i>
     </div>
   </div>
   <div class="filepath-editor-image-container">
@@ -110,6 +115,13 @@
 
   .filepath-editor-img-toolbar-size {
     width: 300;
+  }
+
+  .filepath-editor-img-toolbar-size i {
+    color: red;
+    font-size: 18px;
+    padding-bottom: 3px;
+    cursor: default;
   }
 
   .filepath-editor-img-toolbar-resize {

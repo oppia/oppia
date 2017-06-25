@@ -75,6 +75,21 @@ oppia.directive('filepathEditor', [
                  data.metadata.savedUrl.length > 0;
         };
 
+        $scope.getImageSizeHelp = function() {
+          var imageWidth = $scope.data.metadata.originalWidth;
+          if ($scope.resizeRatio === 1 &&
+              imageWidth > $scope.MAX_OUTPUT_IMAGE_WIDTH) {
+            return 'Even at 100%, the image is being automatically downsized ' +
+                   'to ensure that it will fit in the card.';
+          }
+          return null;
+        };
+
+        $scope.getMainContainerStyles = function() {
+          var width = $scope.MAX_OUTPUT_IMAGE_WIDTH;
+          return 'margin: 0 auto; width: ' + width + 'px';
+        };
+
         $scope.isNoImageUploaded = function() {
           return $scope.data.mode === $scope.MODE_EMPTY;
         };
