@@ -36,7 +36,6 @@ oppia.directive('filepathEditor', [
         $scope.MODE_SAVED = 3;
         $scope.MAX_OUTPUT_IMAGE_WIDTH = 490;
 
-
         // This variable holds all the data needed for the image upload flow.
         // It's always guaranteed to have the 'mode' and 'metadata' properties.
         //
