@@ -74,6 +74,15 @@
           <div class="protractor-test-conversation-input"
                angular-html-bind="activeCard.interactionHtml">
           </div>
+          <div ng-if="currentInteractionHints.length" style="text-align: right">
+            <span tooltip="<[!isHintAvailable() ? 'Please try answering the question first.' : 'Click here for a hint!']>">
+              <md-button class="hint-button"
+                         ng-click="showHint()"
+                         ng-disabled="!isHintAvailable()">
+                Hint <i class="fa fa-lightbulb-o"></i>
+              </md-button>
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -119,8 +128,19 @@
   }
 
   .conversation-skin-tutor-card .instructions-button {
-      background: inherit;
-      border: none;
+    background: inherit;
+    border: none;
+  }
+
+  .conversation-skin-tutor-card .hint-button {
+    background-color: #0D48A1;
+    border: none;
+    color: #ffffff;
+  }
+
+  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
+  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
+    background-color: #115FD4;
   }
 
   .conversation-skin-tutor-card.animate-card-width {
@@ -222,7 +242,7 @@
   }
 
   @media screen and (max-width: 959px) {
-    .conversation-skin-tutor-card .instructions-button {
+    .conversation-skin-tutor-card .instructions-button .hint-button {
       background-color: #0D48A1;
       color: #ffffff;
       padding: 6px 12px;
@@ -233,7 +253,9 @@
     }
 
     .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover {
+    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover,
+    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
+    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
       background-color: #115FD4;
     }
   }
