@@ -214,7 +214,7 @@ oppia.directive('filepathEditor', [
           var dimensions = $scope.calculateTargetImageDimensions();
           canvas.width = dimensions.width;
           canvas.height = dimensions.height;
-          var ctx = canvas.getContext("2d");
+          var ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
 
           // Return a File object obtained from the data in the canvas.
