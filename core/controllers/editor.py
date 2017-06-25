@@ -17,7 +17,6 @@
 """Controllers for the editor view."""
 
 import datetime
-import imghdr
 import logging
 
 import jinja2
