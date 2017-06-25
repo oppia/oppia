@@ -17,6 +17,7 @@
 """Controllers for the editor view."""
 
 import datetime
+import imghdr
 import logging
 
 import jinja2
@@ -888,6 +889,12 @@ class ImageUploadHandler(EditorHandler):
         if not raw:
             raise self.InvalidInputException('No image supplied')
 
+        # Verify that the data is recognized as an image.
+        format = imghdr.what(None, h=raw)
+        if format not in feconf.ACCEPTED_IMAGE_EXTENSIONS:
+            raise self.InvalidInputException('Image not recognized')
+
+        # Verify that a valid filename and extension is provided.
         if not filename:
             raise self.InvalidInputException('No filename supplied')
         if '/' in filename or '..' in filename:
@@ -908,6 +915,7 @@ class ImageUploadHandler(EditorHandler):
                 'the following extensions: %s. Received: %s',
                 (feconf.ACCEPTED_IMAGE_EXTENSIONS, filename))
 
+        # Save the file.
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))
         if fs.isfile(filename):

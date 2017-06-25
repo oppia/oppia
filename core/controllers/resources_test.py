@@ -83,6 +83,27 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_upload_bad_image(self):
+        """Test upload of a malformed image."""
+
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Upload an empty image.
+        response_dict = self.post_json(
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            {'filename': 'test.png'},
+            csrf_token=csrf_token,
+            expect_errors=True,
+            expected_status_int=400,
+            upload_files=(('image', 'unused_filename', 'non_image_data'),)
+        )
+        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['error'], 'Image not recognized')
+
+        self.logout()
+
     def test_get_invalid_image(self):
         """Test retrieval of invalid images."""
 

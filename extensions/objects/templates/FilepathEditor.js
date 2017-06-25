@@ -34,7 +34,7 @@ oppia.directive('filepathEditor', [
         $scope.MODE_EMPTY = 1;
         $scope.MODE_UPLOADED = 2;
         $scope.MODE_SAVED = 3;
-        $scope.MAX_OUTPUT_IMAGE_WIDTH = 490;
+        $scope.MAX_OUTPUT_IMAGE_WIDTH_PX = 490;
 
         // This variable holds all the data needed for the image upload flow.
         // It's always guaranteed to have the 'mode' and 'metadata' properties.
@@ -78,15 +78,15 @@ oppia.directive('filepathEditor', [
         $scope.getImageSizeHelp = function() {
           var imageWidth = $scope.data.metadata.originalWidth;
           if ($scope.resizeRatio === 1 &&
-              imageWidth > $scope.MAX_OUTPUT_IMAGE_WIDTH) {
-            return 'Even at 100%, the image is being automatically downsized ' +
-                   'to ensure that it will fit in the card.';
+              imageWidth > $scope.MAX_OUTPUT_IMAGE_WIDTH_PX) {
+            return 'This image has been automatically downsized to ensure ' +
+                   'that it will fit in the card.';
           }
           return null;
         };
 
         $scope.getMainContainerStyles = function() {
-          var width = $scope.MAX_OUTPUT_IMAGE_WIDTH;
+          var width = $scope.MAX_OUTPUT_IMAGE_WIDTH_PX;
           return 'margin: 0 auto; width: ' + width + 'px';
         };
 
@@ -119,9 +119,9 @@ oppia.directive('filepathEditor', [
         $scope.calculateTargetImageDimensions = function() {
           var width = $scope.data.metadata.originalWidth;
           var height = $scope.data.metadata.originalHeight;
-          if (width > $scope.MAX_OUTPUT_IMAGE_WIDTH) {
+          if (width > $scope.MAX_OUTPUT_IMAGE_WIDTH_PX) {
             var aspectRatio = width / height;
-            width = $scope.MAX_OUTPUT_IMAGE_WIDTH;
+            width = $scope.MAX_OUTPUT_IMAGE_WIDTH_PX;
             height = width / aspectRatio;
           }
           return {
@@ -192,13 +192,7 @@ oppia.directive('filepathEditor', [
           var dataURIToBlob = function(dataURI) {
             // Convert base64/URLEncoded data component to raw binary data
             // held in a string.
-            var byteString;
-            if (dataURI.split(',')[0].indexOf('base64') >= 0) {
-              byteString = atob(dataURI.split(',')[1]);
-            }
-            else {
-              byteString = unescape(dataURI.split(',')[1]);
-            }
+            var byteString = atob(dataURI.split(',')[1]);
 
             // Separate out the mime component.
             var mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
@@ -208,8 +202,8 @@ oppia.directive('filepathEditor', [
             for (var i = 0; i < byteString.length; i++) {
               ia[i] = byteString.charCodeAt(i);
             }
-            return new Blob([ia], {type:mime});
-          }
+            return new Blob([ia], {type: mime});
+          };
 
           // Create an Image object with the original data.
           var img = new Image();
@@ -225,7 +219,15 @@ oppia.directive('filepathEditor', [
 
           // Return a File object obtained from the data in the canvas.
           var file = $scope.data.metadata.uploadedFile;
-          return dataURIToBlob(canvas.toDataURL(file.type, 1));
+          var blob = dataURIToBlob(canvas.toDataURL(file.type, 1));
+
+          if (blob instanceof Blob &&
+              blob.type.match('image') &&
+              blob.size > 0) {
+            return blob;
+          } else {
+            return null;
+          }
         };
 
         $scope.saveUploadedFile = function() {
@@ -236,8 +238,14 @@ oppia.directive('filepathEditor', [
             return;
           }
 
+          var resampledFile = $scope.generateResampledImageFile();
+          if (resampledFile === null) {
+            alertsService.addWarning('Could not get resampled file.');
+            return;
+          }
+
           var form = new FormData();
-          form.append('image', $scope.generateResampledImageFile());
+          form.append('image', resampledFile);
           form.append('payload', JSON.stringify({
             filename: $scope.generateImageFilename()
           }));

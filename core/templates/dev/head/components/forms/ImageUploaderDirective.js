@@ -49,7 +49,7 @@ oppia.directive('imageUploader', [
           }
 
           var ONE_MB_IN_BYTES = 1048576;
-          if (file.size / ONE_MB_IN_BYTES > 1) {
+          if (file.size > ONE_MB_IN_BYTES) {
             var currentSize = (file.size / ONE_MB_IN_BYTES).toFixed(1) + ' MB';
             return 'The maximum allowed file size is 1 MB' +
                    ' (' + currentSize + ' given).';
