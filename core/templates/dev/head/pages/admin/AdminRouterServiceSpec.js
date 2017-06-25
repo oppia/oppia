@@ -28,6 +28,7 @@ describe('Admin router service', function() {
   it('should initially be routed to the activities tab', function() {
     expect(AdminRouterService.isActivitiesTabOpen()).toBe(true);
     expect(AdminRouterService.isConfigTabOpen()).toBe(false);
+    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
     expect(AdminRouterService.isJobsTabOpen()).toBe(false);
     expect(AdminRouterService.isMiscTabOpen()).toBe(false);
   });
@@ -41,6 +42,7 @@ describe('Admin router service', function() {
     AdminRouterService.showTab('#activities');
     expect(AdminRouterService.isActivitiesTabOpen()).toBe(true);
     expect(AdminRouterService.isConfigTabOpen()).toBe(false);
+    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
     expect(AdminRouterService.isJobsTabOpen()).toBe(false);
     expect(AdminRouterService.isMiscTabOpen()).toBe(false);
   });
@@ -50,6 +52,17 @@ describe('Admin router service', function() {
     AdminRouterService.showTab('#config');
     expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
     expect(AdminRouterService.isConfigTabOpen()).toBe(true);
+    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
+    expect(AdminRouterService.isJobsTabOpen()).toBe(false);
+    expect(AdminRouterService.isMiscTabOpen()).toBe(false);
+  });
+
+  it('should be able to navigate to the roles tab', function() {
+    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
+    AdminRouterService.showTab('#roles');
+    expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
+    expect(AdminRouterService.isConfigTabOpen()).toBe(false);
+    expect(AdminRouterService.isRolesTabOpen()).toBe(true);
     expect(AdminRouterService.isJobsTabOpen()).toBe(false);
     expect(AdminRouterService.isMiscTabOpen()).toBe(false);
   });
@@ -59,6 +72,7 @@ describe('Admin router service', function() {
     AdminRouterService.showTab('#jobs');
     expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
     expect(AdminRouterService.isConfigTabOpen()).toBe(false);
+    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
     expect(AdminRouterService.isJobsTabOpen()).toBe(true);
     expect(AdminRouterService.isMiscTabOpen()).toBe(false);
   });
@@ -68,6 +82,7 @@ describe('Admin router service', function() {
     AdminRouterService.showTab('#misc');
     expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
     expect(AdminRouterService.isConfigTabOpen()).toBe(false);
+    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
     expect(AdminRouterService.isJobsTabOpen()).toBe(false);
     expect(AdminRouterService.isMiscTabOpen()).toBe(true);
   });
@@ -81,6 +96,7 @@ describe('Admin router service', function() {
     AdminRouterService.showTab('#jobs');
     expect(AdminRouterService.isActivitiesTabOpen()).toBe(false);
     expect(AdminRouterService.isConfigTabOpen()).toBe(false);
+    expect(AdminRouterService.isRolesTabOpen()).toBe(false);
     expect(AdminRouterService.isJobsTabOpen()).toBe(true);
     expect(AdminRouterService.isMiscTabOpen()).toBe(false);
   });

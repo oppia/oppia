@@ -48,6 +48,7 @@ describe('States object factory', function() {
             param_changes: []
           },
           fallbacks: [],
+          hints: [],
           id: 'TextInput'
         },
         param_changes: []
@@ -80,7 +81,8 @@ describe('States object factory', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: []
+            fallbacks: [],
+            hints: []
           },
           param_changes: []
         }
@@ -114,6 +116,7 @@ describe('States object factory', function() {
               param_changes: []
             },
             fallbacks: [],
+            hints: [],
             id: 'TextInput'
           },
           param_changes: []

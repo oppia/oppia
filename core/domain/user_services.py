@@ -356,7 +356,7 @@ def get_users_settings(user_ids):
             result.append(UserSettings(
                 feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
-                role=feconf.ROLE_ADMIN,
+                role=feconf.ROLE_ID_ADMIN,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
@@ -496,12 +496,25 @@ def get_user_role_from_id(user_id):
         user_id: str. The User id.
 
     Returns:
-        role: str. Role of the user with given id.
+        str. Role of the user with given id.
     """
     user_settings = get_user_settings(user_id)
     if user_settings is None:
-        return feconf.ROLE_GUEST
+        return feconf.ROLE_ID_GUEST
     return user_settings.role
+
+
+def get_usernames_by_role(role):
+    """Get usernames of all the users with given role Id.
+
+    Args:
+        role: str. The role Id of users requested.
+
+    Returns:
+        list(str). List of usernames of users with given role Id.
+    """
+    user_settings = user_models.UserSettingsModel.get_by_role(role)
+    return [user.username for user in user_settings]
 
 
 def _save_user_settings(user_settings):

@@ -78,7 +78,8 @@ describe('State Editor controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: []
+            fallbacks: [],
+            hints: []
           },
           param_changes: []
         },
@@ -103,7 +104,8 @@ describe('State Editor controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: []
+            fallbacks: [],
+            hints: []
           },
           param_changes: []
         },
@@ -128,7 +130,8 @@ describe('State Editor controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: []
+            fallbacks: [],
+            hints: []
           },
           param_changes: [{
             name: 'comparison',
@@ -295,6 +298,7 @@ describe('State Editor controller', function() {
               param_changes: []
             },
             fallbacks: [],
+            hints: [],
             confirmed_unclassified_answers: []
           },
           param_changes: []
