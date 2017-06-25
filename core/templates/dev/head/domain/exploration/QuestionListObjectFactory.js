@@ -37,19 +37,16 @@ oppia.factory('QuestionListObjectFactory', [function() {
 
   QuestionList.prototype.removeQuestion = function(questionToDelete) {
     var index = -1;
-    this._questions.some(function(question, idx) {
-      if (question._stateName === questionToDelete._stateName) {
-        index = idx;
-        // This will break the 'some' once question has been found.
-        return true;
+    for (var i = 0; i < this._questions.length; i++) {
+      if (this._questions[i]._stateName === questionToDelete._stateName) {
+        index = i;
+        break;
       }
-      return false;
-    });
-
-    if (index !== -1) {
-      return this._questions.splice(index, 1);
     }
-    throw Error('Cannot find question: ' + question);
+
+    if (index == -1) {
+      throw Error('Cannot find question: ' + question);
+    }
   };
 
   QuestionList.prototype.doesLastQuestionHaveAnswerGroups = function() {
