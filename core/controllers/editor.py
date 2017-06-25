@@ -902,7 +902,7 @@ class ImageUploadHandler(EditorHandler):
 
         dot_index = filename.rfind('.')
         extension = filename[dot_index + 1:].lower()
-        if (extension not in feconf.ACCEPTED_IMAGE_EXTENSIONS):
+        if extension not in feconf.ACCEPTED_IMAGE_EXTENSIONS:
             raise self.InvalidInputException(
                 'Image filename with invalid extension: it should have one of '
                 'the following extensions: %s. Received: %s',
