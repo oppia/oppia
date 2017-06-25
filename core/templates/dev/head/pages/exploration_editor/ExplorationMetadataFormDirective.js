@@ -17,11 +17,11 @@
  */
 oppia.directive('explorationMetadataForm', [
  'UrlInterpolationService', function(UrlInterpolationService) {
-  return {
-  restrict: 'E',
-  templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-               '/pages/exploration_editor/' +
-               'exploration_metadata_form_directive.html')
-  }
+   return {
+    restrict: 'E',
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                 '/pages/exploration_editor/' +
+                 'exploration_metadata_form_directive.html')
+   }
  }
 ])
