@@ -37,7 +37,6 @@
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Оценка",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Нерешени одговори",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Овде довлечете ја сликата",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "или изберете податотека:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Оневозможено истражување",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "За жал, истражувањето на кое стиснавте е моментално оневозможено. Обидете се подоцна.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Оневозможено истражување – Опија",

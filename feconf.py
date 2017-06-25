@@ -522,6 +522,7 @@ TASK_URL_SUGGESTION_EMAILS = (
 
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
+ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
 EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -965,11 +966,22 @@ SITE_NAME = 'Oppia.org'
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
 
-# Following are the constants for the roles.
-ROLE_GUEST = 'GUEST'
-ROLE_BANNED_USER = 'BANNED_USER'
-ROLE_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
-ROLE_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
-ROLE_MODERATOR = 'MODERATOR'
-ROLE_ADMIN = 'ADMIN'
-ROLE_SUPER_ADMIN = 'SUPER_ADMIN'
+# Following are the constants for the role Ids.
+# To check the role updation from /admin#roles, set ADMIN_SHOW_UPDATE_ROLE
+# constant in Admin.js to true.
+ROLE_ID_GUEST = 'GUEST'
+ROLE_ID_BANNED_USER = 'BANNED_USER'
+ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
+ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_ID_MODERATOR = 'MODERATOR'
+ROLE_ID_ADMIN = 'ADMIN'
+ROLE_ID_SUPER_ADMIN = 'SUPER_ADMIN'
+
+# Intent of the User making query to role structure via admin interface. Used
+# to store audit data regarding queries to role Ids.
+ROLE_ACTION_UPDATE = 'update'
+ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
+ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
+
+VIEW_METHOD_ROLE = 'role'
+VIEW_METHOD_USERNAME = 'username'

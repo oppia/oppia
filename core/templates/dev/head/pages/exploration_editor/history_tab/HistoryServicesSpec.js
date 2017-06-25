@@ -214,7 +214,8 @@ describe('Compare versions service', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: []
+            fallbacks: [],
+            hints: []
           },
           param_changes: []
         };

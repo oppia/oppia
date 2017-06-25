@@ -155,3 +155,31 @@ def get_state_answers(exploration_id, exploration_version, state_name):
             schema_version=main_state_answers_model.schema_version)
     else:
         return None
+
+
+def get_sample_answers(exploration_id, exploration_version, state_name):
+    """Fetches a list of sample answers that were submitted to the specified
+    exploration state (at the given version of the exploration).
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration to fetch
+            answers for.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        list(*). A list of some sample raw answers. At most 100 answers are
+        returned.
+    """
+    answers_model = stats_models.StateAnswersModel.get_master_model(
+        exploration_id, exploration_version, state_name)
+    if answers_model is None:
+        return []
+
+    # Return at most 100 answers, and only answers from the initial shard. (If
+    # we needed to use subsequent shards then the answers are probably too big
+    # anyway.)
+    sample_answers = answers_model.submitted_answer_list[:100]
+    return [
+        stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict).answer
+        for submitted_answer_dict in sample_answers]

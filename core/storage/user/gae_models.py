@@ -98,6 +98,19 @@ class UserSettingsModel(base_models.BaseModel):
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
 
+    @classmethod
+    def get_by_role(cls, role):
+        """Returns user models with given role.
+
+        Args:
+            role: str. The role Id that is being queried for.
+
+        Returns:
+            list(UserSettingsModel). The UserSettingsModel instances which
+            have the given role Id.
+        """
+        return cls.query(cls.role == role).fetch()
+
 
 class CompletedActivitiesModel(base_models.BaseModel):
     """Keeps track of all the explorations and collections completed by the
@@ -342,6 +355,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
     draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
     # The exploration version that this change list applied to.
     draft_change_list_exp_version = ndb.IntegerProperty(default=None)
+    #The exploration draft version of this change list.
+    draft_change_list_id = ndb.IntegerProperty(default=None)
     # The user's preference for receiving suggestion emails for this exploration
     mute_suggestion_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
@@ -455,7 +470,7 @@ class CollectionProgressModel(base_models.BaseModel):
     @classmethod
     def get(cls, user_id, collection_id):
         """Gets the CollectionProgressModel for the given user and collection
-        ids.
+        id.
 
         Args:
             user_id: str. The id of the user.
@@ -468,6 +483,25 @@ class CollectionProgressModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, collection_id)
         return super(CollectionProgressModel, cls).get(
             instance_id, strict=False)
+
+    @classmethod
+    def get_multi(cls, user_id, collection_ids):
+        """Gets the CollectionProgressModels for the given user and collection
+        ids.
+
+        Args:
+            user_id: str. The id of the user.
+            collection_ids: list(str). The ids of the collections.
+
+        Returns:
+            list(CollectionProgressModel). The list of CollectionProgressModel
+            instances which matches the given user_id and collection_ids.
+        """
+        instance_ids = [cls._generate_id(user_id, collection_id)
+                        for collection_id in collection_ids]
+
+        return super(CollectionProgressModel, cls).get_multi(
+            instance_ids)
 
     @classmethod
     def get_or_create(cls, user_id, collection_id):

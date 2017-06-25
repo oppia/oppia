@@ -446,12 +446,12 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 self.exploration.init_state_name, 'TextInput',
                 submitted_answer_list * 200)
 
-            # Verify more than 1 shard was stored. The index shard (shard_id 0)
-            # is not included in the shard count.
-            model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-                self.exploration.id, str(self.exploration.version),
-                self.exploration.init_state_name, '0'))
-            self.assertEqual(model.shard_count, 1)
+            # Verify that more than 1 shard was stored. The index shard
+            # (shard_id 0) is not included in the shard count.
+            master_model = stats_models.StateAnswersModel.get_master_model(
+                self.exploration.id, self.exploration.version,
+                self.exploration.init_state_name)
+            self.assertGreater(master_model.shard_count, 0)
 
             # The order of the answers returned depends on the size of the
             # answers.
@@ -551,3 +551,115 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': {}
         }])
+
+
+class SampleAnswerTests(test_utils.GenericTestBase):
+    """Tests for functionality related to retrieving sample answers."""
+
+    EXP_ID = 'exp_id0'
+
+    def setUp(self):
+        super(SampleAnswerTests, self).setUp()
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+
+    def test_at_most_100_answers_returned_even_if_there_are_lots(self):
+        submitted_answer_list = [
+            stats_domain.SubmittedAnswer(
+                'answer a', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0),
+            stats_domain.SubmittedAnswer(
+                'answer ccc', 'TextInput', 1, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 3.0),
+            stats_domain.SubmittedAnswer(
+                'answer bbbbb', 'TextInput', 1, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
+        ]
+        # Record 600 answers.
+        stats_services.record_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            submitted_answer_list * 200)
+
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(len(sample_answers), 100)
+
+    def test_exactly_100_answers_returned_if_main_shard_has_100_answers(self):
+        submitted_answer_list = [
+            stats_domain.SubmittedAnswer(
+                'answer a', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0)
+        ]
+        # Record 100 answers.
+        stats_services.record_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            submitted_answer_list * 100)
+
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(sample_answers, ['answer a'] * 100)
+
+    def test_all_answers_returned_if_main_shard_has_few_answers(self):
+        submitted_answer_list = [
+            stats_domain.SubmittedAnswer(
+                'answer a', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0),
+            stats_domain.SubmittedAnswer(
+                'answer bbbbb', 'TextInput', 1, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
+        ]
+        # Record 2 answers.
+        stats_services.record_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            submitted_answer_list)
+
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(sample_answers, ['answer a', 'answer bbbbb'])
+
+    def test_only_sample_answers_in_main_shard_returned(self):
+        # Use a smaller max answer list size so fewer answers are needed to
+        # exceed a shard.
+        with self.swap(
+            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
+            15000):
+            state_answers = stats_services.get_state_answers(
+                self.EXP_ID, self.exploration.version,
+                self.exploration.init_state_name)
+            self.assertIsNone(state_answers)
+
+            submitted_answer_list = [
+                stats_domain.SubmittedAnswer(
+                    'answer ccc', 'TextInput', 1, 1,
+                    exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v',
+                    3.0),
+            ]
+            stats_services.record_answers(
+                self.EXP_ID, self.exploration.version,
+                self.exploration.init_state_name, 'TextInput',
+                submitted_answer_list * 100)
+
+        # Verify more than 1 shard was stored. The index shard (shard_id 0)
+        # is not included in the shard count. Since a total of 100 answers were
+        # submitted, there must therefore be fewer than 100 answers in the
+        # index shard.
+        model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
+            self.exploration.id, str(self.exploration.version),
+            self.exploration.init_state_name, '0'))
+        self.assertEqual(model.shard_count, 1)
+
+        # Verify that the list of sample answers returned contains fewer than
+        # 100 answers, although a total of 100 answers were submitted.
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertLess(len(sample_answers), 100)
