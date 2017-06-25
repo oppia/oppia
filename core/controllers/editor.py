@@ -958,8 +958,7 @@ class EditorAutosaveHandler(ExplorationHandler):
             raise self.InvalidInputException(e)
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.user_id, exploration_id)
-        draft_change_list_id = (exp_user_data.draft_change_list_id
-                                if exp_user_data else 0)
+        draft_change_list_id = exp_user_data.draft_change_list_id
         # If the value passed here is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.

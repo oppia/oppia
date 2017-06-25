@@ -25,7 +25,7 @@ oppia.factory('explorationData', [
     ReadOnlyExplorationBackendApiService,$q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
-    var draftChangeListId = 0;
+    var draftChangeListId = null;
     var pathnameArray = window.location.pathname.split('/');
     for (var i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create') {
