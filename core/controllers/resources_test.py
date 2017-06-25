@@ -83,28 +83,6 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_upload_bad_image(self):
-        """Test upload of a malformed image."""
-
-        self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
-
-        # Upload a malformed image.
-        response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
-            {'filename': 'test.png'},
-            csrf_token=csrf_token,
-            expect_errors=True,
-            expected_status_int=500,
-            upload_files=(
-                ('image', 'unused_filename', 'this_is_not_an_image'),)
-        )
-        self.assertEqual(response_dict['code'], 500)
-        self.assertIn('Image file not recognized', response_dict['error'])
-
-        self.logout()
-
     def test_get_invalid_image(self):
         """Test retrieval of invalid images."""
 
@@ -131,5 +109,47 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(response_dict['code'], 400)
         self.assertIn('Filenames should not include', response_dict['error'])
+
+        self.logout()
+
+    def test_missing_extensions_are_detected(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+                  mode='rb') as f:
+            raw_image = f.read()
+        response_dict = self.post_json(
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            {'filename': 'test'},
+            csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=400,
+            upload_files=(('image', 'unused_filename', raw_image),),
+        )
+        self.assertEqual(response_dict['code'], 400)
+        self.assertIn('Image filename with no extension',
+                      response_dict['error'])
+
+        self.logout()
+
+    def test_bad_extensions_are_detected(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+                  mode='rb') as f:
+            raw_image = f.read()
+        response_dict = self.post_json(
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            {'filename': 'test.pdf'},
+            csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=400,
+            upload_files=(('image', 'unused_filename', raw_image),),
+        )
+        self.assertEqual(response_dict['code'], 400)
+        self.assertIn('Image filename with invalid extension',
+                      response_dict['error'])
 
         self.logout()

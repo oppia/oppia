@@ -896,9 +896,10 @@ class ImageUploadHandler(EditorHandler):
                 'Filenames should not include slashes (/) or consecutive dot '
                 'characters.')
         if '.' not in filename:
-            raise Exception('Image filename with no extension: it should have '
-                            'one of the following extensions: %s.' %
-                            feconf.ACCEPTED_IMAGE_EXTENSIONS)
+            raise self.InvalidInputException(
+                'Image filename with no extension: it should have '
+                'one of the following extensions: %s.' %
+                feconf.ACCEPTED_IMAGE_EXTENSIONS)
 
         dot_index = filename.rfind('.')
         extension = filename[dot_index + 1:].lower()
