@@ -16,12 +16,12 @@
  * @fileoverview Directive for the exploration meta data form.
  */
 oppia.directive('explorationMetadataForm', [
-	'UrlInterpolationService', function(UrlInterpolationService) {
-		return {
-			restrict: 'E',
-			templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-				'/pages/exploration_editor/' +
-				'exploration_metadata_form_directive.html')
-		}
-	}
+ 'UrlInterpolationService', function(UrlInterpolationService) {
+  return {
+  restrict: 'E',
+  templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+               '/pages/exploration_editor/' +
+               'exploration_metadata_form_directive.html')
+  }
+ }
 ])
