@@ -890,8 +890,8 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException('No image supplied')
 
         # Verify that the data is recognized as an image.
-        format = imghdr.what(None, h=raw)
-        if format not in feconf.ACCEPTED_IMAGE_EXTENSIONS:
+        file_format = imghdr.what(None, h=raw)
+        if file_format not in feconf.ACCEPTED_IMAGE_EXTENSIONS:
             raise self.InvalidInputException('Image not recognized')
 
         # Verify that a valid filename and extension is provided.
