@@ -57,6 +57,7 @@ oppia.directive('filepathEditor', [
             mode: $scope.MODE_EMPTY,
             metadata: {}
           };
+          $scope.resizeRatio = 1;
         };
         $scope.clearScopeData();
 
@@ -91,10 +92,12 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.decreaseResizePercent = function(amount) {
-          $scope.resizeRatio = Math.max(0, $scope.resizeRatio - amount / 100);
+          // Do not allow to decrease size below 10%.
+          $scope.resizeRatio = Math.max(0.1, $scope.resizeRatio - amount / 100);
         };
 
         $scope.increaseResizePercent = function(amount) {
+          // Do not allow to increase size above 100% (only downsize allowed).
           $scope.resizeRatio = Math.min(1, $scope.resizeRatio + amount / 100);
         };
 
@@ -206,10 +209,9 @@ oppia.directive('filepathEditor', [
           ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
 
           // Return a File object obtained from the data in the canvas.
-          return dataURIToBlob(canvas.toDataURL());
+          var file = $scope.data.metadata.uploadedFile;
+          return dataURIToBlob(canvas.toDataURL(file.type, 1));
         };
-
-
 
         $scope.saveUploadedFile = function() {
           alertsService.clearWarnings();
