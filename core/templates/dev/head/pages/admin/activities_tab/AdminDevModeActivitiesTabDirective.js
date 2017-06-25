@@ -104,24 +104,25 @@ oppia.directive('adminDevModeActivitiesTab', [
           }
         };
 
-        $scope.reloadDummyExplorations = function(){
-          // Create a dummy exploration with random title.
+        $scope.generateDummyExplorations = function() {
+          // Generate dummy explorations with random title.
           AdminTaskManagerService.startTask();
+          var POSSIBLE_TITLES = ['Hulk Neuroscience',
+                                 'Quantum Starks',
+                                 'Wonder Anatomy',
+                                 'Elvish, language of "Lord of the Rings',
+                                 'The Science of Superheroes'
+          ];
           $scope.setStatusMessage('Processing...');
           for (var i = 0; i < $scope.DummyExplorationCount; ++i) {
-            var title = ['Hulk Neuroscience',
-                         'Quantum Starks',
-                         'Wonder Anatomy',
-                         'Elvish, language of "Lord of the Rings',
-                         'The Science of Superheroes'
-            ];
-            var randomTitle = Math.floor( Math.random() * title.length);
+            var randomTitle = Math.floor(
+                              Math.random() * POSSIBLE_TITLES.length
+                              );
             $http.post('/contributehandler/create_new', {
-              title: title[randomTitle],
-            }).then(function(response) {
-              $scope.setStatusMessage('Dummy explorations reloaded.');
+              title: POSSIBLE_TITLES[randomTitle]
             });
           }
+          $scope.setStatusMessage('Dummy explorations created.');
           AdminTaskManagerService.finishTask();
         };
 
