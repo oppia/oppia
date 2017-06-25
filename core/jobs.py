@@ -621,13 +621,17 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def get_mapper_param(param_name):
-        """TODO(brianrodri).
+        """Returns current value of given param_name for this job.
 
         Args:
-            param_name: str. TODO(brianrodri).
+            param_name: str. One of the configurable parameters of this
+                particular mapreduce job.
 
         Returns:
-            TODO(brianrodri).
+            The current value of the parameter.
+
+        Raises:
+            Exception: If the parameter is not associated to this job type.
         """
         mapper_params = context.get().mapreduce_spec.mapper.params
         if param_name not in mapper_params:
@@ -675,8 +679,8 @@ class BaseMapReduceJobManager(BaseJobManager):
         This code can assume that it is the only process handling values for the
         given key.
 
-        TODO(brianrodri): Verify whether it can also assume that it will be
-        called exactly once for each key with all of the output.
+        TODO: Verify whether it can also assume that it will be called exactly
+        once for each key with all of the output.
 
         Args:
             key: A key value as emitted from the map() function, above.
@@ -798,10 +802,16 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
     @classmethod
     def split_input(cls, mapper_spec):
-        """Returns data split from mapper_spec as inputs(list).
+        """Returns new input readers which will split the work the mapper_spec
+        is responsible for.
 
         Args:
-            mapper_spec: dict(? : ?). TODO(brianrodri).
+            mapper_spec: mapreduce_spec.mapper. The original mapreduce
+            configuration to split.
+
+        Returns:
+            list(MultipleDatastoreEntitiesInputReader). Each ready to handle
+                subsets which spans all of mapper_spec's inputs.
         """
         params = mapper_spec.params
         entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
@@ -889,15 +899,17 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def get_realtime_id(cls, layer_index, raw_entity_id):
-        """Returns an ID used to identify the element with the given entity id
-        in the currently active realtime datastore layer.
+        """Returns a valid id for identifying the entity with the given raw id
+        from the given active realtime datastore layer.
 
         Args:
             layer_index: int. The realtime layer id, should be either 0 or 1.
-            raw_entity_id: int. TODO(brianrodri).
+            raw_entity_id: int. The id of some entity wishing storage in the
+                realtime layer.
 
         Returns:
-            A unique, hashable object for all inputs.
+            str. A new id which can be used to store the entity between realtime
+            layers.
         """
         return '%s:%s' % (layer_index, raw_entity_id)
 
@@ -907,8 +919,9 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         the given datetime.
 
         Args:
-            layer_index: int. TODO(brianrodri).
-            latest_created_on_datetime: int. TODO(brianrodri).
+            layer_index: int. The realtime layer id, should be either 0 or 1.
+            latest_created_on_datetime: datetime.datetime. All remaining
+                entities will have been created on or after this time.
         """
         query = cls.query().filter(cls.realtime_layer == layer_index).filter(
             cls.created_on < latest_created_on_datetime)
@@ -921,11 +934,21 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def get(cls, entity_id, strict=True):
-        """TODO(brianrodri).
+        """Gets an entity by id.
 
         Args:
-            entity_id: int. TODO(brianrodri).
-            strict: bool. TODO(brianrodri).
+            entity_id: str.
+            strict: bool. Whether to fail noisily if no entity with the given
+                id exists in the datastore. Default is True.
+
+        Returns:
+            None, if strict == False and no undeleted entity with the given id
+            exists in the datastore. Otherwise, the entity instance that
+            corresponds to the given id.
+
+        Raises:
+            base_models.BaseModel.EntityNotFoundError: if strict == True and
+                no undeleted entity with the given id exists in the datastore.
         """
         if not cls._is_valid_realtime_id(entity_id):
             raise ValueError('Invalid realtime id: %s' % entity_id)
@@ -935,7 +958,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         ).get(entity_id, strict=strict)
 
     def put(self):
-        """TODO(brianrodri)."""
+        """TODO(brianrodri): This method seems unneccesary."""
         if (self.realtime_layer is None or
                 str(self.realtime_layer) != self.id[0]):
             raise Exception(
@@ -1048,7 +1071,8 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _get_active_realtime_index(cls):
-        """TODO(brianrodri)."""
+        """Returns the registered realtime id of this class, creating one if it
+        doesn't exist."""
         def _get_active_realtime_index_transactional():
             cc_model = job_models.ContinuousComputationModel.get(
                 cls.__name__, strict=False)
@@ -1084,7 +1108,7 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _switch_active_realtime_class(cls):
-        """TODO(brianrodri)."""
+        """Toggles between the active realtime layers, from either 0 or 1."""
         def _switch_active_realtime_class_transactional():
             cc_model = job_models.ContinuousComputationModel.get(
                 cls.__name__)
@@ -1098,7 +1122,7 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _clear_inactive_realtime_layer(cls, latest_created_on_datetime):
         """Deletes all entries in the given realtime datastore class whose
-        created_on date is before latest_timestamp.
+        created_on date is before latest_created_on_datetime.
         """
         inactive_realtime_index = 1 - cls._get_active_realtime_index()
         cls._get_realtime_datastore_class().delete_layer(
