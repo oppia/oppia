@@ -20,7 +20,6 @@ import random
 
 import jinja2
 
-from constants import constants
 from core.controllers import base
 from core.domain import classifier_services
 from core.domain import collection_services
@@ -216,7 +215,7 @@ class ExplorationPage(base.BaseHandler):
 class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
@@ -496,7 +495,7 @@ class RatingHandler(base.BaseHandler):
     exploration.
     """
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_playable
     def get(self, exploration_id):
@@ -530,7 +529,7 @@ class RecommendationsHandler(base.BaseHandler):
     if there are upcoming explorations for the learner to complete.
     """
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_playable
     def get(self, exploration_id):

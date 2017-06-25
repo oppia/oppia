@@ -191,6 +191,8 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
 INVALID_NAME_CHARS = u':#/|_%<>[]{}\ufffd\\' + chr(127)
 for ind in range(32):
     INVALID_NAME_CHARS += chr(ind)
+# Prefix for data sent from the server to the client via JSON.
+XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 # A regular expression for alphanumeric words separated by single spaces.
@@ -274,6 +276,11 @@ DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
 # dashboard is rounded off to.
 AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
+# Whether to enable the promo bar functionality. This does not actually turn on
+# the promo bar, as that is gated by a config value (see config_domain). This
+# merely avoids checking for whether the promo bar is enabled for every Oppia
+# page visited.
+ENABLE_PROMO_BAR = True
 # Whether to enable maintenance mode on the site. For non-admins, this redirects
 # all HTTP requests to the maintenance page. This is the only check which
 # determines whether the site is in maintenance mode to avoid queries to the
@@ -355,9 +362,6 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
-
-# The default language code for an exploration.
-DEFAULT_LANGUAGE_CODE = 'en'
 
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
@@ -552,9 +556,11 @@ PREFERENCES_DATA_URL = '/preferenceshandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
+SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -755,6 +761,11 @@ TERMS_PAGE_DESCRIPTION = (
     'distributing learning material.')
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
+SITE_NAME = 'Oppia.org'
+
+# The type of the response returned by a handler when an exception is raised.
+HANDLER_TYPE_HTML = 'html'
+HANDLER_TYPE_JSON = 'json'
 
 # Following are the constants for the roles.
 ROLE_GUEST = 'GUEST'

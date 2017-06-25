@@ -18,7 +18,6 @@ import random
 import urllib
 import urlparse
 
-from constants import constants
 from core.controllers import base
 import feconf
 
@@ -64,7 +63,7 @@ class SplashPage(base.BaseHandler):
                     '%s=%s' % (arg_name, self.request.get(arg_name))
                     for arg_name in arguments if arg_name != 'c'])
 
-                target_url = constants.SPLASH_URL
+                target_url = feconf.SPLASH_URL
                 if query_suffix:
                     target_url += '?%s' % query_suffix
                 self.redirect(target_url)

@@ -14,7 +14,6 @@
 
 """Controllers for the profile page."""
 
-from constants import constants
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import subscription_services
@@ -66,7 +65,7 @@ class ProfilePage(base.BaseHandler):
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, username):
         """Handles GET requests."""
@@ -134,7 +133,7 @@ class PreferencesPage(base.BaseHandler):
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @base.require_user
     def get(self):
@@ -214,7 +213,7 @@ class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
     picture is uploaded."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @base.require_user
     def get(self):
@@ -230,7 +229,7 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
     """ Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, username):
         user_id = user_services.get_user_id_from_username(username)
@@ -272,7 +271,7 @@ class SignupHandler(base.BaseHandler):
 
     REDIRECT_UNFINISHED_SIGNUPS = False
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_user_id_else_redirect_to_homepage
     def get(self):

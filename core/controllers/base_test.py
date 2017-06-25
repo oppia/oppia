@@ -281,7 +281,7 @@ class EscapingTest(test_utils.GenericTestBase):
 
     def test_jinja_autoescaping(self):
         form_url = '<[angular_tag]> x{{51 * 3}}y'
-        with self.swap(constants, 'SITE_FEEDBACK_FORM_URL', form_url):
+        with self.swap(feconf, 'SITE_FEEDBACK_FORM_URL', form_url):
             response = self.testapp.get('/fake')
             self.assertEqual(response.status_int, 200)
 
@@ -295,7 +295,7 @@ class EscapingTest(test_utils.GenericTestBase):
         response = self.testapp.post('/fake', {})
         self.assertEqual(response.status_int, 200)
 
-        self.assertTrue(response.body.startswith(constants.XSSI_PREFIX))
+        self.assertTrue(response.body.startswith(feconf.XSSI_PREFIX))
         self.assertIn('\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
         self.assertNotIn('<script>', response.body)
         self.assertNotIn('马', response.body)
@@ -422,7 +422,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
 class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
 
     class FakeHandler(base.BaseHandler):
-        GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         def get(self):
             raise self.InternalErrorException('fake exception')
 

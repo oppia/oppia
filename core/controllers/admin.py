@@ -18,7 +18,6 @@ import logging
 
 import jinja2
 
-from constants import constants
 from core import jobs
 from core import jobs_registry
 from core.controllers import base
@@ -114,7 +113,7 @@ class AdminPage(base.BaseHandler):
 class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_super_admin
     def get(self):
@@ -209,7 +208,7 @@ class AdminHandler(base.BaseHandler):
 class AdminJobOutput(base.BaseHandler):
     """Retrieves job output to show on the admin page."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_super_admin
     def get(self):

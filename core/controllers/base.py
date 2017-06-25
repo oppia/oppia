@@ -167,7 +167,7 @@ class BaseHandler(webapp2.RequestHandler):
     REDIRECT_UNFINISHED_SIGNUPS = True
 
     # What format the get method returns when exception raised, json or html
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_HTML
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
 
     @webapp2.cached_property
     def jinja2_env(self):
@@ -312,7 +312,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
-        self.response.write('%s%s' % (constants.XSSI_PREFIX, json_output))
+        self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
     def render_template(
             self, filepath, iframe_restriction='DENY',
@@ -341,8 +341,8 @@ class BaseHandler(webapp2.RequestHandler):
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'CAN_SEND_ANALYTICS_EVENTS': constants.CAN_SEND_ANALYTICS_EVENTS,
             'CATEGORIES_TO_COLORS': constants.CATEGORIES_TO_COLORS,
-            'DEFAULT_LANGUAGE_CODE': constants.ALL_LANGUAGE_CODES[0]['code'],
-            'DEFAULT_CATEGORY_ICON': constants.DEFAULT_THUMBNAIL_ICON,
+            'DEFAULT_LANGUAGE_CODE': constants.DEFAULT_LANGUAGE_CODE,
+            'DEFAULT_CATEGORY_ICON': constants.DEFAULT_CATEGORY_ICON,
             'DEFAULT_COLOR': constants.DEFAULT_COLOR,
             'DEV_MODE': feconf.DEV_MODE,
             'MINIFICATION': feconf.IS_MINIFIED,
@@ -358,8 +358,8 @@ class BaseHandler(webapp2.RequestHandler):
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
-            'SITE_FEEDBACK_FORM_URL': constants.SITE_FEEDBACK_FORM_URL,
-            'SITE_NAME': constants.SITE_NAME,
+            'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
+            'SITE_NAME': feconf.SITE_NAME,
 
             'SUPPORTED_SITE_LANGUAGES': constants.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
@@ -373,7 +373,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id),
             'preferred_site_language_code': self.preferred_site_language_code
         })
-        if constants.ENABLE_PROMO_BAR:
+        if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
             promo_bar_message = config_domain.PROMO_BAR_MESSAGE.value
         else:
@@ -409,7 +409,7 @@ class BaseHandler(webapp2.RequestHandler):
                     redirect_url_on_logout))
         else:
             target_url = (
-                '/' if self.request.uri.endswith(constants.SPLASH_URL)
+                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
                 else self.request.uri)
             values['login_url'] = (
                 current_user_services.create_login_url(target_url))
@@ -460,7 +460,7 @@ class BaseHandler(webapp2.RequestHandler):
         # Otherwise, we check whether self.payload exists.
         if (self.payload is not None or
                 self.GET_HANDLER_ERROR_RETURN_TYPE ==
-                constants.HANDLER_TYPE_JSON):
+                feconf.HANDLER_TYPE_JSON):
             self.render_json(values)
         else:
             self.values.update(values)

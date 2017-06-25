@@ -99,22 +99,22 @@ class LibraryPage(base.BaseHandler):
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups([
-            feconf.DEFAULT_LANGUAGE_CODE])
+            constants.DEFAULT_LANGUAGE_CODE])
         top_rated_activity_summary_dicts = (
             summary_services.get_top_rated_exploration_summary_dicts(
-                [feconf.DEFAULT_LANGUAGE_CODE],
+                [constants.DEFAULT_LANGUAGE_CODE],
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         featured_activity_summary_dicts = (
             summary_services.get_featured_activity_summary_dicts(
-                [feconf.DEFAULT_LANGUAGE_CODE]))
+                [constants.DEFAULT_LANGUAGE_CODE]))
 
-        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
@@ -189,7 +189,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
         elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
             top_rated_activity_summary_dicts = (
                 summary_services.get_top_rated_exploration_summary_dicts(
-                    [feconf.DEFAULT_LANGUAGE_CODE],
+                    [constants.DEFAULT_LANGUAGE_CODE],
                     feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE))
             if top_rated_activity_summary_dicts:
                 activity_list = top_rated_activity_summary_dicts
@@ -206,7 +206,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
         else:
             return self.PageNotFoundException
 
-        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
@@ -222,7 +222,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
 class SearchHandler(base.BaseHandler):
     """Provides data for activity search results."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
@@ -267,7 +267,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
     controller supports returning private explorations for the given user.
     """
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
@@ -308,7 +308,7 @@ class CollectionSummariesHandler(base.BaseHandler):
     """Returns collection summaries corresponding to collection ids.
     """
 
-    GET_HANDLER_ERROR_RETURN_TYPE = constants.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""

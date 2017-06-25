@@ -17,7 +17,6 @@
 import logging
 
 # pylint: disable=relative-import
-from constants import constants
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import collection_editor
@@ -87,7 +86,7 @@ class HomePageRedirectHandler(base.BaseHandler):
             else:
                 self.redirect(feconf.LIBRARY_INDEX_URL)
         else:
-            self.redirect(constants.SPLASH_URL)
+            self.redirect(feconf.SPLASH_URL)
 
 
 def get_redirect_route(regex_route, handler, defaults=None):
@@ -156,7 +155,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupHandler),
     get_redirect_route(r'/', HomePageRedirectHandler),
 
-    get_redirect_route(constants.SPLASH_URL, pages.SplashPage),
+    get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
     get_redirect_route(r'/get_started', pages.GetStartedPage),
     get_redirect_route(r'/foundation', pages.AboutRedirectPage),

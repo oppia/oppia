@@ -227,9 +227,9 @@ class TestBase(unittest.TestCase):
 
         self.assertEqual(
             json_response.content_type, 'application/javascript')
-        self.assertTrue(json_response.body.startswith(constants.XSSI_PREFIX))
+        self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
-        return json.loads(json_response.body[len(constants.XSSI_PREFIX):])
+        return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
     def get_json(self, url, params=None, expect_errors=False):
         """Get a JSON response, transformed to a Python object."""
@@ -370,7 +370,7 @@ class TestBase(unittest.TestCase):
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
             end_state_name=None,
             interaction_id='TextInput'):
         """Saves a new strictly-validated exploration.
@@ -440,7 +440,7 @@ class TestBase(unittest.TestCase):
     def save_new_default_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default collection written by owner_id.
 
         Returns the collection domain object.
@@ -454,7 +454,7 @@ class TestBase(unittest.TestCase):
     def save_new_valid_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
         collection = collection_domain.Collection.create_default_collection(

@@ -8,6 +8,9 @@
  *    functions.
  */
 var constants = {
+  "//": "Whether to allow custom event reporting to Google Analytics.",
+  "CAN_SEND_ANALYTICS_EVENTS": false,
+
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -20,22 +23,18 @@ var constants = {
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
 
-  "//": "Whether to allow custom event reporting to Google Analytics.",
-  "CAN_SEND_ANALYTICS_EVENTS": false,
-
-  "//": "The type of the response returned by a handler when an exception is raised.",
-  "HANDLER_TYPE_HTML": "html",
-  "HANDLER_TYPE_JSON": "json",
-
-  "//": "Prefix for data sent from the server to the client via JSON.",
-  "XSSI_PREFIX": ")]}'\n",
-
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
+  "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
-  "//": ["List of supported default categories. For now, each category has a specific ",
-         "color associated with it. Each category also has a thumbnail icon whose ",
-         "filename is '{CategoryName}}.svg'."],
+  "//": "The default language code for an exploration.",
+  "DEFAULT_LANGUAGE_CODE": "en",
+
+  "//": [
+    "List of supported default categories. For now, each category has a specific ",
+    "color associated with it. Each category also has a thumbnail icon whose ",
+    "filename is '{CategoryName}}.svg'."
+  ],
   "CATEGORIES_TO_COLORS": {
     "Mathematics": "#cd672b",
     "Algebra": "#cd672b",
@@ -84,148 +83,181 @@ var constants = {
     "Education": "#942e20",
     "Puzzles": "#a8554a",
     "Sport": "#893327",
-    "Welcome": "#992a2b"},
+    "Welcome": "#992a2b"
+  },
 
-  "//": ["List of supported language codes. Each description has a ",
-         "parenthetical part that may be stripped out to give a shorter ",
-         "description."],
+  "//": [
+    "List of supported language codes. Each description has a ",
+    "parenthetical part that may be stripped out to give a shorter ",
+    "description."
+   ],
   "ALL_LANGUAGE_CODES": [{
-        "code": "en", "description": "English"
+      "code": "en",
+      "description": "English"
     }, {
-        "code": "ar", "description": "العربية (Arabic)"
+      "code": "ar",
+      "description": "العربية (Arabic)"
     }, {
-        "code": "bg", "description": "български (Bulgarian)"
+      "code": "bg",
+      "description": "български (Bulgarian)"
     }, {
-        "code": "ca", "description": "català (Catalan)"
+      "code": "ca",
+      "description": "català (Catalan)"
     }, {
-        "code": "zh", "description": "中文 (Chinese)"
+      "code": "zh",
+      "description": "中文 (Chinese)"
     }, {
-        "code": "hr", "description": "hrvatski (Croatian)"
+      "code": "hr",
+      "description": "hrvatski (Croatian)"
     }, {
-        "code": "cs", "description": "čeština (Czech)"
+      "code": "cs",
+      "description": "čeština (Czech)"
     }, {
-        "code": "da", "description": "dansk (Danish)"
+      "code": "da",
+      "description": "dansk (Danish)"
     }, {
-        "code": "nl", "description": "Nederlands (Dutch)"
+      "code": "nl",
+      "description": "Nederlands (Dutch)"
     }, {
-        "code": "tl", "description": "Filipino (Filipino)"
+      "code": "tl",
+      "description": "Filipino (Filipino)"
     }, {
-        "code": "fi", "description": "suomi (Finnish)"
+      "code": "fi",
+      "description": "suomi (Finnish)"
     }, {
-        "code": "fr", "description": "français (French)"
+      "code": "fr",
+      "description": "français (French)"
     }, {
-        "code": "de", "description": "Deutsch (German)"
+      "code": "de",
+      "description": "Deutsch (German)"
     }, {
-        "code": "el", "description": "ελληνικά (Greek)"
+      "code": "el",
+      "description": "ελληνικά (Greek)"
     }, {
-        "code": "he", "description": "עברית (Hebrew)"
+      "code": "he",
+      "description": "עברית (Hebrew)"
     }, {
-        "code": "hi", "description": "हिन्दी (Hindi)"
+      "code": "hi",
+      "description": "हिन्दी (Hindi)"
     }, {
-        "code": "hu", "description": "magyar (Hungarian)"
+      "code": "hu",
+      "description": "magyar (Hungarian)"
     }, {
-        "code": "id", "description": "Bahasa Indonesia (Indonesian)"
+      "code": "id",
+      "description": "Bahasa Indonesia (Indonesian)"
     }, {
-        "code": "it", "description": "italiano (Italian)"
+      "code": "it",
+      "description": "italiano (Italian)"
     }, {
-        "code": "ja", "description": "日本語 (Japanese)"
+      "code": "ja",
+      "description": "日本語 (Japanese)"
     }, {
-        "code": "ko", "description": "한국어 (Korean)"
+      "code": "ko",
+      "description": "한국어 (Korean)"
     }, {
-        "code": "lv", "description": "latviešu (Latvian)"
+      "code": "lv",
+      "description": "latviešu (Latvian)"
     }, {
-        "code": "lt", "description": "lietuvių (Lithuanian)"
+      "code": "lt",
+      "description": "lietuvių (Lithuanian)"
     }, {
-        "code": "no", "description": "Norsk (Norwegian)"
+      "code": "no",
+      "description": "Norsk (Norwegian)"
     }, {
-        "code": "fa", "description": "فارسی (Persian)"
+      "code": "fa",
+      "description": "فارسی (Persian)"
     }, {
-        "code": "pl", "description": "polski (Polish)"
+      "code": "pl",
+      "description": "polski (Polish)"
     }, {
-        "code": "pt", "description": "português (Portuguese)"
+      "code": "pt",
+      "description": "português (Portuguese)"
     }, {
-        "code": "ro", "description": "română (Romanian)"
+      "code": "ro",
+      "description": "română (Romanian)"
     }, {
-        "code": "ru", "description": "русский (Russian)"
+      "code": "ru",
+      "description": "русский (Russian)"
     }, {
-        "code": "sr", "description": "српски (Serbian)"
+      "code": "sr",
+      "description": "српски (Serbian)"
     }, {
-        "code": "sk", "description": "slovenčina (Slovak)"
+      "code": "sk",
+      "description": "slovenčina (Slovak)"
     }, {
-        "code": "sl", "description": "slovenščina (Slovenian)"
+      "code": "sl",
+      "description": "slovenščina (Slovenian)"
     }, {
-        "code": "es", "description": "español (Spanish)"
+      "code": "es",
+      "description": "español (Spanish)"
     }, {
-        "code": "sv", "description": "svenska (Swedish)"
+      "code": "sv",
+      "description": "svenska (Swedish)"
     }, {
-        "code": "th", "description": "ภาษาไทย (Thai)"
+      "code": "th",
+      "description": "ภาษาไทย (Thai)"
     }, {
-        "code": "tr", "description": "Türkçe (Turkish)"
+      "code": "tr",
+      "description": "Türkçe (Turkish)"
     }, {
-        "code": "uk", "description": "українська (Ukrainian)"
+      "code": "uk",
+      "description": "українська (Ukrainian)"
     }, {
-        "code": "vi", "description": "Tiếng Việt (Vietnamese)"
+      "code": "vi",
+      "description": "Tiếng Việt (Vietnamese)"
     }],
 
-  "//": ["NOTE TO DEVELOPERS: While adding another language, please ensure that the ",
-         "languages are in alphabetical order "],
+  "//": [
+    "NOTE TO DEVELOPERS: While adding another language, please ensure that the ",
+    "languages are in alphabetical order "
+  ],
   "SUPPORTED_SITE_LANGUAGES": [{
-        "id": "id",
-        "text": "Bahasa Indonesia"
+      "id": "id",
+      "text": "Bahasa Indonesia"
     }, {
-        "id": "en",
-        "text": "English"
+      "id": "en",
+      "text": "English"
     }, {
-        "id": "de",
-        "text": "Deutsch"
+      "id": "de",
+      "text": "Deutsch"
     }, {
-        "id": "fr",
-        "text": "français"
+      "id": "fr",
+      "text": "français"
     }, {
-        "id": "nl",
-        "text": "Nederlands"
+      "id": "nl",
+      "text": "Nederlands"
     }, {
-        "id": "es",
-        "text": "Español"
+      "id": "es",
+      "text": "Español"
     }, {
-        "id": "hu",
-        "text": "magyar"
+      "id": "hu",
+      "text": "magyar"
     }, {
-        "id": "pt",
-        "text": "Português"
+      "id": "pt",
+      "text": "Português"
     }, {
-        "id": "pt-br",
-        "text": "Português (Brasil)"
+      "id": "pt-br",
+      "text": "Português (Brasil)"
     }, {
-        "id": "mk",
-        "text": "македонски јазик"
+      "id": "mk",
+      "text": "македонски јазик"
     }, {
-        "id": "vi",
-        "text": "Tiếng Việt"
+      "id": "vi",
+      "text": "Tiếng Việt"
     }, {
-        "id": "hi",
-        "text": "हिन्दी"
+      "id": "hi",
+      "text": "हिन्दी"
     }, {
-        "id": "bn",
-        "text": "বাংলা"
+      "id": "bn",
+      "text": "বাংলা"
     }, {
-        "id": "tr",
-        "text": "Türkçe"
+      "id": "tr",
+      "text": "Türkçe"
     }, {
-        "id": "zh-hans",
-        "text": "中文(简体)"
+      "id": "zh-hans",
+      "text": "中文(简体)"
     }, {
-        "id": "zh-hant",
-        "text": "中文(繁體)"
-    }],
-
-  "SITE_NAME": "Oppia.org",
-  "SITE_FEEDBACK_FORM_URL": "",
-  "SPLASH_URL": "/splash",
-
-  "//": ["Whether to enable the promo bar functionality. This does not actually turn on ",
-         "the promo bar, as that is gated by a config value (see config_domain). This ",
-         "merely avoids checking for whether the promo bar is enabled for every Oppia ",
-         "page visited."],
-  "ENABLE_PROMO_BAR": true
+      "id": "zh-hant",
+      "text": "中文(繁體)"
+    }]
 };
