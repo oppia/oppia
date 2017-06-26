@@ -1494,8 +1494,8 @@ textarea {
 }
 
 .oppia-set-dashboard .modal-dialog {
-  width: 60%;
   height: 195px;
+  width: 60%;
 }
 
 .oppia-set-dashboard .modal-content {

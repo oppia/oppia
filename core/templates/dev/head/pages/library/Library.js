@@ -259,7 +259,7 @@ oppia.controller('Library', [
         ],
         windowClass: 'oppia-set-dashboard'
       });
-    }
+    };
 
     // The following loads explorations belonging to a particular group. If
     // fullResultsUrl is given it loads the page corresponding to the url.

@@ -89,7 +89,7 @@ class HomePageRedirectHandler(base.BaseHandler):
                 else:
                     self.redirect(feconf.LIBRARY_INDEX_URL)
             else:
-                if user_settings.default_dashboard == 'creator':
+                if user_settings.default_dashboard == feconf.DASHBOARD_TYPE_CREATOR:
                     self.redirect(feconf.CREATOR_DASHBOARD_URL)
                 else:
                     self.redirect(feconf.LEARNER_DASHBOARD_URL)

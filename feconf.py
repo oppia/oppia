@@ -362,6 +362,13 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
+# If the default dashboard is set to the value below, it signifies the
+# preferred dashboard of the user is the creator dashboard.
+DASHBOARD_TYPE_CREATOR = 'creator'
+# If the default dashboard is set to the value below, it signifies the
+# preferred dashboard of the user is the learner dashboard.
+DASHBOARD_TYPE_LEARNER = 'learner'
+
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
