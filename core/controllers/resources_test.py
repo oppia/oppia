@@ -71,6 +71,13 @@ class ImageHandlerTest(test_utils.GenericTestBase):
                   mode='rb') as f:
             raw_image = f.read()
         # Pass JPG extension even though raw_image data is PNG.
+        # This test verifies that, when the filename extension differs from what
+        # the raw data 'appears' to be, the image is still accepted, as long as
+        # the raw data is identified as 'image' data.
+        # The motivation arose from this image:
+        # http://www.math.wisc.edu/~miller/gif/beads.gif
+        # The above image, when tested with imghrd.what using the raw data, is
+        # identified as PNG, even though the extension is GIF.
         response_dict = self.post_json(
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.jpg'},
