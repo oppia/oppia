@@ -611,7 +611,7 @@ def create_new_user(user_id, email):
         raise Exception('User %s already exists.' % user_id)
 
     user_settings = UserSettings(
-        user_id, email, feconf.ROLE_EXPLORATION_EDITOR,
+        user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
