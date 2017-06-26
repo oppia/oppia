@@ -926,7 +926,7 @@ oppia.factory('explorationStatesService', [
       return conversionFunction(frontendValue);
     };
 
-    var confirmDelete = function(deleteStateName) {
+    var reallyConfirmDelete = function(deleteStateName) {
       _states.deleteState(deleteStateName);
 
       changeListService.deleteState(deleteStateName);
@@ -1111,10 +1111,10 @@ oppia.factory('explorationStatesService', [
               };
             }
           ]
-        }).result.then(confirmDelete);
+        }).result.then(reallyConfirmDelete);
       },
       confirmDelete: function(deleteStateName) {
-        return confirmDelete(deleteStateName);
+        return reallyConfirmDelete(deleteStateName);
       },
       renameState: function(oldStateName, newStateName) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
