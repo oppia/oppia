@@ -30,7 +30,6 @@ import jinja2
 import webapp2
 from google.appengine.api import users
 
-from constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -334,16 +333,9 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
-            'ALL_CATEGORIES': constants.ALL_CATEGORIES,
-            'ALL_LANGUAGE_CODES': constants.ALL_LANGUAGE_CODES,
             'ASSET_DIR_PREFIX': utils.get_asset_dir_prefix(),
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'CAN_SEND_ANALYTICS_EVENTS': constants.CAN_SEND_ANALYTICS_EVENTS,
-            'CATEGORIES_TO_COLORS': constants.CATEGORIES_TO_COLORS,
-            'DEFAULT_LANGUAGE_CODE': constants.DEFAULT_LANGUAGE_CODE,
-            'DEFAULT_CATEGORY_ICON': constants.DEFAULT_CATEGORY_ICON,
-            'DEFAULT_COLOR': constants.DEFAULT_COLOR,
             'DEV_MODE': feconf.DEV_MODE,
             'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
@@ -361,7 +353,6 @@ class BaseHandler(webapp2.RequestHandler):
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'SITE_NAME': feconf.SITE_NAME,
 
-            'SUPPORTED_SITE_LANGUAGES': constants.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
             'can_create_collections': (
