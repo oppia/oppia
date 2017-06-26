@@ -64,7 +64,7 @@ oppia.directive('answerFeedbackPair', [
                   $scope.data.learnerAnswer, interaction.id,
                   interaction.customizationArgs));
             }
-            if ($scope.data.learnerAnswer === '(Asked for a hint)') {
+            if ($scope.data.learnerAnswer === 'I would like a hint.') {
               return $scope.data.learnerAnswer;
             }
             return shortAnswerHtml;

@@ -22,6 +22,8 @@ oppia.constant('TWO_CARD_THRESHOLD_PX', 960);
 
 oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
 
+oppia.constant('WAIT_FOR_HINT_MSEC', 30000);
+
 oppia.constant(
     'EXPLORATION_DATA_URL_TEMPLATE',
     '/explorehandler/init/<exploration_id>');

@@ -75,7 +75,7 @@
                angular-html-bind="activeCard.interactionHtml">
           </div>
           <div ng-if="currentInteractionHints.length" style="text-align: right">
-            <span tooltip="<[!isHintAvailable() ? 'Please try answering the question first.' : 'Click here for a hint!']>">
+            <span tooltip="<[tooltipText]>">
               <md-button class="hint-button"
                          ng-click="showHint()"
                          ng-disabled="!isHintAvailable()">
