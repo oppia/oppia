@@ -50,8 +50,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     collection_jobs_one_off.CollectionMigrationJob,
-    exp_jobs_one_off.FallbackOneOffJob,
-    exp_jobs_one_off.FallbacksToHintsOneOffJob]
+    exp_jobs_one_off.FallbackOneOffJob]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.

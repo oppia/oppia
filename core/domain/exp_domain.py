@@ -1818,9 +1818,7 @@ class Exploration(object):
                 if interaction.solution:
                     Solution.from_dict(
                         interaction.solution).validate(interaction.id)
-                else:
-                    raise utils.ValidationError(
-                        'Solution must be specified if hint(s) are specified')
+
             elif interaction.solution:
                 raise utils.ValidationError(
                     'Hint(s) must be specified if solution is specified')
