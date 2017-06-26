@@ -62,6 +62,30 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'image/png')
         self.assertEqual(response.body, raw_image)
 
+    def test_unexpected_extensions_are_accepted(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+                  mode='rb') as f:
+            raw_image = f.read()
+        # Pass JPG extension even though raw_image data is PNG.
+        response_dict = self.post_json(
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            {'filename': 'test.jpg'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),)
+        )
+        filepath = response_dict['filepath']
+
+        self.logout()
+
+        response = self.testapp.get(
+            str('%s/0/%s' % (self.IMAGE_VIEW_URL_PREFIX, filepath)))
+        self.assertEqual(response.content_type, 'image/jpg')
+        self.assertEqual(response.body, raw_image)
+
     def test_upload_empty_image(self):
         """Test upload of an empty image."""
 
