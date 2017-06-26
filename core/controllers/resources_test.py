@@ -76,7 +76,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         # the raw data is identified as 'image' data.
         # The motivation arose from this image:
         # http://www.math.wisc.edu/~miller/gif/beads.gif
-        # The above image, when tested with imghrd.what using the raw data, is
+        # The above image, when tested with imghdr.what using the raw data, is
         # identified as PNG, even though the extension is GIF.
         response_dict = self.post_json(
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
