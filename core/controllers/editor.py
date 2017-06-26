@@ -959,7 +959,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.user_id, exploration_id)
         draft_change_list_id = exp_user_data.draft_change_list_id
-        # If the value passed here is False, have the user discard the draft
+        # If the draft_change_list_id is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
         self.render_json({
