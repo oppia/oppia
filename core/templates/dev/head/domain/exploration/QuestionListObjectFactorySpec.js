@@ -161,16 +161,11 @@ describe('Question List Object Factory', function() {
   it('should remove the given question if it exists', function() {
     var questionToDelete = sampleQuestions[1];
     questionList.removeQuestion(questionToDelete);
-    expect((function() {
-      // Return true if question exists else return false.
-      var questions = questionList.getQuestions();
-      for (var i = 0; i < questions.length; i++) {
-        if (questions[i].getStateName() === questionToDelete.getStateName()) {
-          return true;
-        }
-      }
-      return false;
-    })()).toBe(false);
+    expect(questionList.getQuestionCount())
+      .toEqual(sampleQuestions.length - 1);
+    expect(function() {
+      questionList.getBindableQuestion(questionToDelete.getStateName());
+    }).toThrowError();
   });
 
   it('should have answer group', function() {

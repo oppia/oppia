@@ -45,7 +45,7 @@ oppia.factory('QuestionListObjectFactory', [function() {
       }
     }
 
-    if (index == -1) {
+    if (index === -1) {
       throw Error('Cannot find question: ' + question);
     }
     this._questions.splice(index, 1);
