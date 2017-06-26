@@ -1965,14 +1965,12 @@ def create_or_update_draft(
         exp_user_data = user_models.ExplorationUserDataModel.create(
             user_id, exp_id)
 
-    draft_id = exp_user_data.draft_change_list_id
-    if draft_id is None:
-        draft_id = 0
-    draft_id += 1
+    draft_change_list_id = exp_user_data.draft_change_list_id
+    draft_change_list_id += 1
     exp_user_data.draft_change_list = change_list
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
-    exp_user_data.draft_change_list_id = draft_id
+    exp_user_data.draft_change_list_id = draft_change_list_id
     exp_user_data.put()
 
 
