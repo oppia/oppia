@@ -25,6 +25,7 @@ oppia.factory('explorationData', [
     ReadOnlyExplorationBackendApiService,$q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
+    var draftChangeListId = null;
     var pathnameArray = window.location.pathname.split('/');
     for (var i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create') {
@@ -54,6 +55,7 @@ oppia.factory('explorationData', [
           version: explorationData.data.version
         }).then(function(response) {
           if (successCallback) {
+            draftChangeListId = response.data.draft_change_list_id;
             successCallback(response);
           }
         }, function() {
@@ -92,7 +94,7 @@ oppia.factory('explorationData', [
             explorationId).then(function(response) {
               $log.info('Retrieved exploration data.');
               $log.info(response);
-
+              draftChangeListId = response.draft_change_list_id;
               explorationData.data = response;
 
               return response;

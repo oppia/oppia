@@ -355,8 +355,11 @@ class ExplorationUserDataModel(base_models.BaseModel):
     draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
     # The exploration version that this change list applied to.
     draft_change_list_exp_version = ndb.IntegerProperty(default=None)
-    #The exploration draft version of this change list.
-    draft_change_list_id = ndb.IntegerProperty(default=None)
+    # The version of the draft change list which was last saved by the user.
+    # Can be zero if the draft is None or if the user has not committed
+    # draft changes to this exploration since the draft_change_list_id property
+    # was introduced.
+    draft_change_list_id = ndb.IntegerProperty(default=0)
     # The user's preference for receiving suggestion emails for this exploration
     mute_suggestion_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
