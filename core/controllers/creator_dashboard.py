@@ -154,6 +154,11 @@ class CreatorDashboardHandler(base.BaseHandler):
         def _round_average_ratings(rating):
             return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
+        user_settings = user_services.get_user_settings(
+            self.user_id)
+        show_set_dashboard_modal = (
+            False if user_settings.default_dashboard else True)
+
         # We need to do the filtering because some activities that were
         # originally subscribed to may have been deleted since.
         subscribed_exploration_summaries = [
@@ -253,7 +258,8 @@ class CreatorDashboardHandler(base.BaseHandler):
             'collections_list': collection_summary_dicts,
             'dashboard_stats': dashboard_stats,
             'last_week_stats': last_week_stats,
-            'subscribers_list': subscribers_list
+            'subscribers_list': subscribers_list,
+            'show_set_dashboard_modal': show_set_dashboard_modal
         })
         self.render_json(self.values)
 

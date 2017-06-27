@@ -74,17 +74,25 @@ class HomePageRedirectHandler(base.BaseHandler):
     """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
+            user_settings = user_services.get_user_settings(
+                self.user_id)
             user_contributions = user_services.get_user_contributions(
                 self.user_id)
 
-            # 'Creator' is a user who has created or edited an exploration.
-            user_is_creator = user_contributions and (
-                user_contributions.created_exploration_ids or
-                user_contributions.edited_exploration_ids)
-            if user_is_creator:
-                self.redirect(feconf.CREATOR_DASHBOARD_URL)
+            if not user_settings.default_dashboard:
+                # 'Creator' is a user who has created or edited an exploration.
+                user_is_creator = user_contributions and (
+                    user_contributions.created_exploration_ids or
+                    user_contributions.edited_exploration_ids)
+                if user_is_creator:
+                    self.redirect(feconf.CREATOR_DASHBOARD_URL)
+                else:
+                    self.redirect(feconf.LIBRARY_INDEX_URL)
             else:
-                self.redirect(feconf.LIBRARY_INDEX_URL)
+                if user_settings.default_dashboard == 'creator':
+                    self.redirect(feconf.CREATOR_DASHBOARD_URL)
+                else:
+                    self.redirect(feconf.LEARNER_DASHBOARD_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
 
