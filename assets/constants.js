@@ -33,7 +33,7 @@ var constants = {
   "//": [
     "List of supported default categories. For now, each category has a specific ",
     "color associated with it. Each category also has a thumbnail icon whose ",
-    "filename is '{CategoryName}}.svg'."
+    "filename is '{{CategoryName}}.svg'."
   ],
   "CATEGORIES_TO_COLORS": {
     "Mathematics": "#cd672b",
@@ -92,172 +92,172 @@ var constants = {
     "description."
   ],
   "ALL_LANGUAGE_CODES": [{
-      "code": "en",
-      "description": "English"
-    }, {
-      "code": "ar",
-      "description": "العربية (Arabic)"
-    }, {
-      "code": "bg",
-      "description": "български (Bulgarian)"
-    }, {
-      "code": "ca",
-      "description": "català (Catalan)"
-    }, {
-      "code": "zh",
-      "description": "中文 (Chinese)"
-    }, {
-      "code": "hr",
-      "description": "hrvatski (Croatian)"
-    }, {
-      "code": "cs",
-      "description": "čeština (Czech)"
-    }, {
-      "code": "da",
-      "description": "dansk (Danish)"
-    }, {
-      "code": "nl",
-      "description": "Nederlands (Dutch)"
-    }, {
-      "code": "tl",
-      "description": "Filipino (Filipino)"
-    }, {
-      "code": "fi",
-      "description": "suomi (Finnish)"
-    }, {
-      "code": "fr",
-      "description": "français (French)"
-    }, {
-      "code": "de",
-      "description": "Deutsch (German)"
-    }, {
-      "code": "el",
-      "description": "ελληνικά (Greek)"
-    }, {
-      "code": "he",
-      "description": "עברית (Hebrew)"
-    }, {
-      "code": "hi",
-      "description": "हिन्दी (Hindi)"
-    }, {
-      "code": "hu",
-      "description": "magyar (Hungarian)"
-    }, {
-      "code": "id",
-      "description": "Bahasa Indonesia (Indonesian)"
-    }, {
-      "code": "it",
-      "description": "italiano (Italian)"
-    }, {
-      "code": "ja",
-      "description": "日本語 (Japanese)"
-    }, {
-      "code": "ko",
-      "description": "한국어 (Korean)"
-    }, {
-      "code": "lv",
-      "description": "latviešu (Latvian)"
-    }, {
-      "code": "lt",
-      "description": "lietuvių (Lithuanian)"
-    }, {
-      "code": "no",
-      "description": "Norsk (Norwegian)"
-    }, {
-      "code": "fa",
-      "description": "فارسی (Persian)"
-    }, {
-      "code": "pl",
-      "description": "polski (Polish)"
-    }, {
-      "code": "pt",
-      "description": "português (Portuguese)"
-    }, {
-      "code": "ro",
-      "description": "română (Romanian)"
-    }, {
-      "code": "ru",
-      "description": "русский (Russian)"
-    }, {
-      "code": "sr",
-      "description": "српски (Serbian)"
-    }, {
-      "code": "sk",
-      "description": "slovenčina (Slovak)"
-    }, {
-      "code": "sl",
-      "description": "slovenščina (Slovenian)"
-    }, {
-      "code": "es",
-      "description": "español (Spanish)"
-    }, {
-      "code": "sv",
-      "description": "svenska (Swedish)"
-    }, {
-      "code": "th",
-      "description": "ภาษาไทย (Thai)"
-    }, {
-      "code": "tr",
-      "description": "Türkçe (Turkish)"
-    }, {
-      "code": "uk",
-      "description": "українська (Ukrainian)"
-    }, {
-      "code": "vi",
-      "description": "Tiếng Việt (Vietnamese)"
+    "code": "en",
+    "description": "English"
+  }, {
+    "code": "ar",
+    "description": "العربية (Arabic)"
+  }, {
+    "code": "bg",
+    "description": "български (Bulgarian)"
+  }, {
+    "code": "ca",
+    "description": "català (Catalan)"
+  }, {
+    "code": "zh",
+    "description": "中文 (Chinese)"
+  }, {
+    "code": "hr",
+    "description": "hrvatski (Croatian)"
+  }, {
+    "code": "cs",
+    "description": "čeština (Czech)"
+  }, {
+    "code": "da",
+    "description": "dansk (Danish)"
+  }, {
+    "code": "nl",
+    "description": "Nederlands (Dutch)"
+  }, {
+    "code": "tl",
+    "description": "Filipino (Filipino)"
+  }, {
+    "code": "fi",
+    "description": "suomi (Finnish)"
+  }, {
+    "code": "fr",
+    "description": "français (French)"
+  }, {
+    "code": "de",
+    "description": "Deutsch (German)"
+  }, {
+    "code": "el",
+    "description": "ελληνικά (Greek)"
+  }, {
+    "code": "he",
+    "description": "עברית (Hebrew)"
+  }, {
+    "code": "hi",
+    "description": "हिन्दी (Hindi)"
+  }, {
+    "code": "hu",
+    "description": "magyar (Hungarian)"
+  }, {
+    "code": "id",
+    "description": "Bahasa Indonesia (Indonesian)"
+  }, {
+    "code": "it",
+    "description": "italiano (Italian)"
+  }, {
+    "code": "ja",
+    "description": "日本語 (Japanese)"
+  }, {
+    "code": "ko",
+    "description": "한국어 (Korean)"
+  }, {
+    "code": "lv",
+    "description": "latviešu (Latvian)"
+  }, {
+    "code": "lt",
+    "description": "lietuvių (Lithuanian)"
+  }, {
+    "code": "no",
+    "description": "Norsk (Norwegian)"
+  }, {
+    "code": "fa",
+    "description": "فارسی (Persian)"
+  }, {
+    "code": "pl",
+    "description": "polski (Polish)"
+  }, {
+    "code": "pt",
+    "description": "português (Portuguese)"
+  }, {
+    "code": "ro",
+    "description": "română (Romanian)"
+  }, {
+    "code": "ru",
+    "description": "русский (Russian)"
+  }, {
+    "code": "sr",
+    "description": "српски (Serbian)"
+  }, {
+    "code": "sk",
+    "description": "slovenčina (Slovak)"
+  }, {
+    "code": "sl",
+    "description": "slovenščina (Slovenian)"
+  }, {
+    "code": "es",
+    "description": "español (Spanish)"
+  }, {
+    "code": "sv",
+    "description": "svenska (Swedish)"
+  }, {
+    "code": "th",
+    "description": "ภาษาไทย (Thai)"
+  }, {
+    "code": "tr",
+    "description": "Türkçe (Turkish)"
+  }, {
+    "code": "uk",
+    "description": "українська (Ukrainian)"
+  }, {
+    "code": "vi",
+    "description": "Tiếng Việt (Vietnamese)"
   }],
 
   "//": [
     "NOTE TO DEVELOPERS: While adding another language, please ensure that the ",
-    "languages are in alphabetical order "
+    "languages are in alphabetical order."
   ],
   "SUPPORTED_SITE_LANGUAGES": [{
-      "id": "id",
-      "text": "Bahasa Indonesia"
-    }, {
-      "id": "en",
-      "text": "English"
-    }, {
-      "id": "de",
-      "text": "Deutsch"
-    }, {
-      "id": "fr",
-      "text": "français"
-    }, {
-      "id": "nl",
-      "text": "Nederlands"
-    }, {
-      "id": "es",
-      "text": "Español"
-    }, {
-      "id": "hu",
-      "text": "magyar"
-    }, {
-      "id": "pt",
-      "text": "Português"
-    }, {
-      "id": "pt-br",
-      "text": "Português (Brasil)"
-    }, {
-      "id": "mk",
-      "text": "македонски јазик"
-    }, {
-      "id": "vi",
-      "text": "Tiếng Việt"
-    }, {
-      "id": "hi",
-      "text": "हिन्दी"
-    }, {
-      "id": "bn",
-      "text": "বাংলা"
-    }, {
-      "id": "tr",
-      "text": "Türkçe"
-    }, {
-      "id": "zh-hans",
-      "text": "中文(简体)"
-    }, {
-      "id": "zh-hant",
-      "text": "中文(繁體)"
+    "id": "id",
+    "text": "Bahasa Indonesia"
+  }, {
+    "id": "en",
+    "text": "English"
+  }, {
+    "id": "de",
+    "text": "Deutsch"
+  }, {
+    "id": "fr",
+    "text": "français"
+  }, {
+    "id": "nl",
+    "text": "Nederlands"
+  }, {
+    "id": "es",
+    "text": "Español"
+  }, {
+    "id": "hu",
+    "text": "magyar"
+  }, {
+    "id": "pt",
+    "text": "Português"
+  }, {
+    "id": "pt-br",
+    "text": "Português (Brasil)"
+  }, {
+    "id": "mk",
+    "text": "македонски јазик"
+  }, {
+    "id": "vi",
+    "text": "Tiếng Việt"
+  }, {
+    "id": "hi",
+    "text": "हिन्दी"
+  }, {
+    "id": "bn",
+    "text": "বাংলা"
+  }, {
+    "id": "tr",
+    "text": "Türkçe"
+  }, {
+    "id": "zh-hans",
+    "text": "中文(简体)"
+  }, {
+    "id": "zh-hant",
+    "text": "中文(繁體)"
   }]
 };
