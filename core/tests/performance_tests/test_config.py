@@ -76,7 +76,7 @@ TEST_DATA = {
         'preload_options': PRELOAD_RELOAD_DEMO_EXPS
     },
     PAGE_KEY_CREATOR_DASHBOARD: {
-        'url': '/dashboard',
+        'url': '/creator_dashboard',
         'size_limits_mb': {
             'uncached': 8.0,
             'cached': 0.8,

@@ -19,6 +19,9 @@
 oppia.directive('stateGraphViz', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
+      // Note: This directive is used as attribute because pannability does not
+      //    work when directive is used as element. (Convention in the codebase
+      //    is to use directive as element.)
       restrict: 'A',
       scope: {
         allowPanning: '@',
@@ -101,17 +104,6 @@ oppia.directive('stateGraphViz', [
           $scope.$watch('opacityMap', redrawGraph);
           $(window).resize(redrawGraph);
 
-          // A rough upper bound for the width of a single letter, in pixels,
-          // to use as a scaling factor to determine the width of graph nodes.
-          // This is not an entirely accurate description because it also takes
-          // into account the horizontal whitespace between graph nodes.
-          var LETTER_WIDTH_IN_PIXELS = 10.5;
-          var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
-          var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
-          $scope.GRAPH_WIDTH = (
-            MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * LETTER_WIDTH_IN_PIXELS
-            );
-
           var getElementDimensions = function() {
             return {
               h: $element.height(),
@@ -127,36 +119,6 @@ oppia.directive('stateGraphViz', [
             return Math.min(Math.max(value, minValue), maxValue);
           };
 
-          var getGraphBoundaries = function(nodeData) {
-            var INFINITY = 1e30;
-            var BORDER_PADDING = 5;
-
-            var leftEdge = INFINITY;
-            var topEdge = INFINITY;
-            var bottomEdge = -INFINITY;
-            var rightEdge = -INFINITY;
-
-            for (var nodeId in nodeData) {
-              leftEdge = Math.min(
-                nodeData[nodeId].x0 - BORDER_PADDING, leftEdge);
-              topEdge = Math.min(
-                nodeData[nodeId].y0 - BORDER_PADDING, topEdge);
-              rightEdge = Math.max(
-                nodeData[nodeId].x0 + BORDER_PADDING + nodeData[nodeId].width,
-                rightEdge);
-              bottomEdge = Math.max(
-                nodeData[nodeId].y0 + BORDER_PADDING + nodeData[nodeId].height,
-                bottomEdge);
-            }
-
-            return {
-              bottom: bottomEdge,
-              left: leftEdge,
-              right: rightEdge,
-              top: topEdge
-            };
-          };
-
           $scope.getGraphHeightInPixels = function() {
             return Math.max($scope.GRAPH_HEIGHT, 300);
           };
@@ -169,23 +131,13 @@ oppia.directive('stateGraphViz', [
             var nodeData = StateGraphLayoutService.computeLayout(
               nodes, links, initStateId, angular.copy(finalStateIds));
 
-            var maxDepth = 0;
-            for (var nodeId in nodeData) {
-              maxDepth = Math.max(maxDepth, nodeData[nodeId].depth);
-            }
-            $scope.GRAPH_HEIGHT = 70.0 * (maxDepth + 1);
+            $scope.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
+              MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH);
+            $scope.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
+              nodeData);
 
-            // Change the position values in nodeData to use pixels.
-            for (var nodeId in nodeData) {
-              for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
-                nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
-                  $scope.GRAPH_WIDTH *
-                  nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
-                nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
-                  $scope.GRAPH_HEIGHT *
-                  nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
-              }
-            }
+            nodeData = StateGraphLayoutService.modifyPositionValues(
+              nodeData, $scope.GRAPH_WIDTH, $scope.GRAPH_HEIGHT);
 
             // These constants correspond to the rectangle that, when clicked
             // and dragged, translates the graph. Its height, width, and x and
@@ -196,76 +148,21 @@ oppia.directive('stateGraphViz', [
             $scope.VIEWPORT_X = -Math.max(1000, $scope.GRAPH_WIDTH * 2);
             $scope.VIEWPORT_Y = -Math.max(1000, $scope.GRAPH_HEIGHT * 2);
 
-            var graphBounds = getGraphBoundaries(nodeData);
+            var graphBounds = StateGraphLayoutService.getGraphBoundaries(
+              nodeData);
 
-            $scope.augmentedLinks = links.map(function(link) {
-              return {
-                source: angular.copy(nodeData[link.source]),
-                target: angular.copy(nodeData[link.target])
-              };
-            });
+            $scope.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
+              nodeData, links);
 
-            for (var i = 0; i < $scope.augmentedLinks.length; i++) {
-              var link = $scope.augmentedLinks[i];
-              if (link.source.label !== link.target.label) {
-                var sourcex = link.source.xLabel;
-                var sourcey = link.source.yLabel;
-                var targetx = link.target.xLabel;
-                var targety = link.target.yLabel;
-
-                if (sourcex === targetx && sourcey === targety) {
-                  // TODO(sll): Investigate why this happens.
-                  return;
-                }
-
-                var sourceWidth = link.source.width;
-                var sourceHeight = link.source.height;
-                var targetWidth = link.target.width;
-                var targetHeight = link.target.height;
-
-                var dx = targetx - sourcex;
-                var dy = targety - sourcey;
-
-                /* Fractional amount of truncation to be applied to the end of
-                   each link. */
-                var startCutoff = (sourceWidth / 2) / Math.abs(dx);
-                var endCutoff = (targetWidth / 2) / Math.abs(dx);
-                if (dx === 0 || dy !== 0) {
-                  startCutoff = (
-                    (dx === 0) ? (sourceHeight / 2) / Math.abs(dy) :
-                    Math.min(startCutoff, (sourceHeight / 2) / Math.abs(dy)));
-                  endCutoff = (
-                    (dx === 0) ? (targetHeight / 2) / Math.abs(dy) :
-                    Math.min(endCutoff, (targetHeight / 2) / Math.abs(dy)));
-                }
-
-                var dxperp = targety - sourcey;
-                var dyperp = sourcex - targetx;
-                var norm = Math.sqrt(dxperp * dxperp + dyperp * dyperp);
-                dxperp /= norm;
-                dyperp /= norm;
-
-                var midx = sourcex + dx / 2 + dxperp * (sourceHeight / 4);
-                var midy = sourcey + dy / 2 + dyperp * (targetHeight / 4);
-                var startx = sourcex + startCutoff * dx;
-                var starty = sourcey + startCutoff * dy;
-                var endx = targetx - endCutoff * dx;
-                var endy = targety - endCutoff * dy;
-
-                // Draw a quadratic bezier curve.
-                $scope.augmentedLinks[i].d = (
-                  'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
-                  ' ' + endx + ' ' + endy);
-
-                // Style links if link properties and style mappings are
-                // provided
-                if (links[i].hasOwnProperty('linkProperty') &&
-                    $scope.linkPropertyMapping) {
-                  if ($scope.linkPropertyMapping.hasOwnProperty(
-                        links[i].linkProperty)) {
-                    $scope.augmentedLinks[i].style = (
-                      $scope.linkPropertyMapping[links[i].linkProperty]);
-                  }
+            for(var i = 0; i < $scope.augmentedLinks.length; i++) {
+              // Style links if link properties and style mappings are
+              // provided
+              if (links[i].hasOwnProperty('linkProperty') &&
+                  $scope.linkPropertyMapping) {
+                if ($scope.linkPropertyMapping.hasOwnProperty(
+                      links[i].linkProperty)) {
+                  $scope.augmentedLinks[i].style = (
+                    $scope.linkPropertyMapping[links[i].linkProperty]);
                 }
               }
             }

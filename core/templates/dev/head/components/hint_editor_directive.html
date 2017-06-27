@@ -1,0 +1,53 @@
+<div style="height: 100%;">
+  <div ng-if="!hintEditorIsOpen"
+       style="height: 100%;"
+       ng-attr-title="<[isEditable ? 'Edit hint' : '']>">
+    <div class="oppia-readonly-rule-tile"
+         ng-class="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-preview oppia-transition-200">
+        <div class="oppia-click-to-start-editing"
+             ng-if="isEditable" ng-click="openHintEditor()">
+          <i ng-if="isEditable"
+             class="material-icons oppia-editor-edit-icon pull-right"
+             title="Edit Hint">&#xE254;
+          </i>
+        </div>
+
+        <strong>Hint #<[getIndex()]> is...</strong>
+        <span angular-html-bind="hint.hintText"></span>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="isEditable && hintEditorIsOpen">
+    <form role="form"
+          class="form-inline"
+          name="editHintForm"
+          ng-submit="saveThisHint()">
+      <div class="oppia-rule-details-header">
+        <strong>Hint #<[getIndex()]> is...</strong>
+        <schema-based-editor schema="HINT_FORM_SCHEMA"
+                             local-value="hint.hintText">
+        </schema-based-editor>
+      </div>
+    </form>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="pull-right">
+        <button type="button"
+                class="btn btn-default"
+                ng-click="cancelThisHintEdit()">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-success"
+                ng-disabled="editHintForm.$invalid"
+                ng-click="saveThisHint()">
+          Save
+        </button>
+      </div>
+
+      <div style="clear: both;"></div>
+    </div>
+  </div>
+</div>

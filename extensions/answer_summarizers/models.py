@@ -59,8 +59,8 @@ def _get_hashable_value(value):
     elif isinstance(value, dict):
         return _get_hashable_value(
             sorted([
-                (_get_hashable_value(key), _get_hashable_value(value))
-                for (key, value) in value.iteritems()]))
+                (_get_hashable_value(key), _get_hashable_value(val))
+                for (key, val) in value.iteritems()]))
     else:
         return value
 
@@ -79,6 +79,26 @@ def _count_answers(answer_dicts_list):
           for idx, val in enumerate(hashable_answer_values)
           if val == hashable_answer][0], frequency)
         for (hashable_answer, frequency) in answer_frequencies.most_common()]
+
+
+def _calculate_top_answer_frequencies(state_answers_dict, num_results):
+    """Computes the number of occurrences of each answer, keeping only the top
+    num_results answers, and returns a list of dicts; each dict has keys
+    'answer' and 'frequency'.
+
+    This method is run from within the context of a MapReduce job.
+    """
+    top_answer_counts_as_list_of_pairs = _count_answers(
+        state_answers_dict['submitted_answer_list'])[:num_results]
+
+    calculation_output = []
+    for item in top_answer_counts_as_list_of_pairs:
+        calculation_output.append({
+            'answer': item[0]['answer'],
+            'frequency': item[1],
+        })
+
+    return calculation_output
 
 
 class BaseCalculation(object):
@@ -142,15 +162,29 @@ class Top5AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        top_5_answer_counts_as_list_of_pairs = (
-            _count_answers(state_answers_dict['submitted_answer_list'])[:5])
+        calculation_output = _calculate_top_answer_frequencies(
+            state_answers_dict, 5)
 
-        calculation_output = []
-        for item in top_5_answer_counts_as_list_of_pairs:
-            calculation_output.append({
-                'answer': item[0]['answer'],
-                'frequency': item[1],
-            })
+        return stats_domain.StateAnswersCalcOutput(
+            state_answers_dict['exploration_id'],
+            state_answers_dict['exploration_version'],
+            state_answers_dict['state_name'],
+            self.id,
+            calculation_output)
+
+
+class Top10AnswerFrequencies(BaseCalculation):
+    """Calculation for the top 10 answers, by frequency."""
+
+    def calculate_from_state_answers_dict(self, state_answers_dict):
+        """Computes the number of occurrences of each answer, keeping only
+        the top 10 answers, and returns a list of dicts; each dict has keys
+        'answer' and 'frequency'.
+
+        This method is run from within the context of a MapReduce job.
+        """
+        calculation_output = _calculate_top_answer_frequencies(
+            state_answers_dict, 10)
 
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],

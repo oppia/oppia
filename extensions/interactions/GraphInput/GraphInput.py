@@ -114,5 +114,3 @@ class GraphInput(base.BaseInteraction):
         },
         'default_value': False
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

@@ -56,67 +56,80 @@ oppia.directive('imageWithRegionsEditor', [
 
           // Dynamically defines the CSS style for the region label.
           $scope.getRegionLabelStyle = function(index) {
+            var commonStyles = 'font-size: 14px; pointer-events: none;';
             if (index === $scope.selectedRegion) {
-              return 'fill: #eee; font-size: 14px; pointer-events: none;';
+              return commonStyles + ' fill: #eee; visibility: hidden;';
             } else {
-              return 'fill: #333; font-size: 14px; pointer-events: none;';
+              return commonStyles + ' fill: #333; visibility: visible;';
             }
           };
 
-          // All coordinates have origin at top-left,
-          // increasing in x to the right and increasing in y down
-          // Current mouse position in SVG coordinates
-          $scope.mouseX = 0;
-          $scope.mouseY = 0;
-          // Original mouse click position for rectangle drawing.
-          $scope.originalMouseX = 0;
-          $scope.originalMouseY = 0;
-          // Original position and dimensions for dragged rectangle.
-          $scope.originalRectArea = {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0
-          };
-          // Coordinates for currently drawn rectangle (when user is dragging)
-          $scope.rectX = 0;
-          $scope.rectY = 0;
-          $scope.rectWidth = 0;
-          $scope.rectHeight = 0;
-          // Is user currently drawing a new region?
-          $scope.userIsCurrentlyDrawing = false;
-          // Is user currently dragging an existing region?
-          $scope.userIsCurrentlyDragging = false;
-          // Is user currently resizing an existing region?
-          $scope.userIsCurrentlyResizing = false;
-          // The horizontal direction along which user resize occurs.
-          // 1 -> Left     -1 -> Right     0 -> No resize
-          $scope.xDirection = 0;
-          // The vertical direction along which user resize occurs.
-          // 1 -> Top     -1 -> Bottom     0 -> No resize
-          $scope.yDirection = 0;
-          // Flags to check whether the direction changes while resizing.
-          $scope.yDirectionToggled = false;
-          $scope.xDirectionToggled = false;
-          // A boolean that is set whenever the cursor moves out of the
-          // rectangular region while resizing.
-          $scope.movedOutOfRegion = false;
-          // The region along borders which when hovered provides resize cursor.
-          $scope.resizableBorderWidthPx = 10;
-          // Dimensions of original image.
-          $scope.originalImageWidth = 0;
-          $scope.originalImageHeight = 0;
-          // Index of region currently hovered over.
-          $scope.hoveredRegion = null;
-          // Index of region currently selected.
-          $scope.selectedRegion = null;
-
-          // Temporary label list
-          var labelList = $scope.$parent.value.labeledRegions.map(
-            function(region) {
-              return region.label;
+          // Dynamically defines the CSS style for the region label text input.
+          $scope.getRegionLabelEditorStyle = function() {
+            if ($scope.selectedRegion === null) {
+              return 'display: none';
             }
-          );
+            var area = cornerAndDimensionsFromRegionArea(
+              $scope.$parent.value.labeledRegions[
+                $scope.selectedRegion].region.area);
+            return 'left: ' + (area.x + 6) + 'px; ' +
+              'top: ' + (area.y + 26) + 'px; ' +
+              'width: ' + (area.width - 12) + 'px;';
+          };
+
+          $scope.initializeEditor = function() {
+            // All coordinates have origin at top-left,
+            // increasing in x to the right and increasing in y down
+            // Current mouse position in SVG coordinates
+            $scope.mouseX = 0;
+            $scope.mouseY = 0;
+            // Original mouse click position for rectangle drawing.
+            $scope.originalMouseX = 0;
+            $scope.originalMouseY = 0;
+            // Original position and dimensions for dragged rectangle.
+            $scope.originalRectArea = {
+              x: 0,
+              y: 0,
+              width: 0,
+              height: 0
+            };
+            // Coordinates for currently drawn rectangle (when user is dragging)
+            $scope.rectX = 0;
+            $scope.rectY = 0;
+            $scope.rectWidth = 0;
+            $scope.rectHeight = 0;
+            // Is user currently drawing a new region?
+            $scope.userIsCurrentlyDrawing = false;
+            // Is user currently dragging an existing region?
+            $scope.userIsCurrentlyDragging = false;
+            // Is user currently resizing an existing region?
+            $scope.userIsCurrentlyResizing = false;
+            // The horizontal direction along which user resize occurs.
+            // 1 -> Left     -1 -> Right     0 -> No resize
+            $scope.xDirection = 0;
+            // The vertical direction along which user resize occurs.
+            // 1 -> Top     -1 -> Bottom     0 -> No resize
+            $scope.yDirection = 0;
+            // Flags to check whether the direction changes while resizing.
+            $scope.yDirectionToggled = false;
+            $scope.xDirectionToggled = false;
+            // A boolean that is set whenever the cursor moves out of the
+            // rectangular region while resizing.
+            $scope.movedOutOfRegion = false;
+            // The region along borders that will display the resize cursor.
+            $scope.resizableBorderWidthPx = 10;
+            // Dimensions of original image.
+            $scope.originalImageWidth = 0;
+            $scope.originalImageHeight = 0;
+            // Index of region currently hovered over.
+            $scope.hoveredRegion = null;
+            // Index of region currently selected.
+            $scope.selectedRegion = null;
+            // Message to displaye when there is an error.
+            $scope.errorText = '';
+          };
+
+          $scope.initializeEditor();
 
           // Calculates the dimensions of the image, assuming that the width
           // of the image is scaled down to fit the svg element if necessary.
@@ -181,17 +194,20 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.regionLabelGetterSetter = function(index) {
             return function(label) {
               if (angular.isDefined(label)) {
-                labelList[index] = label;
-                if (hasDuplicates(labelList)) {
-                  $scope.errorText = 'ERROR: Duplicate labels!';
+                $scope.$parent.value.labeledRegions[index].label = label;
+                var labels = $scope.$parent.value.labeledRegions.map(
+                  function(region) {
+                    return region.label;
+                  }
+                );
+                if (hasDuplicates(labels)) {
+                  $scope.errorText = 'Warning: Label "' + label + '" already ' +
+                    'exists! Please use a different label.';
                 } else {
                   $scope.errorText = '';
-                  for (var i = 0; i < labelList.length; i++) {
-                    $scope.$parent.value.labeledRegions[i].label = labelList[i];
-                  }
                 }
               }
-              return labelList[index];
+              return $scope.$parent.value.labeledRegions[index].label;
             };
           };
 
@@ -315,7 +331,6 @@ oppia.directive('imageWithRegionsEditor', [
               resizeRegion();
             }
           };
-
           $scope.onSvgMouseDown = function(evt) {
             evt.preventDefault();
             $scope.originalMouseX = $scope.mouseX;
@@ -325,7 +340,6 @@ oppia.directive('imageWithRegionsEditor', [
               $scope.userIsCurrentlyDrawing = true;
             }
           };
-
           $scope.onSvgMouseUp = function() {
             if ($scope.hoveredRegion === null) {
               $scope.selectedRegion = null;
@@ -370,7 +384,6 @@ oppia.directive('imageWithRegionsEditor', [
                   }
                 };
                 $scope.$parent.value.labeledRegions.push(newRegion);
-                labelList.push(newLabel);
                 $scope.selectedRegion = (
                   $scope.$parent.value.labeledRegions.length - 1);
               }
@@ -440,6 +453,10 @@ oppia.directive('imageWithRegionsEditor', [
                 $scope.hoveredRegion].region.area
             );
           };
+          $scope.regionLabelEditorMouseUp = function() {
+            $scope.userIsCurrentlyDragging = false;
+            $scope.userIsCurrentlyResizing = false;
+          };
           $scope.getCursorStyle = function() {
             var xDirectionCursor = '';
             var yDirectionCursor = '';
@@ -492,6 +509,7 @@ oppia.directive('imageWithRegionsEditor', [
             }).result.then(function() {
               $scope.$parent.value.imagePath = '';
               $scope.$parent.value.labeledRegions = [];
+              $scope.initializeEditor();
             });
           };
           $scope.deleteRegion = function(index) {
@@ -506,7 +524,6 @@ oppia.directive('imageWithRegionsEditor', [
               $scope.hoveredRegion--;
             }
             $scope.$parent.value.labeledRegions.splice(index, 1);
-            labelList.splice(index, 1);
           };
         }
       ]

@@ -43,7 +43,8 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_STRING_CLASSIFIER', false);
-
+// Feature still in development.
+oppia.constant('ENABLE_HINT_EDITOR', false);
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
@@ -816,12 +817,11 @@ oppia.factory('urlService', ['$window', function($window) {
 // Service for computing the window dimensions.
 oppia.factory('windowDimensionsService', ['$window', function($window) {
   var onResizeHooks = [];
-
-  $window.onresize = function() {
+  angular.element($window).bind('resize', function() {
     onResizeHooks.forEach(function(hookFn) {
       hookFn();
     });
-  };
+  });
   return {
     getWidth: function() {
       return (
@@ -838,14 +838,30 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
   };
 }]);
 
+// Service for enabling a background mask that leaves navigation visible.
+oppia.factory('BackgroundMaskService', function() {
+  var maskIsActive = false;
+
+  return {
+    isMaskActive: function() {
+      return maskIsActive;
+    },
+    activateMask: function() {
+      maskIsActive = true;
+    },
+    deactivateMask: function() {
+      maskIsActive = false;
+    }
+  };
+});
+
 // Service for sending events to Google Analytics.
 //
 // Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
 // turned on. This flag must be turned on explicitly by the application
 // owner in feconf.py.
 oppia.factory('siteAnalyticsService', ['$window', function($window) {
-  var CAN_SEND_ANALYTICS_EVENTS = GLOBALS.CAN_SEND_ANALYTICS_EVENTS;
-
+  var CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/events
   var _sendEventToGoogleAnalytics = function(
