@@ -44,10 +44,10 @@ oppia.directive('explorationFooter', [
           };
 
           $scope.mobileFeedbackIsShown =
-            windowDimensionsService.isExplorationPlayerNavHidden();
+            windowDimensionsService.isWindowNarrow();
           windowDimensionsService.registerOnResizeHook(function() {
             $scope.mobileFeedbackIsShown =
-              windowDimensionsService.isExplorationPlayerNavHidden();
+              windowDimensionsService.isWindowNarrow();
             $scope.$apply();
           });
           

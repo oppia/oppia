@@ -57,7 +57,7 @@ oppia.directive('collectionNodeCreator', [
                 explorationMetadataBackendDict.collection_node_metadata_list.
                   map(function(item) {
                     if (!$scope.collection.containsCollectionNode(item.id)) {
-                      options.push('(#' + item.id + ') ' + item.title);
+                      options.push(item.title + ' (#' + item.id + ')');
                     }
                   });
                 return options;
@@ -115,7 +115,7 @@ oppia.directive('collectionNodeCreator', [
           };
 
           var convertTypeaheadToExplorationId = function(typeaheadOption) {
-            var matchResults = typeaheadOption.match(/\(#(.*?)\)/);
+            var matchResults = typeaheadOption.match(/\(#(.*?)\)$/);
             if (matchResults == null) {
               return typeaheadOption;
             }
@@ -143,6 +143,16 @@ oppia.directive('collectionNodeCreator', [
                   newExplorationId);
               addExplorationToCollection(newExplorationId);
             });
+          };
+
+          // Checks whether the user has left a '#' at the end of their ID
+          // by accident (which can happen if it's being copy/pasted from the
+          // editor page.
+          $scope.isMalformedId = function(typedExplorationId) {
+            return (
+              typedExplorationId &&
+              typedExplorationId.lastIndexOf('#') ===
+              typedExplorationId.length - 1);
           };
 
           $scope.addExploration = function() {

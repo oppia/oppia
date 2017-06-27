@@ -31,8 +31,7 @@ class Image(base.BaseRichTextComponent):
     _customization_arg_specs = [{
         'name': 'filepath',
         'description': (
-            'The name of the image file. (Allowed extensions: gif, jpeg, jpg, '
-            'png.)'),
+            'The image (Allowed extensions: gif, jpeg, jpg, png)'),
         'schema': {
             'type': 'custom',
             'obj_type': 'Filepath',

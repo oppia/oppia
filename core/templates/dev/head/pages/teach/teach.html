@@ -28,13 +28,12 @@
         <div class="about-nav md-tab oppia-about-teach-tabs">
           <ul class="oppia-about-tabs">
             <li class="oppia-about-tabs-active">
-              <a class="oppia-about-tabs-text" href="teach" name="teach" translate="I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA">
+              <a ng-click="onTabClick(TAB_ID_TEACH)" class="oppia-about-tabs-text" href="" id="teach" translate="I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA">
                 
               </a>
             </li>
             <li>
-              <a class="oppia-about-tabs-text" href="playbook" name="playbook" translate="I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK">
-                
+              <a ng-click="onTabClick(TAB_ID_PLAYBOOK)" class="oppia-about-tabs-text" href="" id="playbook" translate="I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK">
               </a>
             </li>
           </ul>
@@ -177,40 +176,6 @@
   </div>
   <div class="oppia-footer-padding-below-banner">
   </div>
-  <script>
-    $(document).ready(function() {
-      var activeTabClass = 'oppia-about-tabs-active';
-      var hash = window.location.hash.slice(1);
-      var visibleContent = 'oppia-about-visible-content';
-
-      function activateTab(tabName) {
-        $("a[name='" + tabName + "']").parent().addClass(activeTabClass).siblings().removeClass(activeTabClass);
-        $('.' + tabName).addClass(visibleContent).siblings().removeClass(visibleContent);
-      }
-
-      if (hash === 'teach') {
-        activateTab('teach');
-      } else if (hash === 'playbook') {
-        activateTab("playbook");
-      }
-
-      window.onhashchange = function() {
-        var hashChange = window.location.hash.slice(1);
-        if (hashChange === 'teach') {
-          activateTab('teach');
-        } else if (hashChange === 'playbook') {
-          activateTab('playbook');
-        }
-      };
-
-      $('.oppia-about-tabs li').on('click', function(evt) {
-        evt.preventDefault();
-        $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
-        var currentAttrVal = $(this).children('a').attr('href');
-        $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(visibleContent);
-      });
-    });
-  </script>
 {% endblock %}
 
 {% block footer_js %}

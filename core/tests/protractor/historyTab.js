@@ -142,14 +142,22 @@ describe('Exploration history', function() {
         highlighted: false
       },
       23: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      24: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      24: {
+      25: {
+        text: '  solution: {}',
+        highlighted: false
+      },
+      26: {
         text: 'param_changes: []',
         highlighted: false
       },
-      25: {
+      27: {
         text: ' ',
         highlighted: false
       }
@@ -211,14 +219,22 @@ describe('Exploration history', function() {
         highlighted: false
       },
       14: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      15: {
         text: '  id: null',
         highlighted: true
       },
-      15: {
+      16: {
+        text: '  solution: {}',
+        highlighted: false
+      },
+      17: {
         text: 'param_changes: []',
         highlighted: false
       },
-      16: {
+      18: {
         text: ' ',
         highlighted: false
       }
@@ -240,7 +256,9 @@ describe('Exploration history', function() {
       '    feedback: []\n' +
       '    param_changes: []\n' +
       '  fallbacks: []\n' +
+      '  hints: []\n' +
       '  id: Continue\n' +
+      '  solution: {}\n' +
       'param_changes: []\n' +
       ' ';
 

@@ -64,8 +64,10 @@
                      ng-if="!isIframed"
                      focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
                      ng-click="onClickContinueButton()"
-                     translate="I18N_PLAYER_CONTINUE_BUTTON"
                      aria-label="Continue">
+            <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
+            <i class="fa fa-arrow-right"
+               style="font-size: 19px; padding-top: 1.5px;"></i>
           </md-button>
         </div>
         <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">

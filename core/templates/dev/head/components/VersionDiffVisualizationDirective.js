@@ -185,7 +185,6 @@ oppia.directive('versionDiffVisualization', [
           }
         }
         $scope.legendGraph.finalStateIds = [_lastUsedStateType];
-
         // Opens the modal showing the history diff for a given state.
         // stateId is the unique ID assigned to a state during the
         // calculation of the state graph.

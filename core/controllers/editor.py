@@ -288,11 +288,14 @@ class ExplorationHandler(EditorHandler):
                 exploration_id, exp_user_data.draft_change_list_exp_version)
             if exp_user_data and exp_user_data.draft_change_list_exp_version
             else None)
+        draft_change_list_id = (exp_user_data.draft_change_list_id
+                                if exp_user_data else 0)
         exploration_email_preferences = (
             user_services.get_email_preferences_for_exploration(
                 self.user_id, exploration_id))
         editor_dict = {
             'category': exploration.category,
+            'draft_change_list_id': draft_change_list_id,
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'language_code': exploration.language_code,
@@ -640,11 +643,12 @@ class UntrainedAnswersHandler(EditorHandler):
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to the classifier individually.
-        submitted_answers = stats_services.get_top_state_rule_answers(
-            exploration_id, state_name, [
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
-                exp_domain.TRAINING_DATA_CLASSIFICATION])[
-                    :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
+
+        # TODO(sll): Functionality for retrieving untrained answers was removed
+        # in PR 3489 due to infeasibility of the calculation approach. It needs
+        # to be reinstated in the future so that the training interface can
+        # function.
+        submitted_answers = []
 
         interaction = state.interaction
         unhandled_answers = []
@@ -888,43 +892,42 @@ class ImageUploadHandler(EditorHandler):
         if not raw:
             raise self.InvalidInputException('No image supplied')
 
+        # Verify that the data is recognized as an image.
         file_format = imghdr.what(None, h=raw)
-        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
-            allowed_formats = ', '.join(
-                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
-            raise Exception('Image file not recognized: it should be in '
-                            'one of the following formats: %s.' %
-                            allowed_formats)
+        if file_format not in feconf.ACCEPTED_IMAGE_EXTENSIONS:
+            raise self.InvalidInputException('Image not recognized')
 
+        # Verify that a valid filename and extension is provided.
         if not filename:
             raise self.InvalidInputException('No filename supplied')
         if '/' in filename or '..' in filename:
             raise self.InvalidInputException(
                 'Filenames should not include slashes (/) or consecutive dot '
                 'characters.')
-        if '.' in filename:
-            dot_index = filename.rfind('.')
-            primary_name = filename[:dot_index]
-            extension = filename[dot_index + 1:].lower()
-            if (extension not in
-                    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
-                raise self.InvalidInputException(
-                    'Expected a filename ending in .%s; received %s' %
-                    (file_format, filename))
-        else:
-            primary_name = filename
+        if '.' not in filename:
+            raise self.InvalidInputException(
+                'Image filename with no extension: it should have '
+                'one of the following extensions: %s.' %
+                feconf.ACCEPTED_IMAGE_EXTENSIONS)
 
-        filepath = '%s.%s' % (primary_name, file_format)
+        dot_index = filename.rfind('.')
+        extension = filename[dot_index + 1:].lower()
+        if extension not in feconf.ACCEPTED_IMAGE_EXTENSIONS:
+            raise self.InvalidInputException(
+                'Image filename with invalid extension: it should have one of '
+                'the following extensions: %s. Received: %s',
+                (feconf.ACCEPTED_IMAGE_EXTENSIONS, filename))
 
+        # Save the file.
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))
-        if fs.isfile(filepath):
+        if fs.isfile(filename):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
-                'different name.' % filepath)
-        fs.commit(self.user_id, filepath, raw)
+                'different name.' % filename)
+        fs.commit(self.user_id, filename, raw)
 
-        self.render_json({'filepath': filepath})
+        self.render_json({'filepath': filename})
 
 
 class StartedTutorialEventHandler(EditorHandler):
@@ -952,11 +955,14 @@ class EditorAutosaveHandler(ExplorationHandler):
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
-
-        # If the value passed here is False, have the user discard the draft
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.user_id, exploration_id)
+        draft_change_list_id = exp_user_data.draft_change_list_id
+        # If the draft_change_list_id is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
         self.render_json({
+            'draft_change_list_id': draft_change_list_id,
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 
