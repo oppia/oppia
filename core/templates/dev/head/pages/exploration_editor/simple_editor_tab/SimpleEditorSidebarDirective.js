@@ -65,7 +65,13 @@ oppia.directive('simpleEditorSidebar', [
           });
 
           $scope.deleteQuestion = function(question) {
+            var lastQuestionBeforeDel = $scope.questionList.getLastQuestion();
             SimpleEditorManagerService.deleteQuestion(question);
+            if (question.getId() === lastQuestionBeforeDel.getId()) {
+              var end = $scope.questionList.isEmpty() ?
+                'intro' : $scope.questionList.getLastQuestion().getId();
+              ScrollSyncService.scrollTo(end);
+            }
           };
         }
       ]
