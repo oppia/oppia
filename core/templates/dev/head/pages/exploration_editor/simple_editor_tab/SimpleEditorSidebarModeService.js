@@ -17,24 +17,25 @@
  * two modes: ReadOnly and Edit.
  */
 
-oppia.factory('SimpleEditorSidebarModeService', [function() {
-  var SIDEBAR_MODE_READONLY = 'readonly';
-  var SIDEBAR_MODE_EDIT = 'edit';
+oppia.factory('SimpleEditorSidebarModeService', [
+  function() {
+    var SIDEBAR_MODE_READONLY = 'readonly';
+    var SIDEBAR_MODE_EDIT = 'edit';
 
-  var mode = SIDEBAR_MODE_READONLY;
+    var mode = SIDEBAR_MODE_READONLY;
 
-  return {
-    isSidebarInReadonlyMode: function() {
-      return mode === SIDEBAR_MODE_READONLY;
-    },
-    isSidebarInEditMode: function() {
-      return mode === SIDEBAR_MODE_EDIT;
-    },
-    setModeToReadonly: function() {
-      mode = SIDEBAR_MODE_READONLY;
-    },
-    setModeToEdit: function() {
-      mode = SIDEBAR_MODE_EDIT;
-    }
-  };
-}]);
+    return {
+      isSidebarInReadonlyMode: function() {
+        return mode === SIDEBAR_MODE_READONLY;
+      },
+      isSidebarInEditMode: function() {
+        return mode === SIDEBAR_MODE_EDIT;
+      },
+      setModeToReadonly: function() {
+        mode = SIDEBAR_MODE_READONLY;
+      },
+      setModeToEdit: function() {
+        mode = SIDEBAR_MODE_EDIT;
+      }
+    };
+  }]);

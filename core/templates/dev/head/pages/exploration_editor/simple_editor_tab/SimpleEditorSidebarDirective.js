@@ -24,11 +24,11 @@ oppia.directive('simpleEditorSidebar', [
         '/pages/exploration_editor/simple_editor_tab/' +
         'simple_editor_sidebar_directive.html'),
       controller: [
-        'EditorModeService', 'QuestionIdService', '$scope',
+        '$scope', 'EditorModeService', 'QuestionIdService',
         'ScrollSyncService', 'SimpleEditorManagerService',
         'SimpleEditorSidebarModeService',
         function(
-          EditorModeService, QuestionIdService, $scope,
+          $scope, EditorModeService, QuestionIdService,
           ScrollSyncService, SimpleEditorManagerService,
           SimpleEditorSidebarModeService) {
           /* This initializes Perfect Scrollbar on the simple editor sidebar.
