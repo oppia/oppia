@@ -17,12 +17,36 @@
  */
 
 oppia.factory('TextInputValidationService', [
-  'baseInteractionValidationService',
-  function(baseInteractionValidationService) {
+  'WARNING_TYPES', 'baseInteractionValidationService',
+  function(WARNING_TYPES, baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
-        // TODO(juansaba): Implement customization args validations.
-        return [];
+        var warningsList = [];
+        baseInteractionValidationService.requireCustomizationArguments(
+          customizationArgs,
+          ['placeholder', 'rows']);
+
+        var rows = customizationArgs.rows.value;
+        var placeholder = customizationArgs.placeholder.value;
+        if (typeof placeholder != 'string') {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Placeholder text must be a string.')
+          });
+        }
+        // Can we get these values dynamically?
+        var MIN_ROWS = 1;
+        var MAX_ROWS = 200;
+        if (rows < MIN_ROWS || rows > MAX_ROWS) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Number of rows must be between ' + MIN_ROWS + ' and ' +
+              MAX_ROWS + '.')
+          });
+        }
+        return warningsList;
       },
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {

@@ -15,7 +15,7 @@
 describe('TextInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 
-  var currentState;
+  var currentState, customizationArguments;
   var goodAnswerGroups, goodDefaultOutcome;
 
   beforeEach(function() {
@@ -33,6 +33,15 @@ describe('TextInputValidationService', function() {
       feedback: []
     };
 
+    customizationArguments = {
+      placeholder: {
+        value: ''
+      },
+      rows: {
+        value: 1
+      }
+    };
+
     goodAnswerGroups = [{
       rules: [],
       outcome: goodDefaultOutcome,
@@ -42,7 +51,8 @@ describe('TextInputValidationService', function() {
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 });
