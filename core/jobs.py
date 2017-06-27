@@ -688,8 +688,8 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         Args:
             key: *. A key value as emitted from the map() function, above.
-            values: list(*). A list of all values from all mappers that were tagged
-                with the given key.
+            values: list(*). A list of all values from all mappers that were
+                tagged with the given key.
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement '
@@ -1469,8 +1469,8 @@ def get_data_for_unfinished_jobs():
                 last_stopped_msec: float or None. When a batch job for the
                     computation was last stopped, in milliseconds since the
                     epoch.
-                active_realtime_layer_index: int or None. The index of the active
-                    realtime layer.
+                active_realtime_layer_index: int or None. The index of the
+                    active realtime layer.
                 is_startable: bool. Whether an admin should be allowed to start
                     this computation.
                 is_stoppable: bool. Whether an admin should be allowed to stop
@@ -1514,8 +1514,8 @@ def get_continuous_computations_info(cc_classes):
                 last_stopped_msec: float or None. When a batch job for the
                     computation was last stopped, in milliseconds since the
                     epoch.
-                active_realtime_layer_index: int or None. The index of the active
-                    realtime layer.
+                active_realtime_layer_index: int or None. The index of the
+                    active realtime layer.
                 is_startable: bool. Whether an admin should be allowed to start
                     this computation.
                 is_stoppable: bool. Whether an admin should be allowed to stop
@@ -1597,7 +1597,7 @@ class JobCleanupManager(BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         """TODO(brianrodri).
-        
+
         Args:
             item: TODO(brianrodri).
         """
@@ -1625,7 +1625,7 @@ class JobCleanupManager(BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, stringified_values):
         """TODO(brianrodri).
-        
+
         Args:
             key: *. TODO(brianrodri).
             stringified_values: list(str). TODO(brianrodri)."""
