@@ -43,7 +43,7 @@ oppia.controller('I18nFooter', [
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
-    $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
+    $scope.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
     if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
       $translate.use(GLOBALS.preferredSiteLanguageCode);
     }
@@ -75,7 +75,7 @@ oppia.config([
   function($translateProvider, DEFAULT_TRANSLATIONS) {
     var availableLanguageKeys = [];
     var availableLanguageKeysMap = {};
-    GLOBALS.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+    constants.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
       availableLanguageKeys.push(language.id);
       availableLanguageKeysMap[language.id + '*'] = language.id;
     });

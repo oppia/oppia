@@ -27,6 +27,7 @@ import logging
 import re
 import string
 
+from constants import constants
 from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
@@ -1505,7 +1506,7 @@ class Exploration(object):
             cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-            language_code=feconf.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         init_state_dict = State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
@@ -1647,7 +1648,7 @@ class Exploration(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
         if not any([self.language_code == lc['code']
-                    for lc in feconf.ALL_LANGUAGE_CODES]):
+                    for lc in constants.ALL_LANGUAGE_CODES]):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
@@ -2497,7 +2498,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 3
 
         exploration_dict['objective'] = ''
-        exploration_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
+        exploration_dict['language_code'] = constants.DEFAULT_LANGUAGE_CODE
         exploration_dict['skill_tags'] = []
         exploration_dict['blurb'] = ''
         exploration_dict['author_notes'] = ''

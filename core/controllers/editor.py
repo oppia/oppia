@@ -242,7 +242,6 @@ class ExplorationPage(EditorHandler):
                 get_value_generators_js()),
             'title': exploration.title,
             'visualizations_html': jinja2.utils.Markup(visualizations_html),
-            'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
