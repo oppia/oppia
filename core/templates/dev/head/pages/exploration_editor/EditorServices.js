@@ -33,6 +33,19 @@ oppia.factory('explorationData', [
         break;
       }
     }
+    var localSaveKey = 'draft_' + explorationId;
+    // check that local storage exists and works as expected. If it does storage stores
+    // the localStorage object, else storage is undefined.
+    var storage = (function() {
+	    var test = 'test';
+	    var result;
+	    try {
+		    localStorage.setItem(test, test);
+		    result = localStorage.getItem(test) == test;
+		    localStorage.removeItem(test);
+		    return result && localStorage;
+	    } catch (exception) {}
+    }());
 
     if (!explorationId) {
       $log.error(
@@ -50,12 +63,21 @@ oppia.factory('explorationData', [
     var explorationData = {
       explorationId: explorationId,
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
+        // TODO: cehck if localStorage exists, if it does not then we mau want to display
+        // a warning to the user at a later stage.
+        // Firt save locally to be retrieved later if save is unsuccessful.
+        if (storage) {
+          var saveObject = {draftChanges: changeList, draftChangeListId: draftChangeListId};
+          saveObject = JSON.stringify(saveObject);
+          storage.setItem(localSaveKey, saveObject);
+        }
         $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
         }).then(function(response) {
+          draftChangeListId = response.data.draft_change_list_id;
+          storage.removeItem(localSaveKey);
           if (successCallback) {
-            draftChangeListId = response.data.draft_change_list_id;
             successCallback(response);
           }
         }, function() {
