@@ -92,15 +92,17 @@ describe('Player transcript service', function() {
     }).toThrow(
       new Error('Trying to add feedback when it has already been added.'));
 
-    pts.addNewAnswer('second answer', null);
+    pts.addNewAnswer('second answer');
 
     var firstCard = pts.getCard(0);
     expect(firstCard.answerFeedbackPairs).toEqual([{
       learnerAnswer: 'first answer',
-      oppiaFeedbackHtml: 'feedback'
+      oppiaFeedbackHtml: 'feedback',
+      isHintRequest: false
     }, {
       learnerAnswer: 'second answer',
-      oppiaFeedbackHtml: null
+      oppiaFeedbackHtml: null,
+      isHintRequest: false
     }]);
   });
 
