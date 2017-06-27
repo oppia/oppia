@@ -1,4 +1,4 @@
-<p>
+<p ng-class="{'has-error': !explorationTitleService.displayed.length > 0}">
   Add a title: what should your exploration be called?
   <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40" ng-trim="false">
   <span class="help-block" style="font-size: smaller">
@@ -9,7 +9,8 @@
   </span>
 </p>
 <form name="objectiveForm">
-  <p ng-class="{'has-error': (objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && (explorationObjectiveService.displayed.length < 15) || (explorationObjectiveService.displayed.length > 100)}">
+  <p ng-class="{'has-error': ((explorationObjectiveService.displayed.length < 15) ||
+  (explorationObjectiveService.displayed.length > 100))}">
     Add a goal: what does the exploration help people to do?
     <input id="explorationObjective" type="text" class="form-control protractor-test-exploration-objective-input"
     ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to..." ng-trim="false">
@@ -21,7 +22,7 @@
     </span>
   </p>
 </form>
-<p ng-if="explorationInitStateName">
+<p ng-if="explorationInitStateNameService.displayed">
   Name of first card
   <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames track by name">
   </select>
@@ -41,6 +42,11 @@
                     on-selection-change="saveExplorationCategory()"
                     invalid-search-term-message="Invalid category name">
   </select2-dropdown>
+  <span class="help-block" style="font-size: smaller">
+    <em>
+      Categories help learners discover your exploration when searching.
+    </em>
+  </span>
 </p>
 
 <p>
