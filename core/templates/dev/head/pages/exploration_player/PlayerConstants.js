@@ -25,6 +25,9 @@ oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
 // Wait period between successive hints.
 oppia.constant('WAIT_FOR_HINT_MSEC', 30000);
 
+// Delay for a hint feedback.
+oppia.constant('DELAY_FOR_HINT_FEEDBACK', 600);
+
 oppia.constant(
     'EXPLORATION_DATA_URL_TEMPLATE',
     '/explorehandler/init/<exploration_id>');
