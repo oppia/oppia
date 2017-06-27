@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,14 +49,14 @@ oppia.directive('tutorCard', [
         '/pages/exploration_player/' +
         'tutor_card_directive.html'),
       controller: [
-        '$scope', '$timeout', 'oppiaPlayerService',
+        '$scope', '$timeout', 'oppiaPlayerService', 'hintManagerService',
         'playerPositionService', 'playerTranscriptService',
         'ExplorationPlayerStateService', 'windowDimensionsService',
         'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'WAIT_FOR_HINT_MSEC',
         function(
-          $scope, $timeout, oppiaPlayerService,
+          $scope, $timeout, oppiaPlayerService, hintManagerService,
           playerPositionService, playerTranscriptService,
           ExplorationPlayerStateService, windowDimensionsService,
           urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
@@ -78,10 +78,9 @@ oppia.directive('tutorCard', [
             $scope.interactionInstructions = (
               ExplorationPlayerStateService.getInteractionInstructions(
                 $scope.activeCard.stateName));
-            $scope.isCurrentHintUsable = false;
-            $scope.promiseForHint = $timeout(function () {
-              $scope.isCurrentHintUsable = true;
-            }, WAIT_FOR_HINT_MSEC);
+
+            hintManagerService.setCurrentHintUsable(false);
+            hintManagerService.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
 
             $scope.currentInteractionHints = oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints;
@@ -91,52 +90,43 @@ oppia.directive('tutorCard', [
 
           $scope.waitingForOppiaFeedback = false;
 
-          $scope.isCurrentHintUsable = false;
-
-          $scope.allHintsExhausted = false;
-
-          $scope.promiseForHint = null;
-
-          $scope.hintButtonClicks = 0;
-
-          $scope.tooltipText = '';
-
           $scope.showHint = function() {
             var hints = $scope.currentInteractionHints;
-            if ($scope.hintButtonClicks < hints.length) {
-              var currentHint = hints[$scope.hintButtonClicks].hintText;
-              playerTranscriptService.addNewAnswer('I would like a hint.');
+            var numHintsConsumed = hintManagerService.getNumHintsConsumed();
+            if (numHintsConsumed < hints.length) {
+              var currentHint = hints[numHintsConsumed].hintText;
+              playerTranscriptService.addNewAnswer(
+                'I would like a hint.', true);
               $timeout(function() {
                 $scope.waitingForOppiaFeedback = false;
                 playerTranscriptService.addNewFeedback(currentHint);
               }, 600);
-              $scope.isCurrentHintUsable = false;
-              $scope.promiseForHint = $timeout(function() {
-                $scope.isCurrentHintUsable = true;
-              }, WAIT_FOR_HINT_MSEC);
+              hintManagerService.setCurrentHintUsable(false);
+              hintManagerService.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
 
-              if ($scope.hintButtonClicks === hints.length - 1) {
-                $scope.isCurrentHintUsable = false;
-                $scope.allHintsExhausted = true;
-                $scope.hintButtonClicks = 0;
+              if (hintManagerService.areAllHintsExhausted(hints.length)) {
+                hintManagerService.reset();
               } else {
-                $scope.hintButtonClicks += 1;
+                hintManagerService.incrementHintsConsumed();
               }
             }
           };
 
           $scope.isHintAvailable = function() {
             var hintIsAvailable = (
-              $scope.isCurrentHintUsable && !$scope.allHintsExhausted);
-            if ($scope.allHintsExhausted) {
-              $scope.tooltipText = 'Sorry, I am out of hints!';
-            } else if (!hintIsAvailable) {
-              $scope.tooltipText = (
-                'Try thinking a bit more before asking for another hint!');
-            } else {
-              $scope.tooltipText = 'Click here for a Hint!';
-            }
+              hintManagerService.isCurrentHintUsable() &&
+              !hintManagerService.areAllHintsExhausted(
+                $scope.currentInteractionHints.length));
             return hintIsAvailable;
+          };
+
+          $scope.areAllHintsExhausted = function() {
+            return hintManagerService.areAllHintsExhausted(
+              $scope.currentInteractionHints.length);
+          };
+
+          $scope.isCurrentHintUsable = function() {
+            return hintManagerService.isCurrentHintUsable();
           };
 
           $scope.isIframed = urlService.isIframed();
@@ -187,16 +177,13 @@ oppia.directive('tutorCard', [
 
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
             updateActiveCard();
-            $scope.allHintsExhausted = false;
+            hintManagerService.reset();
           });
 
           $scope.$on('oppiaFeedbackAvailable', function() {
             $scope.waitingForOppiaFeedback = false;
-          });
-
-          $scope.$on('stayOnSameCard', function() {
-            $timeout.cancel($scope.promiseForHint);
-            $scope.isCurrentHintUsable = true;
+            hintManagerService.clearTimeout();
+            hintManagerService.setCurrentHintUsable(true);
           });
 
           updateActiveCard();

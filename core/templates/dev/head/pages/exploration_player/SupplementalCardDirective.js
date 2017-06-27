@@ -28,19 +28,19 @@ oppia.directive('supplementalCard', [
         '/pages/exploration_player/' +
         'supplemental_card_directive.html'),
       controller: [
-        '$scope', '$timeout', '$window', 'oppiaPlayerService',
-        'playerPositionService', 'playerTranscriptService',
-        'ExplorationObjectFactory', 'windowDimensionsService',
-        'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
-        'EVENT_ACTIVE_CARD_CHANGED', 'CONTINUE_BUTTON_FOCUS_LABEL',
-        'WAIT_FOR_HINT_MSEC',
+        '$scope', '$timeout', '$window', 'hintManagerService',
+        'oppiaPlayerService', 'playerPositionService',
+        'playerTranscriptService', 'ExplorationObjectFactory',
+        'windowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',
+        'TWO_CARD_THRESHOLD_PX', 'EVENT_ACTIVE_CARD_CHANGED',
+        'CONTINUE_BUTTON_FOCUS_LABEL', 'WAIT_FOR_HINT_MSEC',
         function(
-          $scope, $timeout, $window, oppiaPlayerService,
-          playerPositionService, playerTranscriptService,
-          ExplorationObjectFactory, windowDimensionsService,
-          CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
-          EVENT_ACTIVE_CARD_CHANGED, CONTINUE_BUTTON_FOCUS_LABEL,
-          WAIT_FOR_HINT_MSEC) {
+          $scope, $timeout, $window, hintManagerService,
+          oppiaPlayerService, playerPositionService,
+          playerTranscriptService, ExplorationObjectFactory,
+          windowDimensionsService, CONTENT_FOCUS_LABEL_PREFIX,
+          TWO_CARD_THRESHOLD_PX, EVENT_ACTIVE_CARD_CHANGED,
+          CONTINUE_BUTTON_FOCUS_LABEL, WAIT_FOR_HINT_MSEC) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -48,10 +48,8 @@ oppia.directive('supplementalCard', [
             }
             $scope.activeCard = playerTranscriptService.getCard(index);
             $scope.clearHelpCard();
-            $scope.isCurrentHintUsable = false;
-            $scope.promiseForHint = $timeout(function () {
-              $scope.isCurrentHintUsable = true;
-            }, WAIT_FOR_HINT_MSEC);
+            hintManagerService.setCurrentHintUsable(false);
+            hintManagerService.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
 
             $scope.currentInteractionHints = oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints;
@@ -71,50 +69,41 @@ oppia.directive('supplementalCard', [
             $scope.helpCardHasContinueButton = false;
           };
 
-          $scope.isCurrentHintUsable = false;
-
-          $scope.allHintsExhausted = false;
-
-          $scope.promiseForHint = null;
-
-          $scope.hintButtonClicks = 0;
-
-          $scope.tooltipText = '';
-
           $scope.showHint = function() {
             var hints = $scope.currentInteractionHints;
-            if ($scope.hintButtonClicks < hints.length) {
-              var currentHint = hints[$scope.hintButtonClicks].hintText;
-              playerTranscriptService.addNewAnswer('I would like a hint.');
+            var numHintsConsumed = hintManagerService.getNumHintsConsumed();
+            if (numHintsConsumed < hints.length) {
+              var currentHint = hints[numHintsConsumed].hintText;
+              playerTranscriptService.addNewAnswer(
+                'I would like a hint.', true);
               playerTranscriptService.addNewFeedback(currentHint);
               $scope.helpCardHtml = currentHint;
-              $scope.isCurrentHintUsable = false;
-              $scope.promiseForHint = $timeout(function() {
-                $scope.isCurrentHintUsable = true;
-              }, WAIT_FOR_HINT_MSEC);
+              hintManagerService.setCurrentHintUsable(false);
+              hintManagerService.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
 
-              if ($scope.hintButtonClicks === hints.length - 1) {
-                $scope.isCurrentHintUsable = false;
-                $scope.allHintsExhausted = true;
-                $scope.hintButtonClicks = 0;
+              if (hintManagerService.areAllHintsExhausted(hints.length)) {
+                hintManagerService.reset();
               } else {
-                $scope.hintButtonClicks += 1;
+                hintManagerService.incrementHintsConsumed();
               }
             }
           };
 
           $scope.isHintAvailable = function() {
             var hintIsAvailable = (
-              $scope.isCurrentHintUsable && !$scope.allHintsExhausted);
-            if ($scope.allHintsExhausted) {
-              $scope.tooltipText = 'Sorry, I am out of hints!';
-            } else if (!hintIsAvailable) {
-              $scope.tooltipText = (
-                'Try thinking a bit more before asking for another hint!');
-            } else {
-              $scope.tooltipText = 'Click here for a Hint!';
-            }
+              hintManagerService.isCurrentHintUsable() &&
+              !hintManagerService.areAllHintsExhausted(
+                $scope.currentInteractionHints.length));
             return hintIsAvailable;
+          };
+
+          $scope.areAllHintsExhausted = function() {
+            return hintManagerService.areAllHintsExhausted(
+              $scope.currentInteractionHints.length);
+          };
+
+          $scope.isCurrentHintUsable = function() {
+            return hintManagerService.isCurrentHintUsable();
           };
 
           $scope.isViewportNarrow = function() {
@@ -145,17 +134,14 @@ oppia.directive('supplementalCard', [
 
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
             updateActiveCard();
-            $scope.allHintsExhausted = false;
+            hintManagerService.reset();
           });
 
           $scope.$on('helpCardAvailable', function(event, helpCard) {
             $scope.helpCardHtml = helpCard.helpCardHtml;
             $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
-          });
-
-          $scope.$on('stayOnSameCard', function() {
-            $timeout.cancel($scope.promiseForHint);
-            $scope.isCurrentHintUsable = true;
+            hintManagerService.clearTimeout();
+            hintManagerService.setCurrentHintUsable(true);
           });
 
           updateActiveCard();

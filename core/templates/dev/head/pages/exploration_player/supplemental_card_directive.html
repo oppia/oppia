@@ -21,15 +21,25 @@
   <div class="protractor-test-conversation-input"
        angular-html-bind="activeCard.interactionHtml">
   </div>
-    <div ng-if="currentInteractionHints.length" style="text-align: right; padding: 8px">
-      <span tooltip="<[tooltipText]>">
-        <md-button class="hint-button"
-                   ng-click="showHint()"
-                   ng-disabled="!isHintAvailable()">
-          Hint <i class="fa fa-lightbulb-o"></i>
-        </md-button>
+  <div ng-if="currentInteractionHints.length" style="text-align: right; padding: 8px">
+    <span ng-if="areAllHintsExhausted()" tooltip="<['I18N_PLAYER_HINTS_EXHAUSTED' | translate]>">
+      <hint-button on-click-hint-button="showHint()"
+                   is-disabled="!isHintAvailable()">
+      </hint-button>
+    </span>
+    <span ng-if="!areAllHintsExhausted()">
+      <span ng-if="isCurrentHintUsable()" tooltip="<['I18N_PLAYER_HINT_IS_USABLE' | translate]>">
+        <hint-button on-click-hint-button="showHint()"
+                     is-disabled="!isHintAvailable()">
+        </hint-button>
       </span>
-    </div>
+      <span ng-if="!isCurrentHintUsable()" tooltip="<['I18N_PLAYER_HINT_NOT_USABLE' | translate]>">
+        <hint-button on-click-hint-button="showHint()"
+                     is-disabled="!isHintAvailable()">
+        </hint-button>
+      </span>
+    </span>
+  </div>
 </div>
 
 <style>

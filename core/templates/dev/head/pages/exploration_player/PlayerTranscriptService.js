@@ -79,7 +79,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
 
       lastCard.destStateName = newDestStateName;
     },
-    addNewAnswer: function(answer) {
+    addNewAnswer: function(answer, isHintRequest) {
       var pairs = transcript[transcript.length - 1].answerFeedbackPairs;
       if (pairs.length > 0 &&
           pairs[pairs.length - 1].oppiaFeedbackHtml === null) {
@@ -90,7 +90,8 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
       }
       transcript[transcript.length - 1].answerFeedbackPairs.push({
         learnerAnswer: answer,
-        oppiaFeedbackHtml: null
+        oppiaFeedbackHtml: null,
+        isHintRequest: (isHintRequest !== undefined)
       });
     },
     addNewFeedback: function(feedbackHtml) {

@@ -539,7 +539,6 @@ oppia.directive('conversationSkin', [
                         hasContinueButton: false
                       });
                     }
-                    $scope.$broadcast('stayOnSameCard');
                     if (refreshInteraction) {
                       // Replace the previous interaction with another of the
                       // same type.

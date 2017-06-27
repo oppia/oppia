@@ -64,11 +64,12 @@ oppia.directive('answerFeedbackPair', [
                   $scope.data.learnerAnswer, interaction.id,
                   interaction.customizationArgs));
             }
-            if ($scope.data.learnerAnswer === 'I would like a hint.') {
-              return $scope.data.learnerAnswer;
-            }
             return shortAnswerHtml;
           };
+
+          $scope.getRequestForHint = function() {
+            return $scope.data.learnerAnswer;
+          }
         }
       ]
     };
