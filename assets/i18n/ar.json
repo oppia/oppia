@@ -41,7 +41,7 @@
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "تعليم/تعلم",
 	"I18N_FORMS_TYPE_NUMBER": "اكتب رقما",
 	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "الرجاء إدخال الرقم الذي هو على الأقل <[minValue]>.",
-	"I18N_FORMS_TYPE_NUMBER_AT_MOST": "الرجاء إدخال الرقم الذي هو على الأكثر <[minValue]>.",
+	"I18N_FORMS_TYPE_NUMBER_AT_MOST": "الرجاء إدخال الرقم الذي هو على الأكثر <[maxValue]>.",
 	"I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL": "يُرجَى إدخال رقم عشري صالح.",
 	"I18N_INTERACTIONS_GRAPH_ADD_EDGE": "إضافة حافة",
 	"I18N_INTERACTIONS_GRAPH_ADD_NODE": "إضافة عقدة",
