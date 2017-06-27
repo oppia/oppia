@@ -83,18 +83,18 @@ sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
 rm app.yaml.bak
 
 # Launch a browser window.
-if [ $(uname) = "Linux" ]; then
+if [ ${OS} == "Linux" ]; then
   echo ""
   echo "  INFORMATION"
   echo "  Setting up a local development server at localhost:8181. Opening a"
-  echo "  Default Browser window pointing to this server."
+  echo "  default browser window pointing to this server."
   echo ""
   (sleep 5; xdg-open http://localhost:8181/ )&
-elif [ $(uname) = "Darwin" ]; then
+elif [ ${OS} == "Darwin" ]; then
   echo ""
   echo "  INFORMATION"
   echo "  Setting up a local development server at localhost:8181. Opening a"
-  echo "  Default Browser window pointing to this server."
+  echo "  default browser window pointing to this server."
   echo ""
   (sleep 5; open http://localhost:8181/ )&
 else
