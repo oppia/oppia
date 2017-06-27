@@ -107,23 +107,18 @@ oppia.directive('adminDevModeActivitiesTab', [
         $scope.generateDummyExplorations = function() {
           // Generate dummy explorations with random title.
           AdminTaskManagerService.startTask();
-          var POSSIBLE_TITLES = ['Hulk Neuroscience',
-                                 'Quantum Starks',
-                                 'Wonder Anatomy',
-                                 'Elvish, language of "Lord of the Rings',
-                                 'The Science of Superheroes'
-          ];
           $scope.setStatusMessage('Processing...');
-          for (var i = 0; i < $scope.DummyExplorationCount; ++i) {
-            var randomTitle = Math.floor(
-                              Math.random() * POSSIBLE_TITLES.length
-                              );
-            $http.post('/contributehandler/create_new', {
-              title: POSSIBLE_TITLES[randomTitle]
-            });
-          }
-          $scope.setStatusMessage('Dummy explorations created.');
-          AdminTaskManagerService.finishTask();
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'reload_dummy_exploration',
+            dummy_exp_count: $scope.DummyExplorationCount
+          }).then(function() {
+            $scope.setStatusMessage(
+              'Dummy explorations generated successfully.');
+          }, function(errorResponse) {
+            $scope.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+            AdminTaskManagerService.finishTask();
+          });
         };
 
         $scope.reloadCollection = function(collectionId) {
