@@ -17,8 +17,8 @@
  */
 
 oppia.factory('TextInputValidationService', [
-  'WARNING_TYPES', 'baseInteractionValidationService',
-  function(WARNING_TYPES, baseInteractionValidationService) {
+  'INTERACTION_SPECS', 'WARNING_TYPES', 'baseInteractionValidationService',
+  function(INTERACTION_SPECS, WARNING_TYPES, baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];
@@ -35,9 +35,12 @@ oppia.factory('TextInputValidationService', [
               'Placeholder text must be a string.')
           });
         }
-        // Can we get these values dynamically?
-        var MIN_ROWS = 1;
-        var MAX_ROWS = 200;
+        var customArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
+        var rowsSpecs = customArgSpecs[1];
+        var MIN_ROWS = rowsSpecs.schema.validators[0].min_value;
+        var MAX_ROWS = rowsSpecs.schema.validators[1].max_value;
+        alert(MIN_ROWS);
+        alert(MAX_ROWS);
         if (rows < MIN_ROWS || rows > MAX_ROWS) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
