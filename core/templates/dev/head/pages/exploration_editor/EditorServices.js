@@ -41,10 +41,10 @@ oppia.factory('explorationData', [
       var test = 'test';
       var result;
       try {
-  	    localStorage.setItem(test, test);
-  	    result = localStorage.getItem(test) == test;
-  	    localStorage.removeItem(test);
-  	    return result && localStorage;
+        localStorage.setItem(test, test);
+        result = localStorage.getItem(test) == test;
+        localStorage.removeItem(test);
+        return result && localStorage;
       } catch (exception) {}
     }());
 
