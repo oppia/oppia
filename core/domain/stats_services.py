@@ -139,6 +139,16 @@ def get_state_answers(exploration_id, exploration_version, state_name):
     """Returns a StateAnswers object containing all answers associated with the
     specified exploration state, or None if no such answers have yet been
     submitted.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration to fetch
+            answers for.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        StateAnswers Object or None if no such answers have yet been
+    submitted.
     """
     state_answers_models = stats_models.StateAnswersModel.get_all_models(
         exploration_id, exploration_version, state_name)
