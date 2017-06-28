@@ -248,8 +248,7 @@ oppia.controller('SettingsTab', [
               if (GLOBALS.ALL_CATEGORIES.indexOf(category) === -1) {
                 category = GLOBALS.DEFAULT_CATEGORY_ICON;
               }
-              return UrlInterpolationService.getStaticImageUrl(
-                '/subjects/' + category + '.svg');
+              return '/subjects/' + category + '.svg';
             };
             $scope.getThumbnailBgColor = function() {
               var category = explorationCategoryService.displayed;

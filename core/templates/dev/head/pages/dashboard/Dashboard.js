@@ -178,6 +178,10 @@ oppia.controller('Dashboard', [
       return value;
     };
 
+    $scope.getCompleteThumbnailIconUrl = function (iconUrl) {
+      return UrlInterpolationService.getStaticImageUrl(iconUrl);
+    };
+
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(
       function(response) {
