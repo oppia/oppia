@@ -15,6 +15,7 @@
 """Controllers for the Oppia collection learner view."""
 
 from core.controllers import base
+from core.domain import action_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
@@ -46,7 +47,7 @@ def require_collection_playable(handler):
 class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
 
-    @require_collection_playable
+    @action_decorators.play_collection
     def get(self, collection_id):
         """Handles GET requests."""
         try:
@@ -82,7 +83,7 @@ class CollectionDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_collection_playable
+    @action_decorators.play_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
 
