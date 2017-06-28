@@ -333,6 +333,33 @@ class I18nDictsTest(test_utils.GenericTestBase):
         return re.findall(regex_pattern, utils.get_file_contents(
             filename))
 
+    def _get_tags(self, input_string, key, filename):
+        """Returns the parts in the input string that lie within <...>
+        characters.
+        """
+        result = []
+        bracket_level = 0
+        current_string = ''
+        for c in input_string:
+            if c == '<':
+                current_string += c
+                bracket_level += 1
+            elif c == '>':
+                self.assertGreater(
+                    bracket_level, 0,
+                    msg='Invalid HTML: %s at %s in %s' % (
+                        input_string, key, filename))
+                result.append(current_string + c)
+                current_string = ''
+                bracket_level -= 1
+            elif bracket_level > 0:
+                current_string += c
+
+        self.assertEqual(
+            bracket_level, 0,
+            msg='Invalid HTML: %s at %s in %s' % (input_string, key, filename))
+        return sorted(result)
+
     def test_i18n_keys(self):
         """Tests that the keys in all JSON files are a subset of those in
         en.json.
@@ -417,6 +444,41 @@ class I18nDictsTest(test_utils.GenericTestBase):
                             self.log_line('')
         self.assertEqual(missing_keys_count, 0)
         self.assertGreater(files_checked, 0)
+
+    def test_html_in_translations_is_preserved_correctly(self):
+        """Tests that HTML in translated strings matches the original
+        structure.
+        """
+        # For this test, show the entire diff if there is a mismatch.
+        self.maxDiff = None
+
+        master_translation_dict = json.loads(utils.get_file_contents(
+            os.path.join(os.getcwd(), 'assets', 'i18n', 'en.json')))
+        # Remove anything outside '<'...'>' tags. Note that this handles both
+        # HTML tags and Angular variable interpolations.
+        master_tags_dict = {
+            key: self._get_tags(value, key, 'en.json')
+            for key, value in master_translation_dict.iteritems()
+        }
+
+        mismatches = []
+
+        filenames = os.listdir(os.path.join(
+            os.getcwd(), self.get_static_asset_filepath(), 'assets', 'i18n'))
+        for filename in filenames:
+            if filename == 'qqq.json':
+                continue
+            translation_dict = json.loads(utils.get_file_contents(
+                os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
+            for key, value in translation_dict.iteritems():
+                tags = self._get_tags(value, key, filename)
+                if tags != master_tags_dict[key]:
+                    mismatches.append('%s (%s): %s != %s' % (
+                        filename, key, tags, master_tags_dict[key]))
+
+        # Sorting the list before printing makes it easier to systematically
+        # fix any issues that arise.
+        self.assertEqual(sorted(mismatches), [])
 
 
 class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
