@@ -77,9 +77,10 @@ oppia.factory('explorationData', [
           version: explorationData.data.version
         }).then(function(response) {
           draftChangeListId = response.data.draft_change_list_id;
-          storage.removeItem(localSaveKey);
+          if (storage) {
+            storage.removeItem(localSaveKey);            
+          }
           if (successCallback) {
-            draftChangeListId = response.data.draft_change_list_id;
             successCallback(response);
           }
         }, function() {
