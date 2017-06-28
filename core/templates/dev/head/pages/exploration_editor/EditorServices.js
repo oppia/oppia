@@ -34,8 +34,9 @@ oppia.factory('explorationData', [
       }
     }
     var localSaveKey = 'draft_' + explorationId;
-    // check that local storage exists and works as expected. If it does storage stores
-    // the localStorage object, else storage is undefined.
+    // check that local storage exists and works as expected.
+    // If it does storage stores the localStorage object,
+    // else storage is undefined.
     var storage = (function() {
 	    var test = 'test';
 	    var result;
@@ -63,11 +64,11 @@ oppia.factory('explorationData', [
     var explorationData = {
       explorationId: explorationId,
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
-        // TODO: cehck if localStorage exists, if it does not then we mau want to display
-        // a warning to the user at a later stage.
         // Firt save locally to be retrieved later if save is unsuccessful.
         if (storage) {
-          var saveObject = {draftChanges: changeList, draftChangeListId: draftChangeListId};
+          var saveObject = {
+            draftChanges: changeList,
+            draftChangeListId: draftChangeListId};
           saveObject = JSON.stringify(saveObject);
           storage.setItem(localSaveKey, saveObject);
         }
