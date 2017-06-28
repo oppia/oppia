@@ -28,7 +28,7 @@ oppia.factory('TextInputValidationService', [
 
         var rows = customizationArgs.rows.value;
         var placeholder = customizationArgs.placeholder.value;
-        if (typeof placeholder != 'string') {
+        if (!angular.isString(placeholder)) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
@@ -39,8 +39,6 @@ oppia.factory('TextInputValidationService', [
         var rowsSpecs = customArgSpecs[1];
         var MIN_ROWS = rowsSpecs.schema.validators[0].min_value;
         var MAX_ROWS = rowsSpecs.schema.validators[1].max_value;
-        alert(MIN_ROWS);
-        alert(MAX_ROWS);
         if (rows < MIN_ROWS || rows > MAX_ROWS) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
