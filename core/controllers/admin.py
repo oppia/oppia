@@ -30,6 +30,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import rte_component_registry
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -335,3 +336,50 @@ class AdminTopicsCsvDownloadHandler(base.BaseHandler):
             'attachment; filename=topic_similarities.csv')
         self.response.write(
             recommendations_services.get_topic_similarities_as_csv())
+
+
+class DataExtractionQueryHandler(base.BaseHandler):
+
+    @require_super_admin
+    def post(self):
+        exp_id = self.payload.get('exp_id')
+        exp_version = self.payload.get('exp_version')
+        state_name = self.payload.get('state_name')
+        num_answers = self.payload.get('num_answers')
+
+        exploration = exp_services.get_exploration_by_id(
+            exp_id, strict=False, version=exp_version)
+
+        if exploration is None:
+            response = {
+                'success': False,
+                'message': 'no exploration with ID \'%s\' exist.' % exp_id,
+                'data': None
+            }
+            self.render_json(response)
+            return
+
+        if state_name not in exploration.states.keys():
+            response = {
+                'success': False,
+                'message': (
+                    'exploration \'%s\' does not have \'%s\' state.'
+                    % (exp_id, state_name)),
+                'data': None
+            }
+            self.render_json(response)
+            return
+
+        state_answers = stats_services.get_state_answers(
+            exp_id, exp_version, state_name)
+        extracted_answers = state_answers.get_submitted_answer_dict_list()
+
+        if num_answers > 0:
+            extracted_answers = extracted_answers[:num_answers]
+
+        response = {
+            'success': True,
+            'message': None,
+            'extracted_data': extracted_answers
+        }
+        self.render_json(response)

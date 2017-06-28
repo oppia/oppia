@@ -31,6 +31,9 @@ oppia.directive('adminMiscTab', [
         '/pages/admin/misc_tab/' +
         'admin_misc_tab_directive.html'),
       controller: ['$scope', function($scope) {
+        var DATA_EXTRACTION_QUERY_HANDLER_URL = (
+          '/explorationdataextractionhandler');
+
         $scope.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
@@ -75,6 +78,55 @@ oppia.directive('adminMiscTab', [
 
         $scope.downloadTopicSimilaritiesFile = function() {
           $window.location.href = ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL;
+        };
+
+        var setDataExtractionQueryStatusMessage = function(message) {
+          $scope.showDataExtractionQueryStatus = true;
+          $scope.dataExtractionQueryStatusMessage = message;
+        };
+
+        $scope.submitQuery = function() {
+          var STATUS_PENDING = (
+            'Data extraction query has been submitted. Please wait.');
+          var STATUS_FINISHED = 'Loading the extracted data ...';
+          var STATUS_FAILED = 'Error, ';
+
+          var data = {
+            exp_id: $scope.exp_id,
+            exp_version: $scope.exp_version,
+            state_name: $scope.state_name,
+            num_answers: $scope.num_answers
+          };
+
+          setDataExtractionQueryStatusMessage(STATUS_PENDING);
+
+          $http.post(DATA_EXTRACTION_QUERY_HANDLER_URL, data).then(
+            function(response) {
+              var data = response.data;
+              if (response.data.success) {
+                setDataExtractionQueryStatusMessage(STATUS_FINISHED);
+                var extractedAnswers = JSON.stringify(data.extracted_data);
+                var dataURL = (
+                  'data:application/json;base64,' + btoa(extractedAnswers));
+                var downloadURL = (
+                  '<a href="' + dataURL +
+                  '" download="data.json"> download </a>');
+                $window.location.href = (
+                  'data:text/html;base64,' + btoa(downloadURL));
+                return;
+              }
+              setDataExtractionQueryStatusMessage(STATUS_FAILED + data.message);
+            }, function(response) {
+            setDataExtractionQueryStatusMessage(
+              STATUS_FAILED + response.data.error);
+          });
+        };
+
+        $scope.resetForm = function() {
+          $scope.exp_id = null;
+          $scope.exp_version = 0;
+          $scope.state_name = null;
+          $scope.num_answers = 0;
         };
       }]
     };
