@@ -365,3 +365,71 @@ class ClassifierTrainingJob(object):
                 raise utils.ValidationError(
                     'Expected answers to be a list, received %s' %
                     grouped_answers['answers'])
+
+
+class ClassifierExplorationMapping(object):
+    """Domain object for a classifier-exploration mapping model.
+
+    A Classifier-Exploration mapping is a one-to-one relation between the
+    attributes in an exploration to the classifier model it needs to utilise.
+    The mapping is from <exp_id, exp_version, state_name> to the classifier_id.
+
+    Attributes:
+        mapping_id: str. The unique id of the classifier-exploration mapping.
+        classifier_id. str. The ID of the classifier corresponding to the id
+            of the classifier-exploration mapping.
+    """
+
+    def __init__(self, mapping_id, classifier_id):
+        """Constructs a ClassifierExplorationMapping domain object.
+
+        Args:
+            mapping_id: str. The unique id of the classifier-exploration
+                mapping.
+            classifier_id: str. The unique id of the classifier.
+        """
+        self._id = mapping_id
+        self._classifier_id = classifier_id
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def classifier_id(self):
+        return self._classifier_id
+
+    def update_classifier_id(self, classifier_id):
+        """Updates the classifier_id attribute of the
+        ClassifierExplorationMapping domain object.
+
+        Args:
+            classifier_id: str. The ID of the classifier.
+        """
+
+        self._classifier_id = classifier_id
+
+    def to_dict(self):
+        """Constructs a dict representation of ClassifierExplorationMapping
+        domain object.
+
+        Returns:
+            A dict representation of ClassifierExplorationMapping domain object.
+        """
+
+        return {
+            'mapping_id': self._id,
+            'classifier_id': self._classifier_id
+        }
+
+    def validate(self):
+        """Validates the mapping before it is saved to storage."""
+
+        if not isinstance(self.id, basestring):
+            raise utils.ValidationError(
+                'Expected id to be a string, received %s' % self.id)
+
+        if not isinstance(self.classifier_id, basestring):
+            raise utils.ValidationError(
+                'Expected classifier_id to be a string, received %s' % (
+                    self.exp_id))

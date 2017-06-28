@@ -74,21 +74,21 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
 
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
-
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
+    # def test_string_classifier_classification(self):
+    #     """All these responses trigger the string classifier."""
+    #
+    #     with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'it\'s a permutation of 3 elements'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'There are 3 options for the first ball, and 2 for the '
+    #                 'remaining two. So 3*2=6.'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('abc acb bac bca cbb cba'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('dunno, just guessed'))
 
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""
@@ -253,3 +253,74 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.exp_id, exp_id)
         self.assertEqual(classifier_training_job.status, test_status)
+
+    def test_retrieval_of_classifier_from_exploration_attributes(self):
+        """Test the get_classifier_from_exploration_attributes method."""
+
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class ClassifierDataModel with id '
+            'fake_id not found')):
+            classifier_services.get_classifier_by_id('fake_id')
+
+        exp_id = u'1'
+        state_name = 'Home'
+        classifier_id = 'classifier_id1'
+        classifier_id = classifier_models.ClassifierDataModel.create(
+            classifier_id, exp_id, 1, state_name,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'], [], 1)
+        classifier_models.ClassifierExplorationMappingModel.create(
+            exp_id, 1, state_name, classifier_id)
+        classifier = (
+            classifier_services.get_classifier_from_exploration_attributes(
+                exp_id, 1, state_name))
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.state_name, state_name)
+        self.assertEqual(classifier.id, classifier_id)
+
+    def test_deletion_of_classifier_exploration_mapping(self):
+        """Test the delete_classifier_exploration_mapping method."""
+
+        exp_id = u'1'
+        state_name = 'Home'
+        classifier_id = 'classifier_id1'
+        classifier_id = classifier_models.ClassifierDataModel.create(
+            classifier_id, exp_id, 1, state_name,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'], [], 1)
+        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+            exp_id, 1, state_name, classifier_id)
+        self.assertTrue(mapping_id)
+        classifier_services.delete_classifier_exploration_mapping(
+            exp_id, 1, state_name)
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class ClassifierExplorationMappingModel '
+            'with id %s not found' %(
+                mapping_id))):
+            classifier_services.get_classifier_exploration_mapping_by_id(
+                mapping_id)
+
+    def test_update_of_classifier_exploration_mapping(self):
+        """Test the save_classifier_exploration_mapping method."""
+
+        exp_id = u'1'
+        state_name = 'Home'
+        classifier_id = 'classifier_id1'
+        test_classifier_id = 'classifier_id2'
+        # Mapping does not exist yet.
+        mapping_id = classifier_services.save_classifier_exploration_mapping(
+            exp_id, 1, state_name, classifier_id)
+        classifier_exploration_mapping = (
+            classifier_services.get_classifier_exploration_mapping_by_id(
+                mapping_id))
+        self.assertEqual(classifier_exploration_mapping.classifier_id,
+                         classifier_id)
+        classifier_exploration_mapping.update_classifier_id(test_classifier_id)
+        # Updating existing job.
+        mapping_id = classifier_services.save_classifier_exploration_mapping(
+            exp_id, 1, state_name, test_classifier_id)
+        classifier_exploration_mapping = (
+            classifier_services.get_classifier_exploration_mapping_by_id(
+                mapping_id))
+        self.assertEqual(classifier_exploration_mapping.classifier_id,
+                         test_classifier_id)

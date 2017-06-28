@@ -356,3 +356,151 @@ def delete_classifier_training_job(job_id):
         classifier_models.ClassifierTrainingJobModel.get(job_id))
     if classifier_training_job_model is not None:
         classifier_training_job_model.delete()
+
+def get_classifier_exploration_mapping_from_model(mapping_model):
+    """Gets a classifier exploration mapping domain object from a classifier
+    exploration mapping model.
+
+    Args:
+        mapping_model: ClassifierExplorationMappingModel. Classifier Exploration
+            mapping instance in datastore.
+
+    Returns:
+        classifier_exploration_mapping: ClassifierExplorationMapping. Domain
+            object for the classifier exploration mapping.
+    """
+    return classifier_domain.ClassifierExplorationMapping(
+        mapping_model.id,
+        mapping_model.classifier_id)
+
+def get_classifier_exploration_mapping_by_id(mapping_id):
+    """Gets a classifier exploration mapping by a mapping_id.
+
+    Args:
+        mapping_id: str. ID of the classifier exploration mapping.
+
+    Returns:
+        classifier_exploration_mapping: ClassifierExplorationMapping. Domain
+            object for the classifier exploration mapping.
+
+    Raises:
+        Exception: Entity for class ClassifierExplorationMapping with id not
+            found.
+    """
+    classifier_exploration_mapping_model = (
+        classifier_models.ClassifierExplorationMappingModel.get(mapping_id))
+    classifier_exploration_mapping = (
+        get_classifier_exploration_mapping_from_model(
+            classifier_exploration_mapping_model))
+    return classifier_exploration_mapping
+
+def get_classifier_from_exploration_attributes(exp_id, exp_version,
+                                               state_name):
+    """Gets the classifier object from the exploration attributes.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. The exploration version.
+        state_name: str. The name of the state to which the classifier
+            belongs.
+
+    Returns:
+        classifier: ClassifierData. Domain object for the Classifier model.
+
+    Raises:
+        Exception: Entity for class ClassifierExplorationMapping with id not
+            found.
+        Exception: Entity for class ClassifierData with id not found.
+    """
+    mapping_id = exp_id + str(exp_version) + state_name
+    classifier_exploration_mapping = get_classifier_exploration_mapping_by_id(
+        mapping_id)
+    classifier_id = classifier_exploration_mapping.classifier_id
+    classifier = get_classifier_by_id(classifier_id)
+    return classifier
+
+def _create_classifier_exploration_mapping(exp_id, exp_version, state_name,
+                                           classifier_id):
+    """Creates classifier exploration mapping model in the datastore.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. The exploration version.
+        state_name: str. The state to which the classifier belongs.
+        classifier_id: str. ID of the classifier.
+
+    Returns:
+        mapping_id: str. ID of the classifier exploration mapping.
+    """
+    mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+        exp_id, exp_version, state_name, classifier_id)
+    return mapping_id
+
+def _update_classifier_exploration_mapping(mapping_model,
+                                           classifier_id):
+    """Updates classifier exploration mapping model in the datastore.
+
+    Args:
+        mapping_model: ClassifierExplorationMappingModel. Classifier exploration
+            mapping instance in datastore.
+        classifier_id: The ID of the classifier.
+
+    Note: All of the properties of a classifier exploration mapping are
+        immutable, except for classifier_id (classifier_id becomes mutable when
+        we implement forward propagation).
+    """
+    mapping_model.classifier_id = classifier_id
+    mapping_model.put()
+
+def save_classifier_exploration_mapping(exp_id, exp_version, state_name,
+                                        classifier_id):
+    """Checks for the existence of the model.
+    If the model exists, it is updated using
+        _update_classifier_exploration_mapping method.
+    If the model doesn't exist, it is created using
+        _create_classifier_exploration_mapping method.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. The exploration version.
+        state_name: str. The state to which the classifier belongs.
+        classifier_id: str. ID of the classifier.
+
+    Returns:
+        mapping_id : str. ID of the classifier exploration mapping.
+    """
+    mapping_id = exp_id + str(exp_version) + state_name
+    classifier_exploration_mapping_model = (
+        classifier_models.ClassifierExplorationMappingModel.get(mapping_id,
+                                                                False))
+    if classifier_exploration_mapping_model is None:
+        classifier_exploration_mapping = (
+            classifier_domain.ClassifierExplorationMapping(
+                mapping_id, classifier_id))
+        classifier_exploration_mapping.validate()
+        mapping_id = _create_classifier_exploration_mapping(exp_id, exp_version,
+                                                            state_name,
+                                                            classifier_id)
+    else:
+        classifier_exploration_mapping = (
+            get_classifier_exploration_mapping_from_model(
+                classifier_exploration_mapping_model))
+        classifier_exploration_mapping.validate()
+        _update_classifier_exploration_mapping(
+            classifier_exploration_mapping_model, classifier_id)
+    return mapping_id
+
+def delete_classifier_exploration_mapping(exp_id, exp_version, state_name):
+    """Deletes classifier exploration mapping model in the datastore given
+    exploration attributes.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. The exploration version.
+        state_name: str. The state to which the classifier belongs.
+    """
+    mapping_id = exp_id + str(exp_version) + state_name
+    classifier_exploration_mapping_model = (
+        classifier_models.ClassifierExplorationMappingModel.get(
+            mapping_id))
+    classifier_exploration_mapping_model.delete()

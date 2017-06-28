@@ -90,3 +90,25 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                          feconf.TRAINING_JOB_STATUS_NEW)
         self.assertEqual(training_job.training_data,
                          [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
+
+
+class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
+    """Tests for the ClassifierExplorationMappingModel class."""
+
+    def setUp(self):
+        super(ClassifierExplorationMappingModelUnitTests, self).setUp()
+        classifier_models.ClassifierExplorationMappingModel.create(
+            'exp_id1', 1, 'state_name1', 'classifier_id1')
+        classifier_models.ClassifierExplorationMappingModel.create(
+            'exp_id1', 1, 'state_name2', 'classifier_id2')
+        classifier_models.ClassifierExplorationMappingModel.create(
+            'exp_id2', 1, 'state_name1', 'classifier_id3')
+
+    def test_create_and_get_new_mapping_runs_successfully(self):
+        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+            'exp_id1', 2, 'state_name4', 'classifier_id4')
+
+        mapping = classifier_models.ClassifierExplorationMappingModel.get(
+            mapping_id)
+
+        self.assertEqual(mapping.classifier_id, 'classifier_id4')

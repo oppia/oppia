@@ -174,3 +174,42 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         training_job_instance.put()
         return instance_id
+
+
+class ClassifierExplorationMappingModel(base_models.BaseModel):
+    """Model for mapping exploration attributes to a ClassifierDataModel.
+
+    The id of instances of this class has the form
+    {{exp_id}}.{{exp_version}}.{{state_name}}
+    """
+
+    # The ID of the classifier corresponding to the exploration attributes.
+    classifier_id = ndb.StringProperty(required=True, indexed=True)
+
+    @classmethod
+    def create(
+            cls, exp_id, exp_version, state_name, classifier_id):
+        """Creates a new ClassifierExplorationMappingModel entry.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. The exploration version at the time
+                this training job was created.
+            state_name: str. The name of the state to which the classifier
+                belongs.
+            classifier_id: str. The ID of the classifier corresponding to this
+                combination of <exp_id, exp_version, state_name>.
+
+        Returns:
+            ID of the new ClassifierExplorationMappingModel entry.
+
+        Raises:
+            Exception: A model with the same ID already exists.
+        """
+
+        instance_id = exp_id + str(exp_version) + state_name
+        mapping_instance = cls(
+            id=instance_id, classifier_id=classifier_id)
+
+        mapping_instance.put()
+        return instance_id
