@@ -22,6 +22,7 @@ import os
 import re
 import types
 
+from constants import constants
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -341,7 +342,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
 
         supported_language_filenames = [
             ('%s.json' % language_details['id'])
-            for language_details in feconf.SUPPORTED_SITE_LANGUAGES]
+            for language_details in constants.SUPPORTED_SITE_LANGUAGES]
 
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),

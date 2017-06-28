@@ -32,6 +32,7 @@ import zipfile
 
 import yaml
 
+from constants import constants  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
 
 
@@ -427,22 +428,22 @@ def capitalize_string(input_string):
 
 def get_hex_color_for_category(category):
     return (
-        feconf.CATEGORIES_TO_COLORS[category]
-        if category in feconf.CATEGORIES_TO_COLORS
-        else feconf.DEFAULT_COLOR)
+        constants.CATEGORIES_TO_COLORS[category]
+        if category in constants.CATEGORIES_TO_COLORS
+        else constants.DEFAULT_COLOR)
 
 
 def get_thumbnail_icon_url_for_category(category):
     icon_name = (
-        category if category in feconf.ALL_CATEGORIES
-        else feconf.DEFAULT_THUMBNAIL_ICON)
+        category if category in constants.CATEGORIES_TO_COLORS
+        else constants.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
     return ('%s/assets/images/subjects/%s.svg'
             % (get_asset_dir_prefix(), icon_name.replace(' ', '')))
 
 
 def _get_short_language_description(full_language_description):
-    """Given one of the descriptions in feconf.ALL_LANGUAGE_CODES, generates
+    """Given one of the descriptions in constants.ALL_LANGUAGE_CODES, generates
     the corresponding short description.
     """
     if ' (' not in full_language_description:
@@ -456,7 +457,7 @@ def get_all_language_codes_and_names():
     return [{
         'code': lc['code'],
         'name': _get_short_language_description(lc['description']),
-    } for lc in feconf.ALL_LANGUAGE_CODES]
+    } for lc in constants.ALL_LANGUAGE_CODES]
 
 
 def unescape_encoded_uri_component(escaped_string):

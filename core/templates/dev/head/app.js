@@ -861,8 +861,7 @@ oppia.factory('BackgroundMaskService', function() {
 // turned on. This flag must be turned on explicitly by the application
 // owner in feconf.py.
 oppia.factory('siteAnalyticsService', ['$window', function($window) {
-  var CAN_SEND_ANALYTICS_EVENTS = GLOBALS.CAN_SEND_ANALYTICS_EVENTS;
-
+  var CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/events
   var _sendEventToGoogleAnalytics = function(

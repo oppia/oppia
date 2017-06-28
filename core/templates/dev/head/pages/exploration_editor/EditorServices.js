@@ -78,6 +78,7 @@ oppia.factory('explorationData', [
           draftChangeListId = response.data.draft_change_list_id;
           storage.removeItem(localSaveKey);
           if (successCallback) {
+            draftChangeListId = response.data.draft_change_list_id;
             successCallback(response);
           }
         }, function() {
@@ -766,17 +767,17 @@ oppia.factory('explorationLanguageCodeService', [
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'language_code';
     child.getAllLanguageCodes = function() {
-      return GLOBALS.ALL_LANGUAGE_CODES;
+      return constants.ALL_LANGUAGE_CODES;
     };
     child.getCurrentLanguageDescription = function() {
-      for (var i = 0; i < GLOBALS.ALL_LANGUAGE_CODES.length; i++) {
-        if (GLOBALS.ALL_LANGUAGE_CODES[i].code === child.displayed) {
-          return GLOBALS.ALL_LANGUAGE_CODES[i].description;
+      for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
+        if (constants.ALL_LANGUAGE_CODES[i].code === child.displayed) {
+          return constants.ALL_LANGUAGE_CODES[i].description;
         }
       }
     };
     child._isValid = function(value) {
-      return GLOBALS.ALL_LANGUAGE_CODES.some(function(elt) {
+      return constants.ALL_LANGUAGE_CODES.some(function(elt) {
         return elt.code === value;
       });
     };
