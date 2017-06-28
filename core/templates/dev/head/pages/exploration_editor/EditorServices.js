@@ -38,14 +38,14 @@ oppia.factory('explorationData', [
     // If it does storage stores the localStorage object,
     // else storage is undefined.
     var storage = (function() {
-	    var test = 'test';
-	    var result;
-	    try {
-		    localStorage.setItem(test, test);
-		    result = localStorage.getItem(test) == test;
-		    localStorage.removeItem(test);
-		    return result && localStorage;
-	    } catch (exception) {}
+      var test = 'test';
+      var result;
+      try {
+  	    localStorage.setItem(test, test);
+  	    result = localStorage.getItem(test) == test;
+  	    localStorage.removeItem(test);
+  	    return result && localStorage;
+      } catch (exception) {}
     }());
 
     if (!explorationId) {
