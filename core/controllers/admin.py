@@ -351,24 +351,13 @@ class DataExtractionQueryHandler(base.BaseHandler):
             exp_id, strict=False, version=exp_version)
 
         if exploration is None:
-            response = {
-                'success': False,
-                'message': 'no exploration with ID \'%s\' exist.' % exp_id,
-                'data': None
-            }
-            self.render_json(response)
-            return
+            raise self.InvalidInputException(
+                'No exploration with ID \'%s\' exist.' % exp_id)
 
-        if state_name not in exploration.states.keys():
-            response = {
-                'success': False,
-                'message': (
-                    'exploration \'%s\' does not have \'%s\' state.'
-                    % (exp_id, state_name)),
-                'data': None
-            }
-            self.render_json(response)
-            return
+        if state_name not in exploration.states:
+            raise self.InvalidInputException(
+                'Exploration \'%s\' does not have \'%s\' state.'
+                % (exp_id, state_name))
 
         state_answers = stats_services.get_state_answers(
             exp_id, exp_version, state_name)
@@ -378,8 +367,6 @@ class DataExtractionQueryHandler(base.BaseHandler):
             extracted_answers = extracted_answers[:num_answers]
 
         response = {
-            'success': True,
-            'message': None,
-            'extracted_data': extracted_answers
+            'data': extracted_answers
         }
         self.render_json(response)

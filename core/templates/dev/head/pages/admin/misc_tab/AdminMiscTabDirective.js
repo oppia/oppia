@@ -103,19 +103,15 @@ oppia.directive('adminMiscTab', [
           $http.post(DATA_EXTRACTION_QUERY_HANDLER_URL, data).then(
             function(response) {
               var data = response.data;
-              if (response.data.success) {
-                setDataExtractionQueryStatusMessage(STATUS_FINISHED);
-                var extractedAnswers = JSON.stringify(data.extracted_data);
-                var dataURL = (
-                  'data:application/json;base64,' + btoa(extractedAnswers));
-                var downloadURL = (
-                  '<a href="' + dataURL +
-                  '" download="data.json"> download </a>');
-                $window.location.href = (
-                  'data:text/html;base64,' + btoa(downloadURL));
-                return;
-              }
-              setDataExtractionQueryStatusMessage(STATUS_FAILED + data.message);
+              setDataExtractionQueryStatusMessage(STATUS_FINISHED);
+              var extractedAnswers = JSON.stringify(data.data);
+              var dataURL = (
+                'data:application/json;base64,' + btoa(extractedAnswers));
+              var downloadURL = (
+                '<a href="' + dataURL +
+                '" download="data.json"> download </a>');
+              $window.location.href = (
+                'data:text/html;base64,' + btoa(downloadURL));
             }, function(response) {
             setDataExtractionQueryStatusMessage(
               STATUS_FAILED + response.data.error);

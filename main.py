@@ -438,8 +438,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
         collection_editor.ExplorationMetadataSearchHandler),
     get_redirect_route(
-        r'/explorationdataextractionhandler',
-        admin.DataExtractionQueryHandler),
+        r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 
