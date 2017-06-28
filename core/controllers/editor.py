@@ -702,6 +702,10 @@ class ExplorationDownloadHandler(EditorHandler):
     @action_decorators.download_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')

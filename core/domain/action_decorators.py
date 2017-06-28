@@ -40,7 +40,7 @@ def check_activity_accessible(self, activity_id, activity_type):
                 self.request.get('iframed')):
             self.values['iframed'] = True
 
-    activity_rights = rights_manager._get_activity_rights(
+    activity_rights = rights_manager.get_activity_rights(
         activity_type, activity_id)
 
     action_play_public = (
@@ -53,22 +53,16 @@ def check_activity_accessible(self, activity_id, activity_type):
         else role_services.ACTION_PLAY_PRIVATE_COLLECTION)
 
     if activity_rights is None:
-            return False
+        return False
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
-        if action_play_public in self.actions:
-            return True
-        else:
-            return False
+        return bool(action_play_public in self.actions)
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-        if (
+        return bool(
             (action_play_private in self.actions) or
             (self.user_id in activity_rights.viewer_ids) or
             (self.user_id in activity_rights.owner_ids) or
             (self.user_id in activity_rights.editor_ids) or
-            activity_rights.viewable_if_private):
-            return True
-        else:
-            return False
+            activity_rights.viewable_if_private)
 
 
 def play_exploration(handler):
@@ -76,7 +70,7 @@ def play_exploration(handler):
 
     def test_can_play(self, exploration_id, **kwargs):
         if check_activity_accessible(
-            self, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION):
+                self, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -89,7 +83,7 @@ def play_collection(handler):
 
     def test_can_play(self, collection_id, **kwargs):
         if check_activity_accessible(
-            self, collection_id, feconf.ACTIVITY_TYPE_COLLECTION):
+                self, collection_id, feconf.ACTIVITY_TYPE_COLLECTION):
             return handler(self, collection_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -104,7 +98,7 @@ def download_exploration(handler):
 
     def test_can_download(self, exploration_id, **kwargs):
         if check_activity_accessible(
-            self, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION):
+                self, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -119,11 +113,9 @@ def view_exploration_stats(handler):
 
     def test_can_view_stats(self, exploration_id, **kwargs):
         if check_activity_accessible(
-            self, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION):
+                self, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
 
     return test_can_view_stats
-
-

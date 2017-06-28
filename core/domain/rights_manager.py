@@ -488,6 +488,10 @@ def _get_activity_rights(activity_type, activity_id):
                 activity_type))
 
 
+def get_activity_rights(activity_type, activity_id):
+    return _get_activity_rights(activity_type, activity_id)
+
+
 class Actor(object):
     """Domain object for a user with various rights."""
 
