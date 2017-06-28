@@ -147,7 +147,7 @@ def get_state_answers(exploration_id, exploration_version, state_name):
         state_name: str. The name of the state to fetch answers for.
 
     Returns:
-        StateAnswers Object or None if no such answers have yet been
+        StateAnswers Object, or None if no such answers have yet been
     submitted.
     """
     state_answers_models = stats_models.StateAnswersModel.get_all_models(
