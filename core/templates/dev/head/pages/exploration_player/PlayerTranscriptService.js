@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,10 +31,15 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
   // - contentHtml: the HTML representing the non-interactive content, i.e.
   //     what Oppia first says to the learner before asking for a response
   // - interactionHtml: the HTML representing the interaction
-  // - answerFeedbackPairs: a list of objects, each with two keys:
-  //   - learnerAnswer: the JS representation of the learner's answer
-  //   - oppiaFeedbackHtml: the HTML representation of Oppia's response to this
-  //       answer, or null if no response was given.
+  // - inputResponsePairs: a list of two types of objects:
+  //   - Answer/Feedback pair:
+  //     - learnerAnswer: the JS representation of the learner's answer
+  //     - oppiaFeedbackHtml: the HTML representation of Oppia's response to
+  //       this answer, or null if no response was given.
+  //   - Request/Hint pair:
+  //     - hintRequest: string representing the learner's request for a hint.
+  //     - oppiaHint: the HTML representation of Oppia's hint, or null if no
+  //       hint was provided.
   // - destStateName: if non-null, this means that the learner is ready to move
   //     on. It represents the state name of the next card.
   //
@@ -65,7 +70,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
         currentParams: params,
         contentHtml: contentHtml,
         interactionHtml: interactionHtml,
-        answerFeedbackPairs: [],
+        inputResponsePairs: [],
         destStateName: null
       });
     },
@@ -79,8 +84,8 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
 
       lastCard.destStateName = newDestStateName;
     },
-    addNewAnswer: function(answer, isHintRequest) {
-      var pairs = transcript[transcript.length - 1].answerFeedbackPairs;
+    addNewAnswer: function(answer) {
+      var pairs = transcript[transcript.length - 1].inputResponsePairs;
       if (pairs.length > 0 &&
           pairs[pairs.length - 1].oppiaFeedbackHtml === null) {
         throw Error(
@@ -88,19 +93,40 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
           'answer has been received.',
           transcript);
       }
-      transcript[transcript.length - 1].answerFeedbackPairs.push({
+      transcript[transcript.length - 1].inputResponsePairs.push({
         learnerAnswer: answer,
-        oppiaFeedbackHtml: null,
-        isHintRequest: (isHintRequest !== undefined)
+        oppiaFeedbackHtml: null
+      });
+    },
+    addNewHintRequest: function(hintRequest) {
+      var pairs = transcript[transcript.length - 1].inputResponsePairs;
+      if (pairs.length > 0 &&
+        pairs[pairs.length - 1].oppiaHint === null) {
+        throw Error(
+          'Trying to add a hint request before the hint for the previous ' +
+          'request has been received.',
+          transcript);
+      }
+      transcript[transcript.length - 1].inputResponsePairs.push({
+        hintRequest: hintRequest,
+        oppiaHint: null
       });
     },
     addNewFeedback: function(feedbackHtml) {
-      var pairs = transcript[transcript.length - 1].answerFeedbackPairs;
+      var pairs = transcript[transcript.length - 1].inputResponsePairs;
       if (pairs[pairs.length - 1].oppiaFeedbackHtml !== null) {
         throw Error(
           'Trying to add feedback when it has already been added.', transcript);
       }
       pairs[pairs.length - 1].oppiaFeedbackHtml = feedbackHtml;
+    },
+    addNewHint: function(hint) {
+      var pairs = transcript[transcript.length - 1].inputResponsePairs;
+      if (pairs[pairs.length - 1].oppiaHint !== null) {
+        throw Error(
+          'Trying to add hint when it has already been added.', transcript);
+      }
+      pairs[pairs.length - 1].oppiaHint = hint;
     },
     getNumCards: function() {
       return transcript.length;
@@ -120,7 +146,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
       return this.getCard(transcript.length - 1);
     },
     getNumSubmitsForLastCard: function() {
-      return this.getLastCard().answerFeedbackPairs.length;
+      return this.getLastCard().inputResponsePairs.length;
     },
     updateLatestInteractionHtml: function(newInteractionHtml) {
       this.getLastCard().interactionHtml = newInteractionHtml;

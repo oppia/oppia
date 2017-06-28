@@ -69,7 +69,7 @@ describe('Player transcript service', function() {
       },
       contentHtml: 'Content HTML',
       interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
-      answerFeedbackPairs: [],
+      inputResponsePairs: [],
       destStateName: null
     });
   });
@@ -95,14 +95,12 @@ describe('Player transcript service', function() {
     pts.addNewAnswer('second answer');
 
     var firstCard = pts.getCard(0);
-    expect(firstCard.answerFeedbackPairs).toEqual([{
+    expect(firstCard.inputResponsePairs).toEqual([{
       learnerAnswer: 'first answer',
-      oppiaFeedbackHtml: 'feedback',
-      isHintRequest: false
+      oppiaFeedbackHtml: 'feedback'
     }, {
       learnerAnswer: 'second answer',
-      oppiaFeedbackHtml: null,
-      isHintRequest: false
+      oppiaFeedbackHtml: null
     }]);
   });
 

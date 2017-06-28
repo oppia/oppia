@@ -48,7 +48,6 @@ oppia.directive('supplementalCard', [
             }
             $scope.activeCard = playerTranscriptService.getCard(index);
             $scope.clearHelpCard();
-            hintManagerService.setCurrentHintUsable(false);
             hintManagerService.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
 
             $scope.currentInteractionHints = oppiaPlayerService.getInteraction(
@@ -70,23 +69,9 @@ oppia.directive('supplementalCard', [
           };
 
           $scope.showHint = function() {
-            var hints = $scope.currentInteractionHints;
-            var numHintsConsumed = hintManagerService.getNumHintsConsumed();
-            if (numHintsConsumed < hints.length) {
-              var currentHint = hints[numHintsConsumed].hintText;
-              playerTranscriptService.addNewAnswer(
-                'I would like a hint.', true);
-              playerTranscriptService.addNewFeedback(currentHint);
-              $scope.helpCardHtml = currentHint;
-              hintManagerService.setCurrentHintUsable(false);
-              hintManagerService.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
-
-              if (hintManagerService.areAllHintsExhausted(hints.length)) {
-                hintManagerService.reset();
-              } else {
-                hintManagerService.incrementHintsConsumed();
-              }
-            }
+            var isSupplementalCard = true;
+            $scope.helpCardHtml = hintManagerService.showHint(
+              $scope.currentInteractionHints, isSupplementalCard);
           };
 
           $scope.isHintAvailable = function() {
@@ -141,7 +126,6 @@ oppia.directive('supplementalCard', [
             $scope.helpCardHtml = helpCard.helpCardHtml;
             $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
             hintManagerService.clearTimeout();
-            hintManagerService.setCurrentHintUsable(true);
           });
 
           updateActiveCard();

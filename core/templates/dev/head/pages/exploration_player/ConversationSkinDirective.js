@@ -525,7 +525,7 @@ oppia.directive('conversationSkin', [
                 $timeout(function() {
                   $scope.$broadcast('oppiaFeedbackAvailable');
                   var pairs = (
-                    playerTranscriptService.getLastCard().answerFeedbackPairs);
+                    playerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
 
                   if (_oldStateName === newStateName) {

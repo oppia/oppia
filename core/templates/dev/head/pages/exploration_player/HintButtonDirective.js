@@ -26,7 +26,6 @@ oppia.directive('hintButton', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
-        'hint_button_directive.html'),
-      controller: ['$scope', function($scope) {}]
+        'hint_button_directive.html')
     };
   }]);

@@ -54,14 +54,16 @@ oppia.directive('tutorCard', [
         'ExplorationPlayerStateService', 'windowDimensionsService',
         'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'WAIT_FOR_HINT_MSEC', 'DELAY_FOR_HINT_FEEDBACK',
+        'WAIT_FOR_HINT_MSEC', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
+        'HINT_REQUEST_STRINGS_ARRAY',
         function(
           $scope, $timeout, oppiaPlayerService, hintManagerService,
           playerPositionService, playerTranscriptService,
           ExplorationPlayerStateService, windowDimensionsService,
           urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
           CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-          WAIT_FOR_HINT_MSEC, DELAY_FOR_HINT_FEEDBACK) {
+          WAIT_FOR_HINT_MSEC, DELAY_FOR_HINT_FEEDBACK_MSEC,
+          HINT_REQUEST_STRINGS_ARRAY) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -79,7 +81,6 @@ oppia.directive('tutorCard', [
               ExplorationPlayerStateService.getInteractionInstructions(
                 $scope.activeCard.stateName));
 
-            hintManagerService.setCurrentHintUsable(false);
             hintManagerService.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
 
             $scope.currentInteractionHints = oppiaPlayerService.getInteraction(
@@ -91,25 +92,7 @@ oppia.directive('tutorCard', [
           $scope.waitingForOppiaFeedback = false;
 
           $scope.showHint = function() {
-            var hints = $scope.currentInteractionHints;
-            var numHintsConsumed = hintManagerService.getNumHintsConsumed();
-            if (numHintsConsumed < hints.length) {
-              var currentHint = hints[numHintsConsumed].hintText;
-              playerTranscriptService.addNewAnswer(
-                'I would like a hint.', true);
-              $timeout(function() {
-                $scope.waitingForOppiaFeedback = false;
-                playerTranscriptService.addNewFeedback(currentHint);
-              }, DELAY_FOR_HINT_FEEDBACK);
-              hintManagerService.setCurrentHintUsable(false);
-              hintManagerService.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
-
-              if (hintManagerService.areAllHintsExhausted(hints.length)) {
-                hintManagerService.reset();
-              } else {
-                hintManagerService.incrementHintsConsumed();
-              }
-            }
+            hintManagerService.showHint($scope.currentInteractionHints);
           };
 
           $scope.isHintAvailable = function() {
@@ -183,7 +166,6 @@ oppia.directive('tutorCard', [
           $scope.$on('oppiaFeedbackAvailable', function() {
             $scope.waitingForOppiaFeedback = false;
             hintManagerService.clearTimeout();
-            hintManagerService.setCurrentHintUsable(true);
           });
 
           updateActiveCard();

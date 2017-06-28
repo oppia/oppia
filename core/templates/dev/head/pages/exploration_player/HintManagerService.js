@@ -16,8 +16,12 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-oppia.factory('hintManagerService',
-  ['$timeout', function($timeout) {
+oppia.factory('hintManagerService', [
+  '$timeout', 'playerTranscriptService', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
+  'HINT_REQUEST_STRINGS_ARRAY', 'WAIT_FOR_HINT_MSEC',
+  function(
+      $timeout, playerTranscriptService, DELAY_FOR_HINT_FEEDBACK_MSEC,
+      HINT_REQUEST_STRINGS_ARRAY, WAIT_FOR_HINT_MSEC) {
     var currentHintIsUsable = false;
     var numHintsConsumed = 0;
     var timeout = null;
@@ -25,9 +29,10 @@ oppia.factory('hintManagerService',
     return {
       incrementHintsConsumed: function() {
         numHintsConsumed += 1;
+        this.setCurrentHintUsable(false);
       },
       getNumHintsConsumed: function() {
-        return numHintsConsumed
+        return numHintsConsumed;
       },
       setCurrentHintUsable: function(value) {
         currentHintIsUsable = value;
@@ -42,6 +47,7 @@ oppia.factory('hintManagerService',
       },
       clearTimeout: function() {
         $timeout.cancel(timeout);
+        this.setCurrentHintUsable(true);
       },
       areAllHintsExhausted: function(numHints) {
         return numHintsConsumed === numHints;
@@ -49,6 +55,29 @@ oppia.factory('hintManagerService',
       reset: function() {
         numHintsConsumed = 0;
         currentHintIsUsable = false;
+      },
+      showHint: function(hints, isSupplementalCard) {
+        var numHintsConsumed = this.getNumHintsConsumed();
+        if (numHintsConsumed < hints.length) {
+          var currentHint = hints[numHintsConsumed].hintText;
+          playerTranscriptService.addNewHintRequest(
+            HINT_REQUEST_STRINGS_ARRAY[Math.floor(
+              Math.random() * HINT_REQUEST_STRINGS_ARRAY.length)]);
+          $timeout(function() {
+            playerTranscriptService.addNewHint(currentHint);
+          }, DELAY_FOR_HINT_FEEDBACK_MSEC);
+          this.setCurrentHintUsable(false);
+          this.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
+
+          if (this.areAllHintsExhausted(hints.length)) {
+            this.reset();
+          } else {
+            this.incrementHintsConsumed();
+          }
+          if (isSupplementalCard) {
+            return currentHint;
+          }
+        }
       }
     };
   }]);
