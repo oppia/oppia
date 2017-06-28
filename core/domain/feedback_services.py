@@ -165,6 +165,8 @@ def create_message(
 
     if author_id:
         subscription_services.subscribe_to_thread(author_id, full_thread_id)
+        update_messages_read_by_the_user(
+            exploration_id, thread_id, author_id, [message_id])
 
 
 def update_messages_read_by_the_user(exploration_id, thread_id,
@@ -420,6 +422,8 @@ def get_thread_summaries(user_id, full_thread_ids):
     last_two_message_ids = (
         feedback_models.FeedbackMessageModel.get_last_two_message_ids_of_threads( # pylint: disable=line-too-long
             exploration_ids, thread_ids))
+
+    print "Kilo", last_two_message_ids
 
     thread_summaries = []
     for index, model in enumerate(thread_models):

@@ -62,7 +62,6 @@ class ThreadHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
-        print "Molo"
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         messages = [m.to_dict() for m in feedback_services.get_messages(
             exploration_id, thread_id)]
@@ -70,8 +69,7 @@ class ThreadHandler(base.BaseHandler):
         feedback_services.update_messages_read_by_the_user(
             exploration_id, thread_id, self.user_id, message_ids)
         self.values.update({
-            'messages': [m.to_dict() for m in feedback_services.get_messages(
-                exploration_id, thread_id)],
+            'messages': messages,
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)
