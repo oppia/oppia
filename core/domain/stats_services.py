@@ -31,6 +31,13 @@ from core.platform import models
 def get_visualizations_info(exploration_id, state_name):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        state_name: str. Name of the state
+
+    Returns:
+        list. Each item in the list is a dict with keys 'data' and 'options'.
     """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     if exploration.states[state_name].interaction.id is None:
@@ -68,7 +75,14 @@ def get_visualizations_info(exploration_id, state_name):
 
 # TODO(bhenning): Test
 def get_versions_for_exploration_stats(exploration_id):
-    """Returns list of versions for this exploration."""
+    """Returns list of versions for this exploration.
+
+    Args:
+        exploration_id: str. The exploration ID.
+
+    Returns:
+        list. A list of versions for the given exploration ID.
+    """
     return stats_models.ExplorationAnnotationsModel.get_versions(
         exploration_id)
 
@@ -77,7 +91,12 @@ def get_versions_for_exploration_stats(exploration_id):
 def get_exploration_stats(exploration_id, exploration_version):
     """Returns a dict with state statistics for the given exploration id.
 
-    Note that exploration_version should be a string.
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: str. The version of the exploration.
+
+    Returns:
+        dict. A dict with state statistics for the given exploration id.
     """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     exp_stats = stats_jobs_continuous.StatisticsAggregator.get_statistics(
@@ -111,6 +130,13 @@ def record_answer(
         exploration_id, exploration_version, state_name, interaction_id,
         submitted_answer):
     """Record an answer by storing it to the corresponding StateAnswers entity.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration.
+        state_name: str. The name of the state.
+        interaction_id: The ID of the interaction.
+        submitted_answer: SubmittedAnswer domain object.
     """
     record_answers(
         exploration_id, exploration_version, state_name, interaction_id,
@@ -122,6 +148,13 @@ def record_answers(
         submitted_answer_list):
     """Optimally record a group of answers using an already loaded exploration..
     The submitted_answer_list is a list of SubmittedAnswer domain objects.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration.
+        state_name: str. The name of the state.
+        interaction_id: The ID of the interaction.
+        submitted_answer_list: list. list of SubmittedAnswer domain objects.
     """
     state_answers = stats_domain.StateAnswers(
         exploration_id, exploration_version, state_name, interaction_id,
