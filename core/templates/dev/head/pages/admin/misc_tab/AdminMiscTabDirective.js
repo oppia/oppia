@@ -92,15 +92,17 @@ oppia.directive('adminMiscTab', [
           var STATUS_FAILED = 'Error, ';
 
           var data = {
-            exp_id: $scope.exp_id,
-            exp_version: $scope.exp_version,
-            state_name: $scope.state_name,
-            num_answers: $scope.num_answers
+            exp_id: $scope.expId,
+            exp_version: $scope.expVersion,
+            state_name: $scope.stateName,
+            num_answers: $scope.numAnswers
           };
 
           setDataExtractionQueryStatusMessage(STATUS_PENDING);
 
-          $http.post(DATA_EXTRACTION_QUERY_HANDLER_URL, data).then(
+          $http.post(
+            DATA_EXTRACTION_QUERY_HANDLER_URL, data
+          ).then(
             function(response) {
               var data = response.data;
               setDataExtractionQueryStatusMessage(STATUS_FINISHED);
@@ -113,16 +115,17 @@ oppia.directive('adminMiscTab', [
               $window.location.href = (
                 'data:text/html;base64,' + btoa(downloadURL));
             }, function(response) {
-            setDataExtractionQueryStatusMessage(
-              STATUS_FAILED + response.data.error);
-          });
+              setDataExtractionQueryStatusMessage(
+                STATUS_FAILED + response.data.error);
+            }
+          );
         };
 
         $scope.resetForm = function() {
-          $scope.exp_id = null;
-          $scope.exp_version = 0;
-          $scope.state_name = null;
-          $scope.num_answers = 0;
+          $scope.expId = '';
+          $scope.expVersion = 0;
+          $scope.stateName = '';
+          $scope.numAnswers = 0;
         };
       }]
     };
