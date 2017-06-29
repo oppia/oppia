@@ -120,6 +120,10 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
         author_ids = [m.author_id for m in messages_object]
         authors_settings = user_services.get_users_settings(author_ids)
 
+        message_ids = [m.message_id for m in messages_object]
+        feedback_services.update_messages_read_by_the_user(
+            exploration_id, thread_id, self.user_id, message_ids)
+
         message_summary_list = []
         for m, author_settings in zip(messages_object, authors_settings):
             message_summary = {
