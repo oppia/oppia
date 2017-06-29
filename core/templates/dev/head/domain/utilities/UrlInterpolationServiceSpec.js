@@ -221,7 +221,7 @@ describe('URL Interpolation Service', function() {
     expect(uis.getGadgetImgUrl('testType')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/gadgets/testType' +
         '/static/images/testType.' +
-        hashes['gadgets/testType/static/images/testType.png']  + '.png');
+        hashes['gadgets/testType/static/images/testType.png'] + '.png');
 
     expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/LogicProof' +
@@ -325,5 +325,5 @@ describe('URL Interpolation Service', function() {
          uis.getExtensionResourceUrl.bind(null, 'test_url/fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
-  });
+    });
 });

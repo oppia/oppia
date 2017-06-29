@@ -38,18 +38,18 @@ oppia.factory('UrlInterpolationService', [
     };
 
     var getUrlWithSlug = function(resourcePath) {
-        validateResourcePath(resourcePath);
-        stripedPath = resourcePath.substring(1);
-        if (GLOBALS.MINIFICATION || !GLOBALS.DEV_MODE) {
-          if (!angular.isUndefined(hashes[stripedPath])) {
-            hash = hashes[stripedPath];
-            splitedPath = resourcePath.split('.');
-            splitedPath.splice(splitedPath.length - 1, 0, hash);
-            resourcePath = splitedPath.join('.');
-            return resourcePath;
-          }
+      validateResourcePath(resourcePath);
+      stripedPath = resourcePath.substring(1);
+      if (GLOBALS.MINIFICATION || !GLOBALS.DEV_MODE) {
+        if (!angular.isUndefined(hashes[stripedPath])) {
+          hash = hashes[stripedPath];
+          splitedPath = resourcePath.split('.');
+          splitedPath.splice(splitedPath.length - 1, 0, hash);
+          resourcePath = splitedPath.join('.');
+          return resourcePath;
         }
-        return resourcePath;
+      }
+      return resourcePath;
     };
 
     return {
@@ -176,8 +176,8 @@ oppia.factory('UrlInterpolationService', [
           alertsService.fatalWarning(
             'Empty interactionId passed in getInteractionThumbnailImageUrl.');
         }
-        return getPrefixedUrl('/extensions' + getUrlWithSlug(
-          '/interactions/' + interactionId + '/static/' + interactionId + '.png'));
+        return getPrefixedUrl('/extensions' + getUrlWithSlug('/interactions/' +
+          interactionId + '/static/' + interactionId + '.png'));
       },
 
       /**

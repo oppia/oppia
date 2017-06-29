@@ -37,7 +37,8 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_LOADING: 'Loading'
 });
 
-oppia.factory('customLoader', ['$http', '$q', 'UrlInterpolationService',
+oppia.factory('customLoader', [
+  '$http', '$q', 'UrlInterpolationService',
   function ($http, $q, UrlInterpolationService) {
     return function (options) {
       var fileUrl = [
@@ -49,9 +50,9 @@ oppia.factory('customLoader', ['$http', '$q', 'UrlInterpolationService',
         url: UrlInterpolationService.getTranslateJsonUrl(fileUrl),
         method: 'GET'
       }).then(function(result) {
-          return result.data;
-        }, function () {
-          return $q.reject(options.key);
+        return result.data;
+      }, function () {
+        return $q.reject(options.key);
       });
     };
   }

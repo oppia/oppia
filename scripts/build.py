@@ -175,9 +175,9 @@ def get_file_hashes(folder_path):
     return file_hashes
 
 
-def filter_hashes(hashes):
+def filter_hashes(file_hashes):
     filtered_hashes = dict()
-    for filepath, file_hash in hashes.iteritems():
+    for filepath, file_hash in file_hashes.iteritems():
         for folder in FOLDERS_PROVIDED_TO_FRONTEND:
             if folder in filepath:
                 filtered_hashes[filepath] = file_hash
@@ -187,20 +187,21 @@ def filter_hashes(hashes):
     return filtered_hashes
 
 
-def save_hashes_as_json(filepath, hashes):
-    filtered_hashes = filter_hashes(hashes)
+def save_hashes_as_json(filepath, file_hashes):
+    filtered_hashes = filter_hashes(file_hashes)
 
     hashes_json = json.dumps(filtered_hashes)
     with open(filepath, 'w') as f:
         f.write("var hashes = " + hashes_json)
 
     file_hash = generate_file_md5(filepath)
-    relative_filepath = os.path.relpath(filepath, os.path.join(os.path.curdir, 'build'))
+    relative_filepath = os.path.relpath(
+        filepath, os.path.join(os.path.curdir, 'build'))
     file_name, file_extension = os.path.splitext(filepath)
     filepath_with_hash = file_name + '.' + file_hash + file_extension
     os.rename(filepath, filepath_with_hash)
 
-    hashes[relative_filepath] = file_hash
+    file_hashes[relative_filepath] = file_hash
 
 
 def build_files(source, target, file_hashes):
