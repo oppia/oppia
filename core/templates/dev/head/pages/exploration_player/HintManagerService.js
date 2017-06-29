@@ -16,7 +16,7 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-oppia.factory('hintManagerService', [
+oppia.factory('HintManagerService', [
   '$timeout', 'playerTranscriptService', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
   'HINT_REQUEST_STRINGS_ARRAY', 'WAIT_FOR_HINT_MSEC',
   function(
@@ -27,7 +27,7 @@ oppia.factory('hintManagerService', [
     var timeout = null;
 
     return {
-      incrementHintsConsumed: function() {
+      consumeHint: function() {
         numHintsConsumed += 1;
         this.setCurrentHintUsable(false);
       },
@@ -40,10 +40,10 @@ oppia.factory('hintManagerService', [
       isCurrentHintUsable: function() {
         return currentHintIsUsable;
       },
-      activateHintAfterTimeout: function(timeInMsec) {
+      activateHintAfterTimeout: function() {
         timeout = $timeout(function() {
           currentHintIsUsable = true;
-        }, timeInMsec);
+        }, WAIT_FOR_HINT_MSEC);
       },
       clearTimeout: function() {
         $timeout.cancel(timeout);
@@ -67,12 +67,12 @@ oppia.factory('hintManagerService', [
             playerTranscriptService.addNewHint(currentHint);
           }, DELAY_FOR_HINT_FEEDBACK_MSEC);
           this.setCurrentHintUsable(false);
-          this.activateHintAfterTimeout(WAIT_FOR_HINT_MSEC);
+          this.activateHintAfterTimeout();
 
           if (this.areAllHintsExhausted(hints.length)) {
             this.reset();
           } else {
-            this.incrementHintsConsumed();
+            this.consumeHint();
           }
           if (isSupplementalCard) {
             return currentHint;
