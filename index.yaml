@@ -106,6 +106,12 @@ indexes:
   - name: thread_id
   - name: last_updated
     direction: desc
+
+- kind: FeedbackMessageModel
+  properties:
+  - name: thread_id
+  - name: last_updated
+    direction: desc
   - name: message_id
 
 - kind: FeedbackThreadModel

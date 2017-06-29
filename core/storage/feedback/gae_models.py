@@ -342,6 +342,32 @@ class FeedbackMessageModel(base_models.BaseModel):
             feconf.DEFAULT_QUERY_LIMIT, projection=[cls.message_id])
 
     @classmethod
+    def get_last_two_messages_of_threads(cls, exploration_ids, thread_ids):
+        """Returns a list of the last two messages of the given threads.
+
+        Args:
+            exploration_id: str. ID of the exploration the thread
+                belongs to.
+            thread_id: str. ID of the thread.
+
+        Returns:
+            list(int). A list of message ids present in the given thread, having
+                a maximum length of feconf.DEFAULT_QUERY_LIMIT.
+        """
+        full_thread_ids = [FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id) for exploration_id, thread_id in zip(
+                exploration_ids, thread_ids)]
+
+        messages = []
+
+        for full_thread_id in full_thread_ids:
+            messages.append(cls.query().filter(
+                cls.thread_id == full_thread_id).order(
+                    -cls.last_updated).fetch(2))
+
+        return messages
+
+    @classmethod
     def get_last_two_message_ids_of_threads(cls, exploration_ids, thread_ids):
         """Returns a list of message ids in the given thread. The number of
         message ids returned is capped by feconf.DEFAULT_QUERY_LIMIT.

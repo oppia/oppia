@@ -419,30 +419,34 @@ def get_thread_summaries(user_id, full_thread_ids):
         feedback_models.FeedbackThreadUserModel.get_multi(
             user_id, exploration_ids, thread_ids))
 
-    last_two_message_ids = (
-        feedback_models.FeedbackMessageModel.get_last_two_message_ids_of_threads( # pylint: disable=line-too-long
+    last_two_messages = (
+        feedback_models.FeedbackMessageModel.get_last_two_messages_of_threads(
             exploration_ids, thread_ids))
-
-    print "Kilo", last_two_message_ids
 
     thread_summaries = []
     for index, model in enumerate(thread_models):
+
+        does_second_message_exist = (len(last_two_messages[index]) > 1)
+        last_message_read = (
+            last_two_messages[index][0].message_id
+            in feedback_thread_user_models[index].message_ids_read_by_user)
+
+        second_last_message_read = None
+        if does_second_message_exist:
+            second_last_message_read = (
+                last_two_messages[index][1].message_id
+                in feedback_thread_user_models[index].message_ids_read_by_user)
+
         thread_summary = {
             'status': model.status,
             'original_author_id': model.original_author_id,
             'last_updated': model.last_updated,
-            'last_message_text': (
-                feedback_models.FeedbackMessageModel.get_most_recent_message(
-                    model.exploration_id, model.thread_id)),
+            'last_message_text': last_two_messages[index][0].text,
             'total_no_of_messages': (
                 feedback_models.FeedbackMessageModel.get_message_count(
                     model.exploration_id, model.thread_id)),
-            'last_message_read': (
-                last_two_message_ids[index][0]
-                in feedback_thread_user_models[index].message_ids_read_by_user),
-            'second_last_message_read': (
-                last_two_message_ids[index][1]
-                in feedback_thread_user_models[index].message_ids_read_by_user)
+            'last_message_read': last_message_read,
+            'second_last_message_read': second_last_message_read
         }
 
         thread_summaries.append(thread_summary)
