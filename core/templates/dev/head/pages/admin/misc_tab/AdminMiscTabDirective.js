@@ -103,11 +103,11 @@ oppia.directive('adminMiscTab', [
           var downloadUrl = DATA_EXTRACTION_QUERY_HANDLER_URL + '?';
 
           downloadUrl += 'exp_id=' + encodeURIComponent($scope.expId);
-          downloadUrl += '&' + 'exp_version=' + encodeURIComponent(
+          downloadUrl += '&exp_version=' + encodeURIComponent(
             $scope.expVersion);
-          downloadUrl += '&' + 'state_name=' + encodeURIComponent(
+          downloadUrl += '&state_name=' + encodeURIComponent(
             $scope.stateName);
-          downloadUrl += '&' + 'num_answers=' + encodeURIComponent(
+          downloadUrl += '&num_answers=' + encodeURIComponent(
             $scope.numAnswers);
 
           $window.open(downloadUrl);
