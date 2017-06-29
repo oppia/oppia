@@ -158,6 +158,14 @@ describe('Question List Object Factory', function() {
     ).toBe(true);
   });
 
+  it('should remove the given question if it exists', function() {
+    var questionToDelete = sampleQuestions[1];
+    questionList.removeQuestion(questionToDelete);
+    expect(questionList.getQuestionCount()).toEqual(1);
+    expect(questionList.getQuestions()[0].getStateName()).toEqual(
+      sampleQuestions[0].getStateName());
+  });
+
   it('should have answer group', function() {
     expect(questionList.doesLastQuestionHaveAnswerGroups())
       .toBe(true);

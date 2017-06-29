@@ -79,6 +79,12 @@ oppia.factory('SimpleEditorShimService', [
       },
       addState: function(newStateName) {
         explorationStatesService.addState(newStateName);
+      },
+      deleteState: function(stateName) {
+        explorationStatesService.confirmDelete(stateName);
+      },
+      saveStateContent: function(stateName, newStateContent) {
+        explorationStatesService.saveStateContent(stateName, newStateContent);
       }
     };
   }

@@ -21,11 +21,13 @@
  */
 
 oppia.factory('SimpleEditorManagerService', [
-  'StatesToQuestionsService', 'SimpleEditorShimService',
-  'QuestionObjectFactory', 'QuestionListObjectFactory', 'OutcomeObjectFactory',
+  'explorationInitStateNameService', 'OutcomeObjectFactory',
+  'QuestionListObjectFactory', 'QuestionObjectFactory',
+  'SimpleEditorShimService', 'StatesToQuestionsService',
   function(
-      StatesToQuestionsService, SimpleEditorShimService,
-      QuestionObjectFactory, QuestionListObjectFactory, OutcomeObjectFactory) {
+    explorationInitStateNameService, OutcomeObjectFactory,
+    QuestionListObjectFactory, QuestionObjectFactory,
+    SimpleEditorShimService, StatesToQuestionsService) {
     var data = {
       title: null,
       introductionHtml: null,
@@ -58,6 +60,16 @@ oppia.factory('SimpleEditorManagerService', [
         minimumStateNumber++;
       }
       return 'Question ' + minimumStateNumber;
+    };
+
+    // Overwrites the given state's properties so that they match those of a
+    // terminal state.
+    var makeStateTerminal = function(stateName) {
+      SimpleEditorShimService.saveInteractionId(
+        stateName, END_EXPLORATION_INTERACTION.ID);
+      SimpleEditorShimService.saveCustomizationArgs(
+        stateName, END_EXPLORATION_INTERACTION.CUSTOMIZATION_ARGS);
+      SimpleEditorShimService.saveDefaultOutcome(stateName, null);
     };
 
     return {
@@ -138,6 +150,50 @@ oppia.factory('SimpleEditorManagerService', [
         data.questionList.addQuestion(QuestionObjectFactory.create(
           lastStateName, stateData.interaction, ''));
       },
+      deleteQuestion: function(question) {
+        // - Change destination of answer groups that point to it.
+        // - Move content stored in present state to next state if it exists.
+        // - Delete the state.
+        var stateName = question.getStateName();
+        var state = SimpleEditorShimService.getState(stateName);
+        // If it's the last question in the list, make it EndExploration.
+        if (state.interaction.answerGroups.length === 0) {
+          makeStateTerminal(stateName);
+          data.questionList.removeQuestion(question);
+          return;
+        }
+        var nextStateName = state.interaction.answerGroups[0].outcome.dest;
+        var allStateNames = SimpleEditorShimService.getAllStateNames();
+        // Change init state name, if init_state is being deleted.
+        if (SimpleEditorShimService.getInitStateName() === stateName) {
+          explorationInitStateNameService.displayed = nextStateName;
+          explorationInitStateNameService.saveDisplayedValue(nextStateName);
+        }
+
+        for (var i = 0; i < allStateNames.length; i++) {
+          var currentState = SimpleEditorShimService
+            .getState(allStateNames[i]);
+          var newAnswerGroups = currentState.interaction.answerGroups;
+          var answerGroupsHaveChanged = false;
+          currentState.interaction.answerGroups.forEach(function(answerGroup,
+            idx) {
+            if (answerGroup.outcome.dest === stateName) {
+              newAnswerGroups[idx].outcome.dest = nextStateName;
+              answerGroupsHaveChanged = true;
+            }
+          });
+          if (answerGroupsHaveChanged) {
+            SimpleEditorShimService
+              .saveAnswerGroups(allStateNames[i], newAnswerGroups);
+            data.questionList.getBindableQuestion(allStateNames[i])
+              .setAnswerGroups(newAnswerGroups);
+          }
+        }
+
+        SimpleEditorShimService.saveStateContent(nextStateName, state.content);
+        SimpleEditorShimService.deleteState(stateName);
+        data.questionList.removeQuestion(question);
+      },
       canAddNewQuestion: function() {
         // Requirements:
         // - If this is the first question, there must already be an
@@ -158,11 +214,7 @@ oppia.factory('SimpleEditorManagerService', [
       addState: function() {
         var newStateName = getNewStateName();
         SimpleEditorShimService.addState(newStateName);
-        SimpleEditorShimService.saveInteractionId(
-          newStateName, END_EXPLORATION_INTERACTION.ID);
-        SimpleEditorShimService.saveCustomizationArgs(
-          newStateName, END_EXPLORATION_INTERACTION.CUSTOMIZATION_ARGS);
-        SimpleEditorShimService.saveDefaultOutcome(newStateName, null);
+        makeStateTerminal(newStateName);
         return newStateName;
       }
     };
