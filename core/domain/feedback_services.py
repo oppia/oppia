@@ -29,6 +29,7 @@ import feconf
 
 (feedback_models, email_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.email])
+datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -411,13 +412,28 @@ def get_thread_summaries(user_id, full_thread_ids):
     """
     exploration_ids = [thread_id.split('.')[0] for thread_id in full_thread_ids]
     thread_ids = [thread_id.split('.')[1] for thread_id in full_thread_ids]
-    thread_models = (
-        feedback_models.FeedbackThreadModel.get_multi_by_exp_and_thread_ids(
-            exploration_ids, thread_ids))
 
-    feedback_thread_user_models = (
-        feedback_models.FeedbackThreadUserModel.get_multi(
-            user_id, exploration_ids, thread_ids))
+    thread_model_ids = (
+        [feedback_models.FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id)
+         for exploration_id, thread_id in zip(exploration_ids, thread_ids)])
+
+    feedback_thread_user_model_ids = (
+        [feedback_models.FeedbackThreadUserModel.generate_full_id(
+            user_id, exploration_id, thread_id)
+         for exploration_id, thread_id in zip(exploration_ids, thread_ids)])
+
+    multiple_models = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [
+                ('FeedbackThreadModel', thread_model_ids),
+                ('FeedbackThreadUserModel', feedback_thread_user_model_ids),
+                ('ExplorationModel', exploration_ids)
+            ]))
+
+    thread_models = multiple_models[0]
+    feedback_thread_user_models = multiple_models[1]
+    explorations = multiple_models[2]
 
     last_two_messages = (
         feedback_models.FeedbackMessageModel.get_last_two_messages_of_threads(
@@ -430,12 +446,15 @@ def get_thread_summaries(user_id, full_thread_ids):
         last_message_read = (
             last_two_messages[index][0].message_id
             in feedback_thread_user_models[index].message_ids_read_by_user)
+        author_last_message = last_two_messages[index][0].author_id
 
         second_last_message_read = None
+        author_second_last_message = None
         if does_second_message_exist:
             second_last_message_read = (
                 last_two_messages[index][1].message_id
                 in feedback_thread_user_models[index].message_ids_read_by_user)
+            author_second_last_message = last_two_messages[index][1].author_id
 
         thread_summary = {
             'status': model.status,
@@ -446,7 +465,10 @@ def get_thread_summaries(user_id, full_thread_ids):
                 feedback_models.FeedbackMessageModel.get_message_count(
                     model.exploration_id, model.thread_id)),
             'last_message_read': last_message_read,
-            'second_last_message_read': second_last_message_read
+            'second_last_message_read': second_last_message_read,
+            'author_last_message': author_last_message,
+            'author_second_last_message': author_second_last_message,
+            'exploration_title': explorations[index].title
         }
 
         thread_summaries.append(thread_summary)

@@ -396,7 +396,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
 
     @classmethod
-    def _generate_id(cls, user_id, exploration_id, thread_id):
+    def generate_full_id(cls, user_id, exploration_id, thread_id):
         full_thread_id = (
             FeedbackThreadModel.generate_full_thread_id(
                 exploration_id, thread_id))
@@ -414,7 +414,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
             FeedbackThreadUserModel. The FeedbackThreadUserModel instance which
                 matches with the given user_id and exploration_id.
         """
-        instance_id = cls._generate_id(user_id, exploration_id, thread_id)
+        instance_id = cls.generate_full_id(user_id, exploration_id, thread_id)
         return super(FeedbackThreadUserModel, cls).get(
             instance_id, strict=False)
 
@@ -430,7 +430,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
             FeedbackThreadUserModel. The newly created FeedbackThreadUserModel
                 instance.
         """
-        instance_id = cls._generate_id(user_id, exploration_id, thread_id)
+        instance_id = cls.generate_full_id(user_id, exploration_id, thread_id)
         return cls(id=instance_id)
 
     @classmethod
@@ -446,7 +446,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
             ExplorationUserDataModel. The ExplorationUserDataModel instance
             which matches with the given user_ids and exploration_id.
         """
-        instance_ids = [cls._generate_id(user_id, exploration_id, thread_id)
+        instance_ids = [cls.generate_full_id(user_id, exploration_id, thread_id)
                         for exploration_id, thread_id in zip(
                             exploration_ids, thread_ids)]
         return super(FeedbackThreadUserModel, cls).get_multi(instance_ids)

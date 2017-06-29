@@ -233,11 +233,19 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackThreadUnitTests, self).setUp()
 
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id, title='Bridges in England',
+            category='Architecture', language_code='en')
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.owner_id, title='Sillat Suomi',
+            category='Architecture', language_code='fi')
 
     def _get_all_messages_read(self, user_id, exploration_id, thread_id):
         feedback_thread_user_model = (
@@ -367,6 +375,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.user_id)
         thread_summaries = feedback_services.get_thread_summaries(
             self.user_id, thread_ids)
+        exploration_titles = ['Bridges in England', 'Sillat Suomi']
 
         # Fetch the threads.
         threads = []
@@ -383,7 +392,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 'last_message_text': 'not used here',
                 'total_no_of_messages': 1,
                 'last_message_read': True,
-                'second_last_message_read': None
+                'second_last_message_read': None,
+                'author_last_message': self.user_id,
+                'author_second_last_message': None,
+                'exploration_title': exploration_titles[index]
             }
             # Check if the summaries match.
             self.assertEqual(thread_summary, thread_summaries[index])
