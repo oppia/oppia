@@ -321,27 +321,6 @@ class FeedbackMessageModel(base_models.BaseModel):
             cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_message_ids(cls, exploration_id, thread_id):
-        """Returns a list of message ids in the given thread. The number of
-        message ids returned is capped by feconf.DEFAULT_QUERY_LIMIT.
-
-        Args:
-            exploration_id: str. ID of the exploration the thread
-                belongs to.
-            thread_id: str. ID of the thread.
-
-        Returns:
-            list(int). A list of message ids present in the given thread, having
-                a maximum length of feconf.DEFAULT_QUERY_LIMIT.
-        """
-        full_thread_id = (
-            FeedbackThreadModel.generate_full_thread_id(
-                exploration_id, thread_id))
-
-        return cls.query().filter(cls.thread_id == full_thread_id).fetch(
-            feconf.DEFAULT_QUERY_LIMIT, projection=[cls.message_id])
-
-    @classmethod
     def get_last_two_messages_of_threads(cls, exploration_ids, thread_ids):
         """Returns a list of the last two messages of the given threads.
 
@@ -368,33 +347,6 @@ class FeedbackMessageModel(base_models.BaseModel):
         return messages
 
     @classmethod
-    def get_last_two_message_ids_of_threads(cls, exploration_ids, thread_ids):
-        """Returns a list of message ids in the given thread. The number of
-        message ids returned is capped by feconf.DEFAULT_QUERY_LIMIT.
-
-        Args:
-            exploration_id: str. ID of the exploration the thread
-                belongs to.
-            thread_id: str. ID of the thread.
-
-        Returns:
-            list(int). A list of message ids present in the given thread, having
-                a maximum length of feconf.DEFAULT_QUERY_LIMIT.
-        """
-        full_thread_ids = [FeedbackThreadModel.generate_full_thread_id(
-            exploration_id, thread_id) for exploration_id, thread_id in zip(
-                exploration_ids, thread_ids)]
-
-        message_ids = []
-
-        for full_thread_id in full_thread_ids:
-            message_ids.append(cls.query().filter(
-                cls.thread_id == full_thread_id).order(-cls.last_updated).fetch(
-                    2, projection=[cls.message_id]))
-
-        return message_ids
-
-    @classmethod
     def get_most_recent_message(cls, exploration_id, thread_id):
         """Returns the last message in the thread.
 
@@ -410,27 +362,6 @@ class FeedbackMessageModel(base_models.BaseModel):
             exploration_id, thread_id)
         return cls.get_all().filter(
             cls.thread_id == full_thread_id).order(-cls.last_updated).get()
-
-    @classmethod
-    def get_most_recent_messages(cls, exploration_id, thread_id,
-                                 number_of_messages):
-        """Returns the most recent message in the thread.
-
-        Args:
-            exploration_id: str. ID of the exploration that the thread
-                belongs to.
-            thread_id: str. ID of the thread.
-            number_of_messages: int. The number of recent messages to be
-                fetched.
-
-        Returns:
-            FeedbackMessageModel. Last message in the thread.
-        """
-        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
-            exploration_id, thread_id)
-        return cls.get_all().filter(
-            cls.thread_id == full_thread_id).order(-cls.last_updated).fetch(
-                number_of_messages)
 
     @classmethod
     def get_message_count(cls, exploration_id, thread_id):
@@ -518,7 +449,6 @@ class FeedbackThreadUserModel(base_models.BaseModel):
         instance_ids = [cls._generate_id(user_id, exploration_id, thread_id)
                         for exploration_id, thread_id in zip(
                             exploration_ids, thread_ids)]
-        print "Rolo", instance_ids
         return super(FeedbackThreadUserModel, cls).get_multi(instance_ids)
 
 
