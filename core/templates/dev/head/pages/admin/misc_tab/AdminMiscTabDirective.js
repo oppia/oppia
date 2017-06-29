@@ -99,11 +99,18 @@ oppia.directive('adminMiscTab', [
           };
 
           setDataExtractionQueryStatusMessage(STATUS_PENDING);
-          var URL = DATA_EXTRACTION_QUERY_HANDLER_URL + '?';
-          angular.forEach(data, function(value, key) {
-            URL += key + '=' + value + '&';
-          });
-          $window.open(URL);
+
+          var downloadUrl = DATA_EXTRACTION_QUERY_HANDLER_URL + '?';
+
+          downloadUrl += 'exp_id=' + encodeURIComponent($scope.expId);
+          downloadUrl += '&' + 'exp_version=' + encodeURIComponent(
+            $scope.expVersion);
+          downloadUrl += '&' + 'state_name=' + encodeURIComponent(
+            $scope.stateName);
+          downloadUrl += '&' + 'num_answers=' + encodeURIComponent(
+            $scope.numAnswers);
+
+          $window.open(downloadUrl);
         };
 
         $scope.resetForm = function() {
