@@ -187,6 +187,44 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
     classifier_id = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
+    def _generate_id(cls, exp_id, exp_version, state_name):
+        """Generates a unique ID for the Classifier Exploration Mapping of the
+        form {{exp_id}}.{{exp_version}}.{{state_name}}
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. The exploration version at the time
+                this training job was created.
+            state_name: str. The name of the state to which the classifier
+                belongs.
+
+        Returns:
+            ID of the new Classifier Exploration Mapping instance.
+        """
+        new_id = '%s.%s.%s' % (exp_id, str(exp_version), state_name)
+        return new_id
+
+    @classmethod
+    def get_model(cls, exp_id, exp_version, state_name):
+        """Retrieves the Classifier Exploration Mapping model given Exploration
+        attributes.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. The exploration version at the time
+                this training job was created.
+            state_name: str. The name of the state to which the classifier
+                belongs.
+
+        Returns:
+            ClassifierExplorationMappingModel. The model instance for the
+                classifier exploration mapping.
+        """
+        mapping_id = cls._generate_id(exp_id, exp_version, state_name)
+        mapping_instance = cls.get_by_id(mapping_id)
+        return mapping_instance
+
+    @classmethod
     def create(
             cls, exp_id, exp_version, state_name, classifier_id):
         """Creates a new ClassifierExplorationMappingModel entry.
@@ -207,7 +245,7 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
             Exception: A model with the same ID already exists.
         """
 
-        instance_id = exp_id + str(exp_version) + state_name
+        instance_id = cls._generate_id(exp_id, exp_version, state_name)
         mapping_instance = cls(
             id=instance_id, classifier_id=classifier_id)
 

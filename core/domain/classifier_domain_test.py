@@ -276,14 +276,18 @@ class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
 
     def _get_mapping_from_dict(self, mapping_dict):
         mapping = classifier_domain.ClassifierExplorationMapping(
-            mapping_dict['mapping_id'],
+            mapping_dict['exp_id'],
+            mapping_dict['exp_version'],
+            mapping_dict['state_name'],
             mapping_dict['classifier_id'])
 
         return mapping
 
     def test_to_dict(self):
         expected_mapping_dict = {
-            'mapping_id': 'exp_id1.2.state_name1',
+            'exp_id': 'exp_id1',
+            'exp_version': 2,
+            'state_name': 'state_name1',
             'classifier_id': 'classifier_id1'
         }
         observed_mapping = self._get_mapping_from_dict(
@@ -297,16 +301,27 @@ class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
 
         # Verify no errors are raised for correct data.
         mapping_dict = {
-            'mapping_id': 'exp_id1.2.state_name1',
+            'exp_id': 'exp_id1',
+            'exp_version': 2,
+            'state_name': 'state_name1',
             'classifier_id': 'classifier_id1'
         }
         mapping = self._get_mapping_from_dict(mapping_dict)
         mapping.validate()
 
-        # Verify validation error is raised when int is provided for instance id
+        # Verify validation error is raised when int is provided for exp_id
         # instead of string.
-        mapping_dict['mapping_id'] = 1
+        mapping_dict['exp_id'] = 1
         mapping = self._get_mapping_from_dict(mapping_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected id to be a string')):
+            'Expected exp_id to be a string')):
+            mapping.validate()
+
+        # Verify validation error is raised when string is provided for
+        # exp_version instead of int.
+        mapping_dict['exp_id'] = 'exp_id1'
+        mapping_dict['exp_version'] = '1'
+        mapping = self._get_mapping_from_dict(mapping_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_version to be an int')):
             mapping.validate()

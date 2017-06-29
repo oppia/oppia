@@ -278,49 +278,25 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.state_name, state_name)
         self.assertEqual(classifier.id, classifier_id)
 
-    def test_deletion_of_classifier_exploration_mapping(self):
-        """Test the delete_classifier_exploration_mapping method."""
+
+    def test_creation_of_classifier_exploration_mapping(self):
+        """Test the create_classifier_exploration_mapping method."""
 
         exp_id = u'1'
         state_name = 'Home'
         classifier_id = 'classifier_id1'
-        classifier_id = classifier_models.ClassifierDataModel.create(
-            classifier_id, exp_id, 1, state_name,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                'algorithm_id'], [], 1)
-        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
-            exp_id, 1, state_name, classifier_id)
-        self.assertTrue(mapping_id)
-        classifier_services.delete_classifier_exploration_mapping(
-            exp_id, 1, state_name)
-        with self.assertRaisesRegexp(Exception, (
-            'Entity for class ClassifierExplorationMappingModel '
-            'with id %s not found' %(
-                mapping_id))):
-            classifier_services.get_classifier_exploration_mapping_by_id(
-                mapping_id)
-
-    def test_update_of_classifier_exploration_mapping(self):
-        """Test the save_classifier_exploration_mapping method."""
-
-        exp_id = u'1'
-        state_name = 'Home'
-        classifier_id = 'classifier_id1'
-        test_classifier_id = 'classifier_id2'
         # Mapping does not exist yet.
-        mapping_id = classifier_services.save_classifier_exploration_mapping(
+        classifier_services.create_classifier_exploration_mapping(
             exp_id, 1, state_name, classifier_id)
+        classifier_exploration_mapping_model = (
+            classifier_models.ClassifierExplorationMappingModel.get_model(
+                exp_id, 1, state_name))
         classifier_exploration_mapping = (
-            classifier_services.get_classifier_exploration_mapping_by_id(
-                mapping_id))
+            classifier_services.get_classifier_exploration_mapping(
+                exp_id, 1, state_name,
+                classifier_exploration_mapping_model.classifier_id))
+        self.assertEqual(classifier_exploration_mapping.exp_id, exp_id)
+        self.assertEqual(classifier_exploration_mapping.exp_version, 1)
+        self.assertEqual(classifier_exploration_mapping.state_name, state_name)
         self.assertEqual(classifier_exploration_mapping.classifier_id,
                          classifier_id)
-        classifier_exploration_mapping.update_classifier_id(test_classifier_id)
-        # Updating existing job.
-        mapping_id = classifier_services.save_classifier_exploration_mapping(
-            exp_id, 1, state_name, test_classifier_id)
-        classifier_exploration_mapping = (
-            classifier_services.get_classifier_exploration_mapping_by_id(
-                mapping_id))
-        self.assertEqual(classifier_exploration_mapping.classifier_id,
-                         test_classifier_id)

@@ -375,39 +375,46 @@ class ClassifierExplorationMapping(object):
     The mapping is from <exp_id, exp_version, state_name> to the classifier_id.
 
     Attributes:
-        mapping_id: str. The unique id of the classifier-exploration mapping.
+        exp_id: str. ID of the exploration.
+        exp_version: int. The exploration version at the time
+            this training job was created.
+        state_name: str. The name of the state to which the classifier
+            belongs.
         classifier_id. str. The ID of the classifier corresponding to the id
             of the classifier-exploration mapping.
     """
 
-    def __init__(self, mapping_id, classifier_id):
+    def __init__(self, exp_id, exp_version, state_name, classifier_id):
         """Constructs a ClassifierExplorationMapping domain object.
 
         Args:
-            mapping_id: str. The unique id of the classifier-exploration
-                mapping.
+            exp_id: str. ID of the exploration.
+            exp_version: int. The exploration version at the time
+                this training job was created.
+            state_name: str. The name of the state to which the classifier
+                belongs.
             classifier_id: str. The unique id of the classifier.
         """
-        self._id = mapping_id
+        self._exp_id = exp_id
+        self._exp_version = exp_version
+        self._state_name = state_name
         self._classifier_id = classifier_id
 
     @property
-    def id(self):
-        return self._id
+    def exp_id(self):
+        return self._exp_id
+
+    @property
+    def exp_version(self):
+        return self._exp_version
+
+    @property
+    def state_name(self):
+        return self._state_name
 
     @property
     def classifier_id(self):
         return self._classifier_id
-
-    def update_classifier_id(self, classifier_id):
-        """Updates the classifier_id attribute of the
-        ClassifierExplorationMapping domain object.
-
-        Args:
-            classifier_id: str. The ID of the classifier.
-        """
-
-        self._classifier_id = classifier_id
 
     def to_dict(self):
         """Constructs a dict representation of ClassifierExplorationMapping
@@ -418,18 +425,30 @@ class ClassifierExplorationMapping(object):
         """
 
         return {
-            'mapping_id': self._id,
+            'exp_id': self._exp_id,
+            'exp_version': self._exp_version,
+            'state_name': self.state_name,
             'classifier_id': self._classifier_id
         }
 
     def validate(self):
         """Validates the mapping before it is saved to storage."""
 
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
-                'Expected id to be a string, received %s' % self.id)
+                'Expected exp_id to be a string, received %s' % self.exp_id)
+
+        if not isinstance(self.exp_version, int):
+            raise utils.ValidationError(
+                'Expected exp_version to be an int, received %s' % (
+                    self.exp_version))
+
+        if not isinstance(self.state_name, basestring):
+            raise utils.ValidationError(
+                'Expected state_name to be a string, received %s' % (
+                    self.state_name))
 
         if not isinstance(self.classifier_id, basestring):
             raise utils.ValidationError(
                 'Expected classifier_id to be a string, received %s' % (
-                    self.exp_id))
+                    self.classifier_id))

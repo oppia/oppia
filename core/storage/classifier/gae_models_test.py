@@ -112,3 +112,16 @@ class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
             mapping_id)
 
         self.assertEqual(mapping.classifier_id, 'classifier_id4')
+
+    def test_get_model_from_exploration_attributes(self):
+        exp_id = 'exp_id1'
+        exp_version = 1
+        state_name = 'state_name1'
+        classifier_id = 'classifier_id1'
+        classifier_models.ClassifierExplorationMappingModel.create(
+            exp_id, exp_version, state_name, classifier_id)
+
+        mapping = classifier_models.ClassifierExplorationMappingModel.get_model(
+            exp_id, exp_version, state_name)
+
+        self.assertEqual(mapping.classifier_id, classifier_id)
