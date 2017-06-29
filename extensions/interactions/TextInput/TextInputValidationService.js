@@ -26,7 +26,6 @@ oppia.factory('TextInputValidationService', [
           customizationArgs,
           ['placeholder', 'rows']);
 
-        var rows = customizationArgs.rows.value;
         var placeholder = customizationArgs.placeholder.value;
         if (!angular.isString(placeholder)) {
           warningsList.push({
@@ -35,16 +34,31 @@ oppia.factory('TextInputValidationService', [
               'Placeholder text must be a string.')
           });
         }
-        var customArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
-        var rowsSpecs = customArgSpecs[1];
-        var MIN_ROWS = rowsSpecs.schema.validators[0].min_value;
-        var MAX_ROWS = rowsSpecs.schema.validators[1].max_value;
-        if (rows < MIN_ROWS || rows > MAX_ROWS) {
+
+        var isInt = function(n) {
+          return angular.isNumber(n) && n % 1 === 0;
+        }
+
+        var rows = customizationArgs.rows.value;
+        if (isInt(rows)) {
+          var customArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
+          var rowsSpecs = customArgSpecs[1];
+          var MIN_ROWS = rowsSpecs.schema.validators[0].min_value;
+          var MAX_ROWS = rowsSpecs.schema.validators[1].max_value;
+          if (rows < MIN_ROWS || rows > MAX_ROWS) {
+            warningsList.push({
+              type: WARNING_TYPES.ERROR,
+              message: (
+                'Number of rows must be between ' + MIN_ROWS + ' and ' +
+                MAX_ROWS + '.')
+            });
+          }
+        }
+        else {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
-              'Number of rows must be between ' + MIN_ROWS + ' and ' +
-              MAX_ROWS + '.')
+              'Number of rows must be integral.')
           });
         }
         return warningsList;
