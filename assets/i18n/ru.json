@@ -40,7 +40,7 @@
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "УЧИТЬ/УЧИТЬСЯ",
 	"I18N_FOOTER_TERMS_OF_SERVICE": "Правила использования",
 	"I18N_FORMS_TYPE_NUMBER": "Введите число",
-	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Пожалуйста, введите число, которое составляет не менее <[minvalue]>.",
+	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Пожалуйста, введите число, которое составляет не менее <[minValue]>.",
 	"I18N_GET_STARTED_PAGE_TITLE": "Начать",
 	"I18N_INTERACTIONS_GRAPH_DELETE": "Удалить",
 	"I18N_INTERACTIONS_GRAPH_ERROR_INVALID": "Неверный график!",

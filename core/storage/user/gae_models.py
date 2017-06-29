@@ -16,6 +16,7 @@
 
 """Models for Oppia users."""
 
+from constants import constants
 from core.platform import models
 import feconf
 
@@ -65,11 +66,11 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
         indexed=True,
-        choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
+        choices=[lc['code'] for lc in constants.ALL_LANGUAGE_CODES])
     # System language preference (for I18N).
     preferred_site_language_code = ndb.StringProperty(
         default=None, choices=[
-            language['id'] for language in feconf.SUPPORTED_SITE_LANGUAGES])
+            language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES])
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):

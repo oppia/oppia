@@ -337,7 +337,7 @@
     "I18N_PREFERENCES_CANCEL_BUTTON": "Cancel",
     "I18N_PREFERENCES_CHANGE_PICTURE": "Change profile picture",
     "I18N_PREFERENCES_EMAIL": "Email",
-    "I18N_PREFERENCES_EMAIL_EXPLAIN": "Only moderators and site admins can see your email.",
+    "I18N_PREFERENCES_EMAIL_EXPLAIN": "Only moderators and site admins can see your email address.",
     "I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS": "Receive emails when someone gives you edit rights to an exploration",
     "I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Receive emails when someone sends you feedback on an exploration",
     "I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Receive news and updates about the site",

@@ -464,7 +464,7 @@ oppia.directive('conversationSkin', [
               // If the exploration is embedded, use the exploration language
               // as site language. If the exploration language is not supported
               // as site language, English is used as default.
-              var langCodes = $window.GLOBALS.SUPPORTED_SITE_LANGUAGES.map(
+              var langCodes = constants.SUPPORTED_SITE_LANGUAGES.map(
                 function(language) {
                   return language.id;
                 });
