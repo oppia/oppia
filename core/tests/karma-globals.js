@@ -30,6 +30,17 @@ var GLOBALS = {
   ASSET_DIR_PREFIX: ''
 };
 
+/* hashes for UrlInterpolationService tests */
+var hashes = {
+  'path_test/hash_test.html': '123456789',
+  'assets_test/hash_test.json': '987654321',
+  'pages_test/hash_test.html': 'abcd12345',
+  'images/hash_test.png': '98765fghij',
+  'gadgets/testType/static/images/testType.png': 'lmnopqrst',
+  'interactions/interTest/static/interTest.png' : '123654789'
+};
+
+
 /* This function overwrites the translationProvider for a dummy function
  * (customLoader). This is necessary to prevent the js test warnings about an
  * "unexpected GET request" when the translationProvider tries to load the
