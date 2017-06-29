@@ -1,4 +1,8 @@
 <div class="sidebar">
+  <div class="edit-mode-container">
+    <button class="md-button edit-mode-button" ng-if="sidebarModeService.isSidebarInReadonlyMode()" ng-click="sidebarModeService.setModeToEdit()">Edit</button>
+    <button class="md-button edit-mode-button" ng-if="sidebarModeService.isSidebarInEditMode()" ng-click="sidebarModeService.setModeToReadonly()">Done</button>
+  </div>
   <ul>
     <li id="<[ID_PREFIX + 'title']>"
         ng-click="scrollToHeader('title')" class="sidebar-item sidebar-header">
@@ -12,13 +16,16 @@
 
     <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
       <div id="<[ID_PREFIX + question.getId()]>" class="sidebar-item-header">
-        <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons">
+        <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons" ng-hide="sidebarModeService.isSidebarInEditMode()">
           <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
+        </i>
+        <i ng-click="deleteQuestion(question)" class="delete-icon material-icons" ng-hide="sidebarModeService.isSidebarInReadonlyMode()">
+          <['&#xE872;']>
         </i>
         <strong ng-click="scrollToQuestion(question)">Question <[$index + 1]></strong>
       </div>
 
-      <ul ng-show="question.isCollapsed()">
+      <ul ng-show="question.isCollapsed() && sidebarModeService.isSidebarInReadonlyMode()">
         <li class="sidebar-item sidebar-item-indented"
             ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index"
             ng-click="scrollToField(question, subfieldLabel)"
@@ -123,5 +130,19 @@
     position: relative;
     text-indent: 30px;
     width: 220px;
+  }
+  simple-editor-sidebar .md-button {
+    color : #449d44;
+  }
+  simple-editor-sidebar .md-button:not([disabled]):hover {
+    background-color: rgba(158, 158, 158, 0.2);
+  }
+  simple-editor-sidebar .edit-mode-container {
+    height: 40px;
+    position: relative;
+  }
+  simple-editor-sidebar .edit-mode-button {
+    position: absolute;
+    right: 0;
   }
 </style>

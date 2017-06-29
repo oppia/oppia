@@ -35,6 +35,22 @@ oppia.factory('QuestionListObjectFactory', [function() {
     this._questions.push(question);
   };
 
+  QuestionList.prototype.removeQuestion = function(questionToDelete) {
+    var index = -1;
+    for (var i = 0; i < this._questions.length; i++) {
+      if (this._questions[i].getStateName() ===
+          questionToDelete.getStateName()) {
+        index = i;
+        break;
+      }
+    }
+
+    if (index === -1) {
+      throw Error('Cannot find question: ' + question);
+    }
+    this._questions.splice(index, 1);
+  };
+
   QuestionList.prototype.doesLastQuestionHaveAnswerGroups = function() {
     return this._questions[this._questions.length - 1].hasAnswerGroups();
   };
