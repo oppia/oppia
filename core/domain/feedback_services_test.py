@@ -242,7 +242,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     def _get_all_messages_read(self, user_id, exploration_id, thread_id):
         feedback_thread_user_model = (
             feedback_models.FeedbackThreadUserModel.get(
-                self.viewer_id, exploration_id, thread_id))
+                user_id, exploration_id, thread_id))
 
         return (
             feedback_thread_user_model.message_ids_read_by_user if
