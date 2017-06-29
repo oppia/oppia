@@ -36,6 +36,7 @@ FOLDERS_PROVIDED_TO_FRONTEND = (os.path.join('images', ''),
                                 os.path.join('i18n', ''))
 FILE_ENDINGS_TO_RENAME = ('directive.html',
                           'modal.html',
+                          'overlay.html',
                           '.png')
 
 HASH_BLOCK_SIZE = 2**20
