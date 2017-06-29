@@ -207,10 +207,8 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 0
         }
 
-        response = self.testapp.get(feconf.ADMIN_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
-        response = self.post_json(
-            '/explorationdataextractionhandler', payload, csrf_token=csrf_token)
+        response = self.get_json(
+            '/explorationdataextractionhandler', payload)
         extracted_answers = response['data']
         self.assertEqual(len(extracted_answers), 2)
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
@@ -224,10 +222,8 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 1
         }
 
-        response = self.testapp.get(feconf.ADMIN_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
-        response = self.post_json(
-            '/explorationdataextractionhandler', payload, csrf_token=csrf_token)
+        response = self.get_json(
+            '/explorationdataextractionhandler', payload)
         extracted_answers = response['data']
         self.assertEqual(len(extracted_answers), 1)
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
@@ -240,8 +236,13 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'state_name': 'state name',
             'num_answers': 0
         }
-        response = self.testapp.get(feconf.ADMIN_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
-        response = self.post_json(
-            '/explorationdataextractionhandler', payload, csrf_token=csrf_token,
-            expect_errors=True, expected_status_int=400)
+
+        response = self.get_json(
+            '/explorationdataextractionhandler', payload,
+            expect_errors=True)
+
+        self.assertEqual(
+            response['error'],
+            'Exploration \'exp\' does not have \'state name\' state.')
+        self.assertEqual(
+            response['code'], 400)

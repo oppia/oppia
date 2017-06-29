@@ -99,26 +99,11 @@ oppia.directive('adminMiscTab', [
           };
 
           setDataExtractionQueryStatusMessage(STATUS_PENDING);
-
-          $http.post(
-            DATA_EXTRACTION_QUERY_HANDLER_URL, data
-          ).then(
-            function(response) {
-              var data = response.data;
-              setDataExtractionQueryStatusMessage(STATUS_FINISHED);
-              var extractedAnswers = JSON.stringify(data.data);
-              var dataURL = (
-                'data:application/json;base64,' + btoa(extractedAnswers));
-              var downloadURL = (
-                '<a href="' + dataURL +
-                '" download="data.json"> download </a>');
-              $window.location.href = (
-                'data:text/html;base64,' + btoa(downloadURL));
-            }, function(response) {
-              setDataExtractionQueryStatusMessage(
-                STATUS_FAILED + response.data.error);
-            }
-          );
+          var URL = DATA_EXTRACTION_QUERY_HANDLER_URL + '?';
+          angular.forEach(data, function(value, key) {
+            URL += key + '=' + value + '&';
+          });
+          $window.open(URL);
         };
 
         $scope.resetForm = function() {
@@ -126,6 +111,7 @@ oppia.directive('adminMiscTab', [
           $scope.expVersion = 0;
           $scope.stateName = '';
           $scope.numAnswers = 0;
+          $scope.showDataExtractionQueryStatus = false;
         };
       }]
     };

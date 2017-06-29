@@ -339,20 +339,23 @@ class AdminTopicsCsvDownloadHandler(base.BaseHandler):
 
 
 class DataExtractionQueryHandler(base.BaseHandler):
+    """Handler for data extraction query."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @require_super_admin
-    def post(self):
-        exp_id = self.payload.get('exp_id')
-        exp_version = self.payload.get('exp_version')
-        state_name = self.payload.get('state_name')
-        num_answers = self.payload.get('num_answers')
+    def get(self):
+        exp_id = self.request.get('exp_id')
+        exp_version = self.request.get('exp_version')
+        state_name = self.request.get('state_name')
+        num_answers = int(self.request.get('num_answers'))
 
         exploration = exp_services.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
 
         if exploration is None:
             raise self.InvalidInputException(
-                'No exploration with ID \'%s\' exist.' % exp_id)
+                'No exploration with ID \'%s\' exists.' % exp_id)
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(
