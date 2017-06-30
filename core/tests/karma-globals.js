@@ -20,7 +20,7 @@ var GLOBALS = {
   INTERACTION_SPECS: {
     TextInput: {
       customization_arg_specs: [
-        ,
+        {},
         {
           schema: {
             validators: [
