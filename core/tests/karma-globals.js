@@ -17,7 +17,21 @@
  */
 
 var GLOBALS = {
-  INTERACTION_SPECS: {},
+  INTERACTION_SPECS: {
+    TextInput: {
+      customization_arg_specs: [
+        ,
+        {
+          schema: {
+            validators: [
+              { min_value: 0 },
+              { max_value: 200 }
+            ]
+          }
+        }
+      ]
+    }
+  },
   GADGET_SPECS: {},
   PANEL_SPECS: {},
   SUPPORTED_SITE_LANGUAGES: [{
