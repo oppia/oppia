@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Decorators to provide authorization accross the site."""
+"""Decorators to provide authorization across the site."""
 
 from core.domain import rights_manager
 from core.domain import role_services
@@ -36,21 +36,22 @@ def check_activity_accessible(self, activity_id, activity_type):
         # error is raised. The self.request.get('iframed') part of the check is
         # needed for backwards compatibility with older versions of the
         # embedding script.
-        if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
-                self.request.get('iframed')):
-            self.values['iframed'] = True
+        # *TODO: shift this according to recommendation
+        # if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
+        #         self.request.get('iframed')):
+        #     self.values['iframed'] = True
 
     activity_rights = rights_manager.get_activity_rights(
         activity_type, activity_id)
 
     action_play_public = (
-        role_services.ACTION_PLAY_PUBLIC_EXPLORATION
+        role_services.ACTION_PLAY_ANY_PUBLIC_EXPLORATION
         if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
-        else role_services.ACTION_PLAY_PUBLIC_COLLECTION)
+        else role_services.ACTION_PLAY_ANY_PUBLIC_COLLECTION)
     action_play_private = (
-        role_services.ACTION_PLAY_PRIVATE_EXPLORATION
+        role_services.ACTION_PLAY_ANY_PRIVATE_EXPLORATION
         if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
-        else role_services.ACTION_PLAY_PRIVATE_COLLECTION)
+        else role_services.ACTION_PLAY_ANY_PRIVATE_COLLECTION)
 
     if activity_rights is None:
         return False

@@ -21,7 +21,7 @@ import random
 import jinja2
 
 from core.controllers import base
-from core.domain import action_decorators
+from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -146,7 +146,7 @@ def _get_exploration_player_data(
 class ExplorationPageEmbed(base.BaseHandler):
     """Page describing a single embedded exploration."""
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         version_str = self.request.get('v')
@@ -178,7 +178,7 @@ class ExplorationPageEmbed(base.BaseHandler):
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         version_str = self.request.get('v')
@@ -248,7 +248,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def post(self, exploration_id):
         old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
@@ -291,7 +291,7 @@ class StateHitEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
         new_state_name = self.payload.get('new_state_name')
@@ -323,7 +323,7 @@ class ClassifyHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def post(self, unused_exploration_id):
         """Handle POST requests.
 
@@ -368,7 +368,7 @@ class ExplorationStartEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
         event_services.StartExplorationEventHandler.record(
@@ -387,7 +387,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
 
@@ -434,7 +434,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
         version = self.payload.get('version')
@@ -498,7 +498,7 @@ class RatingHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @action_decorators.view_exploration_stats
+    @acl_decorators.view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
         self.values.update({

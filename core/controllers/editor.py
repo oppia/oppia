@@ -24,7 +24,7 @@ import jinja2
 
 from constants import constants
 from core.controllers import base
-from core.domain import action_decorators
+from core.domain import acl_decorators
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import email_manager
@@ -699,7 +699,7 @@ class ExplorationDownloadHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @action_decorators.download_exploration
+    @acl_decorators.download_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
@@ -839,7 +839,7 @@ class ExplorationStatsVersionsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
@@ -857,7 +857,7 @@ class StateRulesStatsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @action_decorators.play_exploration
+    @acl_decorators.play_exploration
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:

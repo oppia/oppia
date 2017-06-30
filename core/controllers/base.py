@@ -198,9 +198,6 @@ class BaseHandler(webapp2.RequestHandler):
                 email = current_user_services.get_user_email(self.user)
                 user_settings = user_services.create_new_user(
                     self.user_id, email)
-            self.role = user_settings.role
-            self.actions = role_services.get_all_actions(self.role)
-
             self.values['user_email'] = user_settings.email
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
@@ -225,9 +222,12 @@ class BaseHandler(webapp2.RequestHandler):
                             datetime.datetime.utcnow(),
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
-        else:
-            self.role = feconf.ROLE_ID_GUEST
-            self.actions = role_services.get_all_actions(self.role)
+
+        self.role = (
+            feconf.ROLE_ID_GUEST
+            if self.user_id is None else user_settings.role)
+        self.actions = role_services.get_all_actions(self.role)
+
         # *temp
         print self.role
         print self.actions
