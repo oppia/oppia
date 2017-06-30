@@ -246,8 +246,10 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
         """
 
         instance_id = cls._generate_id(exp_id, exp_version, state_name)
-        mapping_instance = cls(
-            id=instance_id, classifier_id=classifier_id)
+        if not cls.get_by_id(instance_id):
+            mapping_instance = cls(
+                id=instance_id, classifier_id=classifier_id)
 
-        mapping_instance.put()
-        return instance_id
+            mapping_instance.put()
+            return instance_id
+        raise Exception('A model with the same ID already exists.')

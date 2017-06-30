@@ -104,6 +104,13 @@ class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(mapping.classifier_id, 'classifier_id4')
 
+        # Test that exception is raised when creating mapping with same id.
+        with self.assertRaisesRegexp(Exception, (
+            'A model with the same ID already exists.')):
+            mapping_id = (
+                classifier_models.ClassifierExplorationMappingModel.create(
+                    'exp_id1', 2, 'state_name4', 'classifier_id4'))
+
     def test_get_model_from_exploration_attributes(self):
         exp_id = 'exp_id1'
         exp_version = 1
