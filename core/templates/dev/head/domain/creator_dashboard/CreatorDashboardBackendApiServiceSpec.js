@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for DashboardBackendApiService.
+ * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
-describe('Dashboard backend API service', function() {
-  var DashboardBackendApiService = null;
+describe('Creator Dashboard backend API service', function() {
+  var CreatorDashboardBackendApiService = null;
   var $httpBackend = null;
   var SAMPLE_EXP_ID = 'hyuy4GUlvTqJ';
 
@@ -62,14 +62,15 @@ describe('Dashboard backend API service', function() {
     }
   };
 
-  var DASHBOARD_DATA_URL = '/dashboardhandler/data';
+  var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
   var ERROR_STATUS_CODE = 500;
 
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
-    DashboardBackendApiService = $injector.get('DashboardBackendApiService');
+    CreatorDashboardBackendApiService = $injector.get(
+      'CreatorDashboardBackendApiService');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
   }));
@@ -84,9 +85,9 @@ describe('Dashboard backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', DASHBOARD_DATA_URL).respond(
+      $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
         sampleDataResults);
-      DashboardBackendApiService.fetchDashboardData().then(
+      CreatorDashboardBackendApiService.fetchDashboardData().then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -100,9 +101,9 @@ describe('Dashboard backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', DASHBOARD_DATA_URL).respond(
+      $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
         ERROR_STATUS_CODE, 'Error loading dashboard data.');
-      DashboardBackendApiService.fetchDashboardData().then(
+      CreatorDashboardBackendApiService.fetchDashboardData().then(
         successHandler, failHandler);
       $httpBackend.flush();
 

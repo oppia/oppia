@@ -31,6 +31,9 @@ oppia.directive('adminMiscTab', [
         '/pages/admin/misc_tab/' +
         'admin_misc_tab_directive.html'),
       controller: ['$scope', function($scope) {
+        var DATA_EXTRACTION_QUERY_HANDLER_URL = (
+          '/explorationdataextractionhandler');
+
         $scope.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
@@ -75,6 +78,40 @@ oppia.directive('adminMiscTab', [
 
         $scope.downloadTopicSimilaritiesFile = function() {
           $window.location.href = ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL;
+        };
+
+        var setDataExtractionQueryStatusMessage = function(message) {
+          $scope.showDataExtractionQueryStatus = true;
+          $scope.dataExtractionQueryStatusMessage = message;
+        };
+
+        $scope.submitQuery = function() {
+          var STATUS_PENDING = (
+            'Data extraction query has been submitted. Please wait.');
+          var STATUS_FINISHED = 'Loading the extracted data ...';
+          var STATUS_FAILED = 'Error, ';
+
+          setDataExtractionQueryStatusMessage(STATUS_PENDING);
+
+          var downloadUrl = DATA_EXTRACTION_QUERY_HANDLER_URL + '?';
+
+          downloadUrl += 'exp_id=' + encodeURIComponent($scope.expId);
+          downloadUrl += '&exp_version=' + encodeURIComponent(
+            $scope.expVersion);
+          downloadUrl += '&state_name=' + encodeURIComponent(
+            $scope.stateName);
+          downloadUrl += '&num_answers=' + encodeURIComponent(
+            $scope.numAnswers);
+
+          $window.open(downloadUrl);
+        };
+
+        $scope.resetForm = function() {
+          $scope.expId = '';
+          $scope.expVersion = 0;
+          $scope.stateName = '';
+          $scope.numAnswers = 0;
+          $scope.showDataExtractionQueryStatus = false;
         };
       }]
     };

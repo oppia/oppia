@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import collection_domain
@@ -182,7 +183,7 @@ class ExplorationDisplayableSummariesTest(
             'category': u'A category',
             'community_owned': False,
             'id': self.EXP_ID_2,
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
             'objective': u'An objective',
             'ratings': feconf.get_empty_ratings(),
@@ -263,7 +264,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'category': u'Algorithms',
             'community_owned': True,
             'id': '2',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
             'objective': u'discover the binary search algorithm',
             'ratings': feconf.get_empty_ratings(),
@@ -340,7 +341,7 @@ class FeaturedExplorationDisplayableSummariesTest(
 
         featured_activity_summaries = (
             summary_services.get_featured_activity_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+                constants.DEFAULT_LANGUAGE_CODE]))
         self.assertEqual(len(featured_activity_summaries), 1)
         self.assertDictContainsSubset({
             'status': 'public',
@@ -348,7 +349,7 @@ class FeaturedExplorationDisplayableSummariesTest(
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': 'A category',
             'ratings': feconf.get_empty_ratings(),
@@ -368,10 +369,10 @@ class FeaturedExplorationDisplayableSummariesTest(
 
         featured_activity_summaries = (
             summary_services.get_featured_activity_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+                constants.DEFAULT_LANGUAGE_CODE]))
         self.assertEqual(len(featured_activity_summaries), 1)
         self.assertDictContainsSubset({
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
         }, featured_activity_summaries[0])
 
@@ -386,14 +387,14 @@ class FeaturedExplorationDisplayableSummariesTest(
 
         featured_activity_summaries = (
             summary_services.get_featured_activity_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE, self.LANGUAGE_CODE_ES]))
+                constants.DEFAULT_LANGUAGE_CODE, self.LANGUAGE_CODE_ES]))
         self.assertEqual(len(featured_activity_summaries), 2)
         self.assertDictContainsSubset({
             'language_code': self.LANGUAGE_CODE_ES,
             'id': self.EXP_ID_1,
         }, featured_activity_summaries[0])
         self.assertDictContainsSubset({
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
         }, featured_activity_summaries[1])
 
@@ -420,8 +421,8 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
-        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -627,15 +628,15 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         top_rated_exploration_summaries = (
             summary_services.get_top_rated_exploration_summary_dicts(
-                [feconf.DEFAULT_LANGUAGE_CODE],
+                [constants.DEFAULT_LANGUAGE_CODE],
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'thumbnail_icon_url': '/subjects/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
             'category': u'A category',
             'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
@@ -664,7 +665,7 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         top_rated_exploration_summaries = (
             summary_services.get_top_rated_exploration_summary_dicts(
-                [feconf.DEFAULT_LANGUAGE_CODE],
+                [constants.DEFAULT_LANGUAGE_CODE],
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
 
         expected_summary = {
@@ -673,7 +674,7 @@ class TopRatedExplorationDisplayableSummariesTest(
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',
             'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
@@ -755,7 +756,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_1,
             'category': u'A category',
             'ratings': feconf.get_empty_ratings(),
@@ -769,7 +770,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',
             'ratings': feconf.get_empty_ratings(),
@@ -783,7 +784,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
             'category': u'A category',
             'ratings': feconf.get_empty_ratings(),

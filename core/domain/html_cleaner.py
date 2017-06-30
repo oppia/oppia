@@ -16,10 +16,13 @@
 
 """HTML sanitizing service."""
 
+import HTMLParser
+import json
 import logging
 import urlparse
 
 import bleach
+import bs4
 
 from core.domain import rte_component_registry
 
@@ -107,3 +110,37 @@ def strip_html_tags(html):
         stripped out.
     """
     return bleach.clean(html, tags=[], attributes={}, strip=True)
+
+
+def get_rte_components(html_string):
+    """Extracts the RTE components from an HTML string.
+
+    Args:
+        html: str. An HTML string.
+
+    Returns:
+        list(dict). A list of dictionaries, each representing an RTE component.
+        Each dict in the list contains:
+        - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
+        - customization_args: dict. Customization arg specs for the component.
+    """
+    parser = HTMLParser.HTMLParser()
+    components = []
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
+    oppia_custom_tag_attrs = (
+        rte_component_registry.Registry.get_tag_list_with_attrs())
+    for tag_name in oppia_custom_tag_attrs:
+        component_tags = soup.find_all(tag_name)
+        for component_tag in component_tags:
+            component = {'id': tag_name}
+            customization_args = {}
+            for attr in oppia_custom_tag_attrs[tag_name]:
+                # Unescape special HTML characters such as '&quot;'
+                attr_val = parser.unescape(component_tag[attr])
+                # Adds escapes so that things like '\frac' aren't
+                # interpreted as special characters.
+                attr_val = attr_val.encode('unicode_escape')
+                customization_args[attr] = json.loads(attr_val)
+            component['customization_args'] = customization_args
+            components.append(component)
+    return components

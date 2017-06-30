@@ -53,7 +53,7 @@ oppia.controller('SettingsTab', [
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-    var DASHBOARD_PAGE_URL = '/dashboard';
+    var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
     $scope.getExplorePageUrl = function() {
@@ -245,17 +245,17 @@ oppia.controller('SettingsTab', [
             };
             $scope.getThumbnailIconUrl = function() {
               var category = explorationCategoryService.displayed;
-              if (GLOBALS.ALL_CATEGORIES.indexOf(category) === -1) {
-                category = GLOBALS.DEFAULT_CATEGORY_ICON;
+              if (constants.ALL_CATEGORIES.indexOf(category) === -1) {
+                category = constants.DEFAULT_CATEGORY_ICON;
               }
               return '/subjects/' + category + '.svg';
             };
             $scope.getThumbnailBgColor = function() {
               var category = explorationCategoryService.displayed;
-              if (!GLOBALS.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
-                var color = GLOBALS.DEFAULT_COLOR;
+              if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
+                var color = constants.DEFAULT_COLOR;
               } else {
-                var color = GLOBALS.CATEGORIES_TO_COLORS[category];
+                var color = constants.CATEGORIES_TO_COLORS[category];
               }
               return color;
             };
@@ -310,7 +310,7 @@ oppia.controller('SettingsTab', [
       }).result.then(function() {
         EditableExplorationBackendApiService.deleteExploration(
           $scope.explorationId).then(function() {
-            $window.location = DASHBOARD_PAGE_URL;
+            $window.location = CREATOR_DASHBOARD_PAGE_URL;
           });
       });
     };
