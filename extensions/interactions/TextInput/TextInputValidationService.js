@@ -41,7 +41,8 @@ oppia.factory('TextInputValidationService', [
 
         var rows = customizationArgs.rows.value;
         if (isInt(rows)) {
-          var customArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
+          var customArgSpecs =
+              INTERACTION_SPECS.TextInput.customization_arg_specs;
           var rowsSpecs = customArgSpecs[1];
           var MIN_ROWS = rowsSpecs.schema.validators[0].min_value;
           var MAX_ROWS = rowsSpecs.schema.validators[1].max_value;
