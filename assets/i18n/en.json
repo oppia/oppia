@@ -299,7 +299,7 @@
     "I18N_PLAYER_HINT": "Hint",
     "I18N_PLAYER_HINTS_EXHAUSTED": "Sorry, I'm out of hints!",
     "I18N_PLAYER_HINT_IS_USABLE": "Click here for a hint!",
-    "I18N_PLAYER_HINT_NOT_USABLE": "Try thinking a bit more before asking for another hint!",
+    "I18N_PLAYER_HINT_NOT_USABLE": "Try thinking a bit more before asking for a hint!",
     "I18N_PLAYER_HINT_REQUEST_STRING_1": "I would like a hint.",
     "I18N_PLAYER_HINT_REQUEST_STRING_2": "I'm a little stuck, any hints?",
     "I18N_PLAYER_HINT_REQUEST_STRING_3": "I'm having some trouble.",
