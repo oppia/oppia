@@ -21,7 +21,6 @@ import subprocess
 import sys
 import hashlib
 import json
-from pprint import pprint
 
 HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
 OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
@@ -278,6 +277,5 @@ if __name__ == '__main__':
 
     HASHES_JSON = os.path.join('build', 'assets', 'hashes.js')
     save_hashes_as_json(HASHES_JSON, hashes)
-    pprint(hashes)
     build_files(TEMPLATES_DEV_DIR, TEMPLATES_PROD_DIR, hashes)
     copy_files_source_to_target(TEMPLATES_PROD_DIR, TEMPLATES_OUT_DIR, hashes)
