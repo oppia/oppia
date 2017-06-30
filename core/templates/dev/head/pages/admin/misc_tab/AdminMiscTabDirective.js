@@ -91,13 +91,6 @@ oppia.directive('adminMiscTab', [
           var STATUS_FINISHED = 'Loading the extracted data ...';
           var STATUS_FAILED = 'Error, ';
 
-          var data = {
-            exp_id: $scope.expId,
-            exp_version: $scope.expVersion,
-            state_name: $scope.stateName,
-            num_answers: $scope.numAnswers
-          };
-
           setDataExtractionQueryStatusMessage(STATUS_PENDING);
 
           var downloadUrl = DATA_EXTRACTION_QUERY_HANDLER_URL + '?';
