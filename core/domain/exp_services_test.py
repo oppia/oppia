@@ -1401,9 +1401,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exploration.init_state.content[0].type, 'text')
         self.assertEqual(
-            exploration.init_state.content[0].value, '<b>Test content</b>')
+            exploration.init_state.content.html, '<b>Test content</b>')
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""

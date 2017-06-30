@@ -52,16 +52,16 @@ describe('State Editor controller', function() {
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
       IS = $injector.get('INTERACTION_SPECS');
-      cof = $injector.get('ContentObjectFactory');
+      shof = $injector.get('SubtitledHtmlObjectFactory');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
       ess.init({
         'First State': {
-          content: [{
-            type: 'text',
-            value: 'First State Content'
-          }],
+          content: {
+            html: 'First State Content',
+            audio_translations: []
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
@@ -84,10 +84,10 @@ describe('State Editor controller', function() {
           param_changes: []
         },
         'Second State': {
-          content: [{
-            type: 'text',
-            value: 'Second State Content'
-          }],
+          content: {
+            html: 'Second State Content',
+            audio_translations: []
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
@@ -110,10 +110,10 @@ describe('State Editor controller', function() {
           param_changes: []
         },
         'Third State': {
-          content: [{
-            type: 'text',
-            value: 'This is some content.'
-          }],
+          content: {
+            html: 'This is some content.',
+            audio_translations: []
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
@@ -145,10 +145,10 @@ describe('State Editor controller', function() {
       });
 
       scope.getContent = function(contentString) {
-        return [cof.createFromBackendDict({
-          type: 'text',
-          value: contentString
-        })];
+        return shof.createFromBackendDict({
+          html: contentString,
+          audio_translations: []
+        });
       };
 
       ctrl = $controller('StateEditor', {
@@ -169,7 +169,7 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('Third State');
       scope.initStateEditor();
       expect(scope.contentEditorIsOpen).toBe(false);
-      expect(scope.content[0].value).toEqual('This is some content.');
+      expect(scope.content.getHtml()).toEqual('This is some content.');
     });
 
     it('should correctly handle no-op edits', function() {
@@ -194,8 +194,8 @@ describe('State Editor controller', function() {
         scope.content = scope.getContent('babababa');
         scope.saveTextContent();
         expect(cls.getChangeList().length).toBe(1);
-        expect(cls.getChangeList()[0].new_value[0].value).toEqual('babababa');
-        expect(cls.getChangeList()[0].old_value[0].value).toEqual(
+        expect(cls.getChangeList()[0].new_value.html).toEqual('babababa');
+        expect(cls.getChangeList()[0].old_value.html).toEqual(
           'This is some content.');
 
         scope.openStateContentEditor();
@@ -204,9 +204,9 @@ describe('State Editor controller', function() {
         );
         scope.saveTextContent();
         expect(cls.getChangeList().length).toBe(2);
-        expect(cls.getChangeList()[1].new_value[0].value)
+        expect(cls.getChangeList()[1].new_value.html)
           .toEqual('And now for something completely different.');
-        expect(cls.getChangeList()[1].old_value[0].value).toEqual('babababa');
+        expect(cls.getChangeList()[1].old_value.html).toEqual('babababa');
       }
     );
 
@@ -272,10 +272,10 @@ describe('State Editor controller', function() {
 
       ess.init({
         State: {
-          content: [{
-            type: 'text',
-            value: 'State Content'
-          }],
+          content: {
+            html: 'State Content',
+            audio_translations: []
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{

@@ -100,7 +100,7 @@ oppia.factory('oppiaPlayerService', [
     // Evaluate question string.
     var makeQuestion = function(newState, envs) {
       return expressionInterpolationService.processHtml(
-        newState.content[0].value, envs);
+        newState.content.getHtml(), envs);
     };
 
     // This should only be called when 'exploration' is non-null.

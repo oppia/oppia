@@ -48,8 +48,8 @@ states:
   %s:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -66,8 +66,8 @@ states:
   New state:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -114,8 +114,8 @@ skin_customizations:
 states:
   %s:
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       customization_args: {}
@@ -128,8 +128,8 @@ states:
     param_changes: []
   New state:
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       customization_args: {}
@@ -184,8 +184,8 @@ states:
   %s:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -206,8 +206,8 @@ states:
   New state:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -228,8 +228,8 @@ states:
   Second state:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -995,10 +995,10 @@ class StateExportUnitTests(test_utils.GenericTestBase):
         state_dict = exploration.states['New state'].to_dict()
         expected_dict = {
             'classifier_model_id': None,
-            'content': [{
-                'type': 'text',
-                'value': u''
-            }],
+            'content': {
+                'html': '',
+                'audio_translations': []
+            },
             'interaction': {
                 'answer_groups': [],
                 'confirmed_unclassified_answers': [],
@@ -2072,7 +2072,96 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V13
+    YAML_CONTENT_V14 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 13
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: []
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: []
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: {}
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: []
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+states_schema_version: 10
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V14
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2152,6 +2241,13 @@ title: Title
             'eid', self.YAML_CONTENT_V13)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v14(self):
+        """Test direct loading from a v14 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V14)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
 
@@ -2166,10 +2262,10 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name):
             return {
                 'classifier_model_id': None,
-                'content': [{
-                    'type': 'text',
-                    'value': content_str,
-                }],
+                'content': {
+                    'audio_translations': [],
+                    'html': content_str,
+                },
                 'interaction': {
                     'answer_groups': [],
                     'confirmed_unclassified_answers': [],

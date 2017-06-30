@@ -178,6 +178,10 @@ DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 # An array containing the accepted image extensions for uploaded files.
 ACCEPTED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif']
 
+# An array containing the accepted audio extensions for uploaded files.
+ACCEPTED_AUDIO_EXTENSIONS = ['mp3']
+
+
 # A string containing the disallowed characters in state or exploration names.
 # The underscore is needed because spaces in names must be converted to
 # underscores when displayed as part of a URL or key. The other conventions

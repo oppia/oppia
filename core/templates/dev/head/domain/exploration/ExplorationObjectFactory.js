@@ -119,7 +119,7 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getUninterpolatedContentHtml = function(stateName) {
-      return this.getState(stateName).content[0].value;
+      return this.getState(stateName).content.getHtml();
     };
 
     // Static class methods. Note that "this" is not available in

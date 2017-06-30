@@ -136,7 +136,7 @@ oppia.controller('FeedbackTab', [
           currentContent: function() {
             var state = explorationStatesService.getState(
               $scope.activeThread.suggestion.state_name);
-            return state !== undefined ? state.content[0].value : null;
+            return state !== undefined ? state.content.getHtml() : null;
           },
           newContent: function() {
             return $scope.activeThread.suggestion.state_content.value;
@@ -214,7 +214,7 @@ oppia.controller('FeedbackTab', [
               var stateDict = explorationData.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
-              state.content[0].value = suggestion.state_content.value;
+              state.content.setHtml(suggestion.state_content.value);
               explorationData.data.version += 1;
               explorationStatesService.setState(stateName, state);
               $rootScope.$broadcast('refreshVersionHistory', {

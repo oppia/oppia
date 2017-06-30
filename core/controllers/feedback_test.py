@@ -543,7 +543,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self._accept_suggestion(accepted_suggestion_thread_id, csrf_token)
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
-            updated_exploration.states['State A'].content[0].to_dict(),
+            updated_exploration.states['State A'].content.to_dict(),
             {'type': 'text', 'value': u'new accepted suggestion for state A'})
 
         # Reject a suggestion.

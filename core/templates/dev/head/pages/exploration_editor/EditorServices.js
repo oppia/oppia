@@ -841,6 +841,9 @@ oppia.factory('explorationStatesService', [
           return answerGroup.toBackendDict();
         });
       },
+      content: function(content) {
+        return content.toBackendDict()
+      },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
           return defaultOutcome.toBackendDict();

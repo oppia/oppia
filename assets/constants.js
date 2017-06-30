@@ -259,5 +259,13 @@ var constants = {
   }, {
     "id": "zh-hant",
     "text": "中文(繁體)"
+  }],
+
+  "SUPPORTED_AUDIO_LANGUAGES": [{
+    "id": "en",
+    "text": "English"
+  }, {
+    "id": "hi-en",
+    "text": "Hinglish"
   }]
 };
