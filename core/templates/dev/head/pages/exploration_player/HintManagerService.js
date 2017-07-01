@@ -26,20 +26,15 @@ oppia.factory('HintManagerService', [
     var numHintsConsumed = 0;
     var timeout = null;
     var hints = [];
-    var _setCurrentHintAvailable = function(value) {
-      currentHintIsAvailable = value;
-    };
+
 
     return {
-      setHints: function(newHints) {
-        hints = newHints;
-      },
       getCurrentHint: function() {
         return hints[this.getNumHintsConsumed()].hintText;
       },
       consumeHint: function() {
         numHintsConsumed += 1;
-        _setCurrentHintAvailable(false);
+        currentHintIsAvailable = false;
       },
       getNumHintsConsumed: function() {
         return numHintsConsumed;
@@ -48,38 +43,30 @@ oppia.factory('HintManagerService', [
         return currentHintIsAvailable;
       },
       makeCurrentHintAvailable: function() {
-        $timeout.cancel(timeout);
-        _setCurrentHintAvailable(true);
+        if (timeout) {
+          $timeout.cancel(timeout);
+        }
+        currentHintIsAvailable = true;
       },
       areAllHintsExhausted: function() {
         return numHintsConsumed === hints.length;
       },
-      reset: function() {
+      reset: function(newHints) {
         numHintsConsumed = 0;
         currentHintIsAvailable = false;
-        $timeout.cancel(timeout);
+        if (timeout) {
+          $timeout.cancel(timeout);
+        }
+        hints = newHints;
       },
       disableHintButtonTemporarily: function() {
-        _setCurrentHintAvailable(false);
-        $timeout.cancel(timeout);
+        currentHintIsAvailable = false;
+        if (timeout) {
+          $timeout.cancel(timeout);
+        }
         timeout = $timeout(function() {
           currentHintIsAvailable = true;
         }, WAIT_FOR_HINT_MSEC);
-      },
-      processHintRequest: function() {
-        var numHintsConsumed = this.getNumHintsConsumed();
-        var currentHint = this.getCurrentHint();
-        if (numHintsConsumed < hints.length) {
-          playerTranscriptService.addNewInput(
-            HINT_REQUEST_STRING_I18N_IDS[Math.floor(
-              Math.random() * HINT_REQUEST_STRING_I18N_IDS.length)], true);
-          $timeout(function() {
-            playerTranscriptService.addNewResponse(currentHint);
-          }, DELAY_FOR_HINT_FEEDBACK_MSEC);
-          this.disableHintButtonTemporarily();
-
-          this.consumeHint();
-        }
       }
     };
   }]);
