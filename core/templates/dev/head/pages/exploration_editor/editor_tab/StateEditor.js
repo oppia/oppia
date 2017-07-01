@@ -81,7 +81,7 @@ oppia.controller('StateEditor', [
           $scope.isInteractionIdSet &&
           INTERACTION_SPECS[interactionId].is_terminal);
 
-        if ($scope.content[0].value || stateData.interaction.id) {
+        if ($scope.content.getHtml() || stateData.interaction.id) {
           $scope.isInteractionShown = true;
         }
 
@@ -173,7 +173,7 @@ oppia.factory('trainingModalService', [
                 // Retrieve the interaction ID.
                 var interactionId = stateInteractionIdService.savedMemento;
 
-                var rulesServiceName = 
+                var rulesServiceName =
                   angularNameService.getNameOfInteractionRulesService(
                     interactionId)
 

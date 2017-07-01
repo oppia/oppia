@@ -148,7 +148,7 @@ class SuggestionHandler(base.BaseHandler):
             self.payload.get('exploration_version'),
             self.payload.get('state_name'),
             self.payload.get('description'),
-            self.payload.get('suggestion_content'))
+            self.payload.get('suggestion_html'))
         self.render_json(self.values)
 
 

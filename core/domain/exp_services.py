@@ -1828,10 +1828,15 @@ def _create_change_list_from_suggestion(suggestion):
                 object.
     """
 
-    return [{'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-             'state_name': suggestion.state_name,
-             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-             'new_value': [suggestion.state_content]}]
+    return [{
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'state_name': suggestion.state_name,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'new_value': {
+            'html': suggestion.suggestion_html,
+            'audio_translations': []
+        }
+    }]
 
 
 def _get_commit_message_for_suggestion(

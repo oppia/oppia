@@ -71,7 +71,7 @@
     </div>
 
     <div class="modal-body protractor-test-exploration-suggestion-modal">
-      <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
+      <text-angular-rte ng-show="showEditor" html-content="suggestionHtml"></text-angular-rte>
       <br>
       Briefly describe your changes (required):
       <input type="text" ng-model="description" class="protractor-test-suggestion-description-input" style="width: 100%">
@@ -79,7 +79,7 @@
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
-      <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
+      <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(originalHtml == suggestionHtml) || !description">
         Submit Suggestion
       </button>
     </div>
@@ -152,7 +152,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/HintObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AudioTranslationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
