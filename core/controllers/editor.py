@@ -891,12 +891,15 @@ class ImageUploadHandler(EditorHandler):
         if not raw:
             raise self.InvalidInputException('No image supplied')
 
+        allowed_formats = ', '.join(
+            feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
+
         # Verify that the data is recognized as an image.
         file_format = imghdr.what(None, h=raw)
-        if file_format not in feconf.ACCEPTED_IMAGE_EXTENSIONS:
+        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
             raise self.InvalidInputException('Image not recognized')
 
-        # Verify that a valid filename and extension is provided.
+        # Verify that the file type matches the supplied extension.
         if not filename:
             raise self.InvalidInputException('No filename supplied')
         if '/' in filename or '..' in filename:
@@ -906,16 +909,15 @@ class ImageUploadHandler(EditorHandler):
         if '.' not in filename:
             raise self.InvalidInputException(
                 'Image filename with no extension: it should have '
-                'one of the following extensions: %s.' %
-                feconf.ACCEPTED_IMAGE_EXTENSIONS)
+                'one of the following extensions: %s.' % allowed_formats)
 
         dot_index = filename.rfind('.')
         extension = filename[dot_index + 1:].lower()
-        if extension not in feconf.ACCEPTED_IMAGE_EXTENSIONS:
+        if (extension not in
+                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
             raise self.InvalidInputException(
-                'Image filename with invalid extension: it should have one of '
-                'the following extensions: %s. Received: %s',
-                (feconf.ACCEPTED_IMAGE_EXTENSIONS, filename))
+                'Expected a filename ending in .%s, received %s' %
+                (file_format, filename))
 
         # Save the file.
         fs = fs_domain.AbstractFileSystem(

@@ -36,6 +36,11 @@ oppia.directive('filepathEditor', [
         $scope.MODE_SAVED = 3;
         $scope.MAX_OUTPUT_IMAGE_WIDTH_PX = 490;
 
+        // We only use PNG format since that is what canvas can export to in
+        // all browsers.
+        // TODO(sll): See if we can add support for other image formats.
+        var RESAMPLED_IMAGE_FORMAT = 'png';
+
         // This variable holds all the data needed for the image upload flow.
         // It's always guaranteed to have the 'mode' and 'metadata' properties.
         //
@@ -217,10 +222,10 @@ oppia.directive('filepathEditor', [
           var ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
 
-          // Return a File object obtained from the data in the canvas.
-          var file = $scope.data.metadata.uploadedFile;
-          var blob = dataURIToBlob(canvas.toDataURL(file.type, 1));
-
+          // We export to PNG because not all browsers support exports to all
+          // possible file types (like gif).
+          var blob = dataURIToBlob(
+            canvas.toDataURL('image/' + RESAMPLED_IMAGE_FORMAT, 1));
           if (blob instanceof Blob &&
               blob.type.match('image') &&
               blob.size > 0) {
@@ -280,7 +285,8 @@ oppia.directive('filepathEditor', [
           var format = '';
           var chunks = $scope.data.metadata.uploadedFile.name.split('.');
           if (chunks.length > 1) {
-            format = '.' + chunks.pop();
+            chunks.pop();
+            format = '.' + RESAMPLED_IMAGE_FORMAT;
           }
           var date = new Date();
           return 'img_' +
