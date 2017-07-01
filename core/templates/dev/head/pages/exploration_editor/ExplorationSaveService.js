@@ -307,7 +307,7 @@ oppia.factory('explorationSaveService', [
                 $scope.metadataFormObjective = (
                   'Add a goal: what does the exploration help people to do?');
                 $scope.metadataFormCategory = (
-                  ('Add a category: how would you categorize your') + (
+                  ('Add a category: how would you categorize your ') + (
                   'exploration?'));
                 $scope.metadataFormLanguage = (
                   ('Verify the language: is your exploration written in ') + (
