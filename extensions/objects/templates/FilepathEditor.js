@@ -34,6 +34,7 @@ oppia.directive('filepathEditor', [
         $scope.MODE_EMPTY = 1;
         $scope.MODE_UPLOADED = 2;
         $scope.MODE_SAVED = 3;
+        $scope.MAX_OUTPUT_IMAGE_WIDTH_PX = 490;
 
         // This variable holds all the data needed for the image upload flow.
         // It's always guaranteed to have the 'mode' and 'metadata' properties.
@@ -56,6 +57,7 @@ oppia.directive('filepathEditor', [
             mode: $scope.MODE_EMPTY,
             metadata: {}
           };
+          $scope.resizeRatio = 1;
         };
         $scope.clearScopeData();
 
@@ -73,6 +75,21 @@ oppia.directive('filepathEditor', [
                  data.metadata.savedUrl.length > 0;
         };
 
+        $scope.getImageSizeHelp = function() {
+          var imageWidth = $scope.data.metadata.originalWidth;
+          if ($scope.resizeRatio === 1 &&
+              imageWidth > $scope.MAX_OUTPUT_IMAGE_WIDTH_PX) {
+            return 'This image has been automatically downsized to ensure ' +
+                   'that it will fit in the card.';
+          }
+          return null;
+        };
+
+        $scope.getMainContainerStyles = function() {
+          var width = $scope.MAX_OUTPUT_IMAGE_WIDTH_PX;
+          return 'margin: 0 auto; width: ' + width + 'px';
+        };
+
         $scope.isNoImageUploaded = function() {
           return $scope.data.mode === $scope.MODE_EMPTY;
         };
@@ -85,6 +102,41 @@ oppia.directive('filepathEditor', [
           return $scope.data.mode === $scope.MODE_SAVED;
         };
 
+        $scope.getCurrentResizePercent = function() {
+          return Math.round(100 * $scope.resizeRatio);
+        };
+
+        $scope.decreaseResizePercent = function(amount) {
+          // Do not allow to decrease size below 10%.
+          $scope.resizeRatio = Math.max(0.1, $scope.resizeRatio - amount / 100);
+        };
+
+        $scope.increaseResizePercent = function(amount) {
+          // Do not allow to increase size above 100% (only downsize allowed).
+          $scope.resizeRatio = Math.min(1, $scope.resizeRatio + amount / 100);
+        };
+
+        $scope.calculateTargetImageDimensions = function() {
+          var width = $scope.data.metadata.originalWidth;
+          var height = $scope.data.metadata.originalHeight;
+          if (width > $scope.MAX_OUTPUT_IMAGE_WIDTH_PX) {
+            var aspectRatio = width / height;
+            width = $scope.MAX_OUTPUT_IMAGE_WIDTH_PX;
+            height = width / aspectRatio;
+          }
+          return {
+            width: Math.round(width * $scope.resizeRatio),
+            height: Math.round(height * $scope.resizeRatio)
+          };
+        };
+
+        $scope.getUploadedImageStyles = function() {
+          var dimensions = $scope.calculateTargetImageDimensions();
+          var w = dimensions.width;
+          var h = dimensions.height;
+          return 'width: ' + w + 'px; height: ' + h + 'px;';
+        }
+
         $scope.setUploadedFile = function(file) {
           var reader = new FileReader();
           reader.onload = function(e) {
@@ -94,7 +146,9 @@ oppia.directive('filepathEditor', [
                 mode: $scope.MODE_UPLOADED,
                 metadata: {
                   uploadedFile: file,
-                  uploadedImageData: e.target.result
+                  uploadedImageData: e.target.result,
+                  originalWidth: this.naturalWidth,
+                  originalHeight: this.naturalHeight
                 }
               };
               $scope.$apply();
@@ -126,41 +180,54 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.onFileChanged = function(file, filename) {
-          if (!file || !file.size || !file.type.match('image.*')) {
-            $scope.uploadWarning = 'This file is not recognized as an image.';
-            $scope.clearScopeData();
-            $scope.$apply();
-            return;
-          }
-
-          if (!file.type.match('image.jpeg') &&
-              !file.type.match('image.gif') &&
-              !file.type.match('image.jpg') &&
-              !file.type.match('image.png')) {
-            $scope.uploadWarning = 'This image format is not supported.';
-            $scope.clearScopeData();
-            $scope.$apply();
-            return;
-          }
-
-          var ONE_MB_IN_BYTES = 1048576;
-          if (file.size / ONE_MB_IN_BYTES > 1) {
-            var currentSize = parseInt(file.size / ONE_MB_IN_BYTES) + ' MB';
-            $scope.uploadWarning = 
-                'The maximum allowed file size is 1 MB' +
-                ' (' + currentSize + ' given).';
-            $scope.clearScopeData();
-            $scope.$apply();
-            return;
-          }
-
-          $scope.uploadWarning = null;
           $scope.setUploadedFile(file);
           $scope.$apply();
         };
 
         $scope.discardUploadedFile = function() {
           $scope.clearScopeData();
+        };
+
+        $scope.generateResampledImageFile = function() {
+          var dataURIToBlob = function(dataURI) {
+            // Convert base64/URLEncoded data component to raw binary data
+            // held in a string.
+            var byteString = atob(dataURI.split(',')[1]);
+
+            // Separate out the mime component.
+            var mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+            // Write the bytes of the string to a typed array.
+            var ia = new Uint8Array(byteString.length);
+            for (var i = 0; i < byteString.length; i++) {
+              ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ia], {type: mime});
+          };
+
+          // Create an Image object with the original data.
+          var img = new Image();
+          img.src = $scope.data.metadata.uploadedImageData;
+
+          // Create a Canvas and draw the image on it, resampled.
+          var canvas = document.createElement('canvas');
+          var dimensions = $scope.calculateTargetImageDimensions();
+          canvas.width = dimensions.width;
+          canvas.height = dimensions.height;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
+
+          // Return a File object obtained from the data in the canvas.
+          var file = $scope.data.metadata.uploadedFile;
+          var blob = dataURIToBlob(canvas.toDataURL(file.type, 1));
+
+          if (blob instanceof Blob &&
+              blob.type.match('image') &&
+              blob.size > 0) {
+            return blob;
+          } else {
+            return null;
+          }
         };
 
         $scope.saveUploadedFile = function() {
@@ -171,8 +238,14 @@ oppia.directive('filepathEditor', [
             return;
           }
 
+          var resampledFile = $scope.generateResampledImageFile();
+          if (resampledFile === null) {
+            alertsService.addWarning('Could not get resampled file.');
+            return;
+          }
+
           var form = new FormData();
-          form.append('image', $scope.data.metadata.uploadedFile);
+          form.append('image', resampledFile);
           form.append('payload', JSON.stringify({
             filename: $scope.generateImageFilename()
           }));
@@ -223,8 +296,8 @@ oppia.directive('filepathEditor', [
               format;
         };
 
+        $scope.resizeRatio = 1;
         $scope.explorationId = explorationContextService.getExplorationId();
-        $scope.uploadWarning = null;
         $scope.clearScopeData();
       }]
     };

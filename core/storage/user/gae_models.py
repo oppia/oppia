@@ -16,6 +16,7 @@
 
 """Models for Oppia users."""
 
+from constants import constants
 from core.platform import models
 import feconf
 
@@ -32,8 +33,12 @@ class UserSettingsModel(base_models.BaseModel):
     """
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
-    # User role. Required for authorization.
-    role = ndb.StringProperty(required=True, indexed=True)
+    # User role. Required for authorization. User gets a default role of
+    # exploration editor.
+    # TODO (1995YogeshSharma): Remove the default value once the one-off
+    # migration (to give role to all users) is run.
+    role = ndb.StringProperty(
+        required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
     # Identifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.
@@ -65,11 +70,11 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
         indexed=True,
-        choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
+        choices=[lc['code'] for lc in constants.ALL_LANGUAGE_CODES])
     # System language preference (for I18N).
     preferred_site_language_code = ndb.StringProperty(
         default=None, choices=[
-            language['id'] for language in feconf.SUPPORTED_SITE_LANGUAGES])
+            language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES])
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
@@ -97,6 +102,19 @@ class UserSettingsModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
+
+    @classmethod
+    def get_by_role(cls, role):
+        """Returns user models with given role.
+
+        Args:
+            role: str. The role Id that is being queried for.
+
+        Returns:
+            list(UserSettingsModel). The UserSettingsModel instances which
+            have the given role Id.
+        """
+        return cls.query(cls.role == role).fetch()
 
 
 class CompletedActivitiesModel(base_models.BaseModel):
@@ -342,8 +360,11 @@ class ExplorationUserDataModel(base_models.BaseModel):
     draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
     # The exploration version that this change list applied to.
     draft_change_list_exp_version = ndb.IntegerProperty(default=None)
-    #The exploration draft version of this change list.
-    draft_change_list_id = ndb.IntegerProperty(default=None)
+    # The version of the draft change list which was last saved by the user.
+    # Can be zero if the draft is None or if the user has not committed
+    # draft changes to this exploration since the draft_change_list_id property
+    # was introduced.
+    draft_change_list_id = ndb.IntegerProperty(default=0)
     # The user's preference for receiving suggestion emails for this exploration
     mute_suggestion_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)

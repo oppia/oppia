@@ -175,6 +175,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
+    get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -436,7 +437,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
         collection_editor.ExplorationMetadataSearchHandler),
-
+    get_redirect_route(
+        r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 
@@ -452,6 +454,7 @@ if (feconf.ENABLE_MAINTENANCE_MODE and
     URLS_TO_SERVE = [
         get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
         get_redirect_route(r'/adminhandler', admin.AdminHandler),
+        get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
         get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
         get_redirect_route(
             r'/admintopicscsvdownloadhandler',

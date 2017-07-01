@@ -1413,13 +1413,15 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             exploration_id=self.EXP_ID1,
             draft_change_list=self.DRAFT_CHANGELIST,
             draft_change_list_last_updated=self.NEWER_DATETIME,
-            draft_change_list_exp_version=1).put()
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1).put()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.owner_id, self.EXP_ID2), user_id=self.owner_id,
             exploration_id=self.EXP_ID2,
             draft_change_list=self.DRAFT_CHANGELIST,
             draft_change_list_last_updated=self.OLDER_DATETIME,
-            draft_change_list_exp_version=1).put()
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1).put()
 
         # Exploration with no draft.
         user_models.ExplorationUserDataModel(
@@ -1440,9 +1442,10 @@ class EditorAutosaveTest(BaseEditorControllerTest):
     def test_exploration_loaded_with_draft_applied(self):
         response = self.get_json(
             '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
-        # Title updated because chanhe list was applied.
+        # Title updated because change list was applied.
         self.assertEqual(response['title'], 'Updated title')
         self.assertTrue(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 1)
         # Draft changes passed to UI.
         self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
 
@@ -1456,6 +1459,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         # Title not updated because change list not applied.
         self.assertEqual(response['title'], 'A title')
         self.assertFalse(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 1)
         # Draft changes passed to UI even when version is invalid.
         self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
 
@@ -1465,6 +1469,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         # Title not updated because change list not applied.
         self.assertEqual(response['title'], 'A title')
         self.assertIsNone(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 0)
         # Draft changes None.
         self.assertIsNone(response['draft_changes'])
 
@@ -1482,6 +1487,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertEqual(
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
         self.assertTrue(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 1)
 
     def test_draft_not_updated_validation_error(self):
         self.put_json(
@@ -1498,6 +1504,8 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
+            #id is incremented the first time but not the second
+        self.assertEqual(exp_user_data.draft_change_list_id, 2)
         self.assertEqual(
             response, {'code': 400,
                        'error': 'Expected title to be a string, received 1'})
@@ -1515,6 +1523,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertTrue(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_draft_updated_version_invalid(self):
         payload = {
@@ -1529,6 +1538,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_discard_draft(self):
         self.post_json(

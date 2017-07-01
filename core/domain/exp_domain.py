@@ -27,6 +27,7 @@ import logging
 import re
 import string
 
+from constants import constants
 from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
@@ -873,9 +874,7 @@ class InteractionInstance(object):
             if self.solution:
                 Solution.from_dict(
                     self.id, self.solution).validate(self.id)
-            else:
-                raise utils.ValidationError(
-                    'Solution must be specified if hint(s) are specified')
+
         elif self.solution:
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
@@ -1396,6 +1395,17 @@ class State(object):
         self.interaction.fallbacks = [
             Fallback.from_dict(fallback_dict)
             for fallback_dict in fallbacks_list]
+        if self.interaction.fallbacks:
+            hint_list = []
+            for fallback in self.interaction.fallbacks:
+                if fallback.outcome.feedback:
+                    # If a fallback outcome has a non-empty feedback list
+                    # the feedback is converted to a Hint. It may contain
+                    # only one list item.
+                    hint_list.append(
+                        Hint(fallback.outcome.feedback[0]).to_dict())
+        self.update_interaction_hints(hint_list)
+
 
     def update_interaction_hints(self, hints_list):
         if not isinstance(hints_list, list):
@@ -1496,7 +1506,7 @@ class Exploration(object):
             cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-            language_code=feconf.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         init_state_dict = State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
@@ -1638,7 +1648,7 @@ class Exploration(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
         if not any([self.language_code == lc['code']
-                    for lc in feconf.ALL_LANGUAGE_CODES]):
+                    for lc in constants.ALL_LANGUAGE_CODES]):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
@@ -2434,6 +2444,10 @@ class Exploration(object):
             interaction = state_dict['interaction']
             if 'hints' not in interaction:
                 interaction['hints'] = []
+                for fallback in interaction['fallbacks']:
+                    if fallback['outcome']['feedback']:
+                        interaction['hints'].append(
+                            Hint(fallback['outcome']['feedback'][0]).to_dict())
             if 'solution' not in interaction:
                 interaction['solution'] = {}
         return states_dict
@@ -2484,7 +2498,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 3
 
         exploration_dict['objective'] = ''
-        exploration_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
+        exploration_dict['language_code'] = constants.DEFAULT_LANGUAGE_CODE
         exploration_dict['skill_tags'] = []
         exploration_dict['blurb'] = ''
         exploration_dict['author_notes'] = ''
