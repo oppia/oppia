@@ -59,7 +59,7 @@
     ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
-        <div ng-if="activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaFeedbackHtml">
+        <div ng-if="activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse">
           <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
                      ng-if="!isIframed"
                      focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
@@ -75,23 +75,11 @@
                angular-html-bind="activeCard.interactionHtml">
           </div>
           <div ng-if="currentInteractionHints.length" style="text-align: right">
-            <span ng-if="areAllHintsExhausted()" tooltip="<['I18N_PLAYER_HINTS_EXHAUSTED' | translate]>">
-              <hint-button on-click-hint-button="showHint()"
-                           is-disabled="!isHintAvailable()">
-              </hint-button>
-            </span>
-            <span ng-if="!areAllHintsExhausted()">
-              <span ng-if="isCurrentHintUsable()" tooltip="<['I18N_PLAYER_HINT_IS_USABLE' | translate]>">
-                <hint-button on-click-hint-button="showHint()"
-                             is-disabled="!isHintAvailable()">
-                </hint-button>
-              </span>
-              <span ng-if="!isCurrentHintUsable()" tooltip="<['I18N_PLAYER_HINT_NOT_USABLE' | translate]>">
-                <hint-button on-click-hint-button="showHint()"
-                             is-disabled="!isHintAvailable()">
-                </hint-button>
-              </span>
-            </span>
+            <hint-button on-click-hint-button="processHintRequest()"
+                         is-disabled="!isHintAvailable()"
+                         current-hint-is-available="isHintAvailable()"
+                         all-hints-are-exhausted="areAllHintsExhausted()">
+            </hint-button>
           </div>
         </div>
       </div>
@@ -252,7 +240,13 @@
   }
 
   @media screen and (max-width: 959px) {
-    .conversation-skin-tutor-card .instructions-button .hint-button {
+    .conversation-skin-tutor-card .instructions-button {
+      background-color: #0D48A1;
+      color: #ffffff;
+      padding: 6px 12px;
+    }
+
+    .conversation-skin-tutor-card .hint-button {
       background-color: #0D48A1;
       color: #ffffff;
       padding: 6px 12px;

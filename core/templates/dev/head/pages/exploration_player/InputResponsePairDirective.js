@@ -46,7 +46,7 @@ oppia.directive('inputResponsePair', [
               playerPositionService.getCurrentStateName());
             if ($scope.data) {
               return oppiaExplorationHtmlFormatterService.getAnswerHtml(
-                $scope.data.learnerAnswer, interaction.id,
+                $scope.data.learnerInput, interaction.id,
                 interaction.customizationArgs);
             }
           };
@@ -61,7 +61,7 @@ oppia.directive('inputResponsePair', [
                 INTERACTION_SPECS[interaction.id].needs_summary) {
               shortAnswerHtml = (
                 oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-                  $scope.data.learnerAnswer, interaction.id,
+                  $scope.data.learnerInput, interaction.id,
                   interaction.customizationArgs));
             }
             return shortAnswerHtml;

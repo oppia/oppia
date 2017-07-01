@@ -49,6 +49,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
   // happens if the current card offers feedback to the learner before they
   // carry on.
   var transcript = [];
+  var numOfAnswersSubmitted = 0;
 
   return {
     restore: function(oldTranscript) {
@@ -56,6 +57,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
     },
     init: function() {
       transcript = [];
+      numOfAnswersSubmitted = 0;
     },
     getStateHistory: function() {
       var result = [];
@@ -84,49 +86,32 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
 
       lastCard.destStateName = newDestStateName;
     },
-    addNewAnswer: function(answer) {
+    addNewInput: function(input, isHint) {
       var pairs = transcript[transcript.length - 1].inputResponsePairs;
       if (pairs.length > 0 &&
-          pairs[pairs.length - 1].oppiaFeedbackHtml === null) {
+          pairs[pairs.length - 1].oppiaResponse === null) {
         throw Error(
-          'Trying to add an answer before the feedback for the previous ' +
-          'answer has been received.',
+          'Trying to add an input before the response for the previous ' +
+          'input has been received.',
           transcript);
       }
+      if (!isHint) {
+        numOfAnswersSubmitted += 1;
+      }
       transcript[transcript.length - 1].inputResponsePairs.push({
-        learnerAnswer: answer,
-        oppiaFeedbackHtml: null
+        learnerInput: input,
+        oppiaResponse: null,
+        isHint: isHint
       });
     },
-    addNewHintRequest: function(hintRequest) {
+    addNewResponse: function(response) {
       var pairs = transcript[transcript.length - 1].inputResponsePairs;
-      if (pairs.length > 0 &&
-        pairs[pairs.length - 1].oppiaHint === null) {
+      if (pairs[pairs.length - 1].oppiaResponse !== null) {
         throw Error(
-          'Trying to add a hint request before the hint for the previous ' +
-          'request has been received.',
+          'Trying to add a response when it has already been added.',
           transcript);
       }
-      transcript[transcript.length - 1].inputResponsePairs.push({
-        hintRequest: hintRequest,
-        oppiaHint: null
-      });
-    },
-    addNewFeedback: function(feedbackHtml) {
-      var pairs = transcript[transcript.length - 1].inputResponsePairs;
-      if (pairs[pairs.length - 1].oppiaFeedbackHtml !== null) {
-        throw Error(
-          'Trying to add feedback when it has already been added.', transcript);
-      }
-      pairs[pairs.length - 1].oppiaFeedbackHtml = feedbackHtml;
-    },
-    addNewHint: function(hint) {
-      var pairs = transcript[transcript.length - 1].inputResponsePairs;
-      if (pairs[pairs.length - 1].oppiaHint !== null) {
-        throw Error(
-          'Trying to add hint when it has already been added.', transcript);
-      }
-      pairs[pairs.length - 1].oppiaHint = hint;
+      pairs[pairs.length - 1].oppiaResponse = response;
     },
     getNumCards: function() {
       return transcript.length;
@@ -146,7 +131,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
       return this.getCard(transcript.length - 1);
     },
     getNumSubmitsForLastCard: function() {
-      return this.getLastCard().inputResponsePairs.length;
+      return numOfAnswersSubmitted;
     },
     updateLatestInteractionHtml: function(newInteractionHtml) {
       this.getLastCard().interactionHtml = newInteractionHtml;

@@ -22,7 +22,9 @@ oppia.directive('hintButton', [
       restrict: 'E',
       scope: {
         isDisabled: '&',
-        onClickHintButton: '&'
+        onClickHintButton: '&',
+        allHintsAreExhausted: '&',
+        currentHintIsAvailable: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +

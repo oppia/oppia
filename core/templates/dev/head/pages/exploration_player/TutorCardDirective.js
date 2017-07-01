@@ -54,16 +54,12 @@ oppia.directive('tutorCard', [
         'ExplorationPlayerStateService', 'windowDimensionsService',
         'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'WAIT_FOR_HINT_MSEC', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
-        'HINT_REQUEST_STRINGS_ARRAY',
         function(
           $scope, $timeout, oppiaPlayerService, HintManagerService,
           playerPositionService, playerTranscriptService,
           ExplorationPlayerStateService, windowDimensionsService,
           urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
-          CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-          WAIT_FOR_HINT_MSEC, DELAY_FOR_HINT_FEEDBACK_MSEC,
-          HINT_REQUEST_STRINGS_ARRAY) {
+          CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -81,37 +77,37 @@ oppia.directive('tutorCard', [
               ExplorationPlayerStateService.getInteractionInstructions(
                 $scope.activeCard.stateName));
 
-            HintManagerService.activateHintAfterTimeout();
+            HintManagerService.disableHintButtonTemporarily();
 
-            $scope.currentInteractionHints = oppiaPlayerService.getInteraction(
-              $scope.activeCard.stateName).hints;
+            HintManagerService.init(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).hints);
+
+            $scope.currentInteractionHints = HintManagerService.getHints();
           };
 
           $scope.arePreviousResponsesShown = false;
 
           $scope.waitingForOppiaFeedback = false;
 
-          $scope.showHint = function() {
-            var isSupplementalCard = false;
-            HintManagerService.showHint(
-              $scope.currentInteractionHints, isSupplementalCard);
+          $scope.processHintRequest = function() {
+            HintManagerService.processHintRequest();
           };
 
           $scope.isHintAvailable = function() {
             var hintIsAvailable = (
-              HintManagerService.isCurrentHintUsable() &&
+              HintManagerService.isCurrentHintAvailable() &&
               !HintManagerService.areAllHintsExhausted(
-                $scope.currentInteractionHints.length));
+                HintManagerService.getHints().length));
             return hintIsAvailable;
           };
 
           $scope.areAllHintsExhausted = function() {
             return HintManagerService.areAllHintsExhausted(
-              $scope.currentInteractionHints.length);
+              HintManagerService.getHints().length);
           };
 
-          $scope.isCurrentHintUsable = function() {
-            return HintManagerService.isCurrentHintUsable();
+          $scope.isCurrentHintAvailable = function() {
+            return HintManagerService.isCurrentHintAvailable();
           };
 
           $scope.isIframed = urlService.isIframed();
