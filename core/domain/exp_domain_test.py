@@ -960,7 +960,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         audio_translation.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid language code'
+            utils.ValidationError, 'Expected language code to be a string'
             ):
             with self.swap(audio_translation, 'language_code', 20):
                 audio_translation.validate()
@@ -970,6 +970,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_translation, 'language_code', 'invalid-code'):
                 audio_translation.validate()
 
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected audio filename to be a string'
+            ):
+            with self.swap(audio_translation, 'filename', 20):
+                audio_translation.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
@@ -987,7 +992,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 audio_translation.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid file size'
+            utils.ValidationError, 'Expected file size to be an int'
             ):
             with self.swap(audio_translation, 'file_size_bytes', 'abc'):
                 audio_translation.validate()
@@ -998,7 +1003,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 audio_translation.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid needs_update attribute'
+            utils.ValidationError, 'Expected needs_update to be a bool'
             ):
             with self.swap(audio_translation, 'needs_update', 'hello'):
                 audio_translation.validate()

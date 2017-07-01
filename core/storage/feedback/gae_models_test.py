@@ -91,7 +91,8 @@ class SuggestionModelTest(test_utils.GenericTestBase):
             state_name='state_name',
             description='description',
             state_content={
-                'type': 'text', 'value': 'suggestion_text'
+                'type': 'text',
+                'value': 'suggestion_text'
             }
         )]
 

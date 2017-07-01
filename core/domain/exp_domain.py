@@ -358,7 +358,8 @@ class AudioTranslation(object):
     def validate(self):
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code)
+                'Expected language code to be a string, received: %s' %
+                self.language_code)
         allowed_audio_language_codes = [
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
         if self.language_code not in allowed_audio_language_codes:
@@ -367,7 +368,8 @@ class AudioTranslation(object):
 
         if not isinstance(self.filename, basestring):
             raise utils.ValidationError(
-                'Invalid audio filename: %s' % self.filename)
+                'Expected audio filename to be a string, received %s' %
+                self.filename)
         dot_index = self.filename.rfind('.')
         if dot_index == -1 or dot_index == 0:
             raise utils.ValidationError(
@@ -381,14 +383,16 @@ class AudioTranslation(object):
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
-                'Invalid file size: %s' % self.file_size_bytes)
+                'Expected file size to be an int, received %s' %
+                self.file_size_bytes)
         if self.file_size_bytes <= 0:
             raise utils.ValidationError(
                 'Invalid file size: %s' % self.file_size_bytes)
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(
-                'Invalid needs_update attribute: %s' % self.needs_update)
+                'Expected needs_update to be a bool, received %s' %
+                self.needs_update)
 
 
 class SubtitledHtml(object):
