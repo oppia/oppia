@@ -36,12 +36,12 @@
         </li>
       </ul>
     </li>
-    <li class="sidebar-item">
-      <div id="5" class="sidebar-item-header">
-        <i ng-click="" class="collapse-icon material-icons">
-          &#xE5C7;
+    <li ng-hide="sidebarModeService.isSidebarInReadonlyMode()" class="sidebar-item">
+      <div class="sidebar-item-header">
+        <i ng-click="addNewQuestion();" class="add-icon material-icons">
+          &#xe145;
         </i>
-        <strong ng-click="scrollToQuestion(question)">Add a question</strong>
+        <strong>Add new question</strong>
       </div>
     </li>
   </ul>
