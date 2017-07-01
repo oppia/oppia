@@ -375,6 +375,7 @@ def get_classifier_exploration_mapping(
     return classifier_domain.ClassifierExplorationMapping(
         exp_id, exp_version, state_name, classifier_id)
 
+
 def get_classifier_from_exploration_attributes(exp_id, exp_version,
                                                state_name):
     """Gets the classifier object from the exploration attributes.
@@ -403,7 +404,7 @@ def get_classifier_from_exploration_attributes(exp_id, exp_version,
 
 def create_classifier_exploration_mapping(exp_id, exp_version, state_name,
                                           classifier_id):
-    """Creates an entry for Classifier Exploration Mapping in datastore
+    """Creates an entry for Classifier Exploration Mapping in datastore.
 
     Args:
         exp_id: str. ID of the exploration.
@@ -412,7 +413,7 @@ def create_classifier_exploration_mapping(exp_id, exp_version, state_name,
         classifier_id: str. ID of the classifier.
 
     Returns:
-        mapping_id : str. ID of the classifier exploration mapping.
+        mapping_id : str. ID of the classifier exploration mapping instance.
     """
     classifier_exploration_mapping_model = (
         classifier_models.ClassifierExplorationMappingModel.get_model(
@@ -427,4 +428,4 @@ def create_classifier_exploration_mapping(exp_id, exp_version, state_name,
         classifier_exploration_mapping.validate()
         mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
             exp_id, exp_version, state_name, classifier_id)
-    return mapping_id
+        return mapping_id

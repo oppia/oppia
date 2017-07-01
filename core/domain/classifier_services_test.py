@@ -278,7 +278,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.state_name, state_name)
         self.assertEqual(classifier.id, classifier_id)
 
-
     def test_creation_of_classifier_exploration_mapping(self):
         """Test the create_classifier_exploration_mapping method."""
 
