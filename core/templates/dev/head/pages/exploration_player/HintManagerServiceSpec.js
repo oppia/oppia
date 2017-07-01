@@ -25,7 +25,7 @@ describe('Hint manager service', function() {
   }));
 
   it('should consume hints correctly', function() {
-    pts.init([{
+    pts.setHints([{
       hintText: 'one'
     }, {
       hintText: 'two'
