@@ -40,6 +40,25 @@ oppia.directive('simpleEditorSidebar', [
           $scope.questionList = SimpleEditorManagerService.getQuestionList();
           $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
           $scope.sidebarModeService = SimpleEditorSidebarModeService;
+          $scope.addNewQuestion = function() {
+            if (!SimpleEditorManagerService.canAddNewQuestion()) {
+              return;
+            }
+            $scope.sidebarModeService.setModeToReadonly();
+            SimpleEditorManagerService.addNewQuestion();
+            $scope.questionList = SimpleEditorManagerService.getQuestionList();
+            var end = $scope.questionList.getQuestionAt(
+              $scope.questionList.getQuestionCount() - 1);
+        // for (var i = 0; i < $scope.questionList.getQuestionCount(); i++) {
+              // console.log($scope.questionList.getQuestionAt(1));
+            // }
+//         console.log(JSON.stringify($scope.questionList.getLastQuestion()));
+//            console.log(JSON.stringify(
+//SimpleEditorManagerService.getQuestionList().getLastQuestion()));
+            $scope.scrollToQuestion(end);
+//            ScrollSyncService.scrollTo(end.getId());
+          };
+
           $scope.getSidebarItemId = function(question, subfieldLabel) {
             return QuestionIdService.getSidebarItemId(
               question.getId(), subfieldLabel

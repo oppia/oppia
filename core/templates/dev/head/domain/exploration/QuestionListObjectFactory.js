@@ -31,6 +31,10 @@ oppia.factory('QuestionListObjectFactory', [function() {
     return this._questions.slice();
   };
 
+  QuestionList.prototype.getQuestionAt = function(i) {
+    return this._questions[i];
+  };
+
   QuestionList.prototype.addQuestion = function(question) {
     this._questions.push(question);
   };
