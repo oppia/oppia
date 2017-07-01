@@ -56,6 +56,13 @@ oppia.controller('SettingsTab', [
     var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
+    //The following sets up the labels of metadata form on the settings tab.
+    $scope.metadataFormTitle = 'Title';
+    $scope.metadataFormObjective = 'Goal';
+    $scope.metadataFormCategory = 'Category';
+    $scope.metadataFormLanguage = 'Language';
+    $scope.metadataFormTags = 'Tags';
+
     $scope.getExplorePageUrl = function() {
       return (
         window.location.protocol + '//' + window.location.host +

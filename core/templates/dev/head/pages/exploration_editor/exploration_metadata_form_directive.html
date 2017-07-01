@@ -1,5 +1,5 @@
 <p ng-class="{'has-error': !explorationTitleService.displayed.length > 0}">
-  Add a title: what should your exploration be called?
+  <label ng-style="formStyle">{{metadataFormTitle}}</label>
   <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40" ng-trim="false">
   <span class="help-block" style="font-size: smaller">
     <em>Please use at most 40 characters, so that this fits in the summary card.</em>
@@ -11,7 +11,7 @@
 <form name="objectiveForm">
   <p ng-class="{'has-error': ((explorationObjectiveService.displayed.length < 15) ||
   (explorationObjectiveService.displayed.length > 100))}">
-    Add a goal: what does the exploration help people to do?
+    <label ng-style="formStyle">{{metadataFormObjective}}</label>
     <input id="explorationObjective" type="text" class="form-control protractor-test-exploration-objective-input"
     ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to..." ng-trim="false">
     <span class="help-block" style="font-size: smaller"> 
@@ -23,7 +23,7 @@
   </p>
 </form>
 <p ng-if="explorationInitStateNameService.displayed">
-  Name of first card
+  <label ng-style="formStyle">Name of first card</label>
   <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames track by name">
   </select>
   <span class="help-block" style="font-size: smaller">
@@ -31,7 +31,7 @@
   </span>
 </p>
 <p ng-class="{'has-error': !explorationCategoryService.displayed}">
-  Add a category: how would you categorize your exploration?
+  <label ng-style="formStyle">{{metadataFormCategory}}</label>
   <select2-dropdown id="explorationCategory"
                     class="protractor-test-exploration-category-input"
                     item="explorationCategoryService.displayed"
@@ -50,17 +50,17 @@
 </p>
 
 <p>
-  Verify the language: is your exploration written in this language?
+  <label ng-style="formStyle">{{metadataFormLanguage}}</label>
   <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
   </select>
-<span class="help-block" style="font-size: smaller">
-  <em>
-    Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank">Tell us.</a>
-  </em>
-</span>
+  <span class="help-block" style="font-size: smaller">
+    <em>
+      Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank">Tell us.</a>
+    </em>
+  </span>
 </p>
 <p>
-  Add tags to help learners discover your exploration.
+  <label ng-style="formStyle">{{metadataFormTags}}</label>
   <select2-dropdown item="explorationTagsService.displayed"
                     tag-mode="true"
                     allow-multiple-choices="true"

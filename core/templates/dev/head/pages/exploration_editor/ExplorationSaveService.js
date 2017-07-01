@@ -300,6 +300,21 @@ oppia.factory('explorationSaveService', [
 
                 $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
+                //The following sets up the labels of metadata form on the
+                // publish modal.
+                $scope.metadataFormTitle = (
+                  'Add a title: what should your exploration be called?');
+                $scope.metadataFormObjective = (
+                  'Add a goal: what does the exploration help people to do?');
+                $scope.metadataFormCategory = (
+                  ('Add a category: how would you categorize your') + (
+                  'exploration?'));
+                $scope.metadataFormLanguage = (
+                  ('Verify the language: is your exploration written in ') + (
+                    'this language?'));
+                $scope.metadataFormTags = (
+                  'Add tags to help learners discover your exploration.');
+
                 $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
                 for (var i = 0; i < ALL_CATEGORIES.length; i++) {
