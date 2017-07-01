@@ -92,7 +92,7 @@ describe('Player transcript service', function() {
     }).toThrow(
       new Error('Trying to add a response when it has already been added.'));
 
-    pts.addNewInput('second answer', false);
+    pts.addNewInput('second answer', true);
 
     var firstCard = pts.getCard(0);
     expect(firstCard.inputResponsePairs).toEqual([{
@@ -102,8 +102,9 @@ describe('Player transcript service', function() {
     }, {
       learnerInput: 'second answer',
       oppiaResponse: null,
-      isHint: false
+      isHint: true
     }]);
+    expect(pts.getNumSubmitsForLastCard()).toBe(1);
   });
 
   it('should set a destination name correctly', function() {
@@ -134,11 +135,11 @@ describe('Player transcript service', function() {
     expect(pts.getLastStateName()).toBe('Second state');
 
     expect(pts.getNumSubmitsForLastCard()).toBe(0);
-    pts.addNewInput('first answer', null);
+    pts.addNewInput('first answer', false);
     expect(pts.getNumSubmitsForLastCard()).toBe(1);
     pts.addNewResponse('first feedback');
     expect(pts.getNumSubmitsForLastCard()).toBe(1);
-    pts.addNewInput('second answer', null);
+    pts.addNewInput('second answer', false);
     expect(pts.getNumSubmitsForLastCard()).toBe(2);
   });
 });

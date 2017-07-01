@@ -19,13 +19,13 @@
 describe('Hint manager service', function() {
   beforeEach(module('oppia'));
 
-  var pts;
+  var hms;
   beforeEach(inject(function($injector) {
-    pts = $injector.get('HintManagerService');
+    hms = $injector.get('HintManagerService');
   }));
 
   it('should consume hints correctly', function() {
-    pts.reset([{
+    hms.reset([{
       hintText: 'one'
     }, {
       hintText: 'two'
@@ -33,10 +33,9 @@ describe('Hint manager service', function() {
       hintText: 'three'
     }]);
 
-    expect(pts.getNumHintsConsumed()).toBe(0);
-    pts.consumeHint();
-    pts.consumeHint();
+    hms.consumeHint();
+    hms.consumeHint();
 
-    expect(pts.getCurrentHint()).toBe('three');
+    expect(hms.getCurrentHint()).toBe('three');
   });
 });

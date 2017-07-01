@@ -80,7 +80,6 @@ oppia.directive('tutorCard', [
                 $scope.activeCard.stateName));
             HintManagerService.reset(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints);
-            HintManagerService.disableHintButtonTemporarily();
 
             $scope.currentInteractionHintsLength = (
               oppiaPlayerService.getInteraction(
@@ -97,10 +96,8 @@ oppia.directive('tutorCard', [
                 HINT_REQUEST_STRING_I18N_IDS[Math.floor(
                   Math.random() * HINT_REQUEST_STRING_I18N_IDS.length)], true);
               $timeout(function () {
-                playerTranscriptService.addNewResponse(
-                  HintManagerService.getCurrentHint());
-                HintManagerService.consumeHint();
-                HintManagerService.disableHintButtonTemporarily();
+                var hint = HintManagerService.consumeHint();
+                playerTranscriptService.addNewResponse(hint);
               }, DELAY_FOR_HINT_FEEDBACK_MSEC);
             }
           };
@@ -116,9 +113,6 @@ oppia.directive('tutorCard', [
             return HintManagerService.areAllHintsExhausted();
           };
 
-          $scope.isCurrentHintAvailable = function() {
-            return HintManagerService.isCurrentHintAvailable();
-          };
 
           $scope.isIframed = urlService.isIframed();
 

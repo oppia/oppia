@@ -26,18 +26,22 @@ oppia.factory('HintManagerService', [
     var numHintsConsumed = 0;
     var timeout = null;
     var hints = [];
-
+    var _getCurrentHint = function() {
+      return hints[numHintsConsumed].hintText;
+    };
 
     return {
-      getCurrentHint: function() {
-        return hints[this.getNumHintsConsumed()].hintText;
-      },
       consumeHint: function() {
+        var currentHint = _getCurrentHint();
         numHintsConsumed += 1;
         currentHintIsAvailable = false;
-      },
-      getNumHintsConsumed: function() {
-        return numHintsConsumed;
+        if (timeout) {
+          $timeout.cancel(timeout);
+        }
+        timeout = $timeout(function() {
+          currentHintIsAvailable = true;
+        }, WAIT_FOR_HINT_MSEC);
+        return currentHint;
       },
       isCurrentHintAvailable: function() {
         return currentHintIsAvailable;
@@ -58,12 +62,6 @@ oppia.factory('HintManagerService', [
           $timeout.cancel(timeout);
         }
         hints = newHints;
-      },
-      disableHintButtonTemporarily: function() {
-        currentHintIsAvailable = false;
-        if (timeout) {
-          $timeout.cancel(timeout);
-        }
         timeout = $timeout(function() {
           currentHintIsAvailable = true;
         }, WAIT_FOR_HINT_MSEC);

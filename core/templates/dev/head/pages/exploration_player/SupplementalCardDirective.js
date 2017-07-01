@@ -52,7 +52,6 @@ oppia.directive('supplementalCard', [
             $scope.clearHelpCard();
             HintManagerService.reset(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints);
-            HintManagerService.disableHintButtonTemporarily();
 
             $scope.currentInteractionHintsLength = (
               oppiaPlayerService.getInteraction(
@@ -74,16 +73,15 @@ oppia.directive('supplementalCard', [
           };
 
           $scope.consumeHint = function() {
-            $scope.helpCardHtml = HintManagerService.getCurrentHint();
             if (!HintManagerService.areAllHintsExhausted()) {
+              var hint = '';
               playerTranscriptService.addNewInput(
                 HINT_REQUEST_STRING_I18N_IDS[Math.floor(
                   Math.random() * HINT_REQUEST_STRING_I18N_IDS.length)], true);
               $timeout(function () {
-                playerTranscriptService.addNewResponse(
-                  HintManagerService.getCurrentHint());
-                HintManagerService.consumeHint();
-                HintManagerService.disableHintButtonTemporarily();
+                hint = HintManagerService.consumeHint();
+                playerTranscriptService.addNewResponse(hint);
+                $scope.helpCardHtml = hint;
               }, DELAY_FOR_HINT_FEEDBACK_MSEC);
             }
           };

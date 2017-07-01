@@ -48,7 +48,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
   // happens if the current card offers feedback to the learner before they
   // carry on.
   var transcript = [];
-  var numOfAnswersSubmitted = 0;
+  var numAnswersSubmitted = 0;
 
   return {
     restore: function(oldTranscript) {
@@ -56,7 +56,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
     },
     init: function() {
       transcript = [];
-      numOfAnswersSubmitted = 0;
+      numAnswersSubmitted = 0;
     },
     getStateHistory: function() {
       var result = [];
@@ -74,7 +74,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
         inputResponsePairs: [],
         destStateName: null
       });
-      numOfAnswersSubmitted = 0;
+      numAnswersSubmitted = 0;
     },
     setDestination: function(newDestStateName) {
       var lastCard = this.getLastCard();
@@ -96,7 +96,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
           transcript);
       }
       if (!isHint) {
-        numOfAnswersSubmitted += 1;
+        numAnswersSubmitted += 1;
       }
       transcript[transcript.length - 1].inputResponsePairs.push({
         learnerInput: input,
@@ -131,7 +131,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
       return this.getCard(transcript.length - 1);
     },
     getNumSubmitsForLastCard: function() {
-      return numOfAnswersSubmitted;
+      return numAnswersSubmitted;
     },
     updateLatestInteractionHtml: function(newInteractionHtml) {
       this.getLastCard().interactionHtml = newInteractionHtml;
