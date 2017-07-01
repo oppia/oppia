@@ -16,6 +16,7 @@
 activities.
 """
 
+from constants import constants
 from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -147,9 +148,9 @@ class CreatorDashboardHandler(base.BaseHandler):
 
         def _get_intro_card_color(category):
             return (
-                feconf.CATEGORIES_TO_COLORS[category] if
-                category in feconf.CATEGORIES_TO_COLORS else
-                feconf.DEFAULT_COLOR)
+                constants.CATEGORIES_TO_COLORS[category] if
+                category in constants.CATEGORIES_TO_COLORS else
+                constants.DEFAULT_COLOR)
 
         def _round_average_ratings(rating):
             return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)

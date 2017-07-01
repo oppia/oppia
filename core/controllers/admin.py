@@ -30,6 +30,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import rte_component_registry
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -335,3 +336,40 @@ class AdminTopicsCsvDownloadHandler(base.BaseHandler):
             'attachment; filename=topic_similarities.csv')
         self.response.write(
             recommendations_services.get_topic_similarities_as_csv())
+
+
+class DataExtractionQueryHandler(base.BaseHandler):
+    """Handler for data extraction query."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
+    @require_super_admin
+    def get(self):
+        exp_id = self.request.get('exp_id')
+        exp_version = self.request.get('exp_version')
+        state_name = self.request.get('state_name')
+        num_answers = int(self.request.get('num_answers'))
+
+        exploration = exp_services.get_exploration_by_id(
+            exp_id, strict=False, version=exp_version)
+
+        if exploration is None:
+            raise self.InvalidInputException(
+                'No exploration with ID \'%s\' exists.' % exp_id)
+
+        if state_name not in exploration.states:
+            raise self.InvalidInputException(
+                'Exploration \'%s\' does not have \'%s\' state.'
+                % (exp_id, state_name))
+
+        state_answers = stats_services.get_state_answers(
+            exp_id, exp_version, state_name)
+        extracted_answers = state_answers.get_submitted_answer_dict_list()
+
+        if num_answers > 0:
+            extracted_answers = extracted_answers[:num_answers]
+
+        response = {
+            'data': extracted_answers
+        }
+        self.render_json(response)

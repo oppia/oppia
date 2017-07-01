@@ -22,6 +22,7 @@ import imghdr
 import logging
 import re
 
+from constants import constants
 from core.platform import models
 from core.domain import user_domain
 from core.domain import role_services
@@ -611,7 +612,7 @@ def create_new_user(user_id, email):
 
     user_settings = UserSettings(
         user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
-        preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
+        preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
     return user_settings

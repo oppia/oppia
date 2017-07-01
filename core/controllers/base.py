@@ -333,16 +333,9 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
-            'ALL_CATEGORIES': feconf.ALL_CATEGORIES,
-            'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ASSET_DIR_PREFIX': utils.get_asset_dir_prefix(),
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
-            'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
-            'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
-            'DEFAULT_CATEGORY_ICON': feconf.DEFAULT_THUMBNAIL_ICON,
-            'DEFAULT_COLOR': feconf.DEFAULT_COLOR,
             'DEV_MODE': feconf.DEV_MODE,
             'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
@@ -360,7 +353,6 @@ class BaseHandler(webapp2.RequestHandler):
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'SITE_NAME': feconf.SITE_NAME,
 
-            'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
             'can_create_collections': (
@@ -458,7 +450,8 @@ class BaseHandler(webapp2.RequestHandler):
         # GET_HANDLER_ERROR_RETURN_TYPE.
         # Otherwise, we check whether self.payload exists.
         if (self.payload is not None or
-                self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON):
+                self.GET_HANDLER_ERROR_RETURN_TYPE ==
+                feconf.HANDLER_TYPE_JSON):
             self.render_json(values)
         else:
             self.values.update(values)

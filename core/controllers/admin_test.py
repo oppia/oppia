@@ -15,6 +15,9 @@
 """Tests for the admin page."""
 
 from core.controllers import base
+from core.domain import exp_domain
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.tests import test_utils
 import feconf
 
@@ -161,3 +164,85 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
             csrf_token=csrf_token, expect_errors=True,
             expected_status_int=400)
+
+
+class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
+    """Tests for data extraction handler."""
+
+    EXP_ID = 'exp'
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(DataExtractionQueryHandlerTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, end_state_name='End')
+
+        stats_services.record_answer(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                'first answer', 'TextInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, {},
+                'a_session_id_val', 1.0))
+
+        stats_services.record_answer(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                'second answer', 'TextInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, {},
+                'a_session_id_val', 1.0))
+
+    def test_data_extraction_handler(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        # Test that it returns all answers when 'num_answers' is 0.
+        payload = {
+            'exp_id': self.EXP_ID,
+            'exp_version': self.exploration.version,
+            'state_name': self.exploration.init_state_name,
+            'num_answers': 0
+        }
+
+        response = self.get_json(
+            '/explorationdataextractionhandler', payload)
+        extracted_answers = response['data']
+        self.assertEqual(len(extracted_answers), 2)
+        self.assertEqual(extracted_answers[0]['answer'], 'first answer')
+        self.assertEqual(extracted_answers[1]['answer'], 'second answer')
+
+        # Make sure that it returns only 'num_answers' number of answers.
+        payload = {
+            'exp_id': self.EXP_ID,
+            'exp_version': self.exploration.version,
+            'state_name': self.exploration.init_state_name,
+            'num_answers': 1
+        }
+
+        response = self.get_json(
+            '/explorationdataextractionhandler', payload)
+        extracted_answers = response['data']
+        self.assertEqual(len(extracted_answers), 1)
+        self.assertEqual(extracted_answers[0]['answer'], 'first answer')
+
+    def test_that_handler_raises_exception(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        payload = {
+            'exp_id': self.EXP_ID,
+            'exp_version': self.exploration.version,
+            'state_name': 'state name',
+            'num_answers': 0
+        }
+
+        response = self.get_json(
+            '/explorationdataextractionhandler', payload,
+            expect_errors=True)
+
+        self.assertEqual(
+            response['error'],
+            'Exploration \'exp\' does not have \'state name\' state.')
+        self.assertEqual(
+            response['code'], 400)
