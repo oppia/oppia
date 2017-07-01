@@ -48,12 +48,13 @@ oppia.directive('supplementalCard', [
             }
             $scope.activeCard = playerTranscriptService.getCard(index);
             $scope.clearHelpCard();
+            HintManagerService.setHints(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).hints);
             HintManagerService.disableHintButtonTemporarily();
 
-            HintManagerService.init(oppiaPlayerService.getInteraction(
-              $scope.activeCard.stateName).hints);
-
-            $scope.currentInteractionHints = HintManagerService.getHints();
+            $scope.currentInteractionHintsLength = (
+              oppiaPlayerService.getInteraction(
+                $scope.activeCard.stateName).hints.length);
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
@@ -69,23 +70,22 @@ oppia.directive('supplementalCard', [
             $scope.helpCardHtml = null;
             $scope.helpCardHasContinueButton = false;
           };
+          console.log(HintManagerService.getNumHintsConsumed());
 
           $scope.processHintRequest = function() {
+            $scope.helpCardHtml = HintManagerService.getCurrentHint();
             HintManagerService.processHintRequest();
-            $scope.helpCardHtml = HintManagerService.getCurrentHintText();
           };
 
           $scope.isHintAvailable = function() {
             var hintIsAvailable = (
               HintManagerService.isCurrentHintAvailable() &&
-              !HintManagerService.areAllHintsExhausted(
-                HintManagerService.getHints().length));
+              !HintManagerService.areAllHintsExhausted());
             return hintIsAvailable;
           };
 
           $scope.areAllHintsExhausted = function() {
-            return HintManagerService.areAllHintsExhausted(
-              HintManagerService.getHints().length);
+            return HintManagerService.areAllHintsExhausted();
           };
 
           $scope.isCurrentHintAvailable = function() {

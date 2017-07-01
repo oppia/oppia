@@ -74,6 +74,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
         inputResponsePairs: [],
         destStateName: null
       });
+      numOfAnswersSubmitted = 0;
     },
     setDestination: function(newDestStateName) {
       var lastCard = this.getLastCard();

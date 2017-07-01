@@ -37,7 +37,7 @@ oppia.controller('StateEditor', [
     $scope.areFallbacksEnabled = (
       explorationAdvancedFeaturesService.areFallbacksEnabled);
 
-    $scope.isFallbackEditorEnabled = ENABLE_FALLBACK_EDITOR;
+    $scope.fallbackEditorIsEnabled = ENABLE_FALLBACK_EDITOR;
 
     $scope.isCurrentStateTerminal = false;
     $scope.isInteractionIdSet = false;

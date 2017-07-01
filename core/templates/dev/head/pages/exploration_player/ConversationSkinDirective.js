@@ -505,7 +505,7 @@ oppia.directive('conversationSkin', [
             hasInteractedAtLeastOnce = true;
 
             var _oldStateName = playerTranscriptService.getLastCard().stateName;
-            playerTranscriptService.addNewInput(answer);
+            playerTranscriptService.addNewInput(answer, false);
 
             var timeAtServerCall = new Date().getTime();
 

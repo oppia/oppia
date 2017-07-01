@@ -25,44 +25,34 @@ oppia.factory('HintManagerService', [
     var currentHintIsAvailable = false;
     var numHintsConsumed = 0;
     var timeout = null;
-    var currentHintText = '';
     var hints = [];
+    var _setCurrentHintAvailable = function(value) {
+      currentHintIsAvailable = value;
+    };
 
     return {
-      init: function(newHints) {
+      setHints: function(newHints) {
         hints = newHints;
       },
-      getHints: function() {
-        return hints;
-      },
       getCurrentHint: function() {
-        return this.getHints()[this.getNumHintsConsumed()].hintText;
+        return hints[this.getNumHintsConsumed()].hintText;
       },
       consumeHint: function() {
         numHintsConsumed += 1;
-        this.setCurrentHintAvailable(false);
+        _setCurrentHintAvailable(false);
       },
       getNumHintsConsumed: function() {
         return numHintsConsumed;
       },
-      setCurrentHintAvailable: function(value) {
-        currentHintIsAvailable = value;
-      },
       isCurrentHintAvailable: function() {
         return currentHintIsAvailable;
       },
-      activateHintAfterTimeout: function() {
+      makeCurrentHintAvailable: function() {
         $timeout.cancel(timeout);
-        timeout = $timeout(function() {
-          currentHintIsAvailable = true;
-        }, WAIT_FOR_HINT_MSEC);
+        _setCurrentHintAvailable(true);
       },
-      clearTimeout: function() {
-        $timeout.cancel(timeout);
-        this.setCurrentHintAvailable(true);
-      },
-      areAllHintsExhausted: function(numHints) {
-        return numHintsConsumed === numHints;
+      areAllHintsExhausted: function() {
+        return numHintsConsumed === hints.length;
       },
       reset: function() {
         numHintsConsumed = 0;
@@ -70,28 +60,25 @@ oppia.factory('HintManagerService', [
         $timeout.cancel(timeout);
       },
       disableHintButtonTemporarily: function() {
-        this.setCurrentHintAvailable(false);
-        this.activateHintAfterTimeout();
-      },
-      getCurrentHintText: function() {
-        return currentHintText;
+        _setCurrentHintAvailable(false);
+        $timeout.cancel(timeout);
+        timeout = $timeout(function() {
+          currentHintIsAvailable = true;
+        }, WAIT_FOR_HINT_MSEC);
       },
       processHintRequest: function() {
-        hints = this.getHints();
         var numHintsConsumed = this.getNumHintsConsumed();
+        var currentHint = this.getCurrentHint();
         if (numHintsConsumed < hints.length) {
-          currentHintText = this.getCurrentHint();
           playerTranscriptService.addNewInput(
             HINT_REQUEST_STRING_I18N_IDS[Math.floor(
               Math.random() * HINT_REQUEST_STRING_I18N_IDS.length)], true);
           $timeout(function() {
-            playerTranscriptService.addNewResponse(currentHintText);
+            playerTranscriptService.addNewResponse(currentHint);
           }, DELAY_FOR_HINT_FEEDBACK_MSEC);
           this.disableHintButtonTemporarily();
 
-          if (!this.areAllHintsExhausted(hints.length)) {
-            this.consumeHint();
-          }
+          this.consumeHint();
         }
       }
     };

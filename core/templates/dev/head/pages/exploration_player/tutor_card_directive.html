@@ -74,9 +74,8 @@
           <div class="protractor-test-conversation-input"
                angular-html-bind="activeCard.interactionHtml">
           </div>
-          <div ng-if="currentInteractionHints.length" style="text-align: right">
+          <div ng-if="currentInteractionHintsLength" style="text-align: right">
             <hint-button on-click-hint-button="processHintRequest()"
-                         is-disabled="!isHintAvailable()"
                          current-hint-is-available="isHintAvailable()"
                          all-hints-are-exhausted="areAllHintsExhausted()">
             </hint-button>

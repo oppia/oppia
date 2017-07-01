@@ -13,20 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the hint button in the exploration player.
+ * @fileoverview Unit tests for the Hint Manager service.
  */
 
-oppia.directive('hintButton', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        onClickHintButton: '&',
-        allHintsAreExhausted: '&',
-        currentHintIsAvailable: '&'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/' +
-        'hint_button_directive.html')
-    };
-  }]);
+describe('Hint manager service', function() {
+  beforeEach(module('oppia'));
+
+  var pts;
+  beforeEach(inject(function($injector) {
+    pts = $injector.get('HintManagerService');
+  }));
+
+  it('should consume hints correctly', function() {
+    pts.init([{
+      hintText: 'one'
+    }, {
+      hintText: 'two'
+    }, {
+      hintText: 'three'
+    }]);
+
+    expect(pts.getNumHintsConsumed()).toBe(0);
+    pts.consumeHint();
+    pts.consumeHint();
+
+    expect(pts.getCurrentHint()).toBe('three');
+  });
+});

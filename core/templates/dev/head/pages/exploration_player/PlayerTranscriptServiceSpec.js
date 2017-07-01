@@ -78,7 +78,7 @@ describe('Player transcript service', function() {
     pts.addNewCard('First state', {
       a: 'b'
     }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
-    pts.addNewInput('first answer');
+    pts.addNewInput('first answer', false);
     expect(function() {
       pts.addNewInput('invalid answer');
     }).toThrow(
@@ -92,17 +92,17 @@ describe('Player transcript service', function() {
     }).toThrow(
       new Error('Trying to add a response when it has already been added.'));
 
-    pts.addNewInput('second answer');
+    pts.addNewInput('second answer', false);
 
     var firstCard = pts.getCard(0);
     expect(firstCard.inputResponsePairs).toEqual([{
       learnerInput: 'first answer',
       oppiaResponse: 'feedback',
-      isHint: undefined
+      isHint: false
     }, {
       learnerInput: 'second answer',
       oppiaResponse: null,
-      isHint: undefined
+      isHint: false
     }]);
   });
 
