@@ -35,19 +35,7 @@ def check_activity_accessible(self, activity_id, activity_type):
     """
     if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
         if activity_id in feconf.DISABLED_EXPLORATION_IDS:
-            self.render_template(
-                'pages/error/disabled_exploration.html',
-                iframe_restriction=None)
-            return
-
-        # This check is needed in order to show the correct page when a 404
-        # error is raised. The self.request.get('iframed') part of the check is
-        # needed for backwards compatibility with older versions of the
-        # embedding script.
-        # *TODO: shift this according to recommendation
-        # if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
-        #         self.request.get('iframed')):
-        #     self.values['iframed'] = True
+            raise self.DisabledExplorationException
 
     activity_rights = (
         rights_manager.get_exploration_rights(activity_id, strict=False)

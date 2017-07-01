@@ -161,6 +161,13 @@ class ExplorationPageEmbed(base.BaseHandler):
             rights_manager.Actor(self.user_id).can_edit(
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
+        # This check is needed in order to show the correct page when a 404
+        # error is raised. The self.request.get('iframed') part of the check is
+        # needed for backwards compatibility with older versions of the
+        # embedding script.
+        if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
+                self.request.get('iframed')):
+            self.values['iframed'] = True
         try:
             # If the exploration does not exist, a 404 error is raised.
             exploration_data_values = _get_exploration_player_data(
@@ -327,8 +334,8 @@ class ClassifyHandler(base.BaseHandler):
     def post(self, unused_exploration_id):
         """Handle POST requests.
 
-        Note: unused_exploration_id is needed because @require_playable needs 2
-        arguments.
+        Note: unused_exploration_id is needed because
+            @acl_decorators.can_play_exploration needs 2 arguments.
         """
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
@@ -532,7 +539,7 @@ class RecommendationsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         collection_id = self.request.get('collection_id')

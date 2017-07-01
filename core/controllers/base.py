@@ -447,7 +447,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write(
             self.jinja2_env.get_template(filepath).render(**values))
 
-    def x_render_exception(self, error_code, values):
+    def _render_exception(self, error_code, values):
         """Renders an error page, or an error JSON response.
 
          Args:
@@ -511,6 +511,13 @@ class BaseHandler(webapp2.RequestHandler):
             self._render_exception(500, {'error': unicode(exception)})
             return
 
+        if isinstance(exception, self.DisabledExplorationException):
+            self.error(404)
+            self.render_template(
+                'pages/error/disabled_exploration.html',
+                iframe_restriction=None)
+            return
+
         self.error(500)
         self._render_exception(500, {'error': unicode(exception)})
 
@@ -528,6 +535,9 @@ class BaseHandler(webapp2.RequestHandler):
 
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
+
+    class DisabledExplorationException(Exception):
+        """Error class raising error when a disabled class is accessed."""
 
 
 class Error404Handler(BaseHandler):
