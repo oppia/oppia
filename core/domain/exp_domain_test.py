@@ -114,8 +114,8 @@ skin_customizations:
 states:
   %s:
     content:
-      audio_translations: []
-      html: ''
+    - type: text
+      value: ''
     interaction:
       answer_groups: []
       customization_args: {}
@@ -128,8 +128,8 @@ states:
     param_changes: []
   New state:
     content:
-      audio_translations: []
-      html: ''
+    - type: text
+      value: ''
     interaction:
       answer_groups: []
       customization_args: {}
@@ -2080,7 +2080,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 13
+schema_version: 14
 skin_customizations:
   panels_contents:
     bottom: []
@@ -2156,7 +2156,7 @@ states:
       id: TextInput
       solution: {}
     param_changes: []
-states_schema_version: 10
+states_schema_version: 11
 tags: []
 title: Title
 """)

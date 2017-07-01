@@ -214,11 +214,11 @@ class Suggestion(object):
             with the suggestion.
         state_name: str. The name of the state associated with the suggestion.
         description: str. A description of the suggestion.
-        state_content: str. The state's suggested content.
+        suggestion_html: str. The state's suggested content.
         """
 
     def __init__(self, full_thread_id, author_id, exploration_id,
-                 exploration_version, state_name, description, state_content):
+                 exploration_version, state_name, description, suggestion_html):
         """Initializes a Suggestion object."""
         self.id = full_thread_id
         self.author_id = author_id
@@ -226,7 +226,7 @@ class Suggestion(object):
         self.exploration_version = exploration_version
         self.state_name = state_name
         self.description = description
-        self.state_content = state_content
+        self.suggestion_html = suggestion_html
 
     def get_author_name(self):
         """Returns the author's username.
@@ -248,7 +248,7 @@ class Suggestion(object):
             'exploration_version': self.exploration_version,
             'state_name': self.state_name,
             'description': self.description,
-            'state_content': self.state_content
+            'suggestion_html': self.suggestion_html
         }
 
 

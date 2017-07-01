@@ -55,10 +55,10 @@ current_user_services = models.Registry.import_current_user_services()
 # changed to the desired new state name.
 NEW_STATE_TEMPLATE = {
     'classifier_model_id': None,
-    'content': [{
-        'type': 'text',
-        'value': ''
-    }],
+    'content': {
+        'html': '',
+        'audio_translations': [],
+    },
     'interaction': exp_domain.State.NULL_INTERACTION_DICT,
     'param_changes': [],
 }
