@@ -107,13 +107,10 @@ class LearnerDashboardHandler(base.BaseHandler):
 class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
 
-    def get(self):
+    def get(self, exploration_id, thread_id):
         """Handles GET requests."""
         if self.user_id is None:
             raise self.PageNotFoundException
-
-        exploration_id = self.request.get('exploration_id')
-        thread_id = self.request.get('thread_id')
 
         messages_object = feedback_services.get_messages(
             exploration_id, thread_id)
