@@ -20,7 +20,7 @@
 </div>
 
 <div ng-if="contentEditorIsOpen" class="protractor-test-state-content-editor">
-  <!-- TODO: fix stuff below. -->
+  <!-- TODO(sll): Instead of relying on content._html, create a state property for content with the usual 'displayed' and 'savedMemento' fields, and bind to the 'displayed' field. -->
   <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content._html">
   </schema-based-editor>
   <div style="margin-top: 2px;">

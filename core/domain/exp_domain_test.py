@@ -953,6 +953,76 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.validate(strict=True)
 
+    def test_audio_translation_validation(self):
+        """Test validation of audio translations."""
+        audio_translation = exp_domain.AudioTranslation(
+            'hi-en', 'a.mp3', 20, True)
+        audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language code'
+            ):
+            with self.swap(audio_translation, 'language_code', 20):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Unrecognized language code'
+            ):
+            with self.swap(audio_translation, 'language_code', 'invalid-code'):
+                audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid audio filename'
+            ):
+            with self.swap(audio_translation, 'filename', '.invalidext'):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid audio filename'
+            ):
+            with self.swap(audio_translation, 'filename', 'justanextension'):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid audio filename'
+            ):
+            with self.swap(audio_translation, 'filename', 'a.invalidext'):
+                audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid file size'
+            ):
+            with self.swap(audio_translation, 'file_size_bytes', 'abc'):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid file size'
+            ):
+            with self.swap(audio_translation, 'file_size_bytes', -3):
+                audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid needs_update attribute'
+            ):
+            with self.swap(audio_translation, 'needs_update', 'hello'):
+                audio_translation.validate()
+
+    def test_subtitled_html_validation(self):
+        """Test validation of subtitled HTML."""
+        audio_translation = exp_domain.AudioTranslation(
+            'hi-en', 'a.mp3', 20, True)
+        subtitled_html = exp_domain.SubtitledHtml(
+            'some html', [audio_translation])
+        subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content HTML'
+            ):
+            with self.swap(subtitled_html, 'html', 20):
+                subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected audio_translations to be a list'
+            ):
+            with self.swap(subtitled_html, 'audio_translations', 'not_list'):
+                subtitled_html.validate()
+
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')

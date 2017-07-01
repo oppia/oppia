@@ -2214,10 +2214,11 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
           switch (lostChange.property_name) {
             case 'content':
               if (newValue !== null) {
+                // TODO(sll): Also add display of audio translations here.
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div></div>').html(
                     '<strong>Edited content: </strong><div class="content">' +
-                      newValue.value + '</div>')
+                      newValue.html + '</div>')
                     .addClass('state-edit-desc'));
               }
               break;

@@ -17,53 +17,56 @@
  * domain objects.
  */
 
-oppia.factory('SubtitledHtmlObjectFactory', [function() {
-  var SubtitledHtml = function(html, audioTranslations) {
-    this._html = html;
-    this._audioTranslations = audioTranslations;
-  };
-
-  SubtitledHtml.prototype.getHtml = function() {
-    return this._html;
-  };
-
-  SubtitledHtml.prototype.setHtml = function(newHtml) {
-    // TODO(sll): Consider sanitizing here.
-    // TODO(sll): At this point do we invalidate the existing audio
-    // translations? In particular, saving empty HTML should invalidate all
-    // audio.
-    this._html = newHtml;
-  };
-
-  SubtitledHtml.prototype.getBindableAudioTranslations = function() {
-    return this._audioTranslations;
-  };
-
-  SubtitledHtml.prototype.isEmpty = function() {
-    return !this._html;
-  };
-
-  SubtitledHtml.prototype.toBackendDict = function() {
-    return {
-      html: this._html,
-      audio_translations: this._audioTranslations.map(function(translation) {
-        return translation.toBackendDict();
-      })
+oppia.factory('SubtitledHtmlObjectFactory', [
+  'AudioTranslationObjectFactory', function(AudioTranslationObjectFactory) {
+    var SubtitledHtml = function(html, audioTranslations) {
+      this._html = html;
+      this._audioTranslations = audioTranslations;
     };
-  };
 
-  SubtitledHtml.createFromBackendDict = function(subtitledHtmlBackendDict) {
-    return new SubtitledHtml(
-      subtitledHtmlBackendDict.html,
-      subtitledHtmlBackendDict.audio_translations.map(function(translation) {
-        return AudioTranslation.createFromBackendDict(translation);
-      })
-    );
-  };
+    SubtitledHtml.prototype.getHtml = function() {
+      return this._html;
+    };
 
-  SubtitledHtml.createDefault = function(html) {
-    return new SubtitledHtml(html, []);
-  };
+    SubtitledHtml.prototype.setHtml = function(newHtml) {
+      // TODO(sll): Consider sanitizing here.
+      // TODO(sll): At this point do we invalidate the existing audio
+      // translations? In particular, saving empty HTML should invalidate all
+      // audio.
+      this._html = newHtml;
+    };
 
-  return SubtitledHtml;
-}]);
+    SubtitledHtml.prototype.getBindableAudioTranslations = function() {
+      return this._audioTranslations;
+    };
+
+    SubtitledHtml.prototype.isEmpty = function() {
+      return !this._html;
+    };
+
+    SubtitledHtml.prototype.toBackendDict = function() {
+      return {
+        html: this._html,
+        audio_translations: this._audioTranslations.map(function(translation) {
+          return translation.toBackendDict();
+        })
+      };
+    };
+
+    SubtitledHtml.createFromBackendDict = function(subtitledHtmlBackendDict) {
+      return new SubtitledHtml(
+        subtitledHtmlBackendDict.html,
+        subtitledHtmlBackendDict.audio_translations.map(function(translation) {
+          return AudioTranslationObjectFactory.createFromBackendDict(
+            translation);
+        })
+      );
+    };
+
+    SubtitledHtml.createDefault = function(html) {
+      return new SubtitledHtml(html, []);
+    };
+
+    return SubtitledHtml;
+  }
+]);

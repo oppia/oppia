@@ -367,8 +367,11 @@ class AudioTranslation(object):
 
         if not isinstance(self.filename, basestring):
             raise utils.ValidationError(
-                'Invalid filename: %s' % self.filename)
+                'Invalid audio filename: %s' % self.filename)
         dot_index = self.filename.rfind('.')
+        if dot_index == -1 or dot_index == 0:
+            raise utils.ValidationError(
+                'Invalid audio filename: %s' % self.filename)
         extension = self.filename[dot_index + 1:]
         if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
             raise utils.ValidationError(
@@ -379,7 +382,7 @@ class AudioTranslation(object):
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
                 'Invalid file size: %s' % self.file_size_bytes)
-        if self.file_size_bytes < 0:
+        if self.file_size_bytes <= 0:
             raise utils.ValidationError(
                 'Invalid file size: %s' % self.file_size_bytes)
 
@@ -426,9 +429,9 @@ class SubtitledHtml(object):
             audio_translation.validate()
 
     def to_html(self, params):
-        """Exports this content object to an HTML string.
+        """Exports this SubtitledHTML object to an HTML string.
 
-        The content object is parameterized using the parameters in `params`.
+        The HTML is parameterized using the parameters in `params`.
         """
         if not isinstance(params, dict):
             raise Exception(

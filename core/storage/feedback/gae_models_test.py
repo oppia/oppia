@@ -108,6 +108,12 @@ class SuggestionModelTest(test_utils.GenericTestBase):
 
         self.assertIsNone(actual_suggestion)
 
+    def test_get_suggestion_html(self):
+        suggestion = (
+            feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+                'exp_id2', 'thread_id2'))
+        self.assertEqual(suggestion.get_suggestion_html(), 'suggestion_text')
+
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
     """Tests for FeedbackMessageEmailDataModel class"""
