@@ -28,9 +28,6 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
-    def mock_fun(self, obj, act_id):
-        return act_id
-
     class MockHandler(base.BaseHandler):
         @acl_decorators.can_play_exploration
         def get(self, exploration_id):
@@ -40,18 +37,18 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
         super(PlayExplorationDecoratorTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
         self.save_new_valid_exploration(
-            self.published_exp_id, self.OWNER_ID)
+            self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
-            self.private_exp_id, self.OWNER_ID)
+            self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(
-            self.OWNER_ID, self.published_exp_id)
+            self.owner_id, self.published_exp_id)
 
     def test_guest_can_access_published_exploration(self):
         response = self.get_json('/mock/%s' % self.published_exp_id)
@@ -77,9 +74,6 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
     published_col_id = 'col_id_1'
     private_col_id = 'col_id_2'
 
-    def mock_fun(self, obj, act_id):
-        return act_id
-
     class MockHandler(base.BaseHandler):
         @acl_decorators.can_play_collection
         def get(self, collection_id):
@@ -89,26 +83,26 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
         super(PlayCollectionDecoratorTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
         self.save_new_valid_exploration(
-            self.published_exp_id, self.OWNER_ID)
+            self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
-            self.private_exp_id, self.OWNER_ID)
+            self.private_exp_id, self.owner_id)
         self.save_new_valid_collection(
-            self.published_col_id, self.OWNER_ID,
+            self.published_col_id, self.owner_id,
             exploration_id=self.published_col_id)
         self.save_new_valid_collection(
-            self.private_col_id, self.OWNER_ID,
+            self.private_col_id, self.owner_id,
             exploration_id=self.private_col_id)
         rights_manager.publish_exploration(
-            self.OWNER_ID, self.published_exp_id)
+            self.owner_id, self.published_exp_id)
         rights_manager.publish_collection(
-            self.OWNER_ID, self.published_col_id)
+            self.owner_id, self.published_col_id)
 
     def test_guest_can_access_published_collection(self):
         response = self.get_json('/mock/%s' % self.published_col_id)
