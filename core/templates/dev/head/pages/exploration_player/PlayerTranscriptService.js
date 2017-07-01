@@ -31,15 +31,14 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
   // - contentHtml: the HTML representing the non-interactive content, i.e.
   //     what Oppia first says to the learner before asking for a response
   // - interactionHtml: the HTML representing the interaction
-  // - inputResponsePairs: a list of two types of objects:
-  //   - Answer/Feedback pair:
-  //     - learnerAnswer: the JS representation of the learner's answer
-  //     - oppiaFeedbackHtml: the HTML representation of Oppia's response to
-  //       this answer, or null if no response was given.
-  //   - Request/Hint pair:
-  //     - hintRequest: string representing the learner's request for a hint.
-  //     - oppiaHint: the HTML representation of Oppia's hint, or null if no
-  //       hint was provided.
+  // - inputResponsePairs: a list of input response pairs:
+  //   - learnerInput: the JS representation of the learner's input. This can
+  //       either be an answer or a request for a hint.
+  //   - oppiaResponse: the HTML representation of Oppia's response to
+  //       the learner's input. This could either be a hint or a feedback for
+  //       the learner's answer.
+  //   - isHint: A boolean value representing if the current input is a request
+  //       for a hint.
   // - destStateName: if non-null, this means that the learner is ready to move
   //     on. It represents the state name of the next card.
   //
