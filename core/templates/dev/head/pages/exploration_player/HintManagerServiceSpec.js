@@ -34,8 +34,8 @@ describe('Hint manager service', function() {
     }]);
 
     hms.consumeHint();
-    hms.consumeHint();
+    var currentHint = hms.consumeHint();
 
-    expect(hms.getCurrentHint()).toBe('three');
+    expect(currentHint).toBe('three');
   });
 });
