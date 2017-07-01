@@ -99,8 +99,8 @@ oppia.directive('tutorCard', [
               $timeout(function () {
                 playerTranscriptService.addNewResponse(
                   HintManagerService.getCurrentHint());
-                  HintManagerService.consumeHint();
-                  HintManagerService.disableHintButtonTemporarily();
+                HintManagerService.consumeHint();
+                HintManagerService.disableHintButtonTemporarily();
               }, DELAY_FOR_HINT_FEEDBACK_MSEC);
             }
           };
