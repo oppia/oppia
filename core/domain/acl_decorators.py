@@ -24,6 +24,14 @@ import feconf
 def check_activity_accessible(self, activity_id, activity_type):
     """Returns a boolean to signify whether given activity is accessible
     by the user or not.
+
+    Args:
+        activity_id: str. Id of the given activity.
+        activity_type: str. Signifies whether activity is exploration or
+            collection.
+
+    returns:
+        bool. True if activity is accessible else False.
     """
     if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
         if activity_id in feconf.DISABLED_EXPLORATION_IDS:
@@ -41,13 +49,16 @@ def check_activity_accessible(self, activity_id, activity_type):
         #         self.request.get('iframed')):
         #     self.values['iframed'] = True
 
-    activity_rights = rights_manager.get_activity_rights(
-        activity_type, activity_id)
+    activity_rights = (
+        rights_manager.get_exploration_rights(activity_id, strict=False)
+        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
+        else rights_manager.get_collection_rights(activity_id, strict=False))
 
     action_play_public = (
         role_services.ACTION_PLAY_ANY_PUBLIC_EXPLORATION
         if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
         else role_services.ACTION_PLAY_ANY_PUBLIC_COLLECTION)
+
     action_play_private = (
         role_services.ACTION_PLAY_ANY_PRIVATE_EXPLORATION
         if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
@@ -66,7 +77,7 @@ def check_activity_accessible(self, activity_id, activity_type):
             activity_rights.viewable_if_private)
 
 
-def play_exploration(handler):
+def can_play_exploration(handler):
     """Decorator to check whether user can play given exploration."""
 
     def test_can_play(self, exploration_id, **kwargs):
@@ -79,7 +90,7 @@ def play_exploration(handler):
     return test_can_play
 
 
-def play_collection(handler):
+def can_play_collection(handler):
     """Decorator to check whether user can play given collection."""
 
     def test_can_play(self, collection_id, **kwargs):
@@ -92,9 +103,9 @@ def play_collection(handler):
     return test_can_play
 
 
-def download_exploration(handler):
+def can_download_exploration(handler):
     """Decorator to check whether user can download given exploration.
-    If a user is authorized to play given exploration, he can download it.
+    If a user is authorized to play given exploration, they can download it.
     """
 
     def test_can_download(self, exploration_id, **kwargs):
@@ -107,9 +118,9 @@ def download_exploration(handler):
     return test_can_download
 
 
-def view_exploration_stats(handler):
+def can_view_exploration_stats(handler):
     """Decorator to check whether user can view exploration stats.
-    If a user is authorized to play given exploration, he can view its stats.
+    If a user is authorized to play given exploration, they can view its stats.
     """
 
     def test_can_view_stats(self, exploration_id, **kwargs):

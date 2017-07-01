@@ -699,7 +699,7 @@ class ExplorationDownloadHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.download_exploration
+    @acl_decorators.can_download_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
@@ -839,7 +839,7 @@ class ExplorationStatsVersionsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.play_exploration
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
@@ -857,7 +857,7 @@ class StateRulesStatsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.play_exploration
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:

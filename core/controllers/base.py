@@ -228,10 +228,6 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.actions = role_services.get_all_actions(self.role)
 
-        # *temp
-        print self.role
-        print self.actions
-
         rights_mgr_user = rights_manager.Actor(self.user_id)
         self.is_moderator = rights_mgr_user.is_moderator()
         self.is_admin = rights_mgr_user.is_admin()
@@ -451,7 +447,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write(
             self.jinja2_env.get_template(filepath).render(**values))
 
-    def _render_exception(self, error_code, values):
+    def x_render_exception(self, error_code, values):
         """Renders an error page, or an error JSON response.
 
          Args:
