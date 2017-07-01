@@ -232,7 +232,6 @@ class TestBase(unittest.TestCase):
 
     def get_json(self, url, params=None, expect_errors=False):
         """Get a JSON response, transformed to a Python object."""
-        print "TOLO", url
         json_response = self.testapp.get(
             url, params, expect_errors=expect_errors)
         return self._parse_json_response(

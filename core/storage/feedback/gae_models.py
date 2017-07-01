@@ -158,23 +158,6 @@ class FeedbackThreadModel(base_models.BaseModel):
             exploration_id, thread_id))
 
     @classmethod
-    def get_multi_by_exp_and_thread_ids(cls, exploration_ids, thread_ids):
-        """Gets the FeedbackThreadModels corresponding entry to the given IDs.
-
-        Args:
-            exploration_ids: str. IDs of the explorations.
-            thread_ids: str. IDs of the threads.
-
-        Returns
-            list(FeedbackThreadModel|None: Returns the corresponding
-                FeedbackThreadModel else None if the thread is not found.
-        """
-        full_thread_ids = [cls.generate_full_thread_id(
-            exploration_id, thread_id) for exploration_id, thread_id in zip(
-                exploration_ids, thread_ids)]
-        return cls.get_multi(full_thread_ids)
-
-    @classmethod
     def get_threads(cls, exploration_id, limit=feconf.DEFAULT_QUERY_LIMIT):
         """Returns a list of threads associated with the exploration, ordered
         by their "last updated" field. The number of entities fetched is
