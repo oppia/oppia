@@ -41,4 +41,20 @@ describe('Hint manager service', function() {
 
     expect(hms.areAllHintsExhausted()).toBe(true);
   });
+
+  it('should be displayed correctly', function() {
+    hms.reset([{
+      hintText: 'one'
+    }, {
+      hintText: 'two'
+    }, {
+      hintText: 'three'
+    }]);
+
+    expect(hms.isCurrentHintAvailable()).toBe(false);
+    hms.consumeHint();
+    expect(hms.isCurrentHintAvailable()).toBe(false);
+    hms.makeCurrentHintAvailable();
+    expect(hms.isCurrentHintAvailable()).toBe(true);
+  });
 });
