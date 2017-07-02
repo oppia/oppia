@@ -28,17 +28,21 @@ oppia.directive('supplementalCard', [
         '/pages/exploration_player/' +
         'supplemental_card_directive.html'),
       controller: [
-        '$scope', '$window', 'oppiaPlayerService',
-        'playerPositionService', 'playerTranscriptService',
-        'ExplorationObjectFactory', 'windowDimensionsService',
-        'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
-        'EVENT_ACTIVE_CARD_CHANGED', 'CONTINUE_BUTTON_FOCUS_LABEL',
+        '$scope', '$timeout', '$window', 'HintManagerService',
+        'oppiaPlayerService', 'playerPositionService',
+        'playerTranscriptService', 'ExplorationObjectFactory',
+        'windowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',
+        'TWO_CARD_THRESHOLD_PX', 'EVENT_ACTIVE_CARD_CHANGED',
+        'CONTINUE_BUTTON_FOCUS_LABEL', 'HINT_REQUEST_STRING_I18N_IDS',
+        'DELAY_FOR_HINT_FEEDBACK_MSEC',
         function(
-          $scope, $window, oppiaPlayerService,
-          playerPositionService, playerTranscriptService,
-          ExplorationObjectFactory, windowDimensionsService,
-          CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
-          EVENT_ACTIVE_CARD_CHANGED, CONTINUE_BUTTON_FOCUS_LABEL) {
+          $scope, $timeout, $window, HintManagerService,
+          oppiaPlayerService, playerPositionService,
+          playerTranscriptService, ExplorationObjectFactory,
+          windowDimensionsService, CONTENT_FOCUS_LABEL_PREFIX,
+          TWO_CARD_THRESHOLD_PX, EVENT_ACTIVE_CARD_CHANGED,
+          CONTINUE_BUTTON_FOCUS_LABEL, HINT_REQUEST_STRING_I18N_IDS,
+          DELAY_FOR_HINT_FEEDBACK_MSEC) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -46,6 +50,11 @@ oppia.directive('supplementalCard', [
             }
             $scope.activeCard = playerTranscriptService.getCard(index);
             $scope.clearHelpCard();
+            HintManagerService.reset(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).hints);
+
+            $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
+                $scope.activeCard.stateName).hints);
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
@@ -60,6 +69,30 @@ oppia.directive('supplementalCard', [
           $scope.clearHelpCard = function() {
             $scope.helpCardHtml = null;
             $scope.helpCardHasContinueButton = false;
+          };
+
+          $scope.consumeHint = function() {
+            if (!HintManagerService.areAllHintsExhausted()) {
+              playerTranscriptService.addNewInput(
+                HINT_REQUEST_STRING_I18N_IDS[Math.floor(
+                  Math.random() * HINT_REQUEST_STRING_I18N_IDS.length)], true);
+              $timeout(function () {
+                var hint = HintManagerService.consumeHint();
+                playerTranscriptService.addNewResponse(hint);
+                $scope.helpCardHtml = hint;
+              }, DELAY_FOR_HINT_FEEDBACK_MSEC);
+            }
+          };
+
+          $scope.isHintAvailable = function() {
+            var hintIsAvailable = (
+              HintManagerService.isCurrentHintAvailable() &&
+              !HintManagerService.areAllHintsExhausted());
+            return hintIsAvailable;
+          };
+
+          $scope.areAllHintsExhausted = function() {
+            return HintManagerService.areAllHintsExhausted();
           };
 
           $scope.isViewportNarrow = function() {

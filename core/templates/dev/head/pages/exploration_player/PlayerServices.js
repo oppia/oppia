@@ -298,23 +298,6 @@ oppia.factory('oppiaPlayerService', [
           // at oldState.interaction.default_outcome
           var outcome = angular.copy(classificationResult.outcome);
 
-          // If this is a return to the same state, and the resubmission trigger
-          // kicks in, replace the dest, feedback and param changes with that
-          // of the trigger.
-          if (outcome.dest === playerTranscriptService.getLastStateName()) {
-            for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
-              var fallback = oldState.interaction.fallbacks[i];
-              if (fallback.trigger.type === 'NthResubmission' &&
-                  fallback.trigger.customizationArgs.num_submits.value ===
-                    playerTranscriptService.getNumSubmitsForLastCard()) {
-                outcome.dest = fallback.outcome.dest;
-                outcome.feedback = fallback.outcome.feedback;
-                outcome.paramChanges = fallback.outcome.paramChanges;
-                break;
-              }
-            }
-          }
-
           var newStateName = outcome.dest;
           var newState = exploration.getState(newStateName);
 

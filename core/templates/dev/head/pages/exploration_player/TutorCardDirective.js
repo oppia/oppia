@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,17 +49,19 @@ oppia.directive('tutorCard', [
         '/pages/exploration_player/' +
         'tutor_card_directive.html'),
       controller: [
-        '$scope', 'oppiaPlayerService',
+        '$scope', '$timeout', 'oppiaPlayerService', 'HintManagerService',
         'playerPositionService', 'playerTranscriptService',
         'ExplorationPlayerStateService', 'windowDimensionsService',
         'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
+        'HINT_REQUEST_STRING_I18N_IDS', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
         function(
-          $scope, oppiaPlayerService,
+          $scope, $timeout, oppiaPlayerService, HintManagerService,
           playerPositionService, playerTranscriptService,
           ExplorationPlayerStateService, windowDimensionsService,
           urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
-          CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED) {
+          CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
+          HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -76,11 +78,40 @@ oppia.directive('tutorCard', [
             $scope.interactionInstructions = (
               ExplorationPlayerStateService.getInteractionInstructions(
                 $scope.activeCard.stateName));
+            HintManagerService.reset(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).hints);
+
+            $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
+                $scope.activeCard.stateName).hints);
           };
 
           $scope.arePreviousResponsesShown = false;
 
           $scope.waitingForOppiaFeedback = false;
+
+          $scope.consumeHint = function() {
+            if (!HintManagerService.areAllHintsExhausted()) {
+              playerTranscriptService.addNewInput(
+                HINT_REQUEST_STRING_I18N_IDS[Math.floor(
+                  Math.random() * HINT_REQUEST_STRING_I18N_IDS.length)], true);
+              $timeout(function () {
+                var hint = HintManagerService.consumeHint();
+                playerTranscriptService.addNewResponse(hint);
+              }, DELAY_FOR_HINT_FEEDBACK_MSEC);
+            }
+          };
+
+          $scope.isHintAvailable = function() {
+            var hintIsAvailable = (
+              HintManagerService.isCurrentHintAvailable() &&
+              !HintManagerService.areAllHintsExhausted());
+            return hintIsAvailable;
+          };
+
+          $scope.areAllHintsExhausted = function() {
+            return HintManagerService.areAllHintsExhausted();
+          };
+
 
           $scope.isIframed = urlService.isIframed();
 
@@ -134,6 +165,7 @@ oppia.directive('tutorCard', [
 
           $scope.$on('oppiaFeedbackAvailable', function() {
             $scope.waitingForOppiaFeedback = false;
+            HintManagerService.makeCurrentHintAvailable();
           });
 
           updateActiveCard();
