@@ -147,8 +147,10 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, OutcomeObjectFactory.createEmpty(lastStateName));
 
         var stateData = SimpleEditorShimService.getState(lastStateName);
+//        console.log(JSON.stringify(data.questionList.getQuestionCount()));
         data.questionList.addQuestion(QuestionObjectFactory.create(
           lastStateName, stateData.interaction, ''));
+//        console.log(JSON.stringify(data.questionList.getQuestionCount()));
       },
       deleteQuestion: function(question) {
         // - Change destination of answer groups that point to it.

@@ -17,7 +17,8 @@
  */
 
 oppia.directive('simpleEditorSidebar', [
-  'UrlInterpolationService', '$timeout', function(UrlInterpolationService, $timeout) {
+  'UrlInterpolationService', '$timeout', function(
+    UrlInterpolationService, $timeout) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -46,7 +47,6 @@ oppia.directive('simpleEditorSidebar', [
             }
             $scope.sidebarModeService.setModeToReadonly();
             SimpleEditorManagerService.addNewQuestion();
-            var end = $scope.questionList.getLastQuestion();
             $timeout(function() {
               $scope.scrollToQuestion($scope.questionList.getLastQuestion());
             }, 0);
