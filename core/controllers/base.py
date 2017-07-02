@@ -537,7 +537,8 @@ class BaseHandler(webapp2.RequestHandler):
         """Error class for an internal server side error (error code 500)."""
 
     class DisabledExplorationException(Exception):
-        """Error class raising error when a disabled class is accessed."""
+        """Error class for raising error when a disabled exploration is
+        accessed."""
 
 
 class Error404Handler(BaseHandler):
