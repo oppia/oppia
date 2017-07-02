@@ -20,7 +20,7 @@
 // follows:
 //
 // <some-html-element popover-placement="bottom"
-//                    popover-template="popover/feedback"
+//                    uib-popover-template="popover/feedback"
 //                    popover-trigger="click" state-name="<[STATE_NAME]>">
 // </some-html-element>
 //
@@ -60,7 +60,7 @@ oppia.directive('feedbackPopup', [
             oppiaPlayerService.getExplorationId());
 
           var getTriggerElt = function() {
-            // Find the popover trigger node (the one with a popover-template
+            // Find the popover trigger node (the one with a uib-popover-template
             // attribute). This is also the DOM node that contains the state
             // name. Since the popover DOM node is inserted as a sibling to the
             // node, we therefore climb up the DOM tree until we find the
@@ -74,7 +74,7 @@ oppia.directive('feedbackPopup', [
             var popoverChildElt = null;
             for (var i = 0; i < 10; i++) {
               elt = elt.parent();
-              if (!angular.isUndefined(elt.attr('popover-template-popup'))) {
+              if (!angular.isUndefined(elt.attr('uib-popover-template-popup'))) {
                 popoverChildElt = elt;
                 break;
               }
@@ -89,7 +89,7 @@ oppia.directive('feedbackPopup', [
             var childElts = popoverElt.children();
             for (var i = 0; i < childElts.length; i++) {
               var childElt = $(childElts[i]);
-              if (childElt.attr('popover-template')) {
+              if (childElt.attr('uib-popover-template')) {
                 triggerElt = childElt;
                 break;
               }

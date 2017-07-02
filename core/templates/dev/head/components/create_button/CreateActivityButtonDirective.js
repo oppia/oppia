@@ -22,10 +22,10 @@ oppia.directive('createActivityButton', [
       restrict: 'E',
       templateUrl: 'components/createActivityButton',
       controller: [
-        '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
+        '$scope', '$timeout', '$window', '$uibModal', 'ExplorationCreationService',
         'CollectionCreationService', 'siteAnalyticsService', 'urlService',
         function(
-            $scope, $timeout, $window, $modal, ExplorationCreationService,
+            $scope, $timeout, $window, $uibModal, ExplorationCreationService,
             CollectionCreationService, siteAnalyticsService, urlService) {
           $scope.creationInProgress = false;
 
@@ -55,24 +55,24 @@ oppia.directive('createActivityButton', [
             } else if (urlService.getPathname() !== '/creator_dashboard') {
               $window.location.replace('/creator_dashboard?mode=create');
             } else {
-              $modal.open({
+              $uibModal.open({
                 templateUrl: 'modals/createActivity',
                 backdrop: true,
                 controller: [
-                  '$scope', '$modalInstance',
-                  function($scope, $modalInstance) {
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
                     $scope.chooseExploration = function() {
                       ExplorationCreationService.createNewExploration();
-                      $modalInstance.close();
+                      $uibModalInstance.close();
                     };
 
                     $scope.chooseCollection = function() {
                       CollectionCreationService.createNewCollection();
-                      $modalInstance.close();
+                      $uibModalInstance.close();
                     };
 
                     $scope.cancel = function() {
-                      $modalInstance.dismiss('cancel');
+                      $uibModalInstance.dismiss('cancel');
                     };
 
                     $scope.explorationImgUrl = (

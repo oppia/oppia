@@ -18,9 +18,9 @@
  */
 
 oppia.controller('LearnerViewInfo', [
-  '$scope', '$modal', '$http', '$log', 'explorationContextService',
+  '$scope', '$uibModal', '$http', '$log', 'explorationContextService',
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-  function($scope, $modal, $http, $log, explorationContextService,
+  function($scope, $uibModal, $http, $log, explorationContextService,
     EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
     var explorationId = explorationContextService.getExplorationId();
     var expInfo = null;
@@ -44,7 +44,7 @@ oppia.controller('LearnerViewInfo', [
     };
 
     var openInformationCardModal = function() {
-      $modal.open({
+      $uibModal.open({
         animation: true,
         templateUrl: 'modal/informationCard',
         windowClass: 'oppia-modal-information-card',
@@ -54,9 +54,9 @@ oppia.controller('LearnerViewInfo', [
           }
         },
         controller: [
-          '$scope', '$window', '$modalInstance', 'oppiaDatetimeFormatter',
+          '$scope', '$window', '$uibModalInstance', 'oppiaDatetimeFormatter',
           'RatingComputationService', 'expInfo',
-          function($scope, $window, $modalInstance, oppiaDatetimeFormatter,
+          function($scope, $window, $uibModalInstance, oppiaDatetimeFormatter,
                    RatingComputationService, expInfo) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
@@ -113,7 +113,7 @@ oppia.controller('LearnerViewInfo', [
             $scope.objective = expInfo.objective;
 
             $scope.cancel = function() {
-              $modalInstance.dismiss();
+              $uibModalInstance.dismiss();
             };
           }
         ]

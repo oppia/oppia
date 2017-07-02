@@ -20,12 +20,12 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
+  '$scope', '$http', '$uibModal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'IMPROVE_TYPE_INCOMPLETE',
   function(
-      $scope, $http, $modal, alertsService, explorationStatesService,
+      $scope, $http, $uibModal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, IMPROVE_TYPE_INCOMPLETE) {
@@ -131,7 +131,7 @@ oppia.controller('StatisticsTab', [
         '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
         encodeURIComponent(stateName)
       ).then(function(response) {
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/stateStats',
           backdrop: true,
           resolve: {
@@ -149,9 +149,9 @@ oppia.controller('StatisticsTab', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
+            '$scope', '$uibModalInstance', '$filter', 'stateName', 'stateStats',
             'improvementType', 'visualizationsInfo', 'oppiaHtmlEscaper',
-            function($scope, $modalInstance, $filter, stateName, stateStats,
+            function($scope, $uibModalInstance, $filter, stateName, stateStats,
                 improvementType, visualizationsInfo, oppiaHtmlEscaper) {
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
@@ -177,7 +177,7 @@ oppia.controller('StatisticsTab', [
               $scope.visualizationsHtml = _getVisualizationsHtml();
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 alertsService.clearWarnings();
               };
             }

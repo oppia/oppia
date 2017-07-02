@@ -131,8 +131,8 @@ oppia.controller('StateEditor', [
 // A service which handles opening and closing the training modal used for both
 // unresolved answers and answers within the training data of a classifier.
 oppia.factory('trainingModalService', [
-  '$rootScope', '$modal', 'alertsService',
-  function($rootScope, $modal, alertsService) {
+  '$rootScope', '$uibModal', 'alertsService',
+  function($rootScope, $uibModal, alertsService) {
     return {
       openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
         alertsService.clearWarnings();
@@ -140,15 +140,15 @@ oppia.factory('trainingModalService', [
           $rootScope.$broadcast('externalSave');
         }
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/trainUnresolvedAnswer',
           backdrop: true,
           controller: [
-            '$scope', '$injector', '$modalInstance',
+            '$scope', '$injector', '$uibModalInstance',
             'explorationStatesService', 'editorContextService',
             'AnswerClassificationService', 'explorationContextService',
             'stateInteractionIdService', 'angularNameService',
-            function($scope, $injector, $modalInstance,
+            function($scope, $injector, $uibModalInstance,
                 explorationStatesService, editorContextService,
                 AnswerClassificationService, explorationContextService,
                 stateInteractionIdService, angularNameService) {
@@ -164,7 +164,7 @@ oppia.factory('trainingModalService', [
               };
 
               $scope.finishTraining = function() {
-                $modalInstance.close();
+                $uibModalInstance.close();
               };
 
               $scope.init = function() {

@@ -19,21 +19,21 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$modal', '$http', 'oppiaPlayerService', 'alertsService',
+  '$scope', '$uibModal', '$http', 'oppiaPlayerService', 'alertsService',
   'UrlInterpolationService', 'focusService', 'FLAG_EXPLORATION_URL_TEMPLATE',
-  function($scope, $modal, $http, oppiaPlayerService, alertsService,
+  function($scope, $uibModal, $http, oppiaPlayerService, alertsService,
     UrlInterpolationService, focusService, FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = oppiaPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/learnerViewSuggestion',
         backdrop: 'static',
         resolve: {},
         controller: [
-          '$scope', '$modalInstance', '$timeout', 'playerPositionService',
+          '$scope', '$uibModalInstance', '$timeout', 'playerPositionService',
           'oppiaPlayerService',
           function(
-              $scope, $modalInstance, $timeout, playerPositionService,
+              $scope, $uibModalInstance, $timeout, playerPositionService,
               oppiaPlayerService) {
             var stateName = playerPositionService.getCurrentStateName();
             $scope.originalHtml = oppiaPlayerService.getStateContentHtml(
@@ -47,11 +47,11 @@ oppia.controller('LearnerLocalNav', [
             }, 500);
 
             $scope.cancelSuggestion = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
 
             $scope.submitSuggestion = function() {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 id: oppiaPlayerService.getExplorationId(),
                 version: oppiaPlayerService.getExplorationVersion(),
                 stateName: stateName,
@@ -69,15 +69,15 @@ oppia.controller('LearnerLocalNav', [
         }).error(function(res) {
           alertsService.addWarning(res);
         });
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/learnerSuggestionSubmitted',
           backdrop: true,
           resolve: {},
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.close = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
               };
             }
           ]
@@ -86,12 +86,12 @@ oppia.controller('LearnerLocalNav', [
     };
 
     $scope.showFlagExplorationModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/flagExploration',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'playerPositionService',
-          function($scope, $modalInstance, playerPositionService) {
+          '$scope', '$uibModalInstance', 'playerPositionService',
+          function($scope, $uibModalInstance, playerPositionService) {
             $scope.flagMessageTextareaIsShown = false;
             var stateName = playerPositionService.getCurrentStateName();
 
@@ -104,7 +104,7 @@ oppia.controller('LearnerLocalNav', [
 
             $scope.submitReport = function() {
               if ($scope.flagMessage) {
-                $modalInstance.close({
+                $uibModalInstance.close({
                   report_type: $scope.flag,
                   report_text: $scope.flagMessage,
                   state: stateName
@@ -113,7 +113,7 @@ oppia.controller('LearnerLocalNav', [
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]
@@ -131,14 +131,14 @@ oppia.controller('LearnerLocalNav', [
         }).error(function(error) {
           alertsService.addWarning(error);
         });
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/explorationSuccessfullyFlagged',
           backdrop: true,
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.close = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]

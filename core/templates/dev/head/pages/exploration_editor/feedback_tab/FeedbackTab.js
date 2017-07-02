@@ -17,12 +17,12 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
+  '$scope', '$http', '$uibModal', '$timeout', '$rootScope', 'alertsService',
   'oppiaDatetimeFormatter', 'threadStatusDisplayService',
   'threadDataService', 'explorationStatesService', 'explorationData',
   'changeListService', 'StateObjectFactory',
   function(
-    $scope, $http, $modal, $timeout, $rootScope, alertsService,
+    $scope, $http, $uibModal, $timeout, $rootScope, alertsService,
     oppiaDatetimeFormatter, threadStatusDisplayService,
     threadDataService, explorationStatesService, explorationData,
     changeListService, StateObjectFactory) {
@@ -55,12 +55,12 @@ oppia.controller('FeedbackTab', [
     };
 
     $scope.showCreateThreadModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/editorFeedbackCreateThread',
         backdrop: true,
         resolve: {},
-        controller: ['$scope', '$modalInstance', function(
-          $scope, $modalInstance) {
+        controller: ['$scope', '$uibModalInstance', function(
+          $scope, $uibModalInstance) {
           $scope.newThreadSubject = '';
           $scope.newThreadText = '';
 
@@ -74,14 +74,14 @@ oppia.controller('FeedbackTab', [
               return;
             }
 
-            $modalInstance.close({
+            $uibModalInstance.close({
               newThreadSubject: newThreadSubject,
               newThreadText: newThreadText
             });
           };
 
           $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
           };
         }]
       }).result.then(function(result) {
@@ -113,7 +113,7 @@ oppia.controller('FeedbackTab', [
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
     $scope.showSuggestionModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/editorViewSuggestion',
         backdrop: true,
         size: 'lg',
@@ -143,11 +143,11 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'suggestionIsOpen', 'suggestionIsValid',
+          '$scope', '$uibModalInstance', 'suggestionIsOpen', 'suggestionIsValid',
           'unsavedChangesExist', 'suggestionStatus', 'description',
           'currentContent', 'newContent', 'editabilityService',
           function(
-            $scope, $modalInstance, suggestionIsOpen, suggestionIsValid,
+            $scope, $uibModalInstance, suggestionIsOpen, suggestionIsValid,
             unsavedChangesExist, suggestionStatus, description,
             currentContent, newContent, editabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
@@ -183,20 +183,20 @@ oppia.controller('FeedbackTab', [
             $scope.commitMessage = description;
 
             $scope.acceptSuggestion = function() {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
                 commitMessage: $scope.commitMessage
               });
             };
 
             $scope.rejectSuggestion = function() {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: ACTION_REJECT_SUGGESTION
               });
             };
 
             $scope.cancelReview = function() {
-              $modalInstance.dismiss();
+              $uibModalInstance.dismiss();
             };
           }
         ]

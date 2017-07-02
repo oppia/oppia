@@ -17,11 +17,11 @@
  */
 
 oppia.controller('ExplorationGraph', [
-  '$scope', '$modal', 'editorContextService', 'alertsService',
+  '$scope', '$uibModal', 'editorContextService', 'alertsService',
   'explorationStatesService', 'editabilityService', 'routerService',
   'graphDataService',
   function(
-      $scope, $modal, editorContextService, alertsService,
+      $scope, $uibModal, editorContextService, alertsService,
       explorationStatesService, editabilityService, routerService,
       graphDataService) {
     $scope.getGraphData = graphDataService.getGraphData;
@@ -49,7 +49,7 @@ oppia.controller('ExplorationGraph', [
     $scope.openStateGraphModal = function() {
       alertsService.clearWarnings();
 
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/stateGraph',
         backdrop: true,
         resolve: {
@@ -59,30 +59,30 @@ oppia.controller('ExplorationGraph', [
         },
         windowClass: 'oppia-large-modal-window',
         controller: [
-          '$scope', '$modalInstance', 'editorContextService',
+          '$scope', '$uibModalInstance', 'editorContextService',
           'graphDataService', 'isEditable',
-          function($scope, $modalInstance, editorContextService,
+          function($scope, $uibModalInstance, editorContextService,
                    graphDataService, isEditable) {
             $scope.currentStateName = editorContextService.getActiveStateName();
             $scope.graphData = graphDataService.getGraphData();
             $scope.isEditable = isEditable;
 
             $scope.deleteState = function(stateName) {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: 'delete',
                 stateName: stateName
               });
             };
 
             $scope.selectState = function(stateName) {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: 'navigate',
                 stateName: stateName
               });
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               alertsService.clearWarnings();
             };
           }

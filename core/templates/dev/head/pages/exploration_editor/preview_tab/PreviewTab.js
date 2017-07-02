@@ -18,7 +18,7 @@
  */
 
 oppia.controller('PreviewTab', [
-  '$scope', '$modal', '$q', '$timeout', 'LearnerParamsService',
+  '$scope', '$uibModal', '$q', '$timeout', 'LearnerParamsService',
   'explorationData', 'explorationAdvancedFeaturesService',
   'explorationCategoryService', 'editorContextService',
   'explorationGadgetsService', 'explorationInitStateNameService',
@@ -27,7 +27,7 @@ oppia.controller('PreviewTab', [
   'oppiaPlayerService', 'parameterMetadataService',
   'ParamChangeObjectFactory', 'UrlInterpolationService',
   function(
-      $scope, $modal, $q, $timeout, LearnerParamsService,
+      $scope, $uibModal, $q, $timeout, LearnerParamsService,
       explorationData, explorationAdvancedFeaturesService,
       explorationCategoryService, editorContextService,
       explorationGadgetsService, explorationInitStateNameService,
@@ -89,19 +89,19 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.showSetParamsModal = function(manualParamChanges, callback) {
-      var modalInstance = $modal.open({
+      var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/preview_tab/' +
           'preview_set_parameters_modal_directive.html'),
         backdrop: 'static',
         windowClass: 'oppia-preview-set-params-modal',
         controller: [
-          '$scope', '$modalInstance', 'routerService',
-          function($scope, $modalInstance, routerService) {
+          '$scope', '$uibModalInstance', 'routerService',
+          function($scope, $uibModalInstance, routerService) {
             $scope.manualParamChanges = manualParamChanges;
-            $scope.previewParamModalOk = $modalInstance.close;
+            $scope.previewParamModalOk = $uibModalInstance.close;
             $scope.previewParamModalCancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               routerService.navigateToMainTab();
             };
           }

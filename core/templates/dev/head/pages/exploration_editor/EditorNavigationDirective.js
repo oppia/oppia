@@ -23,14 +23,14 @@ oppia.directive('editorNavigation', [
       restrict: 'E',
       templateUrl: 'inline/editor_navigation_directive',
       controller: [
-        '$scope', '$rootScope', '$timeout', '$modal',
+        '$scope', '$rootScope', '$timeout', '$uibModal',
         'routerService', 'explorationRightsService',
         'explorationWarningsService',
         'stateEditorTutorialFirstTimeService',
         'threadDataService', 'siteAnalyticsService',
         'explorationContextService', 'windowDimensionsService',
         function(
-            $scope, $rootScope, $timeout, $modal,
+            $scope, $rootScope, $timeout, $uibModal,
             routerService, explorationRightsService,
             explorationWarningsService,
             stateEditorTutorialFirstTimeService,
@@ -53,16 +53,16 @@ oppia.directive('editorNavigation', [
           $scope.showUserHelpModal = function() {
             var explorationId = explorationContextService.getExplorationId();
             siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/' +
                 'help_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$modalInstance',
+                '$scope', '$uibModalInstance',
                 'siteAnalyticsService', 'explorationContextService',
                 function(
-                  $scope, $modalInstance,
+                  $scope, $uibModalInstance,
                   siteAnalyticsService, explorationContextService) {
                   var explorationId = (
                     explorationContextService.getExplorationId());
@@ -71,13 +71,13 @@ oppia.directive('editorNavigation', [
                     siteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                   };
 
                   $scope.goToHelpCenter = function() {
                     siteAnalyticsService.registerVisitHelpCenterEvent(
                       explorationId);
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ],

@@ -44,14 +44,14 @@ oppia.factory('interactionDetailsCache', [function() {
 }]);
 
 oppia.controller('StateInteraction', [
-  '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
+  '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
   'alertsService', 'editorContextService', 'oppiaHtmlEscaper',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory',
-  function($scope, $http, $rootScope, $modal, $injector, $filter,
+  function($scope, $http, $rootScope, $uibModal, $injector, $filter,
       alertsService, editorContextService, oppiaHtmlEscaper,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
@@ -181,18 +181,18 @@ oppia.controller('StateInteraction', [
       if (editabilityService.isEditable()) {
         alertsService.clearWarnings();
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/customizeInteraction',
           // Clicking outside this modal should not dismiss it.
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', '$injector',
+            '$scope', '$uibModalInstance', '$injector',
             'stateInteractionIdService', 'stateCustomizationArgsService',
             'interactionDetailsCache', 'INTERACTION_SPECS',
             'UrlInterpolationService', 'editorFirstTimeEventsService',
             function(
-                $scope, $modalInstance, $injector,
+                $scope, $uibModalInstance, $injector,
                 stateInteractionIdService, stateCustomizationArgsService,
                 interactionDetailsCache, INTERACTION_SPECS,
                 UrlInterpolationService, editorFirstTimeEventsService) {
@@ -334,15 +334,15 @@ oppia.controller('StateInteraction', [
               $scope.save = function() {
                 editorFirstTimeEventsService
                   .registerFirstSaveInteractionEvent();
-                $modalInstance.close();
+                $uibModalInstance.close();
               };
 
               $scope.okay = function() {
-                $modalInstance.close('okay');
+                $uibModalInstance.close('okay');
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]
@@ -355,17 +355,17 @@ oppia.controller('StateInteraction', [
 
     $scope.deleteInteraction = function() {
       alertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/deleteInteraction',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.reallyDelete = function() {
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               alertsService.clearWarnings();
             };
           }

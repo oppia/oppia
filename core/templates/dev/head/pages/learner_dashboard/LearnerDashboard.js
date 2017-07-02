@@ -50,14 +50,14 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('LearnerDashboard', [
-  '$scope', '$rootScope', '$window', '$http', '$modal',
+  '$scope', '$rootScope', '$window', '$http', '$uibModal',
   'EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'FATAL_ERROR_CODES',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
   'LEARNER_DASHBOARD_SECTIONS', 'LEARNER_DASHBOARD_SUBSECTIONS',
   function(
-      $scope, $rootScope, $window, $http, $modal, EXPLORATIONS_SORT_BY_KEYS,
+      $scope, $rootScope, $window, $http, $uibModal, EXPLORATIONS_SORT_BY_KEYS,
       SUBSCRIPTION_SORT_BY_KEYS, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, 
       FATAL_ERROR_CODES, HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
       LearnerDashboardBackendApiService, UrlInterpolationService,
@@ -193,7 +193,7 @@ oppia.controller('LearnerDashboard', [
 
     $scope.openRemoveEntityModal = function(
       sectionName, subSectionName, entity) {
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/removeEntity',
         backdrop: true,
         resolve: {
@@ -208,8 +208,8 @@ oppia.controller('LearnerDashboard', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', '$http', 'sectionName', 'subSectionName',
-          function($scope, $modalInstance, $http, sectionName, subSectionName) {
+          '$scope', '$uibModalInstance', '$http', 'sectionName', 'subSectionName',
+          function($scope, $uibModalInstance, $http, sectionName, subSectionName) {
             $scope.sectionName = sectionName;
             $scope.subSectionName = subSectionName;
             $scope.entityTitle = entity.title;
@@ -228,11 +228,11 @@ oppia.controller('LearnerDashboard', [
                   collection_id: entity.id
                 });
               }
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]

@@ -17,7 +17,7 @@
  */
 
 oppia.factory('explorationSaveService', [
-  '$modal', '$timeout', '$rootScope', '$log', '$q',
+  '$uibModal', '$timeout', '$rootScope', '$log', '$q',
   'alertsService', 'explorationData', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
@@ -27,7 +27,7 @@ oppia.factory('explorationSaveService', [
   'focusService', 'changeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   function(
-      $modal, $timeout, $rootScope, $log, $q,
+      $uibModal, $timeout, $rootScope, $log, $q,
       alertsService, explorationData, explorationStatesService,
       explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
@@ -74,20 +74,20 @@ oppia.factory('explorationSaveService', [
     };
 
     var showCongratulatorySharingModal = function() {
-      return $modal.open({
+      return $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'explorationContextService',
-          function($scope, $modalInstance, explorationContextService) {
+          '$scope', '$uibModalInstance', 'explorationContextService',
+          function($scope, $uibModalInstance, explorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
               GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
             $scope.close = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
             $scope.explorationId = (
               explorationContextService.getExplorationId());
@@ -101,17 +101,17 @@ oppia.factory('explorationSaveService', [
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
 
-      var publishModalInstance = $modal.open({
+      var publishModalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'exploration_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.publish = $modalInstance.close;
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+            $scope.publish = $uibModalInstance.close;
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               alertsService.clearWarnings();
               whenModalClosed.resolve();
             };
@@ -202,17 +202,17 @@ oppia.factory('explorationSaveService', [
       },
 
       discardChanges: function() {
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/confirmDiscardChanges',
           backdrop: 'static',
           keyboard: false,
           controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
               };
               $scope.confirmDiscard = function() {
-                $modalInstance.close();
+                $uibModalInstance.close();
               };
             }
           ]
@@ -220,16 +220,16 @@ oppia.factory('explorationSaveService', [
           alertsService.clearWarnings();
           $rootScope.$broadcast('externalSave');
 
-          $modal.open({
+          $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/' +
               'editor_reloading_modal_directive.html'),
             backdrop: 'static',
             keyboard: false,
             controller: [
-              '$scope', '$modalInstance', function($scope, $modalInstance) {
+              '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                 $timeout(function() {
-                  $modalInstance.dismiss('cancel');
+                  $uibModalInstance.dismiss('cancel');
                 }, 2500);
               }
             ],
@@ -260,17 +260,17 @@ oppia.factory('explorationSaveService', [
         // If the metadata has not yet been specified, open the pre-publication
         // 'add exploration metadata' modal.
         if (isAdditionalMetadataNeeded()) {
-          var modalInstance = $modal.open({
+          var modalInstance = $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/' +
               'exploration_metadata_modal_directive.html'),
             backdrop: 'static',
             controller: [
-              '$scope', '$modalInstance', 'explorationObjectiveService',
+              '$scope', '$uibModalInstance', 'explorationObjectiveService',
               'explorationTitleService', 'explorationCategoryService',
               'explorationStatesService', 'ALL_CATEGORIES',
               'explorationLanguageCodeService', 'explorationTagsService',
-              function($scope, $modalInstance, explorationObjectiveService,
+              function($scope, $uibModalInstance, explorationObjectiveService,
               explorationTitleService, explorationCategoryService,
               explorationStatesService, ALL_CATEGORIES,
               explorationLanguageCodeService, explorationTagsService) {
@@ -375,7 +375,7 @@ oppia.factory('explorationSaveService', [
                   // will be called when the draft changes entered here
                   // are properly saved to the backend.
                   $timeout(function() {
-                    $modalInstance.close(metadataList);
+                    $uibModalInstance.close(metadataList);
                   }, 500);
                 };
 
@@ -387,7 +387,7 @@ oppia.factory('explorationSaveService', [
                   explorationLanguageCodeService.restoreFromMemento();
                   explorationTagsService.restoreFromMemento();
 
-                  $modalInstance.dismiss('cancel');
+                  $uibModalInstance.dismiss('cancel');
                   alertsService.clearWarnings();
                 };
               }
@@ -485,7 +485,7 @@ oppia.factory('explorationSaveService', [
             return;
           }
 
-          var modalInstance = $modal.open({
+          var modalInstance = $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/' +
               'exploration_save_modal_directive.html'),
@@ -500,8 +500,8 @@ oppia.factory('explorationSaveService', [
             },
             windowClass: 'oppia-save-exploration-modal',
             controller: [
-              '$scope', '$modalInstance', 'isExplorationPrivate',
-              function($scope, $modalInstance, isExplorationPrivate) {
+              '$scope', '$uibModalInstance', 'isExplorationPrivate',
+              function($scope, $uibModalInstance, isExplorationPrivate) {
                 $scope.showDiff = false;
                 $scope.onClickToggleDiffButton = function() {
                   $scope.showDiff = !$scope.showDiff;
@@ -521,10 +521,10 @@ oppia.factory('explorationSaveService', [
                 $scope.laterVersionHeader = 'New changes';
 
                 $scope.save = function(commitMessage) {
-                  $modalInstance.close(commitMessage);
+                  $uibModalInstance.close(commitMessage);
                 };
                 $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
+                  $uibModalInstance.dismiss('cancel');
                   alertsService.clearWarnings();
                 };
               }

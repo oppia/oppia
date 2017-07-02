@@ -17,10 +17,10 @@
  */
 
 oppia.controller('Signup', [
-  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
+  '$scope', '$http', '$rootScope', '$uibModal', 'alertsService', 'urlService',
   'focusService', 'siteAnalyticsService',
   function(
-      $scope, $http, $rootScope, $modal, alertsService, urlService,
+      $scope, $http, $rootScope, $uibModal, alertsService, urlService,
       focusService, siteAnalyticsService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
@@ -49,14 +49,14 @@ oppia.controller('Signup', [
     };
 
     $scope.showLicenseExplanationModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/licenseExplanation',
         backdrop: true,
         resolve: {},
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.close = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]
