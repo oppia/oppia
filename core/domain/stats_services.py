@@ -34,10 +34,14 @@ def get_visualizations_info(exploration_id, state_name):
 
     Args:
         exploration_id: str. The exploration ID.
-        state_name: str. Name of the state
+        state_name: str. Name of the state.
 
     Returns:
-        list. Each item in the list is a dict with keys 'data' and 'options'.
+        list(dict). Each item in the list is a dict with keys and
+        values representing
+        {'id': visualization ID,
+        'data': calculation ID,
+        'options': visualization options}
     """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     if exploration.states[state_name].interaction.id is None:
