@@ -68,7 +68,6 @@ exports.config = {
 
     editorFeatures: [
       'protractor/gadgetEditor.js',
-      'protractor/fallbacks.js',
       'protractor/historyTab.js',
       'protractor/parameters.js'
     ],

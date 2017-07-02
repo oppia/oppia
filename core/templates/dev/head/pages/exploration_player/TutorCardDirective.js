@@ -81,9 +81,8 @@ oppia.directive('tutorCard', [
             HintManagerService.reset(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints);
 
-            $scope.currentInteractionHintsLength = (
-              oppiaPlayerService.getInteraction(
-                $scope.activeCard.stateName).hints.length);
+            $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
+                $scope.activeCard.stateName).hints);
           };
 
           $scope.arePreviousResponsesShown = false;

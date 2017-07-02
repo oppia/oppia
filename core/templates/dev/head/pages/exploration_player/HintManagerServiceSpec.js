@@ -38,5 +38,7 @@ describe('Hint manager service', function() {
     var currentHint = hms.consumeHint();
 
     expect(currentHint).toBe('three');
+
+    expect(hms.areAllHintsExhausted()).toBe(true);
   });
 });

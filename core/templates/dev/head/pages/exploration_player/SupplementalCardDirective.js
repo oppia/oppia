@@ -53,9 +53,8 @@ oppia.directive('supplementalCard', [
             HintManagerService.reset(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints);
 
-            $scope.currentInteractionHintsLength = (
-              oppiaPlayerService.getInteraction(
-                $scope.activeCard.stateName).hints.length);
+            $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
+                $scope.activeCard.stateName).hints);
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
@@ -74,12 +73,11 @@ oppia.directive('supplementalCard', [
 
           $scope.consumeHint = function() {
             if (!HintManagerService.areAllHintsExhausted()) {
-              var hint = '';
               playerTranscriptService.addNewInput(
                 HINT_REQUEST_STRING_I18N_IDS[Math.floor(
                   Math.random() * HINT_REQUEST_STRING_I18N_IDS.length)], true);
               $timeout(function () {
-                hint = HintManagerService.consumeHint();
+                var hint = HintManagerService.consumeHint();
                 playerTranscriptService.addNewResponse(hint);
                 $scope.helpCardHtml = hint;
               }, DELAY_FOR_HINT_FEEDBACK_MSEC);
