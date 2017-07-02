@@ -76,14 +76,10 @@ oppia.factory('ScrollSyncService', [
       // Scroll to an element in the editor given its id.
       scrollTo: function(id) {
         var element = angular.element($document[0].getElementById(id));
-        console.log(element);
-//        console.log(JSON.stringify(element));
         if (element && element.offset()) {
           $('html, body').animate({
             scrollTop: element.offset().top - Y_OFFSET_SMOOTH_SCROLL
           }, 'slow');
-        } else {
-          console.log('No element to scroll');
         }
       }
     };
