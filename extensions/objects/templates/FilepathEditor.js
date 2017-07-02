@@ -279,7 +279,6 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.generateImageFilename = function() {
-          var format = '.' + RESAMPLED_IMAGE_FORMAT;
           var date = new Date();
           return 'img_' +
               date.getFullYear() +
@@ -291,7 +290,7 @@ oppia.directive('filepathEditor', [
               ('0' + date.getSeconds()).slice(-2) +
               '_' +
               Math.random().toString(36).substr(2, 10) +
-              format;
+              '.' + RESAMPLED_IMAGE_FORMAT;
         };
 
         $scope.resizeRatio = 1;
