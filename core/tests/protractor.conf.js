@@ -100,9 +100,12 @@ exports.config = {
       'protractor/cacheSlugs.js',
       'protractor/staticPagesTour.js',
       'protractor/collections.js',
-      'protractor/embedding.js',
       'protractor/accessibility.js',
       'protractor/i18n.js'
+    ],
+
+    embedding: [
+      'protractor/embedding.js'
     ]
   },
 
