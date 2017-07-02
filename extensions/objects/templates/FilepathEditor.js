@@ -385,25 +385,25 @@ oppia.directive('filepathEditor', [
           var styles = {};
 
           // Position and size.
-          styles['left'] = $scope.croppingArea.x1 + 'px';
-          styles['top'] = $scope.croppingArea.y1 + 'px';
+          styles.left = $scope.croppingArea.x1 + 'px';
+          styles.top = $scope.croppingArea.y1 + 'px';
 
           var cropWidth = $scope.croppingArea.x2 - $scope.croppingArea.x1;
           var cropHeight = $scope.croppingArea.y2 - $scope.croppingArea.y1;
-          styles['width'] = cropWidth + 'px';
-          styles['height'] = cropHeight + 'px';
+          styles.width = cropWidth + 'px';
+          styles.height = cropHeight + 'px';
 
           // Cursor.
           var position = $scope.mousePositionWithinCroppingArea;
-          styles['cursor'] = CROP_CURSORS[position];
-          if (!styles['cursor']) {
-            styles['cursor'] = 'default';
+          styles.cursor = CROP_CURSORS[position];
+          if (!styles.cursor) {
+            styles.cursor = 'default';
           }
 
           // Translucent background layer.
           if ($scope.isUserCropping()) {
             var data = 'url(' + $scope.data.metadata.uploadedImageData + ')';
-            styles['background'] = data + ' no-repeat';
+            styles.background = data + ' no-repeat';
 
             var x = $scope.croppingArea.x1 + 3;  // Add crop area border.
             var y = $scope.croppingArea.y1 + 3;  // Add crop area border.
@@ -495,12 +495,14 @@ oppia.directive('filepathEditor', [
 
         $scope.decreaseResizePercent = function(amount) {
           // Do not allow to decrease size below 10%.
-          $scope.imageResizeRatio = Math.max(0.1, $scope.imageResizeRatio - amount / 100);
+          $scope.imageResizeRatio = Math.max(
+            0.1, $scope.imageResizeRatio - amount / 100);
         };
 
         $scope.increaseResizePercent = function(amount) {
           // Do not allow to increase size above 100% (only downsize allowed).
-          $scope.imageResizeRatio = Math.min(1, $scope.imageResizeRatio + amount / 100);
+          $scope.imageResizeRatio = Math.min(
+            1, $scope.imageResizeRatio + amount / 100);
         };
 
         $scope.calculateTargetImageDimensions = function() {
