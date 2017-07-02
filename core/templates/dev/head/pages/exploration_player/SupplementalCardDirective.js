@@ -54,7 +54,7 @@ oppia.directive('supplementalCard', [
               $scope.activeCard.stateName).hints);
 
             $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
-                $scope.activeCard.stateName).hints);
+              $scope.activeCard.stateName).hints.length);
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
