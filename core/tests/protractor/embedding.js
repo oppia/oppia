@@ -29,9 +29,6 @@ describe('Embedding', function() {
       filename: 'embedding_tests_dev_0.0.1.min.html',
       isVersion1: true
     }, {
-      filename: 'embedding_tests_jsdelivr_0.0.1.min.html',
-      isVersion1: true
-    }, {
       filename: 'embedding_tests_dev_0.0.2.min.html',
       isVersion1: false
     }];
