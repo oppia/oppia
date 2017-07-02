@@ -57,17 +57,16 @@ oppia.directive('filepathEditor', [
         var MOUSE_INSIDE = 9;
 
         // Define the cursors for the cropping area.
-        var CROP_CURSORS = {
-          [MOUSE_TOP_LEFT]: 'nwse-resize',
-          [MOUSE_TOP]: 'ns-resize',
-          [MOUSE_TOP_RIGHT]: 'nesw-resize',
-          [MOUSE_RIGHT]: 'ew-resize',
-          [MOUSE_BOTTOM_RIGHT]: 'nwse-resize',
-          [MOUSE_BOTTOM]: 'ns-resize',
-          [MOUSE_BOTTOM_LEFT]: 'nesw-resize',
-          [MOUSE_LEFT]: 'ew-resize',
-          [MOUSE_INSIDE]: 'move'
-        };
+        var CROP_CURSORS = {};
+        CROP_CURSORS[MOUSE_TOP_LEFT] = 'nwse-resize';
+        CROP_CURSORS[MOUSE_TOP] = 'ns-resize';
+        CROP_CURSORS[MOUSE_TOP_RIGHT] = 'nesw-resize';
+        CROP_CURSORS[MOUSE_RIGHT] = 'ew-resize';
+        CROP_CURSORS[MOUSE_BOTTOM_RIGHT] = 'nwse-resize';
+        CROP_CURSORS[MOUSE_BOTTOM] = 'ns-resize';
+        CROP_CURSORS[MOUSE_BOTTOM_LEFT] = 'nesw-resize';
+        CROP_CURSORS[MOUSE_LEFT] = 'ew-resize';
+        CROP_CURSORS[MOUSE_INSIDE] = 'move';
 
         /** Internal functions (not shared with the view) */
 
