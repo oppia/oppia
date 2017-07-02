@@ -31,10 +31,14 @@ oppia.directive('filepathEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
-        $scope.MODE_EMPTY = 1;
-        $scope.MODE_UPLOADED = 2;
-        $scope.MODE_SAVED = 3;
-        $scope.MAX_OUTPUT_IMAGE_WIDTH_PX = 490;
+        var MODE_EMPTY = 1;
+        var MODE_UPLOADED = 2;
+        var MODE_SAVED = 3;
+        var MAX_OUTPUT_IMAGE_WIDTH_PX = 490;
+        // We only use PNG format since that is what canvas can export to in
+        // all browsers.
+        // TODO(sll): See if we can add support for other image formats.
+        var RESAMPLED_IMAGE_FORMAT = 'png';
 
         // This variable holds all the data needed for the image upload flow.
         // It's always guaranteed to have the 'mode' and 'metadata' properties.
@@ -54,7 +58,7 @@ oppia.directive('filepathEditor', [
         //   }
         $scope.clearScopeData = function() {
           $scope.data = {
-            mode: $scope.MODE_EMPTY,
+            mode: MODE_EMPTY,
             metadata: {}
           };
           $scope.resizeRatio = 1;
@@ -70,7 +74,7 @@ oppia.directive('filepathEditor', [
         });
 
         $scope.validate = function(data) {
-          return data.mode === $scope.MODE_SAVED &&
+          return data.mode === MODE_SAVED &&
                  data.metadata.savedUrl &&
                  data.metadata.savedUrl.length > 0;
         };
@@ -78,7 +82,7 @@ oppia.directive('filepathEditor', [
         $scope.getImageSizeHelp = function() {
           var imageWidth = $scope.data.metadata.originalWidth;
           if ($scope.resizeRatio === 1 &&
-              imageWidth > $scope.MAX_OUTPUT_IMAGE_WIDTH_PX) {
+              imageWidth > MAX_OUTPUT_IMAGE_WIDTH_PX) {
             return 'This image has been automatically downsized to ensure ' +
                    'that it will fit in the card.';
           }
@@ -86,20 +90,20 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.getMainContainerStyles = function() {
-          var width = $scope.MAX_OUTPUT_IMAGE_WIDTH_PX;
+          var width = MAX_OUTPUT_IMAGE_WIDTH_PX;
           return 'margin: 0 auto; width: ' + width + 'px';
         };
 
         $scope.isNoImageUploaded = function() {
-          return $scope.data.mode === $scope.MODE_EMPTY;
+          return $scope.data.mode === MODE_EMPTY;
         };
 
         $scope.isImageUploaded = function() {
-          return $scope.data.mode === $scope.MODE_UPLOADED;
+          return $scope.data.mode === MODE_UPLOADED;
         };
 
         $scope.isImageSaved = function() {
-          return $scope.data.mode === $scope.MODE_SAVED;
+          return $scope.data.mode === MODE_SAVED;
         };
 
         $scope.getCurrentResizePercent = function() {
@@ -119,9 +123,9 @@ oppia.directive('filepathEditor', [
         $scope.calculateTargetImageDimensions = function() {
           var width = $scope.data.metadata.originalWidth;
           var height = $scope.data.metadata.originalHeight;
-          if (width > $scope.MAX_OUTPUT_IMAGE_WIDTH_PX) {
+          if (width > MAX_OUTPUT_IMAGE_WIDTH_PX) {
             var aspectRatio = width / height;
-            width = $scope.MAX_OUTPUT_IMAGE_WIDTH_PX;
+            width = MAX_OUTPUT_IMAGE_WIDTH_PX;
             height = width / aspectRatio;
           }
           return {
@@ -143,7 +147,7 @@ oppia.directive('filepathEditor', [
             var img = new Image();
             img.onload = function() {
               $scope.data = {
-                mode: $scope.MODE_UPLOADED,
+                mode: MODE_UPLOADED,
                 metadata: {
                   uploadedFile: file,
                   uploadedImageData: e.target.result,
@@ -160,7 +164,7 @@ oppia.directive('filepathEditor', [
 
         $scope.setSavedImageUrl = function(url, updateParent) {
           $scope.data = {
-            mode: $scope.MODE_SAVED,
+            mode: MODE_SAVED,
             metadata: {savedUrl: url}
           };
           if (updateParent) {
@@ -170,7 +174,7 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.getSavedImageTrustedResourceUrl = function() {
-          if ($scope.data.mode === $scope.MODE_SAVED) {
+          if ($scope.data.mode === MODE_SAVED) {
             var encodedFilepath = window.encodeURIComponent(
               $scope.data.metadata.savedUrl);
             return $sce.trustAsResourceUrl(
@@ -217,10 +221,8 @@ oppia.directive('filepathEditor', [
           var ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
 
-          // Return a File object obtained from the data in the canvas.
-          var file = $scope.data.metadata.uploadedFile;
-          var blob = dataURIToBlob(canvas.toDataURL(file.type, 1));
-
+          var blob = dataURIToBlob(
+            canvas.toDataURL('image/' + RESAMPLED_IMAGE_FORMAT, 1));
           if (blob instanceof Blob &&
               blob.type.match('image') &&
               blob.size > 0) {
@@ -277,11 +279,6 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.generateImageFilename = function() {
-          var format = '';
-          var chunks = $scope.data.metadata.uploadedFile.name.split('.');
-          if (chunks.length > 1) {
-            format = '.' + chunks.pop();
-          }
           var date = new Date();
           return 'img_' +
               date.getFullYear() +
@@ -293,7 +290,7 @@ oppia.directive('filepathEditor', [
               ('0' + date.getSeconds()).slice(-2) +
               '_' +
               Math.random().toString(36).substr(2, 10) +
-              format;
+              '.' + RESAMPLED_IMAGE_FORMAT;
         };
 
         $scope.resizeRatio = 1;
