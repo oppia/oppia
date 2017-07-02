@@ -201,7 +201,9 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
         Returns:
             ID of the new Classifier Exploration Mapping instance.
         """
-        new_id = '%s.%s.%s' % (exp_id, str(exp_version), state_name)
+        if isinstance(state_name, unicode):
+            state_name = state_name.encode('utf-8')
+        new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
         return new_id
 
     @classmethod
@@ -221,7 +223,7 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
                 classifier exploration mapping.
         """
         mapping_id = cls._generate_id(exp_id, exp_version, state_name)
-        mapping_instance = cls.get_by_id(mapping_id)
+        mapping_instance = cls.get(mapping_id, False)
         return mapping_instance
 
     @classmethod

@@ -111,6 +111,27 @@ class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
                 classifier_models.ClassifierExplorationMappingModel.create(
                     'exp_id1', 2, 'state_name4', 'classifier_id4'))
 
+        # Test that state names with unicode characters get saved correctly.
+        state_name1 = u'Klüft'
+        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+            'exp_id1', 2, state_name1, 'classifier_id4')
+
+        mapping = classifier_models.ClassifierExplorationMappingModel.get(
+            mapping_id)
+
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name1.encode(
+            'utf-8')))
+
+        state_name2 = u'टेक्स्ट'
+        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+            'exp_id1', 2, state_name2, 'classifier_id4')
+
+        mapping = classifier_models.ClassifierExplorationMappingModel.get(
+            mapping_id)
+
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name2.encode(
+            'utf-8')))
+
     def test_get_model_from_exploration_attributes(self):
         exp_id = 'exp_id1'
         exp_version = 1
