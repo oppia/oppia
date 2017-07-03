@@ -172,7 +172,7 @@ def record_answers(
         exploration_id: str. The exploration ID.
         exploration_version: int. The version of the exploration.
         state_name: str. The name of the state.
-        interaction_id: The ID of the interaction.
+        interaction_id: str. The ID of the interaction.
         submitted_answer_list: list. list of SubmittedAnswer domain objects.
     """
     state_answers = stats_domain.StateAnswers(
