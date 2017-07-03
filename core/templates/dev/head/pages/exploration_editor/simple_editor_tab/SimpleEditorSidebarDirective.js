@@ -17,7 +17,8 @@
  */
 
 oppia.directive('simpleEditorSidebar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  '$document', 'QuestionIdService', 'UrlInterpolationService',
+  function($document, QuestionIdService, UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -72,6 +73,23 @@ oppia.directive('simpleEditorSidebar', [
                 'intro' : $scope.questionList.getLastQuestion().getId();
               ScrollSyncService.scrollTo(end);
             }
+          };
+
+          $scope.dragQuestionStart = function(question) {
+            console.log('down');
+            var DOMElem = angular
+              .element($document[0].getElementById(
+                $scope.ID_PREFIX + question.getId()));
+            console.log(DOMElem);
+            DOMElem.addClass('selected');
+          };
+          $scope.dragQuestionEnd = function(question) {
+            console.log('up');
+            var DOMElem = angular
+              .element($document[0].getElementById(
+                $scope.ID_PREFIX + question.getId()));
+            console.log(DOMElem);
+            DOMElem.removeClass('selected');
           };
         }
       ]

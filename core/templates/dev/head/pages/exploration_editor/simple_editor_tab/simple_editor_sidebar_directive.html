@@ -15,6 +15,7 @@
     </li>
   </ul>
   <ul ui-sortable="SIDEBAR_SORTABLE_OPTIONS" ng-model="answerGroups">
+  <ul>
     <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index" class="oppia-rule-block oppia-sortable-rule-block oppia-prevent-selection">
       <div id="<[ID_PREFIX + question.getId()]>" class="sidebar-item-header">
         <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons" ng-hide="sidebarModeService.isSidebarInEditMode()">
