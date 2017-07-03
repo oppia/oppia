@@ -54,33 +54,6 @@ DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
         'learning platform!'))
 
 
-def require_playable(handler):
-    """Decorator that checks if the user can play the given exploration."""
-    def test_can_play(self, exploration_id, **kwargs):
-        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            self.render_template(
-                'pages/error/disabled_exploration.html',
-                iframe_restriction=None)
-            return
-
-        # This check is needed in order to show the correct page when a 404
-        # error is raised. The self.request.get('iframed') part of the check is
-        # needed for backwards compatibility with older versions of the
-        # embedding script.
-        if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
-                self.request.get('iframed')):
-            self.values['iframed'] = True
-
-        # Checks if the user for the current session is logged in.
-        if rights_manager.Actor(self.user_id).can_play(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-            return handler(self, exploration_id, **kwargs)
-        else:
-            raise self.PageNotFoundException
-
-    return test_can_play
-
-
 def _get_exploration_player_data(
         exploration_id, version, collection_id, can_edit):
     try:
@@ -353,7 +326,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
         state_name = self.payload.get('state_name')
@@ -505,7 +478,7 @@ class RatingHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_view_exploration_stats
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         self.values.update({

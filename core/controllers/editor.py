@@ -858,7 +858,7 @@ class StateRulesStatsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_play_exploration
+    @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:

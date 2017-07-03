@@ -21,21 +21,24 @@ from core.domain import role_services
 import feconf
 
 
-def check_activity_accessible(self, activity_id, activity_type):
+def check_activity_accessible(
+        user_id, user_actions, activity_type, activity_id):
     """Returns a boolean to signify whether given activity is accessible
     by the user or not.
 
     Args:
+        user_id: str. Id of the given user.
+        user_actions: list(str). List of actions given user can perform.
         activity_id: str. Id of the given activity.
         activity_type: str. Signifies whether activity is exploration or
             collection.
 
-    returns:
-        bool. True if activity is accessible else False.
+    Returns:
+        bool. Whether the given activity can be accessed.
     """
     if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
         if activity_id in feconf.DISABLED_EXPLORATION_IDS:
-            raise self.DisabledExplorationException
+            return False
 
     activity_rights = (
         rights_manager.get_exploration_rights(activity_id, strict=False)
@@ -55,13 +58,13 @@ def check_activity_accessible(self, activity_id, activity_type):
     if activity_rights is None:
         return False
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
-        return bool(action_play_public in self.actions)
+        return bool(action_play_public in user_actions)
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         return bool(
-            (action_play_private in self.actions) or
-            (self.user_id in activity_rights.viewer_ids) or
-            (self.user_id in activity_rights.owner_ids) or
-            (self.user_id in activity_rights.editor_ids) or
+            (action_play_private in user_actions) or
+            (user_id in activity_rights.viewer_ids) or
+            (user_id in activity_rights.owner_ids) or
+            (user_id in activity_rights.editor_ids) or
             activity_rights.viewable_if_private)
 
 
@@ -70,7 +73,8 @@ def can_play_exploration(handler):
 
     def test_can_play(self, exploration_id, **kwargs):
         if check_activity_accessible(
-                self, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION):
+                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -83,7 +87,8 @@ def can_play_collection(handler):
 
     def test_can_play(self, collection_id, **kwargs):
         if check_activity_accessible(
-                self, collection_id, feconf.ACTIVITY_TYPE_COLLECTION):
+                self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
+                collection_id):
             return handler(self, collection_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -98,7 +103,8 @@ def can_download_exploration(handler):
 
     def test_can_download(self, exploration_id, **kwargs):
         if check_activity_accessible(
-                self, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION):
+                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -113,7 +119,8 @@ def can_view_exploration_stats(handler):
 
     def test_can_view_stats(self, exploration_id, **kwargs):
         if check_activity_accessible(
-                self, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION):
+                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
