@@ -41,11 +41,15 @@ oppia.directive('simpleEditorSidebar', [
           $scope.questionList = SimpleEditorManagerService.getQuestionList();
           $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
           $scope.sidebarModeService = SimpleEditorSidebarModeService;
+
+          $scope.canAddNewQuestion = (
+            SimpleEditorManagerService.canAddNewQuestion);
+
           $scope.addNewQuestion = function() {
             if (!SimpleEditorManagerService.canAddNewQuestion()) {
               return;
             }
-            $scope.sidebarModeService.setModeToReadonly();
+//            $scope.sidebarModeService.setModeToReadonly();
             SimpleEditorManagerService.addNewQuestion();
             $timeout(function() {
               $scope.scrollToQuestion($scope.questionList.getLastQuestion());
