@@ -14,7 +14,7 @@
 
 describe('TextInputValidationService', function() {
   var validatorService, WARNING_TYPES;
-  var INTERACTION_SPECS, customArgSpecs, rowsSpecs, MIN_ROWS, MAX_ROWS;
+  var INTERACTION_SPECS, customArgSpecs, rowsSpecs, minRows, maxRows;
 
   var currentState, customizationArguments;
   var goodAnswerGroups, goodDefaultOutcome;
@@ -30,8 +30,8 @@ describe('TextInputValidationService', function() {
     INTERACTION_SPECS = $injector.get('INTERACTION_SPECS');
     customArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
     rowsSpecs = customArgSpecs[1];
-    MIN_ROWS = rowsSpecs.schema.validators[0].min_value;
-    MAX_ROWS = rowsSpecs.schema.validators[1].max_value;
+    minRows = rowsSpecs.schema.validators[0].min_value;
+    maxRows = rowsSpecs.schema.validators[1].max_value;
 
     currentState = 'First State';
     goodDefaultOutcome = {
@@ -92,8 +92,8 @@ describe('TextInputValidationService', function() {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Number of rows must be between ' + MIN_ROWS + ' and ' +
-        MAX_ROWS + '.')
+        'Number of rows must be between ' + minRows + ' and ' +
+        maxRows + '.')
     }]);
   });
 });
