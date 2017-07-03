@@ -155,7 +155,7 @@ def record_answer(
         exploration_version: int. The version of the exploration.
         state_name: str. The name of the state.
         interaction_id: str. The ID of the interaction.
-        submitted_answer: SubmittedAnswer domain object.
+        submitted_answer: SubmittedAnswer. The submitted answer.
     """
     record_answers(
         exploration_id, exploration_version, state_name, interaction_id,
