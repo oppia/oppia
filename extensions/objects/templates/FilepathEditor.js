@@ -88,7 +88,7 @@ oppia.directive('filepathEditor', [
           canvas.width = width;
           canvas.height = height;
           var ctx = canvas.getContext('2d');
-          ctx.fillStyle = "white";
+          ctx.fillStyle = 'white';
           ctx.fillRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
           return canvas.toDataURL('image/' + OUTPUT_IMAGE_FORMAT, 1);
