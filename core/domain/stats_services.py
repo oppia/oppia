@@ -23,7 +23,6 @@ from core.domain import interaction_registry
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.platform import models
-import logging
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
