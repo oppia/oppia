@@ -65,7 +65,7 @@ var GLOBALS = {
         Contains: 'contains {{x|NormalizedString}}',
         CaseSensitiveEquals: 
           'is equal to {{x|NormalizedString}}, taking case into account',
-        Equals:'is equal to {{x|NormalizedString}}'
+        Equals: 'is equal to {{x|NormalizedString}}'
       },
       is_string_classifier_trainable: true,
       is_trainable: true,
