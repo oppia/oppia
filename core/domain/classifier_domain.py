@@ -376,12 +376,12 @@ class ClassifierExplorationMapping(object):
 
     Attributes:
         exp_id: str. ID of the exploration.
-        exp_version: int. The exploration version at the time
-            this training job was created.
+        exp_version: int. The exploration version at the time the corresponding
+            classifier's training job was created.
         state_name: str. The name of the state to which the classifier
             belongs.
-        classifier_id. str. The ID of the classifier corresponding to the id
-            of the classifier-exploration mapping.
+        classifier_id. str. The unique Id of the classifier in the
+            classifier-exploration mapping.
     """
 
     def __init__(self, exp_id, exp_version, state_name, classifier_id):

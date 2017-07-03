@@ -183,6 +183,13 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
     {{exp_id}}.{{exp_version}}.{{state_name}}
     """
 
+    # The exploration_id of the exploration to whose state the model belongs.
+    exp_id = ndb.StringProperty(required=True, indexed=True)
+    # The exploration version at the time the corresponding classifier's
+    # training job was created.
+    exp_version = ndb.IntegerProperty(required=True, indexed=True)
+    # The name of the state to which the model belongs.
+    state_name = ndb.StringProperty(required=True, indexed=True)
     # The ID of the classifier corresponding to the exploration attributes.
     classifier_id = ndb.StringProperty(required=True, indexed=True)
 
@@ -199,10 +206,9 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
                 belongs.
 
         Returns:
-            ID of the new Classifier Exploration Mapping instance.
+            str. ID of the new Classifier Exploration Mapping instance.
         """
-        if isinstance(state_name, unicode):
-            state_name = state_name.encode('utf-8')
+        state_name = utils.convert_unicode_to_str(state_name)
         new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
         return new_id
 
@@ -250,7 +256,8 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
         instance_id = cls._generate_id(exp_id, exp_version, state_name)
         if not cls.get_by_id(instance_id):
             mapping_instance = cls(
-                id=instance_id, classifier_id=classifier_id)
+                id=instance_id, exp_id=exp_id, exp_version=exp_version,
+                state_name=state_name, classifier_id=classifier_id)
 
             mapping_instance.put()
             return instance_id

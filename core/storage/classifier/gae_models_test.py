@@ -102,6 +102,9 @@ class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.ClassifierExplorationMappingModel.get(
             mapping_id)
 
+        self.assertEqual(mapping.exp_id, 'exp_id1')
+        self.assertEqual(mapping.exp_version, 2)
+        self.assertEqual(mapping.state_name, 'state_name4')
         self.assertEqual(mapping.classifier_id, 'classifier_id4')
 
         # Test that exception is raised when creating mapping with same id.
@@ -143,4 +146,7 @@ class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.ClassifierExplorationMappingModel.get_model(
             exp_id, exp_version, state_name)
 
+        self.assertEqual(mapping.exp_id, exp_id)
+        self.assertEqual(mapping.exp_version, 1)
+        self.assertEqual(mapping.state_name, state_name)
         self.assertEqual(mapping.classifier_id, classifier_id)
