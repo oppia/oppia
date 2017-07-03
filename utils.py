@@ -500,13 +500,16 @@ def get_template_dir_prefix():
     return '%s%s' % (get_asset_dir_prefix(), template_path)
 
 
-def convert_unicode_to_str(state_name):
+def convert_to_str(string_to_convert):
     """Converts the given unicode string to a string. If the string is not
     unicode, we return the string.
 
     Args:
-        state_name: unicode|str.
+        string_to_convert: unicode|str.
+
+    Returns:
+        str. The encoded string.
     """
-    if isinstance(state_name, unicode):
-        return state_name.encode('utf-8')
-    return state_name
+    if isinstance(string_to_convert, unicode):
+        return string_to_convert.encode('utf-8')
+    return string_to_convert

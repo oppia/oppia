@@ -180,7 +180,7 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierDataModel.
 
     The id of instances of this class has the form
-    {{exp_id}}.{{exp_version}}.{{state_name}}
+    {{exp_id}}.{{exp_version}}.{{utf8_encoded_state_name}}
     """
 
     # The exploration_id of the exploration to whose state the model belongs.
@@ -196,19 +196,19 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
         """Generates a unique ID for the Classifier Exploration Mapping of the
-        form {{exp_id}}.{{exp_version}}.{{state_name}}
+        form {{exp_id}}.{{exp_version}}.{{utf8_encoded_state_name}}
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. The exploration version at the time
                 this training job was created.
-            state_name: str. The name of the state to which the classifier
+            state_name: unicode. The name of the state to which the classifier
                 belongs.
 
         Returns:
             str. ID of the new Classifier Exploration Mapping instance.
         """
-        state_name = utils.convert_unicode_to_str(state_name)
+        state_name = utils.convert_to_str(state_name)
         new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
         return new_id
 

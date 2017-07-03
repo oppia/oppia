@@ -369,8 +369,8 @@ def get_classifier_exploration_mapping(
         classifier_id: str. ID of the classifier.
 
     Returns:
-        classifier_exploration_mapping: ClassifierExplorationMapping. Domain
-            object for the classifier exploration mapping.
+        ClassifierExplorationMapping. Domain object for the classifier
+            exploration mapping.
     """
     return classifier_domain.ClassifierExplorationMapping(
         exp_id, exp_version, state_name, classifier_id)
@@ -387,7 +387,7 @@ def get_classifier_from_exploration_attributes(exp_id, exp_version,
             belongs.
 
     Returns:
-        classifier: ClassifierData. Domain object for the Classifier model.
+        ClassifierData. Domain object for the Classifier model.
 
     Raises:
         Exception: Entity for class ClassifierExplorationMapping with id not
