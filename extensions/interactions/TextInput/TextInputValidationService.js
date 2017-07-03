@@ -37,25 +37,24 @@ oppia.factory('TextInputValidationService', [
 
         var isInt = function(n) {
           return angular.isNumber(n) && n % 1 === 0;
-        }
+        };
 
         var rows = customizationArgs.rows.value;
         if (isInt(rows)) {
           var textSpecs = INTERACTION_SPECS.TextInput;
-          var customArgSpecs = textSpecs.customization_arg_specs;
-          var rowsSpecs = customArgSpecs[1];
-          var MIN_ROWS = rowsSpecs.schema.validators[0].min_value;
-          var MAX_ROWS = rowsSpecs.schema.validators[1].max_value;
-          if (rows < MIN_ROWS || rows > MAX_ROWS) {
+          var customizationArgSpecs = textSpecs.customization_arg_specs;
+          var rowsSpecs = customizationArgSpecs[1];
+          var minRows = rowsSpecs.schema.validators[0].min_value;
+          var maxRows = rowsSpecs.schema.validators[1].max_value;
+          if (rows < minRows || rows > maxRows) {
             warningsList.push({
               type: WARNING_TYPES.ERROR,
               message: (
-                'Number of rows must be between ' + MIN_ROWS + ' and ' +
-                MAX_ROWS + '.')
+                'Number of rows must be between ' + minRows + ' and ' +
+                maxRows + '.')
             });
           }
-        }
-        else {
+        } else {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
