@@ -64,9 +64,8 @@ var GLOBALS = {
           'misspelled by at most one character',
         Contains: 'contains {{x|NormalizedString}}',
         CaseSensitiveEquals: 
-          'is equal to {{x|NormalizedString}}, ' +
-          'taking case into account','Equals':'is equal to ' +
-          '{{x|NormalizedString}}'
+          'is equal to {{x|NormalizedString}}, taking case into account',
+        Equals:'is equal to {{x|NormalizedString}}'
       },
       is_string_classifier_trainable: true,
       is_trainable: true,
