@@ -33,6 +33,7 @@ from google.appengine.api import users
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
+from core.domain import role_services
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -197,7 +198,6 @@ class BaseHandler(webapp2.RequestHandler):
                 email = current_user_services.get_user_email(self.user)
                 user_settings = user_services.create_new_user(
                     self.user_id, email)
-
             self.values['user_email'] = user_settings.email
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
@@ -222,6 +222,11 @@ class BaseHandler(webapp2.RequestHandler):
                             datetime.datetime.utcnow(),
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
+
+        self.role = (
+            feconf.ROLE_ID_GUEST
+            if self.user_id is None else user_settings.role)
+        self.actions = role_services.get_all_actions(self.role)
 
         rights_mgr_user = rights_manager.Actor(self.user_id)
         self.is_moderator = rights_mgr_user.is_moderator()
