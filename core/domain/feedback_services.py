@@ -166,13 +166,13 @@ def create_message(
 
     if author_id:
         subscription_services.subscribe_to_thread(author_id, full_thread_id)
-        update_messages_read_by_the_user(
-            exploration_id, thread_id, author_id, [message_id])
+        add_message_id_to_read_by_list(
+            exploration_id, thread_id, author_id, message_id)
 
 
 def update_messages_read_by_the_user(exploration_id, thread_id,
                                      user_id, message_ids):
-    """Adds the messages to the list of the messages read by the user.
+    """Updates the messages read by the user.
 
     Args:
         exploration_id: str. The id of the exploration.
@@ -190,6 +190,28 @@ def update_messages_read_by_the_user(exploration_id, thread_id,
                 user_id, exploration_id, thread_id))
 
     feedback_thread_user_model.message_ids_read_by_user = message_ids
+    feedback_thread_user_model.put()
+
+
+def add_message_id_to_read_by_list(exploration_id, thread_id,
+                                   user_id, message_id):
+    """Adds the message id to the list of message ids read by the user.
+
+    Args:
+        exploration_id: str. The id of the exploration.
+        thread_id. str. The id of the thread.
+        user_id: str. The id of the user reading the messages,
+        message_id: int: The id of the message.
+    """
+    feedback_thread_user_model = feedback_models.FeedbackThreadUserModel.get(
+        user_id, exploration_id, thread_id)
+
+    if not feedback_thread_user_model:
+        feedback_thread_user_model = (
+            feedback_models.FeedbackThreadUserModel.create(
+                user_id, exploration_id, thread_id))
+
+    feedback_thread_user_model.message_ids_read_by_user.append(message_id)
     feedback_thread_user_model.put()
 
 
@@ -410,8 +432,9 @@ def get_thread_summaries(user_id, full_thread_ids):
         list(dict). A list of dictionary containing the summaries of the threads
             given to it.
     """
-    exploration_ids = [thread_id.split('.')[0] for thread_id in full_thread_ids]
-    thread_ids = [thread_id.split('.')[1] for thread_id in full_thread_ids]
+    exploration_and_thread_ids = (
+        [thread_id.split('.') for thread_id in full_thread_ids])
+    exploration_ids, thread_ids = zip(*exploration_and_thread_ids)
 
     thread_model_ids = (
         [feedback_models.FeedbackThreadModel.generate_full_thread_id(

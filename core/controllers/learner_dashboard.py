@@ -112,17 +112,17 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        messages_object = feedback_services.get_messages(
+        messages = feedback_services.get_messages(
             exploration_id, thread_id)
-        author_ids = [m.author_id for m in messages_object]
+        author_ids = [m.author_id for m in messages]
         authors_settings = user_services.get_users_settings(author_ids)
 
-        message_ids = [m.message_id for m in messages_object]
+        message_ids = [m.message_id for m in messages]
         feedback_services.update_messages_read_by_the_user(
             exploration_id, thread_id, self.user_id, message_ids)
 
         message_summary_list = []
-        for m, author_settings in zip(messages_object, authors_settings):
+        for m, author_settings in zip(messages, authors_settings):
             message_summary = {
                 'text': m.text,
                 'author_username': author_settings.username,

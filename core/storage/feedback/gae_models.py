@@ -429,9 +429,10 @@ class FeedbackThreadUserModel(base_models.BaseModel):
             ExplorationUserDataModel. The ExplorationUserDataModel instance
             which matches with the given user_ids and exploration_id.
         """
-        instance_ids = [cls.generate_full_id(user_id, exploration_id, thread_id)
-                        for exploration_id, thread_id in zip(
-                            exploration_ids, thread_ids)]
+        instance_ids = [
+            cls.generate_full_id(user_id, exploration_id, thread_id)
+            for exploration_id, thread_id in zip(exploration_ids, thread_ids)]
+
         return super(FeedbackThreadUserModel, cls).get_multi(instance_ids)
 
 

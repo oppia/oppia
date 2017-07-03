@@ -161,7 +161,7 @@ class LearnerDashboardFeedbackThreadHandlerTest(test_utils.GenericTestBase):
 
         # Get the message summary of the thread.
         thread_url = '%s/%s/%s' % (
-            feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_URL, self.EXP_ID,
+            feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL, self.EXP_ID,
             thread_id)
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list']
@@ -183,7 +183,7 @@ class LearnerDashboardFeedbackThreadHandlerTest(test_utils.GenericTestBase):
 
         # Again fetch the thread message summary.
         thread_url = '%s/%s/%s' % (
-            feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_URL, self.EXP_ID,
+            feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL, self.EXP_ID,
             thread_id)
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list']
