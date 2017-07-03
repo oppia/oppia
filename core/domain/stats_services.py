@@ -110,7 +110,13 @@ def get_exploration_stats(exploration_id, exploration_version):
         exploration_version: str. The version of the exploration.
 
     Returns:
-        dict. A dict with state statistics for the given exploration id.
+        dict. A dict with state statistics for the given exploration ID.
+        The keys of the dict and values those representation are as below
+        'last_updated': float. Last updated timestamp of the exploration,
+        'num_starts': int. Start exploration count,
+        'num_completions': int. Complete exploration count,
+        'state_stats': dict(dict). Contains state stats of states contained in
+        the given exploration ID.
     """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     exp_stats = stats_jobs_continuous.StatisticsAggregator.get_statistics(
@@ -118,7 +124,6 @@ def get_exploration_stats(exploration_id, exploration_version):
 
     last_updated = exp_stats['last_updated']
     state_hit_counts = exp_stats['state_hit_counts']
-
     return {
         'last_updated': last_updated,
         'num_completions': exp_stats['complete_exploration_count'],
@@ -149,7 +154,7 @@ def record_answer(
         exploration_id: str. The exploration ID.
         exploration_version: int. The version of the exploration.
         state_name: str. The name of the state.
-        interaction_id: The ID of the interaction.
+        interaction_id: str. The ID of the interaction.
         submitted_answer: SubmittedAnswer domain object.
     """
     record_answers(
