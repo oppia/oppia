@@ -59,9 +59,14 @@ var GLOBALS = {
       rule_descriptions: {
         StartsWith: 'starts with {{x|NormalizedString}}',
         FuzzyMatches: 'is similar to {{training_data|SetOfNormalizedString}}',
-        FuzzyEquals: 'is equal to {{x|NormalizedString}}, misspelled by at most one character',
+        FuzzyEquals: 
+          'is equal to {{x|NormalizedString}}, ' +
+          'misspelled by at most one character',
         Contains: 'contains {{x|NormalizedString}}',
-        CaseSensitiveEquals: 'is equal to {{x|NormalizedString}}, taking case into account','Equals':'is equal to {{x|NormalizedString}}'
+        CaseSensitiveEquals: 
+          'is equal to {{x|NormalizedString}}, ' +
+          'taking case into account','Equals':'is equal to ' +
+          '{{x|NormalizedString}}'
       },
       is_string_classifier_trainable: true,
       is_trainable: true,
