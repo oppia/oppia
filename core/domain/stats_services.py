@@ -23,6 +23,7 @@ from core.domain import interaction_registry
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.platform import models
+import logging
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -37,12 +38,16 @@ def get_visualizations_info(exploration_id, state_name):
         state_name: str. Name of the state.
 
     Returns:
-        list(dict). Each item in the list is a dict with keys and
-        values representing
-        {'id': visualization ID,
-        'data': calculation ID,
-        'options': visualization options}
-    """
+        list(dict). Each item in the list is a dict with keys representing
+        'id': str. visualization ID,
+        'data':  list. list of calculation IDs,
+        'options': dict. visualization options.
+
+        An example of returning list(dict) may be look like
+        [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
+        'id': 'BarChart',
+        'data': [{u'frequency': 1, u'answer': 0}]}]
+        """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     if exploration.states[state_name].interaction.id is None:
         return []
@@ -68,7 +73,6 @@ def get_visualizations_info(exploration_id, state_name):
 
         calculation_ids_to_outputs[calculation_id] = (
             calc_output_domain_object.calculation_output)
-
     return [{
         'id': visualization.id,
         'data': calculation_ids_to_outputs[visualization.calculation_id],
