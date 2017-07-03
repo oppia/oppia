@@ -173,7 +173,8 @@ def record_answers(
         exploration_version: int. The version of the exploration.
         state_name: str. The name of the state.
         interaction_id: str. The ID of the interaction.
-        submitted_answer_list: list. list of SubmittedAnswer domain objects.
+        submitted_answer_list: list. list of SubmittedAnswer. The submitted
+        answer.
     """
     state_answers = stats_domain.StateAnswers(
         exploration_id, exploration_version, state_name, interaction_id,
@@ -195,12 +196,12 @@ def get_state_answers(exploration_id, exploration_version, state_name):
     Args:
         exploration_id: str. The exploration ID.
         exploration_version: int. The version of the exploration to fetch
-            answers for.
+        answers for.
         state_name: str. The name of the state to fetch answers for.
 
     Returns:
-        StateAnswers Object, or None if no such answers have yet been
-    submitted.
+        StateAnswers or None. A StateAnswers object containing all answers
+        associated with the state, or None if no such answers exist.
     """
     state_answers_models = stats_models.StateAnswersModel.get_all_models(
         exploration_id, exploration_version, state_name)
