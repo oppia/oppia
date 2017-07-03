@@ -208,8 +208,10 @@ oppia.controller('LearnerDashboard', [
           }
         },
         controller: [
-          '$scope', '$uibModalInstance', '$http', 'sectionName', 'subSectionName',
-          function($scope, $uibModalInstance, $http, sectionName, subSectionName) {
+          '$scope', '$uibModalInstance', '$http', 'sectionName',
+          'subSectionName',
+          function($scope, $uibModalInstance, $http, sectionName,
+                   subSectionName) {
             $scope.sectionName = sectionName;
             $scope.subSectionName = subSectionName;
             $scope.entityTitle = entity.title;

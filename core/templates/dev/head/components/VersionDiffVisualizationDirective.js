@@ -249,10 +249,10 @@ oppia.directive('versionDiffVisualization', [
               }
             },
             controller: [
-              '$scope', '$http', '$uibModalInstance', '$timeout', 'newStateName',
-              'oldStateName', 'newState', 'oldState', 'headers',
+              '$scope', '$http', '$timeout', '$uibModalInstance',
+              'newStateName', 'oldStateName', 'newState', 'oldState', 'headers',
               function(
-                  $scope, $http, $uibModalInstance, $timeout, newStateName,
+                  $scope, $http, $timeout, $uibModalInstance, newStateName,
                   oldStateName, newState, oldState, headers) {
                 var STATE_YAML_URL = '/createhandler/state_yaml';
 

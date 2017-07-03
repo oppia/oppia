@@ -22,10 +22,11 @@ oppia.directive('createActivityButton', [
       restrict: 'E',
       templateUrl: 'components/createActivityButton',
       controller: [
-        '$scope', '$timeout', '$window', '$uibModal', 'ExplorationCreationService',
-        'CollectionCreationService', 'siteAnalyticsService', 'urlService',
+        '$scope', '$timeout', '$uibModal', '$window',
+        'ExplorationCreationService', 'CollectionCreationService',
+        'siteAnalyticsService', 'urlService',
         function(
-            $scope, $timeout, $window, $uibModal, ExplorationCreationService,
+            $scope, $timeout, $uibModal, $window, ExplorationCreationService,
             CollectionCreationService, siteAnalyticsService, urlService) {
           $scope.creationInProgress = false;
 

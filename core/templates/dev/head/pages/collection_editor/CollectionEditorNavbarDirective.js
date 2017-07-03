@@ -22,9 +22,9 @@ oppia.directive('collectionEditorNavbar', [
       restrict: 'E',
       templateUrl: 'inline/collection_editor_navbar_directive',
       controller: [
-        '$scope', '$uibModal', 'alertsService', 'routerService', 'UndoRedoService',
-        'CollectionEditorStateService', 'CollectionValidationService',
-        'CollectionRightsBackendApiService',
+        '$scope', '$uibModal', 'alertsService', 'routerService',
+        'UndoRedoService', 'CollectionEditorStateService',
+        'CollectionValidationService', 'CollectionRightsBackendApiService',
         'EditableCollectionBackendApiService',
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
@@ -114,7 +114,8 @@ oppia.directive('collectionEditorNavbar', [
                 'collection_editor_save_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.isCollectionPrivate = isPrivate;
 
                   $scope.save = function(commitMessage) {

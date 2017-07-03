@@ -143,9 +143,9 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$uibModalInstance', 'suggestionIsOpen', 'suggestionIsValid',
-          'unsavedChangesExist', 'suggestionStatus', 'description',
-          'currentContent', 'newContent', 'editabilityService',
+          '$scope', '$uibModalInstance', 'suggestionIsOpen',
+          'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
+          'description', 'currentContent', 'newContent', 'editabilityService',
           function(
             $scope, $uibModalInstance, suggestionIsOpen, suggestionIsValid,
             unsavedChangesExist, suggestionStatus, description,

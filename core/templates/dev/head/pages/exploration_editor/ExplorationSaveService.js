@@ -227,7 +227,8 @@ oppia.factory('explorationSaveService', [
             backdrop: 'static',
             keyboard: false,
             controller: [
-              '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+              '$scope', '$uibModalInstance',
+              function($scope, $uibModalInstance) {
                 $timeout(function() {
                   $uibModalInstance.dismiss('cancel');
                 }, 2500);
