@@ -31,17 +31,17 @@
     </div>
     <div ng-show="isImageUploaded()"
          class="filepath-editor-image-crop-container"
-         ng-mousemove="mouseMoveOnImageArea($event)">
+         ng-mousemove="onMouseMoveOnImageArea($event)">
       <div ng-if="isUserCropping()"
            class="filepath-editor-image-shade-overlay"></div>
       <div class="filepath-editor-crop-area"
            ng-if="imageResizeRatio === 1"
-           ng-attr-style="<[getCroppingAreaDynamicStyles()]>"
-           ng-mousedown="mouseDownOnCroppingArea($event)"
-           ng-mouseup="mouseUpOnCroppingArea($event)"></div>
+           ng-attr-style="<[getCropAreaDynamicStyles()]>"
+           ng-mousedown="onMouseDownOnCropArea($event)"
+           ng-mouseup="onMouseUpOnCropArea($event)"></div>
       <div ng-if="isUserCropping()"
            class="filepath-editor-image-crop-button-bar"
-           ng-attr-style="<[getCroppingButtonBarDynamicStyles()]>">
+           ng-attr-style="<[getCropButtonBarDynamicStyles()]>">
         <div class="filepath-editor-button filepath-editor-crop-button"
              ng-click="confirmCropImage()">Crop</div>
         <div class="filepath-editor-button filepath-editor-crop-button"
@@ -55,7 +55,7 @@
         <i class="material-icons filepath-editor-trash"
            ng-click="resetFilePathEditor()"
            title="Delete this image">&#xE872;</i>
-        <img ng-src="<[getSavedImageTrustedResourceUrl()]>">
+        <img ng-src="<[data.metadata.savedImageUrl]>">
       </div>
     </div>
   </div>
