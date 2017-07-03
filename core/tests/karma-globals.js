@@ -19,17 +19,53 @@
 var GLOBALS = {
   INTERACTION_SPECS: {
     TextInput: {
-      customization_arg_specs: [
-        {},
+      is_terminal: false,
+      description: "Allows learners to enter arbitrary text strings.",
+      display_mode: "inline",
+      name: "Text Input",
+      is_linear: false,
+      customization_arg_specs:  [
         {
+          default_value: "",
+          name: "placeholder",
+          schema: {
+            type: "unicode"
+          },
+          description: "Placeholder text (optional)"
+        },
+        {
+          default_value: 1,
+          name: "rows",
           schema: {
             validators: [
-              { min_value: 0 },
-              { max_value: 200 }
-            ]
-          }
+              {
+                id: "is_at_least",
+                min_value: 1
+              },
+              {
+                id: "is_at_most",
+                max_value: 200
+              }
+            ],
+            type: "int"
+          },
+          description: "Height (in rows)"
         }
-      ]
+      ],
+      id: "TextInput",
+      default_outcome_heading: null,
+      instructions: null,
+      needs_summary: false,
+      rule_descriptions: {
+        StartsWith: "starts with {{x|NormalizedString}}",
+        FuzzyMatches: "is similar to {{training_data|SetOfNormalizedString}}",
+        FuzzyEquals: "is equal to {{x|NormalizedString}}, misspelled by at most one character",
+        Contains: "contains {{x|NormalizedString}}",
+        CaseSensitiveEquals: "is equal to {{x|NormalizedString}}, taking case into account","Equals":"is equal to {{x|NormalizedString}}"
+      },
+      is_string_classifier_trainable: true,
+      is_trainable: true,
+      narrow_instructions: null
     }
   },
   GADGET_SPECS: {},
