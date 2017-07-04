@@ -224,6 +224,6 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_convert_to_str(self):
         string1 = 'Home'
-        string2 = u'Hóme'
+        string2 = u'Лорем'
         self.assertEqual(utils.convert_to_str(string1), string1)
         self.assertEqual(utils.convert_to_str(string2), string2.encode('utf-8'))

@@ -289,7 +289,7 @@ class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
         expected_mapping_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
-            'state_name': u'stàte_name1',
+            'state_name': u'網站有中',
             'classifier_id': 'classifier_id1'
         }
         observed_mapping = self._get_mapping_from_dict(
@@ -305,7 +305,7 @@ class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
         mapping_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
-            'state_name': u'stâte_name1',
+            'state_name': u'網站有中',
             'classifier_id': 'classifier_id1'
         }
         mapping = self._get_mapping_from_dict(mapping_dict)
