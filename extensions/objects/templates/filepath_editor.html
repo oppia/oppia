@@ -29,7 +29,7 @@
       <image-uploader on-file-changed="onFileChanged">
       </image-uploader>
     </div>
-    <div ng-show="isImageUploaded()"
+    <div ng-if="isImageUploaded()"
          class="filepath-editor-image-crop-container"
          ng-mousemove="onMouseMoveOnImageArea($event)">
       <div ng-if="isUserCropping()"
