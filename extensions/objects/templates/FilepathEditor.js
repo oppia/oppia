@@ -88,8 +88,6 @@ oppia.directive('filepathEditor', [
           canvas.width = width;
           canvas.height = height;
           var ctx = canvas.getContext('2d');
-          ctx.fillStyle = 'white';
-          ctx.fillRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
           return canvas.toDataURL('image/' + OUTPUT_IMAGE_FORMAT, 1);
         };
@@ -326,7 +324,7 @@ oppia.directive('filepathEditor', [
         // (e.g. if this is part of an editable list).
         $scope.$watch('$parent.value', function(newValue) {
           if (newValue) {
-            $scope.setSavedImageUrl(newValue, false);
+            $scope.setSavedImageFilename(newValue, false);
           }
         });
 
@@ -340,8 +338,8 @@ oppia.directive('filepathEditor', [
 
         $scope.validate = function(data) {
           return data.mode === MODE_SAVED &&
-                 data.metadata.savedImageUrl &&
-                 data.metadata.savedImageUrl.length > 0;
+                 data.metadata.savedImageFilename &&
+                 data.metadata.savedImageFilename.length > 0;
         };
 
         $scope.isUserCropping = function() {
@@ -583,19 +581,18 @@ oppia.directive('filepathEditor', [
           reader.readAsDataURL(file);
         };
 
-        $scope.setSavedImageUrl = function(url, updateParent) {
+        $scope.setSavedImageFilename = function(filename, updateParent) {
           $scope.data = {
             mode: MODE_SAVED,
-            metadata: {savedImageUrl: url}
+            metadata: {
+              savedImageFilename: filename,
+              savedImageUrl: getTrustedResourceUrlForImageFileName(filename)
+            }
           };
           if (updateParent) {
             alertsService.clearWarnings();
-            $scope.$parent.value = url;
+            $scope.$parent.value = filename;
           }
-        };
-
-        $scope.getSavedImageTrustedResourceUrl = function() {
-          return $scope.data.metadata.savedImageUrl;
         };
 
         $scope.onFileChanged = function(file, filename) {
@@ -650,8 +647,7 @@ oppia.directive('filepathEditor', [
             // Pre-load image before marking the image as saved.
             var img = new Image();
             img.onload = function() {
-              $scope.setSavedImageUrl(
-                getTrustedResourceUrlForImageFileName(data.filepath), true);
+              $scope.setSavedImageFilename(data.filepath, true);
               $scope.$apply();
             };
             img.src = getTrustedResourceUrlForImageFileName(data.filepath);
@@ -706,7 +702,8 @@ oppia.directive('filepathEditor', [
         //   At this stage, the user can click on the trash to start over.
         //   In this mode, data.metadata will contain the following info:
         //     {
-        //       savedImageUrl: <File name of the Oppia resource for the image>
+        //       savedImageFilename: <File name of the resource for the image>
+        //       savedImageUrl: <Trusted resource Url for the image>
         //     }
         $scope.data = {mode: MODE_EMPTY, metadata: {}};
 
