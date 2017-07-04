@@ -268,6 +268,7 @@ oppia.factory('changeListService', [
       fallbacks: true,
       hints: true,
       param_changes: true,
+      solution: true,
       state_name: true,
       widget_customization_args: true,
       widget_id: true
@@ -865,6 +866,9 @@ oppia.factory('explorationStatesService', [
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
         });
+      },
+      solution: function(solution) {
+        return solution.toBackendDict();
       }
     };
 
@@ -878,6 +882,7 @@ oppia.factory('explorationStatesService', [
       param_changes: ['paramChanges'],
       fallbacks: ['interaction', 'fallbacks'],
       hints: ['interaction', 'hints'],
+      solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs']
     };
@@ -1026,6 +1031,12 @@ oppia.factory('explorationStatesService', [
       },
       saveHints: function(stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);
+      },
+      getSolutionMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'solution')
+      },
+      saveSolution: function(stateName, newSolution) {
+        saveStateProperty(stateName, 'solution', newSolution);
       },
       isInitialized: function() {
         return _states != null;
@@ -1287,6 +1298,15 @@ oppia.factory('stateHintsService', [
   'statePropertyService', function(statePropertyService) {
     var child = Object.create(statePropertyService);
     child.setterMethodKey = 'saveHints';
+    return child;
+  }
+]);
+
+// A data service that stores the current interaction solution.
+oppia.factory('stateSolutionService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveSolution';
     return child;
   }
 ]);
