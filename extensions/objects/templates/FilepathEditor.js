@@ -277,27 +277,32 @@ oppia.directive('filepathEditor', [
           var yOnBottomBorder = y > cy2 - margin && y < cy2 + margin;
           var xInside = x > cx1 && x < cx2;
           var yInside = y > cy1 && y < cy2;
+
+          // It is important to check the pointer position for corners first,
+          // since the conditions overlap. In other words, the pointer can be
+          // at the top border and at the top-right corner at the same time, in
+          // which case we want to recognize the corner.
           if (xOnLeftBorder && yOnTopBorder) {
             // Upper left corner.
             $scope.mousePositionWithinCropArea = MOUSE_TOP_LEFT;
-          } else if (xOnLeftBorder && yOnBottomBorder) {
-            // Lower left corner.
-            $scope.mousePositionWithinCropArea = MOUSE_BOTTOM_LEFT;
-          } else if (xOnLeftBorder) {
-            // Left border.
-            $scope.mousePositionWithinCropArea = MOUSE_LEFT;
           } else if (xOnRightBorder && yOnTopBorder) {
             // Upper right corner.
             $scope.mousePositionWithinCropArea = MOUSE_TOP_RIGHT;
+          } else if (xOnLeftBorder && yOnBottomBorder) {
+            // Lower left corner.
+            $scope.mousePositionWithinCropArea = MOUSE_BOTTOM_LEFT;
           } else if (xOnRightBorder && yOnBottomBorder) {
             // Lower right corner.
             $scope.mousePositionWithinCropArea = MOUSE_BOTTOM_RIGHT;
-          } else if (xOnRightBorder) {
-            // Right border.
-            $scope.mousePositionWithinCropArea = MOUSE_RIGHT;
           } else if (yOnTopBorder) {
             // Top border.
             $scope.mousePositionWithinCropArea = MOUSE_TOP;
+          } else if (xOnLeftBorder) {
+            // Left border.
+            $scope.mousePositionWithinCropArea = MOUSE_LEFT;
+          } else if (xOnRightBorder) {
+            // Right border.
+            $scope.mousePositionWithinCropArea = MOUSE_RIGHT;
           } else if (yOnBottomBorder) {
             // Bottom border.
             $scope.mousePositionWithinCropArea = MOUSE_BOTTOM;
