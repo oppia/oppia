@@ -418,10 +418,9 @@ def create_classifier_exploration_mapping(exp_id, exp_version, state_name,
     classifier_exploration_mapping_model = (
         classifier_models.ClassifierExplorationMappingModel.get_model(
             exp_id, exp_version, state_name))
-    classifier = get_classifier_by_id(classifier_id)
+    get_classifier_by_id(classifier_id)
 
-    if classifier_exploration_mapping_model is None and (
-            classifier is not None):
+    if classifier_exploration_mapping_model is None:
         classifier_exploration_mapping = (
             classifier_domain.ClassifierExplorationMapping(
                 exp_id, exp_version, state_name, classifier_id))
