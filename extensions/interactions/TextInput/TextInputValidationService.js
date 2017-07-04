@@ -17,12 +17,51 @@
  */
 
 oppia.factory('TextInputValidationService', [
-  'baseInteractionValidationService',
-  function(baseInteractionValidationService) {
+  'INTERACTION_SPECS', 'WARNING_TYPES', 'baseInteractionValidationService',
+  function(INTERACTION_SPECS, WARNING_TYPES, baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
-        // TODO(juansaba): Implement customization args validations.
-        return [];
+        var warningsList = [];
+        baseInteractionValidationService.requireCustomizationArguments(
+          customizationArgs,
+          ['placeholder', 'rows']);
+
+        var placeholder = customizationArgs.placeholder.value;
+        if (!angular.isString(placeholder)) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Placeholder text must be a string.')
+          });
+        }
+
+        var isInt = function(n) {
+          return angular.isNumber(n) && n % 1 === 0;
+        };
+
+        var rows = customizationArgs.rows.value;
+        if (isInt(rows)) {
+          var textSpecs = INTERACTION_SPECS.TextInput;
+          var customizationArgSpecs = textSpecs.customization_arg_specs;
+          var rowsSpecs = customizationArgSpecs[1];
+          var minRows = rowsSpecs.schema.validators[0].min_value;
+          var maxRows = rowsSpecs.schema.validators[1].max_value;
+          if (rows < minRows || rows > maxRows) {
+            warningsList.push({
+              type: WARNING_TYPES.ERROR,
+              message: (
+                'Number of rows must be between ' + minRows + ' and ' +
+                maxRows + '.')
+            });
+          }
+        } else {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Number of rows must be integral.')
+          });
+        }
+        return warningsList;
       },
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {
