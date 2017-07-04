@@ -414,17 +414,21 @@ def create_classifier_exploration_mapping(exp_id, exp_version, state_name,
 
     Returns:
         mapping_id : str. ID of the classifier exploration mapping instance.
+
+    Raises:
+        Exception: The Classifier-Exploration mapping already exists.
     """
     classifier_exploration_mapping_model = (
         classifier_models.ClassifierExplorationMappingModel.get_model(
             exp_id, exp_version, state_name))
+    if classifier_exploration_mapping_model is not None:
+        raise Exception('The Classifier-Exploration mapping already exists.')
+    # Verify that the corresponding classifier exists.
     get_classifier_by_id(classifier_id)
-
-    if classifier_exploration_mapping_model is None:
-        classifier_exploration_mapping = (
-            classifier_domain.ClassifierExplorationMapping(
-                exp_id, exp_version, state_name, classifier_id))
-        classifier_exploration_mapping.validate()
-        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
-            exp_id, exp_version, state_name, classifier_id)
-        return mapping_id
+    classifier_exploration_mapping = (
+        classifier_domain.ClassifierExplorationMapping(
+            exp_id, exp_version, state_name, classifier_id))
+    classifier_exploration_mapping.validate()
+    mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+        exp_id, exp_version, state_name, classifier_id)
+    return mapping_id

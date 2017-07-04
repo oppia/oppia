@@ -208,9 +208,8 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
         Returns:
             str. ID of the new Classifier Exploration Mapping instance.
         """
-        state_name = utils.convert_to_str(state_name)
         new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
-        return new_id
+        return utils.convert_to_str(new_id)
 
     @classmethod
     def get_model(cls, exp_id, exp_version, state_name):

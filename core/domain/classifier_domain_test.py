@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -287,7 +289,7 @@ class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
         expected_mapping_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
-            'state_name': 'state_name1',
+            'state_name': u'stàte_name1',
             'classifier_id': 'classifier_id1'
         }
         observed_mapping = self._get_mapping_from_dict(
@@ -303,7 +305,7 @@ class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
         mapping_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
-            'state_name': 'state_name1',
+            'state_name': u'stâte_name1',
             'classifier_id': 'classifier_id1'
         }
         mapping = self._get_mapping_from_dict(mapping_dict)
