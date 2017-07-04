@@ -66,6 +66,9 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.incorrectBoxes = [];
           $scope.currentDraggedElement = '';
           $scope.currentlyHoveredRegions = [];
+          $scope.warningRValue = 248;
+          $scope.warningGValue = 148;
+          $scope.warningBValue = 6;
           /* Shuffle function to shuffle array to ensure random word bank
           Borrowed from:
           stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array */
@@ -108,6 +111,9 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           }
           //Change the button color based on whether or not it is correct
           $scope.getButtonColor = function(name){
+            if (name === $scope.currentDraggedElement){
+              return 'warning';
+            }
             if (!$scope.submitted){
               return 'primary';
             }
@@ -125,7 +131,6 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           //If all labels have been placed, run a correctness check
           $scope.runSubmitCheck = function(){
             $scope.submitted = 1;
-            console.log($scope.numRegions);
             if ($scope.numRegions == 0){
               $scope.numRegions = $scope.incorrectElements.length;
               $scope.onSubmit({
@@ -223,25 +228,42 @@ oppia.directive('oppiaInteractiveLabelingInput', [
                   regionArea[0][1] <= $scope.mouseY &&
                   $scope.mouseY <= regionArea[1][1]) {
                 $scope.currentlyHoveredRegions.push(labeledRegion.label);
+
               }
             }
           };
+          $scope.dropHovered = function(){
+            $scope.currentDraggedElement = '';
+          }
           //Change to red if the input is not correct
           $scope.getRValue = function(region){
+            if ($scope.currentlyHoveredRegions.indexOf(region.label) != -1){
+              return $scope.warningRValue;
+            }
             //Get the region it is in and not the label
             if (!$scope.submitted){
               return 0;
             }
             return $scope.maxRGBValue * 
                         ($scope.incorrectBoxes.indexOf(region.label) !== -1);
-          }
+          };
           //Change to blue if the input is correct
           $scope.getBValue = function(region){
+            if ($scope.currentlyHoveredRegions.indexOf(region.label) != -1){
+              return $scope.warningBValue;
+            }
             if (!$scope.submitted){
               return $scope.maxRGBValue;
             }
             return $scope.maxRGBValue * 
                         ($scope.incorrectBoxes.indexOf(region.label) === -1);
+          };
+
+          $scope.getGValue = function(region){
+            if ($scope.currentlyHoveredRegions.indexOf(region.label) != -1){
+              return $scope.warningGValue;
+            }
+            return 0;
           };
         
         }
