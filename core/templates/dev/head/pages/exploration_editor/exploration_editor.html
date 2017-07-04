@@ -38,7 +38,6 @@
     function onloadChartLoadHandler() {
       if (window.google && window.google.charts) {
         google.charts.load('current', {packages: ['corechart']});
-        console.log(google);
       } else {
         throw 'error: Could not load google visualization library. Are you offline?';
       }
