@@ -33,6 +33,22 @@ oppia.factory('SimpleEditorManagerService', [
       questionList: null
     };
 
+    var DEFAULT_INTERACTION_PROPERTIES = {
+      MultipleChoiceInput: {
+        CUSTOMIZATION_ARGS:  {
+          choices: {
+            value: ['<p>Option 1</p>']
+          }
+        },
+        ANSWER_GROUP: {
+          type: 'Equals',
+          value: {
+            x: 0
+          }
+        }
+      }
+    };
+
     var DEFAULT_INTERACTION = {
       ID: 'MultipleChoiceInput',
       CUSTOMIZATION_ARGS: {
@@ -127,11 +143,12 @@ oppia.factory('SimpleEditorManagerService', [
           data.questionList.isEmpty() ?
           SimpleEditorShimService.getInitStateName() :
           data.questionList.getLastQuestion().getDestinationStateName());
-
         SimpleEditorShimService.saveInteractionId(
-          lastStateName, DEFAULT_INTERACTION.ID);
+          lastStateName, 'MultipleChoiceInput');
         SimpleEditorShimService.saveCustomizationArgs(
-          lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+          lastStateName,
+          DEFAULT_INTERACTION_PROPERTIES.MultipleChoiceInput.CUSTOMIZATION_ARGS
+        );
         SimpleEditorShimService.saveDefaultOutcome(
           lastStateName, OutcomeObjectFactory.createEmpty(lastStateName));
 
@@ -144,34 +161,33 @@ oppia.factory('SimpleEditorManagerService', [
         var nextStateName = data.questionList.getAllStateNames()[index + 1];
         var questionCount = data.questionList.getQuestionCount();
         var currentInteractionId = (
-          SimpleEditorShimService.currentInteractionId(currentStateName));
+          SimpleEditorShimService.getInteractionId(currentStateName));
         var doesLastQuestionHaveAnswerGroups = (
           QuestionListObjectFactory.doesLastQuestionHaveAnswerGroups);
 
         // Update Question Type If interactionId is not same.
         if (newQuestionType !== currentInteractionId) {
           var newAnswerGroups = [];
-          switch (newQuestionType) {
-            case 'MultipleChoiceInput':
-              SimpleEditorShimService.saveInteractionId(
-                currentStateName, DEFAULT_INTERACTION.ID);
-              SimpleEditorShimService.saveCustomizationArgs(
-                currentStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-                RuleObjectFactory.createNew('Equals', {
-                  x: 0
-                })
-              ], OutcomeObjectFactory.createEmpty(nextStateName), false));
-              break;
-          }
-          if(doesLastQuestionHaveAnswerGroups && index !== questionCount - 1) {
+          SimpleEditorShimService.saveInteractionId(
+            currentStateName, newQuestionType);
+          SimpleEditorShimService.saveCustomizationArgs(
+            currentStateName,
+            DEFAULT_INTERACTION_PROPERTIES[newQuestionType].CUSTOMIZATION_ARGS);
+          newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+            RuleObjectFactory.createNew(
+              DEFAULT_INTERACTION_PROPERTIES[newQuestionType].ANSWER_GROUP.type,
+              DEFAULT_INTERACTION_PROPERTIES[newQuestionType].ANSWER_GROUP.value
+            )
+          ], OutcomeObjectFactory.createEmpty(nextStateName), false));
+
+          if (doesLastQuestionHaveAnswerGroups && index !== questionCount - 1) {
             SimpleEditorShimService.saveAnswerGroups(
               currentStateName, newAnswerGroups);
           }
         }
         // Update the question.
         var questions = StatesToQuestionsService.getQuestions();
-        data.questionList.updateQuestion(index,questions[index]);
+        data.questionList.updateQuestion(index, questions[index]);
       },
       canAddNewQuestion: function() {
         // Requirements:

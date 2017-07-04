@@ -29,11 +29,11 @@ oppia.directive('simpleEditorBody', [
         'explorationSaveService', 'explorationRightsService',
         'explorationWarningsService', 'QuestionIdService',
         'StatesToQuestionsService',
-        function($scope, SimpleEditorManagerService, explorationSaveService,
-          explorationRightsService, explorationWarningsService,
-          QuestionIdService, StatesToQuestionsService) {
+        function($scope, SimpleEditorManagerService,
+          explorationSaveService, explorationRightsService,
+          explorationWarningsService, QuestionIdService,
+          StatesToQuestionsService) {
           $scope.data = SimpleEditorManagerService.getData();
-
 
           var INTERACTION_TYPES = [{
             id: 'MultipleChoiceInput',

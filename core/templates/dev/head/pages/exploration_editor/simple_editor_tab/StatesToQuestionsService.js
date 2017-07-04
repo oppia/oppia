@@ -176,7 +176,7 @@ oppia.factory('StatesToQuestionsService', [
         return getQuestions();
       },
       getHumanReadableQuestionType: function(interactionId) {
-        for (key in SUPPORTED_INTERACTION_TYPES) {
+        for (var key in SUPPORTED_INTERACTION_TYPES) {
           if(SUPPORTED_INTERACTION_TYPES[key].id === interactionId) {
             return SUPPORTED_INTERACTION_TYPES[key].name;
           }
