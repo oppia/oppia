@@ -66,3 +66,13 @@ class InteractiveMap(base.BaseInteraction):
         },
         'default_value': 0.0,
     }]
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers'
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+    }]

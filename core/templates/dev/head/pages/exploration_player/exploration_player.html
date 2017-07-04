@@ -23,38 +23,9 @@
 
   {{dependencies_html}}
   <style>
-    @media(max-width: 768px) {
-      /* This prevents the navbar from collapsing in the exploration page,
-      so that the exploration title can be shown. */
-      .oppia-exploration-header {
-        display: block;
-        float: right;
-        max-width: 240px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .oppia-navbar-collapse.collapse {
-        display: block;
-      }
-    }
-    @media(max-width: 600px) {
-      img.oppia-logo {
-        height: 48px;
-        margin-left: 0;
-        margin-top: 8px;
-        max-width: none;
-        width: auto;
-      }
+    @media(max-width: 500px) {
       .oppia-exploration-header {
         max-width: 180px;
-      }
-      .oppia-navbar-brand-name {
-        max-width: 35px;
-        overflow: hidden;
-      }
-      .oppia-navbar-breadcrumb-icon {
-        display: none;
       }
     }
     @media(max-width: 400px) {
@@ -66,7 +37,7 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewBreadcrumb">
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewInfo">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span></h1>
@@ -100,7 +71,7 @@
     </div>
 
     <div class="modal-body protractor-test-exploration-suggestion-modal">
-      <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
+      <text-angular-rte ng-show="showEditor" html-content="suggestionHtml"></text-angular-rte>
       <br>
       Briefly describe your changes (required):
       <input type="text" ng-model="description" class="protractor-test-suggestion-description-input" style="width: 100%">
@@ -108,7 +79,7 @@
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
-      <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
+      <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(originalHtml == suggestionHtml) || !description">
         Submit Suggestion
       </button>
     </div>
@@ -131,7 +102,7 @@
       font-size: 1em;
       font-weight: normal;
     }
-    .oppia-exploration-info-icon:focus {
+    .oppia-exploration-info-icon:hover {
       background: #fff;
       color: #009688;
       margin-top: -13px;
@@ -139,33 +110,17 @@
       padding-top: 12px;
     }
   </style>
-  {% include 'components/attribution_guide/attribution_guide_directive.html' %}
-  {% include 'components/embed_modal/embed_exploration_modal_directive.html' %}
-  {% include 'components/gadget/gadget_directive.html' %}
-  {% include 'components/gadget/gadget_panel_directive.html' %}
-  {% include 'components/profile_link/profile_link_image_directive.html' %}
 
-  {% if iframed %}
-    {% include 'pages/exploration_player/conversation_skin_embed_directive.html' %}
-  {% else %}
-    {% include 'pages/exploration_player/conversation_skin_directive.html' %}
-  {% endif %}
-
-  {% include 'pages/exploration_player/tutor_card_directive.html' %}
-  {% include 'pages/exploration_player/supplemental_card_directive.html' %}
-  {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
   {% include 'pages/exploration_player/exploration_successfully_flagged_modal.html' %}
   {% include 'pages/exploration_player/feedback_popup_directive.html' %}
   {% include 'pages/exploration_player/flag_exploration_modal.html' %}
   {% include 'pages/exploration_player/information_card_modal.html' %}
-  {% include 'pages/exploration_player/progress_dots_directive.html' %}
+  {% include 'pages/exploration_player/take_break_modal.html' %}
 
 {% endblock %}
 
 {% block footer %}
   {% if not iframed %}
-    {% include 'pages/exploration_player/exploration_footer_directive.html' %}
-    {% include 'components/share/sharing_links_directive.html' %}
     <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
   {% endif %}
 {% endblock %}
@@ -186,14 +141,22 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StatesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/HintObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AudioTranslationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
@@ -202,26 +165,30 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayerStateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerConstants.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/InputResponsePairDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationFooterDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FeedbackPopupDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintManagerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintButtonDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerLocalNav.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewBreadcrumb.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewInfo.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>

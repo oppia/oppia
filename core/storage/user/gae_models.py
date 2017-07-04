@@ -16,6 +16,7 @@
 
 """Models for Oppia users."""
 
+from constants import constants
 from core.platform import models
 import feconf
 
@@ -32,6 +33,12 @@ class UserSettingsModel(base_models.BaseModel):
     """
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
+    # User role. Required for authorization. User gets a default role of
+    # exploration editor.
+    # TODO (1995YogeshSharma): Remove the default value once the one-off
+    # migration (to give role to all users) is run.
+    role = ndb.StringProperty(
+        required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
     # Identifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.
@@ -63,11 +70,11 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
         indexed=True,
-        choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
+        choices=[lc['code'] for lc in constants.ALL_LANGUAGE_CODES])
     # System language preference (for I18N).
     preferred_site_language_code = ndb.StringProperty(
         default=None, choices=[
-            language['id'] for language in feconf.SUPPORTED_SITE_LANGUAGES])
+            language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES])
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
@@ -95,6 +102,98 @@ class UserSettingsModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
+
+    @classmethod
+    def get_by_role(cls, role):
+        """Returns user models with given role.
+
+        Args:
+            role: str. The role Id that is being queried for.
+
+        Returns:
+            list(UserSettingsModel). The UserSettingsModel instances which
+            have the given role Id.
+        """
+        return cls.query(cls.role == role).fetch()
+
+
+class CompletedActivitiesModel(base_models.BaseModel):
+    """Keeps track of all the explorations and collections completed by the
+    learner.
+
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of all the explorations completed by the user.
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of all the collections completed by the user.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+
+class IncompleteActivitiesModel(base_models.BaseModel):
+    """Keeps track of all the activities currently being completed by the
+    learner.
+
+    Instances of this class are keyed by the user id.
+    """
+    # The ids of the explorations partially completed by the user.
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # The ids of the collections partially completed by the user.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+
+class ExpUserLastPlaythroughModel(base_models.BaseModel):
+    """Stores the "last playthrough" information for partially-completed
+    explorations.
+
+    Instances of this class have keys of the form
+    [user_id].[exploration_id]
+    """
+    # The user id.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The exploration id.
+    exploration_id = ndb.StringProperty(required=True, indexed=True)
+    # The version of the exploration last played by the user.
+    last_played_exp_version = ndb.IntegerProperty(default=None)
+    # The name of the state at which the learner left the exploration when
+    # he/she last played it.
+    last_played_state_name = ndb.StringProperty(default=None)
+
+    @classmethod
+    def _generate_id(cls, user_id, exploration_id):
+        return '%s.%s' % (user_id, exploration_id)
+
+    @classmethod
+    def create(cls, user_id, exploration_id):
+        """Creates a new ExpUserLastPlaythroughModel instance and returns it.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            ExpUserLastPlaythroughModel. The newly created
+            ExpUserLastPlaythroughModel instance.
+        """
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return cls(
+            id=instance_id, user_id=user_id, exploration_id=exploration_id)
+
+    @classmethod
+    def get(cls, user_id, exploration_id):
+        """Gets the ExpUserLastPlaythroughModel for the given user and
+        exploration id.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            ExpUserLastPlaythroughModel. The ExpUserLastPlaythroughModel
+            instance which matches with the given user_id and exploration_id.
+        """
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return super(ExpUserLastPlaythroughModel, cls).get(
+            instance_id, strict=False)
 
 
 class UserContributionsModel(base_models.BaseModel):
@@ -261,6 +360,11 @@ class ExplorationUserDataModel(base_models.BaseModel):
     draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
     # The exploration version that this change list applied to.
     draft_change_list_exp_version = ndb.IntegerProperty(default=None)
+    # The version of the draft change list which was last saved by the user.
+    # Can be zero if the draft is None or if the user has not committed
+    # draft changes to this exploration since the draft_change_list_id property
+    # was introduced.
+    draft_change_list_id = ndb.IntegerProperty(default=0)
     # The user's preference for receiving suggestion emails for this exploration
     mute_suggestion_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
@@ -374,7 +478,7 @@ class CollectionProgressModel(base_models.BaseModel):
     @classmethod
     def get(cls, user_id, collection_id):
         """Gets the CollectionProgressModel for the given user and collection
-        ids.
+        id.
 
         Args:
             user_id: str. The id of the user.
@@ -387,6 +491,25 @@ class CollectionProgressModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, collection_id)
         return super(CollectionProgressModel, cls).get(
             instance_id, strict=False)
+
+    @classmethod
+    def get_multi(cls, user_id, collection_ids):
+        """Gets the CollectionProgressModels for the given user and collection
+        ids.
+
+        Args:
+            user_id: str. The id of the user.
+            collection_ids: list(str). The ids of the collections.
+
+        Returns:
+            list(CollectionProgressModel). The list of CollectionProgressModel
+            instances which matches the given user_id and collection_ids.
+        """
+        instance_ids = [cls._generate_id(user_id, collection_id)
+                        for collection_id in collection_ids]
+
+        return super(CollectionProgressModel, cls).get_multi(
+            instance_ids)
 
     @classmethod
     def get_or_create(cls, user_id, collection_id):

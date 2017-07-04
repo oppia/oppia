@@ -21,8 +21,7 @@ oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
     scope: {
       definition: '=',
       isDisabled: '&',
-      savedValue: '=',
-      allowExpressions: '&'
+      savedValue: '='
     },
     templateUrl: 'formOverlay/entryPoint',
     restrict: 'E',
@@ -44,222 +43,184 @@ oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
 }]);
 
 oppia.controller('FormBuilderTests', [
-    '$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
-  parameterSpecsService.addParamSpec('paramBool1', 'bool');
-  parameterSpecsService.addParamSpec('paramBool2', 'bool');
-  parameterSpecsService.addParamSpec('paramInt1', 'int');
-  parameterSpecsService.addParamSpec('paramFloat1', 'float');
-  parameterSpecsService.addParamSpec('paramFloat2', 'float');
-  parameterSpecsService.addParamSpec('paramUnicode1', 'unicode');
-  parameterSpecsService.addParamSpec('paramUnicode2', 'unicode');
-  parameterSpecsService.addParamSpec('paramUnicode3', 'unicode');
+  '$scope', function($scope) {
+    $scope.testText = 'abc{{paramUnicode1}}';
 
-  $scope.testText = 'abc{{paramUnicode1}}';
-
-  $scope.unicodeForm = {
-    schema: {
-      type: 'unicode'
-    },
-    value: 'aab{{paramUnicode1}}',
-    allowExpressions: true
-  };
-
-  $scope.booleanForms = [{
-    name: 'Boolean form',
-    schema: {
-      type: 'bool'
-    },
-    value: true
-  }, {
-    name: 'Boolean form with expressions',
-    schema: {
-      type: 'bool'
-    },
-    value: 'paramBool1',
-    allowExpressions: true
-  }];
-
-  $scope.intForms = [{
-    name: 'Integer form (value must be greater than 2)',
-    schema: {
-      type: 'int',
-      validators: [{
-        id: 'is_at_least',
-        min_value: 2
-      }]
-    },
-    value: 3
-  }, {
-    // TODO(sll): Add test for bad initialization.
-    name: 'Integer form with expressions',
-    schema: {
-      type: 'int'
-    },
-    value: 'paramInt1',
-    allowExpressions: true
-  }];
-
-  $scope.floatForms = [{
-    name: 'Float form (value must be between -3 and 6)',
-    schema: {
-      type: 'float',
-      validators: [{
-        id: 'is_at_least',
-        min_value: -3.0
-      }, {
-        id: 'is_at_most',
-        max_value: 6.0
-      }]
-    },
-    value: 3.14
-  }, {
-    name: 'Float form with expressions (value must be between -3 and 6)',
-    schema: {
-      type: 'float',
-      validators: [{
-        id: 'is_at_least',
-        min_value: -3.0
-      }, {
-        id: 'is_at_most',
-        max_value: 6.0
-      }]
-    },
-    allowExpressions: true,
-    value: 3.14
-  }];
-
-  $scope.unicodeForms = [{
-    name: 'Restricted unicode form; the value must be either a or b.',
-    schema: {
-      type: 'unicode',
-      choices: ['a', 'b']
-    },
-    value: 'a'
-  }];
-
-  $scope.htmlForms = [{
-    name: 'HTML form',
-    schema: {
-      type: 'html'
-    },
-    value: 'Some <b>HTML</b>'
-  }];
-
-  $scope.compositeForms = [{
-    name: (
-      'Dict with a bool, a unicode string and a list of ints. ' +
-      'The string must be either \'abc\' or \'def\'.'),
-    schema: {
-      type: 'dict',
-      properties: [{
-        name: 'a_unicode_string_appearing_first',
-        description: 'First field.',
-        schema: {
-          type: 'unicode',
-          choices: ['abc', 'def']
-        }
-      }, {
-        name: 'a_list_appearing_second',
-        description: 'Second field.',
-        schema: {
-          type: 'list',
-          items: {
-            type: 'int'
-          }
-        }
-      }, {
-        name: 'a_boolean_appearing_last',
-        description: 'Third field.',
-        schema: {
-          type: 'bool'
-        }
-      }]
-    },
-    value: {
-      a_boolean_appearing_last: false,
-      a_unicode_string_appearing_first: 'abc',
-      a_list_appearing_second: [2, 3]
-    }
-  }, {
-    name: 'List of code areas with custom \'add element\' text',
-    schema: {
-      type: 'list',
-      items: {
-        type: 'unicode',
-        ui_config: {
-          coding_mode: 'python'
-        }
+    $scope.unicodeForm = {
+      schema: {
+        type: 'unicode'
       },
-      ui_config: {
-        add_element_text: '[Custom \'add element\' text]'
-      }
-    },
-    value: ['abc', 'def', 'ghi']
-  }, {
-    name: 'Fixed-length list of 2 multiple-choice floats',
-    schema: {
-      type: 'list',
-      items: {
+      value: 'aab{{paramUnicode1}}'
+    };
+
+    $scope.booleanForms = [{
+      name: 'Boolean form',
+      schema: {
+        type: 'bool'
+      },
+      value: true
+    }];
+
+    $scope.intForms = [{
+      name: 'Integer form (value must be greater than 2)',
+      schema: {
+        type: 'int',
+        validators: [{
+          id: 'is_at_least',
+          min_value: 2
+        }]
+      },
+      value: 3
+    }];
+
+    $scope.floatForms = [{
+      name: 'Float form (value must be between -3 and 6)',
+      schema: {
         type: 'float',
-        choices: [1.0, 0.0, -1.0, -2.0, -3.0]
+        validators: [{
+          id: 'is_at_least',
+          min_value: -3.0
+        }, {
+          id: 'is_at_most',
+          max_value: 6.0
+        }]
       },
-      len: 2
-    },
-    value: [1.0, -3.0]
-  }, {
-    name: 'List of complex items (no descriptions in the dicts)',
-    schema: {
-      type: 'list',
-      items: {
+      value: 3.14
+    }];
+
+    $scope.unicodeForms = [{
+      name: 'Restricted unicode form; the value must be either a or b.',
+      schema: {
+        type: 'unicode',
+        choices: ['a', 'b']
+      },
+      value: 'a'
+    }];
+
+    $scope.htmlForms = [{
+      name: 'HTML form',
+      schema: {
+        type: 'html'
+      },
+      value: 'Some <b>HTML</b>'
+    }];
+
+    $scope.compositeForms = [{
+      name: (
+        'Dict with a bool, a unicode string and a list of ints. ' +
+        'The string must be either \'abc\' or \'def\'.'),
+      schema: {
         type: 'dict',
         properties: [{
-          name: 'intField',
+          name: 'a_unicode_string_appearing_first',
+          description: 'First field.',
           schema: {
-            type: 'int'
+            type: 'unicode',
+            choices: ['abc', 'def']
           }
         }, {
-          name: 'htmlField',
+          name: 'a_list_appearing_second',
+          description: 'Second field.',
           schema: {
-            type: 'html'
+            type: 'list',
+            items: {
+              type: 'int'
+            }
+          }
+        }, {
+          name: 'a_boolean_appearing_last',
+          description: 'Third field.',
+          schema: {
+            type: 'bool'
           }
         }]
+      },
+      value: {
+        a_boolean_appearing_last: false,
+        a_unicode_string_appearing_first: 'abc',
+        a_list_appearing_second: [2, 3]
       }
-    },
-    value: [{
-      intField: 5,
-      htmlField: '<span><b>d</b>ef</span>'
-    }]
-  }, {
-    name: 'Nested lists',
-    schema: {
-      type: 'list',
-      items: {
+    }, {
+      name: 'List of code areas with custom \'add element\' text',
+      schema: {
         type: 'list',
         items: {
-          type: 'unicode'
+          type: 'unicode',
+          ui_config: {
+            coding_mode: 'python'
+          }
+        },
+        ui_config: {
+          add_element_text: '[Custom \'add element\' text]'
         }
-      }
-    },
-    value: [['abc'], ['def', 'ghi']]
-  }];
+      },
+      value: ['abc', 'def', 'ghi']
+    }, {
+      name: 'Fixed-length list of 2 multiple-choice floats',
+      schema: {
+        type: 'list',
+        items: {
+          type: 'float',
+          choices: [1.0, 0.0, -1.0, -2.0, -3.0]
+        },
+        len: 2
+      },
+      value: [1.0, -3.0]
+    }, {
+      name: 'List of complex items (no descriptions in the dicts)',
+      schema: {
+        type: 'list',
+        items: {
+          type: 'dict',
+          properties: [{
+            name: 'intField',
+            schema: {
+              type: 'int'
+            }
+          }, {
+            name: 'htmlField',
+            schema: {
+              type: 'html'
+            }
+          }]
+        }
+      },
+      value: [{
+        intField: 5,
+        htmlField: '<span><b>d</b>ef</span>'
+      }]
+    }, {
+      name: 'Nested lists',
+      schema: {
+        type: 'list',
+        items: {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          }
+        }
+      },
+      value: [['abc'], ['def', 'ghi']]
+    }];
 
-  $scope.formsets = [{
-    name: 'Boolean editors',
-    forms: $scope.booleanForms
-  }, {
-    name: 'Integer editors',
-    forms: $scope.intForms
-  }, {
-    name: 'Float editors',
-    forms: $scope.floatForms
-  }, {
-    name: 'Unicode editors',
-    forms: $scope.unicodeForms
-  }, {
-    name: 'HTML editors',
-    forms: $scope.htmlForms
-  }, {
-    name: 'Composite editors',
-    forms: $scope.compositeForms
-  }];
-}]);
+    $scope.formsets = [{
+      name: 'Boolean editors',
+      forms: $scope.booleanForms
+    }, {
+      name: 'Integer editors',
+      forms: $scope.intForms
+    }, {
+      name: 'Float editors',
+      forms: $scope.floatForms
+    }, {
+      name: 'Unicode editors',
+      forms: $scope.unicodeForms
+    }, {
+      name: 'HTML editors',
+      forms: $scope.htmlForms
+    }, {
+      name: 'Composite editors',
+      forms: $scope.compositeForms
+    }];
+  }
+]);

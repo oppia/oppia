@@ -27,7 +27,8 @@ env:
     - RUN_E2E_TESTS_EXTENSIONS=true
     - RUN_E2E_TESTS_LIBRARY=true
     - RUN_E2E_TESTS_MISC=true
-    - RUN_E2E_TESTS_I18N=true
+    - RUN_E2E_TESTS_USERS=true
+    - RUN_E2E_TESTS_EMBEDDING=true
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false
     # TODO(sll): Reinstate this when we can get it to run in reasonable time.
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
@@ -38,7 +39,8 @@ env:
     - RUN_E2E_TESTS_EXTENSIONS_PROD=true
     - RUN_E2E_TESTS_LIBRARY_PROD=true
     - RUN_E2E_TESTS_MISC_PROD=true
-    - RUN_E2E_TESTS_I18N_PROD=true
+    - RUN_E2E_TESTS_USERS_PROD=true
+    - RUN_E2E_TESTS_EMBEDDING_PROD=true
 matrix:
   allow_failures: []
   fast_finish: true
@@ -77,7 +79,6 @@ before_install:
 - bash -e /etc/init.d/xvfb start
 
 install:
-- set -e
 - pushd $TRAVIS_BUILD_DIR
 - source scripts/setup.sh || exit 1
 - source scripts/setup_gae.sh || exit 1
@@ -88,7 +89,8 @@ script:
 - if [ $RUN_E2E_TESTS_EXTENSIONS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="extensions"; fi
 - if [ $RUN_E2E_TESTS_LIBRARY == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library"; fi
 - if [ $RUN_E2E_TESTS_MISC == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="misc"; fi
-- if [ $RUN_E2E_TESTS_I18N == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="i18n"; fi
+- if [ $RUN_E2E_TESTS_USERS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users"; fi
+- if [ $RUN_E2E_TESTS_EMBEDDING == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="embedding"; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 - if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
@@ -101,7 +103,8 @@ script:
 - if [ $RUN_E2E_TESTS_EXTENSIONS_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env; fi
 - if [ $RUN_E2E_TESTS_LIBRARY_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
 - if [ $RUN_E2E_TESTS_MISC_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="misc" --prod_env; fi
-- if [ $RUN_E2E_TESTS_I18N_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="i18n" --prod_env; fi
+- if [ $RUN_E2E_TESTS_USERS_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
+- if [ $RUN_E2E_TESTS_EMBEDDING_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env; fi
 
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi

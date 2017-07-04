@@ -17,14 +17,18 @@
  * exploration editor.
  */
 
+oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
+
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
-  'StateObjectFactory', 'StatesObjectFactory',
+  'StatesObjectFactory', 'StateImprovementSuggestionService',
+  'ReadOnlyExplorationBackendApiService', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
-      StateObjectFactory, StatesObjectFactory) {
+      StatesObjectFactory, StateImprovementSuggestionService,
+      ReadOnlyExplorationBackendApiService, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -57,17 +61,28 @@ oppia.controller('StatisticsTab', [
         '/createhandler/statistics/' + explorationData.explorationId +
         '/' + version);
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
-        var explorationDataUrl = (
-          '/createhandler/data/' + explorationData.explorationId);
+        ReadOnlyExplorationBackendApiService.loadLatestExploration(
+          explorationData.explorationId).then(function(response) {
+            var statesDict = response.exploration.states;
+            var states = StatesObjectFactory.createFromBackendDict(statesDict);
+            var initStateName = response.exploration.init_state_name;
 
-        $http.get(explorationDataUrl).then(function(response) {
-          var statesDict = response.data.states;
-          var states = StatesObjectFactory.createFromBackendDict(statesDict);
-          var initStateName = response.data.init_state_name;
-          $scope.statsGraphData = computeGraphService.compute(
-            initStateName, states);
-        });
-
+            $scope.statsGraphData = computeGraphService.compute(
+              initStateName, states);
+            var improvements = (
+              StateImprovementSuggestionService.getStateImprovements(
+                states, $scope.stateStats));
+            $scope.highlightStates = {};
+            improvements.forEach(function(impItem) {
+              // TODO(bhenning): This is the feedback for improvement types and
+              // should be included with the definitions of the improvement
+              // types.
+              if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
+                $scope.highlightStates[impItem.stateName] = 'May be confusing';
+              }
+            });
+          }
+        );
         var data = response.data;
         var numVisits = data.num_starts;
         var numCompletions = data.num_completions;
@@ -91,22 +106,14 @@ oppia.controller('StatisticsTab', [
         // ending (numCompletions/numVisits), should we do this for all
         // terminal nodes, instead? If so, explorationStatesService needs to be
         // able to provide whether given states are terminal
-        for (var stateName in explorationStatesService.getStates()) {
+
+        explorationStatesService.getStateNames().forEach(function(stateName) {
           var visits = 0;
           if ($scope.stateStats.hasOwnProperty(stateName)) {
-            visits = $scope.stateStats[stateName].firstEntryCount;
+            visits = $scope.stateStats[stateName].first_entry_count;
           }
           $scope.statsGraphOpacities[stateName] = Math.max(
             visits / numVisits, 0.05);
-        }
-
-        $scope.highlightStates = {};
-        improvements.forEach(function(impItem) {
-          if (impItem.type === 'default') {
-            $scope.highlightStates[impItem.state_name] = 'Needs more feedback';
-          } else if (impItem.type === 'incomplete') {
-            $scope.highlightStates[impItem.state_name] = 'May be confusing';
-          }
         });
 
         $scope.hasTabLoaded = true;
@@ -137,40 +144,37 @@ oppia.controller('StatisticsTab', [
             improvementType: function() {
               return improvementType;
             },
-            rulesStats: function() {
-              return response.data.rules_stats;
+            visualizationsInfo: function() {
+              return response.data.visualizations_info;
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'stateName', 'stateStats',
-            'improvementType', 'rulesStats', 'utilsService',
-            function(
-                $scope, $modalInstance, stateName,
-                stateStats, improvementType, rulesStats, utilsService) {
+            '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
+            'improvementType', 'visualizationsInfo', 'oppiaHtmlEscaper',
+            function($scope, $modalInstance, $filter, stateName, stateStats,
+                improvementType, visualizationsInfo, oppiaHtmlEscaper) {
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
-              $scope.rulesStats = rulesStats;
 
-              $scope.getNumTimesString = function(numberOfTimes) {
-                var suffix = (numberOfTimes === 1 ? ' time' : ' times');
-                return numberOfTimes + suffix;
-              };
+              var _getVisualizationsHtml = function() {
+                var htmlSnippets = [];
 
-              $scope.getHumanReadableRuleName = function(ruleName) {
-                return ruleName.substring('submit.'.length);
-              };
-
-              $scope.isEmpty = utilsService.isEmpty;
-
-              $scope.doesAnswerExist = function() {
-                for (var rule in $scope.rulesStats) {
-                  if ($scope.rulesStats[rule].answers.length > 0) {
-                    return true;
-                  }
+                for (var i = 0; i < visualizationsInfo.length; i++) {
+                  var el = $(
+                    '<oppia-visualization-' +
+                    $filter('camelCaseToHyphens')(visualizationsInfo[i].id) +
+                    '/>');
+                  el.attr('data', oppiaHtmlEscaper.objToEscapedJson(
+                    visualizationsInfo[i].data));
+                  el.attr('options', oppiaHtmlEscaper.objToEscapedJson(
+                    visualizationsInfo[i].options));
+                  htmlSnippets.push(el.get(0).outerHTML);
                 }
-                return false;
+                return htmlSnippets.join('');
               };
+
+              $scope.visualizationsHtml = _getVisualizationsHtml();
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');

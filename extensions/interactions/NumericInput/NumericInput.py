@@ -32,3 +32,13 @@ class NumericInput(base.BaseInteraction):
     needs_summary = False
 
     _customization_arg_specs = []
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers'
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+    }]

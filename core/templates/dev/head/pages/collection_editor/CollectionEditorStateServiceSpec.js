@@ -156,26 +156,27 @@ describe('Collection editor state service', function() {
   });
 
   it('should request to load the collection rights from the backend',
-      function() {
-    spyOn(
-      fakeCollectionRightsBackendApiService,
-      'fetchCollectionRights').and.callThrough();
+    function() {
+      spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRights')
+        .and.callThrough();
 
-    CollectionEditorStateService.loadCollection(5);
-    expect(fakeCollectionRightsBackendApiService.fetchCollectionRights)
-      .toHaveBeenCalled();
-  });
+      CollectionEditorStateService.loadCollection(5);
+      expect(fakeCollectionRightsBackendApiService.fetchCollectionRights)
+        .toHaveBeenCalled();
+    }
+  );
 
   it('should fire an init event after loading the first collection',
-      function() {
-    spyOn($rootScope, '$broadcast').and.callThrough();
+    function() {
+      spyOn($rootScope, '$broadcast').and.callThrough();
 
-    CollectionEditorStateService.loadCollection(5);
-    $rootScope.$apply();
+      CollectionEditorStateService.loadCollection(5);
+      $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'collectionInitialized');
-  });
+      expect($rootScope.$broadcast).toHaveBeenCalledWith(
+        'collectionInitialized');
+    }
+  );
 
   it('should fire an update event after loading more collections', function() {
     // Load initial collection.
@@ -203,37 +204,40 @@ describe('Collection editor state service', function() {
   });
 
   it('should indicate a collection is no longer loading after an error',
-      function() {
-    expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
-    fakeEditableCollectionBackendApiService.failure = 'Internal 500 error';
+    function() {
+      expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
+      fakeEditableCollectionBackendApiService.failure = 'Internal 500 error';
 
-    CollectionEditorStateService.loadCollection(5);
-    expect(CollectionEditorStateService.isLoadingCollection()).toBe(true);
+      CollectionEditorStateService.loadCollection(5);
+      expect(CollectionEditorStateService.isLoadingCollection()).toBe(true);
 
-    $rootScope.$apply();
-    expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
-  });
+      $rootScope.$apply();
+      expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
+    }
+  );
 
   it('it should report that a collection has loaded through loadCollection()',
-      function() {
-    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
+    function() {
+      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-    CollectionEditorStateService.loadCollection(5);
-    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
+      CollectionEditorStateService.loadCollection(5);
+      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-    $rootScope.$apply();
-    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
-  });
+      $rootScope.$apply();
+      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
+    }
+  );
 
   it('it should report that a collection has loaded through setCollection()',
-      function() {
-    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
+    function() {
+      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-    var newCollection = CollectionObjectFactory.create(
-      secondBackendCollectionObject);
-    CollectionEditorStateService.setCollection(newCollection);
-    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
-  });
+      var newCollection = CollectionObjectFactory.create(
+        secondBackendCollectionObject);
+      CollectionEditorStateService.setCollection(newCollection);
+      expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
+    }
+  );
 
   it('should initially return an empty collection', function() {
     var collection = CollectionEditorStateService.getCollection();
@@ -274,99 +278,106 @@ describe('Collection editor state service', function() {
 
   it('should return the last collection rights loaded as the same object',
     function() {
-    var previousCollectionRights = (
-      CollectionEditorStateService.getCollectionRights());
-    var expectedCollectionRights = CollectionRightsObjectFactory.create(
-      fakeCollectionRightsBackendApiService.backendCollectionRightsObject);
-    expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
+      var previousCollectionRights = (
+        CollectionEditorStateService.getCollectionRights());
+      var expectedCollectionRights = CollectionRightsObjectFactory.create(
+        fakeCollectionRightsBackendApiService.backendCollectionRightsObject);
+      expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
-    CollectionEditorStateService.loadCollection(5);
-    $rootScope.$apply();
+      CollectionEditorStateService.loadCollection(5);
+      $rootScope.$apply();
 
-    var actualCollectionRights = (
-      CollectionEditorStateService.getCollectionRights());
-    expect(actualCollectionRights).toEqual(expectedCollectionRights);
+      var actualCollectionRights = (
+        CollectionEditorStateService.getCollectionRights());
+      expect(actualCollectionRights).toEqual(expectedCollectionRights);
 
-    // Although the actual collection rights equals the expected collection
-    // rights, they are different objects. Ensure that the actual collection
-    // rights is still the same object from before loading it, however.
-    expect(actualCollectionRights).toBe(previousCollectionRights);
-    expect(actualCollectionRights).not.toBe(expectedCollectionRights);
-  });
+      // Although the actual collection rights equals the expected collection
+      // rights, they are different objects. Ensure that the actual collection
+      // rights is still the same object from before loading it, however.
+      expect(actualCollectionRights).toBe(previousCollectionRights);
+      expect(actualCollectionRights).not.toBe(expectedCollectionRights);
+    }
+  );
 
   it('should be able to set a new collection with an in-place copy',
-      function() {
-    var previousCollection = CollectionEditorStateService.getCollection();
-    var expectedCollection = CollectionObjectFactory.create(
-      secondBackendCollectionObject);
-    expect(previousCollection).not.toEqual(expectedCollection);
+    function() {
+      var previousCollection = CollectionEditorStateService.getCollection();
+      var expectedCollection = CollectionObjectFactory.create(
+        secondBackendCollectionObject);
+      expect(previousCollection).not.toEqual(expectedCollection);
 
-    CollectionEditorStateService.setCollection(expectedCollection);
+      CollectionEditorStateService.setCollection(expectedCollection);
 
-    var actualCollection = CollectionEditorStateService.getCollection();
-    expect(actualCollection).toEqual(expectedCollection);
+      var actualCollection = CollectionEditorStateService.getCollection();
+      expect(actualCollection).toEqual(expectedCollection);
 
-    // Although the actual collection equals the expected collection, they are
-    // different objects. Ensure that the actual collection is still the same
-    // object from before loading it, however.
-    expect(actualCollection).toBe(previousCollection);
-    expect(actualCollection).not.toBe(expectedCollection);
-  });
+      // Although the actual collection equals the expected collection, they are
+      // different objects. Ensure that the actual collection is still the same
+      // object from before loading it, however.
+      expect(actualCollection).toBe(previousCollection);
+      expect(actualCollection).not.toBe(expectedCollection);
+    }
+  );
 
   it('should be able to set a new collection rights with an in-place copy',
-      function() {
-    var previousCollectionRights = (
-      CollectionEditorStateService.getCollectionRights());
-    var expectedCollectionRights = CollectionRightsObjectFactory.create(
-      unpublishablePublicCollectionRightsObject);
-    expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
+    function() {
+      var previousCollectionRights = (
+        CollectionEditorStateService.getCollectionRights());
+      var expectedCollectionRights = CollectionRightsObjectFactory.create(
+        unpublishablePublicCollectionRightsObject);
+      expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
-    CollectionEditorStateService.setCollectionRights(expectedCollectionRights);
+      CollectionEditorStateService.setCollectionRights(
+        expectedCollectionRights);
 
-    var actualCollectionRights = (
-      CollectionEditorStateService.getCollectionRights());
-    expect(actualCollectionRights).toEqual(expectedCollectionRights);
+      var actualCollectionRights = (
+        CollectionEditorStateService.getCollectionRights());
+      expect(actualCollectionRights).toEqual(expectedCollectionRights);
 
-    // Although the actual collection rights equals the expected collection
-    // rights, they are different objects. Ensure that the actual collection
-    // rights is still the same object from before loading it, however.
-    expect(actualCollectionRights).toBe(previousCollectionRights);
-    expect(actualCollectionRights).not.toBe(expectedCollectionRights);
-  });
+      // Although the actual collection rights equals the expected collection
+      // rights, they are different objects. Ensure that the actual collection
+      // rights is still the same object from before loading it, however.
+      expect(actualCollectionRights).toBe(previousCollectionRights);
+      expect(actualCollectionRights).not.toBe(expectedCollectionRights);
+    }
+  );
 
   it('should fire an update event after setting the new collection',
-      function() {
-    // Load initial collection.
-    CollectionEditorStateService.loadCollection(5);
-    $rootScope.$apply();
+    function() {
+      // Load initial collection.
+      CollectionEditorStateService.loadCollection(5);
+      $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
+      spyOn($rootScope, '$broadcast').and.callThrough();
 
-    var newCollection = CollectionObjectFactory.create(
-      secondBackendCollectionObject);
-    CollectionEditorStateService.setCollection(newCollection);
+      var newCollection = CollectionObjectFactory.create(
+        secondBackendCollectionObject);
+      CollectionEditorStateService.setCollection(newCollection);
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'collectionReinitialized');
-  });
+      expect($rootScope.$broadcast).toHaveBeenCalledWith(
+        'collectionReinitialized');
+    }
+  );
 
   it('should fail to save the collection without first loading one',
-      function() {
-    expect(function() {
-      CollectionEditorStateService.saveCollection('Commit message');
-    }).toThrow();
-  });
+    function() {
+      expect(function() {
+        CollectionEditorStateService.saveCollection('Commit message');
+      }).toThrow();
+    }
+  );
 
   it('should not save the collection if there are no pending changes',
-      function() {
-    CollectionEditorStateService.loadCollection(5);
-    $rootScope.$apply();
+    function() {
+      CollectionEditorStateService.loadCollection(5);
+      $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
-    expect(CollectionEditorStateService.saveCollection(
-      'Commit message')).toBe(false);
-    expect($rootScope.$broadcast).not.toHaveBeenCalled();
-  });
+      spyOn($rootScope, '$broadcast').and.callThrough();
+      expect(CollectionEditorStateService.saveCollection(
+        'Commit message')).toBe(false);
+      expect($rootScope.$broadcast).not.toHaveBeenCalled();
+    }
+  );
 
   it('should be able to save the collection and pending changes', function() {
     spyOn(
@@ -420,21 +431,22 @@ describe('Collection editor state service', function() {
   });
 
   it('should indicate a collection is no longer saving after an error',
-      function() {
-    CollectionEditorStateService.loadCollection(5);
-    CollectionUpdateService.setCollectionTitle(
-      CollectionEditorStateService.getCollection(), 'New title');
-    $rootScope.$apply();
+    function() {
+      CollectionEditorStateService.loadCollection(5);
+      CollectionUpdateService.setCollectionTitle(
+        CollectionEditorStateService.getCollection(), 'New title');
+      $rootScope.$apply();
 
-    expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
-    fakeEditableCollectionBackendApiService.failure = 'Internal 500 error';
+      expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
+      fakeEditableCollectionBackendApiService.failure = 'Internal 500 error';
 
-    CollectionEditorStateService.saveCollection('Commit message');
-    expect(CollectionEditorStateService.isSavingCollection()).toBe(true);
+      CollectionEditorStateService.saveCollection('Commit message');
+      expect(CollectionEditorStateService.isSavingCollection()).toBe(true);
 
-    $rootScope.$apply();
-    expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
-  });
+      $rootScope.$apply();
+      expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
+    }
+  );
 
   it('should initially return an empty skill list', function() {
     var collectionSkillList = (
@@ -457,24 +469,25 @@ describe('Collection editor state service', function() {
   });
 
   it('should update the collection\'s skill list with UndoRedoService changes',
-      function() {
-    CollectionEditorStateService.loadCollection(5);
-    $rootScope.$apply();
+    function() {
+      CollectionEditorStateService.loadCollection(5);
+      $rootScope.$apply();
 
-    var prevCollectionSkillList = (
-      CollectionEditorStateService.getCollectionSkillList());
-    expect(prevCollectionSkillList.getSkills()).toEqual(['skill1', 'skill2']);
+      var prevCollectionSkillList = (
+        CollectionEditorStateService.getCollectionSkillList());
+      expect(prevCollectionSkillList.getSkills()).toEqual(['skill1', 'skill2']);
 
-    // Simply applying a change is adequate for updating the skill list.
-    var collection = CollectionEditorStateService.getCollection();
-    CollectionUpdateService.setAcquiredSkills(
-      collection, '0', ['skill2', 'skill3']);
-    $rootScope.$apply();
+      // Simply applying a change is adequate for updating the skill list.
+      var collection = CollectionEditorStateService.getCollection();
+      CollectionUpdateService.setAcquiredSkills(
+        collection, '0', ['skill2', 'skill3']);
+      $rootScope.$apply();
 
-    var collectionSkillList = (
-      CollectionEditorStateService.getCollectionSkillList());
-    expect(collectionSkillList.getSkills()).toEqual([
-      'skill1', 'skill2', 'skill3']);
-    expect(collectionSkillList).toBe(prevCollectionSkillList);
-  });
+      var collectionSkillList = (
+        CollectionEditorStateService.getCollectionSkillList());
+      expect(collectionSkillList.getSkills()).toEqual([
+        'skill1', 'skill2', 'skill3']);
+      expect(collectionSkillList).toBe(prevCollectionSkillList);
+    }
+  );
 });

@@ -44,18 +44,20 @@ oppia.factory('interactionDetailsCache', [function() {
 }]);
 
 oppia.controller('StateInteraction', [
-  '$scope', '$http', '$rootScope', '$modal', '$filter', 'alertsService',
-  'editorContextService', 'oppiaHtmlEscaper', 'INTERACTION_SPECS',
-  'stateInteractionIdService', 'stateCustomizationArgsService',
-  'editabilityService', 'explorationStatesService', 'graphDataService',
-  'interactionDetailsCache', 'oppiaExplorationHtmlFormatterService',
-  'UrlInterpolationService',
-  function($scope, $http, $rootScope, $modal, $filter, alertsService,
-      editorContextService, oppiaHtmlEscaper, INTERACTION_SPECS,
-      stateInteractionIdService, stateCustomizationArgsService,
-      editabilityService, explorationStatesService, graphDataService,
-      interactionDetailsCache, oppiaExplorationHtmlFormatterService,
-      UrlInterpolationService) {
+  '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
+  'alertsService', 'editorContextService', 'oppiaHtmlEscaper',
+  'INTERACTION_SPECS', 'stateInteractionIdService',
+  'stateCustomizationArgsService', 'editabilityService',
+  'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
+  'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
+  'SubtitledHtmlObjectFactory',
+  function($scope, $http, $rootScope, $modal, $injector, $filter,
+      alertsService, editorContextService, oppiaHtmlEscaper,
+      INTERACTION_SPECS, stateInteractionIdService,
+      stateCustomizationArgsService, editabilityService,
+      explorationStatesService, graphDataService, interactionDetailsCache,
+      oppiaExplorationHtmlFormatterService, UrlInterpolationService,
+      SubtitledHtmlObjectFactory) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
     // Declare dummy submitAnswer() and adjustPageHeight() methods for the
@@ -128,16 +130,15 @@ oppia.controller('StateInteraction', [
       // Check if the content is currently empty, as expected.
       var previousContent = explorationStatesService.getStateContentMemento(
         stateName);
-      if (previousContent.length !== 1 || previousContent[0].value !== '' ||
-          previousContent[0].type !== 'text') {
+      if (!previousContent.isEmpty()) {
         return;
       }
 
       // Update the state's content.
-      explorationStatesService.saveStateContent(stateName, [{
-        type: 'text',
-        value: DEFAULT_TERMINAL_STATE_CONTENT
-      }]);
+      explorationStatesService.saveStateContent(
+        stateName,
+        SubtitledHtmlObjectFactory.createDefault(DEFAULT_TERMINAL_STATE_CONTENT)
+      );
 
       // Update the state content editor view.
       $rootScope.$broadcast('refreshStateContent');
@@ -148,8 +149,8 @@ oppia.controller('StateInteraction', [
         stateInteractionIdService.displayed !==
         stateInteractionIdService.savedMemento);
       if (hasInteractionIdChanged) {
-        if (INTERACTION_SPECS[
-              stateInteractionIdService.displayed].is_terminal) {
+        if (INTERACTION_SPECS[stateInteractionIdService.displayed]
+          .is_terminal) {
           updateDefaultTerminalStateContentIfEmpty();
         }
         stateInteractionIdService.saveDisplayedValue();
@@ -186,15 +187,15 @@ oppia.controller('StateInteraction', [
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', 'stateInteractionIdService',
-            'stateCustomizationArgsService', 'interactionDetailsCache',
-            'INTERACTION_SPECS', 'UrlInterpolationService',
-            'editorFirstTimeEventsService',
+            '$scope', '$modalInstance', '$injector',
+            'stateInteractionIdService', 'stateCustomizationArgsService',
+            'interactionDetailsCache', 'INTERACTION_SPECS',
+            'UrlInterpolationService', 'editorFirstTimeEventsService',
             function(
-                $scope, $modalInstance, stateInteractionIdService,
-                stateCustomizationArgsService, interactionDetailsCache,
-                INTERACTION_SPECS, UrlInterpolationService,
-                editorFirstTimeEventsService) {
+                $scope, $modalInstance, $injector,
+                stateInteractionIdService, stateCustomizationArgsService,
+                interactionDetailsCache, INTERACTION_SPECS,
+                UrlInterpolationService, editorFirstTimeEventsService) {
               editorFirstTimeEventsService
                 .registerFirstClickAddInteractionEvent();
 
@@ -244,6 +245,18 @@ oppia.controller('StateInteraction', [
                   stateCustomizationArgsService.displayed).length > 0);
               }
 
+              $scope.getCustomizationArgsWarningsList = function() {
+                var validationServiceName =
+                  INTERACTION_SPECS[
+                    $scope.stateInteractionIdService.displayed].id +
+                  'ValidationService';
+                var validationService = $injector.get(validationServiceName);
+                var warningsList =
+                  validationService.getCustomizationArgsWarnings(
+                    stateCustomizationArgsService.displayed);
+                return warningsList;
+              }
+
               $scope.onChangeInteractionId = function(newInteractionId) {
                 editorFirstTimeEventsService
                   .registerFirstSelectInteractionTypeEvent();
@@ -285,6 +298,37 @@ oppia.controller('StateInteraction', [
 
                 stateInteractionIdService.displayed = null;
                 stateCustomizationArgsService.displayed = {};
+              };
+
+              $scope.isSaveInteractionButtonEnabled = function() {
+                return $scope.hasCustomizationArgs &&
+                  $scope.stateInteractionIdService.displayed &&
+                  $scope.form.schemaForm.$valid &&
+                  $scope.getCustomizationArgsWarningsList().length === 0;
+              };
+
+              $scope.getSaveInteractionButtonTooltip = function() {
+                if (!$scope.hasCustomizationArgs) {
+                  return 'No customization arguments';
+                }
+                if (!$scope.stateInteractionIdService.displayed) {
+                  return 'No interaction being displayed';
+                }
+
+                var warningsList = $scope.getCustomizationArgsWarningsList();
+                var warningMessages = warningsList.map(function(warning) {
+                  return warning.message;
+                });
+
+                if (warningMessages.length === 0) {
+                  if ($scope.form.schemaForm.$invalid) {
+                    return 'Some of the form entries are invalid.';
+                  } else {
+                    return '';
+                  }
+                } else {
+                  return warningMessages.join(' ');
+                }
               };
 
               $scope.save = function() {

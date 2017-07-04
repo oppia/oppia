@@ -1,63 +1,161 @@
-<style>
-  .filepath-editor-image-upload-reset-button {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-</style>
-
-<div ng-model="localValue" ui-validate="'validate($value)'">
-  <div ng-show="!imageUploaderIsActive">
-    <div ng-if="!filepathsLoaded">
-      <span class="text-align: center; width: 50px;">
-        Loading...
-      </span>
+<div ng-model="data"
+     ui-validate="'validate($value)'"
+     ng-attr-style="<[getMainContainerStyles()]>">
+  <div ng-if="isImageUploaded()" class="filepath-editor-img-toolbar">
+    <div class="filepath-editor-img-toolbar-resize">
+      Resize to:
+      <span class="filepath-editor-resize-button filepath-editor-left"
+            ng-click="decreaseResizePercent(10)">-</span><span class="filepath-editor-resize-input">
+        <[getCurrentResizePercent()]> %
+      </span><span class="filepath-editor-resize-button filepath-editor-right"
+            ng-click="increaseResizePercent(10)">+</span>
     </div>
-
-    <div ng-repeat="filepath in filepaths track by $index">
-      <label>
-        <input type="radio" ng-model="localValue.label"
-               name="choiceGroup" id="<[filepath]>"
-               value="<[filepath]>">
-        <[filepath]>
-      </label>
+    <div class="filepath-editor-img-toolbar-size">
+      Image Size:
+      <span><[calculateTargetImageDimensions().width]></span>
+      &times;
+      <span><[calculateTargetImageDimensions().height]></span>
+      <i class="material-icons"
+         ng-if="getImageSizeHelp() !== null"
+         title="<[getImageSizeHelp()]>">&#xE887;</i>
     </div>
-    <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>"/>
-
-    <br><br>
-    <button type="button" class="btn btn-default" ng-click="openImageUploader()">Upload a new image</button>
   </div>
-
-  <div ng-if="imageUploaderIsActive" style="border: 1px solid black; padding: 5px;">
-    <div class="oppia-warning">
-      Before uploading any images, please ensure that they are compatible with the <a href="/about#license" target="_blank">license terms</a> of this site (the link opens in a new window).
-    </div>
-
-    <br>
-
-    <div ng-if="!currentFile">
+  <div class="filepath-editor-image-container">
+    <div ng-if="isNoImageUploaded()">
       <image-uploader on-file-changed="onFileChanged">
       </image-uploader>
-
-      <div ng-if="uploadWarning" style="color: red;">
-        <br>
-        <strong>Error:</strong> <[uploadWarning]>
-      </div>
     </div>
-
-    <div ng-if="currentFile" style="position: relative;">
-      <button class="btn btn-default filepath-editor-image-upload-reset-button" ng-click="resetImageUploader()">
-        <span><i class="material-icons">&#xE14C;</i></span>
-      </button>
-
-      <img ng-src="<[imagePreview]>" style="display: block; margin-left: auto; margin-right: auto;">
+    <div ng-if="isImageUploaded()">
+      <img ng-src="<[data.metadata.uploadedImageData]>"
+           ng-attr-style="<[getUploadedImageStyles()]>">
     </div>
-
-    <br>
-    Choose a filename:
-    <input type="text" ng-model="currentFilename" class="protractor-test-file-name">
-
-    <button type="button" class="btn btn-success" ng-click="saveUploadedFile(currentFile, currentFilename)" ng-disabled="!currentFile || !currentFilename">Save</button>
-    <button type="button" class="btn btn-default" ng-click="closeImageUploader()">Cancel</button>
+    <div ng-if="isImageSaved()">
+      <i class="material-icons filepath-editor-trash"
+         ng-click="clearScopeData()"
+         title="Delete this image">&#xE872;</i>
+      <img ng-src="<[getSavedImageTrustedResourceUrl()]>">
+    </div>
+  </div>
+  <div ng-if="isImageUploaded()" class="filepath-editor-save-box">
+    <button type="button"
+            class="btn btn-success filepath-editor-use"
+            ng-click="saveUploadedFile()">Use This Image</button>
+    <button type="button"
+            class="btn btn-default filepath-editor-discard"
+            ng-click="discardUploadedFile()">Discard</button>
   </div>
 </div>
+
+<style>
+  span.filepath-editor-resize-input {
+    border: 1px solid #ccc;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: normal;
+    height: 24px;
+    padding: 4px 2px;
+    text-align: right;
+    width: 40px;
+  }
+
+  span.filepath-editor-resize-button {
+    background: grey;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #F2F2F2), color-stop(1, #D0D0D0));
+    background-image: -o-linear-gradient(bottom, #F2F2F2 0%, #D0D0D0 100%);
+    background-image: -moz-linear-gradient(bottom, #F2F2F2 0%, #D0D0D0 100%);
+    background-image: -webkit-linear-gradient(bottom, #F2F2F2 0%, #D0D0D0 100%);
+    background-image: -ms-linear-gradient(bottom, #F2F2F2 0%, #D0D0D0 100%);
+    background-image: linear-gradient(to bottom, #F2F2F2 0%, #D0D0D0 100%);
+    cursor: default;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: normal;
+    height: 24px;
+    padding: 4px 8px;
+    text-align: center;
+    width: 22px;
+  }
+
+  span.filepath-editor-resize-button:hover {
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #D0D0D0), color-stop(1, #D0D0D0));
+    background-image: -o-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
+    background-image: -moz-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
+    background-image: -webkit-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
+    background-image: -ms-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
+    background-image: linear-gradient(to bottom, #D0D0D0 0%, #D0D0D0 100%);
+    cursor: pointer;
+  }
+
+  span.filepath-editor-resize-button:active {
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #B0B0B0), color-stop(1, #B0B0B0));
+    background-image: -o-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
+    background-image: -moz-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
+    background-image: -webkit-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
+    background-image: -ms-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
+    background-image: linear-gradient(to bottom, #B0B0B0 0%, #B0B0B0 100%);
+  }
+
+  .filepath-editor-left {
+    border-bottom: solid #ccc 1px;
+    border-bottom-left-radius: 2px;
+    border-left: solid #ccc 1px;
+    border-right: none;
+    border-top: solid #ccc 1px;
+    border-top-left-radius: 2px;
+  }
+
+  .filepath-editor-right {
+    border-bottom: solid #ccc 1px;
+    border-bottom-right-radius: 2px;
+    border-left: none;
+    border-right: solid #ccc 1px;
+    border-top: solid #ccc 1px;
+    border-top-right-radius: 2px;
+  }
+
+  .filepath-editor-img-toolbar-size {
+    width: 300;
+  }
+
+  .filepath-editor-img-toolbar-size i {
+    color: red;
+    font-size: 18px;
+    padding-bottom: 3px;
+    cursor: default;
+  }
+
+  .filepath-editor-img-toolbar-resize {
+    float: right;
+    text-align: right;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  .filepath-editor-img-toolbar {
+    padding: 4px;
+    text-align: left;
+  }
+  .filepath-editor-image-container {
+    border: 1px dotted #888;
+    position: relative;
+    text-align: center;
+  }
+  .filepath-editor-trash {
+    color: black;
+    position: absolute;
+    right: 6px;
+    text-shadow: 0px 0px 1px #fff;
+    top: 6px;
+  }
+  .filepath-editor-save-box {
+    margin-top: 6px;
+    text-align: right;
+  }
+  .filepath-editor-save-box button {
+    margin-left: 6px;
+  }
+</style>

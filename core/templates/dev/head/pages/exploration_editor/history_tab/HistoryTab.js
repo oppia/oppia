@@ -107,10 +107,6 @@ oppia.controller('HistoryTab', [
          * 'earlierVersion' and 'laterVersion' whose values are the metadata
          * of the compared versions, containing 'committerId', 'createdOn',
          * 'commitMessage', and 'versionNumber'.
-         *
-         * $scope.yamlStrs is an object with keys 'earlierVersion' and
-         * 'laterVersion', whose values are the YAML representations of the
-         * compared versions
          */
         $scope.compareVersions = {};
         $scope.compareVersionMetadata = {};
@@ -184,16 +180,18 @@ oppia.controller('HistoryTab', [
         $scope.explorationVersionMetadata[laterComparedVersion];
 
       compareVersionsService.getDiffGraphData(earlierComparedVersion,
-          laterComparedVersion).then(function(response) {
-        $log.info('Retrieved version comparison data');
-        $log.info(response);
+          laterComparedVersion).then(
+        function(response) {
+          $log.info('Retrieved version comparison data');
+          $log.info(response);
 
-        $scope.diffData = response;
-        $scope.earlierVersionHeader = getVersionHeader(
-          $scope.compareVersionMetadata.earlierVersion);
-        $scope.laterVersionHeader = getVersionHeader(
-          $scope.compareVersionMetadata.laterVersion);
-      });
+          $scope.diffData = response;
+          $scope.earlierVersionHeader = getVersionHeader(
+            $scope.compareVersionMetadata.earlierVersion);
+          $scope.laterVersionHeader = getVersionHeader(
+            $scope.compareVersionMetadata.laterVersion);
+        }
+      );
     };
 
     // Check if valid versions were selected
@@ -228,7 +226,8 @@ oppia.controller('HistoryTab', [
             return version;
           }
         },
-        controller: ['$scope', '$modalInstance', 'version', 'explorationData',
+        controller: [
+          '$scope', '$modalInstance', 'version', 'explorationData',
           function($scope, $modalInstance, version, explorationData) {
             $scope.version = version;
 

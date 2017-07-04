@@ -104,6 +104,21 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         for dependency_id in dependency_ids:
             dependency_registry.Registry.get_dependency_html(dependency_id)
 
+    def _validate_answer_visualization_specs(self, answer_visualization_specs):
+        _ANSWER_VISUALIZATIONS_SPECS_SCHEMA = [
+            ('id', basestring), ('options', dict),
+            ('calculation_id', basestring)]
+        _ANSWER_VISUALIZATION_KEYS = [
+            item[0] for item in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA]
+
+        # Check that the keys and the types of their values are correct.
+        for spec in answer_visualization_specs:
+            self.assertItemsEqual(spec.keys(), _ANSWER_VISUALIZATION_KEYS)
+            for key, item_type in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA:
+                self.assertTrue(isinstance(spec[key], item_type))
+                if item_type == basestring:
+                    self.assertTrue(spec[key])
+
     def _listdir_omit_ignored(self, directory):
         """List all files and directories within 'directory', omitting the ones
         whose name ends in one of the IGNORED_FILE_SUFFIXES.
@@ -112,6 +127,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         for suffix in IGNORED_FILE_SUFFIXES:
             names = [name for name in names if not name.endswith(suffix)]
         return names
+
+    def _get_linear_interaction_ids(self):
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+        return [
+            interaction_id for interaction_id in all_interaction_ids
+            if interaction_registry.Registry.get_interaction_by_id(
+                interaction_id).is_linear]
 
     def test_interaction_properties(self):
         """Test the standard properties of interactions."""
@@ -189,22 +212,20 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 feconf.INTERACTIONS_DIR, interaction_id)
             self.assertTrue(os.path.isdir(interaction_dir))
 
-            # In this directory there should only be a config .py file, an
-            # html file, a JS file, a validator.js file,  a directory named
-            # 'static' that contains (at least) a .png thumbnail file,
-            # (optionally) a JS test spec file, (optionally) a JS test spec
-            # file for rules, (optionally) a stats_response.html file and
-            # (optionally) a protractor.js file.
+            # In this directory there should only be the following files:
+            #  Required:
+            #    * A python file called {InteractionName}.py.
+            #    * An html file called {InteractionName}.html.
+            #    * A JS file called {InteractionName}.js.
+            #    * A JS file called {InteractionName}ValidationService.js
+            #    * A directory named 'static' containing at least a .png file.
+            #  Optional:
+            #    * A JS file called {InteractionName}ValidationServiceSpecs.js
+            #    * A JS file called {InteractionName}RulesServiceSpecs.js
+            #    * A JS file called protractor.js.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
-
-            try:
-                self.assertTrue(os.path.isfile(
-                    os.path.join(interaction_dir, 'stats_response.html')))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
@@ -215,7 +236,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, 'validatorSpec.js')))
+                    interaction_dir,
+                    '%sValidationServiceSpec.js' % interaction_id)))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -243,7 +265,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             html_file = os.path.join(
                 interaction_dir, '%s.html' % interaction_id)
             js_file = os.path.join(interaction_dir, '%s.js' % interaction_id)
-            validator_js_file = os.path.join(interaction_dir, 'validator.js')
+            validation_service_js_file = os.path.join(
+                interaction_dir, '%sValidationService.js' % interaction_id)
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
@@ -264,8 +287,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
-            validator_js_file_content = utils.get_file_contents(
-                validator_js_file)
+            validation_service_js_file_content = utils.get_file_contents(
+                validation_service_js_file)
 
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id, js_file_content)
@@ -285,15 +308,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 html_file_content)
             self.assertIn(
                 '<script src="{{cache_slug}}/extensions/interactions/%s/'
-                'validator.js"></script>' % interaction_id,
+                '%sValidationService.js"></script>' % (
+                    interaction_id, interaction_id),
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
             self.assertIn(
-                'oppiaInteractive%sValidator' % interaction_id,
-                validator_js_file_content)
-            self.assertNotIn('<script>', validator_js_file_content)
-            self.assertNotIn('</script>', validator_js_file_content)
+                '%sValidationService' % interaction_id,
+                validation_service_js_file_content)
+            self.assertNotIn('<script>', validation_service_js_file_content)
+            self.assertNotIn('</script>', validation_service_js_file_content)
 
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
@@ -324,6 +348,25 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction._customization_arg_specs)  # pylint: disable=protected-access
 
             self._validate_dependencies(interaction.dependency_ids)
+
+            answer_visualization_specs = (
+                interaction.answer_visualization_specs)
+            self._validate_answer_visualization_specs(
+                answer_visualization_specs)
+
+            answer_visualizations = interaction.answer_visualizations
+            for ind, visualization in enumerate(answer_visualizations):
+                self.assertEqual(
+                    visualization.id, answer_visualization_specs[ind]['id'])
+                self.assertEqual(
+                    visualization.calculation_id,
+                    answer_visualization_specs[ind]['calculation_id'])
+                self.assertEqual(
+                    visualization.options,
+                    answer_visualization_specs[ind]['options'])
+
+                # Check that the derived visualization is valid.
+                visualization.validate()
 
             # Check that supplemental interactions have instructions, and
             # inline ones do not.
@@ -399,7 +442,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     'interaction: %s' % interaction_id)
 
     def test_trainable_interactions_have_more_than_just_a_classifier(self):
-        """This ensures that trainable interactions cannot only have a fuzzy
+        """This ensures that trainable interactions cannot only have a soft
         rule, as that would break frontend functionality (users would not be
         able to create manual answer groups).
         """
@@ -418,14 +461,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
     def test_linear_interactions(self):
         """Sanity-check for the number of linear interactions."""
 
-        all_interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
+        actual_linear_interaction_ids = self._get_linear_interaction_ids()
+        self.assertEqual(len(actual_linear_interaction_ids), 1)
 
-        count = 0
-        for interaction_id in all_interaction_ids:
-            interaction = interaction_registry.Registry.get_interaction_by_id(
-                interaction_id)
-            if interaction.is_linear:
-                count += 1
-
-        self.assertEqual(count, 1)
+    def test_linear_interaction_ids_list_matches_linear_interactions(self):
+        """Sanity-check the feconf constant which lists all linear interaction
+        IDs.
+        """
+        actual_linear_interaction_ids = self._get_linear_interaction_ids()
+        self.assertEqual(
+            actual_linear_interaction_ids, feconf.LINEAR_INTERACTION_IDS)

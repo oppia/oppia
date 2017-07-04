@@ -14,8 +14,13 @@
 
 """Tests for the admin page."""
 
+from core.controllers import admin
 from core.controllers import base
+from core.domain import exp_domain
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.tests import test_utils
+import feconf
 
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
@@ -30,18 +35,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         super(AdminIntegrationTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-
-    def test_admin_page(self):
-        """Test that the admin page shows the expected sections."""
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.testapp.get('/admin')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Configuration',
-            'Reload a single exploration',
-            'three_balls')
-
-        self.logout()
 
     def test_admin_page_rights(self):
         """Test access rights to the admin page."""
@@ -110,3 +103,186 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         response = self.testapp.get('/about')
         self.assertIn(new_config_value, response.body)
+
+
+class AdminRoleHandlerTest(test_utils.GenericTestBase):
+    """Checks the user role handling on the admin page."""
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(AdminRoleHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_view_and_update_role(self):
+        user_email = 'user1@example.com'
+        user_name = 'user1'
+
+        self.signup(user_email, user_name)
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        # Check normal user has expected role. Viewing by username.
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'method': 'username', 'username': 'user1'})
+        self.assertEqual(
+            response_dict, {'user1': feconf.ROLE_ID_EXPLORATION_EDITOR})
+
+        # Check role correctly gets updated.
+        response = self.testapp.get(feconf.ADMIN_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        response_dict = self.post_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'role': feconf.ROLE_ID_MODERATOR, 'username': user_name},
+            csrf_token=csrf_token, expect_errors=False,
+            expected_status_int=200)
+        self.assertEqual(response_dict, {})
+
+        # Viewing by role.
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'method': 'role', 'role': feconf.ROLE_ID_MODERATOR})
+        self.assertEqual(response_dict, {'user1': feconf.ROLE_ID_MODERATOR})
+        self.logout()
+
+    def test_invalid_username_in_view_and_update_role(self):
+        username = 'myinvaliduser'
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        # Trying to view role of non-existent user.
+        response = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'method': 'username', 'username': username},
+            expect_errors=True)
+        self.assertEqual(response['code'], 400)
+
+        # Trying to update role of non-existent user.
+        response = self.testapp.get(feconf.ADMIN_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.post_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
+            csrf_token=csrf_token, expect_errors=True,
+            expected_status_int=400)
+
+
+class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
+    """Tests for data extraction handler."""
+
+    EXP_ID = 'exp'
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(DataExtractionQueryHandlerTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, end_state_name='End')
+
+        stats_services.record_answer(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                'first answer', 'TextInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, {},
+                'a_session_id_val', 1.0))
+
+        stats_services.record_answer(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                'second answer', 'TextInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, {},
+                'a_session_id_val', 1.0))
+
+    def test_data_extraction_handler(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        # Test that it returns all answers when 'num_answers' is 0.
+        payload = {
+            'exp_id': self.EXP_ID,
+            'exp_version': self.exploration.version,
+            'state_name': self.exploration.init_state_name,
+            'num_answers': 0
+        }
+
+        response = self.get_json(
+            '/explorationdataextractionhandler', payload)
+        extracted_answers = response['data']
+        self.assertEqual(len(extracted_answers), 2)
+        self.assertEqual(extracted_answers[0]['answer'], 'first answer')
+        self.assertEqual(extracted_answers[1]['answer'], 'second answer')
+
+        # Make sure that it returns only 'num_answers' number of answers.
+        payload = {
+            'exp_id': self.EXP_ID,
+            'exp_version': self.exploration.version,
+            'state_name': self.exploration.init_state_name,
+            'num_answers': 1
+        }
+
+        response = self.get_json(
+            '/explorationdataextractionhandler', payload)
+        extracted_answers = response['data']
+        self.assertEqual(len(extracted_answers), 1)
+        self.assertEqual(extracted_answers[0]['answer'], 'first answer')
+
+    def test_that_handler_raises_exception(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        payload = {
+            'exp_id': self.EXP_ID,
+            'exp_version': self.exploration.version,
+            'state_name': 'state name',
+            'num_answers': 0
+        }
+
+        response = self.get_json(
+            '/explorationdataextractionhandler', payload,
+            expect_errors=True)
+
+        self.assertEqual(
+            response['error'],
+            'Exploration \'exp\' does not have \'state name\' state.')
+        self.assertEqual(
+            response['code'], 400)
+
+
+class SslChallengeHandlerTests(test_utils.GenericTestBase):
+    """Tests for SSL challenge handler."""
+
+    CHALLENGE = 'hello'
+    RESPONSE = 'goodbye'
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(SslChallengeHandlerTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                admin.SSL_CHALLENGE_RESPONSES.name: [{
+                    'challenge': self.CHALLENGE,
+                    'response': self.RESPONSE,
+                }]
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token)
+        self.logout()
+
+    def test_ssl_challenge_page_functions_correctly(self):
+        response = self.testapp.get(
+            '/.well-known/acme-challenge/%s' % self.CHALLENGE)
+        self.assertEqual(response.body, self.RESPONSE)
+
+    def test_nonexistent_ssl_challenge_page(self):
+        response = self.testapp.get(
+            '/.well-known/acme-challenge/unknown_challenge',
+            expect_errors=True)
+        self.assertEqual(response.status_code, 404)

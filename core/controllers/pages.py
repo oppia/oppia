@@ -14,11 +14,24 @@
 
 """Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
 
+import random
 import urllib
 import urlparse
 
 from core.controllers import base
 import feconf
+
+
+# TODO(bhenning): Convert this over to using action-based ACLs.
+def require_maintenance_mode(handler):
+    """Decorator that checks whether maintenance mode is enabled in feconf."""
+    def test_maintenance_mode(self, **kwargs):
+        if not feconf.ENABLE_MAINTENANCE_MODE:
+            raise self.UnauthorizedUserException(
+                'You cannot access this page unless the site is in '
+                'maintenance mode')
+        return handler(self, **kwargs)
+    return test_maintenance_mode
 
 
 class SplashPage(base.BaseHandler):
@@ -33,7 +46,11 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            self.render_template('pages/splash/splash.html')
+            random_number = random.choice([0, 5, 6])
+            if random_number == 0:
+                self.render_template('pages/splash/splash.html')
+            else:
+                self.redirect('/splash?c=nv%d' % random_number)
         else:
             try:
                 self.render_template('pages/splash/splash_%s.html' % c_value)
@@ -202,3 +219,11 @@ class ConsoleErrorPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_template('pages/tests/console_errors.html')
+
+
+class MaintenancePage(base.BaseHandler):
+    """Page describing that Oppia is down for maintenance mode."""
+
+    def get(self, *args, **kwargs):
+        """Handles GET requests."""
+        self.render_template('pages/maintenance/maintenance.html')

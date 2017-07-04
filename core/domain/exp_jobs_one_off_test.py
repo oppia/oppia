@@ -244,9 +244,6 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
 
-    def setUp(self):
-        super(OneOffExplorationFirstPublishedJobTest, self).setUp()
-
     def test_first_published_time_of_exploration_that_is_unpublished(self):
         """This tests that, if an exploration is published, unpublished, and
         then published again, the job uses the first publication time as the
@@ -300,9 +297,6 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
     USERNAME_B = 'usernameb'
     EMAIL_A = 'emaila@example.com'
     EMAIL_B = 'emailb@example.com'
-
-    def setUp(self):
-        super(ExpSummariesContributorsOneOffJobTest, self).setUp()
 
     def test_contributors_for_valid_contribution(self):
         """Test that if only one commit is made, that the contributor
@@ -743,3 +737,82 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+
+class FallbackOneOffJobTest(test_utils.GenericTestBase):
+
+    EXP_IDS = ['exp_id0', 'exp_id1']
+    FALLBACK = [{
+        'trigger': {
+            'customization_args': {
+                'num_submits': {
+                    'value': i + 3
+                }
+            },
+            'trigger_type': 'NthResubmission'
+        },
+        'outcome': {
+            'feedback': [
+                '<p>feedback %d</p>' % i
+            ],
+            'param_changes': [],
+            'dest': 'Introduction'
+        }
+    } for i in xrange(3)]
+    STATE_NAMES = ['Introduction', 'state 1']
+
+    def setUp(self):
+        super(FallbackOneOffJobTest, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_fallbacks_are_listed(self):
+        """Tests that fallbacks are listed."""
+        explorations = [self.save_new_valid_exploration(
+            EXP_ID, self.owner_id, objective='The objective',
+            end_state_name='end') for EXP_ID in self.EXP_IDS]
+        for exploration in explorations:
+            init_state = exploration.states[exploration.init_state_name]
+            init_interaction = init_state.interaction
+            init_interaction.default_outcome.dest = 'state 1'
+            init_state.update_interaction_fallbacks(self.FALLBACK)
+            exploration.add_states(['state 1'])
+            new_state = exploration.states['state 1']
+            new_state.interaction.default_outcome.dest = 'end'
+            new_state.update_interaction_fallbacks(self.FALLBACK)
+            exploration.states['end'].update_interaction_id('EndExploration')
+
+            exp_services._save_exploration(self.owner_id, exploration, '', []) # pylint: disable=protected-access
+            rights_manager.publish_exploration(self.owner_id, exploration.id)
+
+        job_id = exp_jobs_one_off.FallbackOneOffJob.create_new()
+        exp_jobs_one_off.FallbackOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_values = exp_jobs_one_off.FallbackOneOffJob.get_output(job_id)
+
+        expected_values = [[
+            u'exp_id0: Introduction',
+            [u'3: <p>feedback 0</p>',
+             u'4: <p>feedback 1</p>',
+             u'5: <p>feedback 2</p>']
+        ], [
+            u'exp_id0: state 1',
+            [u'3: <p>feedback 0</p>',
+             u'4: <p>feedback 1</p>',
+             u'5: <p>feedback 2</p>']
+        ], [
+            u'exp_id1: Introduction',
+            [u'3: <p>feedback 0</p>',
+             u'4: <p>feedback 1</p>',
+             u'5: <p>feedback 2</p>']
+        ], [u'exp_id1: state 1',
+            [u'3: <p>feedback 0</p>',
+             u'4: <p>feedback 1</p>',
+             u'5: <p>feedback 2</p>']]]
+
+        actual_values.sort()
+        for index, actual_value in enumerate(actual_values):
+            self.assertEqual(actual_value.encode('ascii'),
+                             str(expected_values[index]))

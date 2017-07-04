@@ -42,6 +42,23 @@ describe('Editor context service', function() {
   });
 });
 
+describe('Angular names service', function() {
+  beforeEach(module('oppia'));
+
+  describe('angular name service', function() {
+    var ans = null;
+
+    beforeEach(inject(function($injector) {
+      ans = $injector.get('angularNameService');
+    }));
+
+    it('should map interaction ID to correct RulesService', function() {
+      expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
+        'textInputRulesService');
+    });
+  });
+});
+
 describe('Change list service', function() {
   beforeEach(module('oppia'));
 
@@ -792,78 +809,5 @@ describe('Exploration gadgets service', function() {
     // TODO(vjoisar/sll): Add the test case when we delete the only state that
     // contains the gadget.
     // Also ensure right confirmation boxes show up in various cases.
-  });
-});
-
-describe('New state template service', function() {
-  beforeEach(module('oppia'));
-
-  describe('new state template service', function() {
-    var nsts = null;
-    var NEW_STATE_NAME = 'new state name';
-
-    beforeEach(inject(function($injector) {
-      GLOBALS.NEW_STATE_TEMPLATE = {
-        classifier_model_id: null,
-        content: [{
-          type: 'text',
-          value: ''
-        }],
-        interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            rows: {
-              value: 1
-            },
-            placeholder: {
-              value: 'Type your answer here.'
-            }
-          },
-          default_outcome: {
-            dest: '(untitled state)',
-            feedback: [],
-            param_changes: []
-          },
-          fallbacks: [],
-          id: 'TextInput'
-        },
-        param_changes: []
-      };
-      nsts = $injector.get('newStateTemplateService');
-    }));
-
-    it('should make a new state template given a state name', function() {
-      expect(JSON.parse(JSON.stringify(
-          nsts.getNewStateTemplate(NEW_STATE_NAME)
-        ))).toEqual({
-          name: 'new state name',
-          classifierModelId: null,
-          content: [{
-            type: 'text',
-            value: ''
-          }],
-          interaction: {
-            answerGroups: [],
-            confirmedUnclassifiedAnswers: [],
-            customizationArgs: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: 'Type your answer here.'
-              }
-            },
-            defaultOutcome: {
-              dest: NEW_STATE_NAME,
-              feedback: [],
-              param_changes: []
-            },
-            fallbacks: [],
-            id: 'TextInput'
-          },
-          paramChanges: []
-        });
-    });
   });
 });

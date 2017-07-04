@@ -29,16 +29,9 @@ describe('Embedding', function() {
       filename: 'embedding_tests_dev_0.0.1.min.html',
       isVersion1: true
     }, {
-      filename: 'embedding_tests_jsdelivr_0.0.1.min.html',
-      isVersion1: true
-    }, {
       filename: 'embedding_tests_dev_0.0.2.min.html',
       isVersion1: false
     }];
-
-    // The length of time the page waits before confirming an exploration
-    // cannot be loaded.
-    var LOADING_TIMEOUT = 10000;
 
     var playCountingExploration = function(version) {
       general.waitForSystem();
@@ -103,29 +96,6 @@ describe('Embedding', function() {
           by.xpath("//div[@class='protractor-test-old-version']/iframe")));
       playCountingExploration(1);
       browser.switchTo().defaultContent();
-
-      if (TEST_PAGES[i].isVersion1) {
-        // Tests of failed loading (old version)
-        var missingIdElement = driver.findElement(
-          by.xpath("//div[@class='protractor-test-missing-id']/div/span"));
-        expect(missingIdElement.getText()).toMatch(
-          'This Oppia exploration could not be loaded because no oppia-id ' +
-          'attribute was specified in the HTML tag.');
-        var buttonXPath = '/oppia/div/button';
-        driver.findElement(
-          by.xpath(
-            "//div[@class='protractor-test-invalid-id-deferred']" + buttonXPath
-          )).click();
-        browser.sleep(LOADING_TIMEOUT);
-        expect(
-          driver.findElement(
-            by.xpath("//div[@class='protractor-test-invalid-id']/div/div/span")
-          ).getText()).toMatch('This exploration could not be loaded.');
-        expect(
-          driver.findElement(
-            by.xpath("//div[@class='protractor-test-invalid-id']/div/div/span")
-          ).getText()).toMatch('This exploration could not be loaded.');
-      }
     }
 
     // Certain events in the exploration playthroughs should trigger hook
@@ -187,7 +157,7 @@ describe('Embedding', function() {
       general.waitForSystem();
       browser.waitForAngular();
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
-          .getAttribute('placeholder')).toBe(expectedPlaceholder);
+        .getAttribute('placeholder')).toBe(expectedPlaceholder);
       browser.switchTo().defaultContent();
     };
 

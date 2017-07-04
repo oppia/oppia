@@ -337,7 +337,7 @@ def _get_suggestion_from_model(suggestion_model):
         suggestion_model.id, suggestion_model.author_id,
         suggestion_model.exploration_id, suggestion_model.exploration_version,
         suggestion_model.state_name, suggestion_model.description,
-        suggestion_model.state_content)
+        suggestion_model.get_suggestion_html())
 
 
 def get_suggestion(exploration_id, thread_id):

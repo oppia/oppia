@@ -1,9 +1,13 @@
 application: oppiaserver
-version: 2-4-1
+version: default
 runtime: python27
 api_version: 1
 threadsafe: false
 instance_class: F2
+automatic_scaling:
+  max_num_instances: 3
+  cpu_utilization:
+    target_utilization: 0.8
 
 builtins:
 - appstats: on
@@ -58,6 +62,13 @@ handlers:
 - url: /templates/dev/head/(.*\.(js))$
   static_files: core/templates/dev/head/\1
   upload: core/templates/dev/head/(.*\.(js))$
+  secure: always
+- url: /templates/dev/head/(.*\.(html))$
+  static_files: core/templates/dev/head/\1
+  upload: core/templates/dev/head/(.*\.(html))$
+  # TODO(vojtechjelinek): Remove application_readable after all
+  # components are referenced directly by URL
+  application_readable: true
   secure: always
 - url: /third_party/static
   static_dir: third_party/static

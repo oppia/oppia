@@ -19,9 +19,9 @@
 
 oppia.factory('StateObjectFactory', [
   'AnswerGroupObjectFactory', 'InteractionObjectFactory',
-  'ContentObjectFactory',
+  'SubtitledHtmlObjectFactory', 'ParamChangesObjectFactory',
   function(AnswerGroupObjectFactory, InteractionObjectFactory,
-    ContentObjectFactory) {
+    SubtitledHtmlObjectFactory, ParamChangesObjectFactory) {
     var State = function(name, classifierModelId, content, interaction,
       paramChanges) {
       this.name = name;
@@ -34,10 +34,12 @@ oppia.factory('StateObjectFactory', [
     // Instance methods.
     State.prototype.toBackendDict = function() {
       return {
-        content: this.content,
+        content: this.content.toBackendDict(),
         classifier_model_id: this.classifierModelId,
         interaction: this.interaction.toBackendDict(),
-        param_changes: this.paramChanges
+        param_changes: this.paramChanges.map(function(paramChange) {
+          return paramChange.toBackendDict();
+        })
       };
     };
 
@@ -47,15 +49,10 @@ oppia.factory('StateObjectFactory', [
       return new State(
         stateName,
         stateDict.classifier_model_id,
-        generateContentFromBackend(stateDict.content),
+        SubtitledHtmlObjectFactory.createFromBackendDict(stateDict.content),
         InteractionObjectFactory.createFromBackendDict(stateDict.interaction),
-        stateDict.param_changes);
-    };
-
-    var generateContentFromBackend = function(contentBackendList) {
-      return contentBackendList.map(function(contentBackendDict) {
-        return ContentObjectFactory.createFromBackendDict(contentBackendDict);
-      });
+        ParamChangesObjectFactory.createFromBackendList(
+          stateDict.param_changes));
     };
 
     return State;

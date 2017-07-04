@@ -16,10 +16,13 @@
 
 """Tests for user-related one-off computations."""
 
+import ast
 import datetime
+import re
 
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_services
 from core.domain import exp_services
 from core.domain import event_services
 from core.domain import feedback_services
@@ -143,6 +146,167 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_d_contributions_model.created_exploration_ids,
             [self.EXP_ID_2])
+
+
+class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off username length distribution job."""
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_EMAIL = 'ab@example.com'
+    USER_B_USERNAME = 'ab'
+    USER_C_EMAIL = 'bc@example.com'
+    USER_C_USERNAME = 'bc'
+    USER_D_EMAIL = 'bcd@example.com'
+    USER_D_USERNAME = 'bcd'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UsernameLengthDistributionOneOffJob.create_new())
+        user_jobs_one_off.UsernameLengthDistributionOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
+                job_id))
+
+        output = {}
+        for stringified_distribution in stringified_output:
+            value = re.findall(r'\d+', stringified_distribution)
+            # output['username length'] = number of users
+            output[value[0]] = int(value[1])
+
+        return output
+
+    def test_null_case(self):
+        """Tests the case when there are no signed up users but there is one
+        default user having the username - 'tmpsuperadm1n'.
+        """
+        output = self._run_one_off_job()
+        # number of users = 1.
+        # length of usernames = 13 (tmpsuperadm1n).
+        self.assertEqual(output['13'], 1)
+
+    def test_single_user_case(self):
+        """Tests the case when there is only one signed up user and a default
+        user - 'tmpsuperadm1n'.
+        """
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        output = self._run_one_off_job()
+        # number of users = 2.
+        # length of usernames = 13 (tmpsuperadm1n), 1 (a).
+        self.assertEqual(output['13'], 1)
+        self.assertEqual(output['1'], 1)
+
+    def test_multiple_users_case(self):
+        """Tests the case when there are multiple signed up users and a
+        default user - 'tmpsuperadm1n'.
+        """
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        output = self._run_one_off_job()
+        # number of users = 3
+        # length of usernames = 13 (tmpsuperadm1n), 2 (ab), 1 (a).
+        self.assertEqual(output['13'], 1)
+        self.assertEqual(output['2'], 1)
+        self.assertEqual(output['1'], 1)
+
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
+        output = self._run_one_off_job()
+        # number of users = 5
+        # length of usernames = 13 (tmpsuperadm1n), 3 (bcd), 2 (ab, bc), 1 (a).
+        self.assertEqual(output['13'], 1)
+        self.assertEqual(output['3'], 1)
+        self.assertEqual(output['2'], 2)
+        self.assertEqual(output['1'], 1)
+
+
+class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off long userbio length job."""
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_A_BIO = 'I am less than 500'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_USERNAME = 'b'
+    USER_B_BIO = 'Long Bio' * 100
+    USER_C_EMAIL = 'c@example.com'
+    USER_C_USERNAME = 'c'
+    USER_C_BIO = 'Same Bio' * 100
+    USER_D_EMAIL = 'd@example.com'
+    USER_D_USERNAME = 'd'
+    USER_D_BIO = 'Diff Bio' * 300
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.LongUserBiosOneOffJob.create_new())
+        user_jobs_one_off.LongUserBiosOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+
+        stringified_output = (
+            user_jobs_one_off.LongUserBiosOneOffJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item)
+                       for stringified_item in stringified_output]
+        output = [[int(eval_item[0]), eval_item[1]]
+                  for eval_item in eval_output]
+        return output
+
+    def test_no_userbio_returns_empty_list(self):
+        """Tests the case when userbio is None."""
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        result = self._run_one_off_job()
+        self.assertEqual(result, [])
+
+    def test_short_userbio_returns_empty_list(self):
+        """Tests the case where the userbio is less than 500 characters."""
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
+        user_services.update_user_bio(user_id_a, self.USER_A_BIO)
+        result = self._run_one_off_job()
+        self.assertEqual(result, [])
+
+    def test_long_userbio_length(self):
+        """Tests the case where the userbio is more than 500 characters."""
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
+        user_services.update_user_bio(user_id_b, self.USER_B_BIO)
+        result = self._run_one_off_job()
+        expected_result = [[800, ['b']]]
+        self.assertEqual(result, expected_result)
+
+    def test_same_userbio_length(self):
+        """Tests the case where two users have same userbio length."""
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
+        user_services.update_user_bio(user_id_b, self.USER_B_BIO)
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_services.update_user_bio(user_id_c, self.USER_C_BIO)
+        result = self._run_one_off_job()
+        result[0][1].sort()
+        expected_result = [[800, ['b', 'c']]]
+        self.assertEqual(result, expected_result)
+
+    def test_diff_userbio_length(self):
+        """Tests the case where two users have different userbio lengths."""
+        self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
+        user_id_d = self.get_user_id_from_email(self.USER_D_EMAIL)
+        user_services.update_user_bio(user_id_d, self.USER_D_BIO)
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_services.update_user_bio(user_id_c, self.USER_C_BIO)
+        result = self._run_one_off_job()
+        expected_result = [[2400, ['d']], [800, ['c']]]
+        self.assertEqual(result, expected_result)
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
@@ -975,3 +1139,70 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNone(owner_settings.last_created_an_exploration)
         self.assertIsNone(owner_settings.last_edited_an_exploration)
+
+
+class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
+    def test_create_user_with_different_roles_and_run_migration_job(self):
+        """Tests the working of roles migration job. A sample set of users
+        is created with varying roles. The migration job is run and resulted
+        change in roles is tested against expected values.
+        """
+        user_ids = [
+            'user_id1', 'user_id2', 'user_id3', 'user_id4',
+            'user_id5', 'user_id6', 'user_id7', 'user_id8'
+        ]
+        user_emails = [
+            'user1@example.com', 'user2@example.com', 'user3@example.com',
+            'user4@example.com', 'user5@example.com', 'user6@example.com',
+            'user7@example.com', 'user8@example.com'
+        ]
+        user_names = [
+            'user1', 'user2', 'user3', 'user4', 'user5', 'user6',
+            'user7', 'user8'
+        ]
+
+        for uid, uemail, uname in zip(user_ids, user_emails, user_names):
+            user_services.create_new_user(uid, uemail)
+            user_services.set_username(uid, uname)
+
+        admin_usernames = ['user1', 'user2', 'user3']
+        moderator_usernames = ['user4', 'user5', 'user2']
+        banned_usernames = ['user6']
+        collection_editor_usernames = ['user7', 'user3']
+
+        config_services.set_property(
+            'admin_id', 'admin_usernames', admin_usernames)
+        config_services.set_property(
+            'admin_id', 'moderator_usernames', moderator_usernames)
+        config_services.set_property(
+            'admin_id', 'banned_usernames', banned_usernames)
+        config_services.set_property(
+            'admin_id', 'collection_editor_whitelist',
+            collection_editor_usernames)
+
+        job_id = (
+            user_jobs_one_off.UserRolesMigrationOneOffJob.create_new())
+        user_jobs_one_off.UserRolesMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        user_final_roles = {}
+        for username in user_names:
+            user_final_roles[username] = user_services.get_user_role_from_id(
+                user_services.get_user_id_from_username(username))
+
+        self.assertEqual(
+            user_final_roles['user1'], feconf.ROLE_ID_ADMIN)
+        self.assertEqual(
+            user_final_roles['user2'], feconf.ROLE_ID_ADMIN)
+        self.assertEqual(
+            user_final_roles['user3'], feconf.ROLE_ID_ADMIN)
+        self.assertEqual(
+            user_final_roles['user4'], feconf.ROLE_ID_MODERATOR)
+        self.assertEqual(
+            user_final_roles['user5'], feconf.ROLE_ID_MODERATOR)
+        self.assertEqual(
+            user_final_roles['user6'], feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(
+            user_final_roles['user7'], feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_final_roles['user8'], feconf.ROLE_ID_EXPLORATION_EDITOR)

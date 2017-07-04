@@ -18,6 +18,7 @@
 
 import datetime
 
+from constants import constants
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
@@ -53,7 +54,7 @@ class ExplorationModel(base_models.VersionedModel):
     objective = ndb.TextProperty(default='', indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
     language_code = ndb.StringProperty(
-        default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
+        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True)
     # Tags (topics, skills, concepts, etc.) associated with this
     # exploration.
     tags = ndb.StringProperty(repeated=True, indexed=True)
@@ -94,22 +95,6 @@ class ExplorationModel(base_models.VersionedModel):
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
         return cls.get_all().count()
-
-    def commit(self, committer_id, commit_message, commit_cmds):
-        """Updates the exploration using the properties dict, then saves it.
-
-        Args:
-            committer_id: str. The user id of the user who committed the
-                change.
-            commit_message: str. The commit description message.
-            commit_cmds: list(dict). A list of commands, describing changes
-                made in this model, which should give sufficient information to
-                reconstruct the commit. Each dict always contains:
-                    cmd: str. Unique command.
-                and additional arguments for that command.
-        """
-        super(ExplorationModel, self).commit(
-            committer_id, commit_message, commit_cmds)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

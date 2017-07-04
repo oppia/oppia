@@ -21,9 +21,7 @@ list of lint errors to the terminal. If the directory path is passed,
 it will lint all Python and JavaScript files in that directory; otherwise,
 it will only lint files that have been touched in this commit.
 
-This script ignores all filepaths contained within the excludeFiles
-argument in .jscsrc. Note that, as a side-effect, these filepaths will also
-prevent Python files in those paths from being linted.
+This script ignores all filepaths contained within .eslintignore.
 
 IMPORTANT NOTES:
 
@@ -38,7 +36,7 @@ IMPORTANT NOTES:
 CUSTOMIZATION OPTIONS
 =====================
 1.  To lint only files that have been touched in this commit
-       python scripts/pre_commit_linter.py
+        python scripts/pre_commit_linter.py
 
 2.  To lint all files in the folder or to lint just a specific file
         python scripts/pre_commit_linter.py --path filepath
@@ -53,7 +51,6 @@ Note that the root folder MUST be named 'oppia'.
 # pylint: disable=wrong-import-order
 import argparse
 import fnmatch
-import json
 import multiprocessing
 import os
 import re
@@ -100,21 +97,6 @@ BAD_PATTERNS = {
         'excluded_dirs': ()}
 }
 
-BAD_PATTERNS_JS = {
-    ' == ': {
-        'message': 'Please replace == with === in this file.',
-        'excluded_files': (
-            'core/templates/dev/head/expressions/parserSpec.js',
-            'core/templates/dev/head/expressions/evaluatorSpec.js',
-            'core/templates/dev/head/expressions/typeParserSpec.js')},
-    ' != ': {
-        'message': 'Please replace != with !== in this file.',
-        'excluded_files': (
-            'core/templates/dev/head/expressions/parserSpec.js',
-            'core/templates/dev/head/expressions/evaluatorSpec.js',
-            'core/templates/dev/head/expressions/typeParserSpec.js')}
-}
-
 BAD_PATTERNS_JS_REGEXP = [
     {
         'regexp': r"\b(ddescribe|fdescribe)\(",
@@ -147,7 +129,7 @@ if not os.getcwd().endswith('oppia'):
     print 'ERROR    Please run this script from the oppia root directory.'
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.5.2')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.7.1')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
@@ -158,16 +140,16 @@ _PATHS_TO_INSERT = [
     _PYLINT_PATH,
     os.getcwd(),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
         'google_appengine', 'lib', 'webapp2-2.3'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
         'google_appengine', 'lib', 'yaml-3.10'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
         'google_appengine', 'lib', 'jinja2-2.6'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),
@@ -175,6 +157,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
+    os.path.join('third_party', 'beautifulsoup4-4.6.0'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
 ]
 for path in _PATHS_TO_INSERT:
@@ -217,22 +200,19 @@ def _get_changed_filenames():
     return unstaged_files + staged_files
 
 
-def _get_glob_patterns_excluded_from_jscsrc(config_jscsrc):
-    """Collects excludeFiles from jscsrc file.
+def _get_glob_patterns_excluded_from_eslint(eslintignore_path):
+    """Collects excludeFiles from .eslintignore file.
 
     Args:
-        config_jscsrc: str. Path to .jscsrc file.
+        eslintignore_path: str. Path to .eslintignore file.
 
     Returns:
         a list of files in excludeFiles.
     """
-    with open(config_jscsrc) as f:
-        f.readline()  # First three lines are comments
-        f.readline()
-        f.readline()
-        json_data = json.loads(f.read())
-
-    return json_data['excludeFiles']
+    file_data = []
+    with open(eslintignore_path) as f:
+        file_data.extend(f.readlines())
+    return file_data
 
 
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
@@ -258,16 +238,15 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
+def _lint_js_files(node_path, eslint_path, files_to_lint, stdout,
                    result):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
         node_path: str. Path to the node binary.
-        jscs_path: str. Path to the JSCS binary.
-        config_jscsrc: str. Configuration args for the call to the JSCS binary.
+        eslint_path: str. Path to the ESLint binary.
         files_to_lint: list(str). A list of filepaths to lint.
-        stdout:  multiprocessing.Queue. A queue to store JSCS outputs.
+        stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
 
     Returns:
@@ -283,10 +262,10 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
         return
 
     print 'Total js files: ', num_js_files
-    jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
+    eslint_cmd_args = [node_path, eslint_path, '--quiet']
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
-        proc_args = jscs_cmd_args + [filename]
+        proc_args = eslint_cmd_args + [filename]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -367,7 +346,7 @@ def _get_all_files():
     root directory and to return a list of all the files for linting and
     pattern checks.
     """
-    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
+    eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     parsed_args = _PARSER.parse_args()
     if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
@@ -378,8 +357,8 @@ def _get_all_files():
         if os.path.isfile(input_path):
             all_files = [input_path]
         else:
-            excluded_glob_patterns = _get_glob_patterns_excluded_from_jscsrc(
-                jscsrc_path)
+            excluded_glob_patterns = _get_glob_patterns_excluded_from_eslint(
+                eslintignore_path)
             all_files = _get_all_files_in_directory(
                 input_path, excluded_glob_patterns)
     elif parsed_args.files:
@@ -397,31 +376,32 @@ def _get_all_files():
         all_files = valid_filepaths
     else:
         all_files = _get_changed_filenames()
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     return all_files
 
 
 def _pre_commit_linter(all_files):
-    """This function is used to check if node-jscs dependencies are installed
-    and pass JSCS binary path.
+    """This function is used to check if node-eslint dependencies are installed
+    and pass ESLint binary path.
     """
     print 'Starting linter...'
 
-    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
     pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
-    config_jscsrc = '--config=%s' % jscsrc_path
     config_pylint = '--rcfile=%s' % pylintrc_path
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
-    jscs_path = os.path.join(
-        parent_dir, 'node_modules', 'jscs', 'bin', 'jscs')
+    eslint_path = os.path.join(
+        parent_dir, 'node_modules', 'eslint', 'bin', 'eslint.js')
 
-    if not os.path.exists(jscs_path):
+    if not os.path.exists(eslint_path):
         print ''
-        print 'ERROR    Please run start.sh first to install node-jscs '
+        print 'ERROR    Please run start.sh first to install node-eslint '
         print '         and its dependencies.'
         sys.exit(1)
 
@@ -434,8 +414,8 @@ def _pre_commit_linter(all_files):
     linting_processes = []
     js_stdout = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
-        target=_lint_js_files, args=(node_path, jscs_path, config_jscsrc,
-                                     js_files_to_lint, js_stdout, js_result)))
+        target=_lint_js_files, args=(node_path, eslint_path, js_files_to_lint,
+                                     js_stdout, js_result)))
 
     py_result = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
@@ -548,15 +528,6 @@ def _check_bad_patterns(all_files):
                         filename, BAD_PATTERNS[pattern]['message'])
                     total_error_count += 1
             if filename.endswith('.js'):
-                for pattern in BAD_PATTERNS_JS:
-                    if filename not in (
-                            BAD_PATTERNS_JS[pattern]['excluded_files']):
-                        if pattern in content:
-                            failed = True
-                            print '%s --> %s' % (
-                                filename,
-                                BAD_PATTERNS_JS[pattern]['message'])
-                            total_error_count += 1
                 for regexp in BAD_PATTERNS_JS_REGEXP:
                     regexp_pattern = regexp['regexp']
                     if filename not in regexp['excluded_files']:

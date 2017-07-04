@@ -141,11 +141,8 @@ def get_collection_from_model(collection_model, run_conversion=True):
             copy.deepcopy(collection_model.collection_contents)
     }
 
-    # If collection_contents is empty, attempt to retrieve nodes data from nodes
-    # instead. This is temporary, and intended to not break backwards
-    # compatibility before the migration job is run.
-    # TODO(wxy): Remove this after collection migration is completed.
-    if not versioned_collection_contents['collection_contents']:
+    # If collection is in version 2, copy nodes data to collection contents
+    if collection_model.schema_version == 2:
         versioned_collection_contents['collection_contents'] = {
             'nodes': copy.deepcopy(collection_model.nodes)
         }
@@ -378,6 +375,32 @@ def get_completed_exploration_ids(user_id, collection_id):
     progress_model = user_models.CollectionProgressModel.get(
         user_id, collection_id)
     return progress_model.completed_explorations if progress_model else []
+
+
+def get_explorations_completed_in_collections(user_id, collection_ids):
+    """Returns the ids of the explorations completed in each of the collections.
+
+    Args:
+        user_id: str. ID of the given user.
+        collection_ids: list(str). IDs of the collections.
+
+    Returns:
+        list(list(str)). List of the exploration ids completed in each
+            collection.
+    """
+    progress_models = user_models.CollectionProgressModel.get_multi(
+        user_id, collection_ids)
+
+    exploration_ids_completed_in_collections = []
+
+    for progress_model in progress_models:
+        if progress_model:
+            exploration_ids_completed_in_collections.append(
+                progress_model.completed_explorations)
+        else:
+            exploration_ids_completed_in_collections.append([])
+
+    return exploration_ids_completed_in_collections
 
 
 def get_valid_completed_exploration_ids(user_id, collection):

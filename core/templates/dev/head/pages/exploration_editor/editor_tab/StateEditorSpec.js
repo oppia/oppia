@@ -52,56 +52,86 @@ describe('State Editor controller', function() {
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
       IS = $injector.get('INTERACTION_SPECS');
-      cof = $injector.get('ContentObjectFactory');
+      shof = $injector.get('SubtitledHtmlObjectFactory');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
       ess.init({
         'First State': {
-          content: [{
-            type: 'text',
-            value: 'First State Content'
-          }],
+          content: {
+            html: 'First State Content',
+            audio_translations: []
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
+              outcome: {
+                dest: 'unused',
+                feedback: [],
+                param_changes: []
+              },
               correct: false
             }],
-            fallbacks: []
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
+            fallbacks: [],
+            hints: []
           },
           param_changes: []
         },
         'Second State': {
-          content: [{
-            type: 'text',
-            value: 'Second State Content'
-          }],
+          content: {
+            html: 'Second State Content',
+            audio_translations: []
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
+              outcome: {
+                dest: 'unused',
+                feedback: [],
+                param_changes: []
+              },
               correct: false
             }],
-            fallbacks: []
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
+            fallbacks: [],
+            hints: []
           },
           param_changes: []
         },
         'Third State': {
-          content: [{
-            type: 'text',
-            value: 'This is some content.'
-          }],
+          content: {
+            html: 'This is some content.',
+            audio_translations: []
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
+              outcome: {
+                dest: 'unused',
+                feedback: [],
+                param_changes: []
+              },
               correct: false
             }],
-            fallbacks: []
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
+            fallbacks: [],
+            hints: []
           },
           param_changes: [{
             name: 'comparison',
@@ -115,10 +145,10 @@ describe('State Editor controller', function() {
       });
 
       scope.getContent = function(contentString) {
-        return [cof.createFromBackendDict({
-          type: 'text',
-          value: contentString
-        })];
+        return shof.createFromBackendDict({
+          html: contentString,
+          audio_translations: []
+        });
       };
 
       ctrl = $controller('StateEditor', {
@@ -139,7 +169,7 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('Third State');
       scope.initStateEditor();
       expect(scope.contentEditorIsOpen).toBe(false);
-      expect(scope.content[0].value).toEqual('This is some content.');
+      expect(scope.content.getHtml()).toEqual('This is some content.');
     });
 
     it('should correctly handle no-op edits', function() {
@@ -157,43 +187,46 @@ describe('State Editor controller', function() {
     });
 
     it('should check that content edits are saved correctly',
-       function() {
-      ecs.setActiveStateName('Third State');
-      expect(cls.getChangeList()).toEqual([]);
-      scope.openStateContentEditor();
-      scope.content = scope.getContent('babababa');
-      scope.saveTextContent();
-      expect(cls.getChangeList().length).toBe(1);
-      expect(cls.getChangeList()[0].new_value[0].value).toEqual('babababa');
-      expect(cls.getChangeList()[0].old_value[0].value).toEqual(
-        'This is some content.');
+      function() {
+        ecs.setActiveStateName('Third State');
+        expect(cls.getChangeList()).toEqual([]);
+        scope.openStateContentEditor();
+        scope.content = scope.getContent('babababa');
+        scope.saveTextContent();
+        expect(cls.getChangeList().length).toBe(1);
+        expect(cls.getChangeList()[0].new_value.html).toEqual('babababa');
+        expect(cls.getChangeList()[0].old_value.html).toEqual(
+          'This is some content.');
 
-      scope.openStateContentEditor();
-      scope.content = scope.getContent(
-        'And now for something completely different.'
-      );
-      scope.saveTextContent();
-      expect(cls.getChangeList().length).toBe(2);
-      expect(cls.getChangeList()[1].new_value[0].value)
-        .toEqual('And now for something completely different.');
-      expect(cls.getChangeList()[1].old_value[0].value).toEqual('babababa');
-    });
+        scope.openStateContentEditor();
+        scope.content = scope.getContent(
+          'And now for something completely different.'
+        );
+        scope.saveTextContent();
+        expect(cls.getChangeList().length).toBe(2);
+        expect(cls.getChangeList()[1].new_value.html)
+          .toEqual('And now for something completely different.');
+        expect(cls.getChangeList()[1].old_value.html).toEqual('babababa');
+      }
+    );
 
     it('should not save any changes to content when an edit is cancelled',
-       function() {
-      ecs.setActiveStateName('Third State');
-      scope.initStateEditor();
-      var contentBeforeEdit = angular.copy(scope.content);
-      scope.content = scope.getContent('Test Content');
-      scope.cancelEdit();
-      expect(scope.contentEditorIsOpen).toBe(false);
-      expect(scope.content).toEqual(contentBeforeEdit);
-    });
+      function() {
+        ecs.setActiveStateName('Third State');
+        scope.initStateEditor();
+        var contentBeforeEdit = angular.copy(scope.content);
+        scope.content = scope.getContent('Test Content');
+        scope.cancelEdit();
+        expect(scope.contentEditorIsOpen).toBe(false);
+        expect(scope.content).toEqual(contentBeforeEdit);
+      }
+    );
   });
 
   describe('TrainingDataService', function() {
     var $httpBackend;
-    var scope, siis, ecs, cls, rs, tds, ess, IS, RULE_TYPE_CLASSIFIER, rof;
+    var scope, siis, ecs, cls, rs, tds, ess, IS, RULE_TYPE_CLASSIFIER, rof,
+      oof;
     var mockExplorationData;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -232,16 +265,17 @@ describe('State Editor controller', function() {
       IS = $injector.get('INTERACTION_SPECS');
       RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
       rof = $injector.get('RuleObjectFactory');
+      oof = $injector.get('OutcomeObjectFactory');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
 
       ess.init({
         State: {
-          content: [{
-            type: 'text',
-            value: 'State Content'
-          }],
+          content: {
+            html: 'State Content',
+            audio_translations: []
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
@@ -253,15 +287,18 @@ describe('State Editor controller', function() {
               }],
               outcome: {
                 feedback: 'Feedback',
-                dest: 'State'
+                dest: 'State',
+                param_changes: []
               },
               correct: false
             }],
             default_outcome: {
               feedback: 'Default',
-              dest: 'State'
+              dest: 'State',
+              param_changes: []
             },
             fallbacks: [],
+            hints: [],
             confirmed_unclassified_answers: []
           },
           param_changes: []
@@ -280,11 +317,11 @@ describe('State Editor controller', function() {
 
       $httpBackend.when('GET', '/createhandler/training_data/0/State').respond({
         unhandled_answers: [{
-          value: 'answer1',
-          count: 2
+          answer: 'answer1',
+          frequency: 2
         }, {
-          value: 'answer2',
-          count: 1
+          answer: 'answer2',
+          frequency: 1
         }]
       });
     }));
@@ -300,7 +337,7 @@ describe('State Editor controller', function() {
       tds.initializeTrainingData('0', 'State');
       $httpBackend.flush();
       expect(tds.getTrainingDataAnswers()).toEqual(['answer1', 'answer2']);
-      expect(tds.getTrainingDataCounts()).toEqual([2, 1]);
+      expect(tds.getTrainingDataFrequencies()).toEqual([2, 1]);
 
       // Ensure it handles receiving no unhandled answers correctly.
       $httpBackend.expect(
@@ -311,38 +348,39 @@ describe('State Editor controller', function() {
       tds.initializeTrainingData('0', 'State');
       $httpBackend.flush();
       expect(tds.getTrainingDataAnswers()).toEqual([]);
-      expect(tds.getTrainingDataCounts()).toEqual([]);
+      expect(tds.getTrainingDataFrequencies()).toEqual([]);
     });
 
     it('should be able to train answer groups and the default response',
-        function() {
-      // Training the first answer of a group should add a new classifier.
-      tds.trainAnswerGroup(0, 'text answer');
-      var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(RULE_TYPE_CLASSIFIER, {
-          training_data: ['text answer']
-        })
-      );
+      function() {
+        // Training the first answer of a group should add a new classifier.
+        tds.trainAnswerGroup(0, 'text answer');
+        var state = ess.getState('State');
+        expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+          rof.createNew(RULE_TYPE_CLASSIFIER, {
+            training_data: ['text answer']
+          })
+        );
 
-      // Training a second answer to the same group should append the answer to
-      // the training data.
-      tds.trainAnswerGroup(0, 'second answer');
-      state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(RULE_TYPE_CLASSIFIER, {
-          training_data: ['text answer', 'second answer']
-        })
-      );
+        // Training a second answer to the same group should append the answer
+        // to the training data.
+        tds.trainAnswerGroup(0, 'second answer');
+        state = ess.getState('State');
+        expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+          rof.createNew(RULE_TYPE_CLASSIFIER, {
+            training_data: ['text answer', 'second answer']
+          })
+        );
 
-      // Training the default response should add information to the confirmed
-      // unclassified answers.
-      tds.trainDefaultResponse('third answer');
-      state = ess.getState('State');
-      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
-        'third answer'
-      ]);
-    });
+        // Training the default response should add information to the confirmed
+        // unclassified answers.
+        tds.trainDefaultResponse('third answer');
+        state = ess.getState('State');
+        expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
+          'third answer'
+        ]);
+      }
+    );
 
     it('should be able to retrain answers between answer groups and the ' +
         'default outcome', function() {
@@ -502,23 +540,19 @@ describe('State Editor controller', function() {
       // Training an answer group should remove an unresolved answer.
       tds.trainAnswerGroup(0, 'answer1');
       expect(tds.getTrainingDataAnswers()).toEqual(['answer2']);
-      expect(tds.getTrainingDataCounts()).toEqual([1]);
+      expect(tds.getTrainingDataFrequencies()).toEqual([1]);
 
       // Training the default response should also remove an answer.
       tds.trainDefaultResponse('answer2');
       expect(tds.getTrainingDataAnswers()).toEqual([]);
-      expect(tds.getTrainingDataCounts()).toEqual([]);
+      expect(tds.getTrainingDataFrequencies()).toEqual([]);
     });
 
     it('should get all potential outcomes of an interaction', function() {
       // First the answer group's outcome is listed, then the default.
-      expect(tds.getAllPotentialOutcomes(ess.getState('State'))).toEqual([{
-          feedback: 'Feedback',
-          dest: 'State'
-        }, {
-          feedback: 'Default',
-          dest: 'State'
-        }]);
+      expect(tds.getAllPotentialOutcomes(ess.getState('State'))).toEqual([
+        oof.createNew('State', 'Feedback', []),
+        oof.createNew('State', 'Default', [])]);
     });
   });
 });

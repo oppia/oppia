@@ -25,7 +25,8 @@ oppia.directive('oppiaNoninteractiveVideo', [
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/Video',
-      controller: ['$scope', '$attrs', 'explorationContextService', '$element',
+      controller: [
+        '$scope', '$attrs', 'explorationContextService', '$element',
         'autoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
         function($scope, $attrs, explorationContextService, $element,
           autoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {

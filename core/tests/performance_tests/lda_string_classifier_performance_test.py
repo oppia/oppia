@@ -106,8 +106,9 @@ class LDAStringClassifierBenchmarker(object):
             dict. The dict representing the resulting classifier model.
         """
         classifier = (
-            classifier_registry.ClassifierRegistry.get_classifier_by_id(
-                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
+            classifier_registry.Registry.get_classifier_by_algorithm_id(
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                    'algorithm_id']))
         classifier.train(self.examples[:num])
         classifier_dict = classifier.to_dict()
         return classifier_dict
@@ -129,8 +130,9 @@ class LDAStringClassifierBenchmarker(object):
         if not self.classifier_model_dict:
             raise Exception('No classifier found')
         classifier = (
-            classifier_registry.ClassifierRegistry.get_classifier_by_id(
-                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
+            classifier_registry.Registry.get_classifier_by_algorithm_id(
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                    'algorithm_id']))
         classifier.from_dict(self.classifier_model_dict)
         classifier.predict(self.docs_to_classify[:num])
 

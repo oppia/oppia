@@ -17,19 +17,117 @@
  * domain objects given a list of backend state dictionaries.
  */
 
- oppia.factory('StatesObjectFactory', ['StateObjectFactory',
-  function(StateObjectFactory) {
-    var createFromBackendDict = function(statesBackendDict) {
+oppia.factory('StatesObjectFactory', [
+  'StateObjectFactory', 'INTERACTION_SPECS',
+  function(StateObjectFactory, INTERACTION_SPECS) {
+    var States = function(states) {
+      this._states = states;
+    };
+    States.prototype.getState = function(stateName) {
+      return angular.copy(this._states[stateName]);
+    };
+
+    // TODO(tjiang11): Remove getStateObjects() and replace calls
+    // with an object to represent data to be manipulated inside
+    // ExplorationDiffService.
+
+    States.prototype.getStateObjects = function() {
+      return angular.copy(this._states);
+    };
+    States.prototype.addState = function(newStateName) {
+      this._states[newStateName] = getNewStateTemplate(newStateName);
+    };
+    States.prototype.setState = function(stateName, stateData) {
+      this._states[stateName] = angular.copy(stateData);
+    };
+    States.prototype.hasState = function(stateName) {
+      return this._states.hasOwnProperty(stateName);
+    };
+    States.prototype.deleteState = function(deleteStateName) {
+      delete this._states[deleteStateName];
+      for (var otherStateName in this._states) {
+        var interaction = this._states[otherStateName].interaction;
+        var groups = interaction.answerGroups;
+        for (var i = 0; i < groups.length; i++) {
+          if (groups[i].outcome.dest === deleteStateName) {
+            groups[i].outcome.dest = otherStateName;
+          }
+        }
+        if (interaction.defaultOutcome) {
+          if (interaction.defaultOutcome.dest === deleteStateName) {
+            interaction.defaultOutcome.dest = otherStateName;
+          }
+        }
+
+        var fallbacks = interaction.fallbacks;
+        for (var i = 0; i < fallbacks.length; i++) {
+          if (fallbacks[i].outcome.dest === deleteStateName) {
+            fallbacks[i].outcome.dest = otherStateName;
+          }
+        }
+      }
+    };
+    States.prototype.renameState = function(oldStateName, newStateName) {
+      this._states[newStateName] = angular.copy(this._states[oldStateName]);
+      delete this._states[oldStateName];
+
+      for (var otherStateName in this._states) {
+        var interaction = this._states[otherStateName].interaction;
+        var groups = interaction.answerGroups;
+        for (var i = 0; i < groups.length; i++) {
+          if (groups[i].outcome.dest === oldStateName) {
+            groups[i].outcome.dest = newStateName;
+          }
+        }
+        if (interaction.defaultOutcome) {
+          if (interaction.defaultOutcome.dest === oldStateName) {
+            interaction.defaultOutcome.dest = newStateName;
+          }
+        }
+
+        var fallbacks = interaction.fallbacks;
+        for (var i = 0; i < fallbacks.length; i++) {
+          if (fallbacks[i].outcome.dest === oldStateName) {
+            fallbacks[i].outcome.dest = newStateName;
+          }
+        }
+      }
+    };
+    States.prototype.getStateNames = function() {
+      return Object.keys(this._states);
+    };
+    States.prototype.getFinalStateNames = function() {
+      var finalStateNames = [];
+      for (var stateName in this._states) {
+        var interaction = this._states[stateName].interaction;
+        if (interaction.id && INTERACTION_SPECS[interaction.id].is_terminal) {
+          finalStateNames.push(stateName);
+        }
+      }
+      return finalStateNames;
+    };
+
+    States.createFromBackendDict = function(statesBackendDict) {
       var stateObjectsDict = {};
       for (var stateName in statesBackendDict) {
         stateObjectsDict[stateName] = StateObjectFactory.createFromBackendDict(
           stateName, statesBackendDict[stateName]);
       }
-      return stateObjectsDict;
+      return new States(stateObjectsDict);
     };
 
-    return {
-      createFromBackendDict: createFromBackendDict
+    var getNewStateTemplate = function(newStateName) {
+      var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
+      var newState = StateObjectFactory.createFromBackendDict(newStateName, {
+        classifier_model_id: newStateTemplate.classifier_model_id,
+        content: newStateTemplate.content,
+        interaction: newStateTemplate.interaction,
+        param_changes: newStateTemplate.param_changes
+      });
+      newState.interaction.defaultOutcome.dest = newStateName;
+      return newState;
     };
+
+    return States;
   }
 ]);

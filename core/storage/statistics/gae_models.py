@@ -17,7 +17,9 @@
 """Models for Oppia statistics."""
 
 import datetime
+import json
 import logging
+import sys
 
 from core.platform import models
 import feconf
@@ -26,10 +28,7 @@ import utils
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
-
-# TODO(bhenning): Everything is handler name submit; therefore, it is
-# pointless and should be removed.
-_OLD_SUBMIT_HANDLER_NAME = 'submit'
+transaction_services = models.Registry.import_transaction_services()
 
 
 class StateCounterModel(base_models.BaseModel):
@@ -58,119 +57,6 @@ class StateCounterModel(base_models.BaseModel):
         if not counter:
             counter = cls(id=instance_id)
         return counter
-
-
-class StateRuleAnswerLogModel(base_models.BaseModel):
-    """The log of all answers hitting a given state rule.
-
-    The id/key of instances of this class has the form
-        [EXPLORATION_ID].[STATE_NAME].[HANDLER_NAME].[RULE_NAME]
-
-    WARNING: If a change is made to existing rules in data/objects (e.g.
-    renaming them or changing their signature), this class will contain
-    invalid values.
-
-    WARNING: Rule names and args that are used to construct the key here must
-    be < 400 characters in length, since these are used as part of the key.
-    """
-    # Log of answers that hit this rule and that have not been resolved. The
-    # JSON blob represents a dict. The keys of this dict are the answers
-    # encoded as HTML strings, and the values are integer counts representing
-    # how many times the answer has been entered.
-    # WARNING: do not use default={} in JsonProperty, it does not work as you
-    # expect.
-    answers = ndb.JsonProperty(indexed=False)
-
-    @classmethod
-    def get_or_create(cls, exploration_id, state_name, rule_str):
-        # TODO(sll): Deprecate this method.
-        return cls.get_or_create_multi_for_multi_explorations(
-            [(exploration_id, state_name)], [rule_str])[0][0]
-
-    @classmethod
-    def _get_entity_key(cls, unused_exploration_id, entity_id):
-        return ndb.Key(cls._get_kind(), entity_id)
-
-    @classmethod
-    def get_or_create_multi_for_multi_explorations(
-            cls, exploration_state_list, rule_str_list):
-        """Gets entities given a list of exploration ID and state name tuples,
-        and a list of rule spec strings to filter answers matched for each of
-        the given explorations and states. Returns a list containing a list of
-        matched entities for each input exploration ID-state name tuple.
-
-        Args:
-            exploration_state_list: a list of exploration ID and state name
-                tuples
-            rule_str_list: a list of rule spec strings which are used to filter
-                the answers matched to the provided explorations and states
-        """
-        # TODO(sll): Use a hash instead to disambiguate.
-        exploration_ids = []
-        state_names = []
-        entity_ids = []
-        for exploration_id, state_name in exploration_state_list:
-            for rule_str in rule_str_list:
-                exploration_ids.append(exploration_id)
-                state_names.append(state_name)
-                entity_ids.append('.'.join([
-                    exploration_id, state_name, _OLD_SUBMIT_HANDLER_NAME,
-                    rule_str])[:490])
-
-        entity_keys = [
-            cls._get_entity_key(exploration_id, entity_id)
-            for exploration_id, entity_id in zip(exploration_ids, entity_ids)]
-
-        entities = ndb.get_multi(entity_keys)
-        entities_to_put = []
-        for ind, entity in enumerate(entities):
-            if entity is None:
-                new_entity = cls(id=entity_ids[ind], answers={})
-                entities_to_put.append(new_entity)
-                entities[ind] = new_entity
-        if entities_to_put:
-            ndb.put_multi(entities_to_put)
-
-        exploration_entities_list = []
-        exploration_state_name_entity_map = {}
-        for ind, exp_state_tuple in enumerate(exploration_state_list):
-            exploration_entities_list.append([])
-            exploration_state_name_entity_map[exp_state_tuple] = (
-                exploration_entities_list[ind])
-
-        for (exploration_id, state_name, entity) in zip(
-                exploration_ids, state_names, entities):
-            exploration_state_name_entity_map[(
-                exploration_id, state_name)].append(entity)
-        return exploration_entities_list
-
-    @classmethod
-    def get_or_create_multi(cls, exploration_id, rule_data):
-        """Gets or creates entities for the given rules.
-        Args:
-            exploration_id: the exploration id
-            rule_data: a list of dicts, each with the following keys:
-                (state_name, rule_str).
-        """
-        # TODO(sll): Use a hash instead to disambiguate.
-        entity_ids = ['.'.join([
-            exploration_id, datum['state_name'],
-            _OLD_SUBMIT_HANDLER_NAME, datum['rule_str']
-        ])[:490] for datum in rule_data]
-
-        entity_keys = [cls._get_entity_key(exploration_id, entity_id)
-                       for entity_id in entity_ids]
-
-        entities = ndb.get_multi(entity_keys)
-        entities_to_put = []
-        for ind, entity in enumerate(entities):
-            if entity is None:
-                new_entity = cls(id=entity_ids[ind], answers={})
-                entities_to_put.append(new_entity)
-                entities[ind] = new_entity
-
-        ndb.put_multi(entities_to_put)
-        return entities
 
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
@@ -546,7 +432,8 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
-    exploration-level statistics."""
+    exploration-level statistics.
+    """
     # Id of exploration.
     exploration_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
@@ -587,51 +474,307 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
 
 
-def process_submitted_answer(
-        exploration_id, unused_exploration_version, state_name,
-        rule_spec_string, answer):
-    """Adds an answer to the answer log for the rule it hits.
+class StateAnswersModel(base_models.BaseModel):
+    """Store all answers of a state. This model encapsulates a sharded storage
+    system for answers. Multiple entries in the model may contain answers for
+    the same state. The initial entry has a shard ID of 0 and contains
+    information about how many shards exist for this state. All other meta
+    information is duplicated across all shards, since they are immutable or are
+    local to that shard.
 
-    Args:
-        exploration_id: the exploration id
-        state_name: the state name
-        answer: an HTML string representation of the answer
+    The id/key of instances of this class has the form
+        [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID].
     """
-    answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_name, rule_spec_string)
-    if answer in answer_log.answers:
-        answer_log.answers[answer] += 1
-    else:
-        answer_log.answers[answer] = 1
+    # This provides about 124k of padding for the other properties and entity
+    # storage overhead (since the max entity size is 1MB). The meta data can
+    # get close to 50k or exceed it, so plenty of padding is left to avoid
+    # risking overflowing an entity.
+    _MAX_ANSWER_LIST_BYTE_SIZE = 900000
 
-    # This may fail due to answer_log.answers being larger than 1 MB in size.
-    try:
-        answer_log.put()
-    except Exception as e:
-        logging.error(e)
+    # Explicitly store exploration id, exploration version and state name
+    # so we can easily do queries on them.
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    exploration_version = ndb.IntegerProperty(indexed=True, required=True)
+    state_name = ndb.StringProperty(indexed=True, required=True)
+    # Which shard this corresponds to in the list of shards. If this is 0 it
+    # represents the master shard which includes the shard_count. All other
+    # shards look similar to the master shard except they do not populate
+    # shard_count.
+    shard_id = ndb.IntegerProperty(indexed=True, required=True)
+    # Store interaction type to know which calculations should be performed
+    interaction_id = ndb.StringProperty(indexed=True, required=True)
+    # Store how many extra shards are associated with this state. This is only
+    # present when shard_id is 0. This starts at 0 (the main shard is not
+    # counted).
+    shard_count = ndb.IntegerProperty(indexed=True, required=False)
+    # The total number of bytes needed to store all of the answers in the
+    # submitted_answer_list, minus any overhead of the property itself. This
+    # value is found by summing the JSON sizes of all answer dicts stored inside
+    # submitted_answer_list.
+    # pylint: disable=invalid-name
+    accumulated_answer_json_size_bytes = ndb.IntegerProperty(
+        indexed=False, required=False, default=0)
+    # pylint: enable=invalid-name
 
+    # List of answer dicts, each of which is stored as JSON blob. The content
+    # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
+    submitted_answer_list = ndb.JsonProperty(repeated=True, indexed=False)
+    # The version of the submitted_answer_list currently supported by Oppia. If
+    # the internal JSON structure of submitted_answer_list changes,
+    # CURRENT_SCHEMA_VERSION in this class needs to be incremented.
+    schema_version = ndb.IntegerProperty(
+        indexed=True, default=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)
 
-def resolve_answers(
-        exploration_id, state_name, rule_str, answers):
-    """Resolves selected answers for the given rule.
+    @classmethod
+    def _get_model(
+            cls, exploration_id, exploration_version, state_name, shard_id):
+        entity_id = cls._get_entity_id(
+            exploration_id, exploration_version, state_name, shard_id)
+        return cls.get(entity_id, strict=False)
 
-    Args:
-        exploration_id: the exploration id
-        state_name: the state name
-        rule_str: a string representation of the rule
-        answers: a list of HTML string representations of the resolved answers
-    """
-    assert isinstance(answers, list)
-    answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_name, rule_str)
+    @classmethod
+    def get_master_model(cls, exploration_id, exploration_version, state_name):
+        """Retrieves the master model associated with the specific exploration
+        state. Returns None if no answers have yet been submitted to the
+        specified exploration state.
 
-    for answer in answers:
-        if answer not in answer_log.answers:
-            logging.error(
-                'Answer %s not found in answer log for rule %s of exploration '
-                '%s, state %s, handler %s' % (
-                    answer, rule_str, exploration_id, state_name,
-                    _OLD_SUBMIT_HANDLER_NAME))
+        Args:
+            exploration_id: str. The exploration ID.
+            exploration_version: int. The version of the exploration to fetch
+                answers for.
+            state_name: str. The name of the state to fetch answers for.
+
+        Returns:
+            StateAnswersModel|None. The master model associated with the
+            specified exploration state, or None if no answers have been
+            submitted to this state.
+        """
+        main_shard = cls._get_model(
+            exploration_id, exploration_version, state_name, 0)
+        return main_shard if main_shard else None
+
+    @classmethod
+    def get_all_models(cls, exploration_id, exploration_version, state_name):
+        """Retrieves all models and shards associated with the specific
+        exploration state. Returns None if no answers have yet been submitted to
+        the specified exploration state.
+        """
+        # It's okay if this isn't run in a transaction. When adding new shards,
+        # it's guaranteed the master shard will be updated at the same time the
+        # new shard is added. Shard deletion is not supported. Finally, if a new
+        # shard is added after the master shard is retrieved, it will simply be
+        # ignored in the result of this function. It will be included during the
+        # next call.
+        main_shard = cls.get_master_model(
+            exploration_id, exploration_version, state_name)
+
+        if main_shard is not None:
+            all_models = [main_shard]
+            if main_shard.shard_count > 0:
+                shard_ids = [
+                    cls._get_entity_id(
+                        exploration_id, exploration_version, state_name,
+                        shard_id)
+                    for shard_id in xrange(1, main_shard.shard_count + 1)]
+                all_models += cls.get_multi(shard_ids)
+            return all_models
         else:
-            del answer_log.answers[answer]
-    answer_log.put()
+            return None
+
+    @classmethod
+    def _insert_submitted_answers_unsafe(
+            cls, exploration_id, exploration_version, state_name,
+            interaction_id, new_submitted_answer_dict_list):
+        """See the insert_submitted_answers for general documentation of what
+        this method does. It's only safe to call this method from within a
+        transaction.
+        """
+        # The main shard always needs to be retrieved. At most one other shard
+        # needs to be retrieved (the last one).
+        main_shard = cls.get_master_model(
+            exploration_id, exploration_version, state_name)
+        last_shard = main_shard
+
+        if not main_shard:
+            entity_id = cls._get_entity_id(
+                exploration_id, exploration_version, state_name, 0)
+            main_shard = cls(
+                id=entity_id, exploration_id=exploration_id,
+                exploration_version=exploration_version, state_name=state_name,
+                shard_id=0, interaction_id=interaction_id, shard_count=0,
+                submitted_answer_list=[])
+            last_shard = main_shard
+        elif main_shard.shard_count > 0:
+            last_shard = cls._get_model(
+                exploration_id, exploration_version, state_name,
+                main_shard.shard_count)
+
+        sharded_answer_lists, sharded_answer_list_sizes = cls._shard_answers(
+            last_shard.submitted_answer_list,
+            last_shard.accumulated_answer_json_size_bytes,
+            new_submitted_answer_dict_list)
+        new_shard_count = main_shard.shard_count + len(sharded_answer_lists) - 1
+
+        # Collect all entities to update to efficiently send them as a single
+        # update.
+        entities_to_put = []
+        last_shard_is_main = main_shard.shard_count == 0
+
+        # Update the last shard if it changed.
+        if sharded_answer_list_sizes[0] != (
+                last_shard.accumulated_answer_json_size_bytes):
+            last_shard.submitted_answer_list = sharded_answer_lists[0]
+            last_shard.accumulated_answer_json_size_bytes = (
+                sharded_answer_list_sizes[0])
+            last_shard_updated = True
+        else:
+            last_shard_updated = False
+
+        # Insert any new shards.
+        for i in xrange(1, len(sharded_answer_lists)):
+            shard_id = main_shard.shard_count + i
+            entity_id = cls._get_entity_id(
+                exploration_id, exploration_version, state_name, shard_id)
+            new_shard = cls(
+                id=entity_id, exploration_id=exploration_id,
+                exploration_version=exploration_version, state_name=state_name,
+                shard_id=shard_id, interaction_id=interaction_id,
+                submitted_answer_list=sharded_answer_lists[i],
+                accumulated_answer_json_size_bytes=sharded_answer_list_sizes[i])
+            entities_to_put.append(new_shard)
+
+        # Update the shard count if any new shards were added.
+        if main_shard.shard_count != new_shard_count:
+            main_shard.shard_count = new_shard_count
+            main_shard_updated = True
+        else:
+            main_shard_updated = False
+
+        if last_shard_is_main and (main_shard_updated or last_shard_updated):
+            entities_to_put.append(main_shard)
+        else:
+            if main_shard_updated:
+                entities_to_put.append(main_shard)
+            if last_shard_updated:
+                entities_to_put.append(last_shard)
+
+        cls.put_multi(entities_to_put)
+
+    @classmethod
+    def insert_submitted_answers(
+            cls, exploration_id, exploration_version, state_name,
+            interaction_id, new_submitted_answer_dict_list):
+        """Given an exploration ID, version, state name, and interaction ID,
+        attempt to insert a list of specified SubmittedAnswers into this model,
+        performing sharding operations as necessary. This method automatically
+        commits updated/new models to the data store. This method returns
+        nothing. This method can guarantee atomicity since mutations are
+        performed transactionally, but it cannot guarantee uniqueness for answer
+        submission. Answers may be duplicated in cases where a past transaction
+        is interrupted and retried. Furthermore, this method may fail with a
+        DeadlineExceededError if too many answers are attempted for submission
+        simultaneously.
+        """
+        transaction_services.run_in_transaction(
+            cls._insert_submitted_answers_unsafe, exploration_id,
+            exploration_version, state_name, interaction_id,
+            new_submitted_answer_dict_list)
+
+    @classmethod
+    def _get_entity_id(
+            cls, exploration_id, exploration_version, state_name, shard_id):
+        return ':'.join([
+            exploration_id, str(exploration_version), state_name,
+            str(shard_id)])
+
+    @classmethod
+    def _shard_answers(
+            cls, current_answer_list, current_answer_list_size,
+            new_answer_list):
+        """Given a current answer list which can fit within one NDB entity and
+        a list of new answers which need to try and fit in the current answer
+        list, shard the answers such that a list of answer lists are returned.
+        The first entry is guaranteed to contain all answers of the current
+        answer list.
+        """
+        # Sort the new answers to insert in ascending order of their sizes in
+        # bytes.
+        new_answer_size_list = [
+            (answer_dict, cls._get_answer_dict_size(answer_dict))
+            for answer_dict in new_answer_list]
+        new_answer_list_sorted = sorted(
+            new_answer_size_list, key=lambda x: x[1])
+        # NOTE TO DEVELOPERS: this list cast is needed because the nested list
+        # is appended to later in this function and the list passed into here
+        # may be a reference to an answer list stored within a model class.
+        sharded_answer_lists = [list(current_answer_list)]
+        sharded_answer_list_sizes = [current_answer_list_size]
+        for answer_dict, answer_size in new_answer_list_sorted:
+            if (sharded_answer_list_sizes[-1] + answer_size <=
+                    cls._MAX_ANSWER_LIST_BYTE_SIZE):
+                sharded_answer_lists[-1].append(answer_dict)
+                sharded_answer_list_sizes[-1] += answer_size
+            else:
+                sharded_answer_lists.append([answer_dict])
+                sharded_answer_list_sizes.append(answer_size)
+        return sharded_answer_lists, sharded_answer_list_sizes
+
+    @classmethod
+    def _get_answer_dict_size(cls, answer_dict):
+        """Returns a size overestimate (in bytes) of the given answer dict."""
+        return sys.getsizeof(json.dumps(answer_dict))
+
+
+class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
+    """Store output of calculation performed on StateAnswers."""
+
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    # May be an integral exploration_version or 'all' if this entity represents
+    # an aggregation of multiple sets of answers.
+    exploration_version = ndb.StringProperty(indexed=True, required=True)
+    state_name = ndb.StringProperty(indexed=True, required=True)
+    calculation_id = ndb.StringProperty(indexed=True, required=True)
+    # Calculation output dict stored as JSON blob
+    calculation_output = ndb.JsonProperty(indexed=False)
+
+    @classmethod
+    def create_or_update(cls, exploration_id, exploration_version, state_name,
+                         calculation_id, calculation_output):
+        instance_id = cls._get_entity_id(
+            exploration_id, exploration_version, state_name, calculation_id)
+        instance = cls.get(instance_id, strict=False)
+        if not instance:
+            # create new instance
+            instance = cls(
+                id=instance_id, exploration_id=exploration_id,
+                exploration_version=exploration_version,
+                state_name=state_name, calculation_id=calculation_id,
+                calculation_output=calculation_output)
+        else:
+            instance.calculation_output = calculation_output
+
+        try:
+            # This may fail if calculation_output is too large.
+            instance.put()
+        except Exception:
+            logging.exception(
+                'Failed to add calculation output for exploration ID %s, '
+                'version %s, state name %s, and calculation ID %s' % (
+                    exploration_id, exploration_version,
+                    state_name.encode('utf-8'), calculation_id))
+
+    @classmethod
+    def get_model(cls, exploration_id, exploration_version, state_name,
+                  calculation_id):
+        entity_id = cls._get_entity_id(
+            exploration_id, str(exploration_version), state_name,
+            calculation_id)
+        instance = cls.get(entity_id, strict=False)
+        return instance
+
+    @classmethod
+    def _get_entity_id(cls, exploration_id, exploration_version, state_name,
+                       calculation_id):
+        return ':'.join([
+            exploration_id, str(exploration_version), state_name,
+            calculation_id])

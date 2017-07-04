@@ -15,6 +15,7 @@
         IS_SUPER_ADMIN: JSON.parse('{{is_super_admin|js_string}}'),
         LOGOUT_URL: JSON.parse('{{logout_url|js_string}}'),
         ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
+        TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
         DEMO_EXPLORATIONS: JSON.parse('{{demo_explorations|js_string}}'),
         DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}'),
         DEMO_COLLECTIONS: JSON.parse('{{demo_collections|js_string}}'),
@@ -25,7 +26,10 @@
         ONE_OFF_JOB_SPECS: JSON.parse('{{one_off_job_specs|js_string}}'),
         UNFINISHED_JOB_DATA: JSON.parse('{{unfinished_job_data|js_string}}'),
         RECENT_JOB_DATA: JSON.parse('{{recent_job_data|js_string}}'),
-        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
+        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
+        UPDATABLE_ROLES: JSON.parse('{{updatable_roles|js_string}}'),
+        VIEWABLE_ROLES: JSON.parse('{{viewable_roles|js_string}}'),
+        ROLE_GRAPH_DATA: JSON.parse('{{role_graph_data|js_string}}'),
       }
     </script>
 
@@ -61,6 +65,10 @@
                         set-status-message="setStatusMessage">
       </admin-config-tab>
 
+      <admin-roles-tab ng-if="isRolesTabOpen()"
+                       set-status-message="setStatusMessage">
+      </admin-roles-tab>
+
       <admin-misc-tab ng-if="isMiscTabOpen()"
                       set-status-message="setStatusMessage">
       </admin-misc-tab>
@@ -71,24 +79,7 @@
     </div>
 
     {% include 'components/forms/form_builder_templates.html' %}
-    {% include 'components/forms/schema_editors/schema_based_bool_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_choices_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_custom_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_dict_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_expression_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_float_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_html_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_int_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_list_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_unicode_editor_directive.html' %}
     {% include 'pages/footer_js_libs.html' %}
-    {% include 'pages/admin/admin_navbar_directive.html' %}
-    {% include 'pages/admin/activities_tab/admin_dev_mode_activities_tab_directive.html' %}
-    {% include 'pages/admin/activities_tab/admin_prod_mode_activities_tab_directive.html' %}
-    {% include 'pages/admin/config_tab/admin_config_tab_directive.html' %}
-    {% include 'pages/admin/jobs_tab/admin_jobs_tab_directive.html' %}
-    {% include 'pages/admin/misc_tab/admin_misc_tab_directive.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
 
@@ -100,6 +91,12 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/config_tab/AdminConfigTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/jobs_tab/AdminJobsTabDirective.js"></script>
+    
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/roles_tab/RolesTabDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/roles_tab/RoleGraphDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/StateGraphLayoutService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
+
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/misc_tab/AdminMiscTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>

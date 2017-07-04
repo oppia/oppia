@@ -16,38 +16,38 @@
  * @fileoverview Directive for showing search results.
  */
 
-oppia.directive('searchResults', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'components/searchResults',
-    controller: [
-      '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
-      'UrlInterpolationService',
-      function($scope, $rootScope, $timeout, $window, siteAnalyticsService,
-        UrlInterpolationService) {
-        $rootScope.loadingMessage = 'Loading';
-        $scope.someResultsExist = true;
+oppia.directive('searchResults', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: 'components/searchResults',
+      controller: [
+        '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
+        function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
+          $rootScope.loadingMessage = 'Loading';
+          $scope.someResultsExist = true;
 
-        // Called when the first batch of search results is retrieved from the
-        // server.
-        $scope.$on(
-          'initialSearchResultsLoaded', function(evt, activityList) {
-            $scope.someResultsExist = activityList.length > 0;
-            $rootScope.loadingMessage = '';
-          }
-        );
+          // Called when the first batch of search results is retrieved from the
+          // server.
+          $scope.$on(
+            'initialSearchResultsLoaded', function(evt, activityList) {
+              $scope.someResultsExist = activityList.length > 0;
+              $rootScope.loadingMessage = '';
+            }
+          );
 
-        $scope.onRedirectToLogin = function(destinationUrl) {
-          siteAnalyticsService.registerStartLoginEvent('noSearchResults');
-          $timeout(function() {
-            $window.location = destinationUrl;
-          }, 150);
-          return false;
-        };
+          $scope.onRedirectToLogin = function(destinationUrl) {
+            siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+            $timeout(function() {
+              $window.location = destinationUrl;
+            }, 150);
+            return false;
+          };
 
-        $scope.noExplorationsImgUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/no_explorations_found.png');
-      }
-    ]
-  };
-}]);
+          $scope.noExplorationsImgUrl =
+           UrlInterpolationService.getStaticImageUrl(
+            '/general/no_explorations_found.png');
+        }
+      ]
+    };
+  }]);

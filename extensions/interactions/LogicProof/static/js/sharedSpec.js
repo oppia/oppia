@@ -152,61 +152,61 @@ describe('Parse lines', function() {
       parse(
         'from p[x->a] we know hence a contradiction {{ a | element }}', true)
     ).toEqual([[{
-        format: 'phrase',
-        content: 'from'
-      }, {
-        format: 'expression',
-        content: {
-          expression: {
-            top_kind_name: 'variable',
-            top_operator_name: 'p',
-            arguments: [],
-            dummies: []
-          },
-          substitutions: [{
-            x: {
-              top_kind_name: 'variable',
-              top_operator_name: 'a',
-              arguments: [],
-              dummies: []
-            }
-          }],
-          type: 'boolean'
-        }
-      }, {
-        format: 'phrase',
-        content: 'have'
-      }, {
-        format: 'phrase',
-        content: 'hence'
-      }, {
-        format: 'expression',
-        content: {
-          expression: {
+      format: 'phrase',
+      content: 'from'
+    }, {
+      format: 'expression',
+      content: {
+        expression: {
+          top_kind_name: 'variable',
+          top_operator_name: 'p',
+          arguments: [],
+          dummies: []
+        },
+        substitutions: [{
+          x: {
             top_kind_name: 'variable',
             top_operator_name: 'a',
             arguments: [],
             dummies: []
-          },
-          substitutions: [],
-          type: 'boolean'
-        }
-      }, {
-        format: 'phrase',
-        content: 'contradiction'
-      }, {
-        format: 'expression',
-        content: {
-          expression: {
-            top_kind_name: 'variable',
-            top_operator_name: 'a',
-            arguments: [],
-            dummies: []
-          },
-          substitutions: [],
-          type: 'element'
-        }
-      }]]);
+          }
+        }],
+        type: 'boolean'
+      }
+    }, {
+      format: 'phrase',
+      content: 'have'
+    }, {
+      format: 'phrase',
+      content: 'hence'
+    }, {
+      format: 'expression',
+      content: {
+        expression: {
+          top_kind_name: 'variable',
+          top_operator_name: 'a',
+          arguments: [],
+          dummies: []
+        },
+        substitutions: [],
+        type: 'boolean'
+      }
+    }, {
+      format: 'phrase',
+      content: 'contradiction'
+    }, {
+      format: 'expression',
+      content: {
+        expression: {
+          top_kind_name: 'variable',
+          top_operator_name: 'a',
+          arguments: [],
+          dummies: []
+        },
+        substitutions: [],
+        type: 'element'
+      }
+    }]]);
   });
 
   it('should reject unknown phrases', function() {
@@ -232,12 +232,12 @@ describe('Parse lines', function() {
 describe('Instantiate types', function() {
   it('should instantiate examples correctly', function() {
     expect(logicProofShared.instantiateTypingElementArray([{
-        type: 'boolean',
-        arbitrarily_many: false
-      }, {
-        type: 'element',
-        arbitrarily_many: true
-      }], 3)).toEqual(['boolean', 'element', 'element']);
+      type: 'boolean',
+      arbitrarily_many: false
+    }, {
+      type: 'element',
+      arbitrarily_many: true
+    }], 3)).toEqual(['boolean', 'element', 'element']);
     expect(logicProofShared.instantiateTypingElementArray([], 0)).toEqual([]);
   });
 });
@@ -413,13 +413,13 @@ describe('Check equality between expression constructs', function() {
   it('should recognise when sets of expressions are equal', function() {
     expect(
       logicProofShared.checkSetsOfExpressionsAreEqual([
-          logicProofParser.parse('A(x)\u2228x=2', 'expression'),
-          logicProofParser.parse('p', 'expression')
-        ], [
-          logicProofParser.parse('p', 'expression'),
-          logicProofParser.parse('A(x)\u2228(x=2)', 'expression'),
-          logicProofParser.parse('p', 'expression')
-        ])
+        logicProofParser.parse('A(x)\u2228x=2', 'expression'),
+        logicProofParser.parse('p', 'expression')
+      ], [
+        logicProofParser.parse('p', 'expression'),
+        logicProofParser.parse('A(x)\u2228(x=2)', 'expression'),
+        logicProofParser.parse('p', 'expression')
+      ])
     ).toBe(true);
   });
 });

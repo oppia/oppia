@@ -35,14 +35,16 @@ oppia.factory('oppiaPlayerService', [
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'ReadOnlyExplorationBackendApiService',
+  'EditableExplorationBackendApiService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
       expressionInterpolationService, StatsReportingService,
-      UrlInterpolationService) {
+      UrlInterpolationService, ReadOnlyExplorationBackendApiService,
+      EditableExplorationBackendApiService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -70,12 +72,12 @@ oppia.factory('oppiaPlayerService', [
     var makeParams = function(oldParams, paramChanges, envs) {
       var newParams = angular.copy(oldParams);
       if (paramChanges.every(function(pc) {
-        if (pc.generator_id === 'Copier') {
-          if (!pc.customization_args.parse_with_jinja) {
-            newParams[pc.name] = pc.customization_args.value;
+        if (pc.generatorId === 'Copier') {
+          if (!pc.customizationArgs.parse_with_jinja) {
+            newParams[pc.name] = pc.customizationArgs.value;
           } else {
             var paramValue = expressionInterpolationService.processUnicode(
-              pc.customization_args.value, [newParams].concat(envs));
+              pc.customizationArgs.value, [newParams].concat(envs));
             if (paramValue === null) {
               return false;
             }
@@ -84,7 +86,7 @@ oppia.factory('oppiaPlayerService', [
         } else {
           // RandomSelector.
           newParams[pc.name] = randomFromArray(
-            pc.customization_args.list_of_values);
+            pc.customizationArgs.list_of_values);
         }
         return true;
       })) {
@@ -98,7 +100,7 @@ oppia.factory('oppiaPlayerService', [
     // Evaluate question string.
     var makeQuestion = function(newState, envs) {
       return expressionInterpolationService.processHtml(
-        newState.content[0].value, envs);
+        newState.content.getHtml(), envs);
     };
 
     // This should only be called when 'exploration' is non-null.
@@ -188,36 +190,33 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
-          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-            '/createhandler/data/<exploration_id>', {
-              exploration_id: _explorationId
+          EditableExplorationBackendApiService.fetchApplyDraftExploration(
+            _explorationId).then(function(data) {
+              exploration = ExplorationObjectFactory.createFromBackendDict(
+                data);
+              exploration.setInitialStateName(initStateName);
+              initParams(manualParamChanges);
+              _loadInitialState(successCallback);
             });
-          $http.get(explorationDataUrl, {
-            params: {
-              apply_draft: true
-            }
-          }).then(function(response) {
-            exploration = ExplorationObjectFactory.createFromBackendDict(
-              response.data);
-            exploration.setInitialStateName(initStateName);
-            initParams(manualParamChanges);
-            _loadInitialState(successCallback);
-          });
         } else {
-          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-            '/explorehandler/init/<exploration_id>', {
-              exploration_id: _explorationId
-            }) + (version ? '?v=' + version : '');
-          $http.get(explorationDataUrl).then(function(response) {
-            var data = response.data;
+          var loadedExploration = null;
+          if (version) {
+            loadedExploration = (
+              ReadOnlyExplorationBackendApiService.loadExploration(
+                _explorationId, version));
+          } else {
+            loadedExploration = (
+              ReadOnlyExplorationBackendApiService.loadLatestExploration(
+                _explorationId));
+          }
+          loadedExploration.then(function(data) {
             exploration = ExplorationObjectFactory.createFromBackendDict(
               data.exploration);
             version = data.version;
-
             initParams([]);
 
             StatsReportingService.initSession(
-              _explorationId, data.version, data.session_id,
+              _explorationId, version, data.session_id,
               GLOBALS.collectionId);
 
             _loadInitialState(successCallback);
@@ -290,30 +289,14 @@ oppia.factory('oppiaPlayerService', [
               LearnerParamsService.getAllParams(),
               answer,
               classificationResult.answerGroupIndex,
-              classificationResult.ruleIndex);
+              classificationResult.ruleIndex,
+              classificationResult.classificationCategorization);
           }
 
           // Use angular.copy() to clone the object
           // since classificationResult.outcome points
           // at oldState.interaction.default_outcome
           var outcome = angular.copy(classificationResult.outcome);
-
-          // If this is a return to the same state, and the resubmission trigger
-          // kicks in, replace the dest, feedback and param changes with that
-          // of the trigger.
-          if (outcome.dest === playerTranscriptService.getLastStateName()) {
-            for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
-              var fallback = oldState.interaction.fallbacks[i];
-              if (fallback.trigger.trigger_type === 'NthResubmission' &&
-                  fallback.trigger.customization_args.num_submits.value ===
-                    playerTranscriptService.getNumSubmitsForLastCard()) {
-                outcome.dest = fallback.outcome.dest;
-                outcome.feedback = fallback.outcome.feedback;
-                outcome.param_changes = fallback.outcome.param_changes;
-                break;
-              }
-            }
-          }
 
           var newStateName = outcome.dest;
           var newState = exploration.getState(newStateName);

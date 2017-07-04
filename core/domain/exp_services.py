@@ -684,6 +684,14 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS):
                     state.update_interaction_fallbacks(change.new_value)
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                    state.update_interaction_hints(change.new_value)
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    state.update_interaction_solution(change.new_value)
             elif change.cmd == exp_domain.CMD_ADD_GADGET:
                 exploration.add_gadget(change.gadget_dict, change.panel)
             elif change.cmd == exp_domain.CMD_RENAME_GADGET:
@@ -923,12 +931,14 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
 
 # Operations on exploration snapshots.
-def get_exploration_snapshots_metadata(exploration_id):
-    """Returns the snapshots for this exploration, as dicts.
+def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
+    """Returns the snapshots for this exploration, as dicts, up to and including
+    the latest version of the exploration.
 
     Args:
         exploration_id: str. The id of the exploration whose snapshots_metadata
             is required.
+        allow_deleted: bool. Whether to allow retrieval of deleted snapshots.
 
     Returns:
         list(dict). List of dicts, each representing a recent snapshot. Each
@@ -942,7 +952,7 @@ def get_exploration_snapshots_metadata(exploration_id):
     version_nums = range(1, current_version + 1)
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
-        exploration_id, version_nums)
+        exploration_id, version_nums, allow_deleted=allow_deleted)
 
 
 def _get_last_updated_by_human_ms(exp_id):
@@ -1818,10 +1828,15 @@ def _create_change_list_from_suggestion(suggestion):
                 object.
     """
 
-    return [{'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-             'state_name': suggestion.state_name,
-             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-             'new_value': [suggestion.state_content]}]
+    return [{
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'state_name': suggestion.state_name,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'new_value': {
+            'html': suggestion.suggestion_html,
+            'audio_translations': []
+        }
+    }]
 
 
 def _get_commit_message_for_suggestion(
@@ -1955,9 +1970,12 @@ def create_or_update_draft(
         exp_user_data = user_models.ExplorationUserDataModel.create(
             user_id, exp_id)
 
+    draft_change_list_id = exp_user_data.draft_change_list_id
+    draft_change_list_id += 1
     exp_user_data.draft_change_list = change_list
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
+    exp_user_data.draft_change_list_id = draft_change_list_id
     exp_user_data.put()
 
 

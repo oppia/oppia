@@ -8,22 +8,27 @@
             <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
               <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40">
+                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40" ng-trim="false">
                 <span class="help-block" style="font-size: smaller">
                   <em>Please use at most 40 characters, so that this fits in the summary card.</em>
+                  <span ng-if="explorationTitleService.displayed.length > 0">
+                    <em>Characters used: <[(explorationTitleService.displayed.length)]>/40</em>
+                  </span>
                 </span>
               </div>
             </div>
-            <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15}">
+            <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed || ((explorationObjectiveService.displayed.length < 15) || (explorationObjectiveService.displayed.length > 100))}">
               <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <input id="explorationObjective" type="text"
                        class="form-control protractor-test-exploration-objective-input"
                        ng-model="explorationObjectiveService.displayed"
-                       ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
-                <span class="help-block" style="font-size: smaller">
-                  What does this exploration help people to do?
-                  <span ng-if="!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15">Please provide a complete, descriptive sentence.</span>
+                       ng-blur="saveExplorationObjective()" placeholder="Learn how to..." ng-trim="false">
+                <span class="help-block" style="font-size: smaller"> 
+                  <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
+                  <span ng-if="explorationObjectiveService.displayed.length > 0">
+                    <em>Characters used: <[(explorationObjectiveService.displayed.length)]>/100</em>
+                  </span>
                 </span>
               </div>
             </div>
@@ -161,7 +166,7 @@
   <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
     <h3>Advanced Features</h3>
     <div class="row">
-      <div class="row">
+      <div ng-if="fallbackEditorIsEnabled" class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div role="form" class="form-horizontal">
             <label for="enableFallbacks" class="col-lg-2 col-md-2 col-sm-2">
@@ -424,7 +429,7 @@
         {% if can_delete %}
           <p class="oppia-exploration-ctrl">
             <button type="button" ng-if="explorationRightsService.isPrivate()"
-                    class="btn btn-danger" ng-click="deleteExploration('')"
+                    class="btn btn-danger" ng-click="deleteExploration()"
                     title="Delete this exploration">
               Delete Exploration
             </button>
@@ -467,7 +472,7 @@
 
         <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
           <button type="button" class="btn btn-danger"
-                  ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
+                  ng-click="deleteExploration()">
             Delete Exploration
             <span ng-if="currentUserIsAdmin">(as admin)</span>
             <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>

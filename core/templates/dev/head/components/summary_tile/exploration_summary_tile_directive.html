@@ -1,71 +1,69 @@
-<script type="text/ng-template" id="summaryTile/exploration">
-  <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}]">
-    <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
-      <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
-        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>" alt="<[getCategory()]>">
-        <h3 class="activity-title protractor-test-exp-summary-tile-title">
-          <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
-          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
-        </h3>
+<md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}]">
+  <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+    <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
+      <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>" alt="<[getCategory()]>">
+      <h3 class="activity-title protractor-test-exp-summary-tile-title">
+        <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
+        <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
+      </h3>
 
-        <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
-        <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
-          <div>
-            <circular-image ng-if="avatarsList.length > 0"
-                            src="avatarsList[0].image"
-                            link="avatarsList[0].link"
-                            tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
-                            tooltip-placement="right">
-            </circular-image>
-          </div>
+      <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
+      <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+        <div>
+          <circular-image ng-if="avatarsList.length > 0"
+                          src="avatarsList[0].image"
+                          link="avatarsList[0].link"
+                          tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
+                          tooltip-placement="right">
+          </circular-image>
         </div>
       </div>
-      <div class="title-section-mask"></div>
-      <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">  
-        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-          <[getObjective() | truncateAndCapitalize: 95]>
-        </div>
-        <div ng-if="!getObjective()" class="objective">
-          <span translate="I18N_LIBRARY_NO_OBJECTIVE">
+    </div>
+    <div class="title-section-mask"></div>
+    <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">  
+      <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+        <[getObjective() | truncateAndCapitalize: 95]>
+      </div>
+      <div ng-if="!getObjective()" class="objective">
+        <span translate="I18N_LIBRARY_NO_OBJECTIVE">
+        </span>
+      </div>
+      <ul ng-if="!isCollectionPreviewTile" layout="row" class="metrics" layout-align="space-between center">
+        <li>
+          <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
+            <span class="fa fa-star fa-lg" tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
+              <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]></span>
+            </span>
+            <span ng-if="getAverageRating()">
+              <[getAverageRating() | number:1]>
+            </span>
+            <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+            </span>
           </span>
-        </div>
-        <ul ng-if="!isCollectionPreviewTile" layout="row" class="metrics" layout-align="space-between center">
-          <li>
-            <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
-              <span class="fa fa-star fa-lg" tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
-                <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]></span>
-              </span>
-              <span ng-if="getAverageRating()">
-                <[getAverageRating() | number:1]>
-              </span>
-              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
-              </span>
-            </span>
-          </li>
-          <li>
-            <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
-              <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]></span>
-            </span>
-            <span ng-if="getNumViews()">
-              <[getNumViews() | summarizeNonnegativeNumber]>
-            </span>
-            <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
-            </span>
-          </li>
-          <li>
-            <span ng-if="getLastUpdatedDatetime()">
-              <span class="oppia-icon-accessibility-label">Last Updated</span>
-              <[getLastUpdatedDatetime()]>
-            </span>
-            <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
-            </span>
-          </li>
-        </ul>
-        <button ng-if="isCollectionPreviewTile" class="oppia-learner-continue-button md-button md-default-theme"
-                style="display: block; margin: auto; touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-          <span translate="I18N_PLAYER_PLAY_EXPLORATION"></span>
-        </button>
-      </div>
-    </a>
-  </md-card>
-</script>
+        </li>
+        <li>
+          <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
+            <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]></span>
+          </span>
+          <span ng-if="getNumViews()">
+            <[getNumViews() | summarizeNonnegativeNumber]>
+          </span>
+          <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+          </span>
+        </li>
+        <li>
+          <span ng-if="getLastUpdatedDatetime()">
+            <span class="oppia-icon-accessibility-label">Last Updated</span>
+            <[getLastUpdatedDatetime()]>
+          </span>
+          <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+          </span>
+        </li>
+      </ul>
+      <button ng-if="isCollectionPreviewTile" class="oppia-learner-continue-button md-button md-default-theme"
+              style="display: block; margin: auto; touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+        <span translate="I18N_PLAYER_PLAY_EXPLORATION"></span>
+      </button>
+    </div>
+  </a>
+</md-card>

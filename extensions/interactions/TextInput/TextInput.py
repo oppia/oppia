@@ -60,3 +60,13 @@ class TextInput(base.BaseInteraction):
         },
         'default_value': 1,
     }]
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top answers'
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+    }]

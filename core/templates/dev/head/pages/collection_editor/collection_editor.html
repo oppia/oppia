@@ -45,28 +45,13 @@
     </div>
   </div>
 
-  {% include 'pages/collection_editor/collection_editor_navbar_breadcrumb_directive.html' %}
   {% include 'pages/collection_editor/collection_editor_navbar_directive.html' %}
-  {% include 'pages/collection_editor/collection_editor_pre_publish_modal_directive.html' %}
-  {% include 'pages/collection_editor/collection_editor_save_modal_directive.html' %}
 
-  {% include 'pages/collection_editor/editor_tab/collection_editor_tab_directive.html' %}
-  {% include 'pages/collection_editor/editor_tab/collection_node_creator_directive.html' %}
-  {% include 'pages/collection_editor/editor_tab/collection_node_editor_directive.html' %}
-  {% include 'pages/collection_editor/editor_tab/collection_skill_list_directive.html' %}
-
-  {% include 'pages/collection_editor/history_tab/collection_history_tab_directive.html' %}
-
-  {% include 'pages/collection_editor/settings_tab/collection_details_editor_directive.html' %}
-  {% include 'pages/collection_editor/settings_tab/collection_permissions_card_directive.html' %}
-  {% include 'pages/collection_editor/settings_tab/collection_settings_tab_directive.html' %}
-
-  {% include 'pages/collection_editor/statistics_tab/collection_statistics_tab_directive.html' %}
 {% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
-  
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
@@ -96,19 +81,30 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionValidationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/EditableCollectionBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SearchExplorationsBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AudioTranslationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/EditableExplorationBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/HintObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StatesObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
 
   {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}

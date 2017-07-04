@@ -36,15 +36,15 @@ var customizeInteraction = function(elem, richTextInstructionsArray) {
 // the options.
 var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
-  elem.all(by.repeater('choice in choices track by $index')).
-      then(function(optionElements) {
-    expect(optionElements.length).toEqual(richTextInstructionsArray.length);
-    for (var i = 0; i < optionElements.length; i++) {
-      forms.expectRichText(optionElements[i].element(by.css(
-        '.protractor-test-multiple-choice-option'
-      ))).toMatch(richTextInstructionsArray[i]);
-    }
-  });
+  elem.all(by.repeater('choice in choices track by $index'))
+    .then(function(optionElements) {
+      expect(optionElements.length).toEqual(richTextInstructionsArray.length);
+      for (var i = 0; i < optionElements.length; i++) {
+        forms.expectRichText(optionElements[i].element(by.css(
+          '.protractor-test-multiple-choice-option'
+        ))).toMatch(richTextInstructionsArray[i]);
+      }
+    });
 };
 
 // 'elem' is the HTML element containing the form to submit the answer to.
@@ -58,16 +58,16 @@ var answerObjectType = 'NonnegativeInt';
 
 var testSuite = [{
   interactionArguments: [[function(editor) {
-      editor.appendBoldText('right');
-    }, function(editor) {
-      editor.appendItalicText('wrong');
-    }]],
+    editor.appendBoldText('right');
+  }, function(editor) {
+    editor.appendItalicText('wrong');
+  }]],
   ruleArguments: ['Equals', ['right']],
   expectedInteractionDetails: [[function(checker) {
-      checker.readBoldText('right');
-    }, function(checker) {
-      checker.readItalicText('wrong');
-    }]],
+    checker.readBoldText('right');
+  }, function(checker) {
+    checker.readItalicText('wrong');
+  }]],
   wrongAnswers: ['wrong'],
   correctAnswers: ['right']
 }];

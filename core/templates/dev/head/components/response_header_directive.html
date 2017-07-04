@@ -1,32 +1,68 @@
-<script type="text/ng-template" id="components/responseHeader">
-  <div class="oppia-response-header-block">
-    <div class="oppia-response-header">
-      <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
-        <[getShortSummary()]>
-        <span ng-if="getNumRules() > 1" class="label label-primary" style="position: relative; bottom: 4px;">
-          +<[getNumRules() - 1]>
-        </span>
-      </span>
-      <span ng-if="isActive()">&nbsp;</span>
-    </div>
+<style>
+  response-header .oppia-delete-response-button {
+    cursor: pointer;
+    opacity: 0.5;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 20px;
+  }
 
-    <span>→</span>
-    <span ng-if="!isOutcomeLooping() && !isCreatingNewState()"
-          ng-click="navigateToState(getOutcome().dest)" class="oppia-nested-link">
-      <[getOutcome().dest]>
+  response-header .oppia-delete-response-button:hover {
+    opacity: 1;
+  }
+
+  response-header .oppia-response-header-block {
+    overflow: hidden;
+    padding-left: 24px;
+    white-space: nowrap;
+    width: 640px;
+  }
+
+  response-header .oppia-nested-link {
+    color: #0844aa;
+    cursor: pointer;
+  }
+  response-header .oppia-nested-link:hover {
+    color: #3f2c76;
+    text-decoration: underline;
+  }
+
+  response-header .oppia-response-header {
+    float: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 500px;
+  }
+</style>
+<div class="oppia-response-header-block">
+  <div class="oppia-response-header">
+    <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
+      <[getShortSummary()]>
+      <span ng-if="getNumRules() > 1" class="label label-primary" style="position: relative; bottom: 4px;">
+        +<[getNumRules() - 1]>
+      </span>
     </span>
-    <span ng-if="!isOutcomeLooping() && isCreatingNewState()">
-      <em ng-if="getOutcome().newStateName">(<[getOutcome().newStateName]>)</em>
-      <em ng-if="!getOutcome().newStateName">Nowhere yet...</em>
-    </span>
-    <span ng-if="isOutcomeLooping()">
-      <em>(try again)</em>
-    </span>
+    <span ng-if="isActive()">&nbsp;</span>
   </div>
 
-  <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
-        ng-if="editabilityService.isEditable() && getOnDeleteFn()"
-        ng-click="deleteResponse($event)">
-    <i class="material-icons md-18">&#xE5CD;</i>
+  <span ng-if="getOutcome()">→</span>
+  <span ng-if="getOutcome() && !isOutcomeLooping() && !isCreatingNewState()"
+        ng-click="navigateToState(getOutcome().dest)" class="oppia-nested-link">
+    <[getOutcome().dest]>
   </span>
-</script>
+  <span ng-if="getOutcome() && !isOutcomeLooping() && isCreatingNewState()">
+    <em ng-if="getOutcome().newStateName">(<[getOutcome().newStateName]>)</em>
+    <em ng-if="!getOutcome().newStateName">Nowhere yet...</em>
+  </span>
+  <span ng-if="getOutcome() && isOutcomeLooping()">
+    <em>(try again)</em>
+  </span>
+</div>
+
+<span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
+      ng-if="editabilityService.isEditable() && getOnDeleteFn()"
+      ng-click="deleteResponse($event)">
+  <i class="material-icons md-18">&#xE5CD;</i>
+</span>

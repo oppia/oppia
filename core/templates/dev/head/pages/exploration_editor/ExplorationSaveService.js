@@ -25,7 +25,7 @@ oppia.factory('explorationSaveService', [
   'explorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'routerService',
   'focusService', 'changeListService', 'siteAnalyticsService',
-  'StateObjectFactory',
+  'StatesObjectFactory', 'UrlInterpolationService',
   function(
       $modal, $timeout, $rootScope, $log, $q,
       alertsService, explorationData, explorationStatesService,
@@ -35,7 +35,7 @@ oppia.factory('explorationSaveService', [
       explorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, routerService,
       focusService, changeListService, siteAnalyticsService,
-      StateObjectFactory) {
+      StatesObjectFactory, UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -52,7 +52,7 @@ oppia.factory('explorationSaveService', [
         !explorationObjectiveService.savedMemento ||
         !explorationCategoryService.savedMemento ||
         explorationLanguageCodeService.savedMemento ===
-          GLOBALS.DEFAULT_LANGUAGE_CODE ||
+          constants.DEFAULT_LANGUAGE_CODE ||
         explorationTagsService.savedMemento.length === 0);
     };
 
@@ -75,13 +75,13 @@ oppia.factory('explorationSaveService', [
 
     var showCongratulatorySharingModal = function() {
       return $modal.open({
-        templateUrl: 'modals/shareExplorationAfterPublish',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/' +
+          'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'explorationContextService',
-          'UrlInterpolationService',
-          function($scope, $modalInstance, explorationContextService,
-            UrlInterpolationService) {
+          function($scope, $modalInstance, explorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
@@ -102,7 +102,9 @@ oppia.factory('explorationSaveService', [
       var whenModalClosed = $q.defer();
 
       var publishModalInstance = $modal.open({
-        templateUrl: 'modals/publishExploration',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/' +
+          'exploration_publish_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
@@ -120,14 +122,14 @@ oppia.factory('explorationSaveService', [
       publishModalInstance.result.then(function() {
         if (onStartSaveCallback) {
           onStartSaveCallback();
-        };
+        }
 
         explorationRightsService.saveChangeToBackend({
           is_public: true
         }).then(function() {
           if (onSaveDoneCallback) {
             onSaveDoneCallback();
-          };
+          }
 
           showCongratulatorySharingModal();
           siteAnalyticsService.registerPublishExplorationEvent(
@@ -219,7 +221,9 @@ oppia.factory('explorationSaveService', [
           $rootScope.$broadcast('externalSave');
 
           $modal.open({
-            templateUrl: 'modals/reloadingEditor',
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'editor_reloading_modal_directive.html'),
             backdrop: 'static',
             keyboard: false,
             controller: [
@@ -257,7 +261,9 @@ oppia.factory('explorationSaveService', [
         // 'add exploration metadata' modal.
         if (isAdditionalMetadataNeeded()) {
           var modalInstance = $modal.open({
-            templateUrl: 'modals/addExplorationMetadata',
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'exploration_metadata_modal_directive.html'),
             backdrop: 'static',
             controller: [
               '$scope', '$modalInstance', 'explorationObjectiveService',
@@ -288,7 +294,7 @@ oppia.factory('explorationSaveService', [
                   !explorationCategoryService.savedMemento);
                 $scope.askForLanguageCheck = (
                   explorationLanguageCodeService.savedMemento ===
-                  GLOBALS.DEFAULT_LANGUAGE_CODE);
+                  constants.DEFAULT_LANGUAGE_CODE);
                 $scope.askForTags = (
                   explorationTagsService.savedMemento.length === 0);
 
@@ -303,8 +309,7 @@ oppia.factory('explorationSaveService', [
                   });
                 }
 
-                var _states = explorationStatesService.getStates();
-                if (_states) {
+                if (explorationStatesService.isInitialized()) {
                   var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
                   .some(
                     function(categoryItem) {
@@ -393,7 +398,7 @@ oppia.factory('explorationSaveService', [
             // Toggle loading dots off after modal is opened
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
-            };
+            }
           });
 
           modalInstance.result.then(function(metadataList) {
@@ -403,12 +408,12 @@ oppia.factory('explorationSaveService', [
 
               if (onStartLoadingCallback) {
                 onStartLoadingCallback();
-              };
+              }
 
               saveDraftToBackend(commitMessage).then(function() {
                 if (onEndLoadingCallback) {
                   onEndLoadingCallback();
-                };
+                }
                 openPublishExplorationModal(
                     onStartLoadingCallback, onEndLoadingCallback)
                   .then(function() {
@@ -450,13 +455,10 @@ oppia.factory('explorationSaveService', [
         }
 
         explorationData.getLastSavedData().then(function(data) {
-          var oldStates = {};
-          for (var stateName in data.states) {
-            oldStates[stateName] =
-              (StateObjectFactory.createFromBackendDict(
-                stateName, data.states[stateName]));
-          }
-          var newStates = explorationStatesService.getStates();
+          var oldStates = StatesObjectFactory.createFromBackendDict(
+            data.states).getStateObjects();
+          var newStates = explorationStatesService.getStates()
+            .getStateObjects();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             oldStates, newStates, [{
               changeList: changeListService.getChangeList(),
@@ -484,7 +486,9 @@ oppia.factory('explorationSaveService', [
           }
 
           var modalInstance = $modal.open({
-            templateUrl: 'modals/saveExploration',
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'exploration_save_modal_directive.html'),
             backdrop: true,
             resolve: {
               isExplorationPrivate: function() {
@@ -534,7 +538,7 @@ oppia.factory('explorationSaveService', [
             // Toggle loading dots off after modal is opened
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
-            };
+            }
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
@@ -548,7 +552,7 @@ oppia.factory('explorationSaveService', [
             // Toggle loading dots back on for loading from backend.
             if (onStartLoadingCallback) {
               onStartLoadingCallback();
-            };
+            }
 
             saveDraftToBackend(commitMessage).then(function() {
               whenModalClosed.resolve();

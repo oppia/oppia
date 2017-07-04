@@ -73,3 +73,12 @@ class CodeRepl(base.BaseInteraction):
         },
         'default_value': ''
     }]
+
+    _answer_visualization_specs = [{
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers'
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+    }]

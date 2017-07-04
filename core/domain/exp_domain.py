@@ -27,6 +27,7 @@ import logging
 import re
 import string
 
+from constants import constants
 from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
@@ -52,6 +53,8 @@ STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
 STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
 STATE_PROPERTY_INTERACTION_FALLBACKS = 'fallbacks'
+STATE_PROPERTY_INTERACTION_HINTS = 'hints'
+STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
 # These two properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -81,10 +84,25 @@ CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
 
-# This represents the stringified version of a 'default rule.' This is to be
-# used as an identifier for the default rule when storing which rule an answer
-# was matched against.
-DEFAULT_RULESPEC_STR = 'Default'
+# These are categories to which answers may be classified. These values should
+# not be changed because they are persisted in the data store within answer
+# logs.
+
+# Represents answers classified using rules defined as part of an interaction.
+EXPLICIT_CLASSIFICATION = 'explicit'
+# Represents answers which are contained within the training data of an answer
+# group.
+TRAINING_DATA_CLASSIFICATION = 'training_data_match'
+# Represents answers which were predicted using a statistical training model
+# from training data within an answer group.
+STATISTICAL_CLASSIFICATION = 'statistical_classifier'
+# Represents answers which led to the 'default outcome' of an interaction,
+# rather than belonging to a specific answer group.
+DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
+
+# This represents the stringified version of a rule which uses statistical
+# classification for evaluation. Answers which are matched to rules with this
+# rulespec will be stored with the STATISTICAL_CLASSIFICATION category.
 RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
 
 
@@ -112,8 +130,8 @@ def _validate_customization_args_and_values(
     validation.
 
     Note that this may modify the given customization_args dict, if it has
-    extra or missing keys. It also normalizes any HTML in the
-    customization_args dict.
+    extra or missing keys. It also normalizes any HTML in the customization_args
+    dict.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -164,6 +182,12 @@ class ExplorationChange(object):
     interpreted in general) preserve backward-compatibility with the
     exploration snapshots in the datastore. Do not modify the definitions of
     cmd keys that already exist.
+
+    NOTE TO DEVELOPERS: Please note that, for a brief period around
+    Feb - Apr 2017, change dicts related to editing of answer groups
+    accidentally stored the old_value using a ruleSpecs key instead of a
+    rule_specs key. So, if you are making use of this data, make sure to
+    verify the format of the old_value before doing any processing.
     """
 
     STATE_PROPERTIES = (
@@ -176,6 +200,8 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_FALLBACKS,
+        STATE_PROPERTY_INTERACTION_HINTS,
+        STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
 
     GADGET_PROPERTIES = (
@@ -297,41 +323,126 @@ class ExplorationCommitLogEntry(object):
         }
 
 
-class Content(object):
-    """Value object representing non-interactive content."""
+class AudioTranslation(object):
+    """Value object representing an audio translation."""
 
     def to_dict(self):
-        return {'type': self.type, 'value': self.value}
+        return {
+            'language_code': self.language_code,
+            'filename': self.filename,
+            'file_size_bytes': self.file_size_bytes,
+            'needs_update': self.needs_update,
+        }
 
     @classmethod
-    def from_dict(cls, content_dict):
-        return cls(content_dict['type'], content_dict['value'])
+    def from_dict(cls, audio_translation_dict):
+        return cls(
+            audio_translation_dict['language_code'],
+            audio_translation_dict['filename'],
+            audio_translation_dict['file_size_bytes'],
+            audio_translation_dict['needs_update'])
 
-    def __init__(self, content_type, value=''):
-        self.type = content_type
-        self.value = html_cleaner.clean(value)
+    def __init__(self, language_code, filename, file_size_bytes, needs_update):
+        # str. A language code, such as ‘en’ or ‘hi’. A hybrid language will be
+        # represented for example as ‘hi-en’ for Hinglish.
+        self.language_code = language_code
+        # str. The corresponding audio file path, e.g.
+        # "content-en-2-h7sjp8s.mp3".
+        self.filename = filename
+        # int. The file size, in bytes. Used to display potential bandwidth
+        # usage to the learner before they download the file.
+        self.file_size_bytes = file_size_bytes
+        # bool. Whether audio is marked for needing review.
+        self.needs_update = needs_update
+
+    def validate(self):
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received: %s' %
+                self.language_code)
+        allowed_audio_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
+        if self.language_code not in allowed_audio_language_codes:
+            raise utils.ValidationError(
+                'Unrecognized language code: %s' % self.language_code)
+
+        if not isinstance(self.filename, basestring):
+            raise utils.ValidationError(
+                'Expected audio filename to be a string, received %s' %
+                self.filename)
+        dot_index = self.filename.rfind('.')
+        if dot_index == -1 or dot_index == 0:
+            raise utils.ValidationError(
+                'Invalid audio filename: %s' % self.filename)
+        extension = self.filename[dot_index + 1:]
+        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
+            raise utils.ValidationError(
+                'Invalid audio filename: it should have one of '
+                'the following extensions: %s. Received: %s',
+                (feconf.ACCEPTED_AUDIO_EXTENSIONS, self.filename))
+
+        if not isinstance(self.file_size_bytes, int):
+            raise utils.ValidationError(
+                'Expected file size to be an int, received %s' %
+                self.file_size_bytes)
+        if self.file_size_bytes <= 0:
+            raise utils.ValidationError(
+                'Invalid file size: %s' % self.file_size_bytes)
+
+        if not isinstance(self.needs_update, bool):
+            raise utils.ValidationError(
+                'Expected needs_update to be a bool, received %s' %
+                self.needs_update)
+
+
+class SubtitledHtml(object):
+    """Value object representing subtitled HTML."""
+
+    def to_dict(self):
+        return {
+            'html': self.html,
+            'audio_translations': [
+                audio_translation.to_dict()
+                for audio_translation in self.audio_translations]
+        }
+
+    @classmethod
+    def from_dict(cls, subtitled_html_dict):
+        return cls(subtitled_html_dict['html'], [
+            AudioTranslation.from_dict(audio_translation_dict)
+            for audio_translation_dict in
+            subtitled_html_dict['audio_translations']])
+
+    def __init__(self, html, audio_translations):
+        self.html = html_cleaner.clean(html)
+        self.audio_translations = audio_translations
         self.validate()
 
     def validate(self):
         # TODO(sll): Add HTML sanitization checking.
         # TODO(sll): Validate customization args for rich-text components.
-        if self.type != 'text':
-            raise utils.ValidationError('Invalid content type: %s' % self.type)
-        if not isinstance(self.value, basestring):
+        if not isinstance(self.html, basestring):
             raise utils.ValidationError(
-                'Invalid content value: %s' % self.value)
+                'Invalid content HTML: %s' % self.html)
+
+        if not isinstance(self.audio_translations, list):
+            raise utils.ValidationError(
+                'Expected audio_translations to be a list, received %s'
+                % self.audio_translations)
+        for audio_translation in self.audio_translations:
+            audio_translation.validate()
 
     def to_html(self, params):
-        """Exports this content object to an HTML string.
+        """Exports this SubtitledHTML object to an HTML string.
 
-        The content object is parameterized using the parameters in `params`.
+        The HTML is parameterized using the parameters in `params`.
         """
         if not isinstance(params, dict):
             raise Exception(
-                'Expected context params for parsing content to be a dict, '
-                'received %s' % params)
+                'Expected context params for parsing subtitled HTML to be a '
+                'dict, received %s' % params)
 
-        return html_cleaner.clean(jinja_utils.parse_string(self.value, params))
+        return html_cleaner.clean(jinja_utils.parse_string(self.html, params))
 
 
 class RuleSpec(object):
@@ -354,15 +465,6 @@ class RuleSpec(object):
         self.rule_type = rule_type
         self.inputs = inputs
 
-    def stringify_classified_rule(self):
-        """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == RULE_TYPE_CLASSIFIER:
-            return self.rule_type
-        else:
-            param_list = [
-                utils.to_ascii(val) for val in self.inputs.values()]
-            return '%s(%s)' % (self.rule_type, ','.join(param_list))
-
     def validate(self, rule_params_list, exp_param_specs_dict):
         """Validates a RuleSpec value object. It ensures the inputs dict does
         not refer to any non-existent parameters and that it contains values
@@ -374,7 +476,7 @@ class RuleSpec(object):
                 this RuleSpec. Each element of the list represents a single
                 parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
-                    1: The typed object instance for that paramter (e.g. Real).
+                    1: The typed object instance for that parameter (e.g. Real).
             exp_param_specs_dict: A dict of specified parameters used in this
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type). RuleSpec
@@ -643,6 +745,78 @@ class Fallback(object):
         self.outcome.validate()
 
 
+class Hint(object):
+    """Value object representing a hint."""
+    def __init__(self, hint_text):
+        self.hint_text = html_cleaner.clean(hint_text)
+
+    def to_dict(self):
+        return {
+            'hint_text': self.hint_text,
+        }
+
+    @classmethod
+    def from_dict(cls, hint_dict):
+        return cls(hint_dict['hint_text'])
+
+    def validate(self):
+        if not isinstance(self.hint_text, basestring):
+            raise utils.ValidationError(
+                'Expected hint text to be a string, received %s' %
+                self.hint_text)
+
+
+class Solution(object):
+    """Value object representing a solution.
+
+    A solution consists of answer_is_exclusive, correct_answer and an
+    explanation.When answer_is_exclusive is True, this indicates that it is
+    the only correct answer; when it is False, this indicates that it is one
+    possible answer. correct_answer records an answer that enables the learner
+    to progress to the next card and explanation is an HTML string containing
+    an explanation for the solution.
+    """
+    def __init__(self, interaction_id, answer_is_exclusive,
+                 correct_answer, explanation):
+        self.answer_is_exclusive = answer_is_exclusive
+        self.correct_answer = (
+            interaction_registry.Registry.get_interaction_by_id(
+                interaction_id).normalize_answer(correct_answer))
+        self.explanation = html_cleaner.clean(explanation)
+
+    def to_dict(self):
+        return {
+            'answer_is_exclusive': self.answer_is_exclusive,
+            'correct_answer': self.correct_answer,
+            'explanation': self.explanation,
+        }
+
+    @classmethod
+    def from_dict(cls, interaction_id, solution_dict):
+        return cls(
+            interaction_id,
+            solution_dict['answer_is_exclusive'],
+            interaction_registry.Registry.get_interaction_by_id(
+                interaction_id).normalize_answer(
+                    solution_dict['correct_answer']),
+            solution_dict['explanation'])
+
+    def validate(self, interaction_id):
+        if not isinstance(self.answer_is_exclusive, bool):
+            raise utils.ValidationError(
+                'Expected answer_is_exclusive to be bool, received %s' %
+                self.answer_is_exclusive)
+        interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).normalize_answer(self.correct_answer)
+        if not self.explanation:
+            raise utils.ValidationError(
+                'Explanation must not be an empty string')
+        if not isinstance(self.explanation, basestring):
+            raise utils.ValidationError(
+                'Expected explanation to be a string, received %s' %
+                self.explanation)
+
+
 class InteractionInstance(object):
     """Value object for an instance of an interaction."""
 
@@ -666,6 +840,8 @@ class InteractionInstance(object):
             'confirmed_unclassified_answers': (
                 self.confirmed_unclassified_answers),
             'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
+            'hints': [hint.to_dict() for hint in self.hints],
+            'solution': self.solution,
         }
 
     @classmethod
@@ -680,11 +856,14 @@ class InteractionInstance(object):
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
             interaction_dict['confirmed_unclassified_answers'],
-            [Fallback.from_dict(f) for f in interaction_dict['fallbacks']])
+            [Fallback.from_dict(f) for f in interaction_dict['fallbacks']],
+            [Hint.from_dict(h) for h in interaction_dict['hints']],
+            interaction_dict['solution'])
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
-            default_outcome, confirmed_unclassified_answers, fallbacks):
+            default_outcome, confirmed_unclassified_answers,
+            fallbacks, hints, solution):
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
@@ -696,6 +875,8 @@ class InteractionInstance(object):
         self.default_outcome = default_outcome
         self.confirmed_unclassified_answers = confirmed_unclassified_answers
         self.fallbacks = fallbacks
+        self.hints = hints
+        self.solution = solution
 
     @property
     def is_terminal(self):
@@ -767,12 +948,28 @@ class InteractionInstance(object):
         for fallback in self.fallbacks:
             fallback.validate()
 
+        if not isinstance(self.hints, list):
+            raise utils.ValidationError(
+                'Expected hints to be a list, received %s'
+                % self.hints)
+        for hint in self.hints:
+            hint.validate()
+
+        if self.hints:
+            if self.solution:
+                Solution.from_dict(
+                    self.id, self.solution).validate(self.id)
+
+        elif self.solution:
+            raise utils.ValidationError(
+                'Hint(s) must be specified if solution is specified')
+
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
         return cls(
             cls._DEFAULT_INTERACTION_ID,
             {}, [],
-            Outcome(default_dest_state_name, [], {}), [], []
+            Outcome(default_dest_state_name, [], {}), [], [], [], {}
         )
 
 
@@ -1108,12 +1305,14 @@ class State(object):
         },
         'confirmed_unclassified_answers': [],
         'fallbacks': [],
+        'hints': [],
+        'solution': {},
     }
 
     def __init__(self, content, param_changes, interaction,
                  classifier_model_id=None):
         # The content displayed to the reader in this state.
-        self.content = [Content(item.type, item.value) for item in content]
+        self.content = content
         # Parameter changes associated with this state.
         self.param_changes = [param_domain.ParamChange(
             param_change.name, param_change.generator.id,
@@ -1123,19 +1322,12 @@ class State(object):
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
             interaction.answer_groups, interaction.default_outcome,
-            interaction.confirmed_unclassified_answers, interaction.fallbacks)
+            interaction.confirmed_unclassified_answers, interaction.fallbacks,
+            interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
-        if not isinstance(self.content, list):
-            raise utils.ValidationError(
-                'Expected state content to be a list, received %s'
-                % self.content)
-        if len(self.content) != 1:
-            raise utils.ValidationError(
-                'The state content list must have exactly one element. '
-                'Received %s' % self.content)
-        self.content[0].validate()
+        self.content.validate()
 
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
@@ -1150,9 +1342,34 @@ class State(object):
         elif self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
 
-    def update_content(self, content_list):
+    def can_undergo_classification(self):
+        """Checks whether the answers for this state satisfy the preconditions
+        for a ML model to be trained.
+
+        Returns:
+            bool: True, if the conditions are satisfied.
+        """
+        training_examples_count = 0
+        labels_count = 0
+        training_examples_count += len(
+            self.interaction.confirmed_unclassified_answers)
+        for answer_group in self.interaction.answer_groups:
+            classifier_rule_spec_index = (
+                answer_group.get_classifier_rule_index())
+            if classifier_rule_spec_index is not None:
+                classifier_rule_spec = answer_group.rule_specs[
+                    classifier_rule_spec_index]
+                training_examples_count += len(
+                    classifier_rule_spec.inputs['training_data'])
+                labels_count += 1
+        if ((training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
+                (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
+            return True
+        return False
+
+    def update_content(self, content_dict):
         # TODO(sll): Must sanitize all content in RTE component attrs.
-        self.content = [Content.from_dict(content_list[0])]
+        self.content = SubtitledHtml.from_dict(content_dict)
 
     def update_param_changes(self, param_change_dicts):
         self.param_changes = [
@@ -1255,10 +1472,46 @@ class State(object):
         self.interaction.fallbacks = [
             Fallback.from_dict(fallback_dict)
             for fallback_dict in fallbacks_list]
+        if self.interaction.fallbacks:
+            hint_list = []
+            for fallback in self.interaction.fallbacks:
+                if fallback.outcome.feedback:
+                    # If a fallback outcome has a non-empty feedback list
+                    # the feedback is converted to a Hint. It may contain
+                    # only one list item.
+                    hint_list.append(
+                        Hint(fallback.outcome.feedback[0]).to_dict())
+        self.update_interaction_hints(hint_list)
+
+
+    def update_interaction_hints(self, hints_list):
+        if not isinstance(hints_list, list):
+            raise Exception(
+                'Expected hints_list to be a list, received %s'
+                % hints_list)
+        self.interaction.hints = [
+            Hint.from_dict(hint_dict)
+            for hint_dict in hints_list]
+
+    def update_interaction_solution(self, solution_dict):
+        if not isinstance(solution_dict, dict):
+            raise Exception(
+                'Expected solution to be a dict, received %s'
+                % solution_dict)
+        self.interaction.solution = Solution.from_dict(
+            self.interaction.id, solution_dict)
+
+    def add_hint(self, hint_text):
+        self.interaction.hints.append(Hint(hint_text))
+
+    def delete_hint(self, index):
+        if index < 0 or index >= len(self.interaction.hints):
+            raise IndexError('Hint index out of range')
+        del self.interaction.hints[index]
 
     def to_dict(self):
         return {
-            'content': [item.to_dict() for item in self.content],
+            'content': self.content.to_dict(),
             'param_changes': [param_change.to_dict()
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
@@ -1268,8 +1521,7 @@ class State(object):
     @classmethod
     def from_dict(cls, state_dict):
         return cls(
-            [Content.from_dict(item)
-             for item in state_dict['content']],
+            SubtitledHtml.from_dict(state_dict['content']),
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
@@ -1279,10 +1531,11 @@ class State(object):
     @classmethod
     def create_default_state(
             cls, default_dest_state_name, is_initial_state=False):
-        text_str = (
+        content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
-            [Content('text', text_str)], [],
+            SubtitledHtml(content_html, []),
+            [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name))
 
@@ -1330,7 +1583,7 @@ class Exploration(object):
             cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-            language_code=feconf.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         init_state_dict = State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
@@ -1376,10 +1629,13 @@ class Exploration(object):
         for (state_name, sdict) in exploration_dict['states'].iteritems():
             state = exploration.states[state_name]
 
-            state.content = [
-                Content(item['type'], html_cleaner.clean(item['value']))
-                for item in sdict['content']
-            ]
+            state.content = SubtitledHtml(
+                html_cleaner.clean(sdict['content']['html']),
+                [
+                    AudioTranslation.from_dict(audio_translation)
+                    for audio_translation in
+                    sdict['content']['audio_translations']
+                ])
 
             state.param_changes = [param_domain.ParamChange(
                 pc['name'], pc['generator_id'], pc['customization_args']
@@ -1413,11 +1669,17 @@ class Exploration(object):
                 Outcome.from_dict(idict['default_outcome'])
                 if idict['default_outcome'] is not None else None)
 
+            solution = (
+                Solution.from_dict(idict['id'], idict['solution'])
+                if idict['solution'] else {})
+
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,
                 idict['confirmed_unclassified_answers'],
-                [Fallback.from_dict(f) for f in idict['fallbacks']])
+                [Fallback.from_dict(f) for f in idict['fallbacks']],
+                [Hint.from_dict(h) for h in idict['hints']],
+                solution)
 
             exploration.states[state_name] = state
 
@@ -1466,7 +1728,7 @@ class Exploration(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
         if not any([self.language_code == lc['code']
-                    for lc in feconf.ALL_LANGUAGE_CODES]):
+                    for lc in constants.ALL_LANGUAGE_CODES]):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
@@ -1612,7 +1874,7 @@ class Exploration(object):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-        # Check that all fallbacks are valid.
+        # Check that all fallbacks and hints are valid.
         for state in self.states.values():
             interaction = state.interaction
 
@@ -2168,10 +2430,15 @@ class Exploration(object):
                     else:
                         answer_groups.append(group)
 
-            is_terminal = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    interaction['id']
-                ).is_terminal if interaction['id'] is not None else False)
+            try:
+                is_terminal = (
+                    interaction_registry.Registry.get_interaction_by_id(
+                        interaction['id']
+                    ).is_terminal if interaction['id'] is not None else False)
+            except KeyError:
+                raise utils.ExplorationConversionError(
+                    'Trying to migrate exploration containing non-existent '
+                    'interaction ID: %s' % interaction['id'])
             if not is_terminal:
                 interaction['answer_groups'] = answer_groups
                 interaction['default_outcome'] = default_outcome
@@ -2226,6 +2493,8 @@ class Exploration(object):
 
         return states_dict
 
+    # TODO(bhenning): Remove pre_v4_states_conversion_func when the answer
+    # migration is completed.
     @classmethod
     def _convert_states_v7_dict_to_v8_dict(cls, states_dict):
         """Converts from version 7 to 8. Version 8 contains classifier
@@ -2244,6 +2513,36 @@ class Exploration(object):
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
                 answer_group['correct'] = False
+        return states_dict
+
+    @classmethod
+    def _convert_states_v9_dict_to_v10_dict(cls, states_dict):
+        """Converts from version 9 to 10. Version 10 contains hints
+        and solution in each interaction.
+        """
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
+            if 'hints' not in interaction:
+                interaction['hints'] = []
+                for fallback in interaction['fallbacks']:
+                    if fallback['outcome']['feedback']:
+                        interaction['hints'].append(
+                            Hint(fallback['outcome']['feedback'][0]).to_dict())
+            if 'solution' not in interaction:
+                interaction['solution'] = {}
+        return states_dict
+
+    @classmethod
+    def _convert_states_v10_dict_to_v11_dict(cls, states_dict):
+        """Converts from version 10 to 11. Version 11 refactors the content to
+        be an HTML string with audio translations.
+        """
+        for state_dict in states_dict.values():
+            content_html = state_dict['content'][0]['value']
+            state_dict['content'] = {
+                'html': content_html,
+                'audio_translations': []
+            }
         return states_dict
 
     @classmethod
@@ -2268,7 +2567,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 12
+    CURRENT_EXP_SCHEMA_VERSION = 14
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2292,7 +2591,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 3
 
         exploration_dict['objective'] = ''
-        exploration_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
+        exploration_dict['language_code'] = constants.DEFAULT_LANGUAGE_CODE
         exploration_dict['skill_tags'] = []
         exploration_dict['blurb'] = ''
         exploration_dict['author_notes'] = ''
@@ -2457,6 +2756,32 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v12_dict_to_v13_dict(cls, exploration_dict):
+        """Converts a v12 exploration dict into a v13 exploration dict."""
+
+        exploration_dict['schema_version'] = 13
+
+        exploration_dict['states'] = cls._convert_states_v9_dict_to_v10_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 10
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v13_dict_to_v14_dict(cls, exploration_dict):
+        """Converts a v13 exploration dict into a v14 exploration dict."""
+
+        exploration_dict['schema_version'] = 14
+
+        exploration_dict['states'] = cls._convert_states_v10_dict_to_v11_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 11
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         try:
@@ -2531,6 +2856,15 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 12
 
+        if exploration_schema_version == 12:
+            exploration_dict = cls._convert_v12_dict_to_v13_dict(
+                exploration_dict)
+            exploration_schema_version = 13
+
+        if exploration_schema_version == 13:
+            exploration_dict = cls._convert_v13_dict_to_v14_dict(
+                exploration_dict)
+            exploration_schema_version = 14
 
         return (exploration_dict, initial_schema_version)
 

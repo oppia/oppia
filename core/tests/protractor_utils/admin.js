@@ -32,28 +32,31 @@ var editConfigProperty = function(
   general.waitForSystem();
   browser.get(general.ADMIN_URL_SUFFIX);
   element(by.css('.protractor-test-admin-config-tab')).click();
-  element.all(by.css('.protractor-test-config-property')).
-      map(function(configProperty) {
-    return configProperty.element(by.css('.protractor-test-config-title')).
-        getText().then(function(title) {
-      if (title.match(propertyName)) {
-        editingInstructions(forms.getEditor(objectType)(configProperty));
-        element(by.css('.protractor-test-save-all-configs')).click();
-        general.acceptAlert();
-        // Time is needed for the saving to complete.
-        browser.waitForAngular();
-        return true;
+  element.all(by.css('.protractor-test-config-property'))
+    .map(function(configProperty) {
+      return configProperty.element(by.css('.protractor-test-config-title'))
+        .getText()
+        .then(function(title) {
+          if (title.match(propertyName)) {
+            editingInstructions(forms.getEditor(objectType)(configProperty));
+            element(by.css('.protractor-test-save-all-configs')).click();
+            general.acceptAlert();
+            // Time is needed for the saving to complete.
+            browser.waitForAngular();
+            return true;
+          }
+        }
+      );
+    }).then(function(results) {
+      var success = false;
+      for (var i = 0; i < results.length; i++) {
+        success = success || results[i];
       }
-    });
-  }).then(function(results) {
-    var success = false;
-    for (var i = 0; i < results.length; i++) {
-      success = success || results[i];
+      if (!success) {
+        throw Error('Could not find config property: ' + propertyName);
+      }
     }
-    if (!success) {
-      throw Error('Could not find config property: ' + propertyName);
-    }
-  });
+  );
 };
 
 // The name should be as given in the admin page (including '.yaml' if
@@ -61,22 +64,34 @@ var editConfigProperty = function(
 var reloadExploration = function(name) {
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(by.css('.protractor-test-reload-exploration-row')).
-      map(function(explorationElement) {
-    explorationElement.element(
-        by.css('.protractor-test-reload-exploration-title')
-      ).getText().then(function(title) {
-      // We use match here in case there is whitespace around the name
-      if (title.match(name)) {
-        explorationElement.element(
-          by.css('.protractor-test-reload-exploration-button')
-        ).click();
-        general.acceptAlert();
-        // Time is needed for the reloading to complete.
-        browser.waitForAngular();
-      }
-    });
-  });
+    map(function(explorationElement) {
+      explorationElement.element(
+          by.css('.protractor-test-reload-exploration-title')
+        ).getText().then(function(title) {
+          // We use match here in case there is whitespace around the name
+          if (title.match(name)) {
+            explorationElement.element(
+              by.css('.protractor-test-reload-exploration-button')
+            ).click();
+            general.acceptAlert();
+            // Time is needed for the reloading to complete.
+            browser.waitForAngular();
+          }
+        }
+      );
+    }
+  );
+};
+
+// Imports all the demo explorations.
+var reloadAllExplorations = function(name) {
+  browser.get(general.ADMIN_URL_SUFFIX);
+  element.all(by.css(
+    '.protractor-test-reload-all-explorations-button')).click();
+  general.acceptAlert();
+  browser.waitForAngular();
 };
 
 exports.editConfigProperty = editConfigProperty;
 exports.reloadExploration = reloadExploration;
+exports.reloadAllExplorations = reloadAllExplorations;

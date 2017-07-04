@@ -78,7 +78,6 @@
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getTabStatuses().active === 'preview'">
         {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
-        {% include 'pages/exploration_editor/preview_tab/preview_set_parameters_modal_directive.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'stats'">
@@ -95,7 +94,6 @@
 
       <div ng-show="getTabStatuses().active === 'feedback'">
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
-        {% include 'pages/exploration_editor/feedback_tab/thread_table_directive.html' %}
       </div>
     </div>
   </div>
@@ -121,47 +119,8 @@
       </linearGradient>
     </defs>
   </svg>
-
-  {% include 'components/attribution_guide/attribution_guide_directive.html' %}
-  {% include 'components/embed_modal/embed_exploration_modal_directive.html' %}
-  {% include 'components/forms/html_select_directive.html' %}
-  {% include 'components/gadget/gadget_directive.html' %}
-  {% include 'components/gadget/gadget_panel_directive.html' %}
-  {% include 'components/profile_link/profile_link_text_directive.html' %}
-  {% include 'components/share/sharing_links_directive.html' %}
-
-  {% include 'components/answer_group_editor_directive.html' %}
-  {% include 'components/classifier_panel_directive.html' %}
-  {% include 'components/fallback_editor_directive.html' %}
-  {% include 'components/outcome_editor_directive.html' %}
-  {% include 'components/outcome_destination_editor_directive.html' %}
-  {% include 'components/outcome_feedback_editor_directive.html' %}
-  {% include 'components/response_header_directive.html' %}
-  {% include 'components/rule_editor_directive.html' %}
-  {% include 'components/version_diff_visualization_directive.html' %}
-
-  {% include 'pages/exploration_player/tutor_card_directive.html' %}
-  {% include 'pages/exploration_player/supplemental_card_directive.html' %}
   {% include 'pages/exploration_editor/editor_navigation_directive.html' %}
-  {% include 'pages/exploration_editor/editor_navbar_breadcrumb_directive.html' %}
-  {% include 'pages/exploration_editor/editor_reloading_modal_directive.html' %}
-  {% include 'pages/exploration_editor/exploration_metadata_modal_directive.html' %}
-  {% include 'pages/exploration_editor/exploration_publish_modal_directive.html' %}
-  {% include 'pages/exploration_editor/exploration_save_and_publish_buttons_directive.html' %}
-  {% include 'pages/exploration_editor/exploration_save_modal_directive.html' %}
-  {% include 'pages/exploration_editor/help_modal_directive.html' %}
-  {% include 'pages/exploration_editor/param_changes_editor_directive.html' %}
-  {% include 'pages/exploration_editor/post_publish_modal_directive.html' %}
-  {% include 'pages/exploration_editor/save_validation_fail_modal.html' %}
-  {% include 'pages/exploration_editor/save_version_mismatch_modal.html' %}
-  {% include 'pages/exploration_editor/state_diff_modal_directive.html' %}
-  {% include 'pages/exploration_editor/welcome_modal_directive.html' %}
 
-  {% include 'pages/exploration_editor/editor_tab/state_graph_visualization_directive.html' %}
-
-  {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
-  {% include 'pages/exploration_player/conversation_skin_directive.html' %}
-  {% include 'pages/exploration_player/progress_dots_directive.html' %}
 {% endblock content %}
 
 {% block footer_js %}
@@ -170,6 +129,8 @@
   <script>
     {{ value_generators_js }}
   </script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
@@ -227,6 +188,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/AnswerGroupEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/CodemirrorMergeviewDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/FallbackEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/ClassifierRulePanelDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeDestinationEditorDirective.js"></script>
@@ -263,6 +225,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SidebarStateName.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateFallbacks.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateHints.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateGraphVisualizationDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateInteraction.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateParameterChanges.js"></script>
@@ -271,6 +234,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StatisticsTab.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/BarChartDirective.js"></script>
 
@@ -284,14 +248,22 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StatesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/HintObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AudioTranslationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/TutorCardDirective.js"></script>
@@ -299,10 +271,12 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayerStateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerConstants.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/InputResponsePairDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintManagerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintButtonDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>
@@ -310,6 +284,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
@@ -319,5 +294,6 @@
   <script src="{{ASSET_DIR_PREFIX}}/extensions/interactions/baseValidator.js"></script>
 
   {{ interaction_templates }}
+  {{ visualizations_html }}
   {{ gadget_templates }}
 {% endblock footer_js %}

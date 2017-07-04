@@ -26,6 +26,7 @@ import unittest
 
 import webtest
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -369,8 +370,9 @@ class TestBase(unittest.TestCase):
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE,
-            end_state_name=None):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            end_state_name=None,
+            interaction_id='TextInput'):
         """Saves a new strictly-validated exploration.
 
         Returns the exploration domain object.
@@ -379,7 +381,7 @@ class TestBase(unittest.TestCase):
             exploration_id, title=title, category=category,
             language_code=language_code)
         exploration.states[exploration.init_state_name].update_interaction_id(
-            'TextInput')
+            interaction_id)
         exploration.objective = objective
 
         # If an end state name is provided, add terminal node with that name
@@ -438,7 +440,7 @@ class TestBase(unittest.TestCase):
     def save_new_default_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default collection written by owner_id.
 
         Returns the collection domain object.
@@ -452,7 +454,7 @@ class TestBase(unittest.TestCase):
     def save_new_valid_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
         collection = collection_domain.Collection.create_default_collection(
@@ -503,7 +505,6 @@ class TestBase(unittest.TestCase):
         slash.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
-
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):

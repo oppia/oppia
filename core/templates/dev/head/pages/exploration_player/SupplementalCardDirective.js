@@ -16,85 +16,121 @@
  * @fileoverview Controller for the supplemental card.
  */
 
-oppia.directive('supplementalCard', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      onClickContinueButton: '&',
-      onSubmitAnswer: '&'
-    },
-    templateUrl: 'components/SupplementalCard',
-    controller: [
-      '$scope', '$window', 'oppiaPlayerService', 'UrlInterpolationService',
-      'playerPositionService', 'playerTranscriptService',
-      'ExplorationObjectFactory', 'windowDimensionsService',
-      'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
-      'EVENT_ACTIVE_CARD_CHANGED', 'CONTINUE_BUTTON_FOCUS_LABEL',
-      function(
-        $scope, $window, oppiaPlayerService, UrlInterpolationService,
-        playerPositionService, playerTranscriptService,
-        ExplorationObjectFactory, windowDimensionsService,
-        CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
-        EVENT_ACTIVE_CARD_CHANGED, CONTINUE_BUTTON_FOCUS_LABEL) {
-        var updateActiveCard = function() {
-          var index = playerPositionService.getActiveCardIndex();
-          if (index === null) {
-            return;
-          }
-          $scope.activeCard = playerTranscriptService.getCard(index);
-          $scope.clearHelpCard();
-        };
+oppia.directive('supplementalCard', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        onClickContinueButton: '&',
+        onSubmitAnswer: '&'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_player/' +
+        'supplemental_card_directive.html'),
+      controller: [
+        '$scope', '$timeout', '$window', 'HintManagerService',
+        'oppiaPlayerService', 'playerPositionService',
+        'playerTranscriptService', 'ExplorationObjectFactory',
+        'windowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',
+        'TWO_CARD_THRESHOLD_PX', 'EVENT_ACTIVE_CARD_CHANGED',
+        'CONTINUE_BUTTON_FOCUS_LABEL', 'HINT_REQUEST_STRING_I18N_IDS',
+        'DELAY_FOR_HINT_FEEDBACK_MSEC',
+        function(
+          $scope, $timeout, $window, HintManagerService,
+          oppiaPlayerService, playerPositionService,
+          playerTranscriptService, ExplorationObjectFactory,
+          windowDimensionsService, CONTENT_FOCUS_LABEL_PREFIX,
+          TWO_CARD_THRESHOLD_PX, EVENT_ACTIVE_CARD_CHANGED,
+          CONTINUE_BUTTON_FOCUS_LABEL, HINT_REQUEST_STRING_I18N_IDS,
+          DELAY_FOR_HINT_FEEDBACK_MSEC) {
+          var updateActiveCard = function() {
+            var index = playerPositionService.getActiveCardIndex();
+            if (index === null) {
+              return;
+            }
+            $scope.activeCard = playerTranscriptService.getCard(index);
+            $scope.clearHelpCard();
+            HintManagerService.reset(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).hints);
 
-        $scope.OPPIA_AVATAR_IMAGE_URL = (
-          UrlInterpolationService.getStaticImageUrl(
-            '/avatar/oppia_black_72px.png'));
+            $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).hints.length);
+          };
 
-        $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
+          $scope.OPPIA_AVATAR_IMAGE_URL = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/avatar/oppia_avatar_100px.svg'));
 
-        $scope.helpCardHtml = null;
-        $scope.helpCardHasContinueButton = false;
+          $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 
-        $scope.clearHelpCard = function() {
           $scope.helpCardHtml = null;
           $scope.helpCardHasContinueButton = false;
-        };
 
-        $scope.isViewportNarrow = function() {
-          return windowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
-        };
+          $scope.clearHelpCard = function() {
+            $scope.helpCardHtml = null;
+            $scope.helpCardHasContinueButton = false;
+          };
 
-        $scope.isWindowTall = function() {
-          var supplemental = $('.conversation-skin-supplemental-card');
-          var scrollBottom = $(window).scrollTop() + $(window).height();
-          var supplementalBottom = supplemental.offset().top +
-                                   supplemental.height();
-          return scrollBottom - supplementalBottom > 50;
-        };
+          $scope.consumeHint = function() {
+            if (!HintManagerService.areAllHintsExhausted()) {
+              playerTranscriptService.addNewInput(
+                HINT_REQUEST_STRING_I18N_IDS[Math.floor(
+                  Math.random() * HINT_REQUEST_STRING_I18N_IDS.length)], true);
+              $timeout(function () {
+                var hint = HintManagerService.consumeHint();
+                playerTranscriptService.addNewResponse(hint);
+                $scope.helpCardHtml = hint;
+              }, DELAY_FOR_HINT_FEEDBACK_MSEC);
+            }
+          };
 
-        $scope.submitAnswer = function(answer, interactionRulesService) {
-          // Do not clear the help card or submit an answer if there is an
-          // upcoming card.
-          if ($scope.activeCard.destStateName) {
-            return;
-          }
+          $scope.isHintAvailable = function() {
+            var hintIsAvailable = (
+              HintManagerService.isCurrentHintAvailable() &&
+              !HintManagerService.areAllHintsExhausted());
+            return hintIsAvailable;
+          };
 
-          $scope.clearHelpCard();
-          $scope.onSubmitAnswer({
-            answer: answer,
-            rulesService: interactionRulesService
+          $scope.areAllHintsExhausted = function() {
+            return HintManagerService.areAllHintsExhausted();
+          };
+
+          $scope.isViewportNarrow = function() {
+            return windowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+          };
+
+          $scope.isWindowTall = function() {
+            var supplemental = $('.conversation-skin-supplemental-card');
+            var scrollBottom = $(window).scrollTop() + $(window).height();
+            var supplementalBottom = supplemental.offset().top +
+                                     supplemental.height();
+            return scrollBottom - supplementalBottom > 50;
+          };
+
+          $scope.submitAnswer = function(answer, interactionRulesService) {
+            // Do not clear the help card or submit an answer if there is an
+            // upcoming card.
+            if ($scope.activeCard.destStateName) {
+              return;
+            }
+
+            $scope.clearHelpCard();
+            $scope.onSubmitAnswer({
+              answer: answer,
+              rulesService: interactionRulesService
+            });
+          };
+
+          $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
+            updateActiveCard();
           });
-        };
 
-        $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
+          $scope.$on('helpCardAvailable', function(event, helpCard) {
+            $scope.helpCardHtml = helpCard.helpCardHtml;
+            $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
+          });
+
           updateActiveCard();
-        });
-
-        $scope.$on('helpCardAvailable', function(event, helpCard) {
-          $scope.helpCardHtml = helpCard.helpCardHtml;
-          $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
-        });
-
-        updateActiveCard();
-      }]
-  };
-}]);
+        }]
+    };
+  }]);

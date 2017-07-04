@@ -18,6 +18,7 @@
 
 import datetime
 
+from constants import constants
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
@@ -53,7 +54,7 @@ class CollectionModel(base_models.VersionedModel):
     objective = ndb.TextProperty(default='', indexed=False)
     # The language code of this collection.
     language_code = ndb.StringProperty(
-        default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
+        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True)
     # Tags associated with this collection.
     tags = ndb.StringProperty(repeated=True, indexed=True)
 
@@ -72,23 +73,6 @@ class CollectionModel(base_models.VersionedModel):
     def get_collection_count(cls):
         """Returns the total number of collections."""
         return cls.get_all().count()
-
-    def commit(self, committer_id, commit_message, commit_cmds):
-        """Updates the collection model by applying the given commit_cmds, then
-        saves it.
-
-        Args:
-            committer_id: str. The user_id of the user who committed the
-                change.
-            commit_message: str. The commit description message.
-            commit_cmds: list(dict). A list of commands, describing changes
-                made in this model, which should give sufficient information to
-                reconstruct the commit. Each dict always contains:
-                    cmd: str. Unique command.
-                and additional arguments for that command.
-        """
-        super(CollectionModel, self).commit(
-            committer_id, commit_message, commit_cmds)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

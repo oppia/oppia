@@ -15,71 +15,72 @@
 // This directive is always editable.
 
 oppia.directive('musicPhraseEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'alertsService',
-    function($compile, OBJECT_EDITOR_URL_PREFIX, alertsService) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'MusicPhrase';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: ['$scope', function($scope) {
-      // The maximum number of notes allowed in a music phrase.
-      var _MAX_NOTES_IN_PHRASE = 8;
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'alertsService',
+  function($compile, OBJECT_EDITOR_URL_PREFIX, alertsService) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'MusicPhrase';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<div ng-include="getTemplateUrl()"></div>',
+      controller: ['$scope', function($scope) {
+        // The maximum number of notes allowed in a music phrase.
+        var _MAX_NOTES_IN_PHRASE = 8;
 
-      $scope.schema = {
-        type: 'list',
-        items: {
-          type: 'unicode',
-          choices: [
-            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5',
-            'G5', 'A5'
-          ]
-        },
-        ui_config: {
-          add_element_text: 'Add Note ♩'
-        },
-        validators: [{
-          id: 'has_length_at_most',
-          max_value: _MAX_NOTES_IN_PHRASE
-        }]
-      };
+        $scope.schema = {
+          type: 'list',
+          items: {
+            type: 'unicode',
+            choices: [
+              'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5',
+              'G5', 'A5'
+            ]
+          },
+          ui_config: {
+            add_element_text: 'Add Note ♩'
+          },
+          validators: [{
+            id: 'has_length_at_most',
+            max_value: _MAX_NOTES_IN_PHRASE
+          }]
+        };
 
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function(newValue) {
-        // TODO(sll): Check that $scope.$parent.value is a list.
-        $scope.localValue = [];
-        if (newValue) {
-          for (var i = 0; i < newValue.length; i++) {
-            $scope.localValue.push(newValue[i].readableNoteName);
-          }
-        }
-      }, true);
-
-      $scope.$watch('localValue', function(newValue, oldValue) {
-        if (newValue && oldValue) {
-          if (newValue.length > _MAX_NOTES_IN_PHRASE) {
-            alertsService.addWarning('There are too many notes on the staff.');
-          } else {
-            var parentValues = [];
+        // Reset the component each time the value changes (e.g. if this is part
+        // of an editable list).
+        $scope.$watch('$parent.value', function(newValue) {
+          // TODO(sll): Check that $scope.$parent.value is a list.
+          $scope.localValue = [];
+          if (newValue) {
             for (var i = 0; i < newValue.length; i++) {
-              parentValues.push({
-                readableNoteName: newValue[i],
-                noteDuration: {
-                  num: 1,
-                  den: 1
-                }
-              });
+              $scope.localValue.push(newValue[i].readableNoteName);
             }
-            $scope.$parent.value = parentValues;
           }
-        }
-      }, true);
-    }]
-  };
-}]);
+        }, true);
+
+        $scope.$watch('localValue', function(newValue, oldValue) {
+          if (newValue && oldValue) {
+            if (newValue.length > _MAX_NOTES_IN_PHRASE) {
+              alertsService.addWarning(
+                'There are too many notes on the staff.');
+            } else {
+              var parentValues = [];
+              for (var i = 0; i < newValue.length; i++) {
+                parentValues.push({
+                  readableNoteName: newValue[i],
+                  noteDuration: {
+                    num: 1,
+                    den: 1
+                  }
+                });
+              }
+              $scope.$parent.value = parentValues;
+            }
+          }
+        }, true);
+      }]
+    };
+  }]);

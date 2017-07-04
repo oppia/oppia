@@ -48,8 +48,8 @@ states:
   %s:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -59,13 +59,15 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: null
+      solution: {}
     param_changes: []
   New state:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -84,7 +86,9 @@ states:
             num_submits:
               value: 42
           trigger_type: NthResubmission
+      hints: []
       id: null
+      solution: {}
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -180,8 +184,8 @@ states:
   %s:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -195,13 +199,15 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
   New state:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -215,13 +221,15 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
   Second state:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -235,7 +243,9 @@ states:
         feedback: []
         param_changes: []
       fallbacks: []
+      hints: []
       id: TextInput
+      solution: {}
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -523,6 +533,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.fallbacks = []
         exploration.validate()
 
+        interaction.hints = {}
+        self._assert_validation_error(
+            exploration, 'Expected hints to be a list')
+
         # Validate AnswerGroup.
         answer_group.rule_specs = {}
         self._assert_validation_error(
@@ -659,6 +673,65 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'outcome': base_outcome,
         }])
+        exploration.validate()
+
+    def test_hints_validation(self):
+        """Test validation of state hints."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.objective = 'Objective'
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        exploration.validate()
+
+        init_state.update_interaction_hints([{
+            'hint_text': 'hint one',
+        }])
+
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': 'hello_world is a string',
+        }
+        init_state.interaction.solution = solution
+        exploration.validate()
+
+        # Add hint and delete hint
+        init_state.add_hint('new hint')
+        self.assertEquals(
+            init_state.interaction.hints[1].hint_text,
+            'new hint')
+        init_state.add_hint('hint three')
+        init_state.delete_hint(1)
+        self.assertEquals(
+            len(init_state.interaction.hints),
+            2)
+        exploration.validate()
+
+    def test_solution_validation(self):
+        """Test validation of state solution."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.objective = 'Objective'
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        exploration.validate()
+
+        init_state.add_hint('hint #1')
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': [0, 0],
+            'explanation': 'hello_world is a string',
+        }
+        init_state.interaction.solution = solution
+        # Object type of answer must match that of correct_answer
+        with self.assertRaises(AssertionError):
+            exploration.validate()
+
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'hello_world!',
+            'explanation': 'hello_world is a string',
+        }
+        init_state.interaction.solution = solution
         exploration.validate()
 
     def test_tag_validation(self):
@@ -880,6 +953,81 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.validate(strict=True)
 
+    def test_audio_translation_validation(self):
+        """Test validation of audio translations."""
+        audio_translation = exp_domain.AudioTranslation(
+            'hi-en', 'a.mp3', 20, True)
+        audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected language code to be a string'
+            ):
+            with self.swap(audio_translation, 'language_code', 20):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Unrecognized language code'
+            ):
+            with self.swap(audio_translation, 'language_code', 'invalid-code'):
+                audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected audio filename to be a string'
+            ):
+            with self.swap(audio_translation, 'filename', 20):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid audio filename'
+            ):
+            with self.swap(audio_translation, 'filename', '.invalidext'):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid audio filename'
+            ):
+            with self.swap(audio_translation, 'filename', 'justanextension'):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid audio filename'
+            ):
+            with self.swap(audio_translation, 'filename', 'a.invalidext'):
+                audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected file size to be an int'
+            ):
+            with self.swap(audio_translation, 'file_size_bytes', 'abc'):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid file size'
+            ):
+            with self.swap(audio_translation, 'file_size_bytes', -3):
+                audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected needs_update to be a bool'
+            ):
+            with self.swap(audio_translation, 'needs_update', 'hello'):
+                audio_translation.validate()
+
+    def test_subtitled_html_validation(self):
+        """Test validation of subtitled HTML."""
+        audio_translation = exp_domain.AudioTranslation(
+            'hi-en', 'a.mp3', 20, True)
+        subtitled_html = exp_domain.SubtitledHtml(
+            'some html', [audio_translation])
+        subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content HTML'
+            ):
+            with self.swap(subtitled_html, 'html', 20):
+                subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected audio_translations to be a list'
+            ):
+            with self.swap(subtitled_html, 'audio_translations', 'not_list'):
+                subtitled_html.validate()
+
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')
@@ -922,10 +1070,10 @@ class StateExportUnitTests(test_utils.GenericTestBase):
         state_dict = exploration.states['New state'].to_dict()
         expected_dict = {
             'classifier_model_id': None,
-            'content': [{
-                'type': 'text',
-                'value': u''
-            }],
+            'content': {
+                'html': '',
+                'audio_translations': []
+            },
             'interaction': {
                 'answer_groups': [],
                 'confirmed_unclassified_answers': [],
@@ -936,7 +1084,9 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                 },
                 'fallbacks': [],
+                'hints': [],
                 'id': None,
+                'solution': {},
             },
             'param_changes': [],
         }
@@ -1907,7 +2057,186 @@ states_schema_version: 9
 tags: []
 title: Title
 """)
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V12
+
+    YAML_CONTENT_V13 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 13
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: {}
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+states_schema_version: 10
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V14 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 14
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: []
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: []
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: {}
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: []
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+states_schema_version: 11
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V14
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -1981,6 +2310,19 @@ title: Title
             'eid', self.YAML_CONTENT_V12)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v13(self):
+        """Test direct loading from a v13 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V13)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v14(self):
+        """Test direct loading from a v14 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V14)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
 
@@ -1995,10 +2337,10 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name):
             return {
                 'classifier_model_id': None,
-                'content': [{
-                    'type': 'text',
-                    'value': content_str,
-                }],
+                'content': {
+                    'audio_translations': [],
+                    'html': content_str,
+                },
                 'interaction': {
                     'answer_groups': [],
                     'confirmed_unclassified_answers': [],
@@ -2009,7 +2351,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'param_changes': [],
                     },
                     'fallbacks': [],
+                    'hints': [],
                     'id': None,
+                    'solution': {},
                 },
                 'param_changes': [],
             }
@@ -2035,6 +2379,29 @@ class ConversionUnitTests(test_utils.GenericTestBase):
 
 class StateOperationsUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
+
+    def test_can_undergo_classification(self):
+        """Test the can_undergo_classification() function."""
+        exploration_id = 'eid'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            assets_list)
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        state_with_training_data = exploration.states['Home']
+        state_without_training_data = exploration.states['End']
+
+        # A state with 786 training examples.
+        self.assertTrue(
+            state_with_training_data.can_undergo_classification())
+
+        # A state with no training examples.
+        self.assertFalse(
+            state_without_training_data.can_undergo_classification())
 
     def test_delete_state(self):
         """Test deletion of states."""

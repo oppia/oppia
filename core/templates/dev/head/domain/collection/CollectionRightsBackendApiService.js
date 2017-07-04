@@ -17,141 +17,142 @@
  */
 
 oppia.factory('CollectionRightsBackendApiService', [
-    '$http', '$log', '$q', 'COLLECTION_RIGHTS_URL_TEMPLATE',
-    'UrlInterpolationService',
-    function($http, $log, $q, COLLECTION_RIGHTS_URL_TEMPLATE,
-      UrlInterpolationService) {
-      // Maps previously loaded collection rights to their IDs.
-      var collectionRightsCache = {};
+  '$http', '$log', '$q', 'COLLECTION_RIGHTS_URL_TEMPLATE',
+  'UrlInterpolationService',
+  function($http, $log, $q, COLLECTION_RIGHTS_URL_TEMPLATE,
+    UrlInterpolationService) {
+    // Maps previously loaded collection rights to their IDs.
+    var collectionRightsCache = {};
 
-      var _fetchCollectionRights = function(collectionId, successCallback,
-        errorCallback) {
-        var collectionRightsUrl = UrlInterpolationService.interpolateUrl(
-          COLLECTION_RIGHTS_URL_TEMPLATE, {
-            collection_id: collectionId
-          });
-
-        $http.get(collectionRightsUrl).then(function(response) {
-          if (successCallback) {
-            successCallback(response.data);
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
+    var _fetchCollectionRights = function(collectionId, successCallback,
+      errorCallback) {
+      var collectionRightsUrl = UrlInterpolationService.interpolateUrl(
+        COLLECTION_RIGHTS_URL_TEMPLATE, {
+          collection_id: collectionId
         });
+
+      $http.get(collectionRightsUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.data);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _setCollectionStatus = function(
+        collectionId, collectionVersion, isPublic, successCallback,
+        errorCallback) {
+      var collectionRightsUrl = UrlInterpolationService.interpolateUrl(
+        COLLECTION_RIGHTS_URL_TEMPLATE, {
+          collection_id: collectionId
+        });
+
+      var putParams = {
+        version: collectionVersion,
+        is_public: isPublic
       };
+      $http.put(collectionRightsUrl, putParams).then(function(response) {
+        // Check if the response from the backend does not contradict
+        // putParams.
+        if (response.data.is_private === isPublic) {
+          if (errorCallback) {
+            errorCallback(response.data);
+          }
+        } else {
+          collectionRightsCache[collectionId] = response.data;
+          if (successCallback) {
+            successCallback(collectionRightsCache[collectionId]);
+          }
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
 
-      var _setCollectionStatus = function(
-          collectionId, collectionVersion, isPublic, successCallback,
-          errorCallback) {
-        var collectionRightsUrl = UrlInterpolationService.interpolateUrl(
-          COLLECTION_RIGHTS_URL_TEMPLATE, {
-            collection_id: collectionId
-          });
+    var _isCached = function(collectionId) {
+      return collectionId in collectionRightsCache;
+    };
 
-        var putParams = {
-          version: collectionVersion,
-          is_public: isPublic
-        };
-        $http.put(collectionRightsUrl, putParams).then(function(response) {
-          // Check if the response from the backend does not contradict
-          // putParams.
-          if (response.data.is_private === isPublic) {
-            if (errorCallback) {
-              errorCallback(response.data);
+    return {
+      /**
+       * Gets a collection's rights, given its ID.
+       */
+      fetchCollectionRights: function(collectionId) {
+        return $q(function(resolve, reject) {
+          _fetchCollectionRights(collectionId, resolve, reject);
+        });
+      },
+
+      /**
+       * Behaves exactly as fetchCollectionRights (including callback
+       * behavior and returning a promise object), except this function will
+       * attempt to see whether the given collection rights has been
+       * cached. If it has not yet been cached, it will fetch the collection
+       * rights from the backend. If it successfully retrieves the collection
+       * rights from the backend, it will store it in the cache to avoid
+       * requests from the backend in further function calls.
+       */
+      loadCollectionRights: function(collectionId) {
+        return $q(function(resolve, reject) {
+          if (_isCached(collectionId)) {
+            if (resolve) {
+              resolve(collectionRightsCache[collectionId]);
             }
           } else {
-            collectionRightsCache[collectionId] = response.data;
-            if (successCallback) {
-              successCallback(collectionRightsCache[collectionId]);
-            }
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
-        });
-      };
-
-      var _isCached = function(collectionId) {
-        return collectionId in collectionRightsCache;
-      };
-
-      return {
-        /**
-         * Gets a collection's rights, given its ID.
-         */
-        fetchCollectionRights: function(collectionId) {
-          return $q(function(resolve, reject) {
-            _fetchCollectionRights(collectionId, resolve, reject);
-          });
-        },
-
-        /**
-         * Behaves exactly as fetchCollectionRights (including callback
-         * behavior and returning a promise object), except this function will
-         * attempt to see whether the given collection rights has been
-         * cached. If it has not yet been cached, it will fetch the collection
-         * rights from the backend. If it successfully retrieves the collection
-         * rights from the backend, it will store it in the cache to avoid
-         * requests from the backend in further function calls.
-         */
-        loadCollectionRights: function(collectionId) {
-          return $q(function(resolve, reject) {
-            if (_isCached(collectionId)) {
+            _fetchCollectionRights(collectionId, function(collectionRights) {
+              // Save the fetched collection rights to avoid future fetches.
+              collectionRightsCache[collectionId] = collectionRights;
               if (resolve) {
                 resolve(collectionRightsCache[collectionId]);
               }
-            } else {
-              _fetchCollectionRights(collectionId, function(collectionRights) {
-                // Save the fetched collection rights to avoid future fetches.
-                collectionRightsCache[collectionId] = collectionRights;
-                if (resolve) {
-                  resolve(collectionRightsCache[collectionId]);
-                }
-              }, reject);
-            }
-          });
-        },
+            }, reject);
+          }
+        });
+      },
 
-        /**
-         * Returns whether the given collection rights is stored within the
-         * local data cache or if it needs to be retrieved from the backend
-         * upon a laod.
-         */
-        isCached: function(collectionId) {
-          return _isCached(collectionId);
-        },
+      /**
+       * Returns whether the given collection rights is stored within the
+       * local data cache or if it needs to be retrieved from the backend
+       * upon a laod.
+       */
+      isCached: function(collectionId) {
+        return _isCached(collectionId);
+      },
 
-        /**
-         * Replaces the current collection rights in the cache given by the
-         * specified collection ID with a new collection rights object.
-         */
-        cacheCollectionRights: function(collectionId, collectionRights) {
-          collectionRightsCache[collectionId] = angular.copy(collectionRights);
-        },
+      /**
+       * Replaces the current collection rights in the cache given by the
+       * specified collection ID with a new collection rights object.
+       */
+      cacheCollectionRights: function(collectionId, collectionRights) {
+        collectionRightsCache[collectionId] = angular.copy(collectionRights);
+      },
 
-        /**
-         * Updates a collection's rights to be have public learner access, given
-         * its ID and version.
-         */
-        setCollectionPublic: function(collectionId, collectionVersion) {
-          return $q(function(resolve, reject) {
-            _setCollectionStatus(
-              collectionId, collectionVersion, true, resolve, reject);
-          });
-        },
+      /**
+       * Updates a collection's rights to be have public learner access, given
+       * its ID and version.
+       */
+      setCollectionPublic: function(collectionId, collectionVersion) {
+        return $q(function(resolve, reject) {
+          _setCollectionStatus(
+            collectionId, collectionVersion, true, resolve, reject);
+        });
+      },
 
-        /**
-         * Updates a collection's rights to be have private learner access,
-         * given its ID and version.
-         */
-        setCollectionPrivate: function(collectionId, collectionVersion) {
-          return $q(function(resolve, reject) {
-            _setCollectionStatus(
-              collectionId, collectionVersion, false, resolve, reject);
-          });
-        }
-      };
-    }]);
+      /**
+       * Updates a collection's rights to be have private learner access,
+       * given its ID and version.
+       */
+      setCollectionPrivate: function(collectionId, collectionVersion) {
+        return $q(function(resolve, reject) {
+          _setCollectionStatus(
+            collectionId, collectionVersion, false, resolve, reject);
+        });
+      }
+    };
+  }
+]);

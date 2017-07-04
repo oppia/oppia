@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Maintenance" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title itemprop="name" translate="Down for Maintenance - Oppia"></title>
+    {% include 'pages/header_css_libs.html' %}
+
+    <script>
+      var GLOBALS = {
+        ADDITIONAL_ANGULAR_MODULES: [],
+        ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
+      };
+    </script>
+    {% include 'pages/header_js_libs.html' %}
+  </head>
+  <body>
+    <div class="oppia-base-container">
+      <div class="oppia-content-container">
+        <div id="wrapper">
+          <div class="oppia-main-body">
+            <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
+              <div class="navbar-container">
+                <div class="navbar-header protractor-test-navbar-header pull-left">
+                  <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
+                    <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>"
+                         class="oppia-logo oppia-logo-wide" alt="Oppia Home">
+                  </a>
+                </div>
+                <div ng-cloak class="navbar-header pull-right">
+                </div>
+              </div>
+            </nav>
+
+            <div class="oppia-top-of-page-padding"></div>
+            <div class="oppia-page-cards-container">
+              <md-card class="oppia-page-card oppia-long-text">
+                <h2>The Oppia site is temporarily unavailable.</h2>
+
+                <p>
+                  Oppia is currently being upgraded, and the site should be up
+                  and running again in a few hours. Thanks for your patience!
+                </p>
+              </md-card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include 'pages/footer_js_libs.html' %}
+    <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/i18n.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/maintenance/Maintenance.js"></script>
+  </body>
+</html>

@@ -48,3 +48,13 @@ class ImageClickInput(base.BaseInteraction):
         },
         'default_value': False
     }]
+
+    _answer_visualization_specs = [{
+        # Bar chart with answer counts.
+        'id': 'BarChart',
+        'options': {
+            'x_axis_label': 'Answer',
+            'y_axis_label': 'Count',
+        },
+        'calculation_id': 'AnswerFrequencies',
+    }]
