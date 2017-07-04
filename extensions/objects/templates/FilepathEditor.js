@@ -157,17 +157,16 @@ oppia.directive('filepathEditor', [
           // one with respect to the crop area itself. So this function does
           // normalization on the (x, y) values so that they are always reported
           // with respect to the image container (makes calculations easier).
-          if (e.target.classList.contains('filepath-editor-crop-area')) {
-            return {
-              x: e.offsetX + e.target.offsetLeft,
-              y: e.offsetY + e.target.offsetTop
-            };
-          } else {
-            return {
-              x: e.offsetX,
-              y: e.offsetY
-            };
+          var x = e.offsetX;
+          var y = e.offsetY;
+          var containerClass = 'filepath-editor-image-crop-container';
+          var node = e.target;
+          while (!node.classList.contains(containerClass)) {
+            x += node.offsetLeft;
+            y += node.offsetTop;
+            node = node.offsetParent;
           }
+          return {x: x, y: y};
         };
 
         var clamp = function(value, min, max) {
