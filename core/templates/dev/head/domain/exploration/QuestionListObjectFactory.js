@@ -37,6 +37,7 @@ oppia.factory('QuestionListObjectFactory', [function() {
 
   QuestionList.prototype.updateQuestion = function(index, question) {
     this._questions[index] = question;
+  };
     
   QuestionList.prototype.removeQuestion = function(questionToDelete) {
     var index = -1;
