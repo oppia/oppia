@@ -24,10 +24,13 @@ oppia.directive('simpleEditorSidebar', [
         '/pages/exploration_editor/simple_editor_tab/' +
         'simple_editor_sidebar_directive.html'),
       controller: [
-        '$scope', 'EditorModeService', 'SimpleEditorManagerService',
-        'ScrollSyncService', 'QuestionIdService',
-        function($scope, EditorModeService, SimpleEditorManagerService,
-                 ScrollSyncService, QuestionIdService) {
+        '$scope', 'EditorModeService', 'QuestionIdService',
+        'ScrollSyncService', 'SimpleEditorManagerService',
+        'SimpleEditorSidebarModeService',
+        function(
+          $scope, EditorModeService, QuestionIdService,
+          ScrollSyncService, SimpleEditorManagerService,
+          SimpleEditorSidebarModeService) {
           /* This initializes Perfect Scrollbar on the simple editor sidebar.
            Perfect scrollbar is needed to show scrollbar on all major browsers.
            */
@@ -36,7 +39,7 @@ oppia.directive('simpleEditorSidebar', [
             'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
           $scope.questionList = SimpleEditorManagerService.getQuestionList();
           $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
-
+          $scope.sidebarModeService = SimpleEditorSidebarModeService;
           $scope.getSidebarItemId = function(question, subfieldLabel) {
             return QuestionIdService.getSidebarItemId(
               question.getId(), subfieldLabel
@@ -60,6 +63,16 @@ oppia.directive('simpleEditorSidebar', [
           $scope.$on('SimpleEditorSidebarToggleCollapse', function() {
             $scope.$apply();
           });
+
+          $scope.deleteQuestion = function(question) {
+            var lastQuestionBeforeDel = $scope.questionList.getLastQuestion();
+            SimpleEditorManagerService.deleteQuestion(question);
+            if (question.getId() === lastQuestionBeforeDel.getId()) {
+              var end = $scope.questionList.isEmpty() ?
+                'intro' : $scope.questionList.getLastQuestion().getId();
+              ScrollSyncService.scrollTo(end);
+            }
+          };
         }
       ]
     };
