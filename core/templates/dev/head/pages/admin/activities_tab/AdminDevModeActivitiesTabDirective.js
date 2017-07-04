@@ -109,8 +109,9 @@ oppia.directive('adminDevModeActivitiesTab', [
           AdminTaskManagerService.startTask();
           $scope.setStatusMessage('Processing...');
           $http.post(ADMIN_HANDLER_URL, {
-            action: 'reload_dummy_exploration',
-            dummy_exp_count: $scope.DummyExplorationCount
+            action: 'generate_dummy_exploration',
+            dummy_exp_count: $scope.DummyExplorationCount,
+            dummy_exp_publish: $scope.DummyExplorationPublishCount
           }).then(function() {
             $scope.setStatusMessage(
               'Dummy explorations generated successfully.');

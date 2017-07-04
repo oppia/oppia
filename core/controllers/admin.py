@@ -18,7 +18,6 @@ import logging
 import random
 import jinja2
 
-
 from core import jobs
 from core import jobs_registry
 from core.controllers import base
@@ -136,9 +135,11 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'reload_collection':
                 collection_id = self.payload.get('collection_id')
                 self._reload_collection(collection_id)
-            elif self.payload.get('action') == 'reload_dummy_exploration':
+            elif self.payload.get('action') == 'generate_dummy_exploration':
                 dummy_exp_count = self.payload.get('dummy_exp_count')
-                self._reload_dummy_exploration(dummy_exp_count)
+                dummy_exp_publish = self.payload.get('dummy_exp_publish')
+                self._generate_dummy_exploration(
+                    dummy_exp_count, dummy_exp_publish)
             elif self.payload.get('action') == 'clear_search_index':
                 exp_services.clear_search_index()
             elif self.payload.get('action') == 'save_config_properties':
@@ -208,7 +209,8 @@ class AdminHandler(base.BaseHandler):
                 feconf.SYSTEM_COMMITTER_ID, unicode(collection_id))
         else:
             raise Exception('Cannot reload a collection in production.')
-    def _reload_dummy_exploration(self, dummy_exp_count):
+
+    def _generate_dummy_exploration(self, dummy_exp_count, dummy_exp_publish):
         if feconf.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations' %
@@ -217,15 +219,20 @@ class AdminHandler(base.BaseHandler):
                                'Wonder Anatomy',
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
+            dummy_exp_list = []
             for _ in range(int(dummy_exp_count)):
                 title = random.choice(possible_titles)
                 category = random.choice(feconf.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_services.get_new_exploration_id()
                 exploration = exp_domain.Exploration.create_default_exploration(
-                    new_exploration_id, title=title, category=category)
+                    new_exploration_id, title=title, category=category,
+                    objective='Dummy Objective')
                 exp_services.save_new_exploration(self.user_id, exploration)
-                exp_services.publish_exploration_and_update_user_profiles(
-                    self.user_id, new_exploration_id)
+                dummy_exp_list.append(new_exploration_id)
+                if len(dummy_exp_list) <= int(dummy_exp_publish):
+                    rights_manager.publish_exploration(
+                        self.user_id, new_exploration_id)
+            exp_services.index_explorations_given_ids(dummy_exp_list)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
