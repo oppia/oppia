@@ -397,7 +397,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
 
 class SslChallengeHandler(base.BaseHandler):
-    """Plaintext page for responding to SSL challenges."""
+    """Plaintext page for responding to LetsEncrypt SSL challenges."""
 
     def get(self, challenge):
         """Handles GET requests."""
