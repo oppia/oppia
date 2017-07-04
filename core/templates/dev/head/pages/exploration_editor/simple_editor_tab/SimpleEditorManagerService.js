@@ -21,12 +21,13 @@
  */
 
 oppia.factory('SimpleEditorManagerService', [
-  'AnswerGroupObjectFactory', 'OutcomeObjectFactory', 'QuestionObjectFactory',
-  'QuestionListObjectFactory', 'RuleObjectFactory', 'StatesToQuestionsService',
-  'SimpleEditorShimService', function(
-      AnswerGroupObjectFactory, OutcomeObjectFactory, QuestionObjectFactory,
-      QuestionListObjectFactory, RuleObjectFactory, StatesToQuestionsService,
-      SimpleEditorShimService) {
+  'AnswerGroupObjectFactory', 'explorationInitStateNameService',
+  'OutcomeObjectFactory', 'QuestionObjectFactory', 'QuestionListObjectFactory',
+  'RuleObjectFactory', 'StatesToQuestionsService', 'SimpleEditorShimService',
+  function(
+      AnswerGroupObjectFactory, explorationInitStateNameService,
+      OutcomeObjectFactory, QuestionObjectFactory, QuestionListObjectFactory,
+      RuleObjectFactory, StatesToQuestionsService, SimpleEditorShimService) {
     var data = {
       title: null,
       introductionHtml: null,
