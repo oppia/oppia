@@ -14,7 +14,7 @@
 
 describe('TextInputValidationService', function() {
   var validatorService, WARNING_TYPES;
-  var INTERACTION_SPECS, customArgSpecs, rowsSpecs, minRows, maxRows;
+  var INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;
 
   var currentState, customizationArguments;
   var goodAnswerGroups, goodDefaultOutcome;
@@ -28,8 +28,8 @@ describe('TextInputValidationService', function() {
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     INTERACTION_SPECS = $injector.get('INTERACTION_SPECS');
-    customArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
-    rowsSpecs = customArgSpecs[1];
+    customizationArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
+    rowsSpecs = customizationArgSpecs[1];
     minRows = rowsSpecs.schema.validators[0].min_value;
     maxRows = rowsSpecs.schema.validators[1].max_value;
 
