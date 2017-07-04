@@ -35,16 +35,15 @@
   https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
   <script type="text/javascript" async src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
-    function onloadChartLoadHandler() {
+    // Since we are using async to load the library wait until entire page is loaded to call google.load().
+    // That should allow the initial page load to complete before starting the chart rendering.
+    window.addEventListener('load', function() {
       if (window.google && window.google.charts) {
         google.charts.load('current', {packages: ['corechart']});
       } else {
         throw 'error: Could not load google visualization library. Are you offline?';
       }
-    }
-    // Since we are using async to load the library wait until entire page is loaded to call google.load().
-    // That should allow the initial page load to complete before starting the chart rendering.
-    window.onload = onloadChartLoadHandler;
+    });
   </script>
 
   <style>
