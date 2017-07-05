@@ -300,7 +300,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_services.create_classifier_exploration_mapping(
             exp_id, 1, state_name, classifier_id)
         classifier_exploration_mapping = (
-            classifier_services.get_classifier_exploration_mapping(
+            classifier_domain.ClassifierExplorationMapping(
                 exp_id, 1, state_name, classifier_id))
         self.assertEqual(classifier_exploration_mapping.exp_id, exp_id)
         self.assertEqual(classifier_exploration_mapping.exp_version, 1)

@@ -358,24 +358,6 @@ def delete_classifier_training_job(job_id):
         classifier_training_job_model.delete()
 
 
-def get_classifier_exploration_mapping(
-        exp_id, exp_version, state_name, classifier_id):
-    """Gets a classifier exploration mapping domain object from attributes.
-
-    Args:
-        exp_id: str. ID of the exploration.
-        exp_version: int. The exploration version.
-        state_name: str. The state to which the classifier belongs.
-        classifier_id: str. ID of the classifier.
-
-    Returns:
-        ClassifierExplorationMapping. Domain object for the classifier
-            exploration mapping.
-    """
-    return classifier_domain.ClassifierExplorationMapping(
-        exp_id, exp_version, state_name, classifier_id)
-
-
 def get_classifier_from_exploration_attributes(exp_id, exp_version,
                                                state_name):
     """Gets the classifier object from the exploration attributes.
@@ -413,7 +395,7 @@ def create_classifier_exploration_mapping(exp_id, exp_version, state_name,
         classifier_id: str. ID of the classifier.
 
     Returns:
-        mapping_id : str. ID of the classifier exploration mapping instance.
+        str. ID of the classifier exploration mapping instance.
 
     Raises:
         Exception: The Classifier-Exploration mapping with id already exists.
