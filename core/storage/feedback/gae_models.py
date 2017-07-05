@@ -70,6 +70,8 @@ class FeedbackThreadModel(base_models.BaseModel):
     summary = ndb.TextProperty(indexed=False)
     # Specifies whether this thread has a related learner suggestion.
     has_suggestion = ndb.BooleanProperty(indexed=True, default=False)
+    # The number of messages in the thread.
+    message_count = ndb.IntegerProperty(default=None, indexed=True)
 
     @classmethod
     def generate_new_thread_id(cls, exploration_id):
@@ -304,7 +306,7 @@ class FeedbackMessageModel(base_models.BaseModel):
             cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_last_two_messages_of_threads(cls, exploration_ids, thread_ids):
+    def get_last_two_message_ids_of_threads(cls, exploration_ids, thread_ids):
         """Returns a list of the last two messages of the given threads.
 
         Args:
@@ -316,18 +318,28 @@ class FeedbackMessageModel(base_models.BaseModel):
             list(int). A list of message ids present in the given thread, having
                 a maximum length of feconf.DEFAULT_QUERY_LIMIT.
         """
-        full_thread_ids = [FeedbackThreadModel.generate_full_thread_id(
-            exploration_id, thread_id) for exploration_id, thread_id in zip(
-                exploration_ids, thread_ids)]
+        message_ids = []
+        full_thread_ids = (
+            [FeedbackThreadModel.generate_full_thread_id(
+                exploration_id, thread_id)
+             for exploration_id, thread_id in zip(exploration_ids, thread_ids)])
+        thread_models = FeedbackThreadModel.get_multi(full_thread_ids)
 
-        messages = []
+        index = 0
+        for exploration_id, thread_id in zip(exploration_ids, thread_ids):
+            if thread_models[index].message_count:
+                message_count = thread_models[index].message_count
+            else:
+                message_count = cls.get_message_count(exploration_id, thread_id)
+            last_message_id = message_count - 1
+            message_ids.append(cls._generate_id(
+                exploration_id, thread_id, last_message_id))
+            second_last_message_id = message_count - 2
+            message_ids.append(cls._generate_id(
+                exploration_id, thread_id, second_last_message_id))
+            index += 1
 
-        for full_thread_id in full_thread_ids:
-            messages.append(cls.query().filter(
-                cls.thread_id == full_thread_id).order(
-                    -cls.last_updated).fetch(2))
-
-        return messages
+        return message_ids
 
     @classmethod
     def get_most_recent_message(cls, exploration_id, thread_id):

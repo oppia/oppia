@@ -403,7 +403,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_get_thread_summaries_load_test(self):
         # The speed of fetching the summaries of 100 threads having 5 messages
-        # should be less than 8 seconds.
+        # should be less than 0.2 seconds.
         # Create 100 threads.
         for _ in range(100):
             feedback_services.create_thread(
@@ -426,7 +426,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # Fetch the summaries of all the threads.
         feedback_services.get_thread_summaries(self.user_id, thread_ids)
         elapsed_time = time.time() - start
-        self.assertLessEqual(elapsed_time, 8)
+        self.assertLessEqual(elapsed_time, 0.2)
 
     def test_update_messages_read_by_the_user(self):
         feedback_services.create_thread(

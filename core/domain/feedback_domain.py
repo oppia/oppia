@@ -41,7 +41,7 @@ class FeedbackThread(object):
 
     def __init__(self, full_thread_id, exploration_id, state_name,
                  original_author_id, status, subject, summary, has_suggestion,
-                 created_on, last_updated):
+                 message_count, created_on, last_updated):
         """Initializes a FeedbackThread object."""
 
         self.id = full_thread_id
@@ -52,6 +52,7 @@ class FeedbackThread(object):
         self.subject = subject
         self.summary = summary
         self.has_suggestion = has_suggestion
+        self.message_count = message_count
 
         self.created_on = created_on
         self.last_updated = last_updated
@@ -78,7 +79,8 @@ class FeedbackThread(object):
             'status': self.status,
             'subject': self.subject,
             'summary': self.summary,
-            'thread_id': self.get_thread_id()
+            'thread_id': self.get_thread_id(),
+            'message_count': self.message_count
         }
 
     @staticmethod
