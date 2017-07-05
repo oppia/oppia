@@ -781,7 +781,6 @@ ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
-ROLE_ID_SUPER_ADMIN = 'SUPER_ADMIN'
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role Ids.

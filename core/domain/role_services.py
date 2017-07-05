@@ -60,7 +60,6 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_EXPLORATION_EDITOR: 'exploration editor',
     feconf.ROLE_ID_GUEST: 'guest',
     feconf.ROLE_ID_MODERATOR: 'moderator',
-    feconf.ROLE_ID_SUPER_ADMIN: 'super admin'
 }
 
 # This dict maps the roles in current authorization system to roles in new
@@ -128,7 +127,6 @@ PARENT_ROLES = {
     feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_GUEST],
     feconf.ROLE_ID_GUEST: [],
     feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_COLLECTION_EDITOR],
-    feconf.ROLE_ID_SUPER_ADMIN: [feconf.ROLE_ID_ADMIN]
 }
 
 # This dict represents the unique actions that belong to a particular role.
@@ -157,8 +155,6 @@ ROLE_ACTIONS = {
     feconf.ROLE_ID_MODERATOR: [
         ACTION_PLAY_ANY_PRIVATE_COLLECTION,
         ACTION_PLAY_ANY_PRIVATE_EXPLORATION,
-    ],
-    feconf.ROLE_ID_SUPER_ADMIN: [
     ]
 }
 
@@ -208,10 +204,9 @@ def get_role_graph_data():
     role_graph['links'] = []
     role_graph['nodes'] = {}
     for role in PARENT_ROLES:
-        if role != feconf.ROLE_ID_SUPER_ADMIN:
-            role_graph['nodes'][role] = HUMAN_READABLE_ROLES[role]
-            for parent in PARENT_ROLES[role]:
-                role_graph['links'].append({'source': parent, 'target': role})
+        role_graph['nodes'][role] = HUMAN_READABLE_ROLES[role]
+        for parent in PARENT_ROLES[role]:
+            role_graph['links'].append({'source': parent, 'target': role})
     return role_graph
 
 
