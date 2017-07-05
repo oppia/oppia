@@ -50,7 +50,6 @@ VIEWABLE_ROLES = [
     feconf.ROLE_ID_BANNED_USER,
     feconf.ROLE_ID_COLLECTION_EDITOR,
     feconf.ROLE_ID_MODERATOR,
-    feconf.ROLE_ID_SUPER_ADMIN
 ]
 
 # The string corresponding to role Ids that should be visible to admin.
@@ -209,9 +208,10 @@ def get_role_graph_data():
     role_graph['links'] = []
     role_graph['nodes'] = {}
     for role in PARENT_ROLES:
-        role_graph['nodes'][role] = HUMAN_READABLE_ROLES[role]
-        for parent in PARENT_ROLES[role]:
-            role_graph['links'].append({'source': parent, 'target': role})
+        if role != feconf.ROLE_ID_SUPER_ADMIN:
+            role_graph['nodes'][role] = HUMAN_READABLE_ROLES[role]
+            for parent in PARENT_ROLES[role]:
+                role_graph['links'].append({'source': parent, 'target': role})
     return role_graph
 
 
