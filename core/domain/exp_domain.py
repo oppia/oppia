@@ -111,9 +111,17 @@ def _get_full_customization_args(customization_args, ca_specs):
     if any of the expected customization_args are missing.
 
     Args:
-        customization_args: dict. Costumization dictionary.
-        ca_specs: dict. Specs dictionary. Used to check if some keys are
-            missing in costumization_args.
+        customization_args: dict. The customization dict. The keys are names of
+            customization_args and the values are dicts with a
+            single key, 'value', whose corresponding value is the value of
+            the customization arg.
+        ca_specs: list(dict). List of specs dictionary. Is used to check if
+            some keys are missing in customization_args. Dicts have the
+            following structure:
+                - name: str. The customization variable name.
+                - description: str. The customization variable description.
+                - default_value: The defaul value of customization variable.
+                    Can have multiple types.
 
     Returns:
         dict. The customization_args dict where missing keys are populated with
@@ -135,16 +143,24 @@ def _validate_customization_args_and_values(
     populate any error messages that arise during validation.
     Note that this may modify the given customization_args dict, if it has
     extra or missing keys. It also normalizes any HTML in the
-    customization_args
-    dict.
+    customization_args dict.
 
     Args:
         item_name: str. The item_name is either 'interaction', 'gadget' or
             'trigger'.
         item_type: str. The item_type is the id/type of the
             interaction/gadget/trigger, respectively.
-        customization_args: dict. Costumization dictionary.
-        ca_specs_to_validate_against: dict. Specs dictionary.
+        customization_args: dict. The customization dict. The keys are names of
+            customization_args and the values are dicts with a
+            single key, 'value', whose corresponding value is the value of
+            the customization arg.
+        ca_specs_to_validate_against: list(dict). List of specs dictionary. Is
+            used to check if some keys are missing in customization_args. Dicts
+            have the following structure:
+                - name: str. The customization variable name.
+                - description: str. The customization variable description.
+                - default_value: multiple types. The defaul value of
+                    customization variable.
 
     Raises:
         ValidationError: The given 'customization_args' is not valid.
@@ -318,18 +334,22 @@ class ExplorationCommitLogEntry(object):
 
         Args:
             created_on: datetime.datetime. Date and time when the exploration
-                commits was created.
+                commit was created.
             last_updated: datetime.datetime. Date and time when the exploration
-                commits was last updated.
+                commit was last updated.
             user_id: str. User id of the user who has made the commit.
             username: str. Username of the user who has made the commit.
             exploration_id: str. Id of the exploration.
             commit_type: str. The type of commit.
             commit_message: str. A description of changes made to the
                 exploration.
-            commit_cmds: list(dict). A list of change commands made to the
-                given exploration.
-            version: int. The version of the exploration.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains the following
+                key:
+                    - cmd: str. Unique command.
+                and then additional arguments for that command.
+            version: int. The version of the exploration after the commit.
             post_commit_status: str. The new exploration status after the
                 commit.
             post_commit_community_owned: bool. Whether the exploration is
@@ -352,12 +372,11 @@ class ExplorationCommitLogEntry(object):
 
     def to_dict(self):
         """Returns a dict representing this ExplorationCommitLogEntry domain
-            object. This omits created_on, user_id and (for now) commit_cmds.
+        object. This omits created_on, user_id and commit_cmds.
 
         Returns:
             dict. A dict, mapping all fields of ExplorationCommitLogEntry
-            instance, except created_on, user_id and (for now) commit_cmds
-            field.
+            instance, except created_on, user_id and commit_cmds fields.
         """
         return {
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
@@ -399,8 +418,9 @@ class Content(object):
         """Initializes a Content domain object.
 
         Args:
-            content_type: str. The type of content.
-            value: str. The value of content.
+            content_type: str. The content type. At the moment, this is always
+                'text'.
+            value: str. The content string.
         """
         self.type = content_type
         self.value = html_cleaner.clean(value)
@@ -424,7 +444,9 @@ class Content(object):
         """Exports this content object to an HTML string.
 
         Args:
-            params: dict. The dict representation of Content object.
+            params: dict. The keys are the parameters names and the values are
+                the values of parameters. The parameters are parsed with the
+                value of Content.
 
         Raises:
             Exception: 'params' is not a dict.
@@ -487,7 +509,7 @@ class RuleSpec(object):
                 this RuleSpec. Each element of the list represents a single
                 parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
-                    1: The typed object instance for that parameter (e.g. Real).
+                    1: The typed object instance for that parameter(e.g. Real).
             exp_param_specs_dict: A dict of specified parameters used in this
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type). RuleSpec
@@ -586,11 +608,11 @@ class Outcome(object):
         """Initializes a Outcome domain object.
 
         Args:
-            dest: str. The destination state.
+            dest: str. The name of the destination state.
             feedback: list(str). List of feedback to show the user if this rule
                 is triggered.
-            param_changes: list(str). List of exploration-level parameter
-                changes to make if this rule is triggered.
+            param_changes: list(ParamChange). List of exploration-level
+                parameter changes to make if this rule is triggered.
         """
         # Id of the destination state.
         # TODO(sll): Check that this state actually exists.
@@ -677,9 +699,10 @@ class AnswerGroup(object):
         """Initializes a AnswerGroup domain object.
 
         Args:
-            outcome: Outcome. The outcome of an interaction.
+            outcome: Outcome. The outcome corresponding to the answer group.
             rule_specs: list(RuleSpec). List of rule specifications.
-            correct: bool. True if user answers correctly else False.
+            correct: bool. Whether this answer group represents a "correct"
+                answer.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
@@ -689,16 +712,18 @@ class AnswerGroup(object):
         self.correct = correct
 
     def validate(self, interaction, exp_param_specs_dict):
-        """Rule validation. Verifies that all rule classes are valid, and that
-        the AnswerGroup only has one classifier rule.
+        """Verifies that all rule classes are valid, and that the AnswerGroup
+        only has one classifier rule.
 
         Args:
-            exp_param_specs_dict: dict. A dict of specified parameters used in
-                the exploration.
+            exp_param_specs_dict: dict. A dict of all parameters used in the
+                exploration. Keys are parameter names and values are ParamSpec
+                value objects with an object type property (obj_type).
 
         Raises:
-            ValidationError: One or more attributes of the AnswerGroup are
-            invalid or AnswerGroup contains more than one classifier rule.
+        ValidationError: One or more attributes of the AnswerGroupare invalid.
+        ValidationError: The AnswerGroup contains more than one classifier
+            rule.
         """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
@@ -731,7 +756,7 @@ class AnswerGroup(object):
         self.outcome.validate()
 
     def get_classifier_rule_index(self):
-        """Get the index of the classifier in the answer groups.
+        """Gets the index of the classifier in the answer groups.
 
         Returns:
             int or None. Returns the index of the classifier in the answer
@@ -755,7 +780,10 @@ class TriggerInstance(object):
 
         Args:
             trigger_type: str. The type of trigger.
-            customization_args: dict. The customization args for the trigger.
+            customization_args: dict. The customization dict. The keys are
+                names of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
         """
         # A string denoting the type of trigger.
         self.trigger_type = trigger_type
@@ -827,7 +855,8 @@ class Fallback(object):
 
         Args:
             trigger: TriggerInstance. The satisfied trigger.
-            outcome: Outcome. The outcome where reroute the user flow.
+            outcome: Outcome. The outcome to apply when the user hits the
+                trigger.
         """
         self.trigger = trigger
         self.outcome = outcome
@@ -864,19 +893,43 @@ class Fallback(object):
 
 class Hint(object):
     """Value object representing a hint."""
+
     def __init__(self, hint_text):
+        """Constructs a Hint domain object.
+
+        Args:
+            hint_text: str. The hint text.
+        """
         self.hint_text = html_cleaner.clean(hint_text)
 
     def to_dict(self):
+        """Returns a dict representing this Hint domain object.
+
+        Returns:
+            dict. A dict mapping the field of Hint instance.
+        """
         return {
             'hint_text': self.hint_text,
         }
 
     @classmethod
     def from_dict(cls, hint_dict):
+        """Return a Hint domain object from a dict.
+
+        Args:
+            hint_dict: dict. The dict representation of Hint object.
+
+        Returns:
+            Hint. The corresponding Hint domain object.
+        """
         return cls(hint_dict['hint_text'])
 
     def validate(self):
+        """Validates all properties of Hint.
+
+        Raises:
+            ValidationError: 'hint_text' is not a string.
+        """
         if not isinstance(self.hint_text, basestring):
             raise utils.ValidationError(
                 'Expected hint text to be a string, received %s' %
@@ -895,6 +948,17 @@ class Solution(object):
     """
     def __init__(self, interaction_id, answer_is_exclusive,
                  correct_answer, explanation):
+        """Constructs a Solution domain object.
+
+        Args:
+            interaction_id: str. The interaction id.
+            answer_is_exclusive: bool. True if is the only correct answer;
+                False if is one of possible answer.
+            correct_answer: str. The correct answer; this answer enables the
+                learner to progress to the next card.
+            explanation: str. HTML string containing an explanation for the
+                solution.
+        """
         self.answer_is_exclusive = answer_is_exclusive
         self.correct_answer = (
             interaction_registry.Registry.get_interaction_by_id(
@@ -902,6 +966,11 @@ class Solution(object):
         self.explanation = html_cleaner.clean(explanation)
 
     def to_dict(self):
+        """Returns a dict representing this Solution domain object.
+
+        Returns:
+            dict. A dict mapping all fields of Solution instance.
+        """
         return {
             'answer_is_exclusive': self.answer_is_exclusive,
             'correct_answer': self.correct_answer,
@@ -910,6 +979,15 @@ class Solution(object):
 
     @classmethod
     def from_dict(cls, interaction_id, solution_dict):
+        """Return a Solution domain object from a dict.
+
+        Args:
+            interaction_id: str. The interaction id.
+            solution_dict: dict. The dict representation of Solution object.
+
+        Returns:
+            Solution. The corresponding Solution domain object.
+        """
         return cls(
             interaction_id,
             solution_dict['answer_is_exclusive'],
@@ -919,6 +997,15 @@ class Solution(object):
             solution_dict['explanation'])
 
     def validate(self, interaction_id):
+        """Validates all properties of Solution.
+
+        Args:
+            interaction_id: str. The interaction id.
+
+        Raises:
+            ValidationError: One or more attributes of the Solution are not
+            valid.
+        """
         if not isinstance(self.answer_is_exclusive, bool):
             raise utils.ValidationError(
                 'Expected answer_is_exclusive to be bool, received %s' %
@@ -994,8 +1081,8 @@ class InteractionInstance(object):
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
-<<<<<<< HEAD
-            default_outcome, confirmed_unclassified_answers, fallbacks):
+            default_outcome, confirmed_unclassified_answers,
+            fallbacks, hints, solution):
         """Initializes a InteractionInstance domain object.
 
         Args:
@@ -1004,19 +1091,17 @@ class InteractionInstance(object):
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
-            answer_groups: list(AnswerGroup). List of AnswerGroup of the
+            answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
             default_outcome: Outcome. The default outcome of the interaction
                 instance.
             confirmed_unclassified_answers: list(AnswerGroup). List of answers
                 which have been confirmed to be associated with the default
                 outcome.
-            fallbacks: list(Fallback). List of fallbacks.
+            fallbacks: list(Fallback). List of fallbacks for this interaction.
+            hints: list(Hint). List of Hint of this InteractionInstance.
+            solution: Solution. The Solution of this InteractionInstance.
         """
-=======
-            default_outcome, confirmed_unclassified_answers,
-            fallbacks, hints, solution):
->>>>>>> upstream/develop
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
@@ -1037,7 +1122,7 @@ class InteractionInstance(object):
         this interaction, it is assumed to not be terminal.
 
         Returns:
-            bool. True if the interaction is terminal, else False.
+            bool. Whether the interaction is terminal.
         """
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
@@ -1047,7 +1132,7 @@ class InteractionInstance(object):
         i.e. every answer group and the default outcome.
 
         Returns:
-            list(Outcome). List of non-fallback outcomes of this interacion.
+            list(Outcome). List of non-fallback outcomes of this interaction.
         """
         outcomes = []
         for answer_group in self.answer_groups:
@@ -1074,7 +1159,9 @@ class InteractionInstance(object):
 
         Args:
             exp_param_specs_dict: dict. A dict of specified parameters used in
-                the exploration.
+                the exploration. Keys are parameter names and values are
+                ParamSpec value objects with an object type property(obj_type).
+                Is used to validate AnswerGroup objects.
 
         Raises:
             ValidationError: One or more attributes of the InteractionInstance
@@ -1139,12 +1226,12 @@ class InteractionInstance(object):
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
         """Create a default InteractionInstance domain object:
-            -customization_args: empty dictionary;
-            -answer_groups: empty list;
-            -default_outcome: dest is set to 'default_dest_state_name' and
+            - customization_args: empty dictionary;
+            - answer_groups: empty list;
+            - default_outcome: dest is set to 'default_dest_state_name' and
                 feedback and param_changes are initialized as empty lists;
-            -confirmed_unclassified_answers: empty list;
-            -fallbacks: empty list;
+            - confirmed_unclassified_answers: empty list;
+            - fallbacks: empty list;
 
         Args:
             default_dest_state_name: str. The default destination state.
@@ -1167,13 +1254,13 @@ class GadgetInstance(object):
 
     def __init__(self, gadget_type, gadget_name,
                  visible_in_states, customization_args):
-    """Initializes a GadgetInstance domain object.
+        """Initializes a GadgetInstance domain object.
 
         Args:
             gadget_type: str. Backend ID referring to the gadget's type in
                 gadget registry.
             gadget_name: str. The gadget name.
-            visible_in_states: list(str). List of state name strings where this
+            visible_in_states: list(str). List of state name where this
                 gadget is visible.
             customization_args: dict. The customization args for the gadget's
                 view.
@@ -1193,8 +1280,7 @@ class GadgetInstance(object):
 
     @property
     def gadget(self):
-        """Get a Gadget spec for validation and derived properties below. The
-        Gadget is found through its id (gadget_type).
+        """Gets a gadget spec based on its type.
 
         Returns:
             GadgetInstance. The corresponding GadgetInstance domain object.
@@ -1203,19 +1289,19 @@ class GadgetInstance(object):
 
     @property
     def width(self):
-        """Get the gadget Width in pixels.
+        """Gets the gadget width in pixels.
 
         Returns:
-            int. The gadget width.
+            int. The gadget width, in pixels.
         """
         return self.gadget.width_px
 
     @property
     def height(self):
-        """Get the gadget Height in pixels.
+        """Gets the gadget height in pixels.
 
         Returns:
-            int. The gadget height.
+            int. The gadget height, in pixels.
         """
         return self.gadget.height_px
 
@@ -1338,8 +1424,8 @@ class GadgetInstance(object):
         """Updates the GadgetInstance's visibility in different states.
 
         Args:
-            visible_in_states: list(str). List of state name strings where this
-                gadget is visible.
+            visible_in_states: list(str). List of state names where this gadget
+                is visible.
         """
         self.visible_in_states = visible_in_states
 
@@ -1407,7 +1493,7 @@ class SkinInstance(object):
         """Generates default skin customizations when none are specified.
 
         Returns:
-            dict. The default skin costumizations.
+            dict. The default skin customizations.
         """
         return {
             'panels_contents': {
@@ -1428,7 +1514,7 @@ class SkinInstance(object):
                 instances.
 
         Raises:
-            ValidationError: Space requirements does not fit.
+            ValidationError: The space requirements are not satisfied.
         """
         # If the panel contains no gadgets, max() will raise an error,
         # so we return early.
@@ -1596,7 +1682,8 @@ class State(object):
                 this state.
             interaction: InteractionInstance. The interaction instance
                 associated with this state.
-            classifier_model_id: str. The classifier model id.
+            classifier_model_id: str or None. The classifier model ID
+                associated with this state, if applicable.
         """
         # The content displayed to the reader in this state.
         self.content = [Content(item.type, item.value) for item in content]
@@ -1618,8 +1705,10 @@ class State(object):
 
         Args:
             exp_param_specs_dict: dict. A dict of specified parameters used in
-                this exploration.
-            allow_null_interaction. bool. If this state allow null interaction.
+                this exploration. Keys are parameter names and values are
+                ParamSpec value objects with an object type property(obj_type).
+            allow_null_interaction. bool. Whether this state's interaction is
+                allowed to be unspecified.
 
         Raises:
             ValidationError: One or more attributes of the State are invalid.
@@ -1709,7 +1798,7 @@ class State(object):
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args. dict. The new customization_args to be set.
+            customization_args. dict. The new customization_args to set.
         """
         self.interaction.customization_args = customization_args
 
@@ -1815,7 +1904,7 @@ class State(object):
             confirmed_unclassified_answers)
 
     def update_interaction_fallbacks(self, fallbacks_list):
-        """Update the fallbacks of IteractionInstance domain object.
+        """Update the fallbacks of InteractionInstance domain object.
 
         Args:
             fallbacks_list. list(dict). List of dicts that represent Fallback
@@ -1904,8 +1993,9 @@ class State(object):
         """Return a State domain object with default value.
 
         Args:
-            default_dest_state_name: dict. The default destination state.
-            is_initial_state: bool. If the State is an initial state.
+            default_dest_state_name: str. The default destination state.
+            is_initial_state: bool. Whether this state represents the initial
+                state of an exploration.
 
         Returns:
             State. The corresponding State domain object.
@@ -1926,7 +2016,7 @@ class Exploration(object):
                  states_schema_version, init_state_name, states_dict,
                  param_specs_dict, param_changes_list, version,
                  created_on=None, last_updated=None):
-        """Initializes a Exploration domain object.
+        """Initializes an Exploration domain object.
 
         Args:
             exploration_id: str. The exploration id.
@@ -1991,8 +2081,7 @@ class Exploration(object):
             cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-<<<<<<< HEAD
-            language_code=feconf.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Returns a Exploration domain object with default values.
             'title', 'category', 'objective' if not provided are taken from
             feconf; 'tags' and 'param_changes_list' are initialized to empty
@@ -2013,9 +2102,6 @@ class Exploration(object):
             Exploration. The Exploration domain object with default
             values.
         """
-=======
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
->>>>>>> upstream/develop
         init_state_dict = State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
@@ -2152,7 +2238,8 @@ class Exploration(object):
         """Validates various properties of the Exploration.
 
         Args:
-            strict: bool. If True more properties are validated.
+            strict: bool. If True, the exploration is assumed to be published,
+                and the validation checks are stricter.
 
         Raises:
             ValidationError: One or more attributes of the Exploration are
@@ -2502,7 +2589,7 @@ class Exploration(object):
         """A list of param changes, represented as JSONifiable Python dicts.
 
         Returns:
-            lsit(dict). List of parameter changes dict.
+            list(dict). List of dicts, each representing a parameter change.
         """
         return [param_change.to_dict() for param_change in self.param_changes]
 
@@ -2514,7 +2601,7 @@ class Exploration(object):
             exploration_id: str. The exploration id.
 
         Returns:
-            bool. True is the corresponding exploration is a demo exploration.
+            bool. Whether the corresponding exploration is a demo exploration.
         """
         return exploration_id in feconf.DEMO_EXPLORATIONS
 
@@ -2609,10 +2696,10 @@ class Exploration(object):
         ]
 
     def update_init_state_name(self, init_state_name):
-        """Update the name for the initial state of the exploration
+        """Update the name for the initial state of the exploration.
 
         Args:
-            init_state_name: str. The name of the initial state to set.
+            init_state_name: str. The new name of the initial state.
         """
         if init_state_name not in self.states:
             raise Exception(
@@ -2629,7 +2716,8 @@ class Exploration(object):
             state_names: list(str). List of state names to add.
 
         Raises:
-            ValueError: A state name is alredy in states dict.
+            ValueError: At least one of the new state names already exists in
+            the states dict.
         """
         for state_name in state_names:
             if state_name in self.states:
@@ -2642,8 +2730,8 @@ class Exploration(object):
         """Renames the given state.
 
         Args:
-            old_state_names: str. The old state name to set.
-            new_state_names: str. The new state name to be set.
+            old_state_names: str. The old name of state to rename.
+            new_state_names: str. The new state name.
 
         Raises:
             ValueError: The old state name does not exist or the new state name
@@ -2725,8 +2813,8 @@ class Exploration(object):
         """Renames the given gadget.
 
         Args:
-            old_gadget_name: str. The old gadget name to set.
-            new_gadget_name: str. The new gadget name to be set.
+            old_gadget_name: str. The old name of gadget to rename.
+            new_gadget_name: str. The new gadget name.
 
         Raises:
             ValueError: The old gadget name does not exist or the new gadget
@@ -2750,7 +2838,7 @@ class Exploration(object):
         """Deletes the given gadget.
 
         Args:
-            gadget_name: str. The gadget name to be deleted.
+            gadget_name: str. The name of the gadget to be deleted.
 
         Raises:
             ValueError: The gadget does not exist.
@@ -2772,7 +2860,7 @@ class Exploration(object):
         """Returns the GadgetInstance with the given name.
 
         Args:
-            gadget_name: str. The gadget name to return.
+            gadget_name: str. The gadget name.
 
         Returns:
             GadgetInstance. The corresponding GadgetInstance domain object.
@@ -2788,7 +2876,7 @@ class Exploration(object):
         raise ValueError('Gadget %s does not exist.' % gadget_name)
 
     def get_all_gadget_names(self):
-        """Convenience method to query against current gadget names.
+        """Gets a list of names of all gadgets used in this exploration.
 
         Returns:
             list(GadgetInstance). The list of all gadget names.
@@ -2825,8 +2913,9 @@ class Exploration(object):
         visible in the renamed state.
 
         Args:
-            old_gadget_name: str. The old gadget name to set.
-            new_gadget_name: str. The new gadget name to be set.
+            old_state_name: str. The name of state to remove.
+            new_state_name: str. The new gadget name to append in
+                'visible_in_states' list.
         """
         affected_gadget_instances = (
             self._get_gadget_instances_visible_in_state(old_state_name))
@@ -2843,7 +2932,7 @@ class Exploration(object):
         visible in the deleted state.
 
         Args:
-            gadget_name: str. The gadget name to delete.
+            state_name: str. The state name.
         """
         affected_gadget_instances = (
             self._get_gadget_instances_visible_in_state(state_name))
@@ -2864,7 +2953,10 @@ class Exploration(object):
         a given state.
 
         Args:
-            state_name: str. The state name where search.
+            state_name: str. The name of state in which search for gadgets.
+
+        Returns:
+            list(GadgetInstance). List of gadgets visibile in a givent state.
         """
         visible_gadget_instances = []
         for gadget_instances in (
@@ -2886,6 +2978,9 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         # ensure widgets are renamed to be interactions
         for _, state_defn in states_dict.iteritems():
@@ -2912,6 +3007,9 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         # The name of the implicit END state before the migration. Needed here
         # to migrate old explorations which expect that implicit END state.
@@ -2981,6 +3079,9 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         # Ensure all states interactions have a triggers list.
         for sdict in states_dict.values():
@@ -3004,6 +3105,9 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -3097,6 +3201,9 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         # Ensure all states interactions have a fallbacks list.
         for state_dict in states_dict.values():
@@ -3118,6 +3225,9 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -3135,6 +3245,9 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -3155,6 +3268,9 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             state_dict['classifier_model_id'] = None
@@ -3169,6 +3285,9 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
@@ -3180,6 +3299,14 @@ class Exploration(object):
     def _convert_states_v9_dict_to_v10_dict(cls, states_dict):
         """Converts from version 9 to 10. Version 10 contains hints
         and solution in each interaction.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+           dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -3204,10 +3331,11 @@ class Exploration(object):
 
         Args:
             versioned_exploration_states: dict. A dict with two keys:
-                -states_schema_version: int. The states schema version for the
+                - states_schema_version: int. The states schema version for the
                     exploration.
-                -states: dict. The dict of states comprising the exploration.
-                    The keys in this dict are state names.
+                - states: dict. The dict of states comprising the exploration.
+                    The keys are state names and the values are dicts used to
+                    initialize a State domain object.
             current_states_schema_version: int. The current states
                 schema version.
         """
@@ -3236,7 +3364,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v2."""
+            following schema version v2.
+        """
         exploration_dict['schema_version'] = 2
         exploration_dict['init_state_name'] = (
             exploration_dict['states'][0]['name'])
@@ -3259,7 +3388,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v3"""
+            following schema version v3.
+        """
         exploration_dict['schema_version'] = 3
 
         exploration_dict['objective'] = ''
@@ -3280,7 +3410,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v4"""
+            following schema version v4.
+        """
         exploration_dict['schema_version'] = 4
 
         for _, state_defn in exploration_dict['states'].iteritems():
@@ -3303,7 +3434,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v5"""
+            following schema version v5.
+        """
         exploration_dict['schema_version'] = 5
 
         # Rename the 'skill_tags' field to 'tags'.
@@ -3330,7 +3462,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v6"""
+            following schema version v6.
+        """
         exploration_dict['schema_version'] = 6
 
         # Ensure this exploration is up-to-date with states schema v3.
@@ -3357,7 +3490,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v7"""
+            following schema version v7.
+        """
         exploration_dict['schema_version'] = 7
 
         # Ensure this exploration is up-to-date with states schema v4.
@@ -3380,7 +3514,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v8"""
+            following schema version v8.
+        """
         exploration_dict['schema_version'] = 8
 
         # Ensure this exploration is up-to-date with states schema v5.
@@ -3403,7 +3538,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v9"""
+            following schema version v9.
+        """
         exploration_dict['schema_version'] = 9
 
         # Ensure this exploration is up-to-date with states schema v6.
@@ -3428,7 +3564,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v10"""
+            following schema version v10.
+        """
 
         exploration_dict['schema_version'] = 10
 
@@ -3469,7 +3606,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v11"""
+            following schema version v11.
+        """
 
         exploration_dict['schema_version'] = 11
 
@@ -3490,7 +3628,8 @@ class Exploration(object):
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v12"""
+            following schema version v12.
+        """
 
         exploration_dict['schema_version'] = 12
 
@@ -3526,8 +3665,9 @@ class Exploration(object):
             category: str. The exploration category.
 
         Returns:
-            str. The YAML representation of the exploration, in the latest
-                schema format.
+            tuple(dict, int). The dict 'exploration_dict' is the representation
+            of the Exploration and the 'initial_schema_version' is the initial
+            schema version provided in 'yaml_content'.
 
         Raises:
             Exception: 'yaml_content' or the exploration schema version is not
@@ -3626,7 +3766,8 @@ class Exploration(object):
             Exploration. The corresponding exploration domain object.
 
         Raises:
-            Exception: Incorrect YAML version.
+            Exception: The initial schema version of exploration is less than
+            or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict = migration_result[0]
@@ -3656,7 +3797,8 @@ class Exploration(object):
             Exploration. The corresponding exploration domain object.
 
         Raises:
-            Exception: Incorrect YAML version.
+            Exception: The initial schema version of exploration is less than
+            or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
             yaml_content, title, category)
@@ -3719,9 +3861,20 @@ class Exploration(object):
 
         Returns:
             dict. A dict mapping some fields of Exploration instance. The
-            fields inserted in the dict (as key) are: init_state_name
-            param_changes, param_specs, skin_customizations, states, title,
-            and language_code.
+            fields inserted in the dict (as key) are:
+                - init_state_name: str. The name for the initial state of the
+                    exploration.
+                - param_change. list(dict). List of param_change dicts that
+                    represent ParamChange domain object.
+                - param_specs: dict. A dict where each key-value pair
+                    represents respectively, a param spec name and a dict used
+                    to initialize a ParamSpec domain object.
+                - skin_customizations: dict. The customization dictionary of
+                    SkinInstance domain object.
+                - states: dict. Keys are states names and values are dict
+                    representation of State domain object.
+                - title: str. The exploration title.
+                - language_code: str. The language code of the exploration.
         """
         return {
             'init_state_name': self.init_state_name,
@@ -3738,7 +3891,7 @@ class Exploration(object):
         }
 
     def get_gadget_types(self):
-        """Get all gadget types used in this exploration.
+        """Gets all gadget types used in this exploration.
 
         Returns:
             set(str). The collection of gadget types.
@@ -3752,7 +3905,7 @@ class Exploration(object):
         return sorted(result)
 
     def get_interaction_ids(self):
-        """Get all interaction ids used in this exploration.
+        """Gets all interaction ids used in this exploration.
 
         Returns:
             list(str). The list of interaction ids.
@@ -3775,36 +3928,38 @@ class ExplorationSummary(object):
         """Initializes a ExplorationSummary domain object.
 
         Args:
-        exploration_id: str. The exploration id.
-        title: str. The exploration title.
-        category: str. The exploration category.
-        objective: str. The exploration objective.
-        language_code: str. The code that represents the exploration language.
-        tags: list(str). List of tags.
-        ratings: dict. Dict whose keys are '1', '2', '3', '4', '5' and whose
-            values are nonnegative integers representing frequency counts. Note
-            that the keys need to be strings in order for this dict to be
-            JSON-serializable.
-        scaled_average_rating: float. The average rating.
-        status: str. The status of the exploration.
-        community_owned: bool. Whether the exploration is community-owned.
-        owner_ids: list(str). List of the user ids who are the owner of
-            this exploration.
-        editor_ids: list(str). List of the user ids of the users who have
-            access to edit this exploration.
-        viewer_ids: lsit(str). List of the user ids of the users who have
-            view this exploration.
-        contributor_ids: list(str). List of the user ids of the user who
-            have contributed to  this exploration.
-        contributors_summary: dict. The summary given by the contributors
-            to the exploration, user id as the key and summary as value.
-        version: int. The version of the exploration.
-        exploration_model_created_on: datetime.datetime. Date and time when
-            the exploration model is created.
-        exploration_model_last_updated: datetime.datetime. Date and time
-            when the exploration model was last updated.
-        first_published_msec: int. Time in milliseconds, when the exploration
-            was first published.
+            exploration_id: str. The exploration id.
+            title: str. The exploration title.
+            category: str. The exploration category.
+            objective: str. The exploration objective.
+            language_code: str. The code that represents the exploration
+                language.
+            tags: list(str). List of tags.
+            ratings: dict. Dict whose keys are '1', '2', '3', '4', '5' and
+                whose values are nonnegative integers representing frequency
+                counts. Note that the keys need to be strings in order for this
+                dict to be JSON-serializable.
+            scaled_average_rating: float. The average rating.
+            status: str. The status of the exploration.
+            community_owned: bool. Whether the exploration is community-owned.
+            owner_ids: list(str). List of the users ids who are the owners of
+                this exploration.
+            editor_ids: list(str). List of the users ids who have access to
+                edit this exploration.
+            viewer_ids: list(str). List of the users ids who have access to
+                view this exploration.
+            contributor_ids: list(str). List of the users ids of the user who
+                have contributed to this exploration.
+            contributors_summary: dict. A summary about contributors of current
+                exploration. The keys are user ids and the values are the
+                number of commits made by that user.
+            version: int. The version of the exploration.
+            exploration_model_created_on: datetime.datetime. Date and time when
+                the exploration model is created.
+            exploration_model_last_updated: datetime.datetime. Date and time
+                when the exploration model was last updated.
+            first_published_msec: int. Time in milliseconds since the Epoch,
+                when the exploration was first published.
         """
         self.id = exploration_id
         self.title = title
@@ -3833,9 +3988,9 @@ class ExplorationSummary(object):
         Returns:
             A metadata dict for the given exploration summary.
             The metadata dict has three keys:
-                'id': the exploration id;
-                'title': the exploration title;
-                'objective': the exploration objective.
+                - 'id': str. The exploration ID.
+                - 'title': str. The exploration title.
+                - 'objective': str. The exploration objective.
         """
         return {
             'id': self.id,
