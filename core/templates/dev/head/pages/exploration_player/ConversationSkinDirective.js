@@ -505,7 +505,7 @@ oppia.directive('conversationSkin', [
             hasInteractedAtLeastOnce = true;
 
             var _oldStateName = playerTranscriptService.getLastCard().stateName;
-            playerTranscriptService.addNewAnswer(answer);
+            playerTranscriptService.addNewInput(answer, false);
 
             var timeAtServerCall = new Date().getTime();
 
@@ -525,12 +525,12 @@ oppia.directive('conversationSkin', [
                 $timeout(function() {
                   $scope.$broadcast('oppiaFeedbackAvailable');
                   var pairs = (
-                    playerTranscriptService.getLastCard().answerFeedbackPairs);
+                    playerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
 
                   if (_oldStateName === newStateName) {
                     // Stay on the same card.
-                    playerTranscriptService.addNewFeedback(feedbackHtml);
+                    playerTranscriptService.addNewResponse(feedbackHtml);
                     if (feedbackHtml &&
                         !ExplorationPlayerStateService.isInteractionInline(
                           $scope.activeCard.stateName)) {
@@ -580,7 +580,7 @@ oppia.directive('conversationSkin', [
                         $scope.upcomingStateName));
 
                     if (feedbackHtml) {
-                      playerTranscriptService.addNewFeedback(feedbackHtml);
+                      playerTranscriptService.addNewResponse(feedbackHtml);
 
                       if (!ExplorationPlayerStateService.isInteractionInline(
                             $scope.activeCard.stateName)) {
@@ -594,7 +594,7 @@ oppia.directive('conversationSkin', [
                       focusService.setFocusIfOnDesktop(_nextFocusLabel);
                       scrollToBottom();
                     } else {
-                      playerTranscriptService.addNewFeedback(feedbackHtml);
+                      playerTranscriptService.addNewResponse(feedbackHtml);
                       $scope.showPendingCard(
                         newStateName,
                         newParams,

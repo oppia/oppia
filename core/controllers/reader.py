@@ -21,6 +21,7 @@ import random
 import jinja2
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -51,33 +52,6 @@ DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
     default_value=(
         'Check out this interactive lesson from Oppia - a free, open-source '
         'learning platform!'))
-
-
-def require_playable(handler):
-    """Decorator that checks if the user can play the given exploration."""
-    def test_can_play(self, exploration_id, **kwargs):
-        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            self.render_template(
-                'pages/error/disabled_exploration.html',
-                iframe_restriction=None)
-            return
-
-        # This check is needed in order to show the correct page when a 404
-        # error is raised. The self.request.get('iframed') part of the check is
-        # needed for backwards compatibility with older versions of the
-        # embedding script.
-        if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
-                self.request.get('iframed')):
-            self.values['iframed'] = True
-
-        # Checks if the user for the current session is logged in.
-        if rights_manager.Actor(self.user_id).can_play(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-            return handler(self, exploration_id, **kwargs)
-        else:
-            raise self.PageNotFoundException
-
-    return test_can_play
 
 
 def _get_exploration_player_data(
@@ -145,7 +119,7 @@ def _get_exploration_player_data(
 class ExplorationPageEmbed(base.BaseHandler):
     """Page describing a single embedded exploration."""
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         version_str = self.request.get('v')
@@ -160,6 +134,13 @@ class ExplorationPageEmbed(base.BaseHandler):
             rights_manager.Actor(self.user_id).can_edit(
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
+        # This check is needed in order to show the correct page when a 404
+        # error is raised. The self.request.get('iframed') part of the check is
+        # needed for backwards compatibility with older versions of the
+        # embedding script.
+        if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
+                self.request.get('iframed')):
+            self.values['iframed'] = True
         try:
             # If the exploration does not exist, a 404 error is raised.
             exploration_data_values = _get_exploration_player_data(
@@ -177,7 +158,7 @@ class ExplorationPageEmbed(base.BaseHandler):
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         version_str = self.request.get('v')
@@ -247,7 +228,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
@@ -290,7 +271,7 @@ class StateHitEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
         new_state_name = self.payload.get('new_state_name')
@@ -322,12 +303,12 @@ class ClassifyHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
         """Handle POST requests.
 
-        Note: unused_exploration_id is needed because @require_playable needs 2
-        arguments.
+        Note: unused_exploration_id is needed because
+            @acl_decorators.can_play_exploration needs 2 arguments.
         """
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
@@ -345,7 +326,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
         state_name = self.payload.get('state_name')
@@ -367,7 +348,7 @@ class ExplorationStartEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
         event_services.StartExplorationEventHandler.record(
@@ -386,7 +367,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
 
@@ -433,7 +414,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
         version = self.payload.get('version')
@@ -497,7 +478,7 @@ class RatingHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         self.values.update({
@@ -531,7 +512,7 @@ class RecommendationsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_playable
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         collection_id = self.request.get('collection_id')

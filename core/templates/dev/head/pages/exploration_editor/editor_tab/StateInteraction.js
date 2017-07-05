@@ -50,12 +50,14 @@ oppia.controller('StateInteraction', [
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
+  'SubtitledHtmlObjectFactory',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
       alertsService, editorContextService, oppiaHtmlEscaper,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService, interactionDetailsCache,
-      oppiaExplorationHtmlFormatterService, UrlInterpolationService) {
+      oppiaExplorationHtmlFormatterService, UrlInterpolationService,
+      SubtitledHtmlObjectFactory) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
     // Declare dummy submitAnswer() and adjustPageHeight() methods for the
@@ -128,16 +130,15 @@ oppia.controller('StateInteraction', [
       // Check if the content is currently empty, as expected.
       var previousContent = explorationStatesService.getStateContentMemento(
         stateName);
-      if (previousContent.length !== 1 || previousContent[0].value !== '' ||
-          previousContent[0].type !== 'text') {
+      if (!previousContent.isEmpty()) {
         return;
       }
 
       // Update the state's content.
-      explorationStatesService.saveStateContent(stateName, [{
-        type: 'text',
-        value: DEFAULT_TERMINAL_STATE_CONTENT
-      }]);
+      explorationStatesService.saveStateContent(
+        stateName,
+        SubtitledHtmlObjectFactory.createDefault(DEFAULT_TERMINAL_STATE_CONTENT)
+      );
 
       // Update the state content editor view.
       $rootScope.$broadcast('refreshStateContent');

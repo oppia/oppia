@@ -56,10 +56,10 @@ describe('Sidebar state name controller', function() {
 
       ess.init({
         'First State': {
-          content: [{
-            type: 'text',
-            value: 'First State Content'
-          }],
+          content: {
+            html: 'First State Content',
+            audio_translations: []
+          },
           interaction: {
             answer_groups: [],
             default_outcome: {
@@ -73,10 +73,10 @@ describe('Sidebar state name controller', function() {
           param_changes: []
         },
         'Second State': {
-          content: [{
-            type: 'text',
-            value: 'Second State Content'
-          }],
+          content: {
+            html: 'Second State Content',
+            audio_translations: []
+          },
           interaction: {
             answer_groups: [],
             default_outcome: {
@@ -90,10 +90,10 @@ describe('Sidebar state name controller', function() {
           param_changes: []
         },
         'Third State': {
-          content: [{
-            type: 'text',
-            value: 'This is some content.'
-          }],
+          content: {
+            html: 'This is some content.',
+            audio_translations: []
+          },
           interaction: {
             answer_groups: [],
             default_outcome: {

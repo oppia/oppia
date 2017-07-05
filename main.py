@@ -442,6 +442,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 
+    get_redirect_route(
+        r'/.well-known/acme-challenge/<challenge>',
+        admin.SslChallengeHandler),
+
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
 ]

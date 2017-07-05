@@ -390,45 +390,42 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                 'exploration_version': 3,
                 'state_name': u'State A',
                 'description': u'Suggestion for state A.',
-                'suggestion_content': {
-                    'type': 'text',
-                    'value': u'new accepted suggestion for state A'},
+                'suggestion_html': 'new accepted suggestion for state A',
             }, csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 1,
                 'state_name': u'State 2',
                 'description': u'A new value.',
-                'suggestion_content': {
-                    'type': 'text', 'value': 'some new value'},
+                'suggestion_html': 'some new value',
             }, csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 2,
                 'state_name': u'State 3',
                 'description': u'Empty suggestion',
-                'suggestion_content': {'type': 'text', 'value': ''},
+                'suggestion_html': '',
             }, csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 2,
                 'state_name': u'State A',
                 'description': u'Just a space.',
-                'suggestion_content': {'type': 'text', 'value': ' '},
+                'suggestion_html': ' ',
             }, csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 1,
                 'state_name': u'State 2',
                 'description': u'Random characters.',
-                'suggestion_content': {'type': 'text', 'value': '#!$%'},
+                'suggestion_html': '#!$%',
             }, csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 2,
                 'state_name': u'State 3',
                 'description': u'Very bizarre characters.',
-                'suggestion_content': {'type': 'text', 'value': u'Ֆݓॵক'},
+                'suggestion_html': u'Ֆݓॵক',
             }, csrf_token)
         self.logout()
 
@@ -543,8 +540,10 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self._accept_suggestion(accepted_suggestion_thread_id, csrf_token)
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
-            updated_exploration.states['State A'].content[0].to_dict(),
-            {'type': 'text', 'value': u'new accepted suggestion for state A'})
+            updated_exploration.states['State A'].content.to_dict(), {
+                'html': u'new accepted suggestion for state A',
+                'audio_translations': [],
+            })
 
         # Reject a suggestion.
         self._reject_suggestion(rejected_suggestion_thread_id, csrf_token)

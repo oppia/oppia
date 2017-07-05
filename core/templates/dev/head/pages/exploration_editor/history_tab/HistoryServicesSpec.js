@@ -81,12 +81,12 @@ describe('Versions tree service', function() {
         cmd: 'edit_state_property',
         state_name: 'D',
         new_value: {
-          type: 'text',
-          value: 'Some text'
+          html: 'Some text',
+          audio_translations: []
         },
         old_value: {
-          type: 'text',
-          value: ''
+          html: '',
+          audio_translations: []
         }
       }],
       version_number: 8
@@ -150,12 +150,12 @@ describe('Versions tree service', function() {
         cmd: 'edit_state_property',
         state_name: 'D',
         new_value: {
-          type: 'text',
-          value: 'Some text'
+          html: 'Some text',
+          audio_translations: []
         },
         old_value: {
-          type: 'text',
-          value: ''
+          html: '',
+          audio_translations: []
         }
       }]);
     });
@@ -203,10 +203,10 @@ describe('Compare versions service', function() {
       var statesData = {};
       for (var stateName in statesDetails) {
         var newStateData = {
-          content: [{
-            type: 'text',
-            value: statesDetails[stateName].contentStr
-          }],
+          content: {
+            html: statesDetails[stateName].contentStr,
+            audio_translations: []
+          },
           interaction: {
             answer_groups: [],
             default_outcome: {
@@ -249,12 +249,12 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'A',
         new_value: {
-          type: 'text',
-          value: 'Some text'
+          html: 'Some text',
+          audio_translations: []
         },
         old_value: {
-          type: 'text',
-          value: ''
+          html: '',
+          audio_translations: []
         }
       }],
       version_number: 2
@@ -295,12 +295,12 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'C',
         new_value: {
-          type: 'text',
-          value: 'More text'
+          html: 'More text',
+          audio_translations: []
         },
         old_value: {
-          type: 'text',
-          value: ''
+          html: '',
+          audio_translations: []
         }
       }],
       version_number: 7
@@ -331,12 +331,12 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'A',
         new_value: {
-          type: 'text',
-          value: ''
+          html: '',
+          audio_translations: []
         },
         old_value: {
-          type: 'text',
-          value: 'Some text'
+          html: 'Some text',
+          audio_translations: []
         }
       }],
       version_number: 11
@@ -758,12 +758,12 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'D',
         new_value: {
-          type: 'text',
-          value: 'Some text'
+          html: 'Some text',
+          audio_translations: []
         },
         old_value: {
-          type: 'text',
-          value: ''
+          html: '',
+          audio_translations: []
         }
       }],
       version_number: 8

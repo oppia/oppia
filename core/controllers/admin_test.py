@@ -14,6 +14,7 @@
 
 """Tests for the admin page."""
 
+from core.controllers import admin
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import stats_domain
@@ -246,3 +247,42 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'Exploration \'exp\' does not have \'state name\' state.')
         self.assertEqual(
             response['code'], 400)
+
+
+class SslChallengeHandlerTests(test_utils.GenericTestBase):
+    """Tests for SSL challenge handler."""
+
+    CHALLENGE = 'hello'
+    RESPONSE = 'goodbye'
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(SslChallengeHandlerTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                admin.SSL_CHALLENGE_RESPONSES.name: [{
+                    'challenge': self.CHALLENGE,
+                    'response': self.RESPONSE,
+                }]
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token)
+        self.logout()
+
+    def test_ssl_challenge_page_functions_correctly(self):
+        response = self.testapp.get(
+            '/.well-known/acme-challenge/%s' % self.CHALLENGE)
+        self.assertEqual(response.body, self.RESPONSE)
+
+    def test_nonexistent_ssl_challenge_page(self):
+        response = self.testapp.get(
+            '/.well-known/acme-challenge/unknown_challenge',
+            expect_errors=True)
+        self.assertEqual(response.status_code, 404)
