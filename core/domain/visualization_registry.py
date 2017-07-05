@@ -53,7 +53,7 @@ class Registry(object):
             feconf.VISUALIZATIONS_DIR, 'visualizations.js'))
         html_templates = utils.get_file_contents(os.path.join(
             feconf.VISUALIZATIONS_DIR, 'visualizations.html'))
-        return '<script>%s</script>\n%s' % (js_directives, html_templates)
+        return '<script defer>%s</script>\n%s' % (js_directives, html_templates)
 
     @classmethod
     def get_visualization_class(cls, visualization_id):

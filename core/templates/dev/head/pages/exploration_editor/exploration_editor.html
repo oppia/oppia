@@ -33,7 +33,7 @@
 
   <!-- Updated previous version to current version of google charts
   https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
-  <script type="text/javascript" async src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript"  src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
     // Since we are using async to load the library wait until entire page is loaded to call google.load().
     // That should allow the initial page load to complete before starting the chart rendering.
@@ -242,7 +242,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StatisticsTab.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/BarChartDirective.js"></script>
+  <script defer src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/BarChartDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/settings_tab/SettingsTab.js"></script>
 
