@@ -166,12 +166,16 @@ oppia.factory('threadDataService', [
         });
       },
       resolveSuggestion: function(
-        threadId, action, commitMsg, onSuccess, onFailure) {
+        threadId, action, commitMsg, audioUpdateRequired, onSuccess,
+        onFailure) {
         var payload = {
           action: action
         };
         if (commitMsg) {
           payload.commit_message = commitMsg;
+        }
+        if (audioUpdateRequired) {
+          payload.audio_update_required = audioUpdateRequired;
         }
         _openThreadsCount -= 1;
         $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(

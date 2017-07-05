@@ -185,7 +185,14 @@ oppia.controller('FeedbackTab', [
             $scope.acceptSuggestion = function() {
               $modalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
-                commitMessage: $scope.commitMessage
+                commitMessage: $scope.commitMessage,
+                // TODO(sll): If audio files exist for the content being
+                // replaced, implement functionality in the modal for the
+                // exploration creator to indicate whether this change
+                // requires the corresponding audio subtitles to be updated.
+                // For now, we default to assuming that the changes are
+                // sufficiently small as to warrant no updates.
+                audioUpdateRequired: false
               });
             };
 
@@ -203,6 +210,7 @@ oppia.controller('FeedbackTab', [
       }).result.then(function(result) {
         threadDataService.resolveSuggestion(
           $scope.activeThread.thread_id, result.action, result.commitMessage,
+          result.audioUpdateRequired,
           function() {
             threadDataService.fetchThreads(function() {
               $scope.setActiveThread($scope.activeThread.thread_id);
@@ -215,6 +223,9 @@ oppia.controller('FeedbackTab', [
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
               state.content.setHtml(suggestion.suggestion_html);
+              if (result.audioUpdateRequired) {
+                state.content.markAudioAsNeedingUpdate();
+              }
               explorationData.data.version += 1;
               explorationStatesService.setState(stateName, state);
               $rootScope.$broadcast('refreshVersionHistory', {
