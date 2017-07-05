@@ -107,7 +107,9 @@ def get_exploration_stats(exploration_id, exploration_version):
 
     Args:
         exploration_id: str. The exploration ID.
-        exploration_version: str. The version of the exploration.
+        exploration_version: str. The value is version of the exploration from
+        ExplorationAnnotationsModel. It can be 'all' or version number as
+        string like '3'.
 
     Returns:
         dict. A dict with state statistics for the given exploration ID.
