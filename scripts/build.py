@@ -33,10 +33,10 @@ FILE_EXTENSIONS_NOT_TO_RENAME = (
     '.html', '.map', '.woff', '.ttf', '.woff2', '.eof', '.ico', '.txt')
 FOLDERS_PROVIDED_TO_FRONTEND = (os.path.join('images', ''),
                                 os.path.join('i18n', ''))
-FILE_ENDINGS_TO_RENAME = ('directive.html',
-                          'modal.html',
-                          'overlay.html',
-                          '.png')
+FILE_ENDINGS_PROVIDED_TO_FRONTEND = ('directive.html',
+                                     'modal.html',
+                                     'overlay.html',
+                                     '.png')
 
 HASH_BLOCK_SIZE = 2**20
 
@@ -119,7 +119,7 @@ def copy_files_source_to_target(source, target, file_hashes):
             target_path = source_path
             relative_filepath = os.path.relpath(source_path, source)
             if (not relative_filepath.endswith(FILE_EXTENSIONS_NOT_TO_RENAME) or
-                    relative_filepath.endswith(FILE_ENDINGS_TO_RENAME)):
+                    relative_filepath.endswith(FILE_ENDINGS_PROVIDED_TO_FRONTEND)):
                 filepath, file_extension = os.path.splitext(source_path)
                 target_path = (filepath + '.' +
                                file_hashes[relative_filepath]+
@@ -180,7 +180,7 @@ def filter_hashes(file_hashes):
         for folder in FOLDERS_PROVIDED_TO_FRONTEND:
             if folder in filepath:
                 filtered_hashes[filepath] = file_hash
-        for ending in FILE_ENDINGS_TO_RENAME:
+        for ending in FILE_ENDINGS_PROVIDED_TO_FRONTEND:
             if filepath.endswith(ending):
                 filtered_hashes[filepath] = file_hash
     return filtered_hashes
