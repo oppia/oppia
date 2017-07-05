@@ -2836,14 +2836,18 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
         self.signup(self.USER_EMAIL, self.USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID1, self.editor_id)
+        self.save_new_valid_exploration(self.EXP_ID2, self.editor_id)
+        self.initial_state_name = exploration.init_state_name
         with self.swap(feedback_models.FeedbackThreadModel,
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
-                self.EXP_ID1, self.user_id, 3, 'state_name', 'description',
-                {'type': 'text', 'value': ''})
+                self.EXP_ID1, self.user_id, 3, self.initial_state_name,
+                'description', 'new text')
             feedback_services.create_suggestion(
-                self.EXP_ID2, self.user_id, 3, 'state_name', 'description',
-                {'type': 'text', 'value': ''})
+                self.EXP_ID2, self.user_id, 3, self.initial_state_name,
+                'description', 'new text')
 
     def test_accept_suggestion_valid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid',
