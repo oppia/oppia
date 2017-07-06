@@ -18,9 +18,9 @@
 
 import datetime
 import imghdr
-import mutagen
 import logging
 import tempfile
+import mutagen
 import cloudstorage as gcs
 
 import jinja2
@@ -955,7 +955,7 @@ class AudioFileHandler(EditorHandler):
                 'No filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
         if (extension not in
-            feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()):
+                feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()):
             raise self.InvalidInputException(
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
@@ -967,14 +967,14 @@ class AudioFileHandler(EditorHandler):
                 audio = mutagen.File(f.name)
             except mutagen.MutagenError:
                 raise self.InvalidInputException('Audio not recognized '
-                'as a %s file' % extension)
+                                                 'as a %s file' % extension)
             f.close()
 
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
                 'Audio must be under %s seconds in length. '
-                'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC, 
-                audio.info.length))
+                'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC,
+                                     audio.info.length))
 
         # Upload to GCS bucket with filepath
         # "/assets/audio/<exploration-id>/filename"
@@ -983,8 +983,8 @@ class AudioFileHandler(EditorHandler):
                             '/' + exploration_id +
                             '/assets/audio' +
                             '/' + filename,
-                    'w',
-                    content_type=audio.mime[0])
+                            'w',
+                            content_type=audio.mime[0])
         gcs_file.write(raw)
         gcs_file.close()
 

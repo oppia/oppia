@@ -224,7 +224,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
     AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
 
     def setUp(self):
-        super(AudioHandlerTest, self).setUp();
+        super(AudioHandlerTest, self).setUp()
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
         rights_manager.release_ownership_of_exploration(
@@ -239,7 +239,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
                   mode='rb') as f:
             raw_audio = f.read()
-        response_dict = self.post_json(
+        self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': self.TEST_AUDIO_FILE},
             csrf_token=csrf_token,
@@ -256,12 +256,13 @@ class AudioHandlerTest(test_utils.GenericTestBase):
 
         filename_without_extension = 'test'
         invalid_extension = 'wav'
-        supplied_filename = ('%s.%s' % (filename_without_extension, invalid_extension))
+        supplied_filename = ('%s.%s'
+                             % (filename_without_extension, invalid_extension))
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
                   mode='rb') as f:
             raw_audio = f.read()
-        response_dict=self.post_json(
+        response_dict = self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': supplied_filename},
             csrf_token=csrf_token,
@@ -274,7 +275,8 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['error'],
             'Invalid filename extension: it should have '
-            'one of the following extensions: %s' % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
+            'one of the following extensions: %s'
+            % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
     def test_upload_empty_audio(self):
         """Test upload of empty audio"""
@@ -312,8 +314,8 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
-        self.assertEqual(response_dict['error'],
-            'Audio not recognized as a mp3 file')
+        self.assertEqual(response_dict['error'], 'Audio not recognized as '
+                         'a mp3 file')
 
     def test_missing_extensions_are_detected(self):
         """Test upload of filenames with no extensions are caught"""
@@ -326,7 +328,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
                   mode='rb') as f:
             raw_audio = f.read()
-        response_dict=self.post_json(
+        response_dict = self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': missing_extension_filename},
             csrf_token=csrf_token,
@@ -336,10 +338,10 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
-        self.assertEqual(response_dict['error'], 
-            'No filename extension: it should have '
-            'one of the following extensions: '
-            '%s' % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
+        self.assertEqual(response_dict['error'],
+                         'No filename extension: it should have '
+                         'one of the following extensions: '
+                         '%s' % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
     def test_exceed_max_length_detected(self):
         """Test that audio file is less than max playback length"""
@@ -349,9 +351,10 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR,
-            self.TEST_AUDIO_FILE_OVER_MAX_LENGTH), mode='rb') as f:
+                               self.TEST_AUDIO_FILE_OVER_MAX_LENGTH),
+                  mode='rb') as f:
             raw_audio = f.read()
-        response_dict=self.post_json(
+        response_dict = self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': 'test.mp3'},
             csrf_token=csrf_token,
@@ -361,31 +364,32 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
-        self.assertIn('Audio must be under %s seconds in length' 
-            % feconf.MAX_AUDIO_FILE_LENGTH_SEC, response_dict['error'])
-    
+        self.assertIn('Audio must be under %s seconds in length'
+                      % feconf.MAX_AUDIO_FILE_LENGTH_SEC,
+                      response_dict['error'])
+
     # The following test should only be used when more than
     # one audio extension has been allowed in feconf.ACCEPTED_AUDIO_EXTENSIONS
     # The flac file filler should be replaced with an accepted format.
-    """
-    def test_non_matching_extensions_are_detected(self):
-        self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
 
-        mismatched_filename = 'test.flac'
-        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
-                  mode='rb') as f:
-            raw_audio = f.read()
-        response_dict=self.post_json(
-            '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
-            {'filename': mismatched_filename},
-            csrf_token=csrf_token,
-            expect_errors=True,
-            expected_status_int=400,
-            upload_files=(('audio', 'unused_filename', raw_audio),)
-        )
-        self.logout()
-        self.assertEqual(response_dict['code'], 400)
-        self.assertEqual(response_dict['error'], 'Audio not recognized as a flac file')
-    """
+    # def test_non_matching_extensions_are_detected(self):
+    #     self.login(self.EDITOR_EMAIL)
+    #     response = self.testapp.get('/create/0')
+    #     csrf_token = self.get_csrf_token_from_response(response)
+
+    #     mismatched_filename = 'test.flac'
+    #     with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
+    #               mode='rb') as f:
+    #         raw_audio = f.read()
+    #     response_dict = self.post_json(
+    #         '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
+    #         {'filename': mismatched_filename},
+    #         csrf_token=csrf_token,
+    #         expect_errors=True,
+    #         expected_status_int=400,
+    #         upload_files=(('audio', 'unused_filename', raw_audio),)
+    #     )
+    #     self.logout()
+    #     self.assertEqual(response_dict['code'], 400)
+    #     self.assertEqual(response_dict['error'], 
+    #                      'Audio not recognized as a flac file')
