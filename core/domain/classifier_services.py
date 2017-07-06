@@ -243,7 +243,6 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
     return classifier_domain.ClassifierTrainingJob(
         classifier_training_job_model.id,
         classifier_training_job_model.algorithm_id,
-        classifier_training_job_model.committer_id,
         classifier_training_job_model.exp_id,
         classifier_training_job_model.exp_version,
         classifier_training_job_model.state_name,
@@ -284,7 +283,6 @@ def _create_classifier_training_job(classifier_training_job):
     """
     job_id = classifier_models.ClassifierTrainingJobModel.create(
         classifier_training_job.algorithm_id,
-        classifier_training_job.committer_id,
         classifier_training_job.exp_id,
         classifier_training_job.exp_version,
         classifier_training_job.training_data,
@@ -308,7 +306,7 @@ def _update_classifier_training_job(classifier_training_job_model, status):
     classifier_training_job_model.put()
 
 
-def save_classifier_training_job(algorithm_id, committer_id, exp_id,
+def save_classifier_training_job(algorithm_id, exp_id,
                                  exp_version, state_name, training_data,
                                  status='NEW', job_id='None'):
     """Checks for the existence of the model.
@@ -319,8 +317,6 @@ def save_classifier_training_job(algorithm_id, committer_id, exp_id,
 
     Args:
         algorithm_id: str. ID of the algorithm used to generate the model.
-        committer_id: str. ID of the user who created the exploration to
-            which the job belongs.
         exp_id: str. ID of the exploration.
         exp_version: int. The exploration version at the time
             this training job was created.
@@ -338,7 +334,7 @@ def save_classifier_training_job(algorithm_id, committer_id, exp_id,
         classifier_models.ClassifierTrainingJobModel.get(job_id, False))
     if classifier_training_job_model is None:
         classifier_training_job = classifier_domain.ClassifierTrainingJob(
-            'job_id_dummy', algorithm_id, committer_id, exp_id, exp_version,
+            'job_id_dummy', algorithm_id, exp_id, exp_version,
             state_name, status, training_data)
         classifier_training_job.validate()
         job_id = _create_classifier_training_job(classifier_training_job)

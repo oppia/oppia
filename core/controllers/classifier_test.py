@@ -59,7 +59,6 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(TrainedClassifierHandlerTest, self).setUp()
 
-        committer_id = 'committer_id1'
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
         self.category = 'Test'
@@ -70,7 +69,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
 
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
-            committer_id, self.yaml_content, self.exp_id,
+            feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
             assets_list)
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
 
@@ -97,7 +96,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             '_c_l': []
         }
         self.job_id = classifier_services.save_classifier_training_job(
-            algorithm_id, committer_id, self.exp_id, self.exploration.version,
+            algorithm_id, self.exp_id, self.exploration.version,
             'Home', training_data)
 
         self.job_result_dict = {
@@ -113,18 +112,14 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         # Normal end-to-end test.
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=False, expected_status_int=200)
-        classifier = classifier_services.get_classifier_by_id(
-            self.job_id)
+        classifier = (
+            classifier_services.get_classifier_from_exploration_attributes(
+                self.exp_id, self.exploration.version, 'Home'))
         self.assertEqual(classifier.id, self.job_id)
         self.assertEqual(classifier.exp_id, self.exp_id)
         self.assertEqual(classifier.state_name, 'Home')
         self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
         self.assertEqual(classifier.classifier_data, self.classifier_data)
-
-        # Test if the State is updated with classifier_model_id
-        state = exp_services.get_exploration_by_id(classifier.exp_id).states[
-            classifier.state_name]
-        self.assertEqual(state.classifier_model_id, self.job_id)
 
     def test_error_on_dev_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.
