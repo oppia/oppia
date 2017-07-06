@@ -162,6 +162,7 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'beautifulsoup4-4.6.0'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
     os.path.join('third_party', 'mutagen-1.38'),
+    os.path.join('third_party', 'gae-cloud-storage-1.9.15.0'),
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)

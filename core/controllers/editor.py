@@ -20,9 +20,9 @@ import datetime
 import imghdr
 import logging
 import tempfile
-import mutagen
-import cloudstorage as gcs
 
+import mutagen
+import cloudstorage
 import jinja2
 
 from constants import constants
@@ -979,12 +979,12 @@ class AudioFileHandler(EditorHandler):
         # Upload to GCS bucket with filepath
         # "/assets/audio/<exploration-id>/filename"
         default_bucket_name = app_identity.get_default_gcs_bucket_name()
-        gcs_file = gcs.open('/' + default_bucket_name +
-                            '/' + exploration_id +
-                            '/assets/audio' +
-                            '/' + filename,
-                            'w',
-                            content_type=audio.mime[0])
+        gcs_file = cloudstorage.open('/' + default_bucket_name +
+                                     '/' + exploration_id +
+                                     '/assets/audio' +
+                                     '/' + filename,
+                                     'w',
+                                     content_type=audio.mime[0])
         gcs_file.write(raw)
         gcs_file.close()
 

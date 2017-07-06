@@ -391,5 +391,5 @@ class AudioHandlerTest(test_utils.GenericTestBase):
     #     )
     #     self.logout()
     #     self.assertEqual(response_dict['code'], 400)
-    #     self.assertEqual(response_dict['error'], 
+    #     self.assertEqual(response_dict['error'],
     #                      'Audio not recognized as a flac file')
