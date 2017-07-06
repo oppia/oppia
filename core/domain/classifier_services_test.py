@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -253,3 +255,62 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.exp_id, exp_id)
         self.assertEqual(classifier_training_job.status, test_status)
+
+    def test_retrieval_of_classifier_from_exploration_attributes(self):
+        """Test the get_classifier_from_exploration_attributes method."""
+
+        exp_id = u'1'
+        state_name = u'टेक्स्ट'
+        classifier_id = 'classifier_id1'
+        classifier_id = classifier_models.ClassifierDataModel.create(
+            classifier_id, exp_id, 1, state_name,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'], [], 1)
+        classifier_models.ClassifierExplorationMappingModel.create(
+            exp_id, 1, state_name, classifier_id)
+        classifier = (
+            classifier_services.get_classifier_from_exploration_attributes(
+                exp_id, 1, state_name))
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.exp_version_when_created, 1)
+        self.assertEqual(classifier.state_name, state_name)
+        self.assertEqual(classifier.id, classifier_id)
+
+    def test_creation_of_classifier_exploration_mapping(self):
+        """Test the create_classifier_exploration_mapping method."""
+
+        exp_id = '1'
+        state_name = u'टेक्स्ट'
+        classifier_id = 'classifier_id1'
+
+        # Check that mapping can't be created since the classifier doesn't
+        # exist.
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class ClassifierDataModel with id %s not found' %(
+                classifier_id))):
+            classifier_services.create_classifier_exploration_mapping(
+                exp_id, 1, state_name, classifier_id)
+
+        # Create classifier
+        classifier_id = classifier_models.ClassifierDataModel.create(
+            classifier_id, exp_id, 1, state_name,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'], [], 1)
+
+        classifier_services.create_classifier_exploration_mapping(
+            exp_id, 1, state_name, classifier_id)
+        classifier_exploration_mapping = (
+            classifier_domain.ClassifierExplorationMapping(
+                exp_id, 1, state_name, classifier_id))
+        self.assertEqual(classifier_exploration_mapping.exp_id, exp_id)
+        self.assertEqual(classifier_exploration_mapping.exp_version, 1)
+        self.assertEqual(classifier_exploration_mapping.state_name, state_name)
+        self.assertEqual(classifier_exploration_mapping.classifier_id,
+                         classifier_id)
+
+        # Check that exception is raised if the mapping already exists.
+        with self.assertRaisesRegexp(Exception, (
+            'The Classifier-Exploration mapping with id %s.%s.%s '
+            'already exists.' % (exp_id, 1, state_name.encode('utf-8')))):
+            classifier_services.create_classifier_exploration_mapping(
+                exp_id, 1, state_name, classifier_id)
