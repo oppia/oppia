@@ -28,7 +28,7 @@ from core.platform import models
 
 EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
-    'thread_id', 'subject', 'last_updated']
+    'thread_id', 'subject', 'last_updated', 'message_count']
 EXPECTED_MESSAGE_KEYS = [
     'author_username', 'created_on', 'exploration_id', 'message_id',
     'text', 'updated_status', 'updated_subject', 'received_via_email']

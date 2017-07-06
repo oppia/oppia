@@ -17,6 +17,7 @@
 """One-off jobs for feedback."""
 
 import ast
+import logging
 
 from core import jobs
 from core.domain import feedback_services
@@ -34,11 +35,25 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        yield (item.thread_id, 1)
+        yield (item.thread_id, item.message_id)
 
     @staticmethod
-    def reduce(key, stringified_message_counter):
-        message_counter = [
-            ast.literal_eval(v) for v in stringified_message_counter]
-        feedback_services.set_message_count_for_thread(
-            key, len(message_counter))
+    def reduce(key, stringified_message_ids):
+        message_ids = [
+            ast.literal_eval(v) for v in stringified_message_ids]
+
+        if max(message_ids) + 1 == len(message_ids):
+            feedback_services.set_message_count_for_thread(
+                key, max(message_ids) + 1)
+        else:
+            logging.error('The number of messages estimated by message ids is' +
+                          'not equal to the actual number of messages.')
+            exploration_and_thread_id = key.split('.')
+            exploration_id = exploration_and_thread_id[0]
+            thread_id = exploration_and_thread_id[1]
+            thread = feedback_services.get_thread(exploration_id, thread_id)
+            yield (key, {
+                'subject': thread.subject,
+                'exploration_id': exploration_id,
+                'thread_id': thread_id
+            })
