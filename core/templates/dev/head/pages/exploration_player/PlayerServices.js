@@ -100,7 +100,7 @@ oppia.factory('oppiaPlayerService', [
     // Evaluate question string.
     var makeQuestion = function(newState, envs) {
       return expressionInterpolationService.processHtml(
-        newState.content[0].value, envs);
+        newState.content.getHtml(), envs);
     };
 
     // This should only be called when 'exploration' is non-null.
@@ -297,23 +297,6 @@ oppia.factory('oppiaPlayerService', [
           // since classificationResult.outcome points
           // at oldState.interaction.default_outcome
           var outcome = angular.copy(classificationResult.outcome);
-
-          // If this is a return to the same state, and the resubmission trigger
-          // kicks in, replace the dest, feedback and param changes with that
-          // of the trigger.
-          if (outcome.dest === playerTranscriptService.getLastStateName()) {
-            for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
-              var fallback = oldState.interaction.fallbacks[i];
-              if (fallback.trigger.type === 'NthResubmission' &&
-                  fallback.trigger.customizationArgs.num_submits.value ===
-                    playerTranscriptService.getNumSubmitsForLastCard()) {
-                outcome.dest = fallback.outcome.dest;
-                outcome.feedback = fallback.outcome.feedback;
-                outcome.paramChanges = fallback.outcome.paramChanges;
-                break;
-              }
-            }
-          }
 
           var newStateName = outcome.dest;
           var newState = exploration.getState(newStateName);

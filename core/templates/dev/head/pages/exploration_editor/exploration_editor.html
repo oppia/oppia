@@ -129,6 +129,7 @@
   <script>
     {{ value_generators_js }}
   </script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
@@ -187,6 +188,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/AnswerGroupEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/CodemirrorMergeviewDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/FallbackEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/ClassifierRulePanelDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeDestinationEditorDirective.js"></script>
@@ -223,6 +225,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SidebarStateName.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateFallbacks.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateHints.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateGraphVisualizationDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateInteraction.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateParameterChanges.js"></script>
@@ -253,9 +256,11 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/HintObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AudioTranslationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
@@ -266,10 +271,12 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayerStateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerConstants.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/InputResponsePairDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintManagerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintButtonDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>

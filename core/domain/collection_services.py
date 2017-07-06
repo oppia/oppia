@@ -226,21 +226,6 @@ def get_collection_by_id(collection_id, strict=True, version=None):
             return None
 
 
-def does_collection_exists(collection_id):
-    """Returns true if the exploration exists.
-
-    Args:
-        exploration_id: str. The id of the exploration to be checked.
-
-    Returns:
-        bool. The value is true if the exploration exists.
-    """
-    collection_model = collection_models.CollectionModel.get(
-        collection_id, strict=False)
-
-    return True if collection_model else False
-
-
 def get_collection_summary_by_id(collection_id):
     """Returns a domain object representing a collection summary.
 
@@ -390,6 +375,32 @@ def get_completed_exploration_ids(user_id, collection_id):
     progress_model = user_models.CollectionProgressModel.get(
         user_id, collection_id)
     return progress_model.completed_explorations if progress_model else []
+
+
+def get_explorations_completed_in_collections(user_id, collection_ids):
+    """Returns the ids of the explorations completed in each of the collections.
+
+    Args:
+        user_id: str. ID of the given user.
+        collection_ids: list(str). IDs of the collections.
+
+    Returns:
+        list(list(str)). List of the exploration ids completed in each
+            collection.
+    """
+    progress_models = user_models.CollectionProgressModel.get_multi(
+        user_id, collection_ids)
+
+    exploration_ids_completed_in_collections = []
+
+    for progress_model in progress_models:
+        if progress_model:
+            exploration_ids_completed_in_collections.append(
+                progress_model.completed_explorations)
+        else:
+            exploration_ids_completed_in_collections.append([])
+
+    return exploration_ids_completed_in_collections
 
 
 def get_valid_completed_exploration_ids(user_id, collection):
