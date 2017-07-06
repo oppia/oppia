@@ -38,11 +38,11 @@ def get_visualizations_info(exploration_id, state_name):
 
     Returns:
         list(dict). Each item in the list is a dict with keys representing
-        'id': str. visualization ID,
-        'data':  list. list of calculation IDs,
-        'options': dict. visualization options.
+        - 'id': str. The visualization ID.
+        - 'data': list(dict). A list of calculation IDs.
+        - 'options': dict. The visualization options.
 
-        An example of returning list(dict) may be look like
+        An example of the returned value may be:
         [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
         'id': 'BarChart',
         'data': [{u'frequency': 1, u'answer': 0}]}]
