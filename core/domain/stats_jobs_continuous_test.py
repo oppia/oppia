@@ -703,10 +703,10 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': init_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'new_value': [{
-                    'type': 'text',
-                    'value': 'New content description'
-                }]
+                'new_value': {
+                    'html': 'New content description',
+                    'audio_translations': [],
+                }
             }], 'Change content description')
 
             # Submit some more answers to the latest exploration version.

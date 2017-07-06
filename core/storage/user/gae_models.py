@@ -33,8 +33,12 @@ class UserSettingsModel(base_models.BaseModel):
     """
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
-    # User role. Required for authorization.
-    role = ndb.StringProperty(required=True, indexed=True)
+    # User role. Required for authorization. User gets a default role of
+    # exploration editor.
+    # TODO (1995YogeshSharma): Remove the default value once the one-off
+    # migration (to give role to all users) is run.
+    role = ndb.StringProperty(
+        required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
     # Identifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.

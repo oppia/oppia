@@ -30,12 +30,34 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import rte_component_registry
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
+
+
+SSL_CHALLENGE_RESPONSES = config_domain.ConfigProperty(
+    'ssl_challenge_responses', {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'challenge',
+                'schema': {
+                    'type': 'unicode'
+                }
+            }, {
+                'name': 'response',
+                'schema': {
+                    'type': 'unicode'
+                }
+            }]
+        },
+    },
+    'Challenge-response pairs for SSL validation.', [])
 
 
 def require_super_admin(handler):
@@ -335,3 +357,58 @@ class AdminTopicsCsvDownloadHandler(base.BaseHandler):
             'attachment; filename=topic_similarities.csv')
         self.response.write(
             recommendations_services.get_topic_similarities_as_csv())
+
+
+class DataExtractionQueryHandler(base.BaseHandler):
+    """Handler for data extraction query."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
+    @require_super_admin
+    def get(self):
+        exp_id = self.request.get('exp_id')
+        exp_version = self.request.get('exp_version')
+        state_name = self.request.get('state_name')
+        num_answers = int(self.request.get('num_answers'))
+
+        exploration = exp_services.get_exploration_by_id(
+            exp_id, strict=False, version=exp_version)
+
+        if exploration is None:
+            raise self.InvalidInputException(
+                'No exploration with ID \'%s\' exists.' % exp_id)
+
+        if state_name not in exploration.states:
+            raise self.InvalidInputException(
+                'Exploration \'%s\' does not have \'%s\' state.'
+                % (exp_id, state_name))
+
+        state_answers = stats_services.get_state_answers(
+            exp_id, exp_version, state_name)
+        extracted_answers = state_answers.get_submitted_answer_dict_list()
+
+        if num_answers > 0:
+            extracted_answers = extracted_answers[:num_answers]
+
+        response = {
+            'data': extracted_answers
+        }
+        self.render_json(response)
+
+
+class SslChallengeHandler(base.BaseHandler):
+    """Plaintext page for responding to LetsEncrypt SSL challenges."""
+
+    def get(self, challenge):
+        """Handles GET requests."""
+        challenge_responses = SSL_CHALLENGE_RESPONSES.value
+        response = None
+        for challenge_response_pair in challenge_responses:
+            if challenge_response_pair['challenge'] == challenge:
+                response = challenge_response_pair['response']
+
+        if response is None:
+            raise self.PageNotFoundException()
+
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write(response)

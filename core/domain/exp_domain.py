@@ -391,72 +391,190 @@ class ExplorationCommitLogEntry(object):
         }
 
 
-class Content(object):
-    """Value object representing non-interactive content."""
+class AudioTranslation(object):
+    """Value object representing an audio translation."""
 
     def to_dict(self):
-        """Returns a dict representing this Content domain object.
+        """Returns a dict representing this AudioTranslation domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Content instance.
+            dict. A dict, mapping all fields of AudioTranslation instance.
         """
-        return {'type': self.type, 'value': self.value}
+        return {
+            'language_code': self.language_code,
+            'filename': self.filename,
+            'file_size_bytes': self.file_size_bytes,
+            'needs_update': self.needs_update,
+        }
 
     @classmethod
-    def from_dict(cls, content_dict):
-        """Return a Content domain object from a dict.
+    def from_dict(cls, audio_translation_dict):
+        """Return a AudioTranslation domain object from a dict.
 
         Args:
-            content_dict: dict. The dict representation of Content object.
+            audio_translation_dict: dict. The dict representation of
+                AudioTranslation object.
 
         Returns:
-            Content. The corresponding Content domain object.
+            AudioTranslation. The corresponding AudioTranslation domain object.
         """
-        return cls(content_dict['type'], content_dict['value'])
+        return cls(
+            audio_translation_dict['language_code'],
+            audio_translation_dict['filename'],
+            audio_translation_dict['file_size_bytes'],
+            audio_translation_dict['needs_update'])
 
-    def __init__(self, content_type, value=''):
-        """Initializes a Content domain object.
+    def __init__(self, language_code, filename, file_size_bytes, needs_update):
+        """Initializes a AudioTranslation domain object.
 
         Args:
-            content_type: str. The content type. At the moment, this is always
-                'text'.
-            value: str. The content string.
+            language_code: str. The language code of the audio.
+            filename: str. The corresponding audio file path.
+            file_size_bytes: int. The file size, in bytes. Used to display
+                potential bandwidth usage to the learner before they download
+                the file.
+            needs_update: bool. Whether audio is marked for needing review.
         """
-        self.type = content_type
-        self.value = html_cleaner.clean(value)
-        self.validate()
+        # str. A language code, such as ‘en’ or ‘hi’. A hybrid language will be
+        # represented for example as ‘hi-en’ for Hinglish.
+        self.language_code = language_code
+        # str. The corresponding audio file path, e.g.
+        # "content-en-2-h7sjp8s.mp3".
+        self.filename = filename
+        # int. The file size, in bytes. Used to display potential bandwidth
+        # usage to the learner before they download the file.
+        self.file_size_bytes = file_size_bytes
+        # bool. Whether audio is marked for needing review.
+        self.needs_update = needs_update
 
     def validate(self):
         """Validates properties of the Content.
 
         Raises:
-            ValidationError: One or more attributes of the Content are invalid.
+            ValidationError: One or more attributes of the AudioTranslation are
+            invalid.
+        """
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received: %s' %
+                self.language_code)
+        allowed_audio_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
+        if self.language_code not in allowed_audio_language_codes:
+            raise utils.ValidationError(
+                'Unrecognized language code: %s' % self.language_code)
+
+        if not isinstance(self.filename, basestring):
+            raise utils.ValidationError(
+                'Expected audio filename to be a string, received %s' %
+                self.filename)
+        dot_index = self.filename.rfind('.')
+        if dot_index == -1 or dot_index == 0:
+            raise utils.ValidationError(
+                'Invalid audio filename: %s' % self.filename)
+        extension = self.filename[dot_index + 1:]
+        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
+            raise utils.ValidationError(
+                'Invalid audio filename: it should have one of '
+                'the following extensions: %s. Received: %s',
+                (feconf.ACCEPTED_AUDIO_EXTENSIONS, self.filename))
+
+        if not isinstance(self.file_size_bytes, int):
+            raise utils.ValidationError(
+                'Expected file size to be an int, received %s' %
+                self.file_size_bytes)
+        if self.file_size_bytes <= 0:
+            raise utils.ValidationError(
+                'Invalid file size: %s' % self.file_size_bytes)
+
+        if not isinstance(self.needs_update, bool):
+            raise utils.ValidationError(
+                'Expected needs_update to be a bool, received %s' %
+                self.needs_update)
+
+
+class SubtitledHtml(object):
+    """Value object representing subtitled HTML."""
+
+    def to_dict(self):
+        """Returns a dict representing this SubtitledHtml domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of SubtitledHtml instance.
+        """
+        return {
+            'html': self.html,
+            'audio_translations': [
+                audio_translation.to_dict()
+                for audio_translation in self.audio_translations]
+        }
+
+    @classmethod
+    def from_dict(cls, subtitled_html_dict):
+        """Return a SubtitledHtml domain object from a dict.
+
+        Args:
+            subtitled_html_dict: dict. The dict representation of SubtitledHtml
+                object.
+
+        Returns:
+            SubtitledHtml. The corresponding SubtitledHtml domain object.
+        """
+        return cls(subtitled_html_dict['html'], [
+            AudioTranslation.from_dict(audio_translation_dict)
+            for audio_translation_dict in
+            subtitled_html_dict['audio_translations']])
+
+    def __init__(self, html, audio_translations):
+        """Initializes a SubtitledHtml domain object.
+
+        Args:
+            html: str. A piece of user submitted HTML. This is cleaned in such
+                a way as to contain a restricted set of HTML tags.
+            audio_translations: list(AudioTranslation). List of
+                AudioTranslation domain object.
+        """
+        self.html = html_cleaner.clean(html)
+        self.audio_translations = audio_translations
+        self.validate()
+
+    def validate(self):
+        """Validates properties of the SubtitledHtml.
+
+        Raises:
+            ValidationError: One or more attributes of the SubtitledHtml are
+            invalid.
         """
         # TODO(sll): Add HTML sanitization checking.
         # TODO(sll): Validate customization args for rich-text components.
-        if self.type != 'text':
-            raise utils.ValidationError('Invalid content type: %s' % self.type)
-        if not isinstance(self.value, basestring):
+        if not isinstance(self.html, basestring):
             raise utils.ValidationError(
-                'Invalid content value: %s' % self.value)
+                'Invalid content HTML: %s' % self.html)
+
+        if not isinstance(self.audio_translations, list):
+            raise utils.ValidationError(
+                'Expected audio_translations to be a list, received %s'
+                % self.audio_translations)
+        for audio_translation in self.audio_translations:
+            audio_translation.validate()
 
     def to_html(self, params):
-        """Exports this content object to an HTML string.
+        """Exports this SubtitledHTML object to an HTML string. The HTML is
+        parameterized using the parameters in `params`.
 
         Args:
             params: dict. The keys are the parameters names and the values are
-                the values of parameters. The parameters are parsed with the
-                value of Content.
+                the values of parameters.
 
         Raises:
             Exception: 'params' is not a dict.
         """
         if not isinstance(params, dict):
             raise Exception(
-                'Expected context params for parsing content to be a dict, '
-                'received %s' % params)
+                'Expected context params for parsing subtitled HTML to be a '
+                'dict, received %s' % params)
 
-        return html_cleaner.clean(jinja_utils.parse_string(self.value, params))
+        return html_cleaner.clean(jinja_utils.parse_string(self.html, params))
 
 
 class RuleSpec(object):
@@ -1686,7 +1804,7 @@ class State(object):
                 associated with this state, if applicable.
         """
         # The content displayed to the reader in this state.
-        self.content = [Content(item.type, item.value) for item in content]
+        self.content = content
         # Parameter changes associated with this state.
         self.param_changes = [param_domain.ParamChange(
             param_change.name, param_change.generator.id,
@@ -1713,15 +1831,7 @@ class State(object):
         Raises:
             ValidationError: One or more attributes of the State are invalid.
         """
-        if not isinstance(self.content, list):
-            raise utils.ValidationError(
-                'Expected state content to be a list, received %s'
-                % self.content)
-        if len(self.content) != 1:
-            raise utils.ValidationError(
-                'The state content list must have exactly one element. '
-                'Received %s' % self.content)
-        self.content[0].validate()
+        self.content.validate()
 
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
@@ -1761,15 +1871,15 @@ class State(object):
             return True
         return False
 
-    def update_content(self, content_list):
+    def update_content(self, content_dict):
         """Update the list of Content of this state.
 
         Args:
-            content_list. list(Content). List of contents. The content
-                attribute is set as the first element of content_list.
+            content_dict. dict. The dict representation of SubtitledHtml
+                object.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
-        self.content = [Content.from_dict(content_list[0])]
+        self.content = SubtitledHtml.from_dict(content_dict)
 
     def update_param_changes(self, param_change_dicts):
         """Update the param_changes dict attribute.
@@ -1930,6 +2040,15 @@ class State(object):
 
 
     def update_interaction_hints(self, hints_list):
+        """Update the list of hints.
+
+        Args:
+            hint_list: list(dict). A list of dict; each dict is representation
+                of Hint object.
+
+        Raises:
+            Exception: 'hint_list' is not a list.
+        """
         if not isinstance(hints_list, list):
             raise Exception(
                 'Expected hints_list to be a list, received %s'
@@ -1939,6 +2058,14 @@ class State(object):
             for hint_dict in hints_list]
 
     def update_interaction_solution(self, solution_dict):
+        """Update the solution of interaction.
+
+        Args:
+            solution_dict: dict. The dict representation of Solution object.
+
+        Raises:
+            Exception: 'hint_list' is not a list.
+        """
         if not isinstance(solution_dict, dict):
             raise Exception(
                 'Expected solution to be a dict, received %s'
@@ -1947,9 +2074,24 @@ class State(object):
             self.interaction.id, solution_dict)
 
     def add_hint(self, hint_text):
+        """Add a new hint in the list of hints.
+
+        Args:
+            hint_text: str. The hint text.
+        """
         self.interaction.hints.append(Hint(hint_text))
 
     def delete_hint(self, index):
+        """Delete a hint from the list of hints.
+
+        Args:
+            index: int. The position of hint in the list of hints.
+
+        Raises:
+            IndexError: Index is less than 0
+            IndexError: Index is greater than or equal than the length of hints
+                list.
+        """
         if index < 0 or index >= len(self.interaction.hints):
             raise IndexError('Hint index out of range')
         del self.interaction.hints[index]
@@ -1961,7 +2103,7 @@ class State(object):
             dict. A dict mapping all fields of State instance.
         """
         return {
-            'content': [item.to_dict() for item in self.content],
+            'content': self.content.to_dict(),
             'param_changes': [param_change.to_dict()
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
@@ -1979,8 +2121,7 @@ class State(object):
             State. The corresponding State domain object.
         """
         return cls(
-            [Content.from_dict(item)
-             for item in state_dict['content']],
+            SubtitledHtml.from_dict(state_dict['content']),
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
@@ -2000,10 +2141,11 @@ class State(object):
         Returns:
             State. The corresponding State domain object.
         """
-        text_str = (
+        content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
-            [Content('text', text_str)], [],
+            SubtitledHtml(content_html, []),
+            [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name))
 
@@ -2161,10 +2303,13 @@ class Exploration(object):
         for (state_name, sdict) in exploration_dict['states'].iteritems():
             state = exploration.states[state_name]
 
-            state.content = [
-                Content(item['type'], html_cleaner.clean(item['value']))
-                for item in sdict['content']
-            ]
+            state.content = SubtitledHtml(
+                html_cleaner.clean(sdict['content']['html']),
+                [
+                    AudioTranslation.from_dict(audio_translation)
+                    for audio_translation in
+                    sdict['content']['audio_translations']
+                ])
 
             state.param_changes = [param_domain.ParamChange(
                 pc['name'], pc['generator_id'], pc['customization_args']
@@ -3321,6 +3466,19 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v10_dict_to_v11_dict(cls, states_dict):
+        """Converts from version 10 to 11. Version 11 refactors the content to
+        be an HTML string with audio translations.
+        """
+        for state_dict in states_dict.values():
+            content_html = state_dict['content'][0]['value']
+            state_dict['content'] = {
+                'html': content_html,
+                'audio_translations': []
+            }
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3351,7 +3509,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 13
+    CURRENT_EXP_SCHEMA_VERSION = 14
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3654,6 +3812,19 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v13_dict_to_v14_dict(cls, exploration_dict):
+        """Converts a v13 exploration dict into a v14 exploration dict."""
+
+        exploration_dict['schema_version'] = 14
+
+        exploration_dict['states'] = cls._convert_states_v10_dict_to_v11_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 11
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3750,6 +3921,10 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 13
 
+        if exploration_schema_version == 13:
+            exploration_dict = cls._convert_v13_dict_to_v14_dict(
+                exploration_dict)
+            exploration_schema_version = 14
 
         return (exploration_dict, initial_schema_version)
 

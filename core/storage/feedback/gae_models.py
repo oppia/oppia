@@ -390,41 +390,30 @@ class SuggestionModel(base_models.BaseModel):
     # Learner-provided description of suggestion.
     description = ndb.TextProperty(required=True, indexed=False)
     # The state's content after the suggested edits.
-    # Contains keys 'type' (always 'text') and 'value' (the actual content).
+    # For legacy reasons, contains keys 'type' (always 'text') and 'value' (the
+    # HTML string representing the actual content).
     state_content = ndb.JsonProperty(required=True, indexed=False)
 
     @classmethod
-    def create(cls, exploration_id, thread_id, author_id, exploration_version,
-               state_name, description, state_content):
-        """Creates a new SuggestionModel entry.
+    def _convert_suggestion_html_to_legacy_state_content(cls, suggestion_html):
+        """Converts a suggestion HTML string to a legacy state content object.
+
+        The state content object is a dict containing two keys, "type" and
+        "value". For historical reasons, the value of "type" is always "text"
+        while the value of "value" is the actual suggestion made by the learner
+        in the form of html content.
 
         Args:
-            exploration_id: str. ID of the corresponding exploration.
-            thread_id: str. ID of the corresponding thread.
-            author_id: str. ID of the user who submitted the suggestion.
-            state_name: str. ID of the state the suggestion is for.
-            description: str. Learner-provided description of suggestion.
-            state_content: dict. Contains two keys, "type" and "value". For
-                historical reasons, the value of "type" is always "text"
-                while the value of "value" is the actual suggestion made
-                by learner in the form of html content.
-            exploration_version: int. exploration version for which the
-                suggestion was made.
+            suggestion_html: str. The HTML representing the suggestion.
 
-        Raises:
-            Exception: There is already a feedback thread with the same
-                exploration_id and thread_id.
+        Returns:
+            dict. The legacy content object that corresponds to the given
+            suggestion HTML.
         """
-        instance_id = cls._get_instance_id(exploration_id, thread_id)
-        if cls.get_by_id(instance_id):
-            raise Exception('There is already a feedback thread with the given '
-                            'thread id: %s' % instance_id)
-        cls(id=instance_id, author_id=author_id,
-            exploration_id=exploration_id,
-            exploration_version=exploration_version,
-            state_name=state_name,
-            description=description,
-            state_content=state_content).put()
+        return {
+            'type': 'text',
+            'value': suggestion_html,
+        }
 
     @classmethod
     def _get_instance_id(cls, exploration_id, thread_id):
@@ -443,6 +432,46 @@ class SuggestionModel(base_models.BaseModel):
         return '.'.join([exploration_id, thread_id])
 
     @classmethod
+    def create(cls, exploration_id, thread_id, author_id, exploration_version,
+               state_name, description, suggestion_html):
+        """Creates a new SuggestionModel entry.
+
+        Args:
+            exploration_id: str. ID of the corresponding exploration.
+            thread_id: str. ID of the corresponding thread.
+            author_id: str. ID of the user who submitted the suggestion.
+            exploration_version: int. exploration version for which the
+                suggestion was made.
+            state_name: str. ID of the state the suggestion is for.
+            description: str. Learner-provided description of suggestion.
+            suggestion_html: str. The content of the suggestion.
+
+        Raises:
+            Exception: There is already a feedback thread with the same
+                exploration_id and thread_id.
+        """
+        instance_id = cls._get_instance_id(exploration_id, thread_id)
+        if cls.get_by_id(instance_id):
+            raise Exception('There is already a feedback thread with the given '
+                            'thread id: %s' % instance_id)
+        state_content = cls._convert_suggestion_html_to_legacy_state_content(
+            suggestion_html)
+        cls(id=instance_id, author_id=author_id,
+            exploration_id=exploration_id,
+            exploration_version=exploration_version,
+            state_name=state_name,
+            description=description,
+            state_content=state_content).put()
+
+    def get_suggestion_html(self):
+        """Retrieves the suggestion HTML of this instance as a string.
+
+        Returns:
+            str. The suggested content HTML string.
+        """
+        return self.state_content['value']
+
+    @classmethod
     def get_by_exploration_and_thread_id(cls, exploration_id, thread_id):
         """Gets a suggestion by the corresponding exploration and thread IDs.
 
@@ -456,7 +485,6 @@ class SuggestionModel(base_models.BaseModel):
                 exploration and thread IDs, or None if no such SuggestionModel
                 exists.
         """
-
         return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))
 
 

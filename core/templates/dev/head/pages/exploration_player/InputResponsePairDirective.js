@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for an answer/feedback pair in the learner view.
+ * @fileoverview Directive for an input/response pair in the learner view.
  */
 
-oppia.directive('answerFeedbackPair', [
+oppia.directive('inputResponsePair', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -27,7 +27,7 @@ oppia.directive('answerFeedbackPair', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
-        'answer_feedback_pair_directive.html'),
+        'input_response_pair_directive.html'),
       controller: [
         '$scope', 'oppiaPlayerService', 'playerTranscriptService',
         'oppiaExplorationHtmlFormatterService', 'INTERACTION_SPECS',
@@ -46,7 +46,7 @@ oppia.directive('answerFeedbackPair', [
               playerPositionService.getCurrentStateName());
             if ($scope.data) {
               return oppiaExplorationHtmlFormatterService.getAnswerHtml(
-                $scope.data.learnerAnswer, interaction.id,
+                $scope.data.learnerInput, interaction.id,
                 interaction.customizationArgs);
             }
           };
@@ -61,7 +61,7 @@ oppia.directive('answerFeedbackPair', [
                 INTERACTION_SPECS[interaction.id].needs_summary) {
               shortAnswerHtml = (
                 oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-                  $scope.data.learnerAnswer, interaction.id,
+                  $scope.data.learnerInput, interaction.id,
                   interaction.customizationArgs));
             }
             return shortAnswerHtml;

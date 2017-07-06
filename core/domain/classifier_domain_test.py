@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -269,3 +271,59 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected training_data to be a list')):
             training_job.validate()
+
+
+class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
+    """Tests for the ClassifierExplorationMapping domain."""
+
+    def _get_mapping_from_dict(self, mapping_dict):
+        mapping = classifier_domain.ClassifierExplorationMapping(
+            mapping_dict['exp_id'],
+            mapping_dict['exp_version'],
+            mapping_dict['state_name'],
+            mapping_dict['classifier_id'])
+
+        return mapping
+
+    def test_to_dict(self):
+        expected_mapping_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 2,
+            'state_name': u'網站有中',
+            'classifier_id': 'classifier_id1'
+        }
+        observed_mapping = self._get_mapping_from_dict(
+            expected_mapping_dict)
+        self.assertDictEqual(expected_mapping_dict,
+                             observed_mapping.to_dict())
+
+    def test_validation(self):
+        """Tests to verify validate method of ClassifierExplorationMapping
+        domain."""
+
+        # Verify no errors are raised for correct data.
+        mapping_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 2,
+            'state_name': u'網站有中',
+            'classifier_id': 'classifier_id1'
+        }
+        mapping = self._get_mapping_from_dict(mapping_dict)
+        mapping.validate()
+
+        # Verify validation error is raised when int is provided for exp_id
+        # instead of string.
+        mapping_dict['exp_id'] = 1
+        mapping = self._get_mapping_from_dict(mapping_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_id to be a string')):
+            mapping.validate()
+
+        # Verify validation error is raised when string is provided for
+        # exp_version instead of int.
+        mapping_dict['exp_id'] = 'exp_id1'
+        mapping_dict['exp_version'] = '1'
+        mapping = self._get_mapping_from_dict(mapping_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_version to be an int')):
+            mapping.validate()

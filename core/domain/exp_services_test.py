@@ -580,8 +580,8 @@ states:
   %s:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -602,8 +602,8 @@ states:
   New state:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -647,8 +647,8 @@ states:
   %s:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -669,8 +669,8 @@ states:
   Renamed state:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -783,8 +783,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     contents."""
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: []
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -808,8 +808,8 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'New state': ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: []
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -834,8 +834,8 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: []
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1394,25 +1394,24 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test updating of content."""
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'content', [{
-                    'type': 'text',
-                    'value': '<b>Test content</b>',
-                }]),
+                self.init_state_name, 'content', {
+                    'html': '<b>Test content</b>',
+                    'audio_translations': [],
+                }),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exploration.init_state.content[0].type, 'text')
         self.assertEqual(
-            exploration.init_state.content[0].value, '<b>Test content</b>')
+            exploration.init_state.content.html, '<b>Test content</b>')
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""
-        with self.assertRaisesRegexp(KeyError, 'type'):
+        with self.assertRaisesRegexp(KeyError, 'audio_translations'):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, _get_change_list(
-                    self.init_state_name, 'content', [{
-                        'value': '<b>Test content</b>',
-                    }]),
+                    self.init_state_name, 'content', {
+                        'html': '<b>Test content</b>',
+                    }),
                 '')
 
 
@@ -2554,8 +2553,8 @@ states:
   END:
     classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: []
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2571,8 +2570,8 @@ states:
   %s:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: []
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
