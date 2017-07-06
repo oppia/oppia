@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+    # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -81,6 +81,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'requests-2.10.0'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
     os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.6.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.38'),
 ]
 
 # In the GAE production environment, numpy is automatically provided, and

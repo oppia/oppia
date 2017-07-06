@@ -70,6 +70,14 @@
         "tarRootDirPrefix": "beautifulsoup4-",
         "rootDirPrefix": "beautifulsoup4-",
         "targetDirPrefix": "beautifulsoup4-"
+      },
+      "mutagen": {
+        "version": "1.38",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/57/ec/d7534cdb2766f1fee534a3aabdbdfbf05d6cf77cde617d77b526336a1a72/mutagen-1.38.tar.gz#md5=23990f70ae678c7b8df3fd59e2adbefa5fe392c36da8c71d2254b21c6cd78766",
+        "tarRootDirPrefix": "mutagen-",
+        "rootDirPrefix": "mutagen-",
+        "targetDirPrefix": "mutagen-"
       }
     },
     "frontend": {
