@@ -211,6 +211,17 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot reload a collection in production.')
 
     def _generate_dummy_exploration(self, dummy_exp_count, dummy_exp_publish):
+        """
+        Generates and Publishes given number of dummy explorations.
+
+        Args:
+            dummy_exp_count: int. Count of dummy explorations to be generated.
+            dummy_exp_publish: int. Count of explorations to be published.
+
+        Raises:
+            Exception: Environment is not DEVMODE.
+        """
+
         if feconf.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations' %
@@ -220,7 +231,7 @@ class AdminHandler(base.BaseHandler):
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
             dummy_exp_list = []
-            for _ in range(int(dummy_exp_count)):
+            for _ in range(dummy_exp_count):
                 title = random.choice(possible_titles)
                 category = random.choice(feconf.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_services.get_new_exploration_id()
@@ -229,7 +240,7 @@ class AdminHandler(base.BaseHandler):
                     objective='Dummy Objective')
                 exp_services.save_new_exploration(self.user_id, exploration)
                 dummy_exp_list.append(new_exploration_id)
-                if len(dummy_exp_list) <= int(dummy_exp_publish):
+                if _ <= (dummy_exp_publish - 1):
                     rights_manager.publish_exploration(
                         self.user_id, new_exploration_id)
             exp_services.index_explorations_given_ids(dummy_exp_list)

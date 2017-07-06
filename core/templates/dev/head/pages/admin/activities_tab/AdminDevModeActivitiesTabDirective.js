@@ -107,11 +107,19 @@ oppia.directive('adminDevModeActivitiesTab', [
         $scope.generateDummyExplorations = function() {
           // Generate dummy explorations with random title.
           AdminTaskManagerService.startTask();
+          var DummyExpCount = $scope.DummyExplorationCount,
+            DummyExpPublish = $scope.DummyExplorationPublishCount;
+          if (DummyExpPublish > DummyExpCount) {
+            $scope.setStatusMessage(
+            'Publish exploration count should be less than generate count');
+            AdminTaskManagerService.finishTask();
+            return;
+          }
           $scope.setStatusMessage('Processing...');
           $http.post(ADMIN_HANDLER_URL, {
             action: 'generate_dummy_exploration',
-            dummy_exp_count: $scope.DummyExplorationCount,
-            dummy_exp_publish: $scope.DummyExplorationPublishCount
+            dummy_exp_count: DummyExpCount,
+            dummy_exp_publish: DummyExpPublish
           }).then(function() {
             $scope.setStatusMessage(
               'Dummy explorations generated successfully.');
