@@ -183,8 +183,7 @@ oppia.controller('StateInteraction', [
 
         $modal.open({
           templateUrl: 'modals/customizeInteraction',
-          // Clicking outside this modal should not dismiss it.
-          backdrop: 'static',
+          backdrop: true,
           resolve: {},
           controller: [
             '$scope', '$modalInstance', '$injector',
