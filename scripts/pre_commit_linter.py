@@ -85,13 +85,12 @@ BAD_PATTERNS = {
         'message': 'Please use spaces instead of tabs.',
         'excluded_files': (),
         'excluded_dirs': (
-            'assets/i18n/',
-            'core/tests/data')},
+            'assets/i18n/'
+        )},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
         'excluded_files': (),
-        'excluded_dirs': (
-            'core/tests/data')},
+        'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
                    'instead of glyphicons.',
@@ -124,7 +123,7 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'scripts/pre_commit_linter.py', 'integrations/*',
     'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
-    '*.min.js', 'assets/scripts/*')
+    '*.min.js', 'assets/scripts/*, core/tests/data/*')
 
 if not os.getcwd().endswith('oppia'):
     print ''
