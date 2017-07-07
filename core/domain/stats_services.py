@@ -46,7 +46,7 @@ def get_visualizations_info(exploration_id, state_name):
         [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
         'id': 'BarChart',
         'data': [{u'frequency': 1, u'answer': 0}]}]
-        """
+    """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     if exploration.states[state_name].interaction.id is None:
         return []
@@ -109,17 +109,30 @@ def get_exploration_stats(exploration_id, exploration_version):
     Args:
         exploration_id: str. The exploration ID.
         exploration_version: str. The value is version of the exploration from
-        ExplorationAnnotationsModel. It can be 'all' or version number as
-        string like '3'.
+            ExplorationAnnotationsModel. It can be 'all' or version number as
+            string like '3'.
 
     Returns:
         dict. A dict with state statistics for the given exploration ID.
-        The keys of the dict and values those representation are as below
-        'last_updated': float. Last updated timestamp of the exploration,
-        'num_starts': int. Start exploration count,
-        'num_completions': int. Complete exploration count,
-        'state_stats': dict(dict). Contains state stats of states contained in
-        the given exploration ID.
+        The keys and values of the dict are as follows:
+        - 'last_updated': float. Last updated timestamp of the exploration.
+        - 'num_starts': int. The number of "start exploration" recorded.
+        - 'num_completions': int. The number of "complete exploration" events
+            recorded.
+        - 'state_stats': dict(dict). Contains state stats of states
+            contained in the given exploration ID. The keys of the dict are the
+            names of the states and its values are dict containing the
+            statistics data of the respective state in the key.
+            The keys and values of the dict are as follows:
+            - state_name: dict. The statistics data of the state.
+                The keys and values of the dict are as follows:
+                - "first_entry_count": int. The number of sessions which hit
+                    the state.
+                - "name": str. The name of the state.
+                - "total_entry_count": int. The total number of hits for the
+                    state.
+                - "no_submitted_answer_count": int. The number of hits with
+                    no answer for this state.
     """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     exp_stats = stats_jobs_continuous.StatisticsAggregator.get_statistics(
@@ -176,8 +189,8 @@ def record_answers(
         exploration_version: int. The version of the exploration.
         state_name: str. The name of the state.
         interaction_id: str. The ID of the interaction.
-        submitted_answer_list: list. list of SubmittedAnswer. The submitted
-        answer.
+        submitted_answer_list: list(SubmittedAnswer). The list of answers to be
+            recorded.
     """
     state_answers = stats_domain.StateAnswers(
         exploration_id, exploration_version, state_name, interaction_id,
@@ -199,7 +212,7 @@ def get_state_answers(exploration_id, exploration_version, state_name):
     Args:
         exploration_id: str. The exploration ID.
         exploration_version: int. The version of the exploration to fetch
-        answers for.
+            answers for.
         state_name: str. The name of the state to fetch answers for.
 
     Returns:
