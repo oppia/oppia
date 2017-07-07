@@ -162,6 +162,8 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
+        # *temp
+        print "bete yhan tak bhi aa gye"
         if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'pages/error/disabled_exploration.html',
@@ -317,11 +319,9 @@ class ExplorationHandler(EditorHandler):
 
         return editor_dict
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
-        if not rights_manager.Actor(self.user_id).can_view(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-            raise self.PageNotFoundException
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
         # are not used by that tab.
@@ -332,7 +332,7 @@ class ExplorationHandler(EditorHandler):
                 exploration_id, apply_draft=apply_draft, version=version))
         self.render_json(self.values)
 
-    @require_editor
+    @acl_decorators.can_edit_exploration
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -350,7 +350,7 @@ class ExplorationHandler(EditorHandler):
         self.values.update(self._get_exploration_data(exploration_id))
         self.render_json(self.values)
 
-    @require_editor
+    @acl_decorators.can_delete_exploration
     def delete(self, exploration_id):
         """Deletes the given exploration."""
 
@@ -368,14 +368,6 @@ class ExplorationHandler(EditorHandler):
             log_debug_string = '(%s) %s tried to delete exploration %s' % (
                 role_description, self.user_id, exploration_id)
         logging.debug(log_debug_string)
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        can_delete = rights_manager.Actor(self.user_id).can_delete(
-            feconf.ACTIVITY_TYPE_EXPLORATION, exploration.id)
-        if not can_delete:
-            raise self.UnauthorizedUserException(
-                'User %s does not have permissions to delete exploration %s' %
-                (self.user_id, exploration_id))
 
         is_exploration_cloned = rights_manager.is_exploration_cloned(
             exploration_id)
@@ -581,6 +573,7 @@ class UserExplorationEmailsHandler(EditorHandler):
             'email_preferences': exploration_email_preferences.to_dict()
         })
 
+
 class ResolvedAnswersHandler(EditorHandler):
     """Allows learners' answers for a state to be marked as resolved."""
 
@@ -754,7 +747,7 @@ class ExplorationResourcesHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_editor
+    @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         fs = fs_domain.AbstractFileSystem(
@@ -792,7 +785,7 @@ class ExplorationSnapshotsHandler(EditorHandler):
 class ExplorationRevertHandler(EditorHandler):
     """Reverts an exploration to an older version."""
 
-    @require_editor
+    @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
         current_version = self.payload.get('current_version')
@@ -881,7 +874,7 @@ class StateRulesStatsHandler(EditorHandler):
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
-    @require_editor
+    @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Saves an image uploaded by a content creator."""
 
@@ -940,7 +933,7 @@ class StartedTutorialEventHandler(EditorHandler):
 class EditorAutosaveHandler(ExplorationHandler):
     """Handles requests from the editor for draft autosave."""
 
-    @require_editor
+    @acl_decorators.can_edit_exploration
     def put(self, exploration_id):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
@@ -962,7 +955,7 @@ class EditorAutosaveHandler(ExplorationHandler):
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 
-    @require_editor
+    @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Handles POST request for discarding draft changes."""
         exp_services.discard_draft(exploration_id, self.user_id)

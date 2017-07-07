@@ -15,6 +15,7 @@
 """Controllers related to user subscriptions."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import subscription_services
 from core.domain import user_services
 
@@ -22,7 +23,7 @@ from core.domain import user_services
 class SubscribeHandler(base.BaseHandler):
     """Handles operations relating to new subscriptions."""
 
-    @base.require_user
+    @acl_decorators.can_manage_subscriptions
     def post(self):
         creator_id = user_services.get_user_id_from_username(
             self.payload.get('creator_username'))
@@ -33,7 +34,7 @@ class SubscribeHandler(base.BaseHandler):
 class UnsubscribeHandler(base.BaseHandler):
     """Handles operations related to unsubscriptions."""
 
-    @base.require_user
+    @acl_decorators.can_manage_subscriptions
     def post(self):
         creator_id = user_services.get_user_id_from_username(
             self.payload.get('creator_username'))

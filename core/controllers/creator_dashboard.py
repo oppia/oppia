@@ -17,6 +17,7 @@ activities.
 """
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -46,22 +47,15 @@ DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = config_domain.ConfigProperty(
 class NotificationsDashboardPage(base.BaseHandler):
     """Page with notifications for the user."""
 
-    @base.require_user
+    @acl_decorators.can_access_creator_dashboard
     def get(self):
-        if self.username in config_domain.BANNED_USERNAMES.value:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-        elif user_services.has_fully_registered(self.user_id):
-            self.values.update({
-                'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
-                'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
-            })
-            self.render_template(
-                'pages/notifications_dashboard/notifications_dashboard.html',
-                redirect_url_on_logout='/')
-        else:
-            self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', '/notifications_dashboard'))
+        self.values.update({
+            'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
+            'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
+        })
+        self.render_template(
+            'pages/notifications_dashboard/notifications_dashboard.html',
+            redirect_url_on_logout='/')
 
 
 class NotificationsDashboardHandler(base.BaseHandler):
@@ -69,11 +63,9 @@ class NotificationsDashboardHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_access_creator_dashboard
     def get(self):
         """Handles GET requests."""
-        if self.user_id is None:
-            raise self.PageNotFoundException
-
         job_queued_msec, recent_notifications = (
             user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(  # pylint: disable=line-too-long
                 self.user_id))
@@ -115,24 +107,17 @@ class NotificationsDashboardHandler(base.BaseHandler):
 class CreatorDashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
-    @base.require_user
+    @acl_decorators.can_access_creator_dashboard
     def get(self):
-        if self.username in config_domain.BANNED_USERNAMES.value:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-        elif user_services.has_fully_registered(self.user_id):
-            self.values.update({
-                'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
-                'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
-                'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
-                    DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
-            })
-            self.render_template(
-                'pages/creator_dashboard/creator_dashboard.html',
-                redirect_url_on_logout='/')
-        else:
-            self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', feconf.CREATOR_DASHBOARD_URL))
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_CREATOR_DASHBOARD,
+            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
+            'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
+                DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
+        })
+        self.render_template(
+            'pages/creator_dashboard/creator_dashboard.html',
+            redirect_url_on_logout='/')
 
 
 class CreatorDashboardHandler(base.BaseHandler):
@@ -140,10 +125,9 @@ class CreatorDashboardHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_access_creator_dashboard
     def get(self):
         """Handles GET requests."""
-        if self.user_id is None:
-            raise self.PageNotFoundException
 
         def _get_intro_card_color(category):
             return (
@@ -263,20 +247,20 @@ class NotificationsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_access_creator_dashboard
     def get(self):
         """Handles GET requests."""
         num_unseen_notifications = 0
-        if self.user_id and self.username:
-            last_seen_msec = (
-                subscription_services.get_last_seen_notifications_msec(
-                    self.user_id))
-            _, recent_notifications = (
-                user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications( # pylint: disable=line-too-long
-                    self.user_id))
-            for notification in recent_notifications:
-                if (notification['last_updated_ms'] > last_seen_msec and
-                        notification['author_id'] != self.user_id):
-                    num_unseen_notifications += 1
+        last_seen_msec = (
+            subscription_services.get_last_seen_notifications_msec(
+                self.user_id))
+        _, recent_notifications = (
+            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications( # pylint: disable=line-too-long
+                self.user_id))
+        for notification in recent_notifications:
+            if (notification['last_updated_ms'] > last_seen_msec and
+                    notification['author_id'] != self.user_id):
+                num_unseen_notifications += 1
 
         self.render_json({
             'num_unseen_notifications': num_unseen_notifications,
@@ -286,7 +270,7 @@ class NotificationsHandler(base.BaseHandler):
 class ExplorationDashboardStatsHandler(base.BaseHandler):
     """Returns the most recent open feedback for an exploration."""
 
-    @base.require_fully_signed_up
+    @acl_decorators.can_view_exploration_feedback
     def get(self, exploration_id):
         """Handles GET requests."""
         self.render_json({
@@ -300,7 +284,7 @@ class ExplorationDashboardStatsHandler(base.BaseHandler):
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
-    @base.require_fully_signed_up
+    @acl_decorators.can_create_exploration
     def post(self):
         """Handles POST requests."""
         title = self.payload.get('title', feconf.DEFAULT_EXPLORATION_TITLE)
@@ -318,7 +302,7 @@ class NewExploration(base.BaseHandler):
 class NewCollection(base.BaseHandler):
     """Creates a new collection."""
 
-    @base.require_fully_signed_up
+    @acl_decorators.can_create_collection
     def post(self):
         """Handles POST requests."""
         new_collection_id = collection_services.get_new_collection_id()
