@@ -73,25 +73,27 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.request = None
 
     def set_return_values(self, content='', status_code=200, headers=None):
-        """ Sets the content, status code and headers that the urlfetch mock
-        should return with.
+        """Set the content, status_code and headers to return in subsequent
+        calls to the urlfetch mock.
 
         Args:
             content: str. The content to return in subsequent calls to the
             urlfetch mock.
-            status_code: int. status_code for return_values.
-            headers: headers to return_values.
+            status_code: int. The status_code to return in subsequent calls to
+            the urlfetch mock.
+            headers: str. The headers to return in subsequent calls to
+            the urlfetch mock.
         """
         self.return_values['content'] = content
         self.return_values['status_code'] = status_code
         self.return_values['headers'] = headers
 
     def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
-        """ Simulates a url fetch.
+        """Simulates a url fetch.
 
         Args:
-            request: Request object for the mock url.
-            response: Response object for the mock url.
+            request: str. Request object for the mock url.
+            response: str. Response object for the mock url.
         """
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
@@ -158,13 +160,14 @@ class TestBase(unittest.TestCase):
     }
 
     def _get_unicode_test_string(self, suffix):
-        """ Supply a test string that has unicode characters in it.
+        """Supply a test string that has unicode characters in it.
 
         Args:
-            suffix: str. The suffix to UNICODE_TEST_STRING.
+            suffix: str. A suffix to append to the UNICODE_TEST_STRING.
 
         Returns:
-            str. A string UNICODE_TEST_STRING with suffix 'suffix'.
+            str. A string that contains unicode characters and ends with the
+            given suffix.
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
@@ -193,11 +196,14 @@ class TestBase(unittest.TestCase):
     def log_line(self, line):
         """Print the line with a prefix that can be identified by the
         script that calls the test.
+
+        Args:
+            line: str. A signal message.
         """
         print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
-        """Deletes all keys from the NDB datastore. Subclasses of TestBase
+        """Deletes all keys. Subclasses of TestBase
         should override this method.
         """
         raise NotImplementedError
@@ -229,11 +235,11 @@ class TestBase(unittest.TestCase):
         self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
-        """ Sets the environment variables to simulate a login.
+        """Sets the environment variables to simulate a login.
 
         Args:
-            email: str. Sets the USER_EMAIL to be email.
-            is_super_admin: bool. Sets the USER_IS_ADMIN to be is_super_admin.
+            email: str. The email of the user who is to be logged in.
+            is_super_admin: bool. Whether the user is a super admin.
         """
         os.environ['USER_EMAIL'] = email
         os.environ['USER_ID'] = self.get_user_id_from_email(email)
@@ -389,27 +395,32 @@ class TestBase(unittest.TestCase):
             config_domain.MODERATOR_USERNAMES, moderator_usernames)
 
     def get_current_logged_in_user_id(self):
-        """ Gets the user_id of the current logged-in user.
+        """Gets the user_id of the current logged-in user.
 
         Returns:
-            str. Returns USER_ID from the environment variable.
+            str. The user_id of the currently logged-in user.
         """
         return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
-        """ Gets the user_id corresponding to the given email.
+        """Gets the user_id corresponding to the given email.
 
         Args:
             email: str. Valid email stored in the database.
 
         Returns:
-            str. The user id from the given email.
+            str. The user id corresponding to the given email.
         """
         return current_user_services.get_user_id_from_email(email)
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
-        """ Saves a new default exploration written by owner_id.
+        """Saves a new default exploration written by owner_id.
+
+        Args:
+            exploration_id: str. The id of the new default exploration.
+            owner_id: str. The user_id of the creator of the collection.
+            title: str. The title of the exploration.
 
         Returns:
             Exploration. The exploration domain object.
@@ -425,7 +436,17 @@ class TestBase(unittest.TestCase):
             language_code=feconf.DEFAULT_LANGUAGE_CODE,
             end_state_name=None,
             interaction_id='TextInput'):
-        """ Saves a new strictly-validated exploration.
+        """Saves a new strictly-validated exploration.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+            owner_id: str. The user_id of the creator of the collection.
+            title: str. The tile of the exploration.
+            category: str. The category the exploration belongs to.
+            objective: str. The exploration objective.
+            language_code: str. The language_code of the exploration.
+            end_state_name: str. The name of the final state.
+            interaction_id: str. The id of the interaction.
 
         Returns:
             Exploration. The exploration domain object.
@@ -494,7 +515,15 @@ class TestBase(unittest.TestCase):
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
-        """ Saves a new default collection written by owner_id.
+        """Saves a new default collection written by owner_id.
+
+        Args:
+            collection_id: str. The id of the new default collection.
+            owner_id: str. The user_id of the creator of the collection.
+            title: str. The title of the collection.
+            category: str. The category this collection belongs to.
+            objective: str. The objective of this collection.
+            language_code: str. The language_code of this collection.
 
         Returns:
             Collection. The collection domain object.
@@ -512,11 +541,17 @@ class TestBase(unittest.TestCase):
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
 
-        """ Creates a collection and save exploration details in it.
+        """Creates a collection and save exploration details in it.
 
         Args:
-            collection_id: int. Id for the newly created collection.
-            owner_id: int. Owner id for the newly created collection.
+            collection_id: str. Id for the newly created collection.
+            owner_id: str. The user_id of the creator of the collection.
+            title: str. The title of the collection.
+            category: str. The category this collection belongs to.
+            objective: str. The objective of this collection.
+            language_code: str. The language_code of this collection.
+            exploration_id: str. The exploration id of this collection.
+            end_state_name: str. The name of the final state.
 
         Returns:
             Collection. Newly created collection containing corresponding
@@ -610,7 +645,7 @@ class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
     def _delete_all_models(self):
-        """Deletes all models for Google NDB."""
+        """Deletes all models from the NDB datastore."""
         from google.appengine.ext import ndb
         ndb.delete_multi(ndb.Query().iter(keys_only=True))
 
@@ -662,7 +697,7 @@ class AppEngineTestBase(TestBase):
     @contextlib.contextmanager
     def urlfetch_mock(
             self, content='', status_code=200, headers=None):
-        """ Enables the custom urlfetch mock (URLFetchServiceMock) within the
+        """Enables the custom urlfetch mock (URLFetchServiceMock) within the
         context of a 'with' statement.
 
         This mock is currently used for signup to prevent external HTTP
@@ -766,7 +801,7 @@ class FunctionWrapper(object):
     """
 
     def __init__(self, func):
-        """ Creates a new FunctionWrapper instance.
+        """Creates a new FunctionWrapper instance.
 
         Args:
             func: a callable, or data descriptor. If it's a descriptor, its
@@ -802,7 +837,7 @@ class FunctionWrapper(object):
         return self
 
     def pre_call_hook(self, args):
-        """ Override this to do tasks that should be executed before the
+        """Override this to do tasks that should be executed before the
         actual function call.
 
         Args:
@@ -811,7 +846,7 @@ class FunctionWrapper(object):
         pass
 
     def post_call_hook(self, args, result):
-        """ Override this to do tasks that should be executed after the
+        """Override this to do tasks that should be executed after the
         actual function call.
 
         Args:
@@ -844,6 +879,9 @@ class CallCounter(FunctionWrapper):
         """Method that is called before each function call to increment the
         counter tracking the number of times a function is called. This
         would also be called even when the function raises an exception.
+
+        Args:
+            args: Set of arguments that the function accepts.
         """
         self._times_called += 1
 
@@ -859,9 +897,9 @@ class FailingFunction(FunctionWrapper):
         """Create a new Failing function.
 
         Args:
-            f: see FunctionWrapper.
-            exception: the exception to be raised.
-            num_tries_before_success: the number of times to raise an
+            f: func. see FunctionWrapper.
+            exception: str. the exception to be raised.
+            num_tries_before_success: int. the number of times to raise an
             exception, before a call succeeds. If this is 0, all calls will
             succeed, if it is FailingFunction.INFINITY, all calls will fail.
         """
@@ -879,7 +917,7 @@ class FailingFunction(FunctionWrapper):
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
-        """ Method that is called each time before the actual function call
+        """Method that is called each time before the actual function call
         to check if the exception is to be raised based on the number of
         tries before success.
 
