@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.controllers import editor
+from core.domain import acl_decorators
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.platform import models
@@ -140,7 +141,7 @@ class FeedbackStatsHandler(base.BaseHandler):
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to learner suggestions."""
 
-    @base.require_user
+    @acl_decorators.can_suggest_changes_to_exploration
     def post(self, exploration_id):
         feedback_services.create_suggestion(
             exploration_id,
@@ -158,7 +159,7 @@ class SuggestionActionHandler(base.BaseHandler):
     _ACCEPT_ACTION = 'accept'
     _REJECT_ACTION = 'reject'
 
-    @editor.require_editor
+    @acl_decorators.can_manage_suggestions_on_exploration
     def put(self, exploration_id, thread_id):
         action = self.payload.get('action')
         if action == self._ACCEPT_ACTION:
@@ -193,7 +194,7 @@ class SuggestionListHandler(base.BaseHandler):
         else:
             return None
 
-    @base.require_user
+    @acl_decorators.can_manage_suggestions_on_exploration
     def get(self, exploration_id):
         threads = None
         list_type = self.request.get('list_type')

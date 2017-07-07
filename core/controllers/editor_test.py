@@ -892,8 +892,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         self.assert_can_edit(response.body)
 
         # Ban joe.
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, 'banned_usernames', ['joe'])
+        self.set_banned_users(['joe'])
 
         # Test that Joe is banned. (He can still access the library page.)
         response = self.testapp.get(

@@ -350,6 +350,11 @@ class TestBase(unittest.TestCase):
         self.set_config_property(
             config_domain.MODERATOR_USERNAMES, moderator_usernames)
 
+    def set_banned_users(self, banned_usernames):
+        """Set the BANNED_USERNAMES property."""
+        self.set_config_property(
+            config_domain.BANNED_USERNAMES, banned_usernames)
+
     def get_current_logged_in_user_id(self):
         return os.environ['USER_ID']
 
