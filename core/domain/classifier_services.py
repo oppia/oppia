@@ -214,6 +214,13 @@ def save_classifier(classifier):
         classifier_id = _create_classifier(classifier)
     else:
         _update_classifier(classifier_data_model, classifier.state_name)
+
+    # Create the mapping from <exp_id,exp_version,state_name>
+    # to classifier_id.
+    create_classifier_exploration_mapping(
+        classifier.exp_id, classifier.exp_version_when_created,
+        classifier.state_name, classifier_id)
+
     return classifier_id
 
 

@@ -76,11 +76,6 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_data, data_schema_version)
         classifier_id = classifier_services.save_classifier(classifier)
 
-        # Create the mapping from <exp_id,exp_version,state_name>
-        # to classifier_id.
-        classifier_services.create_classifier_exploration_mapping(
-            exp_id, exp_version, state_name, classifier_id)
-
         # Update status of the training job to 'COMPLETE'.
         classifier_training_job.update_status(
             feconf.TRAINING_JOB_STATUS_COMPLETE)

@@ -121,7 +121,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
         self.assertEqual(classifier.classifier_data, self.classifier_data)
 
-    def test_error_on_dev_mode_and_default_vm_id(self):
+    def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.
         with self.swap(feconf, 'DEV_MODE', False):
             self.post_json('/ml/trainedclassifierhandler', self.payload,
