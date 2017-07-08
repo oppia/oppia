@@ -43,27 +43,28 @@ oppia.directive('select2Dropdown', [function() {
       tagMode: '@',
       width: '@'
     },
-    template: '<input type="hidden">',
+    template: '<select><option></option></select>',
     controller: ['$scope', '$element', function($scope, $element) {
       $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
 
       var select2Options = {
         allowClear: false,
-        data: $scope.choices,
+        data: $scope.tagMode === 'true' ? $scope.item : $scope.choices,
         multiple: $scope.allowMultipleChoices === 'true',
+        tags: $scope.tagMode === 'true',
         placeholder: $scope.placeholder,
         width: $scope.width || '250px',
-        createSearchChoice: function(term, data) {
-          if ($(data).filter(function() {
+        createTag: function(params) {
+          if ($($scope.choices).filter(function() {
             return this.text.localeCompare(term) === 0;
           }).length === 0) {
-            return term.match($scope.newChoiceValidator) ? {
-              id: term,
-              text: term
+            return params.term.match($scope.newChoiceValidator) ? {
+              id: params.term,
+              text: params.term
             } : null;
           }
         },
-        formatResult: function(queryResult) {
+        templateResult: function(queryResult) {
           var doesChoiceMatchText = function(choice) {
             return choice.id === queryResult.text;
           };
@@ -78,18 +79,19 @@ oppia.directive('select2Dropdown', [function() {
             }
           }
         },
-        formatNoMatches: function(searchTerm) {
-          if ($scope.invalidSearchTermMessage &&
-              !searchTerm.match($scope.newChoiceValidator)) {
-            return $scope.invalidSearchTermMessage;
-          } else {
-            return 'No matches found';
+        language: {
+          noResults: function() {
+            if ($scope.invalidSearchTermMessage) {
+              return $scope.invalidSearchTermMessage;
+            } else {
+              return 'No matches found';
+            }
           }
         }
       };
 
       if ($scope.tagMode) {
-        select2Options.tags = [];
+        select2Options.tags = true;
       }
 
       if ($scope.dropdownCssClass) {
@@ -100,19 +102,19 @@ oppia.directive('select2Dropdown', [function() {
 
       // Initialize the dropdown.
       $(select2Node).select2(select2Options);
-      $(select2Node).select2('val', $scope.item);
+      $(select2Node).val($scope.item).trigger('change');
+
 
       // Update $scope.item when the selection changes.
-      $(select2Node).on('change', function(e) {
-        $scope.item = e.val;
+      $(select2Node).on('change', function() {
+        $scope.item = $(select2Node).val();
         $scope.$apply();
         $scope.onSelectionChange();
-        $scope.$apply();
       });
 
       // Respond to external changes in $scope.item
       $scope.$watch('item', function(newValue) {
-        $(select2Node).select2('val', newValue);
+        $(select2Node).val(newValue);
       });
     }]
   };
