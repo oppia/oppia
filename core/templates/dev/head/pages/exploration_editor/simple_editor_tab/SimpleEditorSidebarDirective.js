@@ -46,6 +46,26 @@ oppia.directive('simpleEditorSidebar', [
               question.getId(), subfieldLabel
             );
           };
+          $scope._questions = $scope.questionList.getBindableQuestions();
+          $scope.SIDEBAR_SORTABLE_OPTIONS = {
+            axis: 'y',
+            cursor: 'move',
+            containment: 'parent',
+            tolerance: 'pointer',
+            revert: 100,
+            start: function(e, ui) {
+              ui.placeholder.height(ui.item.height());
+              // This class is to be added, but it is giving strange behaviour.
+              // ui.item.addClass('selected');
+            },
+            update: function(e, ui) {
+              SimpleEditorManagerService.sortQuestions(
+                ui.item.sortable.index, ui.item.sortable.dropindex);
+            },
+            stop: function() {
+              // ui.item.removeClass('selected');
+            }
+          };
 
           $scope.scrollToField = function(question, subfieldLabel) {
             ScrollSyncService.scrollTo(
@@ -73,23 +93,6 @@ oppia.directive('simpleEditorSidebar', [
                 'intro' : $scope.questionList.getLastQuestion().getId();
               ScrollSyncService.scrollTo(end);
             }
-          };
-
-          $scope.dragQuestionStart = function(question) {
-            console.log('down');
-            var DOMElem = angular
-              .element($document[0].getElementById(
-                $scope.ID_PREFIX + question.getId()));
-            console.log(DOMElem);
-            DOMElem.addClass('selected');
-          };
-          $scope.dragQuestionEnd = function(question) {
-            console.log('up');
-            var DOMElem = angular
-              .element($document[0].getElementById(
-                $scope.ID_PREFIX + question.getId()));
-            console.log(DOMElem);
-            DOMElem.removeClass('selected');
           };
         }
       ]
