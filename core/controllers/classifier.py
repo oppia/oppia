@@ -27,8 +27,7 @@ import feconf
 
 
 def validate_request(handler):
-    """Decorator that checks if the incoming request for storing trained
-    classifier is valid."""
+    """Decorator that checks if the incoming request from the VM is valid."""
     def test_is_valid(self, **kwargs):
         message = self.request.get('payload')
         message = json.loads(message)
@@ -43,7 +42,7 @@ def validate_request(handler):
             secret, message, digestmod=hashlib.sha256).hexdigest()
         if generated_signature != signature:
             raise self.UnauthorizedUserException
-        if vm_id == 'vm_default' and not feconf.DEV_MODE:
+        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
             raise self.UnauthorizedUserException
         return handler(self, **kwargs)
 
