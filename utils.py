@@ -499,3 +499,18 @@ def get_template_dir_prefix():
     template_path = ('/templates/head' if feconf.IS_MINIFIED
                      or not feconf.DEV_MODE else '/templates/dev/head')
     return '%s%s' % (get_asset_dir_prefix(), template_path)
+
+
+def convert_to_str(string_to_convert):
+    """Converts the given unicode string to a string. If the string is not
+    unicode, we return the string.
+
+    Args:
+        string_to_convert: unicode|str.
+
+    Returns:
+        str. The encoded string.
+    """
+    if isinstance(string_to_convert, unicode):
+        return string_to_convert.encode('utf-8')
+    return string_to_convert
