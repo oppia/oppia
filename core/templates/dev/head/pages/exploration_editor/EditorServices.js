@@ -2066,7 +2066,7 @@ oppia.factory('explorationWarningsService', [
         _warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'The following states have errors: ' +
+            'The following cards have errors: ' +
             Object.keys(stateWarnings).join(', ') + '.')
         });
       }
