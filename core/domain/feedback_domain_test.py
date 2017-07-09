@@ -31,7 +31,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         super(FeedbackThreadDomainUnitTests, self).setUp()
 
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        user_services.get_or_create_user(self.viewer_id, self.VIEWER_EMAIL)
+        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_to_dict(self):
@@ -76,7 +76,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackMessageDomainUnitTests, self).setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_to_dict(self):
@@ -103,9 +103,6 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
 
-    def setUp(self):
-        super(FeedbackAnalyticsDomainUnitTests, self).setUp()
-
     def test_to_dict(self):
         expected_thread_analytics = feedback_domain.FeedbackAnalytics(
             self.EXP_ID, 1, 2)
@@ -123,7 +120,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SuggestionDomainUnitTests, self).setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_to_dict(self):
@@ -133,14 +130,14 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'exploration_version': 1,
             'state_name': 'a state name',
             'description': 'a description',
-            'state_content': 'a state content'
+            'suggestion_html': 'suggestion HTML',
         }
         observed_suggestion = feedback_domain.Suggestion(
             self.THREAD_ID, self.owner_id, self.EXP_ID,
             expected_suggestion_dict['exploration_version'],
             expected_suggestion_dict['state_name'],
             expected_suggestion_dict['description'],
-            expected_suggestion_dict['state_content'])
+            expected_suggestion_dict['suggestion_html'])
         self.assertDictEqual(expected_suggestion_dict,
                              observed_suggestion.to_dict())
 

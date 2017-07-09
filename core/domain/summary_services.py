@@ -612,7 +612,7 @@ def get_featured_activity_summary_dicts(language_codes):
             'tags': [],
             'thumbnail_icon_url': self.get_static_asset_url(
                 '/images/subjects/Lightbulb.svg'),
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': 'eid2',
             'category': 'A category',
             'ratings': feconf.get_empty_ratings(),

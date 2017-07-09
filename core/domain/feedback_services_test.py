@@ -97,7 +97,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         super(SuggestionQueriesUnitTests, self).setUp()
         # Register users.
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        user_services.get_or_create_user(self.user_id, self.USER_EMAIL)
+        user_services.create_new_user(self.user_id, self.USER_EMAIL)
         self.signup(self.USER_EMAIL, self.USERNAME)
         # Open thread with suggestion.
         thread1 = feedback_models.FeedbackThreadModel(
@@ -153,8 +153,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         with self.swap(feedback_models.FeedbackThreadModel,
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
-                self.EXP_ID2, self.user_id, 3, 'state_name',
-                'description', {'type': 'text', 'value': ''})
+                self.EXP_ID2, self.user_id, 3, 'state_name', 'description', '')
         suggestion = feedback_services.get_suggestion(
             self.EXP_ID2, self.THREAD_ID1)
         thread = feedback_models.FeedbackThreadModel.get(
@@ -166,7 +165,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
             'exploration_version': 3,
             'state_name': 'state_name',
             'description': 'description',
-            'state_content': {'type': 'text', 'value': ''}
+            'suggestion_html': ''
         }
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
         self.assertDictEqual(expected_suggestion_dict, suggestion.to_dict())
@@ -230,7 +229,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         super(FeedbackThreadUnitTests, self).setUp()
 
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        user_services.get_or_create_user(self.viewer_id, self.VIEWER_EMAIL)
+        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def _run_computation(self):
@@ -699,7 +698,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             '<ul><li>some text<br></li>'
             '</ul></li></ul>'
             'You can view and reply to your messages from your '
-            '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+            '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
             '<br>'
             '<br>Thanks, and happy teaching!<br>'
             '<br>'
@@ -760,7 +759,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             '<li>more text<br></li>'
             '</ul></li></ul>'
             'You can view and reply to your messages from your '
-            '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+            '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
             '<br>'
             '<br>Thanks, and happy teaching!<br>'
             '<br>'

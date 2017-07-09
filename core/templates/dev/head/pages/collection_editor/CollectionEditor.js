@@ -29,6 +29,10 @@ oppia.constant(
 oppia.constant(
   'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
 
+oppia.constant(
+  'SEARCH_EXPLORATION_URL_TEMPLATE',
+  '/exploration/metadata_search?q=<query>');
+
 oppia.controller('CollectionEditor', [
   'CollectionEditorStateService',
   function(CollectionEditorStateService) {

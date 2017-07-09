@@ -77,15 +77,23 @@
   </div>
 
   <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()" ng-if="!hasCustomizationArgs">Cancel</button>
     <!-- Do not show this button if an interaction is already selected. -->
     <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed && !stateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
 
     <button class="btn btn-default" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
-    <button class="btn btn-success protractor-test-save-interaction" ng-click="save()"
-            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid"
-            ng-if="hasCustomizationArgs">
-      Save Interaction
-    </button>
+    <div class="btn-group"
+         ng-if="hasCustomizationArgs"
+         popover-append-to-body
+         popover-placement="bottom"
+         popover-trigger="<[isSaveInteractionButtonEnabled() ? 'none' : 'mouseenter']>"
+         ng-attr-popover="<[getSaveInteractionButtonTooltip()]>">
+      <button class="btn btn-success protractor-test-save-interaction"
+              ng-click="save()"
+              ng-disabled="!isSaveInteractionButtonEnabled()">
+        Save Interaction
+      </button>
+    </div>
     <button class="btn btn-success protractor-test-close-no-customization-modal"
             ng-click="okay()"
             ng-if="!hasCustomizationArgs && customizationModalReopened">

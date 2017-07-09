@@ -3,7 +3,7 @@
 </script>
 
 <script type="text/ng-template" id="visualizations/FrequencyTable">
-  <b><[options.title]></b>
+  <strong><[options.title]></strong>
   <table class="table">
     <tr>
       <th><[options.column_headers[0]]></th>
@@ -14,4 +14,10 @@
       <td><[row.frequency]></td>
     </tr>
   </table>
+
+  <style>
+    oppia-visualization-frequency-table table {
+      margin-top: 12px;
+    }
+  </style>
 </script>

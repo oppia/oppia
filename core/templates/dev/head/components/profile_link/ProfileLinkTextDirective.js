@@ -16,17 +16,20 @@
  * @fileoverview Directives for creating text links to a user's profile page.
  */
 
-oppia.directive('profileLinkText', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      username: '&'
-    },
-    templateUrl: 'components/profileLinkText',
-    controller: ['$scope', function($scope) {
-      $scope.isUsernameLinkable = function(username) {
-        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) === -1;
-      };
-    }]
-  };
-}]);
+oppia.directive('profileLinkText', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        username: '&'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/profile_link/' +
+        'profile_link_text_directive.html'),
+      controller: ['$scope', function($scope) {
+        $scope.isUsernameLinkable = function(username) {
+          return GLOBALS.SYSTEM_USERNAMES.indexOf(username) === -1;
+        };
+      }]
+    };
+  }]);

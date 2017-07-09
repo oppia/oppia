@@ -26,7 +26,8 @@ oppia.controller('SettingsTab', [
   'explorationParamChangesService', 'explorationWarningsService',
   'explorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
-  'UrlInterpolationService',
+  'EditableExplorationBackendApiService', 'UrlInterpolationService',
+  'ENABLE_FALLBACK_EDITOR',
   function(
       $scope, $http, $window, $modal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
@@ -37,7 +38,8 @@ oppia.controller('SettingsTab', [
       explorationParamChangesService, explorationWarningsService,
       explorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
-      UrlInterpolationService) {
+      EditableExplorationBackendApiService, UrlInterpolationService,
+      ENABLE_FALLBACK_EDITOR) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -53,7 +55,7 @@ oppia.controller('SettingsTab', [
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-    var DASHBOARD_PAGE_URL = '/dashboard';
+    var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
     $scope.getExplorePageUrl = function() {
@@ -81,12 +83,11 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.refreshSettingsTab = function() {
-      var _states = explorationStatesService.getStates();
       // Ensure that explorationStatesService has been initialized before
       // getting the state names from it. (Otherwise, navigating to the
       // settings tab directly (by entering a URL that ends with /settings)
       // results in a console error.
-      if (_states) {
+      if (explorationStatesService.isInitialized()) {
         var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
           function(categoryItem) {
             return categoryItem.id === explorationCategoryService.savedMemento;
@@ -103,7 +104,7 @@ oppia.controller('SettingsTab', [
           });
         }
 
-        $scope.stateNames = Object.keys(_states);
+        $scope.stateNames = explorationStatesService.getStateNames();
       }
     };
 
@@ -170,6 +171,7 @@ oppia.controller('SettingsTab', [
       explorationAdvancedFeaturesService.areGadgetsEnabled);
     $scope.areFallbacksEnabled = (
       explorationAdvancedFeaturesService.areFallbacksEnabled);
+    $scope.fallbackEditorIsEnabled = ENABLE_FALLBACK_EDITOR;
 
     $scope.enableParameters = (
       explorationAdvancedFeaturesService.enableParameters);
@@ -246,18 +248,18 @@ oppia.controller('SettingsTab', [
             };
             $scope.getThumbnailIconUrl = function() {
               var category = explorationCategoryService.displayed;
-              if (GLOBALS.ALL_CATEGORIES.indexOf(category) === -1) {
-                category = GLOBALS.DEFAULT_CATEGORY_ICON;
+              if (constants.ALL_CATEGORIES.indexOf(category) === -1) {
+                category = constants.DEFAULT_CATEGORY_ICON;
               }
               return UrlInterpolationService.getStaticImageUrl(
                 '/subjects/' + category + '.svg');
             };
             $scope.getThumbnailBgColor = function() {
               var category = explorationCategoryService.displayed;
-              if (!GLOBALS.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
-                var color = GLOBALS.DEFAULT_COLOR;
+              if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
+                var color = constants.DEFAULT_COLOR;
               } else {
-                var color = GLOBALS.CATEGORIES_TO_COLORS[category];
+                var color = constants.CATEGORIES_TO_COLORS[category];
               }
               return color;
             };
@@ -310,10 +312,10 @@ oppia.controller('SettingsTab', [
           }
         ]
       }).result.then(function() {
-        var deleteUrl = $scope.explorationDataUrl;
-        $http['delete'](deleteUrl).then(function() {
-          $window.location = DASHBOARD_PAGE_URL;
-        });
+        EditableExplorationBackendApiService.deleteExploration(
+          $scope.explorationId).then(function() {
+            $window.location = CREATOR_DASHBOARD_PAGE_URL;
+          });
       });
     };
 
