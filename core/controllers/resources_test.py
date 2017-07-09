@@ -368,28 +368,29 @@ class AudioHandlerTest(test_utils.GenericTestBase):
                       % feconf.MAX_AUDIO_FILE_LENGTH_SEC,
                       response_dict['error'])
 
-    # The following test should only be used when more than
-    # one audio extension has been allowed in feconf.ACCEPTED_AUDIO_EXTENSIONS
-    # The flac file filler should be replaced with an accepted format.
 
-    # def test_non_matching_extensions_are_detected(self):
-    #     self.login(self.EDITOR_EMAIL)
-    #     response = self.testapp.get('/create/0')
-    #     csrf_token = self.get_csrf_token_from_response(response)
+    def test_non_matching_extensions_are_detected(self):
+        """Test that filenames with extensions that don't match the audio are
+        detected."""
+        if len(feconf.ACCEPTED_AUDIO_EXTENSIONS) >= 2:
+            self.login(self.EDITOR_EMAIL)
+            response = self.testapp.get('/create/0')
+            csrf_token = self.get_csrf_token_from_response(response)
 
-    #     mismatched_filename = 'test.flac'
-    #     with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
-    #               mode='rb') as f:
-    #         raw_audio = f.read()
-    #     response_dict = self.post_json(
-    #         '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
-    #         {'filename': mismatched_filename},
-    #         csrf_token=csrf_token,
-    #         expect_errors=True,
-    #         expected_status_int=400,
-    #         upload_files=(('audio', 'unused_filename', raw_audio),)
-    #     )
-    #     self.logout()
-    #     self.assertEqual(response_dict['code'], 400)
-    #     self.assertEqual(response_dict['error'],
-    #                      'Audio not recognized as a flac file')
+            # Use an accepted audio extension in mismatched_filename
+            mismatched_filename = 'test.flac'
+            with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
+                      mode='rb') as f:
+                raw_audio = f.read()
+            response_dict = self.post_json(
+                '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
+                {'filename': mismatched_filename},
+                csrf_token=csrf_token,
+                expect_errors=True,
+                expected_status_int=400,
+                upload_files=(('audio', 'unused_filename', raw_audio),)
+            )
+            self.logout()
+            self.assertEqual(response_dict['code'], 400)
+            self.assertEqual(response_dict['error'],
+                             'Audio not recognized as a flac file')

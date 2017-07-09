@@ -21,9 +21,9 @@ import imghdr
 import logging
 import tempfile
 
-import mutagen
 import cloudstorage
 import jinja2
+import mutagen
 
 from constants import constants
 from core.controllers import base
