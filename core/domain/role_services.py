@@ -50,7 +50,6 @@ VIEWABLE_ROLES = [
     feconf.ROLE_ID_BANNED_USER,
     feconf.ROLE_ID_COLLECTION_EDITOR,
     feconf.ROLE_ID_MODERATOR,
-    feconf.ROLE_ID_SUPER_ADMIN
 ]
 
 # The string corresponding to role Ids that should be visible to admin.
@@ -61,7 +60,6 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_EXPLORATION_EDITOR: 'exploration editor',
     feconf.ROLE_ID_GUEST: 'guest',
     feconf.ROLE_ID_MODERATOR: 'moderator',
-    feconf.ROLE_ID_SUPER_ADMIN: 'super admin'
 }
 
 # This dict maps the roles in current authorization system to roles in new
@@ -129,7 +127,6 @@ PARENT_ROLES = {
     feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_GUEST],
     feconf.ROLE_ID_GUEST: [],
     feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_COLLECTION_EDITOR],
-    feconf.ROLE_ID_SUPER_ADMIN: [feconf.ROLE_ID_ADMIN]
 }
 
 # This dict represents the unique actions that belong to a particular role.
@@ -158,8 +155,6 @@ ROLE_ACTIONS = {
     feconf.ROLE_ID_MODERATOR: [
         ACTION_PLAY_ANY_PRIVATE_COLLECTION,
         ACTION_PLAY_ANY_PRIVATE_EXPLORATION,
-    ],
-    feconf.ROLE_ID_SUPER_ADMIN: [
     ]
 }
 

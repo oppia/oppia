@@ -77,16 +77,17 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
 
         Returns:
             tuple(float, list(dict)). A 2-tuple with following entries:
-            - float. The time, in milliseconds since the Epoch, when the job was queued.
-            - list(dict). A list of recent updates to explorations and feedback threads;
-                Each entry in the list is a dict with keys:
-                - 'type': str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or 
+            - float. The time, in milliseconds since the Epoch, when the job was
+                queued.
+            - list(dict). A list of recent updates to explorations and feedback
+                threads; Each entry in the list is a dict with keys:
+                - 'type': str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
                     feconf.UPDATE_TYPE_FEEDBACK_MESSAGE.
-                - 'activity_id': str. The ID of the exploration being committed to or
-                    to which the feedback thread belongs.
+                - 'activity_id': str. The ID of the exploration being committed
+                    to or to which the feedback thread belongs.
                 - 'activity_title': str. The title of the activity.
-                - 'last_updated_ms': float. The time when the update was made, in 
-                    milliseconds since the Epoch. 
+                - 'last_updated_ms': float. The time when the update was made,
+                    in milliseconds since the Epoch.
                 - 'author_id': str. The ID of the author who made the update.
                 - 'subject': str. A brief description of the notification.
         """
@@ -130,20 +131,25 @@ class RecentUpdatesMRJobManager(
                 feconf.COMMIT_MESSAGE_EXPLORATION_DELETED.
 
         Returns:
-            tuple(list(dict), list(ExplorationModel|CollectionModel)). A 2-tuple with 
-                following entries:
-                - list(dict): A list, having information for every activity in 
-                    activity_ids_list. Each dict in this list has the following keys:
+            tuple(list(dict), list(ExplorationModel|CollectionModel)). A 2-tuple
+            with following entries:
+                - list(dict): A list, having information for every activity in
+                    activity_ids_list. Each dict in this list has the following
+                    keys:
                     - 'type': str. The value of the commit_type argument.
-                    - 'activity_id': str. The ID of the activity for this commit.
+                    - 'activity_id': str. The ID of the activity for this
+                        commit.
                     - 'activity_title': str. The title of the activity.
-                    - 'author_id': str. The ID of the author who made the commit.
-                    - 'last_update_ms': float. The time when the commit was created, in 
-                        milliseconds since Epoch.
+                    - 'author_id': str. The ID of the author who made the
+                        commit.
+                    - 'last_update_ms': float. The time when the commit was
+                        created, in milliseconds since Epoch.
                     - 'subject': str. The commit message, or (if the activity
-                        has been deleted) a message indicating that the activity was deleted.
-                - list(ExplorationModel|CollectionModel): A list containing valid Exploration 
-                    or Collection model instances which are mappable to feedback threads.
+                        has been deleted) a message indicating that the activity
+                        was deleted.
+                - list(ExplorationModel|CollectionModel): A list containing
+                    valid Exploration or Collection model instances which are
+                    mappable to feedback threads.
         """
         most_recent_commits = []
         activity_models = activity_model_cls.get_multi(
@@ -205,18 +211,19 @@ class RecentUpdatesMRJobManager(
             item: UserSubscriptionsModel. An instance of UserSubscriptionsModel.
 
         Yields:
-            This function may yield as many times as appropriate (including zero) 
-            2-tuples in the format (str, dict), where
+            This function may yield as many times as appropriate (including
+            zero) 2-tuples in the format (str, dict), where
                 - str: A key of the form 'user_id@job_queued_msec'.
                 - dict: A dictionary with the following keys:
-                    - 'type': str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or 
-                        feconf.UPDATE_TYPE_FEEDBACK_MESSAGE.
-                    - 'activity_id': str. The ID of the exploration being committed to or
-                        to which the feedback thread belongs.
+                    - 'type': str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT
+                        or feconf.UPDATE_TYPE_FEEDBACK_MESSAGE.
+                    - 'activity_id': str. The ID of the exploration being
+                        committed to or to which the feedback thread belongs.
                     - 'activity_title': str. The title of the activity.
-                    - 'last_updated_ms': float. The time when the update was made, in 
-                        milliseconds since the Epoch. 
-                    - 'author_id': str. The ID of the author who made the update.
+                    - 'last_updated_ms': float. The time when the update was
+                        made, in milliseconds since the Epoch.
+                    - 'author_id': str. The ID of the author who made the
+                        update.
                     - 'subject': str. A brief description of the recent updates.
         """
         user_id = item.id
@@ -276,25 +283,25 @@ class RecentUpdatesMRJobManager(
     def reduce(key, stringified_values):
         """Implements the reduce function.
 
-        This function updates an instance of UserRecentChangesBatchModel 
-        for a particular user, storing the most recent changes corresponding 
+        This function updates an instance of UserRecentChangesBatchModel
+        for a particular user, storing the most recent changes corresponding
         to things the user (for the given user_id) subscribes to.
 
         Args:
             key: str. Should be of the form 'user_id@job_queued_msec'.
             stringified_values: list(str). A list of all recent_activity_commits
-                and feedback_threads that are tagged with the given key. Each entry is 
-                a stringified dict having the following keys:
-                - 'type': str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or 
+                and feedback_threads that are tagged with the given key. Each
+                entry is a stringified dict having the following keys:
+                - 'type': str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
                     feconf.UPDATE_TYPE_FEEDBACK_MESSAGE.
-                - 'activity_id': str. The ID of the exploration being committed to or
-                    to which the feedback thread belongs.
+                - 'activity_id': str. The ID of the exploration being committed
+                    to or to which the feedback thread belongs.
                 - 'activity_title': str. The title of the activity.
-                - 'last_updated_ms': float. The time when the changes were made, in
-                    milliseconds since the Epoch. 
+                - 'last_updated_ms': float. The time when the changes were made,
+                    in milliseconds since the Epoch.
                 - 'author_id': str. The ID of the author who made the changes.
-                - 'subject': str. The commit message or message indicating a feedback 
-                    update.
+                - 'subject': str. The commit message or message indicating a
+                    feedback update.
         """
         if '@' not in key:
             logging.error(
@@ -351,19 +358,20 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
             active_realtime_layer: int. The currently active realtime datastore
                 layer.
             event_type: str. The event triggered by a student. For example, when
-                a student starts an exploration, an event of type `start` is triggered 
-                and the total play count is incremented. If he/she rates an exploration, 
-                an event of type `rate` is triggered and average rating of the realtime 
-                model is refreshed.
-            *args: 
-                If event_type is 'start', then this is a 1-element list with following 
-                entry:
+                a student starts an exploration, an event of type `start` is
+                triggered and the total play count is incremented. If he/she
+                rates an exploration, an event of type `rate` is triggered and
+                average rating of the realtime model is refreshed.
+            *args:
+                If event_type is 'start', then this is a 1-element list with
+                following entry:
                 - str. The ID of the exploration currently being played.
-                If event_type is 'rate_exploration', then this is a 3-element list with
-                following entries: 
-                - str. The ID of the exploration currently being played. 
+                If event_type is 'rate_exploration', then this is a 3-element
+                list with following entries:
+                - str. The ID of the exploration currently being played.
                 - float. The rating given by user to the exploration.
-                - float. The old rating of the exploration, before it is refreshed.
+                - float. The old rating of the exploration, before it is
+                    refreshed.
         """
         exp_id = args[0]
 
@@ -428,9 +436,12 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
             user_id: str. The ID of the user.
 
         Returns a dict with the following keys:
-            'total_plays': int. Number of times the user's explorations were played.
-            'num_ratings': int. Number of times the explorations have been rated.
-            'average_ratings': float. Average of average ratings across all explorations.
+            'total_plays': int. Number of times the user's explorations were
+                played.
+            'num_ratings': int. Number of times the explorations have been
+                rated.
+            'average_ratings': float. Average of average ratings across all
+                explorations.
         """
         total_plays = 0
         num_ratings = 0
@@ -491,25 +502,27 @@ class UserStatsMRJobManager(
     @staticmethod
     def map(item):
         """Implements the map function (generator).
-        Computes exploration data for every contributor and owner of the exploration.
+        Computes exploration data for every contributor and owner of the
+        exploration.
 
         Args:
             item: ExpSummaryModel. An instance of ExpSummaryModel.
 
         Yields:
-            This function may yield as many times as appropriate 2-tuples in the 
+            This function may yield as many times as appropriate 2-tuples in the
             format (str, dict), where
             - str. The unique ID of the user.
-            - dict: A dict that includes entries for all the explorations that this
-                user contributes to or owns. Each entry has the following keys:
+            - dict: A dict that includes entries for all the explorations that
+                this user contributes to or owns. Each entry has the following
+                keys:
                 - 'exploration_impact_score': float. The impact score of all the
                     explorations contributed to by the user.
-                - 'total_plays_for_owned_exp': int. Total plays of all explorations
-                    owned by the user.
-                - 'average_rating_for_owned_exp': float. Average of average ratings
-                    of all explorations owned by the user.
-                - 'num_ratings_for_owned_exp': int. Total number of ratings of all
+                - 'total_plays_for_owned_exp': int. Total plays of all
                     explorations owned by the user.
+                - 'average_rating_for_owned_exp': float. Average of average
+                    ratings of all explorations owned by the user.
+                - 'num_ratings_for_owned_exp': int. Total number of ratings of
+                    all explorations owned by the user.
         """
         if item.deleted:
             return
@@ -615,23 +628,24 @@ class UserStatsMRJobManager(
     def reduce(key, stringified_values):
         """Implements the reduce function.
 
-        This function creates or updates the UserStatsModel instance for the given 
-        user. It updates the impact score, total plays of all explorations, number 
-        of ratings across all explorations and average rating.
+        This function creates or updates the UserStatsModel instance for the
+        given user. It updates the impact score, total plays of all
+        explorations, number of ratings across all explorations and average
+        rating.
 
         Args:
             key: str. The unique ID of the user.
             stringified_values: list(str). A list of information regarding all
-                the explorations that this user contributes to or owns. Each entry is
-                a stringified dict having the following keys:
+                the explorations that this user contributes to or owns. Each
+                entry is a stringified dict having the following keys:
                 - 'exploration_impact_score': float. The impact score of all the
                     explorations contributed to by the user.
-                - 'total_plays_for_owned_exp': int. Total plays of all explorations
-                    owned by the user.
-                - 'average_rating_for_owned_exp': float. Average of average ratings
-                    of all explorations owned by the user.
-                - 'num_ratings_for_owned_exp': int. Total number of ratings of all
-                    explorations owned by the user. 
+                - 'total_plays_for_owned_exp': int. Total plays of all
+                    explorations owned by the user.
+                - 'average_rating_for_owned_exp': float. Average of average
+                    ratings of all explorations owned by the user.
+                - 'num_ratings_for_owned_exp': int. Total number of ratings of
+                    all explorations owned by the user.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
         exponent = 2.0/3
