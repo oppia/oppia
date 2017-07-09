@@ -103,7 +103,7 @@ describe('Interaction validator', function() {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Please add feedback for the user in the [All other ' +
-          'answers] rule if they are to return to the same state again.'
+          'answers] rule.'
       }]);
     });
 
@@ -131,8 +131,7 @@ describe('Interaction validator', function() {
       }, {
         type: WARNING_TYPES.ERROR,
         message: (
-          'Please add feedback for the user in the [All other answers] rule ' +
-          'if they are to return to the same state again.')
+          'Please add feedback for the user in the [All other answers] rule.')
       }
       ]);
     });
