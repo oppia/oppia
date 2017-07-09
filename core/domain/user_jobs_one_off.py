@@ -100,7 +100,12 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        yield (len(item.user_bio), item.username)
+        if item.user_bio is None:
+            user_bio_length = 0
+        else:
+            user_bio_length = len(item.user_bio)
+
+        yield (user_bio_length, item.username)
 
     @staticmethod
     def reduce(userbio_length, stringified_usernames):
