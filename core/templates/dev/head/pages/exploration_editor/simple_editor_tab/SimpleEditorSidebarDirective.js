@@ -35,7 +35,8 @@ oppia.directive('simpleEditorSidebar', [
           /* This initializes Perfect Scrollbar on the simple editor sidebar.
            Perfect scrollbar is needed to show scrollbar on all major browsers.
            */
-          Ps.initialize(document.querySelector('simple-editor-sidebar'));
+          var container = document.querySelector('simple-editor-sidebar');
+          Ps.initialize(container);
           $scope.SUBFIELD_LABELS = [
             'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
           $scope.questionList = SimpleEditorManagerService.getQuestionList();
@@ -49,10 +50,12 @@ oppia.directive('simpleEditorSidebar', [
             if (!SimpleEditorManagerService.canAddNewQuestion()) {
               return;
             }
-//            $scope.sidebarModeService.setModeToReadonly();
+            $scope.sidebarModeService.setModeToReadonly();
             SimpleEditorManagerService.addNewQuestion();
             $timeout(function() {
               $scope.scrollToQuestion($scope.questionList.getLastQuestion());
+              container.scrollTop = container.scrollHeight;
+              Ps.update(container);
             }, 0);
           };
 
