@@ -52,7 +52,7 @@
         "
         class="btn btn-<[getButtonColor(word)]>"
         data-drag="true"
-        data-jqyoui-options="{revert: 'invalid'}"
+        data-jqyoui-options="{revert: checkRevertBounce(), snap:true}"
         jqyoui-draggable="{animate:true, onStart:'getThisName(word)', 
                                          onStop: 'dropHovered()'}"
         ><[word]>
@@ -67,13 +67,14 @@
      <div ng-if="alwaysShowRegions">
       <div ng-repeat="region in allRegions",
           data-drop="true",
-          jqyoui-droppable="{animate:false, onDrop: 'checkTheValues(region.label)'}",
+          jqyoui-droppable="{animate:false, onDrop: 'checkTheValues(region.label)', onOver: 'isInRegion(region)', onOut: 'outOfRegion(region)'}",
           data-jqyoui-options="{snap:true}",
           style="
             height: <[getRegionDimensions($index).height]>px;
              width: <[getRegionDimensions($index).width]>px;
-             left: <[getRegionDimensions($index).left]>px;
-             top: <[getRegionDimensions($index).top]>px;
+             left: <[getRegionDimensions($index).left - 5]>px;
+             top: <[getRegionDimensions($index).top - 2]>px;
+             border-radius: 5px;
              pointer-events: none;
              position: absolute;
              display: <[getInlineDisplay()]>;

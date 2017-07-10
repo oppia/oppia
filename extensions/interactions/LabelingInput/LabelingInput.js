@@ -66,6 +66,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.incorrectBoxes = [];
           $scope.currentDraggedElement = '';
           $scope.currentlyHoveredRegions = [];
+          $scope.occupiedRegions = [];
           $scope.warningRValue = 248;
           $scope.warningGValue = 148;
           $scope.warningBValue = 6;
@@ -126,6 +127,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.getThisName = function(event, ui, name){
             $scope.checkAndRemoveElement(name);
             $scope.currentDraggedElement = name;
+            $scope.$apply();
             return;
           }
           //If all labels have been placed, run a correctness check
@@ -145,6 +147,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           }
           //Check if our value is the one of the region, and handle acccordingly
           $scope.checkTheValues = function(event, ui, correctName){
+            $scope.occupiedRegions.push(correctName);
             $scope.numRegions--;
             if ($scope.numRegions < 0){
               $scope.numRegions = 0;
@@ -232,8 +235,41 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               }
             }
           };
+          $scope.isInRegion = function(event, ui, region){
+            $scope.currentlyHoveredRegions.push(region.label);
+            console.log($scope.currentlyHoveredRegions);
+            $scope.$apply();
+            console.log($scope.currentlyHoveredRegions);
+          }
+          $scope.outOfRegion = function(event, ui, region){
+            console.log("Out");
+            var name = region.label;
+            var index = $scope.currentlyHoveredRegions.indexOf(name);
+            if (index > -1){
+              $scope.currentlyHoveredRegions.splice(index, 1);
+            }
+            index = $scope.occupiedRegions.indexOf(name);
+            if (index > -1){
+              $scope.occupiedRegions.splice(index, 1);
+            }            
+            $scope.$apply();
+          }
+          $scope.checkRevertBounce = function(){
+            return 'invalid';
+            //TODO fix implementation
+            // console.log("Revert");
+            // console.log($scope.currentlyHoveredRegions);
+            // var hoveredRegion;
+            // if ($scope.occupiedRegions.length === 0){
+            //   return 'invalid';
+            // }
+            // hoveredRegion = $scope.currentlyHoveredRegions[0];
+            // console.log(hoveredRegion);
+            // return 'invalid';
+          }
           $scope.dropHovered = function(){
             $scope.currentDraggedElement = '';
+            $scope.$apply();
           }
           //Change to red if the input is not correct
           $scope.getRValue = function(region){
