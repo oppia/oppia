@@ -42,6 +42,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'state_name': u'a_state_name',
             'summary': None,
             'original_author_username': self.VIEWER_USERNAME,
+            'message_count': 1,
             'subject': u'a subject',
             'last_updated': utils.get_time_in_millisecs(fake_date)
         }
@@ -49,7 +50,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             self.FULL_THREAD_ID, self.EXP_ID,
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
-            expected_thread_dict['summary'], False, fake_date, fake_date)
+            expected_thread_dict['summary'], False, 1, fake_date, fake_date)
         self.assertDictEqual(expected_thread_dict,
                              observed_thread.to_dict())
 

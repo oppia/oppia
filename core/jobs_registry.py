@@ -18,6 +18,7 @@
 
 from core.domain import collection_jobs_one_off
 from core.domain import exp_jobs_one_off
+from core.domain import feedback_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
@@ -36,6 +37,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.IndexAllExplorationsJobManager,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
+    feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
     stats_jobs_one_off.StatisticsAudit,
     user_jobs_one_off.UserContributionsOneOffJob,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
