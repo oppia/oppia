@@ -73,6 +73,11 @@ class LearnerDashboardHandler(base.BaseHandler):
             learner_progress_services.get_collection_summary_dicts(
                 learner_progress.incomplete_collection_summaries))
 
+        full_thread_ids = subscription_services.get_all_threads_subscribed_to(
+            self.user_id)
+        thread_summaries = feedback_services.get_thread_summaries(
+            self.user_id, full_thread_ids)
+
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))
         creators_settings = user_services.get_users_settings(
@@ -99,6 +104,7 @@ class LearnerDashboardHandler(base.BaseHandler):
             'number_of_deleted_activities': number_of_deleted_activities,
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
+            'thread_summaries': thread_summaries,
             'subscription_list': subscription_list
         })
         self.render_json(self.values)

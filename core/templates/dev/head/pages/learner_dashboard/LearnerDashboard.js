@@ -293,6 +293,8 @@ oppia.controller('LearnerDashboard', [
         $scope.completedToIncompleteCollections = (
           responseData.completed_to_incomplete_collections
         );
+        $scope.threadSummaries = responseData.thread_summaries;
+        console.log($scope.threadSummaries);
 
         $scope.activeSection = LEARNER_DASHBOARD_SECTIONS.INCOMPLETE;
         $scope.activeSubSection = LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS;

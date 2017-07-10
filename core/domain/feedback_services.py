@@ -26,6 +26,7 @@ from core.domain import user_services
 from core.domain import email_manager
 from core.platform import models
 import feconf
+import utils
 
 (feedback_models, email_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.email])
@@ -525,7 +526,7 @@ def get_thread_summaries(user_id, full_thread_ids):
         thread_summary = {
             'status': model.status,
             'original_author_id': model.original_author_id,
-            'last_updated': model.last_updated,
+            'last_updated': utils.get_time_in_millisecs(model.last_updated),
             'last_message_text': last_two_messages[index][0].text,
             'total_no_of_messages': total_no_of_messages,
             'last_message_read': last_message_read,
