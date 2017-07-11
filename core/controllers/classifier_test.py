@@ -26,26 +26,6 @@ from core.tests import test_utils
 import feconf
 
 
-def get_training_data_from_state(state):
-    """Retrieves training data from the State domain object."""
-    training_data = []
-    for (answer_group_index, answer_group) in enumerate(
-            state.interaction.answer_groups):
-        classifier_rule_spec_index = (
-            answer_group.get_classifier_rule_index())
-        if classifier_rule_spec_index is not None:
-            classifier_rule_spec = answer_group.rule_specs[
-                classifier_rule_spec_index]
-            answers = []
-            for doc in classifier_rule_spec.inputs['training_data']:
-                answers.extend([doc])
-            training_data.extend([{
-                'answer_group_index': answer_group_index,
-                'answers': answers
-            }])
-    return training_data
-
-
 def generate_signature(data):
     """Generates digital signature for given data."""
     msg = json.dumps(data, sort_keys=True)
@@ -76,7 +56,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         state = self.exploration.states['Home']
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             state.interaction.id]['algorithm_id']
-        training_data = get_training_data_from_state(state)
+        training_data = state.get_training_data()
         self.classifier_data = {
             '_alpha': 0.1,
             '_beta': 0.001,
