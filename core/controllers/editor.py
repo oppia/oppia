@@ -977,8 +977,8 @@ class AudioFileHandler(EditorHandler):
 
         # Upload to GCS bucket with filepath
         # "/assets/audio/<exploration-id>/filename"
-        default_bucket_name = 
-            app_identity_services.get_default_gcs_bucket_name()
+        default_bucket_name = (
+            app_identity_services.get_default_gcs_bucket_name())
 
         gcs_file_url = ('/%s/%s/assets/audio/%s' 
             % (default_bucket_name, exploration_id, filename))
