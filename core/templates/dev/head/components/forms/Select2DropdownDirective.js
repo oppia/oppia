@@ -56,7 +56,7 @@ oppia.directive('select2Dropdown', [function() {
         width: $scope.width || '250px',
         createTag: function(params) {
           if ($($scope.choices).filter(function() {
-            return this.text.localeCompare(term) === 0;
+            return this.text.localeCompare(params.term) === 0;
           }).length === 0) {
             return params.term.match($scope.newChoiceValidator) ? {
               id: params.term,
