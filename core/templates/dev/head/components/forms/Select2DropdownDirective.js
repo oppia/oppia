@@ -55,14 +55,10 @@ oppia.directive('select2Dropdown', [function() {
         placeholder: $scope.placeholder,
         width: $scope.width || '250px',
         createTag: function(params) {
-          if ($($scope.choices).filter(function() {
-            return this.text.localeCompare(params.term) === 0;
-          }).length === 0) {
-            return params.term.match($scope.newChoiceValidator) ? {
-              id: params.term,
-              text: params.term
-            } : null;
-          }
+          return params.term.match($scope.newChoiceValidator) ? {
+            id: params.term,
+            text: params.term
+          } : null;
         },
         templateResult: function(queryResult) {
           var doesChoiceMatchText = function(choice) {
