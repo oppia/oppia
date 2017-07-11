@@ -408,8 +408,8 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     SAMPLE_JSON_CONTENT = {
         'State A': ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: []
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -423,13 +423,15 @@ interaction:
     feedback: []
     param_changes: []
   fallbacks: []
+  hints: []
   id: TextInput
+  solution: {}
 param_changes: []
 """),
         'State B': ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: []
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -443,13 +445,15 @@ interaction:
     feedback: []
     param_changes: []
   fallbacks: []
+  hints: []
   id: TextInput
+  solution: {}
 param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: []
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -463,15 +467,17 @@ interaction:
     feedback: []
     param_changes: []
   fallbacks: []
+  hints: []
   id: TextInput
+  solution: {}
 param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
     SAMPLE_STATE_STRING = ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: []
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -485,7 +491,9 @@ interaction:
     feedback: []
     param_changes: []
   fallbacks: []
+  hints: []
   id: TextInput
+  solution: {}
 param_changes: []
 """)
 
@@ -763,7 +771,10 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
-                'new_value': [{'type': 'text', 'value': 'ABC'}],
+                'new_value': {
+                    'html': 'ABC',
+                    'audio_translations': [],
+                },
             }], 'Change objective and init state content')
 
     def test_reverting_to_old_exploration(self):
@@ -794,7 +805,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
             init_state_name = reader_dict['exploration']['init_state_name']
             init_state_data = (
                 reader_dict['exploration']['states'][init_state_name])
-            init_content = init_state_data['content'][0]['value']
+            init_content = init_state_data['content']['html']
             self.assertIn('ABC', init_content)
             self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
@@ -813,7 +824,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         init_state_name = reader_dict['exploration']['init_state_name']
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
-        init_content = init_state_data['content'][0]['value']
+        init_content = init_state_data['content']['html']
         self.assertNotIn('ABC', init_content)
         self.assertIn('Hi, welcome to Oppia!', init_content)
 
@@ -825,7 +836,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         init_state_name = reader_dict['exploration']['init_state_name']
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
-        init_content = init_state_data['content'][0]['value']
+        init_content = init_state_data['content']['html']
         self.assertIn('ABC', init_content)
         self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
@@ -835,7 +846,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         init_state_name = reader_dict['exploration']['init_state_name']
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
-        init_content = init_state_data['content'][0]['value']
+        init_content = init_state_data['content']['html']
         self.assertIn('Hi, welcome to Oppia!', init_content)
         self.assertNotIn('ABC', init_content)
 
@@ -845,7 +856,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         init_state_name = reader_dict['exploration']['init_state_name']
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
-        init_content = init_state_data['content'][0]['value']
+        init_content = init_state_data['content']['html']
         self.assertIn('ABC', init_content)
         self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
@@ -1405,13 +1416,15 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             exploration_id=self.EXP_ID1,
             draft_change_list=self.DRAFT_CHANGELIST,
             draft_change_list_last_updated=self.NEWER_DATETIME,
-            draft_change_list_exp_version=1).put()
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1).put()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.owner_id, self.EXP_ID2), user_id=self.owner_id,
             exploration_id=self.EXP_ID2,
             draft_change_list=self.DRAFT_CHANGELIST,
             draft_change_list_last_updated=self.OLDER_DATETIME,
-            draft_change_list_exp_version=1).put()
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1).put()
 
         # Exploration with no draft.
         user_models.ExplorationUserDataModel(
@@ -1432,9 +1445,10 @@ class EditorAutosaveTest(BaseEditorControllerTest):
     def test_exploration_loaded_with_draft_applied(self):
         response = self.get_json(
             '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
-        # Title updated because chanhe list was applied.
+        # Title updated because change list was applied.
         self.assertEqual(response['title'], 'Updated title')
         self.assertTrue(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 1)
         # Draft changes passed to UI.
         self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
 
@@ -1448,6 +1462,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         # Title not updated because change list not applied.
         self.assertEqual(response['title'], 'A title')
         self.assertFalse(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 1)
         # Draft changes passed to UI even when version is invalid.
         self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
 
@@ -1457,6 +1472,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         # Title not updated because change list not applied.
         self.assertEqual(response['title'], 'A title')
         self.assertIsNone(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 0)
         # Draft changes None.
         self.assertIsNone(response['draft_changes'])
 
@@ -1474,6 +1490,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertEqual(
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
         self.assertTrue(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 1)
 
     def test_draft_not_updated_validation_error(self):
         self.put_json(
@@ -1490,6 +1507,8 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
+            #id is incremented the first time but not the second
+        self.assertEqual(exp_user_data.draft_change_list_id, 2)
         self.assertEqual(
             response, {'code': 400,
                        'error': 'Expected title to be a string, received 1'})
@@ -1507,6 +1526,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertTrue(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_draft_updated_version_invalid(self):
         payload = {
@@ -1521,6 +1541,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_discard_draft(self):
         self.post_json(

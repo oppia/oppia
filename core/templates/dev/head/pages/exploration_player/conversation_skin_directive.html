@@ -105,6 +105,10 @@
                                   style="margin-left: 10px;">
         </exploration-summary-tile>
       </div>
+
+      <div ng-if="collectionSummary" class="conversation-skin-back-to-collection-container">
+        <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
+      </div>
     </div>
 
     <div ng-if="collectionSummary && recommendedExplorationSummaries.length === 0">
@@ -144,6 +148,16 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
 
   /* All classes below should start with .conversation-skin */
+  .conversation-skin-back-to-collection-container {
+    margin-top: 25px;
+    margin-bottom: 92px;
+    text-align: center;
+  }
+
+  .conversation-skin-back-to-collection {
+    color: #064b46;
+  }
+
   .conversation-skin-progress-dots {
     left: 0;
     margin: 0 auto;

@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,26 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Content
- * domain objects.
+ * @fileoverview Directive for the hint button in the exploration player.
  */
 
-oppia.factory('ContentObjectFactory', [function() {
-  var Content = function(type, value) {
-    this.type = type;
-    this.value = value;
-  };
-
-  Content.prototype.toBackendDict = function() {
+oppia.directive('hintButton', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      type: this.type,
-      value: this.value
+      restrict: 'E',
+      scope: {
+        onClickHintButton: '&',
+        allHintsAreExhausted: '&',
+        currentHintIsAvailable: '&'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_player/' +
+        'hint_button_directive.html')
     };
-  };
-
-  Content.createFromBackendDict = function(contentBackendDict) {
-    return new Content(contentBackendDict.type, contentBackendDict.value);
-  };
-
-  return Content;
-}]);
+  }]);
