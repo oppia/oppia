@@ -979,7 +979,8 @@ class AudioFileHandler(EditorHandler):
         # "/assets/audio/<exploration-id>/filename"
         default_bucket_name = app_identity_services.get_default_gcs_bucket_name()
 
-        gcs_file_url = '/%s/%s/assets/audio/%s' % (default_bucket_name, exploration_id, filename);
+        gcs_file_url = ('/%s/%s/assets/audio/%s' %
+            (default_bucket_name, exploration_id, filename))
 
         gcs_file = cloudstorage.open(gcs_file_url, 'w', content_type=audio.mime[0])
         gcs_file.write(raw)
