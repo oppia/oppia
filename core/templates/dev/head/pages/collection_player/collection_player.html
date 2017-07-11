@@ -153,9 +153,7 @@
                xmlns="http://www.w3.org/2000/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
                version="1.1"
-               style="position: absolute;
-                    left: <[pathIconParameters[$index].left]>;
-                    top: <[pathIconParameters[$index].top]>;">
+               ng-attr-style="position: absolute; left: <[pathIconParameters[$index].left]>; top: <[pathIconParameters[$index].top]>;">
             <defs>
               <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
                 <circle cx="50"
@@ -227,7 +225,7 @@
                  xmlns="http://www.w3.org/2000/svg"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
                  version="1.1"
-                 style="position: absolute; left: 50%; transform: translate(-50%, 195px);"
+                 ng-attr-style="position: absolute; left: 50%; transform: translate(-50%, 195px);"
                  ng-click="scrollToLocation('mobile-path-anchor-' + $index); updateExplorationPreview(node.getExplorationId());">
               <image ng-if="!collectionPlaythrough.hasStartedCollection() && $index===0"
                      x="0"
