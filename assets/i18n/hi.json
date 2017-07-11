@@ -212,6 +212,7 @@
 	"I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS": "ऐसा लगता है कि आपके पास प्रगति में कोई अन्वेषण नहीं है। एक रोमांचक नई अन्वेषण शुरू करने के लिए पुस्तकालय पर जाएं!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS": "ऐसा लगता है कि आपने अभी तक किसी भी निर्माता की सदस्यता नहीं ली है। नए रचनाकारों और उनके अद्भुत अन्वेषणों को खोजने के लिए लाइब्रेरी पर जाएं!",
 	"I18N_LEARNER_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_PLAYED": "पिछला खेला",
+	"I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION": "फ़ीडबैक अपडेट",
 	"I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "चालू",
 	"I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE": "ऐसा लगता है कि आपने अभी तक हमारे किसी भी अन्वेषण का प्रयास नहीं किया है",
 	"I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_TWO": "चलो यह रोमांचक यात्रा शुरू करें!",

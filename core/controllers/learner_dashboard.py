@@ -75,8 +75,11 @@ class LearnerDashboardHandler(base.BaseHandler):
 
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
-        thread_summaries = feedback_services.get_thread_summaries(
-            self.user_id, full_thread_ids)
+        if len(full_thread_ids) > 0:
+            thread_summaries = feedback_services.get_thread_summaries(
+                self.user_id, full_thread_ids)
+        else:
+            thread_summaries = []
 
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))

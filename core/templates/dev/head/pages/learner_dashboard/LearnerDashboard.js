@@ -19,7 +19,8 @@
 oppia.constant('LEARNER_DASHBOARD_SECTIONS', {
   INCOMPLETE: 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION',
   COMPLETED: 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION',
-  SUBSCRIPTIONS: 'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION'
+  SUBSCRIPTIONS: 'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION',
+  FEEDBACK: 'I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION'
 });
 
 oppia.constant('LEARNER_DASHBOARD_SUBSECTIONS', {
@@ -38,6 +39,11 @@ oppia.constant('SUBSCRIPTION_SORT_BY_KEYS', {
   IMPACT: 'subscriber_impact'
 });
 
+oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS', {
+  LAST_UPDATED: 'last_updated',
+  EXPLORATION: 'exploration'
+});
+
 oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
   LAST_PLAYED: 'I18N_LEARNER_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_PLAYED',
   TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE ',
@@ -49,6 +55,11 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
   IMPACT: 'Impact'
 });
 
+oppia.constant('HUMAN_READABLE_FEEDBACK_THREADS_SORT_BY_KEYS', {
+  LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED',
+  EXPLORATION: 'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION'
+});
+
 oppia.controller('LearnerDashboard', [
   '$scope', '$rootScope', '$window', '$http', '$modal',
   'EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
@@ -56,12 +67,14 @@ oppia.controller('LearnerDashboard', [
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
   'LEARNER_DASHBOARD_SECTIONS', 'LEARNER_DASHBOARD_SUBSECTIONS',
+  'threadStatusDisplayService', 'oppiaDatetimeFormatter',
   function(
       $scope, $rootScope, $window, $http, $modal, EXPLORATIONS_SORT_BY_KEYS,
       SUBSCRIPTION_SORT_BY_KEYS, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, 
       FATAL_ERROR_CODES, HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
       LearnerDashboardBackendApiService, UrlInterpolationService,
-      LEARNER_DASHBOARD_SECTIONS, LEARNER_DASHBOARD_SUBSECTIONS) {
+      LEARNER_DASHBOARD_SECTIONS, LEARNER_DASHBOARD_SUBSECTIONS,
+      threadStatusDisplayService, oppiaDatetimeFormatter) {
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.SUBSCRIPTION_SORT_BY_KEYS = SUBSCRIPTION_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
@@ -73,6 +86,12 @@ oppia.controller('LearnerDashboard', [
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.PAGE_SIZE = 8;
     $scope.Math = window.Math;
+
+    $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
+    $scope.getHumanReadableStatus = (
+      threadStatusDisplayService.getHumanReadableStatus);
+    $scope.getLocaleAbbreviatedDatetimeString = (
+      oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
     $scope.setActiveSection = function(newActiveSectionName) {
       $scope.activeSection = newActiveSectionName;
@@ -191,6 +210,22 @@ oppia.controller('LearnerDashboard', [
       return value;
     };
 
+    $scope.onClickThread = function(exploration_id, thread_id, exploration_title) {
+      var threadDataUrl = (
+        '/learnerdashboardthreadhandler/' + exploration_id + '/' + thread_id);
+      $scope.threadTitle = exploration_title;
+      $scope.feedbackThreadActive = true;
+
+      $http.get(threadDataUrl).then(function(response) {
+        var data = response.data;
+        $scope.messageSummaries = data.message_summary_list;
+      });
+    };
+
+    $scope.backFromThread = function() {
+      $scope.feedbackThreadActive = false;
+    }
+
     $scope.openRemoveEntityModal = function(
       sectionName, subSectionName, entity) {
       $modal.open({
@@ -259,6 +294,8 @@ oppia.controller('LearnerDashboard', [
         $scope.isCurrentExpSortDescending = true;
         $scope.currentExpSortType = EXPLORATIONS_SORT_BY_KEYS.LAST_PLAYED;
         $scope.currentSubscribersSortType = SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
+        $scope.currentFeedbackThreadsSortType = (
+          FEEDBACK_THREADS_SORT_BY_KEYS.LAST_UPDATED);
         $scope.startIncompleteExpIndex = 0;
         $scope.startCompletedExpIndex = 0;
         $scope.startIncompleteCollectionIndex = 0;
@@ -294,10 +331,10 @@ oppia.controller('LearnerDashboard', [
           responseData.completed_to_incomplete_collections
         );
         $scope.threadSummaries = responseData.thread_summaries;
-        console.log($scope.threadSummaries);
 
         $scope.activeSection = LEARNER_DASHBOARD_SECTIONS.INCOMPLETE;
         $scope.activeSubSection = LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS;
+        $scope.feedbackThreadActive = false;
 
         $scope.noActivity = (
           ($scope.completedExplorationsList.length === 0) &&

@@ -128,6 +128,11 @@
               ng-click="setActiveSection(LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS)">
             <span translate="<[LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS]>"></span>
           </h4>
+          <h4 class="oppia-learner-dashboard-menu protractor-test-feedback-section"
+              ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTIONS.FEEDBACK}"
+              ng-click="setActiveSection(LEARNER_DASHBOARD_SECTIONS.FEEDBACK)">
+            <span translate="<[LEARNER_DASHBOARD_SECTIONS.FEEDBACK]>"></span>
+          </h4>
         </md-card>
       </div>
 
@@ -136,7 +141,7 @@
         <div>
           <span class="oppia-learner-dashboard-main-content-title">
             <span translate="<[activeSection]>"></span>
-            <span ng-if="activeSection !== LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS">
+            <span ng-if="activeSection !== LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS && activeSection !== LEARNER_DASHBOARD_SECTIONS.FEEDBACK">
               <span class="oppia-navbar-breadcrumb-separator"
                     style="margin: 0 1px;">
               </span>
@@ -419,7 +424,7 @@
             </md-card>
 
             <md-card class="oppia-subscription-card"
-                     ng-repeat="subscription in subscriptionsList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending""
+                     ng-repeat="subscription in subscriptionsList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending"
                      style="margin: 0 8px 0 4px; width: 197px;">
               <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank">
                 <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
@@ -439,6 +444,57 @@
                 </span>
               </a>
             </md-card>
+          </div>
+
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.FEEDBACK" class="oppia-learner-dashboard-feedback-section">
+            <table class="table" ng-if="!feedbackThreadActive">
+              <tr ng-repeat="thread in threadSummaries | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending"
+                  ng-click="onClickThread(thread.exploration_id, thread.thread_id, thread.exploration_title)"
+                  class="oppia-feedback-tab-row">
+                <td class="col-lg-1 col-md-1 col-sm-1">
+                  <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
+                </td>
+                <td class="col-lg-3 col-md-3 col-sm-3" style="width: 20%;">
+                  <span ng-if="thread.author_second_last_message">
+                    <span ng-if="thread.second_last_message_read"><[thread.author_second_last_message]>, </span>
+                    <span ng-if="!thread.second_last_message_read">
+                      <strong><[thread.author_second_last_message]>, </strong>
+                    </span>
+                  </span>
+                  <span ng-if="thread.last_message_read"><[thread.author_last_message]></span>
+                  <span ng-if="!thread.last_message_read">
+                    <strong><[thread.author_last_message]></strong>
+                  </span>
+                  <span class="feedback-thread-message-count">(<[thread.total_no_of_messages]>)</span>
+                </td>
+                <td class="col-lg-6 col-md-6 col-sm-6" style="width: 58%;">
+                  <span ng-if="thread.second_last_message_read && thread.last_message_read"><[thread.exploration_title]> -</span>
+                  <span ng-if="!thread.second_last_message_read || !thread.last_message_read">
+                    <strong><[thread.exploration_title]> -</strong>
+                  </span>
+                  <span><[thread.last_message_text | truncate:50]></span>
+                <td class="col-lg-2 col-md-2 col-sm-2">
+                  <span><[getLocaleAbbreviatedDatetimeString(thread.last_updated)]></span>
+                </td>
+              </tr>
+            </table>
+
+            <table class="table" ng-if="feedbackThreadActive">
+              <tr>
+                <td>
+                  <button ng-click="backFromThread()"
+                          class="btn btn-default"
+                          style="padding: 0 3px;">
+                    <i class="material-icons oppia-vcenter" title="Return to list of messages"></i>
+                  </button>
+                  <span style="margin-left: 7px;"><[threadTitle]></span>
+                </td>
+              </tr>
+
+              <tr ng-repeat="message in messageSummaries">
+                <span><[message.text]></span>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -478,6 +534,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/learner_dashboard/LearnerDashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/learner_dashboard/LearnerDashboard.js"></script>
 {% endblock footer_js %}

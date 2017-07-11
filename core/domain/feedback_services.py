@@ -506,7 +506,8 @@ def get_thread_summaries(user_id, full_thread_ids):
         last_message_read = (
             last_two_messages[index][0].message_id
             in feedback_thread_user_models[index].message_ids_read_by_user)
-        author_last_message = last_two_messages[index][0].author_id
+        author_last_message = user_services.get_username(
+            last_two_messages[index][0].author_id)
 
         second_last_message_read = None
         author_second_last_message = None
@@ -514,7 +515,8 @@ def get_thread_summaries(user_id, full_thread_ids):
             second_last_message_read = (
                 last_two_messages[index][1].message_id
                 in feedback_thread_user_models[index].message_ids_read_by_user)
-            author_second_last_message = last_two_messages[index][1].author_id
+            author_second_last_message = user_services.get_username(
+                last_two_messages[index][1].author_id)
 
         if model.message_count:
             total_no_of_messages = model.message_count
@@ -533,7 +535,9 @@ def get_thread_summaries(user_id, full_thread_ids):
             'second_last_message_read': second_last_message_read,
             'author_last_message': author_last_message,
             'author_second_last_message': author_second_last_message,
-            'exploration_title': explorations[index].title
+            'exploration_title': explorations[index].title,
+            'exploration_id': exploration_ids[index],
+            'thread_id': thread_ids[index]
         }
 
         thread_summaries.append(thread_summary)
