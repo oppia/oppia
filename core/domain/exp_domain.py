@@ -375,7 +375,7 @@ class AudioTranslation(object):
             raise utils.ValidationError(
                 'Invalid audio filename: %s' % self.filename)
         extension = self.filename[dot_index + 1:]
-        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS.keys():
+        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
                 'the following extensions: %s. Received: %s',

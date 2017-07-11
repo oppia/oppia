@@ -45,12 +45,12 @@ from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import visualization_registry
 from core.platform import models
-from google.appengine.api import app_identity
 
 import feconf
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
+app_identity_services = models.Registry.import_app_identity_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 # The frontend template for a new state. It is sent to the frontend when the
@@ -954,8 +954,7 @@ class AudioFileHandler(EditorHandler):
             raise self.InvalidInputException(
                 'No filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
-        if (extension not in
-                feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()):
+        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
             raise self.InvalidInputException(
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
@@ -978,13 +977,11 @@ class AudioFileHandler(EditorHandler):
 
         # Upload to GCS bucket with filepath
         # "/assets/audio/<exploration-id>/filename"
-        default_bucket_name = app_identity.get_default_gcs_bucket_name()
-        gcs_file = cloudstorage.open('/' + default_bucket_name +
-                                     '/' + exploration_id +
-                                     '/assets/audio' +
-                                     '/' + filename,
-                                     'w',
-                                     content_type=audio.mime[0])
+        default_bucket_name =
+            app_identity_services.get_default_gcs_bucket_name()
+
+        gcs_file_url = '/%s/%s/assets/audio/%s' % (default_bucket_name, exploration_id, filename);
+        gcs_file = cloudstorage.open(gcs_file_url, content_type=audio.mime[0])
         gcs_file.write(raw)
         gcs_file.close()
 
