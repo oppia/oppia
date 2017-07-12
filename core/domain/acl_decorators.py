@@ -399,3 +399,68 @@ def can_manage_suggestions_on_exploration(handler):
                 'this exploration.')
 
     return test_can_manage
+
+
+def can_publish_exploration(handler):
+
+    def test_can_publish(self, exploration_id, **kwargs):
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+
+        if exploration_rights is None:
+            raise self.PageNotFoundException
+
+        if exploration_rights.cloned_from:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to publish this exploration.')
+
+        if role_services.ACTION_PUBLISH_ANY_EXPLORATION in self.actions:
+            return handler(self, exploration_id, **kwargs)
+
+        if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            if role_services.ACTION_PUBLISH_OWNED_EXPLORATION in self.actions:
+                if self.user_id in exploration_rights.owner_ids:
+                    return handler(self, exploration_id, **kwargs)
+
+        if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+            if role_services.ACTION_PUBLISH_PUBLIC_EXPLORATION in self.actions:
+                return handler(self, exploration_id, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to publish this exploration.')
+
+    return test_can_publish
+
+
+def can_modify_exploration_roles(handler):
+
+    def test_can_modify(self, exploration_id, **kwargs):
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+
+        if exploration_rights is None:
+            raise self.PageNotFoundException
+
+        if (
+            exploration_rights.community_owned or
+                exploration_rights.cloned_from):
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to change rights for this' +
+                'exploration.')
+
+        if (
+            role_services.ACTION_MODIFY_ROLES_FOR_ANY_EXPLORATION in
+                self.actions):
+            return handler(self, exploration_id, **kwargs)
+        if (
+            role_services.ACTION_MODIFY_ROLES_FOR_OWNED_EXPLORATION in
+                self.actions):
+            if self.user_id in exploration_rights.owner_ids:
+                return handler(self, exploration_id, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to change rights for this' +
+            'exploration.')
+
+    return test_can_modify
