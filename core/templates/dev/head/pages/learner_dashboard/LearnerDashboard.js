@@ -210,10 +210,11 @@ oppia.controller('LearnerDashboard', [
       return value;
     };
 
-    $scope.onClickThread = function(exploration_id, thread_id, exploration_title) {
+    $scope.onClickThread = function(
+      explorationId, threadId, explorationTitle) {
       var threadDataUrl = (
-        '/learnerdashboardthreadhandler/' + exploration_id + '/' + thread_id);
-      $scope.threadTitle = exploration_title;
+        '/learnerdashboardthreadhandler/' + explorationId + '/' + threadId);
+      $scope.threadTitle = explorationTitle;
       $scope.feedbackThreadActive = true;
 
       $http.get(threadDataUrl).then(function(response) {
