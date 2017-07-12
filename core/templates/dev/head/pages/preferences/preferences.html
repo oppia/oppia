@@ -73,6 +73,7 @@
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
                 <select2-dropdown
                   item="$parent.subjectInterests"
+                  choices="$parent.subjectInterests"
                   tag-mode="true"
                   allow-multiple-choices="true"
                   new-choice-regex="<[::TAG_REGEX_STRING]>"

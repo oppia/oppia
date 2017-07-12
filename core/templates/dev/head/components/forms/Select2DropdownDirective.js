@@ -49,7 +49,7 @@ oppia.directive('select2Dropdown', [function() {
 
       var select2Options = {
         allowClear: false,
-        data: $scope.tagMode === 'true' ? $scope.item : $scope.choices,
+        data: $scope.choices,
         multiple: $scope.allowMultipleChoices === 'true',
         tags: $scope.tagMode === 'true',
         placeholder: $scope.placeholder,
