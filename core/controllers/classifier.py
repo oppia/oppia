@@ -29,11 +29,11 @@ import feconf
 def validate_request(handler):
     """Decorator that checks if the incoming request from the VM is valid."""
     def test_is_valid(self, **kwargs):
-        message = self.request.get('payload')
-        message = json.loads(message)
-        signature = message.get('signature')
-        vm_id = message.get('vm_id')
-        message.pop('signature')
+        payload = self.request.get('payload')
+        payload = json.loads(payload)
+        signature = payload.get('signature')
+        message = payload.get('message')
+        vm_id = payload.get('vm_id')
         message = json.dumps(message, sort_keys=True)
         secret = str([val['shared_secret_key'] for val in (
             config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value) if val[
@@ -48,6 +48,7 @@ def validate_request(handler):
 
     return test_is_valid
 
+
 class TrainedClassifierHandler(base.BaseHandler):
     """This handler stores the result of the training job in datastore and
     updates the status of the job.
@@ -58,22 +59,30 @@ class TrainedClassifierHandler(base.BaseHandler):
     @validate_request
     def post(self):
         """Handles POST requests."""
-        job_id = self.payload.get('job_id')
-        classifier_data = self.payload.get('classifier_data')
+        job_id = self.payload.get('message').get('job_id')
+        classifier_data = self.payload.get('message').get('classifier_data')
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         state_name = classifier_training_job.state_name
         exp_id = classifier_training_job.exp_id
         exp_version = classifier_training_job.exp_version
         algorithm_id = classifier_training_job.algorithm_id
+
+        data_schema_version = None
         for algorithm_details in feconf.INTERACTION_CLASSIFIER_MAPPING.values():
             if algorithm_details['algorithm_id'] == algorithm_id:
                 data_schema_version = algorithm_details[
                     'current_data_schema_version']
+        if data_schema_version is None:
+            return self.InternalErrorException
+
         classifier = classifier_domain.ClassifierData(
             job_id, exp_id, exp_version, state_name, algorithm_id,
             classifier_data, data_schema_version)
-        classifier_id = classifier_services.save_classifier(classifier)
+        try:
+            classifier_services.save_classifier(classifier)
+        except Exception:
+            return self.InternalErrorException
 
         # Update status of the training job to 'COMPLETE'.
         classifier_training_job.update_status(
@@ -86,7 +95,4 @@ class TrainedClassifierHandler(base.BaseHandler):
             classifier_training_job.training_data,
             classifier_training_job.status,
             classifier_training_job.job_id)
-        if classifier_id:
-            return self.render_json({})
-        else:
-            return self.InternalErrorException
+        return self.render_json({})

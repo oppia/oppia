@@ -1352,13 +1352,12 @@ class State(object):
             if classifier_rule_spec_index is not None:
                 classifier_rule_spec = answer_group.rule_specs[
                     classifier_rule_spec_index]
-                answers = []
-                for doc in classifier_rule_spec.inputs['training_data']:
-                    answers.extend([doc])
-                training_data.extend([{
+                answers = copy.deepcopy(classifier_rule_spec.inputs[
+                    'training_data'])
+                training_data.append({
                     'answer_group_index': answer_group_index,
                     'answers': answers
-                }])
+                })
         return training_data
 
     def can_undergo_classification(self):

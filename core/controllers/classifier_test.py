@@ -81,12 +81,13 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
 
         self.job_result_dict = {
             'job_id' : self.job_id,
-            'classifier_data' : self.classifier_data
+            'classifier_data' : self.classifier_data,
         }
 
-        self.payload = self.job_result_dict
+        self.payload = {}
         self.payload['vm_id'] = feconf.DEFAULT_VM_ID
-        self.payload['signature'] = generate_signature(self.payload)
+        self.payload['message'] = self.job_result_dict
+        self.payload['signature'] = generate_signature(self.payload['message'])
 
     def test_trained_classifier_handler(self):
         # Normal end-to-end test.
@@ -109,6 +110,6 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
 
     def test_error_on_different_signatures(self):
         # Altering data to result in different signatures.
-        self.payload['job_id'] = 'different_job_id'
+        self.payload['message']['job_id'] = 'different_job_id'
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=True, expected_status_int=401)

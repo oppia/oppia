@@ -315,9 +315,6 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.RecommendationsHandler),
 
     get_redirect_route(
-        r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
-
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
         editor.ExplorationPage),
     get_redirect_route(
@@ -452,6 +449,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
+
+    get_redirect_route(
+        r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
+
 ]
 
 URLS_TO_SERVE = []

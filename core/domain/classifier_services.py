@@ -315,7 +315,7 @@ def _update_classifier_training_job(classifier_training_job_model, status):
 
 def save_classifier_training_job(algorithm_id, exp_id,
                                  exp_version, state_name, training_data,
-                                 status='NEW', job_id='None'):
+                                 status=None, job_id=None):
     """Checks for the existence of the model.
     If the model exists, it is updated using _update_classifier_training_job
         method.
@@ -337,15 +337,17 @@ def save_classifier_training_job(algorithm_id, exp_id,
     Returns:
         job_id: str. ID of the classifier training job.
     """
-    classifier_training_job_model = (
-        classifier_models.ClassifierTrainingJobModel.get(job_id, False))
-    if classifier_training_job_model is None:
+    if status is None:
+        status = feconf.TRAINING_JOB_STATUS_NEW
+    if job_id is None:
         classifier_training_job = classifier_domain.ClassifierTrainingJob(
             'job_id_dummy', algorithm_id, exp_id, exp_version,
             state_name, status, training_data)
         classifier_training_job.validate()
         job_id = _create_classifier_training_job(classifier_training_job)
     else:
+        classifier_training_job_model = (
+            classifier_models.ClassifierTrainingJobModel.get(job_id, False))
         classifier_training_job = get_classifier_training_job_from_model(
             classifier_training_job_model)
         classifier_training_job.validate()
