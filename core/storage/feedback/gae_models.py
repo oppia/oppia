@@ -399,15 +399,18 @@ class FeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, user_id, exploration_id, thread_id):
-        """Gets the FeedbackThreadUserModel for the given user and thread id.
+        """Gets the FeedbackThreadUserModel corresponding to the given user and
+        the thread given by the exploration id and thread id.
 
         Args:
             user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration to which the thread
+                belongs.
             thread_id: str. The id of the thread.
 
         Returns:
             FeedbackThreadUserModel. The FeedbackThreadUserModel instance which
-                matches with the given user_id and exploration_id.
+                matches with the given user_id, exploration_id and thread id.
         """
         instance_id = cls.generate_full_id(user_id, exploration_id, thread_id)
         return super(FeedbackThreadUserModel, cls).get(
@@ -419,6 +422,8 @@ class FeedbackThreadUserModel(base_models.BaseModel):
 
         Args:
             user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration to which the thread
+                belongs.
             thread_id: str. The id of the thread.
 
         Returns:
@@ -426,20 +431,25 @@ class FeedbackThreadUserModel(base_models.BaseModel):
                 instance.
         """
         instance_id = cls.generate_full_id(user_id, exploration_id, thread_id)
-        return cls(id=instance_id)
+        new_instance = cls(id=instance_id)
+        new_instance.put()
+        return new_instance
 
     @classmethod
     def get_multi(cls, user_id, exploration_ids, thread_ids):
-        """Gets the ExplorationUserDataModel for the given user and exploration
-         ids.
+        """Gets the ExplorationUserDataModel corresponding to the given user and
+        the exploration and thread ids.
 
         Args:
-            user_ids: list(str). A list of user_ids.
-            exploration_id: str. The id of the exploration.
+            user_id: str. The id of the user.
+            exploration_ids: list(str). The ids of the explorations to which
+                the thread belongs.
+            thread_ids: list(str). The ids of the threads.
 
         Returns:
-            ExplorationUserDataModel. The ExplorationUserDataModel instance
-            which matches with the given user_ids and exploration_id.
+            list(FeedbackThreadUserModel). The FeedbackThreadUserModels
+                corresponding to the given user and the exploration and thread
+                ids.
         """
         instance_ids = [
             cls.generate_full_id(user_id, exploration_id, thread_id)

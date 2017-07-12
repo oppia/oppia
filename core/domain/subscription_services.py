@@ -105,8 +105,8 @@ def unsubscribe_from_creator(user_id, creator_id):
 
 
 def get_all_threads_subscribed_to(user_id):
-    """Returns a list with ids of all the threads to which the user is
-    subscribed.
+    """Returns a list with ids of all the feedback and suggestion threads to
+    which the user is subscribed.
 
     Callers of this function should ensure that the user_id is valid.
     """

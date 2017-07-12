@@ -109,6 +109,32 @@ class FeedbackThread(object):
         """
         return full_thread_id.split('.')[1]
 
+    def get_full_message_id(self, message_id):
+        """ Returns the full id of the message.
+
+        Args:
+            message_id: int. The id of the message for which we have to fetch
+                the complete message id.
+
+        Returns:
+            str. The full id corresponding to the given message id.
+        """
+        return '.'.join([self.id, str(message_id)])
+
+    def get_last_two_message_ids(self):
+        """Returns the full message ids of the last two messages of the thread.
+
+        Returns:
+            list(str). The ids of the last two messages of the thread.
+        """
+        message_ids = []
+        last_message_id = self.message_count - 1
+        second_last_message_id = self.message_count - 2
+        message_ids.append(self.get_full_message_id(last_message_id))
+        message_ids.append(self.get_full_message_id(second_last_message_id))
+
+        return message_ids
+
 
 class FeedbackMessage(object):
     """Domain object for a feedback message.

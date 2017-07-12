@@ -27,7 +27,7 @@ from core.platform import models
 
 
 class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for calculating the distribution of username lengths."""
+    """One-off job for calculating the number of messages in a thread."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -42,16 +42,21 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
         message_ids = [
             ast.literal_eval(v) for v in stringified_message_ids]
 
-        if max(message_ids) + 1 == len(message_ids):
-            feedback_services.set_message_count_for_thread(
-                key, max(message_ids) + 1)
-        else:
-            logging.error('The number of messages estimated by message ids is' +
-                          'not equal to the actual number of messages.')
+        thread_model = feedback_models.FeedbackThreadModel.get(key)
+        thread_model.message_count = max(message_ids) + 1
+        thread_model.put()
+
+        if max(message_ids) + 1 != len(message_ids):
             exploration_and_thread_id = key.split('.')
             exploration_id = exploration_and_thread_id[0]
             thread_id = exploration_and_thread_id[1]
             thread = feedback_services.get_thread(exploration_id, thread_id)
+            logging.error('The number of messages in thread, given by the ' +
+                          'id '+ key + ', is '  + len(message_ids) + '. But ' +
+                          'the number of messages as estimated by the ' +
+                          'message ids is ' + (max(message_ids) + 1) +
+                          '. Therefore the number estimate is not equal to' +
+                          'the actual number of messages.')
             yield (key, {
                 'subject': thread.subject,
                 'exploration_id': exploration_id,
