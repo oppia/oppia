@@ -576,3 +576,109 @@ class SuggestChangesTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
+
+class PublishExplorationTest(test_utils.GenericTestBase):
+
+    private_exp_id = 'exp_0'
+    public_exp_id = 'exp_1'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_publish_exploration
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(PublishExplorationTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.public_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(
+            self.owner_id, self.public_exp_id)
+
+    def test_owner_can_publish_owned_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_can_publicize_public_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.public_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_cannot_publish_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+
+    def test_admin_can_publish_any_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.public_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class ModifyExplorationRolesTest(test_utils.GenericTestBase):
+
+    private_exp_id = 'exp_0'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_modify_exploration_roles
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(ModifyExplorationRolesTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+
+    def test_owner_can_modify_exploration_roles(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_cannot_modify_roles_of_unowned_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_admin_can_modigy_roles_of_any_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
