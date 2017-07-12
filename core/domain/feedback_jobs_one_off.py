@@ -55,7 +55,7 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
                           'id '+ key + ', is '  + len(message_ids) + '. But ' +
                           'the number of messages as estimated by the ' +
                           'message ids is ' + (max(message_ids) + 1) +
-                          '. Therefore the number estimate is not equal to' +
+                          '. Therefore the estimate is not equal to ' +
                           'the actual number of messages.')
             yield (key, {
                 'subject': thread.subject,

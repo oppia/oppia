@@ -443,7 +443,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
         Args:
             user_id: str. The id of the user.
             exploration_ids: list(str). The ids of the explorations to which
-                the thread belongs.
+                the threads belong.
             thread_ids: list(str). The ids of the threads.
 
         Returns:

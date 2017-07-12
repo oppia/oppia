@@ -71,7 +71,6 @@ def _create_models_for_thread_and_first_message(
     thread.has_suggestion = has_suggestion
     thread.message_count = 0
     thread.put()
-
     create_message(
         exploration_id, thread_id, original_author_id,
         feedback_models.STATUS_CHOICES_OPEN, subject, text)
@@ -435,7 +434,7 @@ def get_thread_summaries(user_id, full_thread_ids):
             to fetch the summaries.
 
     Returns:
-        list(dict). A list of dictionary containing the summaries of the threads
+        list(dict). A list of dictionaries containing the summaries of the threads
             given to it. The format of the returned value:
             [
                 {
