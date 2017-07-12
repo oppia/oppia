@@ -60,7 +60,7 @@
           <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              <textarea ng-model="userBio" ng-blur="saveUserBio(userBio)" rows="5"></textarea>
+              <textarea ng-model="userBio" ng-blur="saveUserBio(userBio)" rows="5" maxlength="2000"></textarea>
               <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_BIO_EXPLAIN_TEXT"></span>
             </div>
           </div>
