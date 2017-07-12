@@ -115,13 +115,13 @@ def _get_full_customization_args(customization_args, ca_specs):
             customization_args and the values are dicts with a
             single key, 'value', whose corresponding value is the value of
             the customization arg.
-        ca_specs: list(dict). List of specs dictionary. Is used to check if
+        ca_specs: list(dict). List of spec dictionaries. Is used to check if
             some keys are missing in customization_args. Dicts have the
             following structure:
                 - name: str. The customization variable name.
                 - description: str. The customization variable description.
-                - default_value: The defaul value of customization variable.
-                    Can have multiple types.
+                - default_value: *. The default value of the customization
+                    variable.
 
     Returns:
         dict. The customization_args dict where missing keys are populated with
@@ -154,13 +154,13 @@ def _validate_customization_args_and_values(
             customization_args and the values are dicts with a
             single key, 'value', whose corresponding value is the value of
             the customization arg.
-        ca_specs_to_validate_against: list(dict). List of specs dictionary. Is
+        ca_specs_to_validate_against: list(dict). List of spec dictionaries. Is
             used to check if some keys are missing in customization_args. Dicts
             have the following structure:
                 - name: str. The customization variable name.
                 - description: str. The customization variable description.
-                - default_value: multiple types. The defaul value of
-                    customization variable.
+                - default_value: *. The default value of the customization
+                    variable.
 
     Raises:
         ValidationError: The given 'customization_args' is not valid.
@@ -563,7 +563,7 @@ class SubtitledHtml(object):
         parameterized using the parameters in `params`.
 
         Args:
-            params: dict. The keys are the parameters names and the values are
+            params: dict. The keys are the parameter names and the values are
                 the values of parameters.
 
         Raises:
@@ -610,8 +610,14 @@ class RuleSpec(object):
         """Initializes a RuleSpec domain object.
 
         Args:
-            rule_type: str. The type of rule.
-            inputs: dict. TODO
+            rule_type: str. The rule type, e.g. "CodeContains" or "Equals". A
+                full list of rule types can be found in
+                extensions/interactions/rule_templates.json.
+            inputs: dict. The values of the parameters needed in order to fully
+                specify the rule. The keys for this dict can be deduced from
+                the relevant description field in
+                extensions/interactions/rule_templates.json -- they are
+                enclosed in {{...}} braces.
         """
         self.rule_type = rule_type
         self.inputs = inputs
@@ -627,7 +633,8 @@ class RuleSpec(object):
                 this RuleSpec. Each element of the list represents a single
                 parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
-                    1: The typed object instance for that parameter(e.g. Real).
+                    1: The typed object instance for that
+                        parameter (e.g. Real).
             exp_param_specs_dict: A dict of specified parameters used in this
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type). RuleSpec
@@ -839,7 +846,7 @@ class AnswerGroup(object):
                 value objects with an object type property (obj_type).
 
         Raises:
-        ValidationError: One or more attributes of the AnswerGroupare invalid.
+        ValidationError: One or more attributes of the AnswerGroup are invalid.
         ValidationError: The AnswerGroup contains more than one classifier
             rule.
         """
@@ -1217,8 +1224,9 @@ class InteractionInstance(object):
                 which have been confirmed to be associated with the default
                 outcome.
             fallbacks: list(Fallback). List of fallbacks for this interaction.
-            hints: list(Hint). List of Hint of this InteractionInstance.
-            solution: Solution. The Solution of this InteractionInstance.
+            hints: list(Hint). List of Hint for this interaction.
+            solution: Solution. A possible solution for the question asked in
+                this interaction.
         """
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
@@ -1977,7 +1985,7 @@ class State(object):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome_dict. dict. Dict that represent Outcome domain
+            default_outcome_dict. dict. Dict that represents Outcome domain
                 object.
         """
         if default_outcome_dict:
@@ -2043,8 +2051,8 @@ class State(object):
         """Update the list of hints.
 
         Args:
-            hint_list: list(dict). A list of dict; each dict is representation
-                of Hint object.
+            hint_list: list(dict). A list of dict; each dict represents a Hint
+                object.
 
         Raises:
             Exception: 'hint_list' is not a list.
@@ -2074,7 +2082,7 @@ class State(object):
             self.interaction.id, solution_dict)
 
     def add_hint(self, hint_text):
-        """Add a new hint in the list of hints.
+        """Add a new hint to the list of hints.
 
         Args:
             hint_text: str. The hint text.
@@ -2085,10 +2093,10 @@ class State(object):
         """Delete a hint from the list of hints.
 
         Args:
-            index: int. The position of hint in the list of hints.
+            index: int. The position of the hint in the list of hints.
 
         Raises:
-            IndexError: Index is less than 0
+            IndexError: Index is less than 0.
             IndexError: Index is greater than or equal than the length of hints
                 list.
         """
@@ -3125,7 +3133,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         # ensure widgets are renamed to be interactions
         for _, state_defn in states_dict.iteritems():
@@ -3154,7 +3162,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         # The name of the implicit END state before the migration. Needed here
         # to migrate old explorations which expect that implicit END state.
@@ -3226,7 +3234,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         # Ensure all states interactions have a triggers list.
         for sdict in states_dict.values():
@@ -3252,7 +3260,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -3348,7 +3356,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         # Ensure all states interactions have a fallbacks list.
         for state_dict in states_dict.values():
@@ -3372,7 +3380,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -3392,7 +3400,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -3415,7 +3423,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             state_dict['classifier_model_id'] = None
@@ -3432,7 +3440,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
@@ -3451,7 +3459,7 @@ class Exploration(object):
                 State domain object.
 
         Returns:
-           dict. The converted states_dict.
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -3517,7 +3525,7 @@ class Exploration(object):
         """Converts a v1 exploration dict into a v2 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v1.
 
         Returns:
@@ -3541,7 +3549,7 @@ class Exploration(object):
         """Converts a v2 exploration dict into a v3 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v2.
 
         Returns:
@@ -3563,7 +3571,7 @@ class Exploration(object):
         """Converts a v3 exploration dict into a v4 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v3.
 
         Returns:
@@ -3587,7 +3595,7 @@ class Exploration(object):
         """Converts a v4 exploration dict into a v5 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v4.
 
         Returns:
@@ -3615,7 +3623,7 @@ class Exploration(object):
         """Converts a v5 exploration dict into a v6 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v5.
 
         Returns:
@@ -3643,7 +3651,7 @@ class Exploration(object):
         """Converts a v6 exploration dict into a v7 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v6.
 
         Returns:
@@ -3667,7 +3675,7 @@ class Exploration(object):
         """Converts a v7 exploration dict into a v8 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v7.
 
         Returns:
@@ -3691,7 +3699,7 @@ class Exploration(object):
         """Converts a v8 exploration dict into a v9 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v8.
 
         Returns:
@@ -3715,7 +3723,7 @@ class Exploration(object):
         """Converts a v9 exploration dict into a v10 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v9.
             title: str. The exploration title.
             category: str. The exploration category.
@@ -3759,7 +3767,7 @@ class Exploration(object):
         """Converts a v10 exploration dict into a v11 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v10.
 
         Returns:
@@ -3781,7 +3789,7 @@ class Exploration(object):
         """Converts a v11 exploration dict into a v12 exploration dict.
 
         Args:
-            exploration_dict: dict. The dict representation of a exploration
+            exploration_dict: dict. The dict representation of an exploration
                 with schema version v11.
 
         Returns:
@@ -3842,7 +3850,7 @@ class Exploration(object):
 
         Raises:
             Exception: 'yaml_content' or the exploration schema version is not
-            valid.
+                valid.
         """
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
@@ -3942,7 +3950,7 @@ class Exploration(object):
 
         Raises:
             Exception: The initial schema version of exploration is less than
-            or equal to 9.
+                or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict = migration_result[0]
@@ -3973,7 +3981,7 @@ class Exploration(object):
 
         Raises:
             Exception: The initial schema version of exploration is less than
-            or equal to 9.
+                or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
             yaml_content, title, category)
