@@ -149,3 +149,430 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
             '/mock/%s' % self.private_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 404)
         self.logout()
+
+
+class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
+
+    user_name = 'banneduser'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_create_exploration
+        def get(self):
+            self.render_json({'success': True})
+
+    def setUp(self):
+        super(CreateExplorationDecoratorTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.user_email, self.user_name)
+        self.set_banned_users([self.user_name])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/create', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_create_exploration(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/create', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_normal_user_can_create_exploration(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/mock/create', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_guest_user_cannot_create_exploration(self):
+        response = self.testapp.get(
+            '/mock/create', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+
+
+class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
+
+    user_name = 'collectioneditor'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_create_collection
+        def get(self):
+            self.render_json({'success': True})
+
+    def setUp(self):
+        super(CreateCollectionDecoratorTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.user_email, self.user_name)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_collection_editors([self.user_name])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/create', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_guest_user_cannot_create_collection(self):
+        response = self.testapp.get('/mock/create', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+
+    def test_normal_user_cannot_create_collection(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/mock/create', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_collection_editor_can_create_collection(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/create', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_admins_can_create_collection(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get('/mock/create', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class AccessCreatorDashboardTest(test_utils.GenericTestBase):
+
+    user_name = 'banneduser'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+
+        @acl_decorators.can_access_creator_dashboard
+        def get(self):
+            self.render_json({'success': True})
+
+    def setUp(self):
+        super(AccessCreatorDashboardTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.user_email, self.user_name)
+        self.set_banned_users([self.user_name])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/access', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_access_editor_dashboard(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/access', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_normal_user_can_access_editor_dashboard(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/mock/access', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+
+
+class ViewExplorationFeedbackTest(test_utils.GenericTestBase):
+
+    published_exp_id = 'exp_0'
+    private_exp_id = 'exp_1'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_view_exploration_feedback
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(ViewExplorationFeedbackTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(
+            self.owner_id, self.published_exp_id)
+
+    def test_guest_cannot_view_feedbacks(self):
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+
+    def test_owner_can_view_feedback(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_can_view_feeback_public_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.published_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_cannot_view_feedback_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_admin_can_view_feeback_private_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class RateExplorationTest(test_utils.GenericTestBase):
+
+    user_name = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_rate_exploration
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(RateExplorationTest, self).setUp()
+        self.signup(self.user_email, self.user_name)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_guest_cannot_give_rating(self):
+        response = self.testapp.get('/mock/exp', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+
+    def test_normal_user_can_give_rating(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/exp', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class FlagExplorationTest(test_utils.GenericTestBase):
+
+    user_name = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_flag_exploration
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(FlagExplorationTest, self).setUp()
+        self.signup(self.user_email, self.user_name)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_guest_cannot_flag_exploration(self):
+        response = self.testapp.get('/mock/exp', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+
+    def test_normal_user_can_flag_exploration(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/exp', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class ManageSubscriptionsTest(test_utils.GenericTestBase):
+
+    user_name = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_manage_subscriptions
+        def get(self):
+            self.render_json({'success': True})
+
+    def setUp(self):
+        super(ManageSubscriptionsTest, self).setUp()
+        self.signup(self.user_email, self.user_name)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_guest_cannot_flag_exploration(self):
+        response = self.testapp.get('/mock/', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+
+    def test_normal_user_can_flag_exploration(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class EditExplorationTest(test_utils.GenericTestBase):
+
+    user_name = 'banneduser'
+    user_email = 'user@example.com'
+    published_exp_id = 'exp_0'
+    private_exp_id = 'exp_1'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_edit_exploration
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(EditExplorationTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.user_name)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_banned_users([self.user_name])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(
+            self.owner_id, self.published_exp_id)
+
+    def test_banned_user_cannot_edit_exploration(self):
+        self.login(self.user_email)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_owner_can_edit_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_can_edit_public_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.published_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_cannot_edit_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_admin_can_edit_private_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class DeleteExplorationTest(test_utils.GenericTestBase):
+
+    private_exp_id = 'exp_0'
+    published_exp_id = 'exp_1'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_delete_exploration
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(DeleteExplorationTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(
+            self.owner_id, self.published_exp_id)
+
+    def test_owner_can_delete_owned_private_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_can_delete_published_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.published_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_owner_cannot_delete_published_exploratin(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.published_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_moderator_cannot_delete_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+
+class SuggestChangesTest(test_utils.GenericTestBase):
+
+    user_name = 'user'
+    user_email = 'user@example.com'
+    banned_user_name = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_suggest_changes_to_exploration
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(SuggestChangesTest, self).setUp()
+        self.signup(self.user_email, self.user_name)
+        self.signup(self.banned_user_email, self.banned_user_name)
+        self.set_banned_users([self.banned_user_name])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_suggest_changes(self):
+        self.login(self.banned_user_email)
+        response = self.testapp.get('/mock/exp', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_normal_user_can_suggest_changes(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/exp', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
