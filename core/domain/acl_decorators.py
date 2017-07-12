@@ -16,13 +16,14 @@
 
 """Decorators to provide authorization across the site."""
 
+import logging
+
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import user_services
 from core.platform import models
 import feconf
-import logging
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -76,6 +77,17 @@ def check_activity_accessible(
 
 
 def check_exploration_editable(user_id, user_actions, exploration_rights):
+    """Returns a boolean to signify whether given exploration is editable
+    by the user or not.
+
+    Args:
+        user_id: str. Id of the given user.
+        user_actions: list(str). List of actions given user can perform.
+        exploration_rights: Exploration rights object.
+
+    Returns:
+        bool. Whether the given exploration can be accessed.
+    """
     if exploration_rights.community_owned:
         return True
 
@@ -84,13 +96,13 @@ def check_exploration_editable(user_id, user_actions, exploration_rights):
 
     if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
         if (
-            role_services.ACTION_EDIT_ANY_PUBLIC_EXPLORATION in
+                role_services.ACTION_EDIT_ANY_PUBLIC_EXPLORATION in
                 user_actions):
             return True
 
     if role_services.ACTION_EDIT_OWNED_EXPLORATION in user_actions:
         if (
-           (user_id in exploration_rights.owner_ids) or
+                (user_id in exploration_rights.owner_ids) or
                 (user_id in exploration_rights.editor_ids)):
             return True
 
@@ -162,7 +174,7 @@ def can_create_exploration(handler):
 
     def test_can_create(self, **kwargs):
         if (
-            (role_services.ACTION_CREATE_EXPLORATION in self.actions) and
+                (role_services.ACTION_CREATE_EXPLORATION in self.actions) and
                 user_services.has_fully_registered(self.user_id)):
             return handler(self, **kwargs)
         else:
@@ -177,7 +189,7 @@ def can_create_collection(handler):
 
     def test_can_create(self, **kwargs):
         if (
-            (role_services.ACTION_CREATE_COLLECTION in self.actions) and
+                (role_services.ACTION_CREATE_COLLECTION in self.actions) and
                 user_services.has_fully_registered(self.user_id)):
             return handler(self, **kwargs)
         else:
@@ -213,7 +225,8 @@ def can_access_creator_dashboard(handler):
 
 def can_view_exploration_feedback(handler):
     """Decorator to check whether the user can view feedback for a given
-    exploration."""
+    exploration.
+    """
 
     def test_can_access(self, exploration_id, **kwargs):
         exploration_rights = rights_manager.get_exploration_rights(
@@ -230,10 +243,13 @@ def can_view_exploration_feedback(handler):
 
 
 def can_rate_exploration(handler):
+    """Decorator to check whether the user can give rating to given
+    exploration.
+    """
 
     def test_can_rate(self, exploration_id, **kwargs):
         if (
-            (role_services.ACTION_RATE_EXPLORATION in self.actions) and
+                (role_services.ACTION_RATE_EXPLORATION in self.actions) and
                 user_services.has_fully_registered(self.user_id)):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -244,10 +260,11 @@ def can_rate_exploration(handler):
 
 
 def can_flag_exploration(handler):
+    """Decorator to check whether user can flag given exploration."""
 
     def test_can_flag(self, exploration_id, **kwargs):
         if (
-            (role_services.ACTION_FLAG_EXPLORATION in self.actions) and
+                (role_services.ACTION_FLAG_EXPLORATION in self.actions) and
                 user_services.has_fully_registered(self.user_id)):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -258,10 +275,11 @@ def can_flag_exploration(handler):
 
 
 def can_manage_subscriptions(handler):
+    """Decorator to check whether user can subscribe/unsubscribe a creator."""
 
     def test_can_flag(self, **kwargs):
         if (
-            (role_services.ACTION_MANAGE_SUBSCRIPTION in self.actions) and
+                (role_services.ACTION_MANAGE_SUBSCRIPTION in self.actions) and
                 user_services.has_fully_registered(self.user_id)):
             return handler(self, **kwargs)
         else:
@@ -326,6 +344,7 @@ def can_edit_exploration(handler):
 
 
 def can_delete_exploration(handler):
+    """Decorator to check whether user can delete exploration."""
 
     def test_can_delete(self, exploration_id, **kwargs):
         if not self.user_id:
@@ -337,15 +356,15 @@ def can_delete_exploration(handler):
             exploration_id)
 
         if (
-            (exploration_rights.status == (
-                rights_manager.ACTIVITY_STATUS_PRIVATE)) and
+                (exploration_rights.status == (
+                    rights_manager.ACTIVITY_STATUS_PRIVATE)) and
                 (role_services.ACTION_DELETE_OWNED_EXPLORATION in (
                     self.actions)) and
                 (self.user_id in exploration_rights.owner_ids)):
             return handler(self, exploration_id, **kwargs)
         elif (
-            (exploration_rights.status == (
-                rights_manager.ACTIVITY_STATUS_PUBLIC)) and
+                (exploration_rights.status == (
+                    rights_manager.ACTIVITY_STATUS_PUBLIC)) and
                 (role_services.ACTION_DELETE_ANY_PUBLIC_EXPLORATION in (
                     self.actions))):
             return handler(self, exploration_id, **kwargs)
@@ -363,9 +382,9 @@ def can_suggest_changes_to_exploration(handler):
     """
     def test_can_suggest(self, exploration_id, **kwargs):
         if (
-            role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in
-            self.actions and user_services.has_fully_registered(
-                self.user_id)):
+                role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in
+                self.actions and user_services.has_fully_registered(
+                    self.user_id)):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -402,6 +421,7 @@ def can_manage_suggestions_on_exploration(handler):
 
 
 def can_publish_exploration(handler):
+    """Decorator to check whether user can publish exploration."""
 
     def test_can_publish(self, exploration_id, **kwargs):
         exploration_rights = rights_manager.get_exploration_rights(
@@ -433,6 +453,9 @@ def can_publish_exploration(handler):
 
 
 def can_modify_exploration_roles(handler):
+    """Decorators to check whether user can manage rights related to an
+    exploration.
+    """
 
     def test_can_modify(self, exploration_id, **kwargs):
 
@@ -443,18 +466,18 @@ def can_modify_exploration_roles(handler):
             raise self.PageNotFoundException
 
         if (
-            exploration_rights.community_owned or
+                exploration_rights.community_owned or
                 exploration_rights.cloned_from):
             raise self.UnauthorizedUserException(
                 'You do not have credentials to change rights for this' +
                 'exploration.')
 
         if (
-            role_services.ACTION_MODIFY_ROLES_FOR_ANY_EXPLORATION in
+                role_services.ACTION_MODIFY_ROLES_FOR_ANY_EXPLORATION in
                 self.actions):
             return handler(self, exploration_id, **kwargs)
         if (
-            role_services.ACTION_MODIFY_ROLES_FOR_OWNED_EXPLORATION in
+                role_services.ACTION_MODIFY_ROLES_FOR_OWNED_EXPLORATION in
                 self.actions):
             if self.user_id in exploration_rights.owner_ids:
                 return handler(self, exploration_id, **kwargs)
