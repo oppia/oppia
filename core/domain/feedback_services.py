@@ -434,8 +434,8 @@ def get_thread_summaries(user_id, full_thread_ids):
             to fetch the summaries.
 
     Returns:
-        list(dict). A list of dictionaries containing the summaries of the threads
-            given to it. The format of the returned value:
+        list(dict). A list of dictionaries containing the summaries of the
+            threads given to it. The format of the returned value:
             [
                 {
                     'status': Status of the thread,
