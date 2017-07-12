@@ -216,14 +216,15 @@ def can_view_exploration_feedback(handler):
     exploration."""
 
     def test_can_access(self, exploration_id, **kwargs):
-        activity_rights = rights_manager.get_exploration_rights(exploration_id)
-        if role_services.ACTION_VIEW_EXPLORATION_FEEDBACK in self.actions:
-            if ((self.user_id in activity_rights.owner_ids) or
-                    (self.user_id in activity_rights.editor_ids)):
-                return handler(self, exploration_id, **kwargs)
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+
+        if check_exploration_editable(
+                self.user_id, self.actions, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                'You do not have credentials to view this page.')
+                'You do not have credentials to view feedbacks.')
 
     return test_can_access
 
@@ -294,7 +295,6 @@ def can_edit_exploration(handler):
             exploration_rights = rights_manager.get_exploration_rights(
                 exploration_id)
         except:
-            print "bete error to yhi pe aa gyi"
             raise self.PageNotFoundException
 
         if (exploration is None) or (exploration_rights is None):
@@ -384,8 +384,6 @@ def can_manage_suggestions_on_exploration(handler):
             self.redirect(current_user_services.create_login_url(
                 self.request.uri))
             return
-        print self.role
-        print self.actions
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
 
@@ -397,6 +395,7 @@ def can_manage_suggestions_on_exploration(handler):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                'You do not have the credentials to edit this exploration.')
+                'You do not have the credentials to manage suggestions for ' +
+                'this exploration.')
 
     return test_can_manage
