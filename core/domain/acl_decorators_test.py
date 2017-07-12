@@ -152,7 +152,7 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
 
 
 class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
-
+    """Tests for can_create_exploration decorator."""
     user_name = 'banneduser'
     user_email = 'user@example.com'
 
@@ -190,7 +190,7 @@ class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
 
 
 class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
-
+    """Tests for can_create_collection decorator."""
     user_name = 'collectioneditor'
     user_email = 'user@example.com'
 
@@ -235,7 +235,7 @@ class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
 
 
 class AccessCreatorDashboardTest(test_utils.GenericTestBase):
-
+    """Tests for can_access_creator_dashboard decorator."""
     user_name = 'banneduser'
     user_email = 'user@example.com'
 
@@ -268,7 +268,7 @@ class AccessCreatorDashboardTest(test_utils.GenericTestBase):
 
 
 class ViewExplorationFeedbackTest(test_utils.GenericTestBase):
-
+    """Tests for can_view_exploration_feedback decorator."""
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
 
@@ -331,7 +331,7 @@ class ViewExplorationFeedbackTest(test_utils.GenericTestBase):
 
 
 class RateExplorationTest(test_utils.GenericTestBase):
-
+    """Tests for can_rate_exploration decorator."""
     user_name = 'user'
     user_email = 'user@example.com'
 
@@ -360,7 +360,7 @@ class RateExplorationTest(test_utils.GenericTestBase):
 
 
 class FlagExplorationTest(test_utils.GenericTestBase):
-
+    """Tests for can_flag_exploration decorator."""
     user_name = 'user'
     user_email = 'user@example.com'
 
@@ -389,7 +389,7 @@ class FlagExplorationTest(test_utils.GenericTestBase):
 
 
 class ManageSubscriptionsTest(test_utils.GenericTestBase):
-
+    """Tests for can_manage_subscriptions decorator."""
     user_name = 'user'
     user_email = 'user@example.com'
 
@@ -418,7 +418,7 @@ class ManageSubscriptionsTest(test_utils.GenericTestBase):
 
 
 class EditExplorationTest(test_utils.GenericTestBase):
-
+    """Tests for can_edit_exploration decorator."""
     user_name = 'banneduser'
     user_email = 'user@example.com'
     published_exp_id = 'exp_0'
@@ -487,7 +487,7 @@ class EditExplorationTest(test_utils.GenericTestBase):
 
 
 class DeleteExplorationTest(test_utils.GenericTestBase):
-
+    """Tests for can_delete_exploration decorator."""
     private_exp_id = 'exp_0'
     published_exp_id = 'exp_1'
 
@@ -543,7 +543,7 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
 
 
 class SuggestChangesTest(test_utils.GenericTestBase):
-
+    """Tests for can_suggest_changes_to_exploration decorator."""
     user_name = 'user'
     user_email = 'user@example.com'
     banned_user_name = 'banneduser'
@@ -578,7 +578,7 @@ class SuggestChangesTest(test_utils.GenericTestBase):
 
 
 class PublishExplorationTest(test_utils.GenericTestBase):
-
+    """Tests for can_publish_exploration decorator."""
     private_exp_id = 'exp_0'
     public_exp_id = 'exp_1'
 
@@ -639,7 +639,7 @@ class PublishExplorationTest(test_utils.GenericTestBase):
 
 
 class ModifyExplorationRolesTest(test_utils.GenericTestBase):
-
+    """Tests for can_modify_exploration_roles decorator."""
     private_exp_id = 'exp_0'
 
     class MockHandler(base.BaseHandler):
