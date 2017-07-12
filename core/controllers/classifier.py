@@ -41,6 +41,13 @@ def verify_signature(message, vm_id, received_signature):
     Raises:
         UnauthorizedUserException.
     """
+    secret = None
+    for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
+        if val['vm_id'] == vm_id:
+            secret = val['shared_secret_key'][0]
+            break
+    if secret is None:
+        return False
     secret = str([val['shared_secret_key'] for val in (
         config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value) if val[
             'vm_id'] == vm_id][0])
