@@ -21,13 +21,15 @@
  */
 
 oppia.factory('SimpleEditorManagerService', [
-  'explorationInitStateNameService', 'OutcomeObjectFactory',
-  'QuestionListObjectFactory', 'QuestionObjectFactory',
-  'SimpleEditorShimService', 'StatesToQuestionsService',
+  'AnswerGroupObjectFactory', 'explorationInitStateNameService',
+  'OutcomeObjectFactory', 'QuestionListObjectFactory',
+  'QuestionObjectFactory', 'RuleObjectFactory', 'SimpleEditorShimService',
+  'StatesToQuestionsService',
   function(
-    explorationInitStateNameService, OutcomeObjectFactory,
-    QuestionListObjectFactory, QuestionObjectFactory,
-    SimpleEditorShimService, StatesToQuestionsService) {
+    AnswerGroupObjectFactory, explorationInitStateNameService,
+    OutcomeObjectFactory, QuestionListObjectFactory,
+    QuestionObjectFactory, RuleObjectFactory, SimpleEditorShimService,
+    StatesToQuestionsService) {
     var data = {
       title: null,
       introductionHtml: null,
@@ -210,9 +212,28 @@ oppia.factory('SimpleEditorManagerService', [
         var stateNamesInOrder = data.questionList.getAllStateNames();
         var sStateName = stateNamesInOrder[sIndex];
         var sState = SimpleEditorShimService.getState(sStateName);
-        var sDestName = sState.interaction.answerGroups[0].outcome.dest;
         var dStateName = stateNamesInOrder[dIndex];
         var dState = SimpleEditorShimService.getState(dStateName);
+        if (dState.interaction.answerGroups.length === 0 ||
+          sState.interaction.answerGroups.length === 0) {
+          var newStateName = this.addState();
+          var newAnswerGroups = [];
+          newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+            RuleObjectFactory.createNew('Equals', {
+              x: 0
+            })
+          ], OutcomeObjectFactory.createEmpty(newStateName), false));
+          if (dState.interaction.answerGroups.length === 0) {
+            SimpleEditorShimService.saveAnswerGroups(dStateName,
+              newAnswerGroups);
+            dState.interaction.answerGroups = newAnswerGroups;
+          } else {
+            SimpleEditorShimService.saveAnswerGroups(sStateName,
+              newAnswerGroups);
+            sState.interaction.answerGroups = newAnswerGroups;
+          }
+        }
+        var sDestName = sState.interaction.answerGroups[0].outcome.dest;
         var dDestName = dState.interaction.answerGroups[0].outcome.dest;
 
         redirectAllIncomingNodes(sStateName, sDestName);
