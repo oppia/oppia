@@ -41,20 +41,11 @@ oppia.factory('SimpleEditorManagerService', [
             value: ['<p>Option 1</p>']
           }
         },
-        ANSWER_GROUP: {
+        FIRST_ANSWER_GROUP_RULE: {
           type: 'Equals',
-          value: {
+          inputs: {
             x: 0
           }
-        }
-      }
-    };
-
-    var DEFAULT_INTERACTION = {
-      ID: 'MultipleChoiceInput',
-      CUSTOMIZATION_ARGS: {
-        choices: {
-          value: ['<p>Option 1</p>']
         }
       }
     };
@@ -186,8 +177,10 @@ oppia.factory('SimpleEditorManagerService', [
             DEFAULT_INTERACTION_PROPERTIES[newQuestionType].CUSTOMIZATION_ARGS);
           newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
             RuleObjectFactory.createNew(
-              DEFAULT_INTERACTION_PROPERTIES[newQuestionType].ANSWER_GROUP.type,
-              DEFAULT_INTERACTION_PROPERTIES[newQuestionType].ANSWER_GROUP.value
+              DEFAULT_INTERACTION_PROPERTIES[newQuestionType].
+                FIRST_ANSWER_GROUP_RULE.type,
+              DEFAULT_INTERACTION_PROPERTIES[newQuestionType].
+                FIRST_ANSWER_GROUP_RULE.value
             )
           ], OutcomeObjectFactory.createEmpty(nextStateName), false));
 

@@ -43,12 +43,6 @@ oppia.directive('simpleEditorBody', [
           $scope.getHumanReadableQuestionType = (
             StatesToQuestionsService.getHumanReadableQuestionType);
 
-          $scope.getSubfieldId = function(question, subfieldLabel) {
-            return QuestionIdService.getSidebarItemId(
-              question.getId(), subfieldLabel
-            );
-          };
-
           $scope.saveTitle = SimpleEditorManagerService.saveTitle;
           $scope.saveIntroductionHtml = (
             SimpleEditorManagerService.saveIntroductionHtml);

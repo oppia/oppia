@@ -37,7 +37,10 @@ describe('Simple Editor Shim Service', function() {
           }, {
             value: 'st1html2'
           }
-        ]
+        ],
+        interaction: {
+          id: 'Introduction'
+        }
       },
       state2: {
         name: 'state2',
@@ -49,7 +52,10 @@ describe('Simple Editor Shim Service', function() {
           }, {
             value: 'st2html2'
           }
-        ]
+        ],
+        interaction: {
+          id: 'Introduction'
+        }
       }
     };
 
@@ -136,6 +142,12 @@ describe('Simple Editor Shim Service', function() {
     var givenState = currentStateName;
     var html = srv.getContentHtml(givenState);
     expect(html).toEqual(states[givenState].content[0].value);
+  });
+
+  it('should return interaction id for given state', function() {
+    var givenState = currentStateName;
+    var interactionId = srv.getInteractionId(givenState);
+    expect(interactionId).toEqual(states[givenState].interaction.id);
   });
 
   it('should change the displayed title and should save it', function() {
