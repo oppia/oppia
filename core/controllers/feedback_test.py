@@ -373,6 +373,11 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         init_interaction.default_outcome.dest = exploration.init_state_name
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
+        # Create content in State A with a single audio subtitle.
+        exploration.states['State A'].update_content(
+            exp_domain.SubtitledHtml('old content', [
+                exp_domain.AudioTranslation('en', 'filename.mp3', 20, False)
+            ]).to_dict())
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
@@ -498,18 +503,21 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             status=400, expect_errors=True)
         self.assertEqual(response_dict.status_int, 400)
 
-    def _accept_suggestion(self, thread_id, csrf_token,
+    def _accept_suggestion(self, thread_id, audio_update_required, csrf_token,
                            expect_errors=False, expected_status_int=200):
         with self.swap(exp_domain.Exploration, '_verify_all_states_reachable',
                        self._return_null):
             with self.swap(exp_domain.Exploration, '_verify_no_dead_ends',
                            self._return_null):
+                url = '%s/%s/%s' % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
+                    thread_id)
                 return self.put_json(
-                    '%s/%s/%s' % (
-                        feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
-                        thread_id),
-                    {'action': u'accept', 'commit_message': 'message'},
-                    csrf_token, expect_errors=expect_errors,
+                    url, {
+                        'action': u'accept',
+                        'commit_message': 'message',
+                        'audio_update_required': audio_update_required,
+                    }, csrf_token, expect_errors=expect_errors,
                     expected_status_int=expected_status_int)
 
     def _reject_suggestion(self, thread_id, csrf_token,
@@ -537,13 +545,12 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(threads[2]['subject'], 'Empty suggestion')
 
         # Accept a suggestion.
-        self._accept_suggestion(accepted_suggestion_thread_id, csrf_token)
+        self._accept_suggestion(
+            accepted_suggestion_thread_id, False, csrf_token)
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
-            updated_exploration.states['State A'].content.to_dict(), {
-                'html': u'new accepted suggestion for state A',
-                'audio_translations': [],
-            })
+            updated_exploration.states['State A'].content.html,
+            u'new accepted suggestion for state A')
 
         # Reject a suggestion.
         self._reject_suggestion(rejected_suggestion_thread_id, csrf_token)
@@ -569,7 +576,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         # Editor tries to accept rejected suggestion.
         exception_msg = 'Suggestion has already been accepted/rejected.'
         response_dict = self._accept_suggestion(
-            rejected_suggestion_thread_id, csrf_token,
+            rejected_suggestion_thread_id, False, csrf_token,
             expect_errors=True, expected_status_int=500)
         self.assertIn(exception_msg, response_dict['error'])
 
@@ -585,7 +592,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/create/%s' % self.EXP_ID))
         response_dict = self._accept_suggestion(
-            rejected_suggestion_thread_id, csrf_token,
+            rejected_suggestion_thread_id, False, csrf_token,
             expect_errors=True, expected_status_int=500)
         self.assertIn(exception_msg, response_dict['error'])
 
@@ -601,7 +608,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self._accept_suggestion(
-            unsuccessful_accept_thread_id, csrf_token,
+            unsuccessful_accept_thread_id, False, csrf_token,
             expect_errors=True, expected_status_int=401)
         self.assertIn(
             'You do not have the credentials to edit this exploration.',
@@ -622,3 +629,43 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                 'true'))
         threads = response_dict['threads']
         self.assertEqual(len(threads), 4)
+
+    def test_accept_suggestion_without_audio_update(self):
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/create/%s' % self.EXP_ID))
+        response_dict = self.get_json(
+            '%s/%s?list_type=%s&has_suggestion=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
+        threads = response_dict['threads']
+        accepted_suggestion_thread_id = threads[0]['thread_id']
+        self.assertEqual(threads[0]['subject'], 'Suggestion for state A.')
+
+        # Accept a suggestion.
+        self._accept_suggestion(
+            accepted_suggestion_thread_id, False, csrf_token)
+        updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        audio_translations = (
+            updated_exploration.states['State A'].content.audio_translations)
+        self.assertEqual(len(audio_translations), 1)
+        self.assertFalse(audio_translations[0].needs_update)
+
+    def test_accept_suggestion_requiring_audio_update(self):
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/create/%s' % self.EXP_ID))
+        response_dict = self.get_json(
+            '%s/%s?list_type=%s&has_suggestion=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
+        threads = response_dict['threads']
+        accepted_suggestion_thread_id = threads[0]['thread_id']
+        self.assertEqual(threads[0]['subject'], 'Suggestion for state A.')
+
+        # Accept a suggestion.
+        self._accept_suggestion(
+            accepted_suggestion_thread_id, True, csrf_token)
+        updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        audio_translations = (
+            updated_exploration.states['State A'].content.audio_translations)
+        self.assertEqual(len(audio_translations), 1)
+        self.assertTrue(audio_translations[0].needs_update)
