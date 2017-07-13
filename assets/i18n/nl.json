@@ -55,7 +55,7 @@
 	"I18N_FOOTER_TERMS_OF_SERVICE": "Gebruiksvoorwaarden",
 	"I18N_FORMS_TYPE_NUMBER": "Geef een getal op",
 	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Geen een getal op dat groter of gelijk is aan <[minValue]>.",
-	"I18N_FORMS_TYPE_NUMBER_AT_MOST": "Geen een getal op dat kleiner of gelijk is aan <[minValue]>.",
+	"I18N_FORMS_TYPE_NUMBER_AT_MOST": "Geen een getal op dat kleiner of gelijk is aan <[maxValue]>.",
 	"I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL": "Geef een geldig decimaal getal op.",
 	"I18N_GET_STARTED_PAGE_TITLE": "Aan de slag",
 	"I18N_INTERACTIONS_GRAPH_ADD_EDGE": "Rand toevoegen",

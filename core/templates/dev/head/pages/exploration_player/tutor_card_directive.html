@@ -12,12 +12,12 @@
       </div>
     </div>
 
-    <div ng-if="(activeCard.answerFeedbackPairs.length > 1 && isInteractionInline) || (activeCard.answerFeedbackPairs.length > 0 && !isInteractionInline)">
+    <div ng-if="(activeCard.inputResponsePairs.length > 1 && isInteractionInline) || (activeCard.inputResponsePairs.length > 0 && !isInteractionInline)">
       <h4 class="conversation-skin-responses-dropdown-container"
           ng-click="toggleShowPreviousResponses()">
         <span class="conversation-skin-responses-dropdown-text">
           <span translate="I18N_PLAYER_PREVIOUS_RESPONSES"
-                translate-values="{previousResponses: <[activeCard.answerFeedbackPairs.length - (isInteractionInline ? 1 : 0)]>}">
+                translate-values="{previousResponses: <[activeCard.inputResponsePairs.length - (isInteractionInline ? 1 : 0)]>}">
           </span>
           <span class="conversation-skin-responses-dropdown-icon">
             <i class="material-icons conversation-skin-responses-dropdown-icon" ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">&#xE037;</i>
@@ -28,22 +28,22 @@
 
     <div ng-show="arePreviousResponsesShown"
          class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
-      <div ng-repeat="responsePair in activeCard.answerFeedbackPairs track by $index">
+      <div ng-repeat="responsePair in activeCard.inputResponsePairs track by $index">
         <div ng-if="!$last || !isInteractionInline">
-          <answer-feedback-pair data="responsePair"
+          <input-response-pair data="responsePair"
                                 profile-picture="profilePicture"
                                 oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
-          </answer-feedback-pair>
+          </input-response-pair>
         </div>
       </div>
     </div>
 
     <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
-    <div class="conversation-skin-tutor-card-bottom-section" ng-if="isInteractionInline && activeCard.answerFeedbackPairs.length > 0">
-      <answer-feedback-pair data="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1]"
+    <div class="conversation-skin-tutor-card-bottom-section" ng-if="isInteractionInline && activeCard.inputResponsePairs.length > 0">
+      <input-response-pair data="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1]"
                             profile-picture="profilePicture"
                             oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
-      </answer-feedback-pair>
+      </input-response-pair>
     </div>
 
     <!--
@@ -59,7 +59,7 @@
     ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
-        <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml">
+        <div ng-if="activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse">
           <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
                      ng-if="!isIframed"
                      focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
@@ -73,6 +73,12 @@
         <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
           <div class="protractor-test-conversation-input"
                angular-html-bind="activeCard.interactionHtml">
+          </div>
+          <div ng-if="hintsExist" style="text-align: right">
+            <hint-button on-click-hint-button="consumeHint()"
+                         current-hint-is-available="isHintAvailable()"
+                         all-hints-are-exhausted="areAllHintsExhausted()">
+            </hint-button>
           </div>
         </div>
       </div>
@@ -119,8 +125,19 @@
   }
 
   .conversation-skin-tutor-card .instructions-button {
-      background: inherit;
-      border: none;
+    background: inherit;
+    border: none;
+  }
+
+  .conversation-skin-tutor-card .hint-button {
+    background-color: #0D48A1;
+    border: none;
+    color: #ffffff;
+  }
+
+  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
+  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
+    background-color: #115FD4;
   }
 
   .conversation-skin-tutor-card.animate-card-width {
@@ -228,12 +245,20 @@
       padding: 6px 12px;
     }
 
+    .conversation-skin-tutor-card .hint-button {
+      background-color: #0D48A1;
+      color: #ffffff;
+      padding: 6px 12px;
+    }
+
     .has-shadow {
       box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
     }
 
     .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover {
+    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover,
+    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
+    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
       background-color: #115FD4;
     }
   }

@@ -185,7 +185,6 @@ oppia.directive('versionDiffVisualization', [
           }
         }
         $scope.legendGraph.finalStateIds = [_lastUsedStateType];
-
         // Opens the modal showing the history diff for a given state.
         // stateId is the unique ID assigned to a state during the
         // calculation of the state graph.
@@ -260,6 +259,11 @@ oppia.directive('versionDiffVisualization', [
                 $scope.headers = headers;
                 $scope.newStateName = newStateName;
                 $scope.oldStateName = oldStateName;
+                /*
+                 * $scope.yamlStrs is an object with keys 'earlierVersion' and
+                 * 'laterVersion', whose values are the YAML representations of
+                 * the compared versions.
+                 */
                 $scope.yamlStrs = {};
 
                 if (newState) {

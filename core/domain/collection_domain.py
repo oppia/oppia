@@ -25,6 +25,7 @@ import copy
 import re
 import string
 
+from constants import constants
 import feconf
 import utils
 
@@ -405,7 +406,7 @@ class Collection(object):
             cls, collection_id, title=feconf.DEFAULT_COLLECTION_TITLE,
             category=feconf.DEFAULT_COLLECTION_CATEGORY,
             objective=feconf.DEFAULT_COLLECTION_OBJECTIVE,
-            language_code=feconf.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Returns a Collection domain object with default values.
 
         Args:
@@ -482,7 +483,7 @@ class Collection(object):
             following schema version v2.
         """
         collection_dict['schema_version'] = 2
-        collection_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
+        collection_dict['language_code'] = constants.DEFAULT_LANGUAGE_CODE
         collection_dict['tags'] = []
         return collection_dict
 
@@ -931,7 +932,7 @@ class Collection(object):
                 'A language must be specified (in the \'Settings\' tab).')
 
         if not any([self.language_code == lc['code']
-                    for lc in feconf.ALL_LANGUAGE_CODES]):
+                    for lc in constants.ALL_LANGUAGE_CODES]):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 

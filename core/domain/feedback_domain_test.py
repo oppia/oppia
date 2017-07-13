@@ -130,14 +130,14 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'exploration_version': 1,
             'state_name': 'a state name',
             'description': 'a description',
-            'state_content': 'a state content'
+            'suggestion_html': 'suggestion HTML',
         }
         observed_suggestion = feedback_domain.Suggestion(
             self.THREAD_ID, self.owner_id, self.EXP_ID,
             expected_suggestion_dict['exploration_version'],
             expected_suggestion_dict['state_name'],
             expected_suggestion_dict['description'],
-            expected_suggestion_dict['state_content'])
+            expected_suggestion_dict['suggestion_html'])
         self.assertDictEqual(expected_suggestion_dict,
                              observed_suggestion.to_dict())
 

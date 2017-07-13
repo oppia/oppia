@@ -356,3 +356,64 @@ def delete_classifier_training_job(job_id):
         classifier_models.ClassifierTrainingJobModel.get(job_id))
     if classifier_training_job_model is not None:
         classifier_training_job_model.delete()
+
+
+def get_classifier_from_exploration_attributes(exp_id, exp_version,
+                                               state_name):
+    """Gets the classifier object from the exploration attributes.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. The exploration version.
+        state_name: str. The name of the state to which the classifier
+            belongs.
+
+    Returns:
+        ClassifierData. Domain object for the Classifier model.
+
+    Raises:
+        Exception: Entity for class ClassifierExplorationMapping with id not
+            found.
+        Exception: Entity for class ClassifierData with id not found.
+    """
+    classifier_exploration_mapping_model = (
+        classifier_models.ClassifierExplorationMappingModel.get_model(
+            exp_id, exp_version, state_name))
+    classifier_id = classifier_exploration_mapping_model.classifier_id
+    classifier = get_classifier_by_id(classifier_id)
+    return classifier
+
+
+def create_classifier_exploration_mapping(exp_id, exp_version, state_name,
+                                          classifier_id):
+    """Creates an entry for Classifier Exploration Mapping in datastore.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. The exploration version.
+        state_name: str. The state to which the classifier belongs.
+        classifier_id: str. ID of the classifier.
+
+    Returns:
+        str. ID of the classifier exploration mapping instance.
+
+    Raises:
+        Exception: The Classifier-Exploration mapping with id already exists.
+    """
+    classifier_exploration_mapping_model = (
+        classifier_models.ClassifierExplorationMappingModel.get_model(
+            exp_id, exp_version, state_name))
+    if classifier_exploration_mapping_model is not None:
+        raise Exception('The Classifier-Exploration mapping with id %s.%s.%s '
+                        'already exists.' % (exp_id, exp_version,
+                                             state_name.encode('utf-8')))
+    # Verify that the corresponding classifier exists.
+    get_classifier_by_id(classifier_id)
+
+    classifier_exploration_mapping = (
+        classifier_domain.ClassifierExplorationMapping(
+            exp_id, exp_version, state_name, classifier_id))
+    classifier_exploration_mapping.validate()
+    mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+        exp_id, exp_version, state_name, classifier_id)
+    return mapping_id

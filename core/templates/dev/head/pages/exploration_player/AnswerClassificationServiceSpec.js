@@ -48,10 +48,10 @@ describe('Answer classification service with string classifier disabled',
       failHandler = jasmine.createSpy('fail');
 
       state = sof.createFromBackendDict('stateName', {
-        content: [{
-          type: 'text',
-          value: 'content'
-        }],
+        content: {
+          html: 'content',
+          audio_translations: []
+        },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
@@ -101,7 +101,8 @@ describe('Answer classification service with string classifier disabled',
             feedback: [],
             param_changes: []
           },
-          fallbacks: []
+          fallbacks: [],
+          hints: []
         },
         param_changes: []
       });
@@ -187,10 +188,10 @@ describe('Answer classification service with string classifier disabled',
     it('should fail if no answer group matches and no default rule is ' +
        'provided', function() {
       var state2 = sof.createFromBackendDict('stateName', {
-        content: [{
-          type: 'text',
-          value: 'content'
-        }],
+        content: {
+          html: 'content',
+          audio_translations: []
+        },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
@@ -212,7 +213,8 @@ describe('Answer classification service with string classifier disabled',
             feedback: [],
             param_changes: []
           },
-          fallbacks: []
+          fallbacks: [],
+          hints: []
         },
         param_changes: []
       });
@@ -260,10 +262,10 @@ describe('Answer classification service with string classifier enabled',
       failHandler = jasmine.createSpy('fail');
 
       state = sof.createFromBackendDict('stateName', {
-        content: [{
-          type: 'text',
-          value: 'content'
-        }],
+        content: {
+          html: 'content',
+          audio_translations: []
+        },
         interaction: {
           id: 'TrainableInteraction',
           answer_groups: [{
@@ -308,7 +310,8 @@ describe('Answer classification service with string classifier enabled',
             feedback: [],
             param_changes: []
           },
-          fallbacks: []
+          fallbacks: [],
+          hints: []
         },
         param_changes: []
       });

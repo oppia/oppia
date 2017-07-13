@@ -29,6 +29,7 @@ from core.domain import recommendations_jobs_one_off
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
+    user_jobs_one_off.UserRolesMigrationOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
