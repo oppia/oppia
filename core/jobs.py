@@ -603,10 +603,10 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
 
     def write(self, data):
-        """Writes data out in JSON format.
+        """Writes that data serialized in JSON format.
 
         Args:
-            data: dict(str : ?). Data which will be converted to JSON format.
+            data: *. Data to be serialized in JSON format.
         """
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
             '%s\n' % json.dumps(data))
