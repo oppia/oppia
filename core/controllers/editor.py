@@ -162,8 +162,6 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
-        # *temp
-        print "bete yhan tak bhi aa gye"
         if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'pages/error/disabled_exploration.html',

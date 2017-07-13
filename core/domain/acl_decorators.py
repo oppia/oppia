@@ -305,9 +305,6 @@ def can_edit_exploration(handler):
                 self.request.uri))
             return
 
-        print self.role
-        print self.actions
-
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
             exploration_rights = rights_manager.get_exploration_rights(

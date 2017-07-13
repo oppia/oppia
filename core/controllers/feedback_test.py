@@ -504,7 +504,6 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                        self._return_null):
             with self.swap(exp_domain.Exploration, '_verify_no_dead_ends',
                            self._return_null):
-                print "expected status int %s" % expected_status_int
                 return self.put_json(
                     '%s/%s/%s' % (
                         feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
@@ -528,7 +527,6 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
-        print "in test_actions_for_suggestions"
 
         threads = response_dict['threads']
         accepted_suggestion_thread_id = threads[0]['thread_id']
@@ -607,7 +605,6 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         response_dict = self._accept_suggestion(
             unsuccessful_accept_thread_id, csrf_token,
             expect_errors=True, expected_status_int=401)
-        print "in test_actions_for_suggestions"
         self.assertIn(
             'You do not have the credentials to edit this exploration.',
             response_dict['error'])
