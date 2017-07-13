@@ -1,0 +1,17 @@
+{% extends 'pages/base.html' %}
+{% block content %}
+
+<div ng-controller='Audio'>
+	<p>Hello World!</p>
+	<input id="upload" type="file" name="audio upload">
+	<button ng-click="add()">Add</button>
+</div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AssetsBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/audio.js"></script>
+
+{% endblock footer_js %}
+

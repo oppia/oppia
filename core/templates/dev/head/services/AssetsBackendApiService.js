@@ -71,7 +71,7 @@ oppia.factory('AssetsBackendApiService', [
       save: function(explorationId, filename, rawAssetData) {
         return $q(function(resolve, reject) {
           _saveAsset(explorationId, filename, rawAssetData, resolve, reject);
-        }
+        });
       }
     }
   }

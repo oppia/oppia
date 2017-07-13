@@ -69,6 +69,11 @@ oppia.constant(
   'RTE_COMPONENT_SPECS',
   window.GLOBALS.RTE_COMPONENT_SPECS ? window.GLOBALS.RTE_COMPONENT_SPECS : {});
 
+//REMOVE
+oppia.constant(
+  'AUDIO_UPLOAD_URL_TEMPLATE',
+  '/createhandler/audioupload/<exploration_id>')
+
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [

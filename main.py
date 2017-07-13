@@ -166,6 +166,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
     get_redirect_route(r'/contact', pages.ContactPage),
 
+    get_redirect_route(r'/audio', pages.TestAudioPage),
+
     get_redirect_route(r'/blog', pages.BlogPage),
     get_redirect_route(r'/forum', pages.ForumPage),
     get_redirect_route(r'/donate', pages.DonatePage),
