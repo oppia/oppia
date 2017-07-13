@@ -192,9 +192,9 @@ describe('Question List Object Factory', function() {
       'Fifth state content');
 
     questionList.updateQuestion(3, newQuestion);
-    var returnedQuestionList = questionList.getQuestions();
+    var returnedQuestions = questionList.getQuestions();
     expect(
-      newQuestion === returnedQuestionList[3]
+      newQuestion === returnedQuestions[3]
     ).toBe(true);
   });
 
