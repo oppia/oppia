@@ -134,6 +134,8 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
         feedback_services.update_messages_read_by_the_user(
             exploration_id, thread_id, self.user_id, message_ids)
 
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+
         message_summary_list = []
         for m, author_settings in zip(messages, authors_settings):
             message_summary = {
@@ -141,7 +143,8 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'author_username': author_settings.username,
                 'author_picture_data_url': (
                     author_settings.profile_picture_data_url),
-                'created_on': utils.get_time_in_millisecs(m.created_on)
+                'created_on': utils.get_time_in_millisecs(m.created_on),
+                'suggestion': suggestion if suggestion else None
             }
             message_summary_list.append(message_summary)
 
