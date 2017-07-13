@@ -99,6 +99,8 @@ class LearnerDashboardHandler(base.BaseHandler):
 
             subscription_list.append(subscription_summary)
 
+        user_settings = user_services.get_user_settings(self.user_id)
+
         self.values.update({
             'completed_explorations_list': completed_exp_summary_dicts,
             'completed_collections_list': completed_collection_summary_dicts,
@@ -108,7 +110,9 @@ class LearnerDashboardHandler(base.BaseHandler):
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
             'thread_summaries': thread_summaries,
-            'subscription_list': subscription_list
+            'subscription_list': subscription_list,
+            'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'username': user_settings.username
         })
         self.render_json(self.values)
 
@@ -136,7 +140,8 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'text': m.text,
                 'author_username': author_settings.username,
                 'author_picture_data_url': (
-                    author_settings.profile_picture_data_url)
+                    author_settings.profile_picture_data_url),
+                'created_on': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
 

@@ -68,24 +68,32 @@ oppia.controller('LearnerDashboard', [
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
   'LEARNER_DASHBOARD_SECTIONS', 'LEARNER_DASHBOARD_SUBSECTIONS',
   'threadStatusDisplayService', 'oppiaDatetimeFormatter',
+  'FEEDBACK_THREADS_SORT_BY_KEYS',
+  'HUMAN_READABLE_FEEDBACK_THREADS_SORT_BY_KEYS',
   function(
       $scope, $rootScope, $window, $http, $modal, EXPLORATIONS_SORT_BY_KEYS,
       SUBSCRIPTION_SORT_BY_KEYS, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, 
       FATAL_ERROR_CODES, HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
       LearnerDashboardBackendApiService, UrlInterpolationService,
       LEARNER_DASHBOARD_SECTIONS, LEARNER_DASHBOARD_SUBSECTIONS,
-      threadStatusDisplayService, oppiaDatetimeFormatter) {
+      threadStatusDisplayService, oppiaDatetimeFormatter,
+      FEEDBACK_THREADS_SORT_BY_KEYS,
+      HUMAN_READABLE_FEEDBACK_THREADS_SORT_BY_KEYS) {
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.SUBSCRIPTION_SORT_BY_KEYS = SUBSCRIPTION_SORT_BY_KEYS;
+    $scope.FEEDBACK_THREADS_SORT_BY_KEYS = FEEDBACK_THREADS_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS);
     $scope.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = (
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
+    $scope.HUMAN_READABLE_FEEDBACK_THREADS_SORT_BY_KEYS = (
+      HUMAN_READABLE_FEEDBACK_THREADS_SORT_BY_KEYS);
     $scope.LEARNER_DASHBOARD_SECTIONS = LEARNER_DASHBOARD_SECTIONS;
     $scope.LEARNER_DASHBOARD_SUBSECTIONS = LEARNER_DASHBOARD_SUBSECTIONS;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.PAGE_SIZE = 8;
     $scope.Math = window.Math;
+    $scope.newMessage = '';
 
     $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
@@ -189,6 +197,15 @@ oppia.controller('LearnerDashboard', [
       }
     };
 
+    $scope.setFeedbackSortingOptions = function(sortType) {
+      if (sortType === $scope.currentFeedbackThreadsSortType) {
+        $scope.isCurrentFeedbackSortDescending = (
+          !$scope.isCurrentFeedbackSortDescending);
+      } else {
+        $scope.currentFeedbackThreadsSortType = sortType;
+      }
+    };
+
     $scope.sortExplorationFunction = function(entity) {
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
@@ -210,12 +227,30 @@ oppia.controller('LearnerDashboard', [
       return value;
     };
 
+    $scope.sortFeedbackFunction = function(entity) {
+      return entity[$scope.currentFeedbackThreadsSortType];
+    }
+
     $scope.onClickThread = function(
       explorationId, threadId, explorationTitle) {
       var threadDataUrl = (
         '/learnerdashboardthreadhandler/' + explorationId + '/' + threadId);
       $scope.threadTitle = explorationTitle;
       $scope.feedbackThreadActive = true;
+      $scope.explorationId = explorationId;
+      $scope.threadId = threadId;
+
+      for (var index = 0; index < $scope.threadSummaries.length; index++) {
+        if ($scope.threadSummaries[index].exploration_id === explorationId &&
+            $scope.threadSummaries[index].thread_id === threadId) {
+          $scope.threadIndex = index;
+          var threadSummary = $scope.threadSummaries[index]
+          threadSummary.last_message_read = true;
+          if (typeof threadSummary.second_last_message_read !== 'undefined') {
+            $scope.threadSummaries[index].second_last_message_read = true;
+          }
+        }
+      }
 
       $http.get(threadDataUrl).then(function(response) {
         var data = response.data;
@@ -225,7 +260,33 @@ oppia.controller('LearnerDashboard', [
 
     $scope.backFromThread = function() {
       $scope.feedbackThreadActive = false;
-    }
+    };
+
+    $scope.addNewMessage = function(explorationId, threadId, newMessage) {
+      var url = '/threadhandler/' + explorationId + '/' + threadId;
+      var payload = {
+        updated_status: null,
+        updated_subject: null,
+        text: newMessage
+      };
+      $scope.messageSendingInProgress = true;
+      $http.post(url, payload).success(function() {
+        var messageSummary = {};
+        messageSummary.text = newMessage;
+        messageSummary.author_username = $scope.username;
+        messageSummary.author_picture_data_url = $scope.profilePictureDataUrl;
+        messageSummary.created_on = new Date();
+        $scope.messageSummaries.push(messageSummary);
+        $scope.threadSummary = $scope.threadSummaries[$scope.threadIndex];
+        $scope.threadSummary.last_message_text = newMessage;
+        $scope.threadSummary.last_updated = new Date();
+        $scope.threadSummary.author_second_last_message = (
+          $scope.threadSummary.author_last_message);
+        $scope.threadSummary.author_last_message = $scope.username;
+        $scope.threadSummary.total_no_of_messages += 1
+        $scope.messageSendingInProgress = false;
+      });
+    };
 
     $scope.openRemoveEntityModal = function(
       sectionName, subSectionName, entity) {
@@ -293,6 +354,8 @@ oppia.controller('LearnerDashboard', [
       function(response) {
         var responseData = response.data;
         $scope.isCurrentExpSortDescending = true;
+        $scope.isCurrentSubscriptionSortDescending = true;
+        $scope.isCurrentFeedbackSortDescending = true;
         $scope.currentExpSortType = EXPLORATIONS_SORT_BY_KEYS.LAST_PLAYED;
         $scope.currentSubscribersSortType = SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
         $scope.currentFeedbackThreadsSortType = (
@@ -332,6 +395,8 @@ oppia.controller('LearnerDashboard', [
           responseData.completed_to_incomplete_collections
         );
         $scope.threadSummaries = responseData.thread_summaries;
+        $scope.profilePictureDataUrl = responseData.profile_picture_data_url;
+        $scope.username = responseData.username;
 
         $scope.activeSection = LEARNER_DASHBOARD_SECTIONS.INCOMPLETE;
         $scope.activeSubSection = LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS;

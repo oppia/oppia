@@ -422,17 +422,38 @@ body {
 }
 
 .oppia-learner-dashboard-feedback-section {
-  margin-right: 21px;
+  margin-right: 23px;
 }
 
 .oppia-learner-dashboard-feedback-section .table {
   background-color: white;
+  margin-bottom: 10px;
   margin-left: 6px;
 }
 
 .oppia-learner-dashboard-feedback-section .feedback-thread-message-count {
   color: #757575;
   font-size: 100.25%;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-message-author-picture {
+  left: 3px;
+  padding: 0;
+  text-align: center;
+}
+
+.oppia-learner-dashboard-feedback-section .col-sm-11 {
+  padding: 0 20px 0 0;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
+  font-size: 1em;
+  height: 70px;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-thread-warning {
+  color:#0277BD;
+  margin-left: 4px;
 }
 
 @media (max-width: 810px) {

@@ -181,6 +181,23 @@
                   ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
             </span>
           </span>
+
+          <span class="sort-explorations-select oppia-learner-dashboard-sort"
+                ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.FEEDBACK && threadSummaries.length !== 0 && !feedbackThreadActive"
+                ng-class="{'oppia-learner-dashboard-sort-mobile': checkMobileView()}"
+                style="margin-bottom: 7px;">
+            <p class="sort-by-text" style="margin-top: 0;">Sort By</p>
+            <select ng-model="currentFeedbackThreadsSortType"
+                    class="sort-options"
+                    ng-change="setFeedbackSortingOptions(currentFeedbackThreadsSortType)"
+                    ng-options="FEEDBACK_THREADS_SORT_BY_KEYS[key] as value | translate for (key, value) in HUMAN_READABLE_FEEDBACK_THREADS_SORT_BY_KEYS"
+                    style="width: 160px;">
+            </select>
+            <span class="sort-order fa"
+                  ng-click="setFeedbackSortingOptions(currentFeedbackThreadsSortType)"
+                  ng-class="isCurrentFeedbackSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+            </span>
+          </span>
         </div>
         <div class="oppia-learner-dashboard-main-content-container">
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS">
@@ -448,7 +465,7 @@
 
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.FEEDBACK" class="oppia-learner-dashboard-feedback-section">
             <table class="table" ng-if="!feedbackThreadActive">
-              <tr ng-repeat="thread in threadSummaries | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending"
+              <tr ng-repeat="thread in threadSummaries | orderBy:sortFeedbackFunction:isCurrentFeedbackSortDescending"
                   ng-click="onClickThread(thread.exploration_id, thread.thread_id, thread.exploration_title)"
                   class="oppia-feedback-tab-row">
                 <td class="col-lg-1 col-md-1 col-sm-1">
@@ -468,8 +485,12 @@
                   <span class="feedback-thread-message-count">(<[thread.total_no_of_messages]>)</span>
                 </td>
                 <td class="col-lg-6 col-md-6 col-sm-6" style="width: 58%;">
-                  <span ng-if="thread.second_last_message_read && thread.last_message_read"><[thread.exploration_title]> -</span>
-                  <span ng-if="!thread.second_last_message_read || !thread.last_message_read">
+                  <span ng-if="thread.total_no_of_messages > 1 && thread.second_last_message_read && thread.last_message_read"><[thread.exploration_title]> -</span>
+                  <span ng-if="thread.total_no_of_messages === 1 && thread.last_message_read"><[thread.exploration_title]> -</span>
+                  <span ng-if="thread.total_no_of_messages === 1 && !thread.last_message_read">
+                    <strong><[thread.exploration_title]> -</strong>
+                  </span>
+                  <span ng-if="thread.total_no_of_messages > 1 && (!thread.last_message_read || !thread.second_last_message_read)">
                     <strong><[thread.exploration_title]> -</strong>
                   </span>
                   <span><[thread.last_message_text | truncate:50]></span>
@@ -487,14 +508,69 @@
                           style="padding: 0 3px;">
                     <i class="material-icons oppia-vcenter" title="Return to list of messages"></i>
                   </button>
-                  <span style="margin-left: 7px;"><[threadTitle]></span>
+                  <span style="margin-left: 7px; font-size: 105%;"><[threadTitle]></span>
                 </td>
               </tr>
 
-              <tr ng-repeat="message in messageSummaries">
-                <span><[message.text]></span>
+              <tr ng-repeat="message in messageSummaries" style="padding: 13px 8px 7px 8px;">
+                <td>
+                  <div class="row">
+                    <div class="col-sm-1 feedback-message-author-picture">
+                      <span>
+                        <img ng-src="<[message.author_picture_data_url]>"
+                             class="oppia-navbar-profile-picture img-circle"
+                             alt="User Avatar"
+                             style="margin-top: 4px;">
+                      </span>
+                    </div>
+                    <div class="col-sm-11">
+                      <div>
+                        <span><strong><[message.author_username]></strong></span>
+                        <span style="color: #757575; font-size: 90%;"><[getLocaleAbbreviatedDatetimeString(message.created_on)]></span>
+                      </div>
+
+                      <div>
+                        <span><[message.text]></span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <div class="row">
+                    <div class="col-sm-1 feedback-message-author-picture">
+                      <span>
+                        <img ng-src="<[profilePictureDataUrl]>"
+                             class="oppia-navbar-profile-picture img-circle"
+                             alt="User Avatar"
+                             style="margin-top: 4px;">
+                      </span>
+                    </div>
+
+                    <div class="col-sm-11">
+                      <div>
+                        <textarea class="form-control feedback-thread-reply-box" placeholder="Reply" ng-model="newMessage"></textarea>
+                      </div>
+                      <div>
+                        <button class="btn btn-success"
+                                style="margin-top: 6px;"
+                                ng-click="addNewMessage(explorationId, threadId, newMessage)"
+                                ng-disabled="messageSendingInProgress">
+                          <span ng-if="messageSendingInProgress">Sending...</span>
+                          <span ng-if="!messageSendingInProgress">Send</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
               </tr>
             </table>
+            <div class="feedback-thread-warning" ng-if="feedbackThreadActive">
+              <i class="material-icons">&#xE88F;</i>
+              <span>Avoid sharing any personal information as this discussion is publicly viewable.</span>
+            </div>
           </div>
         </div>
       </div>
