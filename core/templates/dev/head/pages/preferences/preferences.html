@@ -137,7 +137,6 @@
                   choices="LANGUAGE_CHOICES"
                   item="$parent.preferredLanguageCodes"
                   allow-multiple-choices="true"
-                  new-choice-regex=".^"
                   width="100%"
                   placeholder="<['I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate]>"
                   on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
@@ -159,11 +158,10 @@
               -->
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
                 <select2-dropdown
-                  choices="SITE_LANGUAGE_CHOICES"
                   class="protractor-test-system-language-selector"
+                  choices="SITE_LANGUAGE_CHOICES"
                   item="$parent.preferredSiteLanguageCode"
                   allow-multiple-choices="false"
-                  new-choice-regex=".^"
                   width="100%"
                   placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
                   on-selection-change="savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">

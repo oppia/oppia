@@ -35,12 +35,10 @@ oppia.directive('select2Dropdown', [function() {
       invalidSearchTermMessage: '@',
       item: '=',
       // The regex used to validate newly-entered choices that do not
-      // already exist. Use ".^" to reject all new choices.
+      // already exist. If is undefined then all new choices are rejected.
       newChoiceRegex: '@',
       onSelectionChange: '&',
       placeholder: '@',
-      // Whether select2 is in tagging mode.
-      tagMode: '@',
       width: '@'
     },
     template: '<select><option></option></select>',
@@ -51,7 +49,7 @@ oppia.directive('select2Dropdown', [function() {
         allowClear: false,
         data: $scope.choices,
         multiple: $scope.allowMultipleChoices === 'true',
-        tags: $scope.tagMode === 'true',
+        tags: $scope.newChoiceRegex !== undefined,
         placeholder: $scope.placeholder,
         width: $scope.width || '250px',
         createTag: function(params) {
@@ -99,7 +97,6 @@ oppia.directive('select2Dropdown', [function() {
       // Initialize the dropdown.
       $(select2Node).select2(select2Options);
       $(select2Node).val($scope.item).trigger('change');
-
 
       // Update $scope.item when the selection changes.
       $(select2Node).on('change', function() {
