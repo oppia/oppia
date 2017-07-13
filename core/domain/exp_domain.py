@@ -846,9 +846,10 @@ class AnswerGroup(object):
                 value objects with an object type property (obj_type).
 
         Raises:
-        ValidationError: One or more attributes of the AnswerGroup are invalid.
-        ValidationError: The AnswerGroup contains more than one classifier
-            rule.
+            ValidationError: One or more attributes of the AnswerGroup are
+                invalid.
+            ValidationError: The AnswerGroup contains more than one classifier
+                rule.
         """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
@@ -884,7 +885,7 @@ class AnswerGroup(object):
         """Gets the index of the classifier in the answer groups.
 
         Returns:
-            int or None. Returns the index of the classifier in the answer
+            int or None. The index of the classifier in the answer
             groups, or None if it doesn't exist.
         """
         for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
@@ -1224,7 +1225,7 @@ class InteractionInstance(object):
                 which have been confirmed to be associated with the default
                 outcome.
             fallbacks: list(Fallback). List of fallbacks for this interaction.
-            hints: list(Hint). List of Hint for this interaction.
+            hints: list(Hint). List of hints for this interaction.
             solution: Solution. A possible solution for the question asked in
                 this interaction.
         """
