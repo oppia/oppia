@@ -3,7 +3,7 @@
 </anchor-header>
 <div class="options-container">
   <ul style="margin-bottom: 0;">
-    <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: disc;">
+    <li ng-repeat="choice in getChoices() track by $index" class="option">
       <button ng-click="deleteChoice($index)" class="btn-delete-option"
               ng-if="getChoices().length > 1">
         <i class="material-icons md-18">&#xE5CD;</i>
@@ -67,10 +67,13 @@
     width: 100%;
   }
   multiple-choice-editor .option {
-    margin-left: 20px;
+    display: list-item;
+    list-style: disc outside none;
+    margin: 0 0 5px 20px;
   }
   multiple-choice-editor .option-text {
-    width: 90%;
+    display: inherit;
+    width: 100%;
   }
   multiple-choice-editor .option-text .view-mode {
     padding: 10px;
