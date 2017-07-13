@@ -35,6 +35,9 @@ oppia.constant(
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
+oppia.constant(
+  'AUDIO_UPLOAD_URL_TEMPLATE',
+  '/createhandler/audioupload/<exploration_id>')
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',

@@ -21,7 +21,7 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
+    'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
     'toastr'
