@@ -84,10 +84,6 @@ oppia.directive('select2Dropdown', [function() {
         }
       };
 
-      if ($scope.tagMode) {
-        select2Options.tags = true;
-      }
-
       if ($scope.dropdownCssClass) {
         select2Options.dropdownCssClass = $scope.dropdownCssClass;
       }
