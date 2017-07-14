@@ -30,7 +30,7 @@ def get_application_id():
     """
     return app_identity.get_application_id()
 
-x
+
 def get_default_gcs_bucket_name():
     """Returns the application's default Google Cloud Storage bucket"""
 
