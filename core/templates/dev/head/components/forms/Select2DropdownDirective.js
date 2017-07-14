@@ -35,7 +35,7 @@ oppia.directive('select2Dropdown', [function() {
       invalidSearchTermMessage: '@',
       item: '=',
       // The regex used to validate newly-entered choices that do not
-      // already exist. If is undefined then all new choices are rejected.
+      // already exist. If it is undefined then all new choices are rejected.
       newChoiceRegex: '@',
       onSelectionChange: '&',
       placeholder: '@',
