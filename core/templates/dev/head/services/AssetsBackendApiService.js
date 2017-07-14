@@ -22,8 +22,8 @@ oppia.factory('AssetsBackendApiService', [
   function($http, $q, AUDIO_UPLOAD_URL_TEMPLATE, UrlInterpolationService) {
     var _loadAsset = function(explorationId, filename,
       successCallback, errorCallback) {
-      var gcsFileUrl = 'https://www.googleapis.com/storage/v1' +
-        '/b/oppiaserver.appspot.com/assets/audio/' + explorationId + '/' + filename;
+      var gcsFileUrl = 'https://storage.googleapis.com/oppiatestserver-resources/'
+        + explorationId + '%5Cassets%5Caudio%5C' + filename;
 
       $http({
         method: 'GET',
@@ -31,6 +31,7 @@ oppia.factory('AssetsBackendApiService', [
         url: gcsFileUrl,
         headers: {
           'Content-type' : 'audio/mpeg',
+          'Access-Control-Allow-Origin' : 'http://localhost:8181',
         }
       }).success(function(data, status, headers, config) {
         var audioBlob = new Blob([data], {type: 'audio/mp3'});

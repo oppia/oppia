@@ -17,14 +17,15 @@
  */
 
 oppia.factory('AudioPlayerService', [
-  'AssetsBackendApiService', 'explorationContextService',
-  function(AssetsBackendApiService, explorationContextService) {
+  'ngAudio', 'AssetsBackendApiService', 'explorationContextService',
+  function(ngAudio, AssetsBackendApiService, explorationContextService) {
 
   var _currentTrackFilename;
   var _currentTrack;
 
   var _play = function(filename) {
-    AssetsBackendApiService.load(explorationContextService.getExplorationId(),
+    //explorationContextService.getExplorationId()
+    AssetsBackendApiService.load('1',
       filename).then(function(audioBlob) {
         var blobUrl = URL.createObjectURL(audioBlob);
         _currentTrack = ngAudio.load(blobUrl);
@@ -40,7 +41,7 @@ oppia.factory('AudioPlayerService', [
   };
 
   return {
-    play: function() {
+    play: function(filename) {
       _play(filename);
     },
     pause: function() {

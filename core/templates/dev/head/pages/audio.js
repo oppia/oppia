@@ -1,5 +1,5 @@
-oppia.controller('Audio', ['$scope', 'AssetsBackendApiService',
-  function($scope, AssetsBackendApiService) {
+oppia.controller('Audio', ['$scope', 'AssetsBackendApiService', 'AudioPlayerService',
+  function($scope, AssetsBackendApiService, AudioPlayerService) {
     $scope.add = function() {
       console.log("add");
       var f = document.getElementById('upload').files[0];
@@ -12,5 +12,9 @@ oppia.controller('Audio', ['$scope', 'AssetsBackendApiService',
         console.log(data.byteLength);
       };
       r.readAsArrayBuffer(f);
+
     };
+
+    AudioPlayerService.play('test-audio.mp3');
+
 }]);
