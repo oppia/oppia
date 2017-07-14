@@ -4,5 +4,5 @@ describe('Assets backend API service', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     AssetsBackendApiService = $injector.get('AssetsBackendApiService');
-  };
+  }));
 })

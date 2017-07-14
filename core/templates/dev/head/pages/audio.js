@@ -6,15 +6,14 @@ oppia.controller('Audio', ['$scope', 'AssetsBackendApiService', 'AudioPlayerServ
       r = new FileReader();
       r.onloadend = function(e) {
         var data = e.target.result;
-        AssetsBackendApiService.save('1', 'myfile.mp3', data).then(function() {
-          console.log("saved!");
+        AssetsBackendApiService.save('1', 'myfile.mp3', data).then(function(r) {
+          console.log(r);
         });
         console.log(data.byteLength);
+        AudioPlayerService.play('test-audio.mp3');
       };
       r.readAsArrayBuffer(f);
 
     };
-
-    AudioPlayerService.play('test-audio.mp3');
 
 }]);

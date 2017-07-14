@@ -978,7 +978,8 @@ class AudioFileHandler(EditorHandler):
 
         # Upload to GCS bucket with filepath
         # "<bucket>/<exploration-id>/assets/audio/filename".
-        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
+        # bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
+        bucket_name = 'oppiatestserver-resources'
         gcs_file_url = ('/%s/%s/assets/audio/%s'
                         % (bucket_name, exploration_id, filename))
 

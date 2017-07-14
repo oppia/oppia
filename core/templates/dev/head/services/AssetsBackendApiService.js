@@ -41,14 +41,15 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
-    var _saveAsset = function(explorationId, filename, rawAssetData, resolve, reject) {
+    var _saveAsset = function(explorationId, filename, rawAssetData,
+      successCallback, errorCallback) {
       params = {
           filename: filename,
           raw: rawAssetData
       };
       $http.post(_getAudioUploadUrl(explorationId), params).then(function(response) {
         if (successCallback) {
-          successCallback();
+          successCallback(response);
         }
       }, function(errorResponse) {
         if (errorCallback) {
