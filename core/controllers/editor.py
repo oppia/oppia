@@ -49,8 +49,8 @@ from core.platform import models
 import feconf
 import utils
 
-current_user_services = models.Registry.import_current_user_services()
 app_identity_services = models.Registry.import_app_identity_services()
+current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 # The frontend template for a new state. It is sent to the frontend when the
@@ -936,12 +936,13 @@ class ImageUploadHandler(EditorHandler):
 
         self.render_json({'filepath': filename})
 
+
 class AudioFileHandler(EditorHandler):
-    """Handles audio file uploads to Google Cloud Storage"""
+    """Handles audio file uploads to Google Cloud Storage."""
 
     @require_editor
     def post(self, exploration_id):
-        """Saves an audio file uploaded by a content creator"""
+        """Saves an audio file uploaded by a content creator."""
         raw = self.request.get('audio')
         filename = self.payload.get('filename')
         allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
@@ -976,12 +977,10 @@ class AudioFileHandler(EditorHandler):
                                      audio.info.length))
 
         # Upload to GCS bucket with filepath
-        # "/assets/audio/<exploration-id>/filename"
-        default_bucket_name = (
-            app_identity_services.get_default_gcs_bucket_name())
-
+        # "<bucket>/<exploration-id>/assets/audio/filename".
+        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
         gcs_file_url = ('/%s/%s/assets/audio/%s'
-                        % (default_bucket_name, exploration_id, filename))
+                        % (bucket_name, exploration_id, filename))
 
         gcs_file = cloudstorage.open(gcs_file_url, 'w',
                                      content_type=audio.mime[0])

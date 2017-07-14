@@ -216,6 +216,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
+
 class AudioHandlerTest(test_utils.GenericTestBase):
     """Test the upload of audio files to GCS"""
 
@@ -368,16 +369,17 @@ class AudioHandlerTest(test_utils.GenericTestBase):
                       % feconf.MAX_AUDIO_FILE_LENGTH_SEC,
                       response_dict['error'])
 
-
     def test_non_matching_extensions_are_detected(self):
         """Test that filenames with extensions that don't match the audio are
-        detected."""
+        detected.
+        """
         if len(feconf.ACCEPTED_AUDIO_EXTENSIONS) >= 2:
             self.login(self.EDITOR_EMAIL)
             response = self.testapp.get('/create/0')
             csrf_token = self.get_csrf_token_from_response(response)
 
             # Use an accepted audio extension in mismatched_filename
+            # that differs from the uploaded file's audio type.
             mismatched_filename = 'test.flac'
             with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
                       mode='rb') as f:
