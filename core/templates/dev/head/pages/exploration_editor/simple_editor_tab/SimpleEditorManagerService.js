@@ -43,7 +43,7 @@ oppia.factory('SimpleEditorManagerService', [
         },
         FIRST_ANSWER_GROUP_RULE: {
           type: 'Equals',
-          inputs: {
+          value: {
             x: 0
           }
         }
@@ -164,9 +164,9 @@ oppia.factory('SimpleEditorManagerService', [
         var questionCount = data.questionList.getQuestionCount();
         var currentInteractionId = (
           SimpleEditorShimService.getInteractionId(currentStateName));
-        var doesLastQuestionHaveAnswerGroups = (
-          QuestionListObjectFactory.doesLastQuestionHaveAnswerGroups);
 
+        var doesLastQuestionHaveAnswerGroups = (
+          data.questionList.doesLastQuestionHaveAnswerGroups());
         // Update Question Type If interactionId is not same.
         if (newInteractionId !== currentInteractionId) {
           SimpleEditorShimService.saveInteractionId(
@@ -175,8 +175,9 @@ oppia.factory('SimpleEditorManagerService', [
             currentStateName,
             DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
               CUSTOMIZATION_ARGS);
-
-          if (doesLastQuestionHaveAnswerGroups && index !== questionCount - 1) {
+          // Don't save answer group when it's last question and doesn't have
+          // answer group.
+          if(index !== questionCount - 1 || doesLastQuestionHaveAnswerGroups){
             var newAnswerGroups = [];
             newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
               RuleObjectFactory.createNew(

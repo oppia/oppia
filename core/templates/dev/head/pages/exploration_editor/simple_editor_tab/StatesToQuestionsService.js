@@ -183,7 +183,7 @@ oppia.factory('StatesToQuestionsService', [
           }
         });
         if (!readableQuestionName) {
-          throw Error('Empty answer groups detected');
+          throw Error('Invalid Interaction ID');
         }
         return readableQuestionName;
       }
