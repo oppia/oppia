@@ -868,7 +868,11 @@ oppia.factory('explorationStatesService', [
         });
       },
       solution: function(solution) {
-        return solution.toBackendDict();
+        if (!angular.equals(solution, {})) {
+          return solution.toBackendDict();
+        } else {
+          return {};
+        }
       }
     };
 

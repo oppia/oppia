@@ -1,0 +1,106 @@
+<div ng-controller="StateSolution">
+  <div ng-if="!isCurrentInteractionLinear() && solutionEditorIsEnabled && stateHintsService.displayed.length > 0 && objectType !== 'LogicQuestion'">
+    <div class="oppia-editor-header">
+      <strong>Solution</strong>
+    </div>
+    <md-card class="oppia-editor-card-with-avatar">
+      <div class="oppia-editor-card-body">
+        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
+            ng-if="solutionIsSpecified && stateSolutionService.savedMemento.explanation">
+          <li ng-class="!isActive"
+              class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
+              style="margin-top: 0;">
+            <a ng-click="toggleIsActive()"
+               class="oppia-rule-tab">
+              <div class="oppia-response-header-block">
+                <div class="oppia-response-header">
+                  <[getSolutionSummary()]>
+                  <span class="pull-right oppia-transition-200"
+                        ng-click="deleteSolution($event)"
+                        style="cursor: pointer; opacity: 0.5;">
+                    <i class="material-icons md-18">&#xE5CD;</i>
+                  </span>
+                </div>
+              </div>
+            </a>
+
+            <div ng-if="isActive">
+              <div class="oppia-editor-card-section">
+                <solution-editor solution="stateSolutionService.savedMemento"
+                                 object-type="objectType"
+                                 rule-description-choices="ruleDescriptionChoices"
+                                 on-save="onComponentSave">
+                </solution-editor>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </md-card>
+
+    <md-card style="margin: 0; padding: 0;">
+      <div ng-if="editabilityService.isEditableOutsideTutorialMode()">
+        <button type="button" class="btn btn-default btn-lg oppia-add-hint-button" ng-click="openAddSolutionModal()">
+          + Add Solution
+        </button>
+      </div>
+    </md-card>
+  </div>
+</div>
+
+<script type="text/ng-template" id="modals/addSolution">
+  <div class="modal-header">
+    <h3>Add Solution</h3>
+  </div>
+
+  <div class="modal-body">
+    <form name="addSolutionForm.answer"
+          class="form-inline">
+      <div class="oppia-rule-details-header">
+        <select ng-model="answerIsExclusive">
+          <option ng-if="!answerIsExclusive" value="">-- Please select an option --</option>
+          <option value="false">One</option>
+          <option value="true">Only</option>
+        </select> <strong>Solution is...</strong>
+        <html-select ng-if="objectType === 'select'" style="width: 250px;" options="ruleDescriptionChoices" selection="tmpSolution.correctAnswer">
+        </html-select>
+        <html-select ng-if="objectType === 'RegionSelect'" style="width: 250px;" options="ruleDescriptionChoices" selection="tmpSolution.correctAnswer">
+        </html-select>
+        <textarea ng-if="objectType === 'LogicQuestion'" ng-model="tmpSolution.correctAnswer"></textarea>
+        <object-editor ng-if="objectType === 'UnicodeString'" obj-type="<[objectType]>" init-args="{choices: ruleDescriptionChoices}" is-editable="true" always-editable="true" value="tmpSolution.correctAnswer" style="color: black;">
+        </object-editor>
+        <object-editor ng-if="objectType !== 'select' && objectType !== 'UnicodeString' && objectType !== 'RegionSelect' && objectType !== 'LogicQuestion'" obj-type="<[objectType]>" init-args="{choices: ruleDescriptionChoices}" is-editable="true" always-editable="true" value="tmpSolution.correctAnswer" style="color: black;">
+        </object-editor>
+        <br>
+        <strong>Explanation is...</strong>
+        <schema-based-editor schema="EXPLANATION_FORM_SCHEMA" local-value="tmpSolution.explanation">
+        </schema-based-editor>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success" ng-click="saveSolution()" ng-disabled="!tmpSolution.explanation && !tmp.correctAnswer">Check and Save Solution</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/deleteSolution">
+  <div class="modal-header">
+    <h3>Delete Solution</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      Are you sure you want to delete this solution?
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-danger"
+            ng-click="reallyDelete()">
+      Delete Solution
+    </button>
+  </div>
+</script>

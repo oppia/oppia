@@ -793,13 +793,16 @@ class Solution(object):
 
     @classmethod
     def from_dict(cls, interaction_id, solution_dict):
-        return cls(
-            interaction_id,
-            solution_dict['answer_is_exclusive'],
-            interaction_registry.Registry.get_interaction_by_id(
-                interaction_id).normalize_answer(
-                    solution_dict['correct_answer']),
-            solution_dict['explanation'])
+        if solution_dict:
+            return cls(
+                interaction_id,
+                solution_dict['answer_is_exclusive'],
+                interaction_registry.Registry.get_interaction_by_id(
+                    interaction_id).normalize_answer(
+                        solution_dict['correct_answer']),
+                solution_dict['explanation'])
+        else:
+            return None
 
     def validate(self, interaction_id):
         if not isinstance(self.answer_is_exclusive, bool):
@@ -841,7 +844,9 @@ class InteractionInstance(object):
                 self.confirmed_unclassified_answers),
             'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
             'hints': [hint.to_dict() for hint in self.hints],
-            'solution': self.solution,
+            'solution': self.solution.to_dict()
+                if self.solution
+                else {},
         }
 
     @classmethod
@@ -849,6 +854,11 @@ class InteractionInstance(object):
         default_outcome_dict = (
             Outcome.from_dict(interaction_dict['default_outcome'])
             if interaction_dict['default_outcome'] is not None else None)
+        solution_dict = (
+            Solution.from_dict(
+            interaction_dict['id'], interaction_dict['solution'])
+            if interaction_dict['solution'] is not None else None)
+
         return cls(
             interaction_dict['id'],
             interaction_dict['customization_args'],
@@ -858,7 +868,7 @@ class InteractionInstance(object):
             interaction_dict['confirmed_unclassified_answers'],
             [Fallback.from_dict(f) for f in interaction_dict['fallbacks']],
             [Hint.from_dict(h) for h in interaction_dict['hints']],
-            interaction_dict['solution'])
+            solution_dict)
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
@@ -957,8 +967,7 @@ class InteractionInstance(object):
 
         if self.hints:
             if self.solution:
-                Solution.from_dict(
-                    self.id, self.solution).validate(self.id)
+                self.solution.validate(self.id)
 
         elif self.solution:
             raise utils.ValidationError(

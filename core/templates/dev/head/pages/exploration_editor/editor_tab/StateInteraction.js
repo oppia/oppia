@@ -50,14 +50,14 @@ oppia.controller('StateInteraction', [
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
-  'SubtitledHtmlObjectFactory',
+  'SubtitledHtmlObjectFactory', 'stateSolutionService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
       alertsService, editorContextService, oppiaHtmlEscaper,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService, interactionDetailsCache,
       oppiaExplorationHtmlFormatterService, UrlInterpolationService,
-      SubtitledHtmlObjectFactory) {
+      SubtitledHtmlObjectFactory, stateSolutionService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
     // Declare dummy submitAnswer() and adjustPageHeight() methods for the
@@ -154,6 +154,8 @@ oppia.controller('StateInteraction', [
           updateDefaultTerminalStateContentIfEmpty();
         }
         stateInteractionIdService.saveDisplayedValue();
+        stateSolutionService.savedMemento = {};
+        stateSolutionService.saveDisplayedValue();
       }
 
       stateCustomizationArgsService.saveDisplayedValue();
@@ -187,12 +189,12 @@ oppia.controller('StateInteraction', [
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', '$injector',
+            '$scope', '$modalInstance', '$injector', 'stateSolutionService',
             'stateInteractionIdService', 'stateCustomizationArgsService',
             'interactionDetailsCache', 'INTERACTION_SPECS',
             'UrlInterpolationService', 'editorFirstTimeEventsService',
             function(
-                $scope, $modalInstance, $injector,
+                $scope, $modalInstance, $injector, stateSolutionService,
                 stateInteractionIdService, stateCustomizationArgsService,
                 interactionDetailsCache, INTERACTION_SPECS,
                 UrlInterpolationService, editorFirstTimeEventsService) {
@@ -373,9 +375,11 @@ oppia.controller('StateInteraction', [
       }).result.then(function() {
         stateInteractionIdService.displayed = null;
         stateCustomizationArgsService.displayed = {};
+        stateSolutionService.displayed = {};
 
         stateInteractionIdService.saveDisplayedValue();
         stateCustomizationArgsService.saveDisplayedValue();
+        stateSolutionService.saveDisplayedValue();
         $rootScope.$broadcast(
           'onInteractionIdChanged', stateInteractionIdService.savedMemento);
         graphDataService.recompute();
