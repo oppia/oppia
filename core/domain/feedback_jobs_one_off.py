@@ -43,22 +43,26 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
             ast.literal_eval(v) for v in stringified_message_ids]
 
         thread_model = feedback_models.FeedbackThreadModel.get(key)
-        thread_model.message_count = max(message_ids) + 1
+        next_message_id = max(message_ids) + 1
+        thread_model.message_count = next_message_id
         thread_model.put()
 
-        if max(message_ids) + 1 != len(message_ids):
+        if next_message_id != len(message_ids):
             exploration_and_thread_id = key.split('.')
             exploration_id = exploration_and_thread_id[0]
             thread_id = exploration_and_thread_id[1]
             thread = feedback_services.get_thread(exploration_id, thread_id)
-            logging.error('The number of messages in thread, given by the ' +
-                          'id '+ key + ', is '  + len(message_ids) + '. But ' +
-                          'the number of messages as estimated by the ' +
-                          'message ids is ' + (max(message_ids) + 1) +
-                          '. Therefore the estimate is not equal to ' +
-                          'the actual number of messages.')
+            logging.error(
+                'The number of messages in the thread, given by the id ' +
+                '%s, is %s. But the number of ' % (key, len(message_ids)) +
+                'messages as estimated by the message ids is ' +
+                '%s. Therefore the estimate is not ' % (next_message_id) +
+                'equal to the actual number of messages.')
+
             yield (key, {
                 'subject': thread.subject,
                 'exploration_id': exploration_id,
-                'thread_id': thread_id
+                'thread_id': thread_id,
+                'next_message_id': next_message_id,
+                'message_count': len(message_ids)
             })

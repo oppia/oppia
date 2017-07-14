@@ -177,7 +177,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         for stringified_distribution in stringified_output:
             value = re.findall(r'\d+', stringified_distribution)
             # output['username length'] = number of users
-            output[value[0]] = int(value[1])
+            print "Hello", value
 
         return output
 

@@ -25,6 +25,26 @@ DELETED_FIELD = 'deleted'
 FIELDS_NOT_REQUIRED = [CREATED_ON_FIELD, LAST_UPDATED_FIELD, DELETED_FIELD]
 
 
+class FeedbackThreadModelTest(test_utils.GenericTestBase):
+    """Tests for the FeedbackThreadModel class."""
+
+    def test_get_exploration_and_thread_ids(self):
+        # Generate some full thread ids.
+        full_thread_id_1 = (
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                'exp_id_1', 'thread_id_1'))
+        full_thread_id_2 = (
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                'exp_id_2', 'thread_id_2'))
+
+        exploration_ids, thread_ids = (
+            feedback_models.FeedbackThreadModel.get_exploration_and_thread_ids(
+                [full_thread_id_1, full_thread_id_2]))
+
+        self.assertEqual(exploration_ids, ('exp_id_1', 'exp_id_2'))
+        self.assertEqual(thread_ids, ('thread_id_1', 'thread_id_2'))
+
+
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadUserModel class."""
 

@@ -174,8 +174,8 @@ def create_message(
             exploration_id, thread_id, author_id, message_id)
 
 
-def update_messages_read_by_the_user(exploration_id, thread_id,
-                                     user_id, message_ids):
+def update_messages_read_by_the_user(user_id, exploration_id, thread_id,
+                                     message_ids):
     """Replaces the list of message ids read by the message ids given to the
     function.
 
@@ -435,32 +435,29 @@ def get_thread_summaries(user_id, full_thread_ids):
 
     Returns:
         list(dict). A list of dictionaries containing the summaries of the
-            threads given to it. The format of the returned value:
-            [
-                {
-                    'status': Status of the thread,
-                    'original_author_id': The id of the original author of the
-                        thread,
-                    'last_updated': When was the thread last updated,
-                    'last_message_text': The text of the last message,
-                    'total_no_of_messages': The total number of messages in the
-                        thread,
-                    'last_message_read': Whether the last message is read by the
-                        user,
-                    'second_last_message_read': Whether the second last message
-                        is read by the user,
-                    'author_last_message': The name of the author of the last
-                        message,
-                    'author_second_last_message': The name of the author of the
-                        second last message,
-                    'exploration_title': The title of the exploration to which
-                        exploration belongs
-                }
-            ]
+            threads given to it. Each dict has the following keys:
+            - 'status': str. The status of the thread.
+            - 'original_author_id': str. The id of the original author of the
+                thread.
+            - 'last_updated': datetime.datetime. When was the thread last
+                updated.
+            - 'last_message_text': str. The text of the last message.
+            - 'total_no_of_messages': int. The total number of messages in the
+                thread.
+            - 'last_message_read': boolean. Whether the last message is read by
+                the user.
+            - 'second_last_message_read': boolean. Whether the second last
+                message is read by the user,
+            - 'author_last_message': str. The name of the author of the last
+                message.
+            - 'author_second_last_message': str. The name of the author of the
+                second last message.
+            - 'exploration_title': str. The title of the exploration to which
+                exploration belongs.
     """
-    exploration_and_thread_ids = (
-        [thread_id.split('.') for thread_id in full_thread_ids])
-    exploration_ids, thread_ids = zip(*exploration_and_thread_ids)
+    exploration_ids, thread_ids = (
+        feedback_models.FeedbackThreadModel.get_exploration_and_thread_ids(
+            full_thread_ids))
 
     thread_model_ids = (
         [feedback_models.FeedbackThreadModel.generate_full_thread_id(
@@ -471,10 +468,6 @@ def get_thread_summaries(user_id, full_thread_ids):
         [feedback_models.FeedbackThreadUserModel.generate_full_id(
             user_id, exploration_id, thread_id)
          for exploration_id, thread_id in zip(exploration_ids, thread_ids)])
-
-    last_two_messages_ids = (
-        feedback_models.FeedbackMessageModel.get_last_two_message_ids_of_threads( # pylint: disable=line-too-long
-            exploration_ids, thread_ids))
 
     multiple_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(

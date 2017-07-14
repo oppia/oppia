@@ -129,10 +129,15 @@ class FeedbackThread(object):
         """
         message_ids = []
         last_message_id = self.message_count - 1
-        second_last_message_id = self.message_count - 2
+        if self.message_count > 1:
+            second_last_message_id = self.message_count - 2
+        else:
+            # The second last message does not exist. So we set it's id to -1
+            # implying that it doesn't exist.
+            second_last_message_id = -1
+
         message_ids.append(self.get_full_message_id(last_message_id))
         message_ids.append(self.get_full_message_id(second_last_message_id))
-
         return message_ids
 
 

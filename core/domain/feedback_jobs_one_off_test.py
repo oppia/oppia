@@ -16,12 +16,15 @@
 
 """Tests for feedback-related jobs."""
 
+import ast
+
 from core.domain import feedback_jobs_one_off
 from core.domain import feedback_services
 from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
 
+(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -67,6 +70,13 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
                 queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
             1)
         self.process_and_flush_pending_tasks()
+        stringified_output = (
+            feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob.get_output( # pylint: disable=line-too-long
+                job_id))
+
+        eval_output = [ast.literal_eval(stringified_item)
+                       for stringified_item in stringified_output]
+        return eval_output
 
     def test_message_count(self):
         """Test if the job returns the correct message count."""
@@ -103,3 +113,16 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
 
         # Check that the first message has two messages.
         self.assertEqual(thread_summaries[0]['total_no_of_messages'], 2)
+
+        # Get the first message so that we can delete it and check the error
+        # case.
+        first_message_model = (
+            feedback_models.FeedbackMessageModel.get(
+                self.EXP_ID_1, thread_ids[0].split('.')[1], 0))
+
+        first_message_model.delete()
+
+        output = self._run_one_off_job()
+        # Check if the quantities have the correct values.
+        self.assertEqual(output[0][1]['message_count'], 1)
+        self.assertEqual(output[0][1]['next_message_id'], 2)

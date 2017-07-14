@@ -444,7 +444,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.viewer_id, self.EXP_ID_1, thread_id), [])
 
         feedback_services.update_messages_read_by_the_user(
-            self.EXP_ID_1, thread_id, self.viewer_id, message_ids)
+            self.viewer_id, self.EXP_ID_1, thread_id, message_ids)
 
         # Check if the message is added to the read section of the viewer.
         self.assertEqual(self._get_all_messages_read(

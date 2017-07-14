@@ -111,6 +111,24 @@ class FeedbackThreadModel(base_models.BaseModel):
         """
         return '.'.join([exploration_id, thread_id])
 
+    @classmethod
+    def get_exploration_and_thread_ids(cls, full_thread_ids):
+        """Gives back the exploration ids and thread ids corresponding to the
+        full thread ids.
+
+        Args:
+            full_thread_ids: str. The list of full thread ids.
+
+        Returns:
+            list(str). The list of exploration ids to which the threads belong.
+            list(str). The ids of the threads corresponding to the full thread
+                ids.
+        """
+        exploration_and_thread_ids = (
+            [thread_id.split('.') for thread_id in full_thread_ids])
+
+        return zip(*exploration_and_thread_ids)
+
     @property
     def thread_id(self):
         """Returns the thread_id (not including the exploration_id) for this
@@ -304,42 +322,6 @@ class FeedbackMessageModel(base_models.BaseModel):
 
         return cls.get_all().filter(
             cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_last_two_message_ids_of_threads(cls, exploration_ids, thread_ids):
-        """Returns a list of the last two messages of the given threads.
-
-        Args:
-            exploration_id: str. ID of the exploration the thread
-                belongs to.
-            thread_id: str. ID of the thread.
-
-        Returns:
-            list(int). A list of message ids present in the given thread, having
-                a maximum length of feconf.DEFAULT_QUERY_LIMIT.
-        """
-        message_ids = []
-        full_thread_ids = (
-            [FeedbackThreadModel.generate_full_thread_id(
-                exploration_id, thread_id)
-             for exploration_id, thread_id in zip(exploration_ids, thread_ids)])
-        thread_models = FeedbackThreadModel.get_multi(full_thread_ids)
-
-        index = 0
-        for exploration_id, thread_id in zip(exploration_ids, thread_ids):
-            if thread_models[index].message_count:
-                message_count = thread_models[index].message_count
-            else:
-                message_count = cls.get_message_count(exploration_id, thread_id)
-            last_message_id = message_count - 1
-            message_ids.append(cls._generate_id(
-                exploration_id, thread_id, last_message_id))
-            second_last_message_id = message_count - 2
-            message_ids.append(cls._generate_id(
-                exploration_id, thread_id, second_last_message_id))
-            index += 1
-
-        return message_ids
 
     @classmethod
     def get_most_recent_message(cls, exploration_id, thread_id):
