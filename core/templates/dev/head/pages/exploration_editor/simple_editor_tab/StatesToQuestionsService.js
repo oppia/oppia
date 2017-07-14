@@ -182,6 +182,9 @@ oppia.factory('StatesToQuestionsService', [
             readableQuestionName = interaction.name;
           }
         });
+        if (!readableQuestionName) {
+          throw Error('Empty answer groups detected');
+        }
         return readableQuestionName;
       }
     };

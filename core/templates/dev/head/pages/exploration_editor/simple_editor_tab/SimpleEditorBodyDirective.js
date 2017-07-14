@@ -55,7 +55,8 @@ oppia.directive('simpleEditorBody', [
           $scope.canAddNewQuestion = (
             SimpleEditorManagerService.canAddNewQuestion);
           $scope.addState = SimpleEditorManagerService.addState;
-          $scope.changeQuestion = SimpleEditorManagerService.changeQuestion;
+          $scope.changeQuestionType = (
+            SimpleEditorManagerService.changeQuestionType);
           $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
           $scope.canTryToFinishExploration =
             SimpleEditorManagerService.canTryToFinishExploration;

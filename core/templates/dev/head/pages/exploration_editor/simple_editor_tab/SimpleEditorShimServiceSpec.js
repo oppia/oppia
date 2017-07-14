@@ -145,9 +145,8 @@ describe('Simple Editor Shim Service', function() {
   });
 
   it('should return interaction id for given state', function() {
-    var givenState = currentStateName;
-    var interactionId = srv.getInteractionId(givenState);
-    expect(interactionId).toEqual(states[givenState].interaction.id);
+    var interactionId = srv.getInteractionId(currentStateName);
+    expect(interactionId).toEqual(states[currentStateName].interaction.id);
   });
 
   it('should change the displayed title and should save it', function() {

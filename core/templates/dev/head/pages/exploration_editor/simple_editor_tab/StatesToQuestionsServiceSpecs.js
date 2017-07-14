@@ -29,8 +29,6 @@
      var questionId = 'MultipleChoiceInput';
      var readableQuestionName =
       statesToQuestionsService.getHumanReadableQuestionType(questionId);
-     expect(
-       readableQuestionName === 'Multiple choice'
-     ).toBe(true);
+     expect(readableQuestionName).toBe('Multiple choice');
    });
  });
