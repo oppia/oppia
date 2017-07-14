@@ -32,14 +32,11 @@
 </p>
 <p ng-class="{'has-error': !explorationCategoryService.displayed}" ng-style="pStyle">
   <label ng-style="formStyle">{{metadataFormCategory}}</label>
-  <select2-dropdown id="explorationCategory"
-                    class="protractor-test-exploration-category-input"
-                    item="explorationCategoryService.displayed"
+  <select2-dropdown item="explorationCategoryService.displayed"
                     choices="CATEGORY_LIST_FOR_SELECT2"
                     placeholder="Choose or type new"
                     new-choice-regex="^[A-Z a-z]+$"
                     width="100%"
-                    on-selection-change="saveExplorationCategory()"
                     invalid-search-term-message="Invalid category name">
   </select2-dropdown>
   <span class="help-block" style="font-size: smaller">
@@ -64,7 +61,7 @@
   <select2-dropdown item="explorationTagsService.displayed"
                     tag-mode="true"
                     allow-multiple-choices="true"
-                    invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..." 
+                    invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
                     new-choice-regex="<[::TAG_REGEX]>"
                     width="100%"
                     placeholder="Skills, concepts, topics, ..."
