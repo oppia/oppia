@@ -71,7 +71,7 @@ class FeedbackThreadModel(base_models.BaseModel):
     # Specifies whether this thread has a related learner suggestion.
     has_suggestion = ndb.BooleanProperty(indexed=True, default=False)
     # The number of messages in the thread.
-    message_count = ndb.IntegerProperty(default=None, indexed=True)
+    message_count = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def generate_new_thread_id(cls, exploration_id):

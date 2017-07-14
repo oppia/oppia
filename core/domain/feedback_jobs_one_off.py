@@ -59,7 +59,7 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
                 '%s. Therefore the estimate is not ' % (next_message_id) +
                 'equal to the actual number of messages.')
 
-            yield (key, {
+            yield ('error', {
                 'subject': thread.subject,
                 'exploration_id': exploration_id,
                 'thread_id': thread_id,
