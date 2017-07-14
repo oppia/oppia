@@ -1809,11 +1809,16 @@ def _is_suggestion_handled(thread_id, exploration_id):
             feedback_models.STATUS_CHOICES_IGNORED])
 
 
-def _create_change_list_from_suggestion(suggestion):
+def _create_change_list_from_suggestion(
+        suggestion, old_content, audio_update_required):
     """Creates a change list from a suggestion object.
 
     Args:
         suggestion: Suggestion. The given Suggestion domain object.
+        old_content: SubtitledHtml. A SubtitledHtml domain object representing
+            the content of the old state.
+        audio_update_required: bool. Whether the audio for the state content
+            should be marked as needing an update.
 
     Returns:
         list(dict). A dict containing a single change that represents an edit to
@@ -1827,6 +1832,10 @@ def _create_change_list_from_suggestion(suggestion):
             new_value: list(str). List of the state content of the suggestion
                 object.
     """
+    audio_translations = old_content.audio_translations
+    if audio_update_required:
+        for translation in audio_translations:
+            translation.needs_update = True
 
     return [{
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1834,7 +1843,8 @@ def _create_change_list_from_suggestion(suggestion):
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'new_value': {
             'html': suggestion.suggestion_html,
-            'audio_translations': []
+            'audio_translations': [
+                translation.to_dict() for translation in audio_translations],
         }
     }]
 
@@ -1861,7 +1871,9 @@ def _get_commit_message_for_suggestion(
         suggestion_author_username, commit_message)
 
 
-def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
+def accept_suggestion(
+        editor_id, thread_id, exploration_id, commit_message,
+        audio_update_required):
     """If the suggestion is valid, accepts it by updating the exploration.
     Raises an exception if the suggestion is not valid.
 
@@ -1871,6 +1883,8 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         exploration_id: str. The id of the exploration that the suggestion is
             for.
         commit_message: str. The commit message.
+        audio_update_required: bool. Whether the audio subtitles for the
+            content need to be updated.
 
     Raises:
         Exception: The suggestion is not valid.
@@ -1889,7 +1903,10 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         suggestion = feedback_services.get_suggestion(
             exploration_id, thread_id)
         suggestion_author_username = suggestion.get_author_name()
-        change_list = _create_change_list_from_suggestion(suggestion)
+        exploration = get_exploration_by_id(exploration_id)
+        old_content = exploration.states[suggestion.state_name].content
+        change_list = _create_change_list_from_suggestion(
+            suggestion, old_content, audio_update_required)
         update_exploration(
             editor_id, exploration_id, change_list,
             _get_commit_message_for_suggestion(
