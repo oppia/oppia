@@ -382,7 +382,8 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         # Use an accepted audio extension in mismatched_filename
         # that differs from the uploaded file's audio type.
         mismatched_filename = 'test.mp3'
-        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
+        with open(os.path.join(feconf.TESTS_DATA_DIR,
+            self.TEST_AUDIO_FILE_FLAC),
                   mode='rb') as f:
             raw_audio = f.read()
         response_dict = self.post_json(
