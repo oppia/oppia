@@ -218,7 +218,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
 
 class AudioHandlerTest(test_utils.GenericTestBase):
-    """Test the upload of audio files to GCS"""
+    """Test the upload of audio files to GCS."""
 
     TEST_AUDIO_FILE = 'test-audio-a.mp3'
     TEST_AUDIO_FILE_OVER_MAX_LENGTH = 'test-over-five-minutes-audio.mp3'
@@ -249,7 +249,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_invalid_extension_is_detected(self):
-        """Test that invalid extensions are caught"""
+        """Test that invalid extensions are caught."""
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
@@ -280,7 +280,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
     def test_upload_empty_audio(self):
-        """Test upload of empty audio"""
+        """Test upload of empty audio."""
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
@@ -300,7 +300,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['error'], 'No audio supplied')
 
     def test_upload_bad_audio(self):
-        """Test upload of malformed audio"""
+        """Test upload of malformed audio."""
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
@@ -319,7 +319,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
                          'a mp3 file')
 
     def test_missing_extensions_are_detected(self):
-        """Test upload of filenames with no extensions are caught"""
+        """Test upload of filenames with no extensions are caught."""
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
@@ -345,7 +345,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
                          '%s' % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
     def test_exceed_max_length_detected(self):
-        """Test that audio file is less than max playback length"""
+        """Test that audio file is less than max playback length."""
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
