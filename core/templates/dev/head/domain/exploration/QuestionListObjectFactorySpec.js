@@ -193,7 +193,8 @@ describe('Question List Object Factory', function() {
 
     questionList.updateQuestion(3, newQuestion);
     var returnedQuestions = questionList.getQuestions();
-    expect(returnedQuestions[3]).toEqual(newQuestion)
+    expect(returnedQuestions[3]).toEqual(newQuestion);
+    expect(returnedQuestions[3]).not.toBe(newQuestion);
   });
 
   it('should remove the given question if it exists', function() {
