@@ -175,8 +175,8 @@ oppia.factory('SimpleEditorManagerService', [
             currentStateName,
             DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
               CUSTOMIZATION_ARGS);
-          // Don't save answer group when it's last question and doesn't have
-          // answer group.
+          // Don't save answer group when it's the last question and doesn't
+          // have a answer group.
           if(index !== questionCount - 1 || doesLastQuestionHaveAnswerGroups){
             var newAnswerGroups = [];
             newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
