@@ -184,8 +184,11 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'gif': ['gif'],
 }
 
-# An array containing the accepted audio extensions for uploaded files.
-ACCEPTED_AUDIO_EXTENSIONS = ['mp3']
+# An array containing the accepted audio extensions for uploaded files and
+# the corresponding MIME types.
+ACCEPTED_AUDIO_EXTENSIONS = {
+    'mp3': ['audio/mp3']
+}
 
 
 # A string containing the disallowed characters in state or exploration names.
@@ -366,6 +369,9 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
+
+# The maximum playback length of an audio file, in seconds.
+MAX_AUDIO_FILE_LENGTH_SEC = 300
 
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
@@ -790,3 +796,5 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
 VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'
+
+GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
