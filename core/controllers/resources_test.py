@@ -220,7 +220,8 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 class AudioHandlerTest(test_utils.GenericTestBase):
     """Test the upload of audio files to GCS."""
 
-    TEST_AUDIO_FILE = 'test-audio-a.mp3'
+    TEST_AUDIO_FILE_MP3 = 'test-audio-a.mp3'
+    TEST_AUDIO_FILE_FLAC = 'test-audio-a.flac'
     TEST_AUDIO_FILE_OVER_MAX_LENGTH = 'test-over-five-minutes-audio.mp3'
     AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
 
@@ -237,12 +238,12 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
+        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
                   mode='rb') as f:
             raw_audio = f.read()
         self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
-            {'filename': self.TEST_AUDIO_FILE},
+            {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
             upload_files=(('audio', 'unused_filename', raw_audio),)
         )
@@ -260,7 +261,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         supplied_filename = ('%s.%s'
                              % (filename_without_extension, invalid_extension))
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
+        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
                   mode='rb') as f:
             raw_audio = f.read()
         response_dict = self.post_json(
@@ -326,7 +327,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         missing_extension_filename = 'test'
-        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
+        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
                   mode='rb') as f:
             raw_audio = f.read()
         response_dict = self.post_json(
@@ -373,26 +374,26 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         """Test that filenames with extensions that don't match the audio are
         detected.
         """
-        if len(feconf.ACCEPTED_AUDIO_EXTENSIONS) >= 2:
-            self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get('/create/0')
-            csrf_token = self.get_csrf_token_from_response(response)
 
-            # Use an accepted audio extension in mismatched_filename
-            # that differs from the uploaded file's audio type.
-            mismatched_filename = 'test.flac'
-            with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE),
-                      mode='rb') as f:
-                raw_audio = f.read()
-            response_dict = self.post_json(
-                '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
-                {'filename': mismatched_filename},
-                csrf_token=csrf_token,
-                expect_errors=True,
-                expected_status_int=400,
-                upload_files=(('audio', 'unused_filename', raw_audio),)
-            )
-            self.logout()
-            self.assertEqual(response_dict['code'], 400)
-            self.assertEqual(response_dict['error'],
-                             'Audio not recognized as a flac file')
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Use an accepted audio extension in mismatched_filename
+        # that differs from the uploaded file's audio type.
+        mismatched_filename = 'test.mp3'
+        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
+                  mode='rb') as f:
+            raw_audio = f.read()
+        response_dict = self.post_json(
+            '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
+            {'filename': mismatched_filename},
+            csrf_token=csrf_token,
+            expect_errors=True,
+            expected_status_int=400,
+            upload_files=(('audio', 'unused_filename', raw_audio),)
+        )
+        self.logout()
+        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['error'],
+                         'Audio not recognized as a mp3 file')
