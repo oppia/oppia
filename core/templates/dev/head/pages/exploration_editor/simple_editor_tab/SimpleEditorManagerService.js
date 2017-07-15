@@ -159,11 +159,11 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, stateData.interaction, ''));
       },
       changeQuestionType: function(newInteractionId, index) {
+          var currentStateName = data.questionList.getAllStateNames()[index];
         var currentInteractionId = (
           SimpleEditorShimService.getInteractionId(currentStateName));
         // Update the question type if the interaction ID has changed.
         if (newInteractionId !== currentInteractionId) {
-          var currentStateName = data.questionList.getAllStateNames()[index];
           var nextStateName = data.questionList.getAllStateNames()[index + 1];
           var questionCount = data.questionList.getQuestionCount();
           var doesLastQuestionHaveAnswerGroups = (
