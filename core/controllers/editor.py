@@ -982,14 +982,13 @@ class AudioFileHandler(EditorHandler):
                 'Audio must be under %s seconds in length. '
                 'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC,
                                      audio.info.length))
-        if len(
-            set(audio.mime).intersection(
+        if len(set(audio.mime).intersection(
                 set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
             raise self.InvalidInputException(
                 'Although the filename extension indicates the file '
                 'is a %s file, it was not recognized as one. '
                 'Found mime types: %s' % (extension, audio.mime))
-        
+
         del audio
 
         bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
