@@ -19,12 +19,11 @@
 import datetime
 import imghdr
 import logging
-import tempfile
+import StringIO
 
 import cloudstorage
 import jinja2
 import mutagen
-import StringIO
 
 from constants import constants
 from core.controllers import base
@@ -963,17 +962,17 @@ class AudioFileHandler(EditorHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        buffer = StringIO.StringIO()
-        buffer.write(raw)
-        buffer.seek(0)
+        tempbuffer = StringIO.StringIO()
+        tempbuffer.write(raw)
+        tempbuffer.seek(0)
         try:
-            audio = mutagen.File(buffer)
+            audio = mutagen.File(tempbuffer)
         except mutagen.MutagenError:
             raise self.InvalidInputException('Audio not recognized '
                                              'as a %s file' % extension)
-        buffer.close()
+        tempbuffer.close()
 
-        if audio == None:
+        if audio is None:
             raise self.InvalidInputException('Audio not recognized')
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
