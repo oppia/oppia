@@ -204,7 +204,7 @@ describe('Full exploration editor', function() {
 
       // Save.
       editor.setTitle('Testing multiple rules');
-      editor.setCategory('Answer Groups');
+      editor.setCategory('Algebra');
       editor.setObjective('To assess happiness.');
       editor.openAndClosePreviewSummaryTile();
       editor.saveChanges();
