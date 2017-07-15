@@ -20,7 +20,7 @@
 oppia.factory('SolutionObjectFactory', function() {
   var Solution = function(answerIsExclusive, correctAnswer, explanation) {
     this.answerIsExclusive = answerIsExclusive;
-    this.correctAnswer =  correctAnswer;
+    this.correctAnswer = correctAnswer;
     this.explanation = explanation;
   };
 
