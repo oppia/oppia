@@ -92,6 +92,28 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             self.assertTrue(
                 self._is_string_classifier_called('dunno, just guessed'))
 
+    def test_check_re_training_conditions(self):
+        """Test the _check_re_training_conditions method."""
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        state = exploration.states['Home']
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            state.interaction.id]['algorithm_id']
+        job_id = classifier_services.save_classifier_training_job(
+            algorithm_id, exploration.id, exploration.version,
+            'Home', classifier_services.get_training_data_from_state(state))
+        state.classifier_model_id = job_id
+
+        # Test outcome mismatch condition.
+        state.interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[1])
+        self.assertTrue(classifier_services.check_re_training_conditions(
+            state))
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class ClassifierTrainingJobModel '
+            'with id %s not found' %(
+                job_id))):
+            classifier_services.get_classifier_training_job_by_id(job_id)
+
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""
 
@@ -221,7 +243,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         exp_id = u'1'
         state_name = 'Home'
-        status = 'NEW'
         test_status = 'PENDING'
         training_data = [
             {
@@ -236,11 +257,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # Job does not exist yet.
         job_id = classifier_services.save_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            exp_id, 1, state_name, status, training_data)
+            exp_id, 1, state_name, training_data)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.exp_id, exp_id)
-        self.assertEqual(classifier_training_job.status, status)
+        self.assertEqual(classifier_training_job.status, 'NEW')
         classifier_training_job.update_status(test_status)
         # Updating existing job.
         classifier_services.save_classifier_training_job(
@@ -248,8 +269,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_training_job.exp_id,
             classifier_training_job.exp_version,
             classifier_training_job.state_name,
-            classifier_training_job.status,
             classifier_training_job.training_data,
+            classifier_training_job.status,
             classifier_training_job.job_id)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
