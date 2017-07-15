@@ -36,6 +36,14 @@
         </li>
       </ul>
     </li>
+    <li ng-click="addNewQuestion();" ng-hide="sidebarModeService.isSidebarInReadonlyMode()" class="sidebar-item">
+      <div class="sidebar-item-header" ng-class="canAddNewQuestion() ? 'sidebar-item' : 'sidebar-item-disabled'">
+        <i class="add-icon material-icons">
+          &#xe145;
+        </i>
+        <strong>Add new question</strong>
+      </div>
+    </li>
   </ul>
 
 </div>
@@ -63,6 +71,7 @@
   }
   simple-editor-sidebar .sidebar-item-disabled {
     color: #ccc;
+    cursor: not-allowed;
   }
 
   simple-editor-sidebar li.sidebar-item a.active,

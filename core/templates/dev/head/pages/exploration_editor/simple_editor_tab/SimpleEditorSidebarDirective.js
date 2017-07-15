@@ -17,7 +17,8 @@
  */
 
 oppia.directive('simpleEditorSidebar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', '$timeout', function(
+    UrlInterpolationService, $timeout) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -34,12 +35,36 @@ oppia.directive('simpleEditorSidebar', [
           /* This initializes Perfect Scrollbar on the simple editor sidebar.
            Perfect scrollbar is needed to show scrollbar on all major browsers.
            */
-          Ps.initialize(document.querySelector('simple-editor-sidebar'));
+          var container = document.querySelector('simple-editor-sidebar');
+          Ps.initialize(container);
           $scope.SUBFIELD_LABELS = [
             'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
           $scope.questionList = SimpleEditorManagerService.getQuestionList();
           $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
           $scope.sidebarModeService = SimpleEditorSidebarModeService;
+
+          $scope.canAddNewQuestion = (
+            SimpleEditorManagerService.canAddNewQuestion);
+
+          $scope.getSubfieldId = function(question, label) {
+            return QuestionIdService.getSubfieldId(question.getId(), label);
+          };
+
+          $scope.addNewQuestion = function() {
+            if (!SimpleEditorManagerService.canAddNewQuestion()) {
+              return;
+            }
+            $scope.sidebarModeService.setModeToReadonly();
+            var secondLastQuestion = $scope.questionList.getLastQuestion();
+            SimpleEditorManagerService.addNewQuestion();
+            $timeout(function() {
+              ScrollSyncService.scrollTo(
+                $scope.getSubfieldId(secondLastQuestion, 'Bridge text'));
+              container.scrollTop = container.scrollHeight;
+              Ps.update(container);
+            }, 0);
+          };
+
           $scope.getSidebarItemId = function(question, subfieldLabel) {
             return QuestionIdService.getSidebarItemId(
               question.getId(), subfieldLabel
