@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service to serve as the interface for fetching and uploading
- * assets. 
+ * assets from Google Cloud Storage.
  */
 
 oppia.factory('AssetsBackendApiService', [
