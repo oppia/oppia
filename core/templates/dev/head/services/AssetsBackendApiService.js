@@ -18,22 +18,23 @@
  */
 
 oppia.factory('AssetsBackendApiService', [
-  '$http', '$q','AUDIO_UPLOAD_URL_TEMPLATE', 'UrlInterpolationService',
-  function($http, $q, AUDIO_UPLOAD_URL_TEMPLATE, UrlInterpolationService) {
+  '$http', '$q', 'AUDIO_DOWNLOAD_URL_TEMPLATE', 'AUDIO_UPLOAD_URL_TEMPLATE',
+  'UrlInterpolationService',
+  function($http, $q, AUDIO_DOWNLOAD_URL_TEMPLATE, AUDIO_UPLOAD_URL_TEMPLATE,
+    UrlInterpolationService) {
     var _loadAudio = function(explorationId, filename,
       successCallback, errorCallback) {
-      var gcsFileUrl = 'https://storage.googleapis.com/oppiatestserver-resources/'
-        + explorationId + '/assets/audio/' + filename;
 
       $http({
         method: 'GET',
         responseType: 'blob',
-        url: window.encodeURIComponent(gcsFileUrl),
+        url: window.encodeURIComponent(
+          _getAudioDownloadUrl(explorationId, filename)),
         headers: {
           'Content-type' : 'audio/mpeg',
         }
       }).success(function(data, status, headers, config) {
-        var audioBlob = new Blob([data], {type: 'audio/mp3'});
+        var audioBlob = new Blob([data]);
         successCallback(audioBlob);
       }).error(function(error) {
         errorCallback(error);
@@ -57,16 +58,23 @@ oppia.factory('AssetsBackendApiService', [
         contentType: false,
         type: 'POST',
         dataType: 'text'
-      }).done(function(data) {
+      }).done(function(response) {
         if (successCallback) {
-          successCallback(data);
+          successCallback(response);
         }
-      }).fail(function(data) {
+      }).fail(function(error) {
         if (errorCallback) {
-          errorCallback(data.data);
+          errorCallback(error.data);
         }
       });
 
+    };
+
+    var _getAudioDownloadUrl = function(explorationId, filename) {
+      return UrlInterpolationService.interpolateUrl(GCS_AUDIO_DOWNLOAD_URL_TEMPLATE, {
+        exploration_id: explorationId,
+        filename: filename
+      });
     };
 
     var _getAudioUploadUrl = function(explorationId) {
@@ -86,6 +94,6 @@ oppia.factory('AssetsBackendApiService', [
           _saveAudio(explorationId, filename, rawAssetData, resolve, reject);
         });
       }
-    }
+    };
   }
 ]);
