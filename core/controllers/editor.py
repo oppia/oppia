@@ -989,7 +989,8 @@ class AudioFileHandler(EditorHandler):
         # "<bucket>/<exploration-id>/assets/audio/<filename>".
         gcs_file_url = ('/%s/%s/assets/audio/%s'
                         % (bucket_name, exploration_id, filename))
-        gcs_file = cloudstorage.open(gcs_file_url, 'w', content_type=audio.mime[0])
+        gcs_file = cloudstorage.open(
+            gcs_file_url, 'w', content_type=audio.mime[0])
         gcs_file.write(raw)
         gcs_file.close()
 

@@ -227,8 +227,3 @@ class MaintenancePage(base.BaseHandler):
     def get(self, *args, **kwargs):
         """Handles GET requests."""
         self.render_template('pages/maintenance/maintenance.html')
-
-class TestAudioPage(base.BaseHandler):
-
-    def get(self):
-        self.render_template('pages/audio.html')
