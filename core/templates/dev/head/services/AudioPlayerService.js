@@ -19,34 +19,33 @@
 oppia.factory('AudioPlayerService', [
   'ngAudio', 'AssetsBackendApiService', 'explorationContextService',
   function(ngAudio, AssetsBackendApiService, explorationContextService) {
+    var _currentTrackFilename;
+    var _currentTrack;
 
-  var _currentTrackFilename;
-  var _currentTrack;
+    var _play = function(filename) {
+      AssetsBackendApiService.loadAudio(
+        explorationContextService.getExplorationId(), filename)
+        .then(function(audioBlob) {
+          var blobUrl = URL.createObjectURL(audioBlob);
+          _currentTrack = ngAudio.load(blobUrl);
+          _currentTrackFilename = filename; 
+          _currentTrack.play();
+        });
+    };
 
-  var _play = function(filename) {
-    AssetsBackendApiService.loadAudio(
-      explorationContextService.getExplorationId(), filename)
-      .then(function(audioBlob) {
-        var blobUrl = URL.createObjectURL(audioBlob);
-        _currentTrack = ngAudio.load(blobUrl);
-        _currentTrackFilename = filename; 
-        _currentTrack.play();
-      });
-  };
+    var _pause = function() {
+      if (_currentTrack) {
+        _currentTrack._pausee();
+      }
+    };
 
-  var _pause = function() {
-    if (_currentTrack) {
-      _currentTrack._pausee();
-    }
-  };
-
-  return {
-    play: function(filename) {
-      _play(filename);
-    },
-    pause: function() {
-      _pause();
-    }
-  };
-
-}]);
+    return {
+      play: function(filename) {
+        _play(filename);
+      },
+      pause: function() {
+        _pause();
+      }
+    };
+  }
+]);

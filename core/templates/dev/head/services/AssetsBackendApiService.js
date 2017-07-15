@@ -18,12 +18,12 @@
  */
 
 oppia.factory('AssetsBackendApiService', [
-  '$http', '$q', 'GCS_AUDIO_DOWNLOAD_URL_TEMPLATE', 'AUDIO_UPLOAD_URL_TEMPLATE',
-  'UrlInterpolationService',
-  function($http, $q, GCS_AUDIO_DOWNLOAD_URL_TEMPLATE, AUDIO_UPLOAD_URL_TEMPLATE,
-    UrlInterpolationService) {
+  '$http', '$q', 'GCS_AUDIO_DOWNLOAD_URL_TEMPLATE',
+  'AUDIO_UPLOAD_URL_TEMPLATE', 'UrlInterpolationService',
+  function($http, $q, GCS_AUDIO_DOWNLOAD_URL_TEMPLATE,
+    AUDIO_UPLOAD_URL_TEMPLATE, UrlInterpolationService) {
     var _loadAudio = function(explorationId, filename,
-      successCallback, errorCallback) {
+    successCallback, errorCallback) {
 
       $http({
         method: 'GET',
@@ -66,11 +66,11 @@ oppia.factory('AssetsBackendApiService', [
           errorCallback(error.data);
         }
       });
-
     };
 
     var _getAudioDownloadUrl = function(explorationId, filename) {
-      return UrlInterpolationService.interpolateUrl(GCS_AUDIO_DOWNLOAD_URL_TEMPLATE, {
+      return UrlInterpolationService.interpolateUrl(
+        GCS_AUDIO_DOWNLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
       }) + filename;
     };
