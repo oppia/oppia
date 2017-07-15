@@ -325,6 +325,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler),
+    get_redirect_route(
+        r'/createhandler/audioupload/<exploration_id>',
+        editor.AudioFileHandler),
     get_redirect_route(r'/createhandler/state_yaml', editor.StateYamlHandler),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',

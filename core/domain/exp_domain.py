@@ -477,7 +477,7 @@ class AudioTranslation(object):
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
                 'the following extensions: %s. Received: %s',
-                (feconf.ACCEPTED_AUDIO_EXTENSIONS, self.filename))
+                (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
