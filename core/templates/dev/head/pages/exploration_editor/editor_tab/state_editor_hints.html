@@ -77,7 +77,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success" ng-click="saveHint()">Save Hint</button>
+    <button class="btn btn-success" ng-click="saveHint()" ng-disabled="!tmpHint">Save Hint</button>
   </div>
 </script>
 

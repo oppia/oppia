@@ -71,7 +71,7 @@ oppia.controller('StateHints', [
 
       $modal.open({
         templateUrl: 'modals/addHint',
-        backdrop: true,
+        backdrop: 'static',
         controller: [
           '$scope', '$modalInstance', 'editorContextService',
           function($scope, $modalInstance, editorContextService) {

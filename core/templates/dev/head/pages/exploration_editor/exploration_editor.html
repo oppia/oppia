@@ -31,10 +31,12 @@
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
   </script>
 
-  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <!-- Updated previous version to current version of google charts
+  https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
+  <script type="text/javascript"  src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
-    if (window.google && window.google.load) {
-      google.load('visualization', '1', {packages: ['corechart']});
+    if (window.google && window.google.charts) {
+      google.charts.load('current', {packages: ['corechart']});
     } else {
       throw 'error: Could not load google visualization library. Are you offline?';
     }

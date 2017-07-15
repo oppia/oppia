@@ -355,16 +355,14 @@
         }
       },
       "select2": {
-        "version": "3.5.1",
+        "version": "4.0.3",
         "downloadFormat": "zip",
-        "url": "https://github.com/ivaynberg/select2/archive/3.5.1.zip",
+        "url": "https://github.com/select2/select2/archive/4.0.3.zip",
         "rootDirPrefix": "select2-",
         "targetDirPrefix": "select2-",
         "bundle": {
-          "css": ["select2.css"],
-          "cssBackgroundImage": [
-            "select2.png", "select2x2.png", "select2-spinner.gif"],
-          "js": ["select2.js"]
+          "css": ["dist/css/select2.css"],
+          "js": ["dist/js/select2.full.js"]
         }
       },
       "textAngular": {
