@@ -37,19 +37,23 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_LOADING: 'Loading'
 });
 
-oppia.factory('customLoader', [
+oppia.factory('I18nFileHashLoader', [
   '$http', '$q', 'UrlInterpolationService',
-  function ($http, $q, UrlInterpolationService) {
-    return function (options) {
+  function($http, $q, UrlInterpolationService) {
+    /* Options object contains:
+     *  prefix: added before key, defined by developer
+     *  key: language key, determined internally by i18n library
+     *  suffix: added after key, defined by developer
+     */
+    return function(options) {
       var fileUrl = [
         options.prefix,
         options.key,
         options.suffix
       ].join('');
-      return $http({
-        url: UrlInterpolationService.getTranslateJsonUrl(fileUrl),
-        method: 'GET'
-      }).then(function(result) {
+      return $http.get(
+        UrlInterpolationService.getTranslateJsonUrl(fileUrl)
+      ).then(function(result) {
         return result.data;
       }, function () {
         return $q.reject(options.key);
@@ -105,7 +109,7 @@ oppia.config([
     $translateProvider
       .registerAvailableLanguageKeys(
         availableLanguageKeys, availableLanguageKeysMap)
-      .useLoader('customLoader', {
+      .useLoader('I18nFileHashLoader', {
         prefix: '/i18n/',
         suffix: '.json'
       })

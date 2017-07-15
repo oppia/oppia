@@ -438,8 +438,7 @@ def get_thumbnail_icon_url_for_category(category):
         category if category in constants.CATEGORIES_TO_COLORS
         else constants.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return ('/subjects/%s.svg'
-            % (icon_name.replace(' ', '')))
+    return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
 
 
 def _get_short_language_description(full_language_description):
