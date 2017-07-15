@@ -968,19 +968,29 @@ class AudioFileHandler(EditorHandler):
         try:
             audio = mutagen.File(tempbuffer)
         except mutagen.MutagenError:
-            raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
+            # Mutagen occasionally has problems with certain files
+            # for unknown reasons.
+            raise self.InvalidInputException('Could not open uploaded'
+                                             'audio file' % extension)
         tempbuffer.close()
 
         if audio is None:
-            raise self.InvalidInputException('Audio not recognized')
+            raise self.InvalidInputException('Audio not recognized '
+                                             'as a %s file' % extension)
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
                 'Audio must be under %s seconds in length. '
                 'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC,
                                      audio.info.length))
+        if len(
+            set(audio.mime).intersection(
+                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
+            raise self.InvalidInputException(
+                'Although the filename extension indicates the file '
+                'is a %s file, it was not recognized as one. '
+                'Found mime types: %s' % (extension, audio.mime))
+        
         del audio
-
 
         bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
 
@@ -989,7 +999,7 @@ class AudioFileHandler(EditorHandler):
         gcs_file_url = ('/%s/%s/assets/audio/%s'
                         % (bucket_name, exploration_id, filename))
         gcs_file = cloudstorage.open(
-            gcs_file_url, 'w', content_type=audio.mime[0])
+            gcs_file_url, 'w', content_type='audio/*')
         gcs_file.write(raw)
         gcs_file.close()
 

@@ -221,7 +221,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
     """Test the upload of audio files to GCS."""
 
     TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
-    TEST_AUDIO_FILE_FLAC = 'test-audio-a.flac'
+    TEST_AUDIO_FILE_FLAC = 'cafe.flac'
     TEST_AUDIO_FILE_OVER_MAX_LENGTH = 'cafe-over-five-minutes.mp3'
     AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
 
@@ -396,5 +396,5 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
-        self.assertEqual(response_dict['error'],
-                         'Audio not recognized as a mp3 file')
+        self.assertIn('Although the filename extension indicates the file',
+            response_dict['error'])
