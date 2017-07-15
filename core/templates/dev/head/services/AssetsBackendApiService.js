@@ -23,12 +23,12 @@ oppia.factory('AssetsBackendApiService', [
     var _loadAudio = function(explorationId, filename,
       successCallback, errorCallback) {
       var gcsFileUrl = 'https://storage.googleapis.com/oppiatestserver-resources/'
-        + explorationId + '%5Cassets%5Caudio%5C' + filename;
+        + explorationId + '/assets/audio/' + filename;
 
       $http({
         method: 'GET',
         responseType: 'blob',
-        url: gcsFileUrl,
+        url: window.encodeURIComponent(gcsFileUrl),
         headers: {
           'Content-type' : 'audio/mpeg',
         }

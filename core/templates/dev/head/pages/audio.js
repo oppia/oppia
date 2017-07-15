@@ -11,14 +11,13 @@ oppia.controller('Audio', ['$scope', 'AssetsBackendApiService', 'AudioPlayerServ
 
         var blob = new Blob([new Uint8Array(data)], {type: 'audio/mp3'});
         //var blob = 'fsddfsfsddsf';
-        AssetsBackendApiService.save('11', 'myfile.mp3', blob).then(function(r) {
+        AssetsBackendApiService.saveAudio('10', 'myfile.mp3', blob).then(function(r) {
           console.log(r);
+          AudioPlayerService.play('myfile.mp3');
         });
 
-        AudioPlayerService.play('test-audio.mp3');
       };
       r.readAsArrayBuffer(f);
-
     };
 
 }]);
