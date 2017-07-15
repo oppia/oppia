@@ -868,7 +868,7 @@ oppia.factory('explorationStatesService', [
         });
       },
       solution: function(solution) {
-        if (!angular.equals(solution, {})) {
+        if (Object.keys(solution).length > 0) {
           return solution.toBackendDict();
         } else {
           return {};
