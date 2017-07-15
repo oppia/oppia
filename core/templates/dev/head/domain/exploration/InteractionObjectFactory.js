@@ -54,7 +54,8 @@ oppia.factory('InteractionObjectFactory', [
         id: this.id,
         solution: (
           (typeof this.solution === 'object' &&
-          Object.keys(this.solution).length > 0)) ? this.solution.toBackendDict() : {}
+          Object.keys(this.solution).length > 0)) ? (
+            this.solution.toBackendDict()) : {}
       };
     };
 
