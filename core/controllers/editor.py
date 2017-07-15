@@ -949,10 +949,8 @@ class AudioFileHandler(EditorHandler):
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
 
-
         raw = self.request.get('raw')
         filename = self.payload.get('filename')
-
         allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 
         if not raw:
@@ -988,13 +986,13 @@ class AudioFileHandler(EditorHandler):
                                      audio.info.length))
         del audio
 
-        #Upload to GCS bucket with filepath
-        #"<bucket>/<exploration-id>/assets/audio/filename".
-        #bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
-        bucket_name = 'oppiatestserver-resources'
+
+        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
+
+        # Upload to GCS bucket with filepath
+        # "<bucket>/<exploration-id>/assets/audio/<filename>".
         gcs_file_url = ('/%s/%s/assets/audio/%s'
                         % (bucket_name, exploration_id, filename))
-
         gcs_file = cloudstorage.open(gcs_file_url, 'w', content_type=audio.mime[0])
         gcs_file.write(raw)
         gcs_file.close()
