@@ -844,9 +844,7 @@ class InteractionInstance(object):
                 self.confirmed_unclassified_answers),
             'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
             'hints': [hint.to_dict() for hint in self.hints],
-            'solution': self.solution.to_dict()
-                if self.solution
-                else {},
+            'solution': self.solution.to_dict() if self.solution else {},
         }
 
     @classmethod
@@ -856,7 +854,7 @@ class InteractionInstance(object):
             if interaction_dict['default_outcome'] is not None else None)
         solution_dict = (
             Solution.from_dict(
-            interaction_dict['id'], interaction_dict['solution'])
+                interaction_dict['id'], interaction_dict['solution'])
             if interaction_dict['solution'] is not None else None)
 
         return cls(
