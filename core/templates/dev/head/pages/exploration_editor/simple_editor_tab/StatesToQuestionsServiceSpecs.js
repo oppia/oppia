@@ -27,8 +27,8 @@
 
    it('should return human readable question name', function() {
      var questionId = 'MultipleChoiceInput';
-     var readableQuestionName =
+     var readableQuestionType =
       statesToQuestionsService.getHumanReadableQuestionType(questionId);
-     expect(readableQuestionName).toBe('Multiple choice');
+     expect(readableQuestionType).toBe('Multiple choice');
    });
  });

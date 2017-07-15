@@ -176,16 +176,16 @@ oppia.factory('StatesToQuestionsService', [
         return getQuestions();
       },
       getHumanReadableQuestionType: function(interactionId) {
-        var readableQuestionName;
+        var readableQuestionType;
         SUPPORTED_INTERACTION_TYPES.forEach(function(interaction) {
           if (interaction.id === interactionId) {
-            readableQuestionName = interaction.name;
+            readableQuestionType = interaction.name;
           }
         });
-        if (!readableQuestionName) {
+        if (!readableQuestionType) {
           throw Error('Invalid Interaction ID');
         }
-        return readableQuestionName;
+        return readableQuestionType;
       }
     };
   }

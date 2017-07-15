@@ -159,16 +159,15 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, stateData.interaction, ''));
       },
       changeQuestionType: function(newInteractionId, index) {
-        var currentStateName = data.questionList.getAllStateNames()[index];
-        var nextStateName = data.questionList.getAllStateNames()[index + 1];
-        var questionCount = data.questionList.getQuestionCount();
         var currentInteractionId = (
           SimpleEditorShimService.getInteractionId(currentStateName));
-
-        var doesLastQuestionHaveAnswerGroups = (
-          data.questionList.doesLastQuestionHaveAnswerGroups());
-        // Update Question Type If interactionId is not same.
+        // Update the question type if the interaction ID has changed.
         if (newInteractionId !== currentInteractionId) {
+          var currentStateName = data.questionList.getAllStateNames()[index];
+          var nextStateName = data.questionList.getAllStateNames()[index + 1];
+          var questionCount = data.questionList.getQuestionCount();
+          var doesLastQuestionHaveAnswerGroups = (
+            data.questionList.doesLastQuestionHaveAnswerGroups());
           SimpleEditorShimService.saveInteractionId(
             currentStateName, newInteractionId);
           SimpleEditorShimService.saveCustomizationArgs(
@@ -177,7 +176,7 @@ oppia.factory('SimpleEditorManagerService', [
               CUSTOMIZATION_ARGS);
           // Don't save answer group when it's the last question and doesn't
           // have a answer group.
-          if(index !== questionCount - 1 || doesLastQuestionHaveAnswerGroups){
+          if (index !== questionCount - 1 || doesLastQuestionHaveAnswerGroups) {
             var newAnswerGroups = [];
             newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
               RuleObjectFactory.createNew(
@@ -191,7 +190,7 @@ oppia.factory('SimpleEditorManagerService', [
               currentStateName, newAnswerGroups);
           }
         }
-        // Update the question.
+        // Update the question in the locally-stored questionList.
         var questions = StatesToQuestionsService.getQuestions();
         data.questionList.updateQuestion(index, questions[index]);
       },
