@@ -183,7 +183,7 @@ oppia.factory('StatesToQuestionsService', [
           }
         });
         if (!readableQuestionType) {
-          throw Error('Invalid Interaction ID');
+          throw Error('Invalid interaction ID' + interactionId);
         }
         return readableQuestionType;
       }
