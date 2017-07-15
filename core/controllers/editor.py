@@ -24,6 +24,8 @@ import tempfile
 import cloudstorage
 import jinja2
 import mutagen
+import StringIO
+import cStringIO
 
 from constants import constants
 from core.controllers import base
@@ -943,14 +945,18 @@ class AudioFileHandler(EditorHandler):
     @require_editor
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
-        raw = self.request.get('audio')
+
+        raw = self.request.get('raw')
         filename = self.payload.get('filename')
+
         allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 
         if not raw:
             raise self.InvalidInputException('No audio supplied')
         dot_index = filename.rfind('.')
         extension = filename[dot_index + 1:].lower()
+        print 'extension'
+        print extension
         if dot_index == -1 or dot_index == 0:
             raise self.InvalidInputException(
                 'No filename extension: it should have '
@@ -960,15 +966,22 @@ class AudioFileHandler(EditorHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        temp_suffix = '.' + extension
-        with tempfile.NamedTemporaryFile(suffix=temp_suffix) as f:
-            f.write(raw)
-            try:
-                audio = mutagen.File(f.name)
-            except mutagen.MutagenError:
-                raise self.InvalidInputException('Audio not recognized '
-                                                 'as a %s file' % extension)
-            f.close()
+
+        buffer = StringIO.StringIO()
+
+        buffer.write(raw)
+        buffer.seek(0)
+
+        try:
+            audio = mutagen.File(buffer)
+        except mutagen.MutagenError:
+            raise self.InvalidInputException('Audio not recognized '
+                                             'as a %s file' % extension)
+
+        buffer.close()
+
+        if audio == None:
+            raise self.InvalidInputException('Audio not recognized')
 
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
@@ -976,15 +989,16 @@ class AudioFileHandler(EditorHandler):
                 'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC,
                                      audio.info.length))
 
-        # Upload to GCS bucket with filepath
-        # "<bucket>/<exploration-id>/assets/audio/filename".
-        # bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
+        del audio
+
+        #Upload to GCS bucket with filepath
+        #"<bucket>/<exploration-id>/assets/audio/filename".
+        #bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
         bucket_name = 'oppiatestserver-resources'
         gcs_file_url = ('/%s/%s/assets/audio/%s'
                         % (bucket_name, exploration_id, filename))
 
-        gcs_file = cloudstorage.open(gcs_file_url, 'w',
-                                     content_type=audio.mime[0])
+        gcs_file = cloudstorage.open(gcs_file_url, 'w', content_type='audio/mp3')
         gcs_file.write(raw)
         gcs_file.close()
 

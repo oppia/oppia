@@ -4,10 +4,6 @@ runtime: python27
 api_version: 1
 threadsafe: false
 instance_class: F2
-automatic_scaling:
-  max_num_instances: 3
-  cpu_utilization:
-    target_utilization: 0.8
 
 builtins:
 - appstats: on
