@@ -110,7 +110,7 @@ class FeedbackThread(object):
         return full_thread_id.split('.')[1]
 
     def get_full_message_id(self, message_id):
-        """ Returns the full id of the message.
+        """Returns the full id of the message.
 
         Args:
             message_id: int. The id of the message for which we have to fetch
@@ -123,21 +123,21 @@ class FeedbackThread(object):
 
     def get_last_two_message_ids(self):
         """Returns the full message ids of the last two messages of the thread.
+        If the thread has only one message, the id of the second last message is
+        None.
 
         Returns:
-            list(str). The ids of the last two messages of the thread.
+            list(str|None). The ids of the last two messages of the thread. If
+                the message does not exist, None is returned.
         """
         message_ids = []
         last_message_id = self.message_count - 1
+        message_ids.append(self.get_full_message_id(last_message_id))
         if self.message_count > 1:
             second_last_message_id = self.message_count - 2
+            message_ids.append(self.get_full_message_id(second_last_message_id))
         else:
-            # The second last message does not exist. So we set it's id to -1
-            # implying that it doesn't exist.
-            second_last_message_id = -1
-
-        message_ids.append(self.get_full_message_id(last_message_id))
-        message_ids.append(self.get_full_message_id(second_last_message_id))
+            message_ids.append(None)
         return message_ids
 
 

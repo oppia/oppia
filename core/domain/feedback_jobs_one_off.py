@@ -53,11 +53,11 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
             thread_id = exploration_and_thread_id[1]
             thread = feedback_services.get_thread(exploration_id, thread_id)
             logging.error(
-                'The number of messages in the thread, given by the id ' +
-                '%s, is %s. But the number of ' % (key, len(message_ids)) +
-                'messages as estimated by the message ids is ' +
-                '%s. Therefore the estimate is not ' % (next_message_id) +
-                'equal to the actual number of messages.')
+                'The number of messages in the thread, given by the id %s is %s'
+                '. But the number of messages as estimated by the message ids '
+                'is %s. Therefore the estimate is not equal to the actual '
+                'number of messages.' % (
+                    key, len(message_ids), next_message_id))
 
             yield ('error', {
                 'subject': thread.subject,

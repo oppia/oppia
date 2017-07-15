@@ -486,8 +486,7 @@ def get_thread_summaries(user_id, full_thread_ids):
 
     last_two_messages_ids = []
     for thread in threads:
-        last_two_messages_ids = (
-            last_two_messages_ids + thread.get_last_two_message_ids())
+        last_two_messages_ids += thread.get_last_two_message_ids()
 
     messages = feedback_models.FeedbackMessageModel.get_multi(
         last_two_messages_ids)
@@ -513,6 +512,8 @@ def get_thread_summaries(user_id, full_thread_ids):
 
         if thread.message_count:
             total_no_of_messages = thread.message_count
+        # TODO(Arunabh): Remove else clause after each thread has a message
+        # count.
         else:
             total_no_of_messages = (
                 feedback_models.FeedbackMessageModel.get_message_count(

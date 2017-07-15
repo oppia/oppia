@@ -86,8 +86,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         # The second last message should be given an id of -1 as it doesn't
         # exist.
         self.assertEqual(
-            last_two_message_ids,
-            [thread_1.get_full_message_id(0), thread_1.get_full_message_id(-1)])
+            last_two_message_ids, [thread_1.get_full_message_id(0), None])
 
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
