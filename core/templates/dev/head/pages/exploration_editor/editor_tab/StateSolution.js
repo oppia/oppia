@@ -109,23 +109,23 @@ oppia.controller('StateSolution', [
     });
 
     $scope.getSolutionSummary = function() {
-      var solutionSavedMemento = stateSolutionService.savedMemento;
+      var solution = stateSolutionService.displayed;
       var isExclusiveAnswer = (
-        solutionSavedMemento.answerIsExclusive ? 'Only' : 'One');
+        solution.answerIsExclusive ? 'Only' : 'One');
       var correctAnswer = '';
-      if (typeof solutionSavedMemento.correctAnswer === 'string') {
+      if (typeof solution.correctAnswer === 'string') {
         correctAnswer = (
-          $filter('convertToPlainText')(solutionSavedMemento.correctAnswer));
+          $filter('convertToPlainText')(solution.correctAnswer));
       } else if (Array.isArray(
-          solutionSavedMemento.correctAnswer)) {
+          solution.correctAnswer)) {
         correctAnswer = (
-          '[' + solutionSavedMemento.correctAnswer + ']');
+          '[' + solution.correctAnswer + ']');
       } else {
         correctAnswer = (
           ($scope.objectType === 'Graph') ? 'Graph Object' : 'Object');
       }
       var explanation = (
-        $filter('convertToPlainText')(solutionSavedMemento.explanation));
+        $filter('convertToPlainText')(solution.explanation));
       return (
         '[' + isExclusiveAnswer + ' solution is ' + correctAnswer + '] ' +
         explanation);

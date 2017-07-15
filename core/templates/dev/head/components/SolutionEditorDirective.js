@@ -36,7 +36,6 @@ oppia.directive('solutionEditor', [
           $scope.solutionEditorIsOpen = false;
 
           $scope.solutionMemento = null;
-          $scope.solution.answerIsExclusive = 'false';
 
           $scope.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
@@ -48,7 +47,7 @@ oppia.directive('solutionEditor', [
               $scope.solutionMemento = angular.copy($scope.solution);
               $scope.solutionEditorIsOpen = true;
               $scope.solution.answerIsExclusive = (
-                $scope.solutionMemento.answerIsExclusive.toString());
+                $scope.solution.answerIsExclusive.toString());
               if ($scope.objectType === 'RegionSelect') {
                 $scope.solution.correctAnswer = (
                   $scope.solution.correctAnswer.clickedRegions[0]);
