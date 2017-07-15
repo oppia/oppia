@@ -303,11 +303,8 @@ class CollectionNode(object):
                 'The prerequisite_skill_ids list has duplicate entries: %s' %
                 self.prerequisite_skill_ids)
 
-        for prerequisite_skill in self.prerequisite_skill_ids:
-            if not isinstance(prerequisite_skill, basestring):
-                raise utils.ValidationError(
-                    'Expected all prerequisite skill ids to be strings, '
-                    'received %s' % prerequisite_skill)
+        for skill_id in self.prerequisite_skill_ids:
+            CollectionSkill.validate_skill_id(skill_id)
 
         if not isinstance(self.acquired_skill_ids, list):
             raise utils.ValidationError(
@@ -319,11 +316,8 @@ class CollectionNode(object):
                 'The acquired_skill_ids list has duplicate entries: %s' %
                 self.acquired_skill_ids)
 
-        for acquired_skill in self.acquired_skill_ids:
-            if not isinstance(acquired_skill, basestring):
-                raise utils.ValidationError(
-                    'Expected all acquired skill ids to be strings, received '
-                    '%s' % acquired_skill)
+        for skill_id in self.acquired_skill_ids:
+            CollectionSkill.validate_skill_id(skill_id)
 
         redundant_skills = (
             set(self.prerequisite_skill_ids) & set(self.acquired_skill_ids))
@@ -395,6 +389,27 @@ class CollectionSkill(object):
 
         return 'skill%s' % index
 
+    @staticmethod
+    def validate_skill_id(skill_id):
+        if not isinstance(skill_id, basestring):
+            raise utils.ValidationError(
+                'Expected skill ID to be a string, received %s' % skill_id)
+
+        if len(skill_id) < 6:
+            raise utils.ValidationError(
+                'Expected skill ID to have length at least 6, received %s' %
+                skill_id)
+
+        if skill_id[0:5] != 'skill':
+            raise utils.ValidationError(
+                'Expected skill ID to begin with \'skill\', received %s' %
+                skill_id)
+
+        if not skill_id[5:].isdigit():
+            raise utils.ValidationError(
+                'Expected skill ID to end with a number, received %s' %
+                skill_id)
+
     def validate(self):
         """Validates various properties of collection skill."""
 
@@ -404,9 +419,7 @@ class CollectionSkill(object):
         utils.require_valid_name(
             self.name, 'the skill name', allow_empty=False)
 
-        if not isinstance(self.id, basestring):
-            raise utils.ValidationError(
-                'Expected skill ID to be a string, received %s' % self.id)
+        self.validate_skill_id(self.id)
 
         if not isinstance(self.question_ids, list):
             raise utils.ValidationError(
@@ -1191,20 +1204,7 @@ class Collection(object):
 
         # Validate all skills.
         for skill_id, skill in self.skills.iteritems():
-            if len(skill_id) < 6:
-                raise utils.ValidationError(
-                    'Expected skill ID to have length at least 6, received %s' %
-                    skill_id)
-
-            if skill_id[0:5] != 'skill':
-                raise utils.ValidationError(
-                    'Expected skill ID to begin with \'skill\', received %s' %
-                    skill_id)
-
-            if not skill_id[5:].isdigit():
-                raise utils.ValidationError(
-                    'Expected skill ID to end with a number, received %s' %
-                    skill_id)
+            CollectionSkill.validate_skill_id(skill_id)
 
             if int(skill_id[5:]) >= self.next_skill_id:
                 raise utils.ValidationError(
@@ -1266,6 +1266,16 @@ class Collection(object):
                     'Some explorations are unreachable from the initial '
                     'explorations: %s' % unreachable_ids)
 
+            # Check that all skill ids are used
+            skill_ids_in_nodes = set()
+            for node in self.nodes:
+                skill_ids_in_nodes.update(
+                    set(node.prerequisite_skill_ids + node.acquired_skill_ids))
+            for skill_id in self.skills.keys():
+                if skill_id not in skill_ids_in_nodes:
+                    raise utils.ValidationError(
+                        'Skill with ID %s is not a prerequisite or acquired '
+                        'skill of any node.' % skill_id)
 
 class CollectionSummary(object):
     """Domain object for an Oppia collection summary."""

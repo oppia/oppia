@@ -355,45 +355,75 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
     def test_collection_node_prerequisite_skill_ids_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
+        self.collection.add_skill('Skill 0')
 
         collection_node0.prerequisite_skill_ids = {}
         self._assert_validation_error(
             'Expected prerequisite_skill_ids to be a list')
 
-        collection_node0.prerequisite_skill_ids = ['skill0a', 'skill0a']
+        collection_node0.prerequisite_skill_ids = ['skill0', 'skill0']
         self._assert_validation_error(
             'The prerequisite_skill_ids list has duplicate entries')
 
-        collection_node0.prerequisite_skill_ids = ['skill0a', 2]
+        collection_node0.prerequisite_skill_ids = ['skill0', 2]
         self._assert_validation_error(
-            'Expected all prerequisite skill ids to be strings')
+            'Expected skill ID to be a string, received 2')
 
     def test_collection_node_acquired_skill_ids_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
+        self.collection.add_skill('Skill 0')
 
         collection_node0.acquired_skill_ids = {}
         self._assert_validation_error(
             'Expected acquired_skill_ids to be a list')
 
-        collection_node0.acquired_skill_ids = ['skill0a', 'skill0a']
+        collection_node0.acquired_skill_ids = ['skill0', 'skill0']
         self._assert_validation_error(
             'The acquired_skill_ids list has duplicate entries')
 
-        collection_node0.acquired_skill_ids = ['skill0a', 2]
+        collection_node0.acquired_skill_ids = ['skill0', 2]
         self._assert_validation_error(
-            'Expected all acquired skill ids to be strings')
+            'Expected skill ID to be a string, received 2')
 
-    def test_collection_node_skills_validation(self):
+    def test_validate_collection_node_skills_are_not_repeated(self):
         collection_node0 = self.collection.get_node('exp_id_0')
+        self.collection.add_skill('Skill 0')
+        self.collection.add_skill('Skill 1')
+        self.collection.add_skill('Skill 3')
+        self.collection.add_skill('Skill 4')
 
         # Ensure prerequisite_skill_ids and acquired_skill_ids do not overlap.
         collection_node0.prerequisite_skill_ids = [
-            'skill0a', 'skill0b', 'skill0c']
+            'skill0', 'skill1', 'skill2']
         collection_node0.acquired_skill_ids = [
-            'skill0z', 'skill0b', 'skill0c', 'skill0d']
+            'skill3', 'skill4', 'skill0', 'skill1']
         self._assert_validation_error(
             'There are some skills which are both required for exploration '
-            'exp_id_0 and acquired after playing it: [skill0b, skill0c]')
+            'exp_id_0 and acquired after playing it: [skill0, skill1]')
+
+    def test_validate_collection_node_skills_exist_in_skill_table(self):
+        collection_node0 = self.collection.get_node('exp_id_0')
+        collection_node0.acquired_skill_ids = ['skill0']
+
+        self._assert_validation_error(
+            'Skill with ID skill0 does not exist')
+
+        self.collection.add_skill('Skill 0')
+        self.collection.validate()
+
+    def test_validate_all_skills_are_used_in_strict_validation(self):
+        collection_node0 = self.collection.get_node('exp_id_0')
+        self.collection.add_skill('Skill 0')
+        self.collection.add_skill('Skill 1')
+        collection_node0.acquired_skill_ids = ['skill0']
+
+        # Passes non-strict validation.
+        self.collection.validate(strict=False)
+
+        # Fails strict validation
+        self._assert_validation_error(
+            'Skill with ID skill1 is not a prerequisite or acquired '
+            'skill of any node.')
 
     def test_is_demo_property(self):
         """Test the is_demo property."""
