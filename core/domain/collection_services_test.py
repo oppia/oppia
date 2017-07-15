@@ -916,7 +916,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
                     'new_value': ['duplicate', 'duplicate']
                 }], 'Add a new tag')
 
-    def test_add_and_delete_collection_skills(self):
+    def test_add_collection_skill(self):
         # Verify skills table is initially empty.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
@@ -934,6 +934,13 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             self.COLLECTION_ID)
         self.assertEqual(collection.skills.keys(), ['skill0'])
 
+    def test_adding_duplicate_collection_skill_raises_error(self):
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+
         # Verify that error will be thrown when duplicate skill is added.
         with self.assertRaisesRegexp(
             ValueError,
@@ -943,6 +950,13 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
                     'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
                     'name': 'test'
                 }], 'Add a new skill, again')
+
+    def test_delete_collection_skill(self):
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
 
         # Delete a skill.
         collection_services.update_collection(
@@ -955,6 +969,77 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         self.assertEqual(collection.skills.keys(), [])
+
+
+    def test_update_collection_node_prerequisite_skill_ids(self):
+        # Verify initial prerequisite skill ids are empty.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        collection_node = collection.get_node(self.EXPLORATION_ID)
+        self.assertEqual(collection_node.prerequisite_skill_ids, [])
+
+        # Add skills
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'new skill 1'
+            }], 'Add a new skill')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'new skill 2'
+            }], 'Add a new skill')
+
+        # Update the prerequisite skills.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': self.EXPLORATION_ID,
+                'property_name': 'prerequisite_skill_ids',
+                'new_value': ['skill0', 'skill1']
+            }], 'Changed the prerequisite skill ids of a collection node')
+
+        # Verify the prerequisites are different.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        collection_node = collection.get_node(self.EXPLORATION_ID)
+        self.assertEqual(
+            collection_node.prerequisite_skill_ids, ['skill0', 'skill1'])
+
+    def test_update_collection_node_acquired_skill_ids(self):
+        # Verify initial acquired skill ids are empty.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        collection_node = collection.get_node(self.EXPLORATION_ID)
+        self.assertEqual(collection_node.acquired_skill_ids, [])
+
+        # Add skills
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'new skill 1'
+            }], 'Add a new skill')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'new skill 2'
+            }], 'Add a new skill')
+
+        # Update the acquired skill ids.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': self.EXPLORATION_ID,
+                'property_name': 'acquired_skill_ids',
+                'new_value': ['skill0', 'skill1']
+            }], 'Changed the acquired skill ids of a collection node')
+
+        # Verify the acquired are different.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        collection_node = collection.get_node(self.EXPLORATION_ID)
+        self.assertEqual(
+            collection_node.acquired_skill_ids, ['skill0', 'skill1'])
 
 
 def _get_node_change_list(exploration_id, property_name, new_value):

@@ -46,9 +46,12 @@ oppia.factory('CollectionObjectFactory', [
       }
 
       // Populates skills.
-      for (var skillId in collectionBackendObject.skills) {
-        this._skills[skillId] = CollectionSkillObjectFactory.create(
-          skillId, collectionBackendObject.skills[skillId]);
+      var skills = collectionBackendObject.skills;
+      for (var skillId in skills) {
+        if (skills.hasOwnProperty(skillId)) {
+          this._skills[skillId] = CollectionSkillObjectFactory.create(
+            skillId, skills[skillId]);
+        }
       }
     };
 
@@ -228,7 +231,8 @@ oppia.factory('CollectionObjectFactory', [
     };
 
     // Gets a new ID for a skill. This should be of the same form as in the
-    // backend. This increments nextSkillId.
+    // backend, in collection_domain.CollectionSkill.get_skill_id_from_index.
+    // This increments nextSkillId.
     Collection.prototype.getNewSkillId = function() {
       var newId = 'skill' + String(this._nextSkillId);
       this._nextSkillId++;
@@ -255,11 +259,13 @@ oppia.factory('CollectionObjectFactory', [
       if (this._skills.hasOwnProperty(skillId)) {
         delete this._skills[skillId];
         this._nodes.forEach(function(node) {
-          if (node.getPrerequisiteSkillList().containsSkill(skillId)) {
-            node.getPrerequisiteSkillList().removeSkillById(skillId);
+          var prerequisiteSkillList = node.getPrerequisiteSkillList();
+          var acquiredSkillList = node.getAcquiredSkillList();
+          if (prerequisiteSkillList.containsSkill(skillId)) {
+            prerequisiteSkillList.removeSkillById(skillId);
           }
-          if (node.getAcquiredSkillList().containsSkill(skillId)) {
-            node.getAcquiredSkillList().removeSkillById(skillId);
+          if (acquiredSkillList.containsSkill(skillId)) {
+            acquiredSkillList.removeSkillById(skillId);
           }
         });
         return true;
@@ -279,7 +285,7 @@ oppia.factory('CollectionObjectFactory', [
       return this._skills;
     };
 
-    // Returns if collection contains skill with given ID.
+    // Returns whether collection contains a skill with the given ID.
     Collection.prototype.containsCollectionSkill = function(skillId) {
       return this._skills.hasOwnProperty(skillId);
     };
@@ -288,7 +294,8 @@ oppia.factory('CollectionObjectFactory', [
     // is not found.
     Collection.prototype.getSkillIdFromName = function(skillName) {
       for (var skillId in this._skills) {
-        if (this._skills[skillId].getName() == skillName) {
+        if (this._skills.hasOwnProperty(skillId) &&
+            this._skills[skillId].getName() === skillName) {
           return skillId;
         }
       }
@@ -328,8 +335,10 @@ oppia.factory('CollectionObjectFactory', [
 
       var skills = otherCollection.getCollectionSkills();
       for (var skillId in skills) {
-        this.addCollectionSkill(angular.copy(
-          skills[skillId]));
+        if (skills.hasOwnProperty(skillId)) {
+          this.addCollectionSkill(angular.copy(
+            skills[skillId]));
+        }
       }
     };
 

@@ -574,11 +574,11 @@ def apply_change_list(collection_id, change_list):
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
                 collection_node = collection.get_node(change.exploration_id)
                 if (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS): # pylint: disable=line-too-long
+                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS): # pylint: disable=line-too-long
                     collection_node.update_prerequisite_skill_ids(
                         change.new_value)
                 elif (change.property_name ==
-                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS): # pylint: disable=line-too-long
+                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS): # pylint: disable=line-too-long
                     collection_node.update_acquired_skill_ids(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if (change.property_name ==

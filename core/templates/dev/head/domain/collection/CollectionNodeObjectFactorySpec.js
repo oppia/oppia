@@ -38,7 +38,7 @@ describe('Collection node object factory', function() {
     });
   };
 
-  it('should contain initial prerequisite skills', function() {
+  it('should contain initial prerequisite skill ids', function() {
     var collectionNode = _createEmptyCollectionNode(
       'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
     expect(collectionNode.getPrerequisiteSkillList().getSkills()).toEqual([
@@ -46,7 +46,7 @@ describe('Collection node object factory', function() {
     ]);
   });
 
-  it('should contain initial acquired skills', function() {
+  it('should contain initial acquired skill ids', function() {
     var collectionNode = _createEmptyCollectionNode(
       'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
     expect(collectionNode.getAcquiredSkillList().getSkills()).toEqual([

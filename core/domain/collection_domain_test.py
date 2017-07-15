@@ -158,6 +158,128 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'There are explorations referenced in the collection more than '
             'once.')
 
+    def test_get_skill_id_from_index(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected index to be an integer, received abc'):
+            collection_domain.CollectionSkill.get_skill_id_from_index('abc')
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected index to be nonnegative, received -1'):
+            collection_domain.CollectionSkill.get_skill_id_from_index(-1)
+
+        self.assertEqual(
+            collection_domain.CollectionSkill.get_skill_id_from_index(123),
+            'skill123')
+
+    def test_next_skill_id(self):
+        self.collection.next_skill_id = 'abc'
+        self._assert_validation_error(
+            'Expected next_skill_id to be an int, received abc')
+
+        self.collection.next_skill_id = -1
+        self._assert_validation_error(
+            'Expected next_skill_id to be nonnegative, received -1')
+
+    def test_skill_ids_validation(self):
+        self.collection.skills = 'abc'
+        self._assert_validation_error(
+            'Expected skills to be a dict, received abc')
+
+        self.collection.skills = {
+            'a': collection_domain.CollectionSkill.from_dict('test_skill', {
+                'name': 'test',
+                'question_ids': []
+            })}
+
+        self._assert_validation_error(
+            'Expected skill ID to have length at least 6, received a')
+
+        self.collection.skills = {
+            'abcdef': collection_domain.CollectionSkill.from_dict(
+                'test_skill', {
+                    'name': 'test',
+                    'question_ids': []
+                })}
+
+        self._assert_validation_error(
+            'Expected skill ID to begin with \'skill\', received abcdef')
+
+        self.collection.skills = {
+            'skilla': collection_domain.CollectionSkill.from_dict(
+                'test_skill', {
+                    'name': 'test',
+                    'question_ids': []
+                })}
+
+        self._assert_validation_error(
+            'Expected skill ID to end with a number, received skilla')
+
+        self.collection.next_skill_id = 1
+        self.collection.skills = {
+            'skill1': collection_domain.CollectionSkill.from_dict(
+                'test_skill', {
+                    'name': 'test',
+                    'question_ids': []
+                })}
+
+        self._assert_validation_error(
+            'Expected skill ID number to be less than 1, received skill1')
+
+    def test_skills_validation(self):
+        self.collection.next_skill_id = 1
+        self.collection.skills = {
+            'skill0': collection_domain.CollectionSkill.from_dict(
+                'skill0', {
+                    'name': 123,
+                    'question_ids': []
+                })}
+
+        self._assert_validation_error(
+            'Expected skill name to be a string, received 123')
+
+        self.collection.skills = {
+            'skill0': collection_domain.CollectionSkill.from_dict(
+                123, {
+                    'name': 'test',
+                    'question_ids': []
+                })}
+
+        self._assert_validation_error(
+            'Expected skill ID to be a string, received 123')
+
+        self.collection.skills = {
+            'skill0': collection_domain.CollectionSkill.from_dict(
+                'skill0', {
+                    'name': 'test',
+                    'question_ids': {}
+                })}
+
+        self._assert_validation_error(
+            'Expected question IDs to be a list, received {}')
+
+        self.collection.skills = {
+            'skill0': collection_domain.CollectionSkill.from_dict(
+                'skill0', {
+                    'name': 'test',
+                    'question_ids': ['question', 123]
+                })}
+
+        self._assert_validation_error(
+            'Expected all question_ids to be strings, received 123')
+
+        self.collection.skills = {
+            'skill0': collection_domain.CollectionSkill.from_dict(
+                'skill0', {
+                    'name': 'test',
+                    'question_ids': ['question', 'question']
+                })}
+
+        self._assert_validation_error(
+            'The question_ids list has duplicate entries.')
+
+
     def test_initial_explorations_validation(self):
         # Having no collection nodes is fine for non-strict validation.
         self.collection.nodes = []
@@ -177,7 +299,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection_node1.update_prerequisite_skill_ids(['skill0'])
         self._assert_validation_error(
             'Expected to have at least 1 exploration with no prerequisite '
-            'skills.')
+            'skill ids.')
 
     def test_metadata_validation(self):
         self.collection.title = ''
@@ -244,7 +366,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         collection_node0.prerequisite_skill_ids = ['skill0a', 2]
         self._assert_validation_error(
-            'Expected all prerequisite skills to be strings')
+            'Expected all prerequisite skill ids to be strings')
 
     def test_collection_node_acquired_skill_ids_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
@@ -259,7 +381,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         collection_node0.acquired_skill_ids = ['skill0a', 2]
         self._assert_validation_error(
-            'Expected all acquired skills to be strings')
+            'Expected all acquired skill ids to be strings')
 
     def test_collection_node_skills_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
@@ -330,7 +452,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection.nodes), 0)
 
     def test_add_skill(self):
-        """Test that add_skill fails in the correct situations."""
+        """Test that add_skill correctly adds skills."""
         collection = collection_domain.Collection.create_default_collection(
             'exp_id')
         self.assertEqual(collection.skills, {})
@@ -343,10 +465,24 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_skill('skillname2')
         self.assertEqual(sorted(collection.skills.keys()), ['skill0', 'skill1'])
 
+    def test_adding_duplicate_skill_raises_error(self):
+        """Test that adding a duplicate skill name raises an error."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        collection.add_skill('skillname1')
+        collection.add_skill('skillname2')
+
         # Names should be unique
         with self.assertRaisesRegexp(
             ValueError, 'Skill with name "skillname1" already exists.'):
             collection.add_skill('skillname1')
+
+    def test_adding_after_deleting_skill_increments_skill_id(self):
+        """Test that re-adding a deleted skill assigns a new skill id."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        collection.add_skill('skillname1')
+        collection.add_skill('skillname2')
 
         # Delete a skill
         collection.delete_skill('skill1')
@@ -381,7 +517,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.get_node('exp_id_1').update_prerequisite_skill_ids(
             ['skill0'])
 
-        # Check that prerequisite and acquired skills are updated when skill
+        # Check that prerequisite and acquired skill ids are updated when skill
         # is deleted.
         collection.delete_skill('skill0')
         self.assertEqual(collection.get_node('exp_id_0').acquired_skill_ids, [])

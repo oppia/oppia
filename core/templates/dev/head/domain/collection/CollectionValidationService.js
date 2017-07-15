@@ -120,7 +120,9 @@ oppia.factory('CollectionValidationService', [
       var collectionSkills = collection.getCollectionSkills();
       var skillNames = [];
       for (var skillId in collectionSkills) {
-        skillNames.push(collectionSkills[skillId].getName());
+        if (collectionSkills.hasOwnProperty(skillId)) {
+          skillNames.push(collectionSkills[skillId].getName());
+        }
       }
       skillNames.forEach(function(skillName, index) {
         if (skillNames.indexOf(skillName) !== index) {

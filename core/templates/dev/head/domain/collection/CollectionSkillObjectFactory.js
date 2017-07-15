@@ -22,7 +22,8 @@ oppia.factory('CollectionSkillObjectFactory', [
     var CollectionSkill = function(skillId, collectionSkillBackendObject) {
       this._id = skillId;
       this._name = collectionSkillBackendObject.name;
-      this._questionIds = collectionSkillBackendObject.question_ids;
+      this._questionIds = angular.copy(
+        collectionSkillBackendObject.question_ids);
     };
 
     // Instance methods
@@ -44,13 +45,13 @@ oppia.factory('CollectionSkillObjectFactory', [
 
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
-    // collection node python dict.
+    // collection skill python dict.
     CollectionSkill.create = function(skillId, collectionSkillBackendObject) {
       return new CollectionSkill(skillId, collectionSkillBackendObject);
     };
 
     // Note to developers: Ensure this matches the backend dict elements for
-    // collection skills.
+    // collection skills (in collection_domain.CollectionSkill).
     CollectionSkill.createFromIdAndName = function(skillId, skillName) {
       return CollectionSkill.create(skillId, {
         name: skillName,

@@ -360,6 +360,12 @@ describe('Collection object factory', function() {
     }
   );
 
+  it('should get the next usable skill id correctly',
+    function() {
+      expect(_sampleCollection.getNewSkillId()).toEqual('skill0');
+      expect(_sampleCollection.getNewSkillId()).toEqual('skill1');
+    });
+
   it('should be able to add an existing skill object to the collection',
     function() {
       var collectionSkillBackendObject = {
@@ -411,9 +417,26 @@ describe('Collection object factory', function() {
     // Other skill still exists
     expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(false);
 
-    // Skill ID is deleted from prerequisite and acquired skills
+    // Skill ID is deleted from prerequisite and acquired skill IDs
     expect(collectionNode0.getAcquiredSkillList().getSkills()).toEqual([]);
     expect(collectionNode1.getPrerequisiteSkillList().getSkills()).toEqual([]);
+  });
+
+  it('should not re-use skill ids for deleted skills', function() {
+    _addCollectionNode('exp_id0');
+    _addCollectionNode('exp_id1');
+    var collectionNode0 = _getCollectionNode('exp_id0');
+    var collectionNode1 = _getCollectionNode('exp_id1');
+
+    expect(_addCollectionSkill('skill01')).toBe(true);
+    var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
+    expect(_addCollectionSkill('skill02')).toBe(true);
+    var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
+
+    collectionNode0.getAcquiredSkillList().addSkill(skillId2);
+    collectionNode1.getPrerequisiteSkillList().addSkill(skillId2);
+
+    expect(_sampleCollection.deleteCollectionSkill(skillId2)).toBe(true);
 
     // Skill ID is not reused
     expect(_addCollectionSkill('skill03')).toBe(true);
@@ -421,7 +444,7 @@ describe('Collection object factory', function() {
     expect(skillId3).toEqual('skill2');
   });
 
-  it('should be able to get all skills and clear skills', function() {
+  it('should be able to get all skills', function() {
     // Add skills.
     expect(_addCollectionSkill('skill01')).toBe(true);
     var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
@@ -436,6 +459,13 @@ describe('Collection object factory', function() {
     expectedSkills[skillId2] = CollectionSkillObjectFactory.createFromIdAndName(
         skillId2, 'skill02');
     expect(_sampleCollection.getCollectionSkills()).toEqual(expectedSkills);
+  });
+
+  it('should be able to clear skills', function() {
+    expect(_addCollectionSkill('skill01')).toBe(true);
+    var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
+    expect(_addCollectionSkill('skill02')).toBe(true);
+    var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
 
     // Clear skills.
     _sampleCollection.clearCollectionSkills();

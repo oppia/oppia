@@ -36,8 +36,11 @@ COLLECTION_PROPERTY_CATEGORY = 'category'
 COLLECTION_PROPERTY_OBJECTIVE = 'objective'
 COLLECTION_PROPERTY_LANGUAGE_CODE = 'language_code'
 COLLECTION_PROPERTY_TAGS = 'tags'
-COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skill_ids'
-COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skill_ids'
+COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
+COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
+# These node properties have been deprecated.
+COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
+COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 
 # This takes an additional 'exploration_id' parameter.
 CMD_ADD_COLLECTION_NODE = 'add_collection_node'
@@ -67,8 +70,8 @@ class CollectionChange(object):
     """
 
     COLLECTION_NODE_PROPERTIES = (
-        COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
-        COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS)
+        COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
+        COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS)
 
     COLLECTION_PROPERTIES = (
         COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
@@ -199,9 +202,9 @@ class CollectionCommitLogEntry(object):
 class CollectionNode(object):
     """Domain object describing a node in the exploration graph of a
     collection. The node contains various information, including a reference to
-    an exploration (its ID), prerequisite skills in order to be qualified to
-    play the exploration, and acquired skills attained once the exploration is
-    completed.
+    an exploration (its ID), prerequisite skill ids in order to be qualified to
+    play the exploration, and acquired skill ids attained once the exploration
+    is completed.
     """
 
     def __init__(self, exploration_id, prerequisite_skill_ids,
@@ -303,7 +306,7 @@ class CollectionNode(object):
         for prerequisite_skill in self.prerequisite_skill_ids:
             if not isinstance(prerequisite_skill, basestring):
                 raise utils.ValidationError(
-                    'Expected all prerequisite skills to be strings, '
+                    'Expected all prerequisite skill ids to be strings, '
                     'received %s' % prerequisite_skill)
 
         if not isinstance(self.acquired_skill_ids, list):
@@ -319,8 +322,8 @@ class CollectionNode(object):
         for acquired_skill in self.acquired_skill_ids:
             if not isinstance(acquired_skill, basestring):
                 raise utils.ValidationError(
-                    'Expected all acquired skills to be strings, received %s' %
-                    acquired_skill)
+                    'Expected all acquired skill ids to be strings, received '
+                    '%s' % acquired_skill)
 
         redundant_skills = (
             set(self.prerequisite_skill_ids) & set(self.acquired_skill_ids))
@@ -339,7 +342,7 @@ class CollectionNode(object):
 
         Returns:
             CollectionNode. The CollectionNode domain object with default
-            value. The prerequisite and acquired skills lists are empty.
+            value. The prerequisite and acquired skill ids lists are empty.
         """
         return cls(exploration_id, [], [])
 
@@ -365,6 +368,8 @@ class CollectionSkill(object):
         self.question_ids = question_ids
 
     def to_dict(self):
+        # Note to developers: ensure this matches the frontend in
+        # CollectionSkillObjectFactory
         return {
             'name': self.name,
             'question_ids': self.question_ids
@@ -374,9 +379,21 @@ class CollectionSkill(object):
     def from_dict(cls, skill_id, skill_dict):
         return cls(
             skill_id,
-            copy.deepcopy(skill_dict['name']),
+            skill_dict['name'],
             copy.deepcopy(skill_dict['question_ids'])
         )
+
+    @staticmethod
+    def get_skill_id_from_index(index):
+        if not isinstance(index, int):
+            raise utils.ValidationError(
+                'Expected index to be an integer, received %s' % index)
+
+        if index < 0:
+            raise utils.ValidationError(
+                'Expected index to be nonnegative, received %s' % index)
+
+        return 'skill%s' % index
 
     def validate(self):
         """Validates various properties of collection skill."""
@@ -404,8 +421,7 @@ class CollectionSkill(object):
 
         if len(set(self.question_ids)) != len(self.question_ids):
             raise utils.ValidationError(
-                'The question_ids list has duplicate entries: %s' %
-                self.question_ids)
+                'The question_ids list has duplicate entries.')
 
 
 class Collection(object):
@@ -713,20 +729,12 @@ class Collection(object):
         nodes, and assigns them integer IDs.
         """
 
-        for index, node in enumerate(collection_contents['nodes']):
-            collection_contents['nodes'][index]['prerequisite_skill_ids'] = (
-                node['prerequisite_skills'])
-            del collection_contents['nodes'][index]['prerequisite_skills']
-            collection_contents['nodes'][index]['acquired_skill_ids'] = (
-                node['acquired_skills'])
-            del collection_contents['nodes'][index]['acquired_skills']
-
         skill_names = set()
         for node in collection_contents['nodes']:
-            skill_names.update(node['acquired_skill_ids'])
-            skill_names.update(node['prerequisite_skill_ids'])
+            skill_names.update(node['acquired_skills'])
+            skill_names.update(node['prerequisite_skills'])
         skill_names_to_ids = {
-            name: 'skill%s' % index
+            name: CollectionSkill.get_skill_id_from_index(index)
             for index, name in enumerate(sorted(skill_names))
         }
 
@@ -734,10 +742,10 @@ class Collection(object):
             'exploration_id': node['exploration_id'],
             'prerequisite_skill_ids': [
                 skill_names_to_ids[prerequisite_skill_name]
-                for prerequisite_skill_name in node['prerequisite_skill_ids']],
+                for prerequisite_skill_name in node['prerequisite_skills']],
             'acquired_skill_ids': [
                 skill_names_to_ids[acquired_skill_name]
-                for acquired_skill_name in node['acquired_skill_ids']]
+                for acquired_skill_name in node['acquired_skills']]
         } for node in collection_contents['nodes']]
 
         collection_contents['skills'] = {
@@ -840,17 +848,17 @@ class Collection(object):
         for node in self.nodes:
             if node.exploration_id in completed_exploration_ids:
                 continue
-            prereq_skills = set(node.prerequisite_skill_ids)
-            if prereq_skills <= acquired_skill_ids:
+            prereq_skill_ids = set(node.prerequisite_skill_ids)
+            if prereq_skill_ids <= acquired_skill_ids:
                 next_exp_ids.append(node.exploration_id)
         return next_exp_ids
 
     def get_next_exploration_ids_in_sequence(self, current_exploration_id):
         """Returns a list of exploration IDs that a logged-out user should
-        complete next based on the prerequisite skills they must have attained
-        by the time they completed the current exploration.  This recursively
-        compiles a list of 'learned skills' then, depending on the
-        'learned skills' and the current exploration's acquired skills,
+        complete next based on the prerequisite skill ids they must have
+        attained by the time they completed the current exploration. This
+        recursively compiles a list of 'learned skills' then, depending on
+        the 'learned skills' and the current exploration's acquired skill ids,
         returns either a list of exploration ids that have either just
         unlocked or the user is qualified to explore.  If neither of these
         lists can be generated a blank list is returned instead.
@@ -874,7 +882,7 @@ class Collection(object):
                     collection.
 
             Returns:
-                list(str). A list of acquired skills by user.
+                list(str). A list of skill ids acquired by user.
             """
             if node.exploration_id in skills_learned_by_exp_id:
                 return skills_learned_by_exp_id[node.exploration_id]
@@ -1049,7 +1057,7 @@ class Collection(object):
                 raise ValueError(
                     'Skill with name "%s" already exists.' % skill_name)
 
-        skill_id = 'skill%s' % self.next_skill_id
+        skill_id = CollectionSkill.get_skill_id_from_index(self.next_skill_id)
         self.skills[skill_id] = CollectionSkill(skill_id, skill_name, [])
         self.next_skill_id += 1
 
@@ -1167,7 +1175,21 @@ class Collection(object):
         for node in self.nodes:
             node.validate()
 
-        # Validate skills.
+        if not isinstance(self.skills, dict):
+            raise utils.ValidationError(
+                'Expected skills to be a dict, received %s' % self.skills)
+
+        if not isinstance(self.next_skill_id, int):
+            raise utils.ValidationError(
+                'Expected next_skill_id to be an int, received %s' %
+                self.next_skill_id)
+
+        if self.next_skill_id < 0:
+            raise utils.ValidationError(
+                'Expected next_skill_id to be nonnegative, received %s' %
+                self.next_skill_id)
+
+        # Validate all skills.
         for skill_id, skill in self.skills.iteritems():
             if len(skill_id) < 6:
                 raise utils.ValidationError(
@@ -1176,7 +1198,7 @@ class Collection(object):
 
             if skill_id[0:5] != 'skill':
                 raise utils.ValidationError(
-                    'Expected skill ID to begin with \'s\', received %s' %
+                    'Expected skill ID to begin with \'skill\', received %s' %
                     skill_id)
 
             if not skill_id[5:].isdigit():
@@ -1187,11 +1209,12 @@ class Collection(object):
             if int(skill_id[5:]) >= self.next_skill_id:
                 raise utils.ValidationError(
                     'Expected skill ID number to be less than %s, received %s' %
-                    self.next_skill_id, skill_id)
+                    (self.next_skill_id, skill_id))
 
             skill.validate()
 
-        # Check that prerequisite and acquired skills exist in the skill table
+        # Check that prerequisite and acquired skill ids exist in the skill
+        # table
         for node in self.nodes:
             for skill_id in (
                     node.prerequisite_skill_ids + node.acquired_skill_ids):
@@ -1221,14 +1244,14 @@ class Collection(object):
             if not self.init_exploration_ids:
                 raise utils.ValidationError(
                     'Expected to have at least 1 exploration with no '
-                    'prerequisite skills.')
+                    'prerequisite skill ids.')
 
             # Ensure the collection can be completed. This is done in two
             # steps: first, no exploration may grant a skill that it
             # simultaneously lists as a prerequisite. Second, every exploration
             # in the collection must be reachable when starting from the
-            # explorations with no prerequisite skills and playing through all
-            # subsequent explorations provided by get_next_exploration_ids.
+            # explorations with no prerequisite skill ids and playing through
+            # all subsequent explorations provided by get_next_exploration_ids.
             completed_exp_ids = set(self.init_exploration_ids)
             next_exp_ids = self.get_next_exploration_ids(
                 list(completed_exp_ids))

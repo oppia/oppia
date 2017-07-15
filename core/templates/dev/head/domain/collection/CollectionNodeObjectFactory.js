@@ -72,14 +72,14 @@ oppia.factory('CollectionNodeObjectFactory', [
       }
     };
 
-    // Returns a SkillsList object of the prerequisite skills of this collection
-    // node. Changes to the return SkillList object will be reflected in this
-    // collection node object.
+    // Returns a SkillsList object of the prerequisite skill ids of this
+    // collection node. Changes to the return SkillList object will be reflected
+    // in this collection node object.
     CollectionNode.prototype.getPrerequisiteSkillList = function() {
       return this._prerequisiteSkillList;
     };
 
-    // Returns a SkillsList object of the acquired skills of this collection
+    // Returns a SkillsList object of the acquired skill ids of this collection
     // node. Changes to the return SkillList object will be reflected in this
     // collection node object.
     CollectionNode.prototype.getAcquiredSkillList = function() {
