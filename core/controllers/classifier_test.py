@@ -20,17 +20,26 @@ import hmac
 import json
 import os
 
+from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_services
 from core.tests import test_utils
 import feconf
 
 
-def generate_signature(data):
-    """Generates digital signature for given data."""
-    msg = json.dumps(data, sort_keys=True)
-    key = feconf.DEFAULT_VM_SHARED_SECRET
-    return hmac.new(key, msg, digestmod=hashlib.sha256).hexdigest()
+def generate_signature(secret, message):
+    """Generates digital signature for given data.
+    This function should be in sync with its counterpart in Oppia-ml.
+
+    Args:
+        secret: str. The secret used to communicate with Oppia-ml.
+        message: dict. The message payload data.
+
+    Returns:
+        str. The signature of the payload data.
+    """
+    message_json = json.dumps(message, sort_keys=True)
+    return hmac.new(secret, message_json, digestmod=hashlib.sha256).hexdigest()
 
 
 class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
@@ -42,8 +51,8 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
         self.category = 'Test'
-        yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                 '../tests/data/string_classifier_test.yaml')
+        yaml_path = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         with open(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
 
@@ -56,6 +65,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         state = self.exploration.states['Home']
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             state.interaction.id]['algorithm_id']
+        interaction_id = 'TextInput'
         training_data = state.get_training_data()
         self.classifier_data = {
             '_alpha': 0.1,
@@ -76,8 +86,8 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             '_c_l': []
         }
         self.job_id = classifier_services.save_classifier_training_job(
-            algorithm_id, self.exp_id, self.exploration.version,
-            'Home', training_data)
+            algorithm_id, interaction_id, self.exp_id, self.exploration.version,
+            'Home', training_data, feconf.TRAINING_JOB_STATUS_NEW)
 
         self.job_result_dict = {
             'job_id' : self.job_id,
@@ -87,7 +97,9 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.payload = {}
         self.payload['vm_id'] = feconf.DEFAULT_VM_ID
         self.payload['message'] = self.job_result_dict
-        self.payload['signature'] = generate_signature(self.payload['message'])
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        self.payload['signature'] = generate_signature(
+            secret, self.payload['message'])
 
     def test_trained_classifier_handler(self):
         # Normal end-to-end test.
@@ -113,3 +125,20 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.payload['message']['job_id'] = 'different_job_id'
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=True, expected_status_int=401)
+
+    def test_error_on_invalid_message(self):
+        # Altering message dict to result in invalid dict.
+        self.payload['message']['job_id'] = 1
+        self.post_json('/ml/trainedclassifierhandler', self.payload,
+                       expect_errors=True, expected_status_int=400)
+
+    def test_error_on_existing_classifier(self):
+        # Create ClassifierDataModel before the controller is called.
+        classifier = classifier_domain.ClassifierData(
+            self.job_id, self.exp_id, 1, 'Home',
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'], self.classifier_data, 1)
+        classifier_services.create_classifier(
+            self.job_id, classifier)
+        self.post_json('/ml/trainedclassifierhandler', self.payload,
+                       expect_errors=True, expected_status_int=500)

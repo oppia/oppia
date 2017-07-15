@@ -442,6 +442,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
+
     get_redirect_route(
         r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
 
@@ -451,7 +452,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
-
 ]
 
 URLS_TO_SERVE = []

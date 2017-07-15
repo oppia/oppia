@@ -26,36 +26,64 @@ from core.domain import config_domain
 import feconf
 
 
+def generate_signature(secret, message):
+    """Generates digital signature for given data.
+    This function should be in sync with its counterpart in Oppia-ml.
+
+    Args:
+        secret: str. The secret used to communicate with Oppia-ml.
+        message: dict. The message payload data.
+
+    Returns:
+        str. The signature of the payload data.
+    """
+    message_json = json.dumps(message, sort_keys=True)
+    return hmac.new(secret, message_json, digestmod=hashlib.sha256).hexdigest()
+
+
+def validate_message(message):
+    """Validates the data-type of the message payload data.
+
+    Args:
+        message: dict. The message payload data.
+
+    Returns:
+        bool. True if the payload data is valid, False otherwise."""
+    job_id = message.get('job_id')
+    classifier_data = message.get('classifier_data')
+
+    if not isinstance(job_id, basestring):
+        return False
+    if not isinstance(classifier_data, dict):
+        return False
+    return True
+
+
 def verify_signature(message, vm_id, received_signature):
     """Function that checks if the signature received from the VM is valid.
 
     Args:
-        message: str. The string encoding of the dict that contains job_id and
-            classifier_data.
+        message: dict. The message payload data.
         vm_id: str. The ID of the VM instance.
         received_signature: str. The signature received from the VM.
 
     Returns:
-        bool.
+        bool. Returns True if the incoming request is valid, False otherwise.
 
     Raises:
-        UnauthorizedUserException.
+        UnauthorizedUserException. Exception is raised when the incoming
+            request is invalid.
     """
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
         if val['vm_id'] == vm_id:
-            secret = val['shared_secret_key'][0]
+            secret = str(val['shared_secret_key'])
             break
     if secret is None:
         return False
-    secret = str([val['shared_secret_key'] for val in (
-        config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value) if val[
-            'vm_id'] == vm_id][0])
-    generated_signature = hmac.new(
-        secret, message, digestmod=hashlib.sha256).hexdigest()
+
+    generated_signature = generate_signature(secret, message)
     if generated_signature != received_signature:
-        return False
-    if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
         return False
     return True
 
@@ -69,50 +97,52 @@ class TrainedClassifierHandler(base.BaseHandler):
 
     def post(self):
         """Handles POST requests."""
-        payload = self.request.get('payload')
-        payload = json.loads(payload)
-        signature = payload.get('signature')
-        message = payload.get('message')
-        vm_id = payload.get('vm_id')
-        message = json.dumps(message, sort_keys=True)
-        if verify_signature(message, vm_id, signature):
-            job_id = self.payload.get('message').get('job_id')
-            classifier_data = self.payload.get('message').get('classifier_data')
-            classifier_training_job = (
-                classifier_services.get_classifier_training_job_by_id(job_id))
-            state_name = classifier_training_job.state_name
-            exp_id = classifier_training_job.exp_id
-            exp_version = classifier_training_job.exp_version
-            algorithm_id = classifier_training_job.algorithm_id
-
-            data_schema_version = None
-            for algorithm_details in (
-                    feconf.INTERACTION_CLASSIFIER_MAPPING.values()):
-                if algorithm_details['algorithm_id'] == algorithm_id:
-                    data_schema_version = algorithm_details[
-                        'current_data_schema_version']
-            if data_schema_version is None:
-                raise self.InternalErrorException
-
-            classifier = classifier_domain.ClassifierData(
-                job_id, exp_id, exp_version, state_name, algorithm_id,
-                classifier_data, data_schema_version)
-            try:
-                classifier_services.save_classifier(classifier)
-            except Exception:
-                raise self.InternalErrorException
-
-            # Update status of the training job to 'COMPLETE'.
-            classifier_training_job.update_status(
-                feconf.TRAINING_JOB_STATUS_COMPLETE)
-            classifier_services.save_classifier_training_job(
-                classifier_training_job.algorithm_id,
-                classifier_training_job.exp_id,
-                classifier_training_job.exp_version,
-                classifier_training_job.state_name,
-                classifier_training_job.training_data,
-                classifier_training_job.status,
-                classifier_training_job.job_id)
-            return self.render_json({})
-        else:
+        signature = self.payload.get('signature')
+        message = self.payload.get('message')
+        vm_id = self.payload.get('vm_id')
+        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
             raise self.UnauthorizedUserException
+
+        if not validate_message(message):
+            raise self.InvalidInputException
+        if not verify_signature(message, vm_id, signature):
+            raise self.UnauthorizedUserException
+
+        job_id = message.get('job_id')
+        classifier_data = message.get('classifier_data')
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        state_name = classifier_training_job.state_name
+        exp_id = classifier_training_job.exp_id
+        exp_version = classifier_training_job.exp_version
+        algorithm_id = classifier_training_job.algorithm_id
+        interaction_id = classifier_training_job.interaction_id
+
+        data_schema_version = None
+        if feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
+                'algorithm_id'] == algorithm_id:
+            data_schema_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
+                interaction_id]['current_data_schema_version']
+        if data_schema_version is None:
+            raise self.InternalErrorException(
+                'The algorithm_id of the job does not exist in the Interaction'
+                'Classifier Mapping.')
+
+        classifier = classifier_domain.ClassifierData(
+            job_id, exp_id, exp_version, state_name, algorithm_id,
+            classifier_data, data_schema_version)
+        try:
+            classifier_services.create_classifier(job_id, classifier)
+        except Exception:
+            raise self.InternalErrorException(
+                'The ClassifierDataModel corresponding to the job already'
+                'exist.')
+
+        # Update status of the training job to 'COMPLETE'.
+        if classifier_training_job.status == (
+                feconf.TRAINING_JOB_STATUS_FAILED):
+            raise self.InternalErrorException(
+                'The current status of the job cannot transition to COMPLETE.')
+        classifier_services.mark_training_job_complete(job_id)
+
+        return self.render_json({})
