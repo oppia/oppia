@@ -18,8 +18,9 @@
  */
 
 oppia.factory('threadDataService', [
-  '$http', '$q', 'explorationData', 'alertsService',
-  function($http, $q, explorationData, alertsService) {
+  '$http', '$q', 'explorationData', 'alertsService', 'ACTION_ACCEPT_SUGGESTION',
+  function(
+      $http, $q, explorationData, alertsService, ACTION_ACCEPT_SUGGESTION) {
     var _expId = explorationData.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
@@ -166,12 +167,14 @@ oppia.factory('threadDataService', [
         });
       },
       resolveSuggestion: function(
-        threadId, action, commitMsg, onSuccess, onFailure) {
+        threadId, action, commitMsg, audioUpdateRequired, onSuccess,
+        onFailure) {
         var payload = {
           action: action
         };
-        if (commitMsg) {
+        if (action === ACTION_ACCEPT_SUGGESTION) {
           payload.commit_message = commitMsg;
+          payload.audio_update_required = audioUpdateRequired;
         }
         _openThreadsCount -= 1;
         $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(

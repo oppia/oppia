@@ -24,7 +24,7 @@
                        class="form-control protractor-test-exploration-objective-input"
                        ng-model="explorationObjectiveService.displayed"
                        ng-blur="saveExplorationObjective()" placeholder="Learn how to..." ng-trim="false">
-                <span class="help-block" style="font-size: smaller"> 
+                <span class="help-block" style="font-size: smaller">
                   <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
                   <span ng-if="explorationObjectiveService.displayed.length > 0">
                     <em>Characters used: <[(explorationObjectiveService.displayed.length)]>/100</em>
@@ -79,9 +79,10 @@
                 <div ng-if="hasPageLoaded">
                   <select2-dropdown
                     item="$parent.explorationTagsService.displayed"
-                    tag-mode="true" allow-multiple-choices="true"
+                    allow-multiple-choices="true"
                     invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
-                    new-choice-regex="<[::TAG_REGEX]>" width="100%"
+                    new-choice-regex="<[::TAG_REGEX]>"
+                    width="100%"
                     placeholder="Skills, concepts, topics, ..."
                     on-selection-change="saveExplorationTags()">
                   </select2-dropdown>
