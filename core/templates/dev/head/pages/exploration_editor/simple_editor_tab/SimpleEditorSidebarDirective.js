@@ -46,14 +46,20 @@ oppia.directive('simpleEditorSidebar', [
           $scope.canAddNewQuestion = (
             SimpleEditorManagerService.canAddNewQuestion);
 
+          $scope.getSubfieldId = function(question, label) {
+            return QuestionIdService.getSubfieldId(question.getId(), label);
+          };
+
           $scope.addNewQuestion = function() {
             if (!SimpleEditorManagerService.canAddNewQuestion()) {
               return;
             }
             $scope.sidebarModeService.setModeToReadonly();
+            var secondLastQuestion = $scope.questionList.getLastQuestion();
             SimpleEditorManagerService.addNewQuestion();
             $timeout(function() {
-              $scope.scrollToQuestion($scope.questionList.getLastQuestion());
+              ScrollSyncService.scrollTo(
+                $scope.getSubfieldId(secondLastQuestion, 'Bridge text'));
               container.scrollTop = container.scrollHeight;
               Ps.update(container);
             }, 0);
