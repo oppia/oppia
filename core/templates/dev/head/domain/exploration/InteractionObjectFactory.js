@@ -52,7 +52,9 @@ oppia.factory('InteractionObjectFactory', [
           return hint.toBackendDict();
         }),
         id: this.id,
-        solution: this.solution.toBackendDict()
+        solution: (
+          (typeof this.solution === 'object' &&
+          Object.keys(this.solution).length > 0)) ? this.solution.toBackendDict() : {}
       };
     };
 
@@ -96,7 +98,8 @@ oppia.factory('InteractionObjectFactory', [
     };
 
     var generateSolutionFromBackend = function(solutionBackendDict) {
-      if (!angular.equals(solutionBackendDict, {}) && solutionBackendDict) {
+      if (typeof solutionBackendDict === 'object' && (
+        Object.keys(solutionBackendDict).length > 0)) {
         return SolutionObjectFactory.createFromBackendDict(solutionBackendDict);
       } else {
         return {};

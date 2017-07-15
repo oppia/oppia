@@ -868,7 +868,7 @@ oppia.factory('explorationStatesService', [
         });
       },
       solution: function(solution) {
-        if (Object.keys(solution).length > 0) {
+        if (typeof solution === 'object' && Object.keys(solution).length > 0) {
           return solution.toBackendDict();
         } else {
           return {};
@@ -902,6 +902,9 @@ oppia.factory('explorationStatesService', [
       var accessorList = PROPERTY_REF_DATA[backendName];
       var propertyRef = _states.getState(stateName);
       accessorList.forEach(function(key) {
+        if (typeof propertyRef === 'undefined') {
+          return {};
+        }
         propertyRef = propertyRef[key];
       });
 
