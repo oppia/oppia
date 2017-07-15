@@ -148,7 +148,7 @@ class SuggestionHandler(base.BaseHandler):
             self.payload.get('exploration_version'),
             self.payload.get('state_name'),
             self.payload.get('description'),
-            self.payload.get('suggestion_content'))
+            self.payload.get('suggestion_html'))
         self.render_json(self.values)
 
 
@@ -166,7 +166,8 @@ class SuggestionActionHandler(base.BaseHandler):
                 self.user_id,
                 thread_id,
                 exploration_id,
-                self.payload.get('commit_message'))
+                self.payload.get('commit_message'),
+                self.payload.get('audio_update_required'))
         elif action == self._REJECT_ACTION:
             exp_services.reject_suggestion(
                 self.user_id, thread_id, exploration_id)

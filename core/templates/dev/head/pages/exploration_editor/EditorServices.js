@@ -841,6 +841,9 @@ oppia.factory('explorationStatesService', [
           return answerGroup.toBackendDict();
         });
       },
+      content: function(content) {
+        return content.toBackendDict()
+      },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
           return defaultOutcome.toBackendDict();
@@ -2060,10 +2063,12 @@ oppia.factory('explorationWarningsService', [
       }
 
       if (Object.keys(stateWarnings).length) {
+        var errorString = (
+          Object.keys(stateWarnings).length > 1 ? 'cards have' : 'card has');
         _warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'The following states have errors: ' +
+            'The following ' + errorString + ' errors: ' +
             Object.keys(stateWarnings).join(', ') + '.')
         });
       }
@@ -2211,10 +2216,11 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
           switch (lostChange.property_name) {
             case 'content':
               if (newValue !== null) {
+                // TODO(sll): Also add display of audio translations here.
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div></div>').html(
                     '<strong>Edited content: </strong><div class="content">' +
-                      newValue.value + '</div>')
+                      newValue.html + '</div>')
                     .addClass('state-edit-desc'));
               }
               break;

@@ -90,7 +90,7 @@
 </style>
 
 <ul class="oppia-progress-dot-list">
-  <li class="oppia-progress-arrow" ng-show="dots.length > 1"
+  <li class="oppia-progress-arrow" ng-show="dots.length > 1 && currentDotIndex > 0"
       ng-class="{'oppia-progress-arrow-active' : currentDotIndex > 0}"
       ng-click="decrementCurrentDotIndex()" tabindex="0">
     <span class="sr-only" translate="I18N_PLAYER_BACK"></span>
@@ -117,7 +117,7 @@
       <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index +1]></span>
     </span>
   </li>
-  <li class="oppia-progress-arrow" ng-show="dots.length > 1"
+  <li class="oppia-progress-arrow" ng-show="dots.length > 1 && currentDotIndex !== dots.length - 1"
       ng-class="{'oppia-progress-arrow-active' : currentDotIndex != dots.length - 1}"
       ng-click="incrementCurrentDotIndex()" tabindex="0">
     <span class="sr-only" translate="I18N_PLAYER_FORWARD"></span>

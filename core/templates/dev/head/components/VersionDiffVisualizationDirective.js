@@ -259,6 +259,11 @@ oppia.directive('versionDiffVisualization', [
                 $scope.headers = headers;
                 $scope.newStateName = newStateName;
                 $scope.oldStateName = oldStateName;
+                /*
+                 * $scope.yamlStrs is an object with keys 'earlierVersion' and
+                 * 'laterVersion', whose values are the YAML representations of
+                 * the compared versions.
+                 */
                 $scope.yamlStrs = {};
 
                 if (newState) {

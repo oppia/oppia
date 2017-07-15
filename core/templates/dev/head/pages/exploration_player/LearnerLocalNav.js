@@ -36,10 +36,10 @@ oppia.controller('LearnerLocalNav', [
               $scope, $modalInstance, $timeout, playerPositionService,
               oppiaPlayerService) {
             var stateName = playerPositionService.getCurrentStateName();
-            $scope.initContent = oppiaPlayerService.getStateContentHtml(
+            $scope.originalHtml = oppiaPlayerService.getStateContentHtml(
               stateName);
             $scope.description = '';
-            $scope.suggestionContent = $scope.initContent;
+            $scope.suggestionHtml = $scope.originalHtml;
             $scope.showEditor = false;
             // Rte initially displays content unrendered for a split second
             $timeout(function() {
@@ -56,7 +56,7 @@ oppia.controller('LearnerLocalNav', [
                 version: oppiaPlayerService.getExplorationVersion(),
                 stateName: stateName,
                 description: $scope.description,
-                suggestionContent: $scope.suggestionContent
+                suggestionHtml: $scope.suggestionHtml
               });
             };
           }]
@@ -65,10 +65,7 @@ oppia.controller('LearnerLocalNav', [
           exploration_version: result.version,
           state_name: result.stateName,
           description: result.description,
-          suggestion_content: {
-            type: 'text',
-            value: result.suggestionContent
-          }
+          suggestion_html: result.suggestionHtml
         }).error(function(res) {
           alertsService.addWarning(res);
         });
