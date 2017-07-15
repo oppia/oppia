@@ -12,12 +12,27 @@
              title="Edit Solution">&#xE254;
           </i>
         </div>
-        <strong><[solution.answerIsExclusive ? 'Only' : 'One']> Solution is...</strong>
-        <span ng-if="objectType !== 'CodeString' && objectType !== 'Graph' && objectType !== 'RegionSelect' && objectType !== 'UnicodeString'"><[solution.correctAnswer]></span>
-        <span ng-if="objectType === 'CodeString'"><[solution.correctAnswer.code]></span>
-        <span ng-if="objectType === 'Graph'">[Graph Object]</span>
-        <span ng-if="objectType === 'RegionSelect'"><[solution.correctAnswer.clickedRegions[0]]></span>
-        <span ng-if="objectType === 'UnicodeString'"><[solution.correctAnswer.latex]></span>
+        <strong>
+          <[solution.answerIsExclusive ? 'Only' : 'One']> Solution is...
+        </strong>
+        <span ng-if="objectType !== 'CodeString' &&
+                     objectType !== 'Graph' &&
+                     objectType !== 'RegionSelect' &&
+                     objectType !== 'UnicodeString'">
+          <[solution.correctAnswer]>
+        </span>
+        <span ng-if="objectType === 'CodeString'">
+          <[solution.correctAnswer.code]>
+        </span>
+        <span ng-if="objectType === 'Graph'">
+          [Graph Object]
+        </span>
+        <span ng-if="objectType === 'RegionSelect'">
+          <[solution.correctAnswer.clickedRegions[0]]>
+        </span>
+        <span ng-if="objectType === 'UnicodeString'">
+          <[solution.correctAnswer.latex]>
+        </span>
         <br>
         <strong>Explanation is...</strong>
         <span angular-html-bind="solution.explanation"></span>
@@ -35,19 +50,51 @@
           <option value="false">One</option>
           <option value="true">Only</option>
         </select> <strong>Solution is...</strong>
-        <html-select ng-if="objectType === 'select'" style="width: 250px;" options="ruleDescriptionChoices" selection="solution.correctAnswer">
+        <html-select ng-if="objectType === 'select'"
+                     style="width: 250px;"
+                     options="ruleDescriptionChoices"
+                     selection="solution.correctAnswer">
         </html-select>
-        <html-select ng-if="objectType === 'RegionSelect'" style="width: 250px;" options="ruleDescriptionChoices" selection="solution.correctAnswer">
+        <html-select ng-if="objectType === 'RegionSelect'"
+                     style="width: 250px;"
+                     options="ruleDescriptionChoices"
+                     selection="solution.correctAnswer">
         </html-select>
-        <textarea ng-if="objectType === 'LogicQuestion'" ng-model="solution.correctAnswer"></textarea>
-        <object-editor ng-if="objectType === 'UnicodeString'" obj-type="<[objectType]>" init-args="{choices: ruleDescriptionChoices}" is-editable="true" always-editable="true" value="solution.correctAnswer.latex" style="color: black;">
+        <textarea ng-if="objectType === 'LogicQuestion'"
+                  ng-model="solution.correctAnswer">
+        </textarea>
+        <object-editor ng-if="objectType === 'UnicodeString'"
+                       obj-type="<[objectType]>"
+                       init-args="{choices: ruleDescriptionChoices}"
+                       is-editable="true"
+                       always-editable="true"
+                       value="solution.correctAnswer.latex"
+                       style="color: black;">
         </object-editor>
-        <object-editor ng-if="objectType === 'CodeString'" obj-type="<[objectType]>" init-args="{choices: ruleDescriptionChoices}" is-editable="true" always-editable="true" value="solution.correctAnswer.code" style="color: black;"></object-editor>
-        <object-editor ng-if="objectType !== 'CodeString' && objectType !== 'select' && objectType !== 'RegionSelect' && objectType !== 'UnicodeString' && objectType !== 'LogicQuestion'" obj-type="<[objectType]>" init-args="{choices: ruleDescriptionChoices}" is-editable="true" always-editable="true" value="solution.correctAnswer" style="color: black;">
+        <object-editor ng-if="objectType === 'CodeString'"
+                       obj-type="<[objectType]>"
+                       init-args="{choices: ruleDescriptionChoices}"
+                       is-editable="true"
+                       always-editable="true"
+                       value="solution.correctAnswer.code"
+                       style="color: black;">
+        </object-editor>
+        <object-editor ng-if="objectType !== 'CodeString' &&
+                              objectType !== 'select' &&
+                              objectType !== 'RegionSelect' &&
+                              objectType !== 'UnicodeString' &&
+                              objectType !== 'LogicQuestion'"
+                       obj-type="<[objectType]>"
+                       init-args="{choices: ruleDescriptionChoices}"
+                       is-editable="true"
+                       always-editable="true"
+                       value="solution.correctAnswer"
+                       style="color: black;">
         </object-editor>
         <br>
         <strong>Explanation is...</strong>
-        <schema-based-editor schema="EXPLANATION_FORM_SCHEMA" local-value="solution.explanation">
+        <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
+                             local-value="solution.explanation">
         </schema-based-editor>
       </div>
     </form>

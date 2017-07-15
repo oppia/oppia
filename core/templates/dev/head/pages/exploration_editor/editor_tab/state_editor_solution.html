@@ -1,12 +1,16 @@
 <div ng-controller="StateSolution">
-  <div ng-if="!isCurrentInteractionLinear() && solutionEditorIsEnabled && stateHintsService.displayed.length > 0 && objectType !== 'LogicQuestion'">
+  <div ng-if="!isCurrentInteractionLinear() &&
+              solutionEditorIsEnabled &&
+              stateHintsService.displayed.length > 0 &&
+              objectType !== 'LogicQuestion'">
     <div class="oppia-editor-header">
       <strong>Solution</strong>
     </div>
     <md-card class="oppia-editor-card-with-avatar">
       <div class="oppia-editor-card-body">
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
-            ng-if="solutionIsSpecified && stateSolutionService.savedMemento.explanation">
+            ng-if="solutionIsSpecified &&
+                   stateSolutionService.savedMemento.explanation">
           <li ng-class="!isActive"
               class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
               style="margin-top: 0;">
@@ -40,7 +44,9 @@
 
     <md-card style="margin: 0; padding: 0;">
       <div ng-if="editabilityService.isEditableOutsideTutorialMode()">
-        <button type="button" class="btn btn-default btn-lg oppia-add-hint-button" ng-click="openAddSolutionModal()">
+        <button type="button"
+                class="btn btn-default btn-lg oppia-add-hint-button"
+                ng-click="openAddSolutionModal()">
           + Add Solution
         </button>
       </div>
@@ -62,18 +68,43 @@
           <option value="false">One</option>
           <option value="true">Only</option>
         </select> <strong>Solution is...</strong>
-        <html-select ng-if="objectType === 'select'" style="width: 250px;" options="ruleDescriptionChoices" selection="tmpSolution.correctAnswer">
+        <html-select ng-if="objectType === 'select'"
+                     style="width: 250px;"
+                     options="ruleDescriptionChoices"
+                     selection="tmpSolution.correctAnswer">
         </html-select>
-        <html-select ng-if="objectType === 'RegionSelect'" style="width: 250px;" options="ruleDescriptionChoices" selection="tmpSolution.correctAnswer">
+        <html-select ng-if="objectType === 'RegionSelect'"
+                     style="width: 250px;"
+                     options="ruleDescriptionChoices"
+                     selection="tmpSolution.correctAnswer">
         </html-select>
-        <textarea ng-if="objectType === 'LogicQuestion'" ng-model="tmpSolution.correctAnswer"></textarea>
-        <object-editor ng-if="objectType === 'UnicodeString'" obj-type="<[objectType]>" init-args="{choices: ruleDescriptionChoices}" is-editable="true" always-editable="true" value="tmpSolution.correctAnswer" style="color: black;">
+        <textarea ng-if="objectType === 'LogicQuestion'"
+                  ng-model="tmpSolution.correctAnswer">
+
+        </textarea>
+        <object-editor ng-if="objectType === 'UnicodeString'"
+                       obj-type="<[objectType]>"
+                       init-args="{choices: ruleDescriptionChoices}"
+                       is-editable="true"
+                       always-editable="true"
+                       value="tmpSolution.correctAnswer"
+                       style="color: black;">
         </object-editor>
-        <object-editor ng-if="objectType !== 'select' && objectType !== 'UnicodeString' && objectType !== 'RegionSelect' && objectType !== 'LogicQuestion'" obj-type="<[objectType]>" init-args="{choices: ruleDescriptionChoices}" is-editable="true" always-editable="true" value="tmpSolution.correctAnswer" style="color: black;">
+        <object-editor ng-if="objectType !== 'select' &&
+                              objectType !== 'UnicodeString' &&
+                              objectType !== 'RegionSelect' &&
+                              objectType !== 'LogicQuestion'"
+                       obj-type="<[objectType]>"
+                       init-args="{choices: ruleDescriptionChoices}"
+                       is-editable="true"
+                       always-editable="true"
+                       value="tmpSolution.correctAnswer"
+                       style="color: black;">
         </object-editor>
         <br>
         <strong>Explanation is...</strong>
-        <schema-based-editor schema="EXPLANATION_FORM_SCHEMA" local-value="tmpSolution.explanation">
+        <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
+                             local-value="tmpSolution.explanation">
         </schema-based-editor>
       </div>
     </form>
@@ -81,7 +112,11 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success" ng-click="saveSolution()" ng-disabled="!tmpSolution.explanation && !tmp.correctAnswer">Check and Save Solution</button>
+    <button class="btn btn-success"
+            ng-click="saveSolution()"
+            ng-disabled="!tmpSolution.explanation && !tmp.correctAnswer">
+      Check and Save Solution
+    </button>
   </div>
 </script>
 

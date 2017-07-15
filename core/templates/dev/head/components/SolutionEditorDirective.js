@@ -50,7 +50,8 @@ oppia.directive('solutionEditor', [
               $scope.solution.answerIsExclusive = (
                 $scope.solutionMemento.answerIsExclusive.toString());
               if ($scope.objectType === 'RegionSelect') {
-                $scope.solution.correctAnswer = $scope.solution.correctAnswer.clickedRegions[0];
+                $scope.solution.correctAnswer = (
+                  $scope.solution.correctAnswer.clickedRegions[0]);
               }
             }
           };
@@ -59,8 +60,7 @@ oppia.directive('solutionEditor', [
             $scope.solutionEditorIsOpen = false;
             $scope.solutionMemento = null;
             $scope.solution.answerIsExclusive = (
-              $scope.solution.answerIsExclusive === "true");
-            console.log($scope.solution)
+              $scope.solution.answerIsExclusive === 'true');
             $scope.getOnSaveFn()();
           };
 
