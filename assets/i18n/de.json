@@ -80,6 +80,7 @@
 	"I18N_CREATE_NO_THANKS": "Nein, danke.",
 	"I18N_CREATE_YES_PLEASE": "Ja, bitte!",
 	"I18N_DASHBOARD_COLLECTIONS": "Sammlungen",
+	"I18N_DASHBOARD_CREATOR_DASHBOARD": "Schöpfer Dashboard",
 	"I18N_DASHBOARD_EXPLORATIONS": "Erforschungen",
 	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "Es sieht so aus, als hättest du noch keine Erkundungen erstellt. Lass uns anfangen!",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY": "Sortieren Nach",

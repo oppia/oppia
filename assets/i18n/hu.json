@@ -29,6 +29,7 @@
 	"I18N_CREATE_NO_THANKS": "Nem, köszönöm",
 	"I18N_CREATE_YES_PLEASE": "Igen, szeretném!",
 	"I18N_DASHBOARD_COLLECTIONS": "Gyűjteményeim",
+	"I18N_DASHBOARD_CREATOR_DASHBOARD": "Teremtő irányítópult",
 	"I18N_DASHBOARD_EXPLORATIONS": "Felfedezéseim",
 	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "Úgy tűnik, még nem készítettél felfedezéseket. Lássunk neki!",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY": "Rendezés",

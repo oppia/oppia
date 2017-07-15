@@ -16,6 +16,7 @@
 	"I18N_CREATE_NO_THANKS": "Không Phải",
 	"I18N_CREATE_YES_PLEASE": "Đúng Rồi!",
 	"I18N_DASHBOARD_COLLECTIONS": "Sưu Tầm",
+	"I18N_DASHBOARD_CREATOR_DASHBOARD": "Trang tổng quan của người tạo",
 	"I18N_DASHBOARD_EXPLORATIONS": "Cách khám mạch",
 	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "Dường như bạn chưa tạo ra bất kỳ cuộc khám phá nào được nêu ra. Băt đâu nao!",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY": "Sắp xếp theo",

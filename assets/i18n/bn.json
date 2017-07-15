@@ -42,6 +42,7 @@
 	"I18N_CREATE_NO_THANKS": "না, ধন্যবাদ",
 	"I18N_CREATE_YES_PLEASE": "হ্যাঁ, দয়া করে!",
 	"I18N_DASHBOARD_COLLECTIONS": "সংগ্রহ",
+	"I18N_DASHBOARD_CREATOR_DASHBOARD": "ক্রিয়েটর ড্যাশবোর্ড",
 	"I18N_DASHBOARD_EXPLORATIONS": "অন্বেষণ",
 	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "মনে হচ্ছে আপনি এখনো কোনও অনুসন্ধান করেননি। চল শুরু করি!",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY": "বাছাই করুন",
