@@ -971,7 +971,7 @@ class AudioFileHandler(EditorHandler):
             # Mutagen occasionally has problems with certain files
             # for unknown reasons.
             raise self.InvalidInputException('Could not open uploaded'
-                                             'audio file' % extension)
+                                             'audio file')
         tempbuffer.close()
 
         if audio is None:
