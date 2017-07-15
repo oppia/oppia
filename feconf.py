@@ -90,7 +90,7 @@ ALLOWED_TRAINING_JOB_STATUSES = [
     TRAINING_JOB_STATUS_PENDING
 ]
 
-# The maximum number of characters allowed  for userbio length.
+# The maximum number of characters allowed for userbio length.
 MAX_BIO_LENGTH_IN_CHARS = 2000
 
 # The minimum number of training samples required for training a classifier.
