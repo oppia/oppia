@@ -24,11 +24,7 @@ import tempfile
 import cloudstorage
 import jinja2
 import mutagen
-<<<<<<< HEAD
 import StringIO
-import cStringIO
-=======
->>>>>>> develop
 
 from constants import constants
 from core.controllers import base
