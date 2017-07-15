@@ -1114,7 +1114,7 @@ class Solution(object):
         Returns:
             Solution. The corresponding Solution domain object.
         """
-	    if solution_dict:
+        if solution_dict:
             return cls(
                 interaction_id,
                 solution_dict['answer_is_exclusive'],
