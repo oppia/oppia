@@ -21,13 +21,13 @@ oppia.controller('StateEditor', [
   'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
   'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
   'UrlInterpolationService', 'editorFirstTimeEventsService',
-  'ENABLE_FALLBACK_EDITOR', 'stateHintsService',
+  'ENABLE_FALLBACK_EDITOR',
   function(
       $scope, $rootScope, editorContextService, changeListService,
       editabilityService, explorationStatesService, INTERACTION_SPECS,
       explorationInitStateNameService, explorationAdvancedFeaturesService,
       UrlInterpolationService, editorFirstTimeEventsService,
-      ENABLE_FALLBACK_EDITOR, stateHintsService) {
+      ENABLE_FALLBACK_EDITOR) {
     $scope.STATE_CONTENT_SCHEMA = {
       type: 'html'
     };
@@ -36,7 +36,6 @@ oppia.controller('StateEditor', [
       explorationAdvancedFeaturesService.areParametersEnabled);
     $scope.areFallbacksEnabled = (
       explorationAdvancedFeaturesService.areFallbacksEnabled);
-    $scope.hintsExist = stateHintsService.displayed.length > 0;
 
     $scope.fallbackEditorIsEnabled = ENABLE_FALLBACK_EDITOR;
 
