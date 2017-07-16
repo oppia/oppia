@@ -58,12 +58,10 @@ oppia.controller('SettingsTab', [
     var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
-    //The following sets up the labels of metadata form on the settings tab.
-    $scope.metadataFormTitle = 'Title';
-    $scope.metadataFormObjective = 'Goal';
-    $scope.metadataFormCategory = 'Category';
-    $scope.metadataFormLanguage = 'Language';
-    $scope.metadataFormTags = 'Tags';
+    // $scope.metadataFormObjective = 'Goal';
+    // $scope.metadataFormCategory = 'Category';
+    // $scope.metadataFormLanguage = 'Language';
+    // $scope.metadataFormTags = 'Tags';
 
     $scope.getExplorePageUrl = function() {
       return (
@@ -233,7 +231,6 @@ oppia.controller('SettingsTab', [
     $scope.unmuteSuggestionNotifications = function() {
       UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
     };
-
     /********************************************
     * Methods relating to control buttons.
     ********************************************/
@@ -404,5 +401,32 @@ oppia.controller('SettingsTab', [
     $scope.closeRolesForm = function() {
       $scope.isRolesFormOpen = false;
     };
+  //The following sets up the labels of metadata form on the settings tab.
+    $scope.metadataForm = {
+      title: 'Title',
+      objective: 'Goal',
+      category: 'Category',
+      language: 'Language',
+      tags: 'Tags',
+      formStyle: {'display':'table-cell', 'width':'16.66666667%'},
+      pStyle: {'display': 'table', 'width':'100%', 'margin-bottom':'2%'},
+      CATEGORY_LIST_FOR_SELECT2: $scope.CATEGORY_LIST_FOR_SELECT2,
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL: $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL,
+      TAG_REGEX: $scope.TAG_REGEX,
+      explorationTitleService: $scope.explorationTitleService,
+      explorationCategoryService: $scope.explorationCategoryService,
+      explorationObjectiveService: $scope.explorationObjectiveService,
+      explorationLanguageCodeService: $scope.explorationLanguageCodeService,
+      explorationTagsService: $scope.explorationTagsService,
+      explorationInitStateNameService: $scope.explorationInitStateNameService,
+      saveExplorationTitle: $scope.saveExplorationTitle,
+      saveExplorationCategory: $scope.saveExplorationCategory,
+      saveExplorationLanguageCode: $scope.saveExplorationLanguageCode,
+      saveExplorationObjective: $scope.saveExplorationObjective,
+      saveExplorationTags: $scope.saveExplorationTags,
+      saveExplorationInitStateName: $scope.saveExplorationInitStateName,
+      stateNames: $scope.stateNames,
+      refreshSettingsTab: $scope.refreshSettingsTab
+    }
   }
 ]);

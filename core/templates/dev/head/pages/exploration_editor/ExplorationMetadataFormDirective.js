@@ -13,12 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the exploration meta data form.
+ * @fileoverview Directive for the exploration metadata form.
  */
 oppia.directive('explorationMetadataForm', [
  'UrlInterpolationService', function(UrlInterpolationService) {
    return {
      restrict: 'E',
+     scope: {
+     	metadataForm: '=',
+    },
      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration_editor/' +
                   'exploration_metadata_form_directive.html')

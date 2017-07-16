@@ -300,21 +300,6 @@ oppia.factory('explorationSaveService', [
 
                 $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-                //The following sets up the labels of metadata form on the
-                // publish modal.
-                $scope.metadataFormTitle = (
-                  'Add a title: what should your exploration be called?');
-                $scope.metadataFormObjective = (
-                  'Add a goal: what does the exploration help people to do?');
-                $scope.metadataFormCategory = (
-                  ('Add a category: how would you categorize your ') + (
-                  'exploration?'));
-                $scope.metadataFormLanguage = (
-                  ('Verify the language: is your exploration written in ') + (
-                    'this language?'));
-                $scope.metadataFormTags = (
-                  'Add tags to help learners discover your exploration.');
-
                 $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
                 for (var i = 0; i < ALL_CATEGORIES.length; i++) {
@@ -342,6 +327,30 @@ oppia.factory('explorationSaveService', [
                       text: explorationCategoryService.savedMemento
                     });
                   }
+                }
+
+                $scope.metadataForm = {
+                  title: 'Add a title: what should your exploration be called?',
+                  objective: 'Add a goal: what does the exploration help people to do?',
+                  category: 'Add a category: how would you categorize your exploration',
+                  language: 'Verify the language: is your exploration written in this language?',
+                  tags: 'Add tags to help learners discover your exploration.',
+                  formStyle: {'font-weight':'normal'},
+                  CATEGORY_LIST_FOR_SELECT2: $scope.CATEGORY_LIST_FOR_SELECT2,
+                  EXPLORATION_TITLE_INPUT_FOCUS_LABEL: $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL,
+                  TAG_REGEX: $scope.TAG_REGEX,
+                  explorationTitleService: $scope.explorationTitleService,
+                  explorationCategoryService: $scope.explorationCategoryService,
+                  explorationObjectiveService: $scope.explorationObjectiveService,
+                  explorationLanguageCodeService: $scope.explorationLanguageCodeService,
+                  explorationTagsService: $scope.explorationTagsService,
+                  explorationInitStateNameService: $scope.explorationInitStateNameService,
+                  saveExplorationTitle: $scope.saveExplorationTitle,
+                  saveExplorationCategory: $scope.saveExplorationCategory,
+                  saveExplorationLanguageCode: $scope.saveExplorationLanguageCode,
+                  saveExplorationObjective: $scope.saveExplorationObjective,
+                  saveExplorationTags: $scope.saveExplorationTags,
+                  saveExplorationInitStateName: $scope.saveExplorationInitStateName,
                 }
 
                 $scope.isSavingAllowed = function() {
@@ -382,6 +391,7 @@ oppia.factory('explorationSaveService', [
                   explorationCategoryService.saveDisplayedValue();
                   explorationLanguageCodeService.saveDisplayedValue();
                   explorationTagsService.saveDisplayedValue();
+
 
                   // TODO(sll): Get rid of the $timeout here.
                   // It's currently used because there is a race condition: the
