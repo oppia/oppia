@@ -630,7 +630,7 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
         userbio_response = self.put_json('/preferenceshandler/data', {
             'update_type': 'user_bio',
-            'data': 'I am not within 2000 char limit' * 200,},
+            'data': 'I am not within 2000 char limit' * 200 },
                                          csrf_token=csrf_token,
                                          expect_errors=True,
                                          expected_status_int=400)
