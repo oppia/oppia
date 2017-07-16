@@ -70,7 +70,7 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
-# A mapping of interaction ids to their default classifier.
+# A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'LDAStringClassifier',
@@ -89,6 +89,14 @@ ALLOWED_TRAINING_JOB_STATUSES = [
     TRAINING_JOB_STATUS_NEW,
     TRAINING_JOB_STATUS_PENDING
 ]
+
+ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
+    TRAINING_JOB_STATUS_COMPLETE: [],
+    TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
+    TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
+                                  TRAINING_JOB_STATUS_FAILED],
+    TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
+}
 
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50

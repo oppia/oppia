@@ -19,6 +19,7 @@ import logging
 # pylint: disable=relative-import
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import classifier
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import creator_dashboard
@@ -444,6 +445,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
+
+    get_redirect_route(
+        r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
 
     get_redirect_route(
         r'/.well-known/acme-challenge/<challenge>',

@@ -1855,6 +1855,24 @@ class State(object):
         elif self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
 
+    def get_training_data(self):
+        """Retrieves training data from the State domain object."""
+        training_data = []
+        for (answer_group_index, answer_group) in enumerate(
+                self.interaction.answer_groups):
+            classifier_rule_spec_index = (
+                answer_group.get_classifier_rule_index())
+            if classifier_rule_spec_index is not None:
+                classifier_rule_spec = answer_group.rule_specs[
+                    classifier_rule_spec_index]
+                answers = copy.deepcopy(classifier_rule_spec.inputs[
+                    'training_data'])
+                training_data.append({
+                    'answer_group_index': answer_group_index,
+                    'answers': answers
+                })
+        return training_data
+
     def can_undergo_classification(self):
         """Checks whether the answers for this state satisfy the preconditions
         for a ML model to be trained.
