@@ -52,9 +52,9 @@ oppia.controller('StateHints', [
 
     $scope.changeActiveHintIndex = function(newIndex) {
       var currentActiveIndex = $scope.activeHintIndex;
-      if (currentActiveIndex && (
+      if (Number.isInteger(currentActiveIndex) && (
         !stateHintsService.displayed[currentActiveIndex].hintText)) {
-        alertsService.addInfoMessage('Deleting empty hint!');
+        alertsService.addInfoMessage('Deleting empty hint.');
         stateHintsService.displayed.splice(currentActiveIndex, 1);
         stateHintsService.saveDisplayedValue();
       }
