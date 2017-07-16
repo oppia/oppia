@@ -20,7 +20,7 @@ oppia.directive('explorationMetadataForm', [
    return {
      restrict: 'E',
      scope: {
-         metadataForm: '=',
+       metadataForm: '=',
      },
      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration_editor/' +

@@ -336,7 +336,8 @@ oppia.factory('explorationSaveService', [
                   category:
                   'Add a category: how would you categorize your exploration',
                   language:
-                  'Verify the language: is your exploration written in this language?',
+                  'Verify the language: is your exploration written in this' +
+                  ' language?',
                   tags:
                   'Add tags to help learners discover your exploration.',
                   formStyle: {'font-weight':'normal'},
