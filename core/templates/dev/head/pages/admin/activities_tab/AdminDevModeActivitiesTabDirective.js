@@ -57,6 +57,8 @@ oppia.directive('adminDevModeActivitiesTab', [
 
         $scope.DEMO_EXPLORATIONS = GLOBALS.DEMO_EXPLORATIONS;
         $scope.DEMO_COLLECTIONS = GLOBALS.DEMO_COLLECTIONS;
+        $scope.numDummyExpsToPublish = 0;
+        $scope.numDummyExpsToGenerate = 0;
 
         $scope.reloadAllExplorations = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -106,20 +108,19 @@ oppia.directive('adminDevModeActivitiesTab', [
 
         $scope.generateDummyExplorations = function() {
           // Generate dummy explorations with random title.
-          AdminTaskManagerService.startTask();
-          var DummyExpCount = $scope.DummyExplorationCount,
-            DummyExpPublish = $scope.DummyExplorationPublishCount;
+          var DummyExpCount = $scope.numDummyExpsToGenerate,
+            DummyExpPublish = $scope.numDummyExpsToPublish;
           if (DummyExpPublish > DummyExpCount) {
             $scope.setStatusMessage(
-            'Publish exploration count should be less than generate count');
-            AdminTaskManagerService.finishTask();
+              'Publish exploration count should be less than generate count');
             return;
           }
+          AdminTaskManagerService.startTask();
           $scope.setStatusMessage('Processing...');
           $http.post(ADMIN_HANDLER_URL, {
-            action: 'generate_dummy_exploration',
-            dummy_exp_count: DummyExpCount,
-            dummy_exp_publish: DummyExpPublish
+            action: 'generate_dummy_explorations',
+            num_dummy_exps_to_generate: DummyExpCount,
+            num_dummy_exps_to_publish: DummyExpPublish
           }).then(function() {
             $scope.setStatusMessage(
               'Dummy explorations generated successfully.');
