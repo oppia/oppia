@@ -340,7 +340,7 @@ class FeedbackMessageModel(base_models.BaseModel):
         thread = FeedbackThreadModel.get_by_exp_and_thread_id(
             exploration_id, thread_id)
         if thread.message_count:
-            most_recent_message = self.get(
+            most_recent_message = cls.get(
                 exploration_id, thread_id, thread.message_count - 1)
             return most_recent_message
         else:
