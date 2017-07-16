@@ -32,12 +32,12 @@ var GLOBALS = {
 
 /* hashes for UrlInterpolationService tests */
 var hashes = {
-  'path_test/hash_test.html': '123456789',
-  'assets_test/hash_test.json': '987654321',
-  'pages_test/hash_test.html': 'abcd12345',
-  'images/hash_test.png': '98765fghij',
-  'gadgets/testType/static/images/testType.png': 'lmnopqrst',
-  'interactions/interTest/static/interTest.png' : '123654789'
+  '/path_test/hash_test.html': '123456789',
+  '/assets_test/hash_test.json': '987654321',
+  '/pages_test/hash_test.html': 'abcd12345',
+  '/images/hash_test.png': '98765fghij',
+  '/gadgets/testType/static/images/testType.png': 'lmnopqrst',
+  '/interactions/interTest/static/interTest.png' : '123654789'
 };
 
 

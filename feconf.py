@@ -51,9 +51,13 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
-INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
-GADGETS_DIR = os.path.join('extensions', 'gadgets')
-RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
+
+EXTENSIONS_DIR_PREFIX = 'build_staging' if (IS_MINIFIED or not DEV_MODE) else ''
+INTERACTIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+GADGETS_DIR = os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'gadgets')
+RTE_EXTENSIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
@@ -62,9 +66,8 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
-DEPENDENCIES_DIR_PREFIX = 'build' if (IS_MINIFIED or not DEV_MODE) else ''
 DEPENDENCIES_TEMPLATES_DIR = (
-    os.path.join(DEPENDENCIES_DIR_PREFIX, 'extensions', 'dependencies'))
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(

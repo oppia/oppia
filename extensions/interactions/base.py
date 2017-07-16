@@ -187,8 +187,7 @@ class BaseInteraction(object):
         in a read-only view after it has been submitted.
         """
         html_templates = utils.get_file_contents(os.path.join(
-            utils.get_asset_dir_prefix()[1:], feconf.INTERACTIONS_DIR,
-            self.id, '%s.html' % self.id))
+            feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
         return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
     @property

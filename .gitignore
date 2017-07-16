@@ -5,7 +5,7 @@
 gae_runtime/*
 third_party/*
 core/templates/prod/*
-extensions/prod/*
+build_staging/*
 .coverage*
 .viminfo
 libpeerconnection.log

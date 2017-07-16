@@ -213,7 +213,7 @@ describe('URL Interpolation Service', function() {
       GLOBALS.ASSET_DIR_PREFIX + '/assets/images/test_url/test.png');
     expect(uis.getStaticImageUrl('/hash_test.png')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/assets/images/hash_test.' +
-      hashes['images/hash_test.png'] + '.png');
+      hashes['/images/hash_test.png'] + '.png');
 
     expect(uis.getGadgetImgUrl('ScoreBar')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/gadgets/ScoreBar' +
@@ -221,7 +221,7 @@ describe('URL Interpolation Service', function() {
     expect(uis.getGadgetImgUrl('testType')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/gadgets/testType' +
         '/static/images/testType.' +
-        hashes['gadgets/testType/static/images/testType.png'] + '.png');
+        hashes['/gadgets/testType/static/images/testType.png'] + '.png');
 
     expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/LogicProof' +
@@ -229,7 +229,7 @@ describe('URL Interpolation Service', function() {
     expect(uis.getInteractionThumbnailImageUrl('interTest')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/interTest' +
       '/static/interTest.' +
-      hashes['interactions/interTest/static/interTest.png'] + '.png');
+      hashes['/interactions/interTest/static/interTest.png'] + '.png');
 
     expect(uis.getDirectiveTemplateUrl('/test.html')).toBe(
       GLOBALS.TEMPLATE_DIR_PREFIX + '/test.html');
@@ -237,7 +237,7 @@ describe('URL Interpolation Service', function() {
       GLOBALS.TEMPLATE_DIR_PREFIX + '/test_url/test.html');
     expect(uis.getDirectiveTemplateUrl('/pages_test/hash_test.html')).toBe(
       GLOBALS.TEMPLATE_DIR_PREFIX + '/pages_test/hash_test.' +
-      hashes['pages_test/hash_test.html'] + '.html');
+      hashes['/pages_test/hash_test.html'] + '.html');
 
     expect(uis.getTranslateJsonUrl('/test.json')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/assets/test.json');
@@ -245,7 +245,7 @@ describe('URL Interpolation Service', function() {
       GLOBALS.ASSET_DIR_PREFIX + '/assets/test_url/test.json');
     expect(uis.getTranslateJsonUrl('/assets_test/hash_test.json')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/assets/assets_test/hash_test.' +
-      hashes['assets_test/hash_test.json'] + '.json');
+      hashes['/assets_test/hash_test.json'] + '.json');
 
     expect(uis.getExtensionResourceUrl('/test.html')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/test.html');
@@ -253,7 +253,7 @@ describe('URL Interpolation Service', function() {
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/test_url/test.html');
     expect(uis.getExtensionResourceUrl('/path_test/hash_test.html')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/path_test/hash_test.' +
-      hashes['path_test/hash_test.html'] + '.html');
+      hashes['/path_test/hash_test.html'] + '.html');
   });
 
   it('should throw an error for empty path', function() {

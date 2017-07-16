@@ -32,24 +32,36 @@ oppia.factory('UrlInterpolationService', [
       }
     };
 
+    /**
+     * Given a resource path,
+     * returns resource path prefixed with url depending on dev/prod mode.
+     */
     var getPrefixedUrl = function(resourcePath) {
-      validateResourcePath(resourcePath);
       return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
     };
 
+    /**
+     * Given a resource path relative to subfolder in /,
+     * returns resource path with cache slug.
+     */
     var getUrlWithSlug = function(resourcePath) {
-      validateResourcePath(resourcePath);
-      stripedPath = resourcePath.substring(1);
       if (GLOBALS.MINIFICATION || !GLOBALS.DEV_MODE) {
-        if (!angular.isUndefined(hashes[stripedPath])) {
-          hash = hashes[stripedPath];
-          splitedPath = resourcePath.split('.');
-          splitedPath.splice(splitedPath.length - 1, 0, hash);
-          resourcePath = splitedPath.join('.');
-          return resourcePath;
+        if (hashes[resourcePath]) {
+          var splitedPath = resourcePath.split('.');
+          splitedPath.splice(splitedPath.length - 1, 0, hashes[resourcePath]);
+          return splitedPath.join('.');
         }
       }
       return resourcePath;
+    };
+
+    /**
+     * Given a resource path relative to extensions folder,
+     * returns the complete url path to that resource.
+     */
+    var getExtensionResourceUrl = function(resourcePath) {
+      validateResourcePath(resourcePath);
+      return getPrefixedUrl('/extensions' + getUrlWithSlug(resourcePath));
     };
 
     return {
@@ -163,8 +175,8 @@ oppia.factory('UrlInterpolationService', [
           alertsService.fatalWarning(
             'Empty gadgetType passed in getGadgetImgUrl.');
         }
-        return getPrefixedUrl('/extensions' + getUrlWithSlug('/gadgets/' +
-          gadgetType + '/static/images/' + gadgetType + '.png'));
+        return getExtensionResourceUrl('/gadgets/' + gadgetType +
+          '/static/images/' + gadgetType + '.png');
       },
 
       /**
@@ -176,8 +188,8 @@ oppia.factory('UrlInterpolationService', [
           alertsService.fatalWarning(
             'Empty interactionId passed in getInteractionThumbnailImageUrl.');
         }
-        return getPrefixedUrl('/extensions' + getUrlWithSlug('/interactions/' +
-          interactionId + '/static/' + interactionId + '.png'));
+        return getExtensionResourceUrl('/interactions/' + interactionId +
+          '/static/' + interactionId + '.png');
       },
 
       /**
@@ -198,14 +210,7 @@ oppia.factory('UrlInterpolationService', [
         return getPrefixedUrl('/assets' + getUrlWithSlug(jsonPath));
       },
 
-      /**
-       * Given a resource path relative to extensions folder,
-       * returns the complete url path to that resource.
-       */
-      getExtensionResourceUrl: function(resourcePath) {
-        validateResourcePath(resourcePath);
-        return getPrefixedUrl('/extensions' + getUrlWithSlug(resourcePath));
-      }
+      getExtensionResourceUrl: getExtensionResourceUrl
     };
   }
 ]);

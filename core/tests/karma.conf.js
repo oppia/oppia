@@ -40,7 +40,7 @@ module.exports = function(config) {
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
       'extensions/**/protractor.js',
-      'extensions/prod/**'
+      'build_staging/extensions/**'
     ],
     proxies: {
       // Karma serves files under the /base directory.

@@ -86,8 +86,7 @@ class BaseRichTextComponent(object):
         consists of a single directive/template pair.
         """
         html_templates = utils.get_file_contents(os.path.join(
-            utils.get_asset_dir_prefix()[1:], feconf.RTE_EXTENSIONS_DIR,
-            self.id, '%s.html' % self.id))
+            feconf.RTE_EXTENSIONS_DIR, self.id, '%s.html' % self.id))
         return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
     def to_dict(self):
