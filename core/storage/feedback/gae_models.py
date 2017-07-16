@@ -337,8 +337,15 @@ class FeedbackMessageModel(base_models.BaseModel):
         """
         full_thread_id = FeedbackThreadModel.generate_full_thread_id(
             exploration_id, thread_id)
-        return cls.get_all().filter(
-            cls.thread_id == full_thread_id).order(-cls.last_updated).get()
+        thread = FeedbackThreadModel.get_by_exp_and_thread_id(
+            exploration_id, thread_id)
+        if thread.message_count:
+            most_recent_message = self.get(
+                exploration_id, thread_id, thread.message_count - 1)
+            return most_recent_message
+        else:
+            return cls.get_all().filter(
+                cls.thread_id == full_thread_id).order(-cls.last_updated).get()
 
     @classmethod
     def get_message_count(cls, exploration_id, thread_id):
@@ -355,8 +362,13 @@ class FeedbackMessageModel(base_models.BaseModel):
         """
         full_thread_id = FeedbackThreadModel.generate_full_thread_id(
             exploration_id, thread_id)
-        return cls.get_all(include_deleted=True).filter(
-            cls.thread_id == full_thread_id).count()
+        thread = FeedbackThreadModel.get_by_exp_and_thread_id(
+            exploration_id, thread_id)
+        if thread.message_count:
+            return thread.message_count
+        else:
+            return cls.get_all(include_deleted=True).filter(
+                cls.thread_id == full_thread_id).count()
 
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
