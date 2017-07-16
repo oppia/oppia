@@ -621,6 +621,7 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             preferences['user_bio'], 'I am within 2000 char limit')
         self.logout()
+        
     def test_user_bio_exceeds_limit(self):
         self.signup(self.EMAIL_B, self.USERNAME_B)
         self.login(self.EMAIL_B)
