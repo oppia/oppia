@@ -1313,7 +1313,7 @@ class BaseContinuousComputationManager(object):
         of the corresponding EventHandler subclass.
 
         Args:
-            event_type: TODO(brianrodri): Fill out type and description.
+            event_type: str or list(str). TODO(brianrodri): Fill out description.
             *args: Forwarded to _handle_event() method.
             *kwargs: Forwarded to _handle_event() method.
         """
