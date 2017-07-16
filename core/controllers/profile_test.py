@@ -628,13 +628,15 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         response = self.testapp.get('/preferences')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-        userbio_response = self.put_json('/preferenceshandler/data', {
-            'update_type': 'user_bio',
-            'data': 'I am not within 2000 char limit' * 200 },
-                                         csrf_token=csrf_token,
-                                         expect_errors=True,
-                                         expected_status_int=400)
-        self.assertEqual(userbio_response['code'], 400)
+        user_bio_response = self.put_json(
+            '/preferenceshandler/data', {
+                'update_type': 'user_bio',
+                'data': 'I am not within 2000 char limit' * 200
+            },
+            csrf_token=csrf_token,
+            expect_errors=True,
+            expected_status_int=400)
+        self.assertEqual(user_bio_response['code'], 400)
         self.assertIn('User bio exceeds maximum character limit: 2000',
-                      userbio_response['error'])
+                      user_bio_response['error'])
         self.logout()
