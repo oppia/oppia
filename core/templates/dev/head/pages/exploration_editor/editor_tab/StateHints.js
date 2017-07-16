@@ -58,7 +58,7 @@ oppia.controller('StateHints', [
         stateHintsService.displayed.splice(currentActiveIndex, 1);
         stateHintsService.saveDisplayedValue();
       }
-    // If the current hint is being clicked on again, close it.
+      // If the current hint is being clicked on again, close it.
       if (newIndex === $scope.activeHintIndex) {
         $scope.activeHintIndex = null;
       } else {

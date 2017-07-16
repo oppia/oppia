@@ -25,7 +25,7 @@
     <div ng-if="areFallbacksEnabled() && fallbackEditorIsEnabled">
       {% include 'pages/exploration_editor/editor_tab/state_editor_fallbacks.html' %}
     </div>
-    <div>
+    <div ng-if="hintsExist">
       {% include 'pages/exploration_editor/editor_tab/state_editor_hints.html' %}
     </div>
   </div>
