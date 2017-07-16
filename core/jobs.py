@@ -769,7 +769,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         event logs.
 
         Args:
-            entity: TODO(brianrodri).
+            entity: TODO(brianrodri): Fill out type and description.
         Returns:
             bool. Whether the entity was queued before the job was created.
         """
@@ -872,7 +872,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         event logs.
 
         Args:
-            entity: TODO(brianrodri).
+            entity: TODO(brianrodri): Fill out type and description.
 
         Returns:
             bool. Whether the entity was created before the given MR job was
@@ -963,7 +963,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         """Gets an entity by id.
 
         Args:
-            entity_id: str. TODO(brianrodri).
+            entity_id: str. TODO(brianrodri): Fill out description.
             strict: bool. Whether to fail noisily if no entity with the given
                 id exists in the datastore. Default is True.
 
@@ -1092,8 +1092,10 @@ class BaseContinuousComputationManager(object):
         multiple calls for the same incoming event.
 
         Args:
-            active_realtime_layer: TODO(brianrodri).
-            event_type: str or list(str). TODO(brianrodri).
+            active_realtime_layer: TODO(brianrodri): Fill out type and
+                description.
+            event_type: str or list(str). TODO(brianrodri): Fill out
+                description.
             *args: list(*). Forwarded to the _handle_event() method.
             **kwargs: dict(* : *). Forwarded to the _handle_event() method.
         """
@@ -1126,10 +1128,10 @@ class BaseContinuousComputationManager(object):
         in the currently active realtime datastore layer.
 
         Args:
-            entity_id: str. TODO(brianrodri).
+            entity_id: str. TODO(brianrodri): Fill out description.
 
         Returns:
-            str. TODO(brianrodri).
+            str. TODO(brianrodri): Fill out description.
         """
         return cls._get_realtime_datastore_class().get_realtime_id(
             cls._get_active_realtime_index(), entity_id)
@@ -1140,10 +1142,10 @@ class BaseContinuousComputationManager(object):
         datastore layer corresponding to the given entity ids.
 
         Args:
-            entity_ids: str. TODO(brianrodri).
+            entity_ids: str. TODO(brianrodri): Fill out description.
 
         Returns:
-            list(str). TODO(brianrodri).
+            list(str). TODO(brianrodri): Fill out description.
         """
         realtime_datastore_class = cls._get_realtime_datastore_class()
         active_realtime_index = cls._get_active_realtime_index()
@@ -1173,7 +1175,8 @@ class BaseContinuousComputationManager(object):
         created_on date is before latest_created_on_datetime.
 
         Args:
-            latest_created_on_datetime: datetime.datetime. TODO(brianrodri).
+            latest_created_on_datetime: datetime.datetime.
+                TODO(brianrodri): Fill out description.
         """
         inactive_realtime_index = 1 - cls._get_active_realtime_index()
         cls._get_realtime_datastore_class().delete_layer(
@@ -1267,7 +1270,7 @@ class BaseContinuousComputationManager(object):
 
         Args:
             user_id: str. The id of the user stopping the job.
-            unused_test_mode: bool. TODO(brianrodri).
+            unused_test_mode: bool. TODO(brianrodri): Fill out description.
         """
         # This is not an ancestor query, so it must be run outside a
         # transaction.
@@ -1310,7 +1313,7 @@ class BaseContinuousComputationManager(object):
         of the corresponding EventHandler subclass.
 
         Args:
-            event_type: TODO(brianrodri).
+            event_type: TODO(brianrodri): Fill out type and description.
             *args: Forwarded to _handle_event() method.
             *kwargs: Forwarded to _handle_event() method.
         """
@@ -1486,10 +1489,10 @@ def get_job_output(job_id):
     """Returns the output of a job.
 
     Args:
-        job_id: str. TODO(brianrodri).
+        job_id: str. TODO(brianrodri): Fill out description.
 
     Returns:
-        job_models.JobModel. TODO(brianrodri).
+        job_models.JobModel. TODO(brianrodri): Fill out description.
     """
     return job_models.JobModel.get_by_id(job_id).output
 
@@ -1564,7 +1567,7 @@ def get_stuck_jobs(recency_msecs):
     milliseconds ago and have experienced more than one retry.
 
     Returns:
-        list(job_models.JobModel). TODO(brianrodri).
+        list(job_models.JobModel). TODO(brianrodri): Fill out description.
     """
     threshold_time = (
         datetime.datetime.utcnow() -
@@ -1627,7 +1630,7 @@ class JobCleanupManager(BaseMapReduceJobManager):
         """TODO(brianrodri).
 
         Args:
-            key: *. TODO(brianrodri).
+            key: str. TODO(brianrodri).
             stringified_values: list(str). TODO(brianrodri)."""
         values = [ast.literal_eval(v) for v in stringified_values]
         if key.endswith('_deleted'):
