@@ -1092,10 +1092,10 @@ class BaseContinuousComputationManager(object):
         multiple calls for the same incoming event.
 
         Args:
-            active_realtime_layer: TODO(brianrodri): Fill out type and
-                description.
-            event_type: str or list(str). TODO(brianrodri): Fill out
-                description.
+            active_realtime_layer:
+                TODO(brianrodri): Fill out type and description.
+            event_type: str or list(str).
+                TODO(brianrodri): Fill out description.
             *args: list(*). Forwarded to the _handle_event() method.
             **kwargs: dict(* : *). Forwarded to the _handle_event() method.
         """
@@ -1592,7 +1592,7 @@ class JobCleanupManager(BaseMapReduceJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """TODO(brianrodri)."""
+        """TODO(brianrodri): Fill out description."""
         return [
             mapreduce_model.MapreduceState,
             mapreduce_model.ShardState
@@ -1600,10 +1600,10 @@ class JobCleanupManager(BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """TODO(brianrodri).
+        """TODO(brianrodri): Fill out description.
 
         Args:
-            item: TODO(brianrodri).
+            item: TODO(brianrodri): Fill out description.
         """
         max_start_time_msec = JobCleanupManager.get_mapper_param(
             MAPPER_PARAM_MAX_START_TIME_MSEC)
@@ -1628,11 +1628,13 @@ class JobCleanupManager(BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """TODO(brianrodri).
+        """TODO(brianrodri): Fill out description.
 
         Args:
-            key: str. TODO(brianrodri).
-            stringified_values: list(str). TODO(brianrodri)."""
+            key: str. TODO(brianrodri): Fill out description.
+            stringified_values: list(str).
+                TODO(brianrodri): Fill out description.
+        """
         values = [ast.literal_eval(v) for v in stringified_values]
         if key.endswith('_deleted'):
             logging.warning(
