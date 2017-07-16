@@ -744,17 +744,17 @@ oppia.factory('explorationLanguageCodeService', [
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'language_code';
     child.getAllLanguageCodes = function() {
-      return GLOBALS.ALL_LANGUAGE_CODES;
+      return constants.ALL_LANGUAGE_CODES;
     };
     child.getCurrentLanguageDescription = function() {
-      for (var i = 0; i < GLOBALS.ALL_LANGUAGE_CODES.length; i++) {
-        if (GLOBALS.ALL_LANGUAGE_CODES[i].code === child.displayed) {
-          return GLOBALS.ALL_LANGUAGE_CODES[i].description;
+      for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
+        if (constants.ALL_LANGUAGE_CODES[i].code === child.displayed) {
+          return constants.ALL_LANGUAGE_CODES[i].description;
         }
       }
     };
     child._isValid = function(value) {
-      return GLOBALS.ALL_LANGUAGE_CODES.some(function(elt) {
+      return constants.ALL_LANGUAGE_CODES.some(function(elt) {
         return elt.code === value;
       });
     };
@@ -840,6 +840,9 @@ oppia.factory('explorationStatesService', [
         return answerGroups.map(function(answerGroup) {
           return answerGroup.toBackendDict();
         });
+      },
+      content: function(content) {
+        return content.toBackendDict()
       },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
@@ -2060,10 +2063,12 @@ oppia.factory('explorationWarningsService', [
       }
 
       if (Object.keys(stateWarnings).length) {
+        var errorString = (
+          Object.keys(stateWarnings).length > 1 ? 'cards have' : 'card has');
         _warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'The following states have errors: ' +
+            'The following ' + errorString + ' errors: ' +
             Object.keys(stateWarnings).join(', ') + '.')
         });
       }
@@ -2211,10 +2216,11 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
           switch (lostChange.property_name) {
             case 'content':
               if (newValue !== null) {
+                // TODO(sll): Also add display of audio translations here.
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div></div>').html(
                     '<strong>Edited content: </strong><div class="content">' +
-                      newValue.value + '</div>')
+                      newValue.html + '</div>')
                     .addClass('state-edit-desc'));
               }
               break;

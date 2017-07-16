@@ -64,8 +64,8 @@ oppia.factory('baseInteractionValidationService', [
           partialWarningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
-              'Please add feedback for the user if they are to return to the ' +
-              'same state again.')
+              'Please add feedback for the user in the [All other answers] ' +
+              'rule.')
           });
         }
         return partialWarningsList;
