@@ -25,8 +25,8 @@ from core.domain import config_domain
 import feconf
 
 
-# NOTE TO DEVELOPERS: This function should be in sync with its counterpart on
-# Oppia-ml.
+# NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
+# in Oppia-ml.
 def generate_signature(secret, message):
     """Generates digital signature for given data.
 
@@ -105,8 +105,8 @@ class TrainedClassifierHandler(base.BaseHandler):
         if not verify_signature(message, vm_id, signature):
             raise self.UnauthorizedUserException
 
-        job_id = message.get('job_id')
-        classifier_data = message.get('classifier_data')
+        job_id = message['job_id']
+        classifier_data = message['classifier_data']
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (

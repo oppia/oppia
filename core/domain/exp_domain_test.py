@@ -2408,7 +2408,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         """Test retrieval of training data."""
         exploration_id = 'eid'
         test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+            feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
@@ -2416,27 +2416,15 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             assets_list)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        state = exploration.states['Home']
+        state = exploration.states['text']
 
-        expected_training_data = []
-        for (answer_group_index, answer_group) in enumerate(
-                state.interaction.answer_groups):
-            classifier_rule_spec_index = (
-                answer_group.get_classifier_rule_index())
-            if classifier_rule_spec_index is not None:
-                classifier_rule_spec = answer_group.rule_specs[
-                    classifier_rule_spec_index]
-                answers = copy.deepcopy(classifier_rule_spec.inputs[
-                    'training_data'])
-                expected_training_data.append({
-                    'answer_group_index': answer_group_index,
-                    'answers': answers
-                })
+        expected_training_data = [{
+            'answer_group_index': 1,
+            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
+                        u'overjoyed', u'pleased', u'thrilled', u'smile']}]
 
         observed_training_data = state.get_training_data()
-        self.assertEqual(type(observed_training_data), list)
-        for answer_group in observed_training_data:
-            self.assertEqual(type(answer_group), dict)
+
         self.assertEqual(observed_training_data, expected_training_data)
 
     def test_delete_state(self):
