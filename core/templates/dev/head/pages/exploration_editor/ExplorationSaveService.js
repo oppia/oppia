@@ -331,26 +331,37 @@ oppia.factory('explorationSaveService', [
 
                 $scope.metadataForm = {
                   title: 'Add a title: what should your exploration be called?',
-                  objective: 'Add a goal: what does the exploration help people to do?',
-                  category: 'Add a category: how would you categorize your exploration',
-                  language: 'Verify the language: is your exploration written in this language?',
-                  tags: 'Add tags to help learners discover your exploration.',
+                  objective:
+                  'Add a goal: what does the exploration help people to do?',
+                  category:
+                  'Add a category: how would you categorize your exploration',
+                  language:
+                  'Verify the language: is your exploration written in this language?',
+                  tags:
+                  'Add tags to help learners discover your exploration.',
                   formStyle: {'font-weight':'normal'},
                   CATEGORY_LIST_FOR_SELECT2: $scope.CATEGORY_LIST_FOR_SELECT2,
-                  EXPLORATION_TITLE_INPUT_FOCUS_LABEL: $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL,
+                  EXPLORATION_TITLE_INPUT_FOCUS_LABEL:
+                  $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL,
                   TAG_REGEX: $scope.TAG_REGEX,
                   explorationTitleService: $scope.explorationTitleService,
-                  explorationCategoryService: $scope.explorationCategoryService,
-                  explorationObjectiveService: $scope.explorationObjectiveService,
-                  explorationLanguageCodeService: $scope.explorationLanguageCodeService,
+                  explorationCategoryService:
+                  $scope.explorationCategoryService,
+                  explorationObjectiveService:
+                  $scope.explorationObjectiveService,
+                  explorationLanguageCodeService:
+                  $scope.explorationLanguageCodeService,
                   explorationTagsService: $scope.explorationTagsService,
-                  explorationInitStateNameService: $scope.explorationInitStateNameService,
+                  explorationInitStateNameService:
+                  $scope.explorationInitStateNameService,
                   saveExplorationTitle: $scope.saveExplorationTitle,
                   saveExplorationCategory: $scope.saveExplorationCategory,
-                  saveExplorationLanguageCode: $scope.saveExplorationLanguageCode,
+                  saveExplorationLanguageCode:
+                  $scope.saveExplorationLanguageCode,
                   saveExplorationObjective: $scope.saveExplorationObjective,
                   saveExplorationTags: $scope.saveExplorationTags,
-                  saveExplorationInitStateName: $scope.saveExplorationInitStateName,
+                  saveExplorationInitStateName:
+                  $scope.saveExplorationInitStateName,
                 }
 
                 $scope.isSavingAllowed = function() {
