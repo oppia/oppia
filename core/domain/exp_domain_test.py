@@ -16,7 +16,6 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 
-import copy
 import os
 
 from core.domain import exp_domain

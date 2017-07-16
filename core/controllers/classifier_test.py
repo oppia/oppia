@@ -69,7 +69,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         }
         self.job_id = classifier_services.create_classifier_training_job(
             algorithm_id, interaction_id, self.exp_id, self.exploration.version,
-            'Home', training_data, feconf.TRAINING_JOB_STATUS_NEW)
+            'Home', training_data, feconf.TRAINING_JOB_STATUS_PENDING)
 
         self.job_result_dict = {
             'job_id' : self.job_id,

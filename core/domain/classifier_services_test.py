@@ -181,7 +181,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         interaction_id = 'TextInput'
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            interaction_id, exp_id, 1, [], state_name)
+            interaction_id, exp_id, 1, [], state_name,
+            feconf.TRAINING_JOB_STATUS_NEW)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.algorithm_id,
@@ -203,7 +204,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         interaction_id = 'TextInput'
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            interaction_id, exp_id, 1, [], state_name)
+            interaction_id, exp_id, 1, [], state_name,
+            feconf.TRAINING_JOB_STATUS_NEW)
         self.assertTrue(job_id)
         classifier_services.delete_classifier_training_job(job_id)
         with self.assertRaisesRegexp(Exception, (
@@ -222,12 +224,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         job_id = classifier_services.create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
                 'algorithm_id'], interaction_id, exp_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_NEW)
+            [], feconf.TRAINING_JOB_STATUS_PENDING)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.status,
-                         feconf.TRAINING_JOB_STATUS_NEW)
+                         feconf.TRAINING_JOB_STATUS_PENDING)
 
         classifier_services.mark_training_job_complete(job_id)
 
@@ -235,6 +237,13 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.status,
                          feconf.TRAINING_JOB_STATUS_COMPLETE)
+
+        # Test that invalid status changes cannot be made.
+        with self.assertRaisesRegexp(Exception, (
+            'The status change %s to %s is not valid.' % (
+                feconf.TRAINING_JOB_STATUS_COMPLETE,
+                feconf.TRAINING_JOB_STATUS_COMPLETE))):
+            classifier_services.mark_training_job_complete(job_id)
 
     def test_retrieval_of_classifier_from_exploration_attributes(self):
         """Test the get_classifier_from_exploration_attributes method."""

@@ -63,21 +63,21 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1')
+            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id2', 2,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1')
+            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1')
+            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
 
     def test_create_and_get_new_training_job_runs_successfully(self):
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2')
+            'state_name2', feconf.TRAINING_JOB_STATUS_NEW)
 
         training_job = (
             classifier_models.ClassifierTrainingJobModel.get(job_id))

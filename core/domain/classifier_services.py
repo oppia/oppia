@@ -302,7 +302,7 @@ def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
     dummy_classifier_training_job.validate()
     job_id = classifier_models.ClassifierTrainingJobModel.create(
         algorithm_id, interaction_id, exp_id, exp_version, training_data,
-        state_name)
+        state_name, status)
     return job_id
 
 
@@ -323,6 +323,12 @@ def _update_classifier_training_job_status(job_id, status):
         raise Exception(
             'The ClassifierTrainingJobModel corresponding to the job_id of the'
             'ClassifierTrainingJob does not exist.')
+
+    initial_status = classifier_training_job_model.status
+    if status not in feconf.ALLOWED_TRAINING_JOB_STATUS_CHANGES[initial_status]:
+        raise Exception(
+            'The status change %s to %s is not valid.' % (initial_status,
+                                                          status))
 
     classifier_training_job = get_classifier_training_job_by_id(job_id)
     classifier_training_job.update_status(status)

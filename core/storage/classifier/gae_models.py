@@ -147,7 +147,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, algorithm_id, interaction_id, exp_id, exp_version,
-            training_data, state_name, status=feconf.TRAINING_JOB_STATUS_NEW):
+            training_data, state_name, status):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -159,7 +159,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 this training job was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
-            status: str. The status of the training job (NEW by default).
+            status: str. The status of the training job.
             training_data: dict. The data used in training phase.
 
         Returns:
