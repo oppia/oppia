@@ -16,6 +16,7 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 
+import copy
 import os
 
 from core.domain import exp_domain
@@ -2416,10 +2417,27 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         state = exploration.states['Home']
-        training_data = state.get_training_data()
-        self.assertEqual(type(training_data), list)
-        for answer_group in training_data:
+
+        expected_training_data = []
+        for (answer_group_index, answer_group) in enumerate(
+                state.interaction.answer_groups):
+            classifier_rule_spec_index = (
+                answer_group.get_classifier_rule_index())
+            if classifier_rule_spec_index is not None:
+                classifier_rule_spec = answer_group.rule_specs[
+                    classifier_rule_spec_index]
+                answers = copy.deepcopy(classifier_rule_spec.inputs[
+                    'training_data'])
+                expected_training_data.append({
+                    'answer_group_index': answer_group_index,
+                    'answers': answers
+                })
+
+        observed_training_data = state.get_training_data()
+        self.assertEqual(type(observed_training_data), list)
+        for answer_group in observed_training_data:
             self.assertEqual(type(answer_group), dict)
+        self.assertEqual(observed_training_data, expected_training_data)
 
     def test_delete_state(self):
         """Test deletion of states."""

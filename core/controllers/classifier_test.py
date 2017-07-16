@@ -15,31 +15,13 @@
 """Tests for the controllers that communicate with VM for training
 classifiers."""
 
-import hashlib
-import hmac
-import json
 import os
 
-from core.domain import classifier_domain
+from core.controllers import classifier
 from core.domain import classifier_services
 from core.domain import exp_services
 from core.tests import test_utils
 import feconf
-
-
-def generate_signature(secret, message):
-    """Generates digital signature for given data.
-    This function should be in sync with its counterpart in Oppia-ml.
-
-    Args:
-        secret: str. The secret used to communicate with Oppia-ml.
-        message: dict. The message payload data.
-
-    Returns:
-        str. The signature of the payload data.
-    """
-    message_json = json.dumps(message, sort_keys=True)
-    return hmac.new(secret, message_json, digestmod=hashlib.sha256).hexdigest()
 
 
 class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
@@ -98,21 +80,21 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.payload['vm_id'] = feconf.DEFAULT_VM_ID
         self.payload['message'] = self.job_result_dict
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        self.payload['signature'] = generate_signature(
+        self.payload['signature'] = classifier.generate_signature(
             secret, self.payload['message'])
 
     def test_trained_classifier_handler(self):
         # Normal end-to-end test.
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=False, expected_status_int=200)
-        classifier = (
+        classifier_obj = (
             classifier_services.get_classifier_from_exploration_attributes(
                 self.exp_id, self.exploration.version, 'Home'))
-        self.assertEqual(classifier.id, self.job_id)
-        self.assertEqual(classifier.exp_id, self.exp_id)
-        self.assertEqual(classifier.state_name, 'Home')
-        self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
-        self.assertEqual(classifier.classifier_data, self.classifier_data)
+        self.assertEqual(classifier_obj.id, self.job_id)
+        self.assertEqual(classifier_obj.exp_id, self.exp_id)
+        self.assertEqual(classifier_obj.state_name, 'Home')
+        self.assertEqual(classifier_obj.algorithm_id, 'LDAStringClassifier')
+        self.assertEqual(classifier_obj.classifier_data, self.classifier_data)
 
     def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.
@@ -134,11 +116,6 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
 
     def test_error_on_existing_classifier(self):
         # Create ClassifierDataModel before the controller is called.
-        classifier = classifier_domain.ClassifierData(
-            self.job_id, self.exp_id, 1, 'Home',
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                'algorithm_id'], self.classifier_data, 1)
-        classifier_services.create_classifier(
-            self.job_id, classifier)
+        classifier_services.create_classifier(self.job_id, self.classifier_data)
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=True, expected_status_int=500)

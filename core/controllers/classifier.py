@@ -19,16 +19,16 @@ import hmac
 import json
 
 from core.controllers import base
-from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import config_domain
 
 import feconf
 
 
+# NOTE TO DEVELOPERS: This function should be in sync with its counterpart on
+# Oppia-ml.
 def generate_signature(secret, message):
     """Generates digital signature for given data.
-    This function should be in sync with its counterpart in Oppia-ml.
 
     Args:
         secret: str. The secret used to communicate with Oppia-ml.
@@ -41,14 +41,15 @@ def generate_signature(secret, message):
     return hmac.new(secret, message_json, digestmod=hashlib.sha256).hexdigest()
 
 
-def validate_message(message):
+def validate_job_result_message_dict(message):
     """Validates the data-type of the message payload data.
 
     Args:
         message: dict. The message payload data.
 
     Returns:
-        bool. True if the payload data is valid, False otherwise."""
+        bool. Whether the payload dict is valid.
+    """
     job_id = message.get('job_id')
     classifier_data = message.get('classifier_data')
 
@@ -68,11 +69,7 @@ def verify_signature(message, vm_id, received_signature):
         received_signature: str. The signature received from the VM.
 
     Returns:
-        bool. Returns True if the incoming request is valid, False otherwise.
-
-    Raises:
-        UnauthorizedUserException. Exception is raised when the incoming
-            request is invalid.
+        bool. Whether the incoming request is valid.
     """
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
@@ -103,7 +100,7 @@ class TrainedClassifierHandler(base.BaseHandler):
         if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
             raise self.UnauthorizedUserException
 
-        if not validate_message(message):
+        if not validate_job_result_message_dict(message):
             raise self.InvalidInputException
         if not verify_signature(message, vm_id, signature):
             raise self.UnauthorizedUserException
@@ -112,37 +109,17 @@ class TrainedClassifierHandler(base.BaseHandler):
         classifier_data = message.get('classifier_data')
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        state_name = classifier_training_job.state_name
-        exp_id = classifier_training_job.exp_id
-        exp_version = classifier_training_job.exp_version
-        algorithm_id = classifier_training_job.algorithm_id
-        interaction_id = classifier_training_job.interaction_id
-
-        data_schema_version = None
-        if feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'] == algorithm_id:
-            data_schema_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
-                interaction_id]['current_data_schema_version']
-        if data_schema_version is None:
-            raise self.InternalErrorException(
-                'The algorithm_id of the job does not exist in the Interaction'
-                'Classifier Mapping.')
-
-        classifier = classifier_domain.ClassifierData(
-            job_id, exp_id, exp_version, state_name, algorithm_id,
-            classifier_data, data_schema_version)
-        try:
-            classifier_services.create_classifier(job_id, classifier)
-        except Exception:
-            raise self.InternalErrorException(
-                'The ClassifierDataModel corresponding to the job already'
-                'exist.')
-
-        # Update status of the training job to 'COMPLETE'.
         if classifier_training_job.status == (
                 feconf.TRAINING_JOB_STATUS_FAILED):
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
+
+        try:
+            classifier_services.create_classifier(job_id, classifier_data)
+        except Exception as e:
+            raise self.InternalErrorException(e)
+
+        # Update status of the training job to 'COMPLETE'.
         classifier_services.mark_training_job_complete(job_id)
 
         return self.render_json({})

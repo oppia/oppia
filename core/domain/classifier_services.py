@@ -162,30 +162,56 @@ def get_classifier_by_id(classifier_id):
     return classifier
 
 
-def create_classifier(job_id, classifier):
+def create_classifier(job_id, classifier_data):
     """Creates classifier data model in the datastore given a classifier
        domain object.
 
     Args:
         job_id: str. ID of the ClassifierTrainingJob corresponding to the
             classifier.
-        classifier: Domain object for the classifier.
+        classifier_data: dict. The trained classifier data.
 
     Returns:
         classifier_id: str. ID of the classifier.
+
+    Raises:
+        Exception. The ClassifierDataModel corresponding to the job already
+            exists.
+        Exception. The algorithm_id of the job does not exist in the Interaction
+            Classifier Mapping.
     """
     classifier_data_model = classifier_models.ClassifierDataModel.get(
-        job_id, False)
-    classifier.validate()
-    if classifier_data_model is None:
-        classifier_id = classifier_models.ClassifierDataModel.create(
-            classifier.id, classifier.exp_id,
-            classifier.exp_version_when_created,
-            classifier.state_name, classifier.algorithm_id,
-            classifier.classifier_data, classifier.data_schema_version)
-    else:
+        job_id, strict=False)
+    if classifier_data_model is not None:
         raise Exception(
             'The ClassifierDataModel corresponding to the job already exists.')
+
+    classifier_training_job = get_classifier_training_job_by_id(job_id)
+    state_name = classifier_training_job.state_name
+    exp_id = classifier_training_job.exp_id
+    exp_version = classifier_training_job.exp_version
+    algorithm_id = classifier_training_job.algorithm_id
+    interaction_id = classifier_training_job.interaction_id
+    data_schema_version = None
+    if feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
+            'algorithm_id'] == algorithm_id:
+        data_schema_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['current_data_schema_version']
+    if data_schema_version is None:
+        raise Exception(
+            'The algorithm_id of the job does not exist in the Interaction'
+            'Classifier Mapping.')
+
+    classifier = classifier_domain.ClassifierData(
+        job_id, exp_id, exp_version, state_name, algorithm_id,
+        classifier_data, data_schema_version)
+    classifier.validate()
+
+    classifier_id = classifier_models.ClassifierDataModel.create(
+        classifier.id, classifier.exp_id,
+        classifier.exp_version_when_created,
+        classifier.state_name, classifier.algorithm_id,
+        classifier.classifier_data, classifier.data_schema_version)
 
     # Create the mapping from <exp_id,exp_version,state_name>
     # to classifier_id.
@@ -321,7 +347,8 @@ def save_classifier_training_job(algorithm_id, interaction_id, exp_id,
         job_id = _create_classifier_training_job(classifier_training_job)
     else:
         classifier_training_job_model = (
-            classifier_models.ClassifierTrainingJobModel.get(job_id, False))
+            classifier_models.ClassifierTrainingJobModel.get(job_id,
+                                                             strict=False))
         classifier_training_job = get_classifier_training_job_from_model(
             classifier_training_job_model)
         classifier_training_job.validate()

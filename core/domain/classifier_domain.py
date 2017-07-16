@@ -337,6 +337,10 @@ class ClassifierTrainingJob(object):
                 'Expected interaction_id to be a string, received %s' %
                 self.interaction_id)
 
+        if self.interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
+            raise utils.ValidationError(
+                'Invalid interaction id: %s' % self.interaction_id)
+
         if not isinstance(self.algorithm_id, basestring):
             raise utils.ValidationError(
                 'Expected algorithm_id to be a string, received %s' %
