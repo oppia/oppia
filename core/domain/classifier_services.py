@@ -313,14 +313,10 @@ def _update_classifier_training_job(classifier_training_job_model, status):
     classifier_training_job_model.put()
 
 
-def save_classifier_training_job(algorithm_id, interaction_id, exp_id,
-                                 exp_version, state_name, training_data,
-                                 status, job_id=None):
-    """Checks for the existence of the model.
-    If the model exists, it is updated using _update_classifier_training_job
-        method.
-    If the model doesn't exist, it is created using
-        _create_classifier_training_job method.
+def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
+                                   exp_version, state_name, training_data,
+                                   status):
+    """Creates a ClassifierTrainingJobModel in data store.
 
     Args:
         algorithm_id: str. ID of the algorithm used to generate the model.
@@ -331,31 +327,41 @@ def save_classifier_training_job(algorithm_id, interaction_id, exp_id,
             this training job was created.
         state_name: str. The name of the state to which the classifier
             belongs.
-        status: str. The status of the training job (NEW by default).
         training_data: dict. The data used in training phase.
-        job_id: str. The optional job_id which decides to create/update
-            classifier.
+        status: str. The status of the training job (NEW by default).
 
     Returns:
-        job_id: str or None. ID of the classifier training job.
+        job_id: str. ID of the classifier training job.
     """
-    if job_id is None:
-        classifier_training_job = classifier_domain.ClassifierTrainingJob(
-            'job_id_dummy', algorithm_id, interaction_id, exp_id, exp_version,
-            state_name, status, training_data)
-        classifier_training_job.validate()
-        job_id = _create_classifier_training_job(classifier_training_job)
-    else:
-        classifier_training_job_model = (
-            classifier_models.ClassifierTrainingJobModel.get(job_id,
-                                                             strict=False))
-        classifier_training_job = get_classifier_training_job_from_model(
-            classifier_training_job_model)
-        classifier_training_job.validate()
-        _update_classifier_training_job(classifier_training_job_model,
-                                        status)
+    classifier_training_job = classifier_domain.ClassifierTrainingJob(
+        'job_id_dummy', algorithm_id, interaction_id, exp_id, exp_version,
+        state_name, status, training_data)
+    classifier_training_job.validate()
+    job_id = _create_classifier_training_job(classifier_training_job)
     return job_id
 
+
+def update_classifier_training_job(classifier_training_job):
+    """Checks for the existence of the model and then updates it.
+
+    Args:
+        classifier_training_job: ClassifierTrainingJob. Domain object for the
+            classifier training job model.
+
+    Raises:
+        Exception. The ClassifierTrainingJobModel corresponding to the job_id
+            of the ClassifierTrainingJob does not exist.
+    """
+    classifier_training_job_model = (
+        classifier_models.ClassifierTrainingJobModel.get(
+            classifier_training_job.job_id, strict=False))
+    if not classifier_training_job_model:
+        raise Exception(
+            'The ClassifierTrainingJobModel corresponding to the job_id of the'
+            'ClassifierTrainingJob does not exist.')
+    classifier_training_job.validate()
+    _update_classifier_training_job(classifier_training_job_model,
+                                    classifier_training_job.status)
 
 def mark_training_job_complete(job_id):
     """Updates the training job's status to complete.
@@ -366,15 +372,7 @@ def mark_training_job_complete(job_id):
     classifier_training_job = get_classifier_training_job_by_id(job_id)
     classifier_training_job.update_status(
         feconf.TRAINING_JOB_STATUS_COMPLETE)
-    save_classifier_training_job(
-        classifier_training_job.algorithm_id,
-        classifier_training_job.interaction_id,
-        classifier_training_job.exp_id,
-        classifier_training_job.exp_version,
-        classifier_training_job.state_name,
-        classifier_training_job.training_data,
-        classifier_training_job.status,
-        classifier_training_job.job_id)
+    update_classifier_training_job(classifier_training_job)
 
 
 def delete_classifier_training_job(job_id):
