@@ -174,6 +174,18 @@ oppia.factory('StatesToQuestionsService', [
       // current set of states to a list of questions.
       getQuestions: function() {
         return getQuestions();
+      },
+      getHumanReadableQuestionType: function(interactionId) {
+        var readableQuestionType;
+        SUPPORTED_INTERACTION_TYPES.forEach(function(interaction) {
+          if (interaction.id === interactionId) {
+            readableQuestionType = interaction.name;
+          }
+        });
+        if (!readableQuestionType) {
+          throw Error('Invalid interaction ID: ' + interactionId);
+        }
+        return readableQuestionType;
       }
     };
   }

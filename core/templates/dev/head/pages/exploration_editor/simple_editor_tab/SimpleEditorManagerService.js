@@ -21,24 +21,31 @@
  */
 
 oppia.factory('SimpleEditorManagerService', [
-  'explorationInitStateNameService', 'OutcomeObjectFactory',
-  'QuestionListObjectFactory', 'QuestionObjectFactory',
-  'SimpleEditorShimService', 'StatesToQuestionsService',
+  'AnswerGroupObjectFactory', 'explorationInitStateNameService',
+  'OutcomeObjectFactory', 'QuestionObjectFactory', 'QuestionListObjectFactory',
+  'RuleObjectFactory', 'StatesToQuestionsService', 'SimpleEditorShimService',
   function(
-    explorationInitStateNameService, OutcomeObjectFactory,
-    QuestionListObjectFactory, QuestionObjectFactory,
-    SimpleEditorShimService, StatesToQuestionsService) {
+      AnswerGroupObjectFactory, explorationInitStateNameService,
+      OutcomeObjectFactory, QuestionObjectFactory, QuestionListObjectFactory,
+      RuleObjectFactory, StatesToQuestionsService, SimpleEditorShimService) {
     var data = {
       title: null,
       introductionHtml: null,
       questionList: null
     };
 
-    var DEFAULT_INTERACTION = {
-      ID: 'MultipleChoiceInput',
-      CUSTOMIZATION_ARGS: {
-        choices: {
-          value: ['<p>Option 1</p>']
+    var DEFAULT_INTERACTION_PROPERTIES = {
+      MultipleChoiceInput: {
+        CUSTOMIZATION_ARGS:  {
+          choices: {
+            value: ['<p>Option 1</p>']
+          }
+        },
+        FIRST_ANSWER_GROUP_RULE: {
+          type: 'Equals',
+          value: {
+            x: 0
+          }
         }
       }
     };
@@ -138,17 +145,54 @@ oppia.factory('SimpleEditorManagerService', [
           data.questionList.isEmpty() ?
           SimpleEditorShimService.getInitStateName() :
           data.questionList.getLastQuestion().getDestinationStateName());
-
         SimpleEditorShimService.saveInteractionId(
-          lastStateName, DEFAULT_INTERACTION.ID);
+          lastStateName, 'MultipleChoiceInput');
         SimpleEditorShimService.saveCustomizationArgs(
-          lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+          lastStateName,
+          DEFAULT_INTERACTION_PROPERTIES.MultipleChoiceInput.CUSTOMIZATION_ARGS
+        );
         SimpleEditorShimService.saveDefaultOutcome(
           lastStateName, OutcomeObjectFactory.createEmpty(lastStateName));
 
         var stateData = SimpleEditorShimService.getState(lastStateName);
         data.questionList.addQuestion(QuestionObjectFactory.create(
           lastStateName, stateData.interaction, ''));
+      },
+      changeQuestionType: function(newInteractionId, index) {
+        var currentStateName = data.questionList.getAllStateNames()[index];
+        var currentInteractionId = (
+          SimpleEditorShimService.getInteractionId(currentStateName));
+        // Update the question type if the interaction ID has changed.
+        if (newInteractionId !== currentInteractionId) {
+          var nextStateName = data.questionList.getAllStateNames()[index + 1];
+          var questionCount = data.questionList.getQuestionCount();
+          var doesLastQuestionHaveAnswerGroups = (
+            data.questionList.doesLastQuestionHaveAnswerGroups());
+          SimpleEditorShimService.saveInteractionId(
+            currentStateName, newInteractionId);
+          SimpleEditorShimService.saveCustomizationArgs(
+            currentStateName,
+            DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
+              CUSTOMIZATION_ARGS);
+          // Don't save answer group when it's the last question and doesn't
+          // have a answer group.
+          if (index !== questionCount - 1 || doesLastQuestionHaveAnswerGroups) {
+            var newAnswerGroups = [];
+            newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+              RuleObjectFactory.createNew(
+                DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
+                  FIRST_ANSWER_GROUP_RULE.type,
+                DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
+                  FIRST_ANSWER_GROUP_RULE.value
+              )
+            ], OutcomeObjectFactory.createEmpty(nextStateName), false));
+            SimpleEditorShimService.saveAnswerGroups(
+              currentStateName, newAnswerGroups);
+          }
+        }
+        // Update the question in the locally-stored questionList.
+        var questions = StatesToQuestionsService.getQuestions();
+        data.questionList.updateQuestion(index, questions[index]);
       },
       deleteQuestion: function(question) {
         // - Change destination of answer groups that point to it.

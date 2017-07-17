@@ -35,6 +35,10 @@ oppia.factory('QuestionListObjectFactory', [function() {
     this._questions.push(question);
   };
 
+  QuestionList.prototype.updateQuestion = function(index, question) {
+    this._questions[index] = angular.copy(question);
+  };
+
   QuestionList.prototype.removeQuestion = function(questionToDelete) {
     var index = -1;
     for (var i = 0; i < this._questions.length; i++) {

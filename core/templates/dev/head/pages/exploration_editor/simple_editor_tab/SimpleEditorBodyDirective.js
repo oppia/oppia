@@ -28,10 +28,20 @@ oppia.directive('simpleEditorBody', [
         '$scope', 'SimpleEditorManagerService',
         'explorationSaveService', 'explorationRightsService',
         'explorationWarningsService', 'QuestionIdService',
+        'StatesToQuestionsService',
         function($scope, SimpleEditorManagerService,
-            explorationSaveService, explorationRightsService,
-            explorationWarningsService, QuestionIdService) {
+          explorationSaveService, explorationRightsService,
+          explorationWarningsService, QuestionIdService,
+          StatesToQuestionsService) {
           $scope.data = SimpleEditorManagerService.getData();
+
+          var INTERACTION_TYPES = [{
+            id: 'MultipleChoiceInput',
+            name: 'Multiple choice'
+          }];
+
+          $scope.getHumanReadableQuestionType = (
+            StatesToQuestionsService.getHumanReadableQuestionType);
 
           $scope.saveTitle = SimpleEditorManagerService.saveTitle;
           $scope.saveIntroductionHtml = (
@@ -45,6 +55,8 @@ oppia.directive('simpleEditorBody', [
           $scope.canAddNewQuestion = (
             SimpleEditorManagerService.canAddNewQuestion);
           $scope.addState = SimpleEditorManagerService.addState;
+          $scope.changeQuestionType = (
+            SimpleEditorManagerService.changeQuestionType);
           $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
           $scope.canTryToFinishExploration =
             SimpleEditorManagerService.canTryToFinishExploration;
@@ -52,6 +64,7 @@ oppia.directive('simpleEditorBody', [
           $scope.getSubfieldId = function(question, label) {
             return QuestionIdService.getSubfieldId(question.getId(), label);
           };
+
           $scope.isExplorationFinishable = function() {
             if (explorationRightsService.isPrivate()) {
               if (!explorationWarningsService.countWarnings()) {

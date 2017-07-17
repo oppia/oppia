@@ -15,6 +15,15 @@
 
     <div ng-repeat="question in data.questionList.getQuestions() track by $index">
       <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
+      <div class="dropdown">
+        <anchor-header header-id="getSubfieldId(question, getHumanReadableQuestionType(question.getInteractionId()))"
+                       header-text="<[getHumanReadableQuestionType(question.getInteractionId())]> &#x25BC;"
+                       class="dropdown-toggle oppia-choose-question-dropdown" data-toggle="dropdown">
+        </anchor-header>
+        <ul class="dropdown-menu oppia-question-list-menu" >
+          <li ng-click="changeQuestionType('MultipleChoiceInput', $index)">Multiple Choice Input</li>
+        </ul>
+      </div>
 
       <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
                               unique-id="question.getId()"
@@ -55,6 +64,7 @@
       <i class="material-icons md-30">&#xE047;</i>
     </button>
   </div>
+</div>
 </div>
 
 <style>
@@ -130,5 +140,39 @@
     margin-right: -100%;
     text-align: center;
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  }
+
+  .oppia-choose-question-dropdown {
+    background: transparent;
+    padding: 0;
+  }
+  .oppia-choose-question-dropdown:hover {
+    cursor: pointer;
+  }
+  .oppia-choose-question-dropdown h3 {
+    margin-top: 18px;
+  }
+  .oppia-choose-question-dropdown:actve{
+    background: none;
+    border-style: outset;
+    outline: none;
+  }
+  .oppia-question-list-menu {
+    background-color: #fff;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    padding: 1px;
+    width: 200px;
+  }
+  .oppia-question-list-menu li {
+    background-color: #fff;
+    border-color: #fff;
+    color: #000;
+    font-size: 16px;
+    padding: 15px 19px;
+  }
+  .oppia-question-list-menu li:hover {
+    background-color: #efecec;
   }
 </style>

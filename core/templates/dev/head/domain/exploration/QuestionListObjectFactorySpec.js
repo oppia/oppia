@@ -158,6 +158,45 @@ describe('Question List Object Factory', function() {
     ).toBe(true);
   });
 
+  it('should update the question', function() {
+    var newQuestion = QuestionObjectFactory.create(
+      'Fourth State',
+      InteractionObjectFactory.createFromBackendDict({
+        answer_groups: [{
+          correct: false,
+          outcome: {
+            dest: 'Second state',
+            feedback: ['Some feedback'],
+            param_changes: []
+          },
+          rule_specs: [{
+            inputs: {
+              x: 0
+            }
+          }]
+        }],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          choices: {
+            value: ['Choice 1', 'Choice 2']
+          }
+        },
+        default_outcome: {
+          dest: 'First state',
+          feedback: ['Try again.'],
+          param_changes: []
+        },
+        fallbacks: [],
+        id: 'MultipleChoiceInput'
+      }),
+      'Fifth state content');
+
+    questionList.updateQuestion(3, newQuestion);
+    var returnedQuestions = questionList.getQuestions();
+    expect(returnedQuestions[3]).toEqual(newQuestion);
+    expect(returnedQuestions[3]).not.toBe(newQuestion);
+  });
+
   it('should remove the given question if it exists', function() {
     var questionToDelete = sampleQuestions[1];
     questionList.removeQuestion(questionToDelete);
