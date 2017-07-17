@@ -15,8 +15,8 @@
 """Controllers for the admin view."""
 
 import logging
-
 import random
+
 import jinja2
 
 from core import jobs
@@ -141,8 +141,9 @@ class AdminHandler(base.BaseHandler):
                     'num_dummy_exps_to_generate')
                 num_dummy_exps_to_publish = self.payload.get(
                     'num_dummy_exps_to_publish')
-                self._generate_dummy_explorations(
-                    num_dummy_exps_to_generate, num_dummy_exps_to_publish)
+                if num_dummy_exps_to_generate >= num_dummy_exps_to_publish:
+                    self._generate_dummy_explorations(
+                        num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif self.payload.get('action') == 'clear_search_index':
                 exp_services.clear_search_index()
             elif self.payload.get('action') == 'save_config_properties':
@@ -216,7 +217,7 @@ class AdminHandler(base.BaseHandler):
     def _generate_dummy_explorations(
             self, num_dummy_exps_to_generate, num_dummy_exps_to_publish):
         """
-        Generates and Publishes given number of dummy explorations.
+        Generates and publishes the given number of dummy explorations.
 
         Args:
             num_dummy_exps_to_generate: int. Count of dummy explorations to
@@ -244,7 +245,7 @@ class AdminHandler(base.BaseHandler):
                     new_exploration_id, title=title, category=category,
                     objective='Dummy Objective')
                 exp_services.save_new_exploration(self.user_id, exploration)
-                if i <= (num_dummy_exps_to_publish - 1):
+                if i <= num_dummy_exps_to_publish - 1:
                     rights_manager.publish_exploration(
                         self.user_id, new_exploration_id)
         else:
