@@ -154,7 +154,7 @@ class LogoutPage(webapp2.RequestHandler):
             self.redirect(url_to_redirect_to)
 
 
-class Exceptions(webapp2.RequestHandler):
+class UserFacingExceptions(object):
     """This class contains all the exception class definitions used."""
 
     class NotLoggedInException(Exception):
@@ -526,11 +526,11 @@ class BaseHandler(webapp2.RequestHandler):
         self.error(500)
         self._render_exception(500, {'error': unicode(exception)})
 
-    InternalErrorException = Exceptions.InternalErrorException
-    InvalidInputException = Exceptions.InvalidInputException
-    NotLoggedInException = Exceptions.NotLoggedInException
-    PageNotFoundException = Exceptions.PageNotFoundException
-    UnauthorizedUserException = Exceptions.UnauthorizedUserException
+    InternalErrorException = UserFacingExceptions.InternalErrorException
+    InvalidInputException = UserFacingExceptions.InvalidInputException
+    NotLoggedInException = UserFacingExceptions.NotLoggedInException
+    PageNotFoundException = UserFacingExceptions.PageNotFoundException
+    UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
 
 
 class Error404Handler(BaseHandler):
