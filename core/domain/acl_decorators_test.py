@@ -388,18 +388,18 @@ class FlagExplorationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ManageSubscriptionsTest(test_utils.GenericTestBase):
-    """Tests for can_manage_subscriptions decorator."""
+class SubscriptionToUsersTest(test_utils.GenericTestBase):
+    """Tests for can_subscribe_to_users decorator."""
     user_name = 'user'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
-        @acl_decorators.can_manage_subscriptions
+        @acl_decorators.can_subscribe_to_users
         def get(self):
             self.render_json({'success': True})
 
     def setUp(self):
-        super(ManageSubscriptionsTest, self).setUp()
+        super(SubscriptionToUsersTest, self).setUp()
         self.signup(self.user_email, self.user_name)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],

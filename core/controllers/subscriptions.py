@@ -23,7 +23,7 @@ from core.domain import user_services
 class SubscribeHandler(base.BaseHandler):
     """Handles operations relating to new subscriptions."""
 
-    @acl_decorators.can_manage_subscriptions
+    @acl_decorators.can_subscribe_to_users
     def post(self):
         creator_id = user_services.get_user_id_from_username(
             self.payload.get('creator_username'))
@@ -34,7 +34,7 @@ class SubscribeHandler(base.BaseHandler):
 class UnsubscribeHandler(base.BaseHandler):
     """Handles operations related to unsubscriptions."""
 
-    @acl_decorators.can_manage_subscriptions
+    @acl_decorators.can_subscribe_to_users
     def post(self):
         creator_id = user_services.get_user_id_from_username(
             self.payload.get('creator_username'))
