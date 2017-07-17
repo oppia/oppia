@@ -73,11 +73,11 @@
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
                 <select2-dropdown
                   item="$parent.subjectInterests"
-                  ng-model="subjectInterests"
-                  tag-mode="true" allow-multiple-choices="true"
-                  new-choice-regex="<[::TAG_REGEX_STRING]>" width="100%"
+                  choices="$parent.subjectInterests"
+                  allow-multiple-choices="true"
+                  new-choice-regex="<[::TAG_REGEX_STRING]>"
+                  width="100%"
                   placeholder="<['I18N_PREFERENCES_SUBJECT_INTERESTS_PLACEHOLDER' | translate]>"
-                  ng-change="onSubjectInterestsSelectionChange($parent.subjectInterests)"
                   invalid-search-term-message="<['I18N_PREFERENCES_SUBJECT_INTERESTS_INVALID_SEARCH' | translate]>"
                   on-selection-change="onSubjectInterestsSelectionChange($parent.subjectInterests)">
                 </select2-dropdown>
@@ -132,9 +132,11 @@
                 updated after the initial page load.
               -->
               <div ng-if="hasPageLoaded">
-                <select2-dropdown choices="LANGUAGE_CHOICES"
-                  item="$parent.preferredLanguageCodes" allow-multiple-choices="true"
-                  new-choice-regex=".^" width="100%"
+                <select2-dropdown
+                  choices="LANGUAGE_CHOICES"
+                  item="$parent.preferredLanguageCodes"
+                  allow-multiple-choices="true"
+                  width="100%"
                   placeholder="<['I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate]>"
                   on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
                 </select2-dropdown>
@@ -154,11 +156,12 @@
                 updated after the initial page load.
               -->
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
-                <select2-dropdown choices="SITE_LANGUAGE_CHOICES"
+                <select2-dropdown
                   class="protractor-test-system-language-selector"
+                  choices="SITE_LANGUAGE_CHOICES"
                   item="$parent.preferredSiteLanguageCode"
                   allow-multiple-choices="false"
-                  new-choice-regex=".^" width="100%"
+                  width="100%"
                   placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
                   on-selection-change="savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">
                 </select2-dropdown>
