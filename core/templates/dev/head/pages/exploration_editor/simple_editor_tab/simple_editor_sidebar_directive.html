@@ -27,6 +27,13 @@
 
       <ul ng-show="question.isCollapsed() && sidebarModeService.isSidebarInReadonlyMode()">
         <li class="sidebar-item sidebar-item-indented"
+            ng-click="scrollToField(question, getHumanReadableQuestionType(question.getInteractionId()))"
+            id="<[getSidebarItemId(question, getHumanReadableQuestionType(question.getInteractionId()))]>">
+          <span>
+            <a><[getHumanReadableQuestionType(question.getInteractionId())]></a>
+          </span>
+        </li>
+        <li class="sidebar-item sidebar-item-indented"
             ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index"
             ng-click="scrollToField(question, subfieldLabel)"
             id="<[getSidebarItemId(question, subfieldLabel)]>">

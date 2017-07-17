@@ -27,18 +27,21 @@ oppia.directive('simpleEditorSidebar', [
       controller: [
         '$scope', 'EditorModeService', 'QuestionIdService',
         'ScrollSyncService', 'SimpleEditorManagerService',
-        'SimpleEditorSidebarModeService',
+        'SimpleEditorSidebarModeService', 'StatesToQuestionsService',
         function(
           $scope, EditorModeService, QuestionIdService,
           ScrollSyncService, SimpleEditorManagerService,
-          SimpleEditorSidebarModeService) {
+          SimpleEditorSidebarModeService, StatesToQuestionsService) {
           /* This initializes Perfect Scrollbar on the simple editor sidebar.
            Perfect scrollbar is needed to show scrollbar on all major browsers.
            */
+
+          $scope.getHumanReadableQuestionType = (
+            StatesToQuestionsService.getHumanReadableQuestionType);
           var container = document.querySelector('simple-editor-sidebar');
           Ps.initialize(container);
           $scope.SUBFIELD_LABELS = [
-            'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
+            'Correct answer', 'Hints', 'Bridge text'];
           $scope.questionList = SimpleEditorManagerService.getQuestionList();
           $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
           $scope.sidebarModeService = SimpleEditorSidebarModeService;
