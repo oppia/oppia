@@ -186,12 +186,12 @@ class AdminHandler(base.BaseHandler):
                     'num_dummy_exps_to_generate')
                 num_dummy_exps_to_publish = self.payload.get(
                     'num_dummy_exps_to_publish')
-                if not isinstance(num_dummy_exps_to_generate,int):
+                if not isinstance(num_dummy_exps_to_generate, int):
                     raise self.InvalidInputException(
-                        '%s is not a number'% num_dummy_exps_to_generate)
-                elif not isinstance(num_dummy_exps_to_publish,int):
+                        '%s is not a number' % num_dummy_exps_to_generate)
+                elif not isinstance(num_dummy_exps_to_publish, int):
                     raise self.InvalidInputException(
-                        '%s is not a number'% num_dummy_exps_to_publish)
+                        '%s is not a number' % num_dummy_exps_to_publish)
                 elif num_dummy_exps_to_generate < num_dummy_exps_to_publish:
                     raise self.InvalidInputException(
                         'Generate count cannot be less than publish count')

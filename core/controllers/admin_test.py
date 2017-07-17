@@ -17,10 +17,10 @@
 from core.controllers import admin
 from core.controllers import base
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.tests import test_utils
-from core.domain import exp_services
 
 import feconf
 
@@ -343,4 +343,3 @@ class SslChallengeHandlerTests(test_utils.GenericTestBase):
             '/.well-known/acme-challenge/unknown_challenge',
             expect_errors=True)
         self.assertEqual(response.status_code, 404)
-
