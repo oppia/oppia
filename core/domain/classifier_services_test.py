@@ -76,21 +76,118 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
 
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
+    # def test_string_classifier_classification(self):
+    #     """All these responses trigger the string classifier."""
+    #
+    #     with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'it\'s a permutation of 3 elements'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'There are 3 options for the first ball, and 2 for the '
+    #                 'remaining two. So 3*2=6.'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('abc acb bac bca cbb cba'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('dunno, just guessed'))
 
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
+    def test_check_re_training_conditions(self):
+        """Test the check_re_training_conditions method."""
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        state = exploration.states['Home']
+        training_data = state.get_training_data()
+        interaction_id = state.interaction.id
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
+            'algorithm_id']
+        job_id = classifier_services.create_classifier_training_job(
+            algorithm_id, interaction_id, exploration.id, exploration.version,
+            'Home', training_data, feconf.TRAINING_JOB_STATUS_NEW)
+
+        # Test change in number of answer groups.
+        state.interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[1])
+        self.assertTrue(classifier_services.check_re_training_conditions(
+            state, job_id))
+
+        # Test change in number of samples more than MIN_SAMPLE_TO_RETRAIN.
+        state = exploration.states['Home']
+        for (answer_group_index, answer_group) in enumerate(
+                state.interaction.answer_groups):
+            classifier_rule_spec_index = (
+                answer_group.get_classifier_rule_index())
+            if classifier_rule_spec_index is not None:
+                extra_training_data = ['someval'] * 20
+                state.interaction.answer_groups[answer_group_index].rule_specs[
+                    0].inputs['training_data'].extend(extra_training_data)
+        self.assertTrue(classifier_services.check_re_training_conditions(
+            state, job_id))
+
+    def test_add_to_queue(self):
+        """Test the add_to_training_queue method."""
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        state = exploration.states['Home']
+        classifier_services.add_to_training_queue(exploration)
+
+        # Since the exploration has only one trainable state, there should be
+        # only one job model in data store.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        job_num = 0
+        for job in all_jobs:
+            job_id = job.id
+            job_num += 1
+        self.assertEqual(job_num, 1)
+
+        # Create classifier for state and then modify state to trigger
+        # re-training check.
+        classifier_data = {
+            '_alpha': 0.1,
+            '_beta': 0.001,
+            '_prediction_threshold': 0.5,
+            '_training_iterations': 25,
+            '_prediction_iterations': 5,
+            '_num_labels': 10,
+            '_num_docs': 12,
+            '_num_words': 20,
+            '_label_to_id': {'text': 1},
+            '_word_to_id': {'hello': 2},
+            '_w_dp': [],
+            '_b_dl': [],
+            '_l_dp': [],
+            '_c_dl': [],
+            '_c_lw': [],
+            '_c_l': []
+        }
+        classifier_services.create_classifier(job_id, classifier_data)
+
+        # Modify such that re-training is not triggered.
+        for (answer_group_index, answer_group) in enumerate(
+                state.interaction.answer_groups):
+            classifier_rule_spec_index = (
+                answer_group.get_classifier_rule_index())
+            if classifier_rule_spec_index is not None:
+                extra_training_data = ['someval']
+                exploration.states['Home'].interaction.answer_groups[
+                    answer_group_index].rule_specs[0].inputs[
+                        'training_data'].extend(extra_training_data)
+        classifier_services.add_to_training_queue(exploration)
+        # There will still be only one job in the data store.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        job_num = 0
+        for job in all_jobs:
+            job_num += 1
+        self.assertEqual(job_num, 1)
+
+        # Modify such that re-training is triggered.
+        exploration.states['Home'].interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[1])
+        classifier_services.add_to_training_queue(exploration)
+        # There are two jobs in the data store now.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        job_num = 0
+        for job in all_jobs:
+            job_num += 1
+        self.assertEqual(job_num, 2)
 
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""

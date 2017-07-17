@@ -127,6 +127,70 @@ def classify_string_classifier_rule(state, normalized_answer):
     return None
 
 
+
+
+def add_to_training_queue(exploration):
+    """Checks all states of the exploration for re-training conditions and
+    creates ClassifierTrainingJobModel instances in the datastore
+    accordingly.
+
+    Args:
+        exploration: Exploration. Domain object for an exploration.
+    """
+    states = exploration.states
+    for state_name in states:
+        state = states[state_name]
+        if not state.can_undergo_classification():
+            continue
+        exp_id = exploration.id
+        exp_version = exploration.version
+        training_data = state.get_training_data()
+        interaction_id = state.interaction.id
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_id']
+        classifier = get_classifier_from_exploration_attributes(
+            exp_id, exp_version, state_name)
+        if classifier:
+            if not check_re_training_conditions(state, classifier.id):
+                create_classifier_exploration_mapping(exp_id, exp_version+1,
+                                                      state_name, classifier.id)
+                continue
+        create_classifier_training_job(algorithm_id, interaction_id, exp_id,
+                                       exp_version, state_name,
+                                       training_data,
+                                       feconf.TRAINING_JOB_STATUS_NEW)
+
+
+def check_re_training_conditions(state, job_id):
+    """Checks whether the classifier needs to be trained again for a state.
+
+    Args:
+        state. State. Domain object for a state of the exploration.
+        job_id: str. ID of the ClassifierTrainingJob.
+
+    Returns:
+        bool. Whether the classifier needs to be re-trained.
+    """
+    classifier_training_job = get_classifier_training_job_by_id(job_id)
+    new_training_data = state.get_training_data()
+    old_training_data = classifier_training_job.training_data
+
+    # Check for change in number of answer groups.
+    if len(old_training_data) != len(new_training_data):
+        return True
+
+    # Check for change in number of training samples.
+    diff = 0
+    for (answer_group_index, answer_group) in enumerate(old_training_data):
+        diff += abs(len(answer_group['answers']) - len(new_training_data[
+            answer_group_index]['answers']))
+    if diff > feconf.MIN_SAMPLE_TO_RETRAIN:
+        return True
+
+    # No re-training condition satisfied.
+    return False
+
+
 def get_classifier_from_model(classifier_data_model):
     """Gets a classifier domain object from a classifier data model.
 
@@ -380,6 +444,8 @@ def get_classifier_from_exploration_attributes(exp_id, exp_version,
     classifier_exploration_mapping_model = (
         classifier_models.ClassifierExplorationMappingModel.get_model(
             exp_id, exp_version, state_name))
+    if classifier_exploration_mapping_model is None:
+        return None
     classifier_id = classifier_exploration_mapping_model.classifier_id
     classifier = get_classifier_by_id(classifier_id)
     return classifier
