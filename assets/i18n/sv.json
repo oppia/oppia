@@ -58,6 +58,7 @@
 	"I18N_CREATE_YES_PLEASE": "Ja, tack!",
 	"I18N_DASHBOARD_COLLECTIONS": "Samlingar",
 	"I18N_DASHBOARD_EXPLORATIONS": "Utforskande",
+	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "Det verkar som om du inte har skapat några utforskningar än. Låt oss börja!",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY": "Sortera efter",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING": "Medelbetyg",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_CATEGORY": "Kategori",
