@@ -15,6 +15,7 @@
 """Controllers for the Oppia collection learner view."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
@@ -26,27 +27,10 @@ import utils
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-def require_collection_playable(handler):
-    """Decorator that checks if the user can play the given collection."""
-    def test_can_play(self, collection_id, **kwargs):
-        """Check if the current user can play the collection."""
-        actor = rights_manager.Actor(self.user_id)
-        can_play = actor.can_play(
-            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
-        can_view = actor.can_view(
-            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
-        if can_play and can_view:
-            return handler(self, collection_id, **kwargs)
-        else:
-            raise self.PageNotFoundException
-
-    return test_can_play
-
-
 class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
 
-    @require_collection_playable
+    @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Handles GET requests."""
         try:
@@ -82,7 +66,7 @@ class CollectionDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_collection_playable
+    @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
 

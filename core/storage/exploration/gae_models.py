@@ -18,6 +18,7 @@
 
 import datetime
 
+from constants import constants
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
@@ -53,7 +54,7 @@ class ExplorationModel(base_models.VersionedModel):
     objective = ndb.TextProperty(default='', indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
     language_code = ndb.StringProperty(
-        default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
+        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True)
     # Tags (topics, skills, concepts, etc.) associated with this
     # exploration.
     tags = ndb.StringProperty(repeated=True, indexed=True)

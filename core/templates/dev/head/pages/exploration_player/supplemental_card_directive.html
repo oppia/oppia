@@ -21,6 +21,12 @@
   <div class="protractor-test-conversation-input"
        angular-html-bind="activeCard.interactionHtml">
   </div>
+  <div ng-if="hintsExist" style="text-align: right; padding: 8px">
+    <hint-button on-click-hint-button="consumeHint()"
+                 current-hint-is-available="isHintAvailable()"
+                 all-hints-are-exhausted="areAllHintsExhausted()">
+    </hint-button>
+  </div>
 </div>
 
 <style>
@@ -77,5 +83,19 @@
     top: 2px;
     width: 24px;
     z-index: 200;
+  }
+
+  .conversation-skin-supplemental-card {
+    background-color: #ffffff;
+  }
+  .conversation-skin-supplemental-card .hint-button {
+    background-color: #0D48A1;
+    border: none;
+    color: #ffffff;
+  }
+
+  .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:focus,
+  .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:hover {
+    background-color: #115FD4;
   }
 </style>

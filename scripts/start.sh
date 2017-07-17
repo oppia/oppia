@@ -83,20 +83,20 @@ sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
 rm app.yaml.bak
 
 # Launch a browser window.
-if [ -f "/usr/bin/google-chrome" ]; then
+if [ ${OS} == "Linux" ]; then
   echo ""
   echo "  INFORMATION"
   echo "  Setting up a local development server at localhost:8181. Opening a"
-  echo "  Chrome browser window pointing to this server."
+  echo "  default browser window pointing to this server."
   echo ""
-  (sleep 5; /usr/bin/google-chrome http://localhost:8181/ )&
-elif [ -e /Applications/Google\ Chrome.app ]; then
+  (sleep 5; xdg-open http://localhost:8181/ )&
+elif [ ${OS} == "Darwin" ]; then
   echo ""
   echo "  INFORMATION"
   echo "  Setting up a local development server at localhost:8181. Opening a"
-  echo "  Chrome browser window pointing to this server."
+  echo "  default browser window pointing to this server."
   echo ""
-  (sleep 5; open /Applications/Google\ Chrome.app http://localhost:8181/ )&
+  (sleep 5; open http://localhost:8181/ )&
 else
   echo ""
   echo "  INFORMATION"

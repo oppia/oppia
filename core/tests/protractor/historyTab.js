@@ -62,11 +62,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '- type: text',
+        text: '  audio_translations: []',
         highlighted: false
       },
       4: {
-        text: '  value: <p>enter 6 to continue</p>',
+        text: '  html: <p>enter 6 to continue</p>',
         highlighted: true
       },
       5: {
@@ -173,11 +173,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '- type: text',
+        text: '  audio_translations: []',
         highlighted: false
       },
       4: {
-        text: '  value: \'\'',
+        text: '  html: \'\'',
         highlighted: true
       },
       5: {
@@ -243,8 +243,8 @@ describe('Exploration history', function() {
     var STATE_2_STRING =
       'classifier_model_id: null\n' +
       'content:\n' +
-      '- type: text\n' +
-      '  value: <p>this is card 2</p>\n' +
+      '  audio_translations: []\n' +
+      '  html: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
