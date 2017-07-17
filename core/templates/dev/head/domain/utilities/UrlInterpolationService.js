@@ -47,9 +47,9 @@ oppia.factory('UrlInterpolationService', [
     var getUrlWithSlug = function(resourcePath) {
       if (GLOBALS.MINIFICATION || !GLOBALS.DEV_MODE) {
         if (hashes[resourcePath]) {
-          var splitedPath = resourcePath.split('.');
-          splitedPath.splice(splitedPath.length - 1, 0, hashes[resourcePath]);
-          return splitedPath.join('.');
+          var index = resourcePath.lastIndexOf('.');
+          return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
+                  resourcePath.slice(index));
         }
       }
       return resourcePath;

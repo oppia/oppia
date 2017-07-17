@@ -39,7 +39,7 @@ oppia.directive('oppiaGadgetAdviceBar', [
             $modal.open({
               templateUrl: (
                 UrlInterpolationService.getExtensionResourceUrl(
-                '/gadgets/AdviceBar/static/html/advice_overlay.html')),
+                '/gadgets/AdviceBar/static/html/advice_modal.html')),
               controller: 'AdviceBarModalCtrl',
               backdrop: true,
               resolve: {
