@@ -57,6 +57,8 @@ oppia.directive('adminDevModeActivitiesTab', [
 
         $scope.DEMO_EXPLORATIONS = GLOBALS.DEMO_EXPLORATIONS;
         $scope.DEMO_COLLECTIONS = GLOBALS.DEMO_COLLECTIONS;
+        $scope.numDummyExpsToPublish = 0;
+        $scope.numDummyExpsToGenerate = 0;
 
         $scope.reloadAllExplorations = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -102,6 +104,29 @@ oppia.directive('adminDevModeActivitiesTab', [
               printResult();
             });
           }
+        };
+
+        $scope.generateDummyExplorations = function() {
+          // Generate dummy explorations with random title.
+          if ($scope.numDummyExpsToPublish > $scope.numDummyExpsToGenerate) {
+            $scope.setStatusMessage(
+              'Publish count should be less than or equal to generate count');
+            return;
+          }
+          AdminTaskManagerService.startTask();
+          $scope.setStatusMessage('Processing...');
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'generate_dummy_explorations',
+            num_dummy_exps_to_generate: $scope.numDummyExpsToGenerate,
+            num_dummy_exps_to_publish: $scope.numDummyExpsToPublish
+          }).then(function() {
+            $scope.setStatusMessage(
+              'Dummy explorations generated successfully.');
+          }, function(errorResponse) {
+            $scope.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+          AdminTaskManagerService.finishTask();
         };
 
         $scope.reloadCollection = function(collectionId) {
