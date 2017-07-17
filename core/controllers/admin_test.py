@@ -139,11 +139,16 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'generate_dummy_explorations',
-            'num_dummy_exps_to_generate': 2,
-            'num_dummy_exps_to_publish': 5
-        }, csrf_token)
+        generated_exps_response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 2,
+                'num_dummy_exps_to_publish': 5
+            },
+            csrf_token=csrf_token,
+            expect_errors=True,
+            expected_status_int=400)
+        self.assertEqual(generated_exps_response['code'], 400)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(len(generated_exps), 0)
