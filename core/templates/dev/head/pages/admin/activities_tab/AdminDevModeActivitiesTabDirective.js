@@ -125,8 +125,8 @@ oppia.directive('adminDevModeActivitiesTab', [
           }, function(errorResponse) {
             $scope.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
-            AdminTaskManagerService.finishTask();
           });
+          AdminTaskManagerService.finishTask();
         };
 
         $scope.reloadCollection = function(collectionId) {
