@@ -28,8 +28,10 @@
     </div>
 
     <div ng-if="rule.type == 'FuzzyMatches'">
-      <classifier-panel rule-inputs="rule.inputs" on-training-data-deletion="onDeleteTrainingDataEntry(index)">
-      </classifier-panel>
+      is similar to
+      <select2-dropdown choices="choices" item="selectedTrainingInput">
+      </select2-dropdown>
+      <button type="button" class="btn btn-danger" ng-click="onDeleteTrainingDataEntry(selectedTrainingInput)">Remove this input</button>
     </div>
   </form>
 
