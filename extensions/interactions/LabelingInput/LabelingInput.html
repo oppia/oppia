@@ -68,7 +68,7 @@
       <div ng-repeat="region in allRegions",
           data-drop="true",
           jqyoui-droppable="{animate:false, onDrop: 'checkTheValues(region.label)', onOver: 'isInRegion(region)', onOut: 'outOfRegion(region)'}",
-          data-jqyoui-options="{snap:true}",
+          data-jqyoui-options="{}",
           style="
             height: <[getRegionDimensions($index).height]>px;
              width: <[getRegionDimensions($index).width]>px;

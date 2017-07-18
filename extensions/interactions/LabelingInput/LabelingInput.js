@@ -132,6 +132,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           }
           //If all labels have been placed, run a correctness check
           $scope.runSubmitCheck = function(){
+            console.log($scope.incorrectBoxes);
             $scope.submitted = 1;
             if ($scope.numRegions == 0){
               $scope.numRegions = $scope.incorrectElements.length;
@@ -147,6 +148,8 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           }
           //Check if our value is the one of the region, and handle acccordingly
           $scope.checkTheValues = function(event, ui, correctName){
+            console.log(correctName);
+            console.log($scope.currentDraggedElement);
             $scope.occupiedRegions.push(correctName);
             $scope.numRegions--;
             if ($scope.numRegions < 0){
@@ -163,6 +166,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             if ((correctLen + incorrectLen) === $scope.allRegions.length){
               $scope.runSubmitCheck();
             }
+            $scope.currentDraggedElement = '';
           }
           //Find where the drop region should be placed
           $scope.getRegionDimensions = function(index) {
@@ -255,21 +259,14 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             $scope.$apply();
           }
           $scope.checkRevertBounce = function(){
+            //TODO fix implementation to work dynamically
             return 'invalid';
-            //TODO fix implementation
-            // console.log("Revert");
-            // console.log($scope.currentlyHoveredRegions);
-            // var hoveredRegion;
-            // if ($scope.occupiedRegions.length === 0){
-            //   return 'invalid';
-            // }
-            // hoveredRegion = $scope.currentlyHoveredRegions[0];
-            // console.log(hoveredRegion);
-            // return 'invalid';
           }
           $scope.dropHovered = function(){
-            $scope.currentDraggedElement = '';
-            $scope.$apply();
+            if ($scope.currentlyHoveredRegions.length == 0){
+              $scope.currentDraggedElement = '';
+              $scope.$apply();              
+            }
           }
           //Change to red if the input is not correct
           $scope.getRValue = function(region){
