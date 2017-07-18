@@ -66,7 +66,6 @@ oppia.controller('CreatorDashboard', [
       smText: 'Publish the exploration to receive statistics.'
     };
 
-    var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;

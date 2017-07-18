@@ -1643,7 +1643,6 @@ span.sort-explorations-select .sort-order {
 .oppia-dashboard-intro-picture {
   width: 400px;
 }
-
 .oppia-dashboard-intro-button {
   background-color: #015c53;
   border-radius: 0;
@@ -1654,7 +1653,6 @@ span.sort-explorations-select .sort-order {
   text-transform: uppercase;
   width: 200px;
 }
-
 .oppia-dashboard-intro-button:hover,
 .oppia-dashboard-intro-button:focus,
 .oppia-dashboard-intro-button:active {

@@ -253,7 +253,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             'collections_list': collection_summary_dicts,
             'dashboard_stats': dashboard_stats,
             'last_week_stats': last_week_stats,
-            'subscribers_list': subscribers_list,
+            'subscribers_list': subscribers_list
         })
         self.render_json(self.values)
 
