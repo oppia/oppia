@@ -17,6 +17,7 @@
 """Controllers for the collections editor."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
@@ -95,7 +96,7 @@ class CollectionEditorHandler(base.BaseHandler):
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def get(self, collection_id):
         """Handles GET requests."""
 
@@ -131,7 +132,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
                 'which is too old. Please reload the page and try again.'
                 % (collection_version, version_from_payload))
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
 
@@ -150,7 +151,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
         self.render_json(self.values)
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def put(self, collection_id):
         """Updates properties of the given collection."""
 

@@ -16,6 +16,7 @@
 
 """Decorators to provide authorization across the site."""
 
+from core.controllers import base
 from core.domain import rights_manager
 from core.domain import role_services
 import feconf
@@ -126,3 +127,38 @@ def can_view_exploration_stats(handler):
             raise self.PageNotFoundException
 
     return test_can_view_stats
+
+
+def can_edit_collection(handler):
+    """Decorator to check whether the user can edit collection."""
+
+    def test_can_edit(self, collection_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
+        if collection_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if collection_rights.community_owned:
+            return handler(self, collection_id, **kwargs)
+
+        if role_services.ACTION_EDIT_ANY_COLLECTION in self.actions:
+            return handler(self, collection_id, **kwargs)
+
+        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+            if (role_services.ACTION_EDIT_ANY_PUBLIC_COLLECTION in
+                    self.actions):
+                return handler(self, collection_id, **kwargs)
+
+        if (role_services.ACTION_EDIT_OWNED_COLLECTION in
+                self.actions):
+            if (collection_rights.is_owner(self.user_id) or
+                    collection_rights.is_editor(self.user_id)):
+                return handler(self, collection_id, **kwargs)
+
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You do not have credentials to edit this collection.')
+
+    return test_can_edit
