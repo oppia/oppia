@@ -287,7 +287,7 @@ class ClassifierTrainingJob(object):
         self._status = status
 
     def update_training_data(self, training_data):
-         """Updates the training_data attribute of the ClassifierTrainingJob
+        """Updates the training_data attribute of the ClassifierTrainingJob
         domain object.
 
         Args:
