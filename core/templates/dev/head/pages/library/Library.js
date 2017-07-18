@@ -27,12 +27,11 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('Library', [
-  '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal',
-  'i18nIdService', 'urlService', 'ALL_CATEGORIES', 'searchService',
-  'windowDimensionsService', 'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
-  'LIBRARY_TILE_WIDTH_PX',
+  '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
+  'urlService', 'ALL_CATEGORIES', 'searchService', 'windowDimensionsService',
+  'UrlInterpolationService', 'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX',
   function(
-      $scope, $http, $rootScope, $window, $timeout, $modal, i18nIdService,
+      $scope, $http, $rootScope, $window, $timeout, i18nIdService,
       urlService, ALL_CATEGORIES, searchService, windowDimensionsService,
       UrlInterpolationService, LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
@@ -40,7 +39,6 @@ oppia.controller('Library', [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
     $scope.bannerImageFilename = possibleBannerFilenames[
       Math.floor(Math.random() * possibleBannerFilenames.length)];
-    var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
       '/library/' + $scope.bannerImageFilename);
@@ -75,11 +73,6 @@ oppia.controller('Library', [
     } else {
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
-        $scope.showSetDashboardModal = data.show_set_dashboard_modal;
-
-        if ($scope.showSetDashboardModal) {
-          $scope.openSetDashboardModal();
-        }
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
@@ -228,37 +221,6 @@ oppia.controller('Library', [
           }, 50);
         });
       }
-    };
-
-    $scope.openSetDashboardModal = function() {
-      $modal.open({
-        templateUrl: 'modals/setDashboard',
-        backdrop: 'static',
-        controller: [
-          '$scope', '$modalInstance', '$http',
-          function($scope, $modalInstance, $http) {
-            $scope.defaultDashboardSelected = false;
-
-            $scope.setDashboard = function(defaultDashboard) {
-              $http.put(_PREFERENCES_DATA_URL, {
-                update_type: 'default_dashboard',
-                data: defaultDashboard
-              });
-              if (defaultDashboard === 'creator') {
-                $scope.defaultDashboardName = 'Creator Dashboard';
-              } else {
-                $scope.defaultDashboardName = 'Learner Dashboard';
-              }
-              $scope.defaultDashboardSelected = true;
-            };
-
-            $scope.close = function() {
-              $modalInstance.close();
-            };
-          }
-        ],
-        windowClass: 'oppia-set-dashboard'
-      });
     };
 
     // The following loads explorations belonging to a particular group. If

@@ -47,20 +47,19 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$window', '$http', '$modal',
-  'oppiaDatetimeFormatter', 'alertsService',
+  '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
   'CreatorDashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $window, $http, $modal, oppiaDatetimeFormatter,
-      alertsService, CreatorDashboardBackendApiService,
-      RatingComputationService, ExplorationCreationService,
-      UrlInterpolationService, FATAL_ERROR_CODES, EXPLORATION_DROPDOWN_STATS,
-      EXPLORATIONS_SORT_BY_KEYS, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
-      SUBSCRIPTION_SORT_BY_KEYS, HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
+      $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
+      CreatorDashboardBackendApiService, RatingComputationService,
+      ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
+      EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
+      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
+      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -180,37 +179,6 @@ oppia.controller('CreatorDashboard', [
       return value;
     };
 
-    $scope.openSetDashboardModal = function() {
-      $modal.open({
-        templateUrl: 'modals/setDashboard',
-        backdrop: 'static',
-        controller: [
-          '$scope', '$modalInstance', '$http',
-          function($scope, $modalInstance, $http) {
-            $scope.defaultDashboardSelected = false;
-
-            $scope.setDashboard = function(defaultDashboard) {
-              $http.put(_PREFERENCES_DATA_URL, {
-                update_type: 'default_dashboard',
-                data: defaultDashboard
-              });
-              if (defaultDashboard === 'creator') {
-                $scope.defaultDashboardName = 'Creator Dashboard';
-              } else {
-                $scope.defaultDashboardName = 'Learner Dashboard';
-              }
-              $scope.defaultDashboardSelected = true;
-            };
-
-            $scope.close = function() {
-              $modalInstance.close();
-            };
-          }
-        ],
-        windowClass: 'oppia-set-dashboard'
-      });
-    }
-
     $rootScope.loadingMessage = 'Loading';
     CreatorDashboardBackendApiService.fetchDashboardData().then(
       function(response) {
@@ -224,14 +192,10 @@ oppia.controller('CreatorDashboard', [
         $scope.subscribersList = responseData.subscribers_list;
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
-        $scope.showSetDashboardModal = responseData.show_set_dashboard_modal;
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
           );
-        }
-        if ($scope.showSetDashboardModal) {
-          $scope.openSetDashboardModal();
         }
         if ($scope.explorationsList.length === 0 &&
           $scope.collectionsList.length > 0) {

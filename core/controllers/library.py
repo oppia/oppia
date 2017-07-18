@@ -114,12 +114,9 @@ class LibraryIndexHandler(base.BaseHandler):
                 [feconf.DEFAULT_LANGUAGE_CODE]))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
-        show_set_dashboard_modal = None
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
-            show_set_dashboard_modal = (
-                False if user_settings.default_dashboard else True)
 
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -144,7 +141,6 @@ class LibraryIndexHandler(base.BaseHandler):
             'activity_summary_dicts_by_category': (
                 summary_dicts_by_category),
             'preferred_language_codes': preferred_language_codes,
-            'show_set_dashboard_modal': show_set_dashboard_modal
         })
         self.render_json(self.values)
 
