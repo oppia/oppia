@@ -26,6 +26,7 @@ from core.domain import exp_services
 
 import feconf
 
+TTL = 5*60*60
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
 # in Oppia-ml.
@@ -130,42 +131,43 @@ class TrainedClassifierHandler(base.BaseHandler):
         return self.render_json({})
 
 
+def update_failed_jobs(job_models):
+    for job_model in job_models:
+        classifier_services.mark_training_job_failed(job_model.id)
+
+
+def fetch_training_data(exp_id, state):
+    exp_model = exp_services.get_exploration_by_id(exp_id)
+    state_model = exp_model.states[state]
+    training_data = state_model.get_training_data()
+    return training_data
+
+
+def fetch_next_job():
+    classifier_job_models = (
+        classifier_services.get_all_classifier_training_jobs())
+    classifier_job_models.sort(key=lambda item: item.created_on)
+    valid_job_models = []
+    failed_job_models = []
+    for classifier_job_model in classifier_job_models:
+        if classifier_job_model.status == feconf.TRAINING_JOB_STATUS_NEW:
+            valid_job_models.append(classifier_job_model)
+        if classifier_job_model.status == (
+                feconf.TRAINING_JOB_STATUS_PENDING):
+            if (datetime.datetime.utcnow() - (
+                    classifier_job_model.last_updated) < TTL):
+                valid_job_models.append(classifier_job_model)
+            else:
+                failed_job_models.append(classifier_job_model)
+    update_failed_jobs(failed_job_models)
+    next_job = valid_job_models[0]
+    return next_job
+
+
 class NextJobHandler(base.BaseHandler):
     """ This handler fetches next job in job queue and sends back job_id,
     algorithm_id and training data to the VM.
     """
-    
-    self.TTL = 5*60*60
-
-    def update_failed_jobs(self, job_models):
-        for job_model in job_models:
-            classifier_services.mark_training_job_failed(job_model.id)
-
-    def fetch_training_data(self, exp_id, state):
-        exp_model = exp_services.get_exploration_by_id(exp_id)
-        state_model = exp_model.states[state]
-        training_data = state_model.get_training_data()
-        return training_data
-
-    def fetch_next_job(self):
-        classifier_job_models = (
-            classifier_services.get_all_classifier_training_jobs())
-        classifier_job_models.sort(key=lambda item: item.created_on)
-        valid_job_models = []
-        failed_job_models = []
-        for classifier_job_model in classifier_job_models:
-            if classifier_job_model.status == feconf.TRAINING_JOB_STATUS_NEW:
-                valid_job_models.append(classifier_job_model)
-            if classifier_job_model.status == (
-                    feconf.TRAINING_JOB_STATUS_PENDING):
-                if (datetime.datetime.utcnow() - (
-                        classifier_job_model.last_updated) < TTL):
-                    valid_job_models.append(classifier_job_model)
-                else:
-                    failed_job_models.append(classifier_job_model)
-        update_failed_jobs(failed_job_models)
-        next_job = valid_job_models[0]
-        return next_job
 
     def post(self):
         """ Handels POST requests. """
