@@ -63,9 +63,13 @@ class ThreadHandler(base.BaseHandler):
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        messages = [m.to_dict() for m in feedback_services.get_messages(
+            exploration_id, thread_id)]
+        message_ids = [message['message_id'] for message in messages]
+        feedback_services.update_messages_read_by_the_user(
+            self.user_id, exploration_id, thread_id, message_ids)
         self.values.update({
-            'messages': [m.to_dict() for m in feedback_services.get_messages(
-                exploration_id, thread_id)],
+            'messages': messages,
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)
