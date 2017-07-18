@@ -97,6 +97,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The ID of the algorithm used to create the model.
     algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES,
                                       indexed=True)
+    # The ID of the interaction to which the algorithm belongs.
+    interaction_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration_id of the exploration to whose state the model belongs.
     exp_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration version at the time this training job was created.
@@ -144,18 +146,20 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, algorithm_id, exp_id, exp_version, training_data,
-            state_name, status=feconf.TRAINING_JOB_STATUS_NEW):
+            cls, algorithm_id, interaction_id, exp_id, exp_version,
+            training_data, state_name, status):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
             algorithm_id: str. ID of the algorithm used to generate the model.
+            interaction_id: str. ID of the interaction to which the algorithm
+                belongs.
             exp_id: str. ID of the exploration.
             exp_version: int. The exploration version at the time
                 this training job was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
-            status: str. The status of the training job (NEW by default).
+            status: str. The status of the training job.
             training_data: dict. The data used in training phase.
 
         Returns:
@@ -167,7 +171,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         instance_id = cls._generate_id(exp_id)
         training_job_instance = cls(
-            id=instance_id, algorithm_id=algorithm_id, exp_id=exp_id,
+            id=instance_id, algorithm_id=algorithm_id,
+            interaction_id=interaction_id,
+            exp_id=exp_id,
             exp_version=exp_version,
             state_name=state_name, status=status, training_data=training_data
             )
