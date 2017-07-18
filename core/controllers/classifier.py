@@ -156,7 +156,8 @@ class NextJobHandler(base.BaseHandler):
             if classifier_job_model.status == feconf.TRAINING_JOB_STATUS_NEW:
                 valid_job_models.append(classifier_job_model)
             if classifier_job_model.status == feconf.TRAINING_JOB_STATUS_PENDING:
-                if (datetime.datetime.now() - classifier_job_model.last_updated < TTL):
+                if (datetime.datetime.utcnow() - (
+                    classifier_job_model.last_updated) < TTL):
                     valid_job_models.append(classifier_job_model)
                 else:
                     failed_job_models.append(classifier_job_model)
