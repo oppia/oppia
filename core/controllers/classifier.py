@@ -14,6 +14,7 @@
 
 """Controllers for communicating with the VM for training classifiers."""
 
+import datetime
 import hashlib
 import hmac
 import json
@@ -21,6 +22,7 @@ import json
 from core.controllers import base
 from core.domain import classifier_services
 from core.domain import config_domain
+from core.domain import exp_services
 
 import feconf
 
@@ -79,7 +81,10 @@ def verify_signature(message, vm_id, received_signature):
     if secret is None:
         return False
 
-    generated_signature = generate_signature(secret, message)
+    if message is None:
+        generated_signature = generate_signature(secret, vm_id)
+    else:
+        generated_signature = generate_signature(secret, message)
     if generated_signature != received_signature:
         return False
     return True
@@ -123,3 +128,55 @@ class TrainedClassifierHandler(base.BaseHandler):
         classifier_services.mark_training_job_complete(job_id)
 
         return self.render_json({})
+
+
+class NextJobHandler(base.BaseHandler):
+    """ This handler fetches next job in job queue and sends back job_id,
+    algorithm_id and training data to the VM.
+    """
+    TTL = 5*60*60
+
+    def update_failed_jobs(job_models):
+        for job_model in job_models:
+            classifier_services.mark_training_job_failed(job_model.id)
+
+    def fetch_training_data(exp_id, state):
+        exp_model = exp_services.get_exploration_by_id(exp_id)
+        state_model = exp_model.states[state]
+        training_data = state_model.get_training_data()
+        return training_data
+
+    def fetch_next_job():
+        classifier_job_models =
+        classifier_services.get_all_classifier_training_jobs()
+        classifier_job_models.sort(key=lambda item:item.created_on)
+        valid_job_models = []
+        failed_job_models = []
+        for classifier_job_model in classifier_job_models:
+            if classifier_job_model.status == feconf.TRAINING_JOB_STATUS_NEW:
+                valid_job_models.append(classifier_job_model)
+            if classifier_job_model.status == feconf.TRAINING_JOB_STATUS_PENDING:
+                if (datetime.datetime.now() - classifier_job_model.last_updated < TTL):
+                    valid_job_models.append(classifier_job_model)
+                else:
+                    failed_job_models.append(classifier_job_model)
+        update_failed_jobs(failed_job_models)
+        next_job = valid_job_models[0]
+        return next_job
+
+    def post(self):
+        """ Handels POST requests. """
+        signature = self.payload.get('signature')
+        vm_id = self.payload.get('vm_id')
+        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
+            raise self.UnauthorizedUserException
+        if not verify_signature(None, vm_id, signature):
+            raise self.UnauthorizedUserException
+        next_job = fetch_next_job()
+        training_data = fetch_training_data(next_job.exp_id, next_job.state)
+        classifier_services.mark_training_job_pending(next_job.id)
+        return self.render_json({
+            'job_id': next_job.id,
+            'algorithm_id': next_job.algorithm_id,
+            'training_data': training_data
+            })

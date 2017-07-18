@@ -276,6 +276,25 @@ def get_classifier_training_job_by_id(job_id):
     return classifier_training_job
 
 
+def get_all_classifier_training_jobs():
+    """Gets all classifier training jobs.
+
+    Returns:
+        classifier_training_jobs: List. Domain objects for the
+            classifier training jobs.
+
+    """
+    classifier_training_jobs = []
+    classifier_training_job_models = (
+        classifier_models.ClassifierTrainingJobModel.get_all()
+        )
+    for job_model in classifier_training_job_models:
+        classifier_training_jobs.append(
+            get_classifier_training_job_from_model(
+                job_model))
+    return classifier_training_jobs
+
+
 def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
                                    exp_version, state_name, training_data,
                                    status):
@@ -345,6 +364,26 @@ def mark_training_job_complete(job_id):
     """
     _update_classifier_training_job_status(job_id,
                                            feconf.TRAINING_JOB_STATUS_COMPLETE)
+
+
+def mark_training_job_failed(job_id):
+    """Updates the training job's status to failed.
+
+    Args:
+        job_id: str. ID of the ClassifierTrainingJob.
+    """
+    _update_classifier_training_job_status(job_id,
+                                           feconf.TRAINING_JOB_STATUS_FAILED)
+
+
+def mark_training_job_pending(job_id):
+    """Updates the training job's status to pending.
+
+    Args:
+        job_id: str. ID of the ClassifierTrainingJob.
+    """
+    _update_classifier_training_job_status(job_id,
+                                           feconf.TRAINING_JOB_STATUS_PENDING)
 
 
 def delete_classifier_training_job(job_id):
