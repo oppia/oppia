@@ -18,14 +18,14 @@
 
 oppia.controller('StateSolution', [
   '$scope', '$rootScope', '$modal', '$filter', '$injector',
-  'editorContextService', 'ENABLE_SOLUTION_EDITOR', 'alertsService',
+  'editorContextService', 'alertsService', 'INTERACTION_SPECS',
   'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
   'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
   'SolutionObjectFactory', 'responsesService', 'AnswerClassificationService',
   'explorationContextService', 'angularNameService',
   function(
     $scope, $rootScope, $modal, $filter, $injector,
-    editorContextService, ENABLE_SOLUTION_EDITOR, alertsService,
+    editorContextService, alertsService, INTERACTION_SPECS,
     INTERACTION_SPECS, stateSolutionService, explorationStatesService,
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
     SolutionObjectFactory, responsesService, AnswerClassificationService,
@@ -34,8 +34,8 @@ oppia.controller('StateSolution', [
     $scope.stateSolutionService = stateSolutionService;
     $scope.isActive = false;
     $scope.answerIsExclusive = false;
-    $scope.isAVerifiedAnswer = '';
     $scope.answerCheckPassed = false;
+    $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 
     $scope.stateHintsService = stateHintsService;
     $scope.stateSolutionService = stateSolutionService;
@@ -43,8 +43,6 @@ oppia.controller('StateSolution', [
     $scope.toggleIsActive = function() {
       $scope.isActive = !$scope.isActive;
     };
-
-    $scope.solutionEditorIsEnabled = ENABLE_SOLUTION_EDITOR;
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateSolutionService.init(
@@ -54,6 +52,7 @@ oppia.controller('StateSolution', [
         JSON.stringify(stateSolutionService.savedMemento) ? true : false);
       $scope.isActive = false;
       var interactionId = stateInteractionIdService.savedMemento;
+      $scope.INTERACTION_SPECS = INTERACTION_SPECS[interactionId];
       if (interactionId === 'InteractiveMap') {
         $rootScope.objectType = 'CoordTwoDim';
       } else if (interactionId === 'CodeRepl' ||
@@ -116,8 +115,7 @@ oppia.controller('StateSolution', [
       if (typeof solution.correctAnswer === 'string') {
         correctAnswer = (
           $filter('convertToPlainText')(solution.correctAnswer));
-      } else if (Array.isArray(
-          solution.correctAnswer)) {
+      } else if (Array.isArray(solution.correctAnswer)) {
         correctAnswer = (
           '[' + solution.correctAnswer + ']');
       } else {
@@ -157,8 +155,7 @@ oppia.controller('StateSolution', [
             $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 
             $scope.tmpSolution = {};
-            $scope.tmpSolution.answerIsExclusive = (
-              $scope.answerIsExclusive === 'true');
+            $scope.tmpSolution.answerIsExclusive = $scope.answerIsExclusive;
             $scope.tmpSolution.correctAnswer = '';
             $scope.tmpSolution.explanation = '';
 
@@ -177,23 +174,29 @@ oppia.controller('StateSolution', [
                 $rootScope.ruleDescriptionChoices[0].id);
             }
             if ($rootScope.objectType === 'CodeString') {
-              stateSolutionService.displayed.correctAnswer = {
-                code: stateSolutionService.displayed.correctAnswer,
-                output: '',
-                evaluation: '',
-                error: ''
+              stateSolutionService.displayed = {
+                correctAnswer: {
+                  code: '',
+                  output: '',
+                  evaluation: '',
+                  error: ''
+                }
               };
             }
             if ($rootScope.objectType === 'UnicodeString') {
-              stateSolutionService.displayed.correctAnswer = {
-                ascii: '',
-                latex: stateSolutionService.displayed.correctAnswer
+              stateSolutionService.displayed = {
+                correctAnswer: {
+                  ascii: '',
+                  latex: ''
+                }
               };
             }
             if ($rootScope.objectType === 'RegionSelect') {
-              stateSolutionService.displayed.correctAnswer = {
-                clickPosition: [0, 0],
-                clickedRegions: [stateSolutionService.displayed.correctAnswer]
+              stateSolutionService.displayed = {
+                correctAnswer: {
+                  clickPosition: [0, 0],
+                  clickedRegions: []
+                }
               };
               $scope.tmpSolution.correctAnswer = (
                 $rootScope.ruleDescriptionChoices[0].id);
@@ -241,7 +244,6 @@ oppia.controller('StateSolution', [
           }
         ]
       }).result.then(function(result) {
-        stateSolutionService.displayed = result.solution;
         var explorationId =
           explorationContextService.getExplorationId();
         var currentStateName =
@@ -255,25 +257,25 @@ oppia.controller('StateSolution', [
         var rulesService = $injector.get(rulesServiceName);
         var correctAnswer = result.solution.correctAnswer;
         try {
-          $scope.isAVerifiedAnswer = (
-            AnswerClassificationService.getMatchingClassificationResult(
-              explorationId, state, correctAnswer, true, rulesService));
+          AnswerClassificationService.getMatchingClassificationResult(
+            explorationId, state, correctAnswer, true, rulesService)
+            .then(function (result) {
+              if (editorContextService.getActiveStateName() !== (
+              result.outcome.dest)) {
+                stateSolutionService.saveDisplayedValue();
+                $scope.solutionIsSpecified = (
+                  JSON.stringify(stateSolutionService.savedMemento) ? true : false);
+              } else {
+                alertsService.addInfoMessage('That solution was incorrect!');
+                $scope.openAddSolutionModal();
+              }
+            });
         }
         catch (e) {
           alertsService.addInfoMessage('That solution was invalid!');
           $scope.openAddSolutionModal();
-          return;
         }
-        //$scope.isAVerifiedAnswer.$$state.value.outcome.dest
-        if (editorContextService.getActiveStateName() !== (
-          $scope.isAVerifiedAnswer.$$state.value.outcome.dest)) {
-          stateSolutionService.saveDisplayedValue();
-          $scope.solutionIsSpecified = (
-            JSON.stringify(stateSolutionService.savedMemento) ? true : false);
-        } else {
-          alertsService.addInfoMessage('That solution was incorrect!');
-          $scope.openAddSolutionModal();
-        }
+        stateSolutionService.displayed = result.solution;
       });
     };
 
@@ -299,7 +301,7 @@ oppia.controller('StateSolution', [
           }
         ]
       }).result.then(function() {
-        stateSolutionService.displayed = {};
+        stateSolutionService.displayed = null;
         stateSolutionService.saveDisplayedValue();
         $scope.solutionIsSpecified = false;
       });
@@ -319,12 +321,6 @@ oppia.controller('StateSolution', [
       // Inject RulesService dynamically.
       var rulesService = $injector.get(rulesServiceName);
       var answer = stateSolutionService.savedMemento.correctAnswer;
-      if ($rootScope.objectType === 'RegionSelect') {
-        answer = {
-          clickPosition: [0, 0],
-          clickedRegions: [stateSolutionService.savedMemento.correctAnswer]
-        };
-      }
 
       try {
         var verifiedAnswer = (

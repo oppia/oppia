@@ -58,7 +58,7 @@
         <html-select ng-if="objectType === 'RegionSelect'"
                      style="width: 250px;"
                      options="ruleDescriptionChoices"
-                     selection="solution.correctAnswer">
+                     selection="solution.correctAnswer.clickedRegions[0]">
         </html-select>
         <textarea ng-if="objectType === 'LogicQuestion'"
                   ng-model="solution.correctAnswer">

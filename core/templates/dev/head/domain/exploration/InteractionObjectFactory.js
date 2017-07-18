@@ -52,10 +52,7 @@ oppia.factory('InteractionObjectFactory', [
           return hint.toBackendDict();
         }),
         id: this.id,
-        solution: (
-          (typeof this.solution === 'object' &&
-          Object.keys(this.solution).length > 0)) ? (
-            this.solution.toBackendDict()) : {}
+        solution: this.solution ? this.solution.toBackendDict() : null
       };
     };
 
@@ -75,7 +72,8 @@ oppia.factory('InteractionObjectFactory', [
         generateFallbacksFromBackend(interactionDict.fallbacks),
         generateHintsFromBackend(interactionDict.hints),
         interactionDict.id,
-        generateSolutionFromBackend(interactionDict.solution));
+        interactionDict.solution ? (
+          generateSolutionFromBackend(interactionDict.solution)) : null);
     };
 
     var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
@@ -99,12 +97,7 @@ oppia.factory('InteractionObjectFactory', [
     };
 
     var generateSolutionFromBackend = function(solutionBackendDict) {
-      if (typeof solutionBackendDict === 'object' && (
-        Object.keys(solutionBackendDict).length > 0)) {
-        return SolutionObjectFactory.createFromBackendDict(solutionBackendDict);
-      } else {
-        return {};
-      }
+      return SolutionObjectFactory.createFromBackendDict(solutionBackendDict);
     };
 
     return Interaction;

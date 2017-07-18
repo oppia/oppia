@@ -20,12 +20,12 @@ oppia.controller('StateHints', [
   '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
   'ENABLE_HINT_EDITOR', 'alertsService', 'INTERACTION_SPECS',
   'stateHintsService', 'explorationStatesService', 'stateInteractionIdService',
-  'UrlInterpolationService', 'HintObjectFactory', 'stateSolutionService',
+  'UrlInterpolationService', 'HintObjectFactory',
   function(
     $scope, $rootScope, $modal, $filter, editorContextService,
     ENABLE_HINT_EDITOR, alertsService, INTERACTION_SPECS,
     stateHintsService, explorationStatesService, stateInteractionIdService,
-    UrlInterpolationService, HintObjectFactory, stateSolutionService) {
+    UrlInterpolationService, HintObjectFactory) {
     $scope.editorContextService = editorContextService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
@@ -149,8 +149,6 @@ oppia.controller('StateHints', [
           }
         ]
       }).result.then(function() {
-        stateSolutionService.displayed = {};
-        stateSolutionService.saveDisplayedValue();
         stateHintsService.displayed.splice(index, 1);
         stateHintsService.saveDisplayedValue();
       });

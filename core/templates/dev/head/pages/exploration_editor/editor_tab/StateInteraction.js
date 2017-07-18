@@ -154,8 +154,9 @@ oppia.controller('StateInteraction', [
           updateDefaultTerminalStateContentIfEmpty();
         }
         stateInteractionIdService.saveDisplayedValue();
-        stateSolutionService.savedMemento = {};
-        stateSolutionService.saveDisplayedValue();
+        if (stateSolutionService.displayed) {
+          stateSolutionService.saveDisplayedValue();
+        }
       }
 
       stateCustomizationArgsService.saveDisplayedValue();
@@ -374,7 +375,7 @@ oppia.controller('StateInteraction', [
       }).result.then(function() {
         stateInteractionIdService.displayed = null;
         stateCustomizationArgsService.displayed = {};
-        stateSolutionService.displayed = {};
+        stateSolutionService.displayed = null;
 
         stateInteractionIdService.saveDisplayedValue();
         stateCustomizationArgsService.saveDisplayedValue();

@@ -1114,16 +1114,13 @@ class Solution(object):
         Returns:
             Solution. The corresponding Solution domain object.
         """
-        if solution_dict:
-            return cls(
-                interaction_id,
-                solution_dict['answer_is_exclusive'],
-                interaction_registry.Registry.get_interaction_by_id(
-                    interaction_id).normalize_answer(
-                        solution_dict['correct_answer']),
-                solution_dict['explanation'])
-        else:
-            return None
+        return cls(
+            interaction_id,
+            solution_dict['answer_is_exclusive'],
+            interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).normalize_answer(
+                solution_dict['correct_answer']),
+            solution_dict['explanation'])
 
     def validate(self, interaction_id):
         """Validates all properties of Solution.
@@ -1179,7 +1176,7 @@ class InteractionInstance(object):
                 self.confirmed_unclassified_answers),
             'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
             'hints': [hint.to_dict() for hint in self.hints],
-            'solution': self.solution.to_dict() if self.solution else {},
+            'solution': self.solution.to_dict() if self.solution else None,
         }
 
     @classmethod
@@ -1200,7 +1197,7 @@ class InteractionInstance(object):
         solution_dict = (
             Solution.from_dict(
                 interaction_dict['id'], interaction_dict['solution'])
-            if interaction_dict['solution'] is not None else None)
+            if interaction_dict['solution'] else None)
 
         return cls(
             interaction_dict['id'],
@@ -2077,17 +2074,21 @@ class State(object):
         """Update the solution of interaction.
 
         Args:
-            solution_dict: dict. The dict representation of Solution object.
+            solution_dict: dict or None. The dict representation of
+                Solution object.
 
         Raises:
-            Exception: 'hint_list' is not a list.
+            Exception: 'solution_dict' is not a dict.
         """
-        if not isinstance(solution_dict, dict):
-            raise Exception(
-                'Expected solution to be a dict, received %s'
-                % solution_dict)
-        self.interaction.solution = Solution.from_dict(
-            self.interaction.id, solution_dict)
+        if solution_dict is not None:
+            if not isinstance(solution_dict, dict):
+                raise Exception(
+                    'Expected solution to be a dict, received %s'
+                    % solution_dict)
+            self.interaction.solution = Solution.from_dict(
+                self.interaction.id, solution_dict)
+        else:
+            self.interaction.solution = None
 
     def add_hint(self, hint_text):
         """Add a new hint to the list of hints.

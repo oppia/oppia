@@ -868,10 +868,10 @@ oppia.factory('explorationStatesService', [
         });
       },
       solution: function(solution) {
-        if (typeof solution === 'object' && Object.keys(solution).length > 0) {
+        if (solution) {
           return solution.toBackendDict();
         } else {
-          return {};
+          return null;
         }
       }
     };
@@ -902,9 +902,6 @@ oppia.factory('explorationStatesService', [
       var accessorList = PROPERTY_REF_DATA[backendName];
       var propertyRef = _states.getState(stateName);
       accessorList.forEach(function(key) {
-        if (typeof propertyRef === 'undefined') {
-          return {};
-        }
         propertyRef = propertyRef[key];
       });
 
@@ -1040,7 +1037,7 @@ oppia.factory('explorationStatesService', [
         saveStateProperty(stateName, 'hints', newHints);
       },
       getSolutionMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'solution')
+        return getStatePropertyMemento(stateName, 'solution');
       },
       saveSolution: function(stateName, newSolution) {
         saveStateProperty(stateName, 'solution', newSolution);

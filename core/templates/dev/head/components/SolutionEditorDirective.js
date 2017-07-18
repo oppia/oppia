@@ -48,10 +48,6 @@ oppia.directive('solutionEditor', [
               $scope.solutionEditorIsOpen = true;
               $scope.solution.answerIsExclusive = (
                 $scope.solution.answerIsExclusive.toString());
-              if ($scope.objectType === 'RegionSelect') {
-                $scope.solution.correctAnswer = (
-                  $scope.solution.correctAnswer.clickedRegions[0]);
-              }
             }
           };
 
