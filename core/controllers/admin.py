@@ -337,7 +337,7 @@ class AdminHandler(base.BaseHandler):
                 if i <= num_dummy_exps_to_publish - 1:
                     rights_manager.publish_exploration(
                         self.user_id, new_exploration_id)
-             exp_services.index_explorations_given_ids(dummy_exp_list)
+            exp_services.index_explorations_given_ids(dummy_exp_list)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
