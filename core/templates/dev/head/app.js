@@ -79,7 +79,7 @@ oppia.constant(
 oppia.constant(
   'GCS_AUDIO_DOWNLOAD_URL_TEMPLATE',
   'https://storage.googleapis.com/oppiatestserver-resources/' +
-    '<exploration_id>/assets/audio/');
+    '<exploration_id>/assets/audio/<filename>');
 
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {

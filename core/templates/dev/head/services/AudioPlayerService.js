@@ -17,34 +17,68 @@
  */
 
 oppia.factory('AudioPlayerService', [
-  'ngAudio', 'AssetsBackendApiService', 'explorationContextService',
-  function(ngAudio, AssetsBackendApiService, explorationContextService) {
-    var _currentTrackFilename;
-    var _currentTrack;
+  '$q', 'ngAudio', 'AssetsBackendApiService', 'explorationContextService',
+  function($q, ngAudio, AssetsBackendApiService, explorationContextService) {
+    var _currentTrackFilename = null;
+    var _currentTrack = null;
 
-    var _play = function(filename) {
-      AssetsBackendApiService.loadAudio(
-        explorationContextService.getExplorationId(), filename)
-        .then(function(audioBlob) {
+    var _load = function(filename, successCallback, errorCallback) {
+      if (filename !== _currentTrackFilename) {
+        AssetsBackendApiService.fetchAudio(
+        '11', filename).then(function(audioBlob) {
           var blobUrl = URL.createObjectURL(audioBlob);
           _currentTrack = ngAudio.load(blobUrl);
           _currentTrackFilename = filename; 
-          _currentTrack.play();
+          successCallback();
+        }, function(reason) {
+          errorCallback(reason);
         });
+      }
+    };
+
+    var _play = function() {
+      if (_currentTrack) {
+        _currentTrack.play();
+      }
     };
 
     var _pause = function() {
       if (_currentTrack) {
-        _currentTrack._pausee();
+        _currentTrack.pause();
+      }
+    };
+
+    var _stop = function() {
+      if (_currentTrack) {
+        _currentTrack.stop();
+      }
+    };
+
+    var _rewind = function(seconds) {
+      if (_currentTrack) {
+        currentSeconds = _currentTrack.progress * _currentTrack.duration;
+        rewindedProgress = (currentSeconds - seconds) / _currentTrack.duration;
+        _currentTrack.progress = rewindedProgress;
       }
     };
 
     return {
-      play: function(filename) {
-        _play(filename);
+      load: function(filename, startPlaybackOnLoad) {
+        return $q(function(resolve, reject) {
+          _load(filename, resolve, reject);
+        });
+      },
+      play: function() {
+        _play();
       },
       pause: function() {
         _pause();
+      },
+      stop: function() {
+        _stop();
+      },
+      rewind: function(seconds) {
+        _rewind(seconds);
       }
     };
   }

@@ -989,6 +989,7 @@ class AudioFileHandler(EditorHandler):
                 'is a %s file, it was not recognized as one. '
                 'Found mime types: %s' % (extension, audio.mime))
 
+        mimetype = audio.mime[0]
         del audio
 
         bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
@@ -998,7 +999,7 @@ class AudioFileHandler(EditorHandler):
         gcs_file_url = ('/%s/%s/assets/audio/%s'
                         % (bucket_name, exploration_id, filename))
         gcs_file = cloudstorage.open(
-            gcs_file_url, 'w', content_type='audio/*')
+            gcs_file_url, 'w', content_type=mimetype)
         gcs_file.write(raw)
         gcs_file.close()
 
