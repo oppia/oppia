@@ -526,11 +526,13 @@
                     <div class="col-sm-11">
                       <div>
                         <span><strong><[message.author_username]></strong></span>
-                        <span style="color: #757575; font-size: 90%;"><[getLocaleAbbreviatedDatetimeString(message.created_on)]></span>
                       </div>
 
                       <div>
-                        <span><[message.text]></span>
+                        <span ng-if="message.text"><[message.text]></span>
+                          <button ng-if="message.suggestion_html" class="btn btn-primary" ng-click="showSuggestionModal(message.suggestion_html, message.description)">
+                            View Suggestion
+                          </button>
                       </div>
                     </div>
                   </div>
@@ -599,6 +601,33 @@
               ng-click="remove()">
         Remove
       </button>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="modals/editorViewSuggestion">
+    <div class="modal-header">
+      <h3>Suggestion</h3>
+    </div>
+
+    <div class="modal-body">
+      <section class="oppia-suggestion-review-container">
+        <div class="oppia-suggestion-review-panel-container" style="float: right;">
+          <strong>Suggested:</strong>
+          <div class="oppia-suggestion-review-panel">
+            <div angular-html-bind="newContent"></div>
+          </div>
+        </div>
+      </section>
+      <div style="margin-top: 20px; margin-left: 10px;">
+        Brief Description of Changes:
+        <div class="oppia-suggestion-review-panel">
+          <div angular-html-bind="description"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     </div>
   </script>
 {% endblock %}

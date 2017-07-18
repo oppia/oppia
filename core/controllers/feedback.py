@@ -67,7 +67,7 @@ class ThreadHandler(base.BaseHandler):
             exploration_id, thread_id)]
         message_ids = [message['message_id'] for message in messages]
         feedback_services.update_messages_read_by_the_user(
-            exploration_id, thread_id, self.user_id, message_ids)
+            self.user_id, exploration_id, thread_id, message_ids)
         self.values.update({
             'messages': messages,
             'suggestion': suggestion.to_dict() if suggestion else None

@@ -255,6 +255,7 @@ oppia.controller('LearnerDashboard', [
       $http.get(threadDataUrl).then(function(response) {
         var data = response.data;
         $scope.messageSummaries = data.message_summary_list;
+        console.log($scope.messageSummaries);
       });
     };
 
@@ -285,6 +286,31 @@ oppia.controller('LearnerDashboard', [
         $scope.threadSummary.author_last_message = $scope.username;
         $scope.threadSummary.total_no_of_messages += 1
         $scope.messageSendingInProgress = false;
+      });
+    };
+
+    $scope.showSuggestionModal = function(newContent, description) {
+      $modal.open({
+        templateUrl: 'modals/editorViewSuggestion',
+        backdrop: true,
+        resolve: {
+          newContent: function() {
+            return newContent;
+          },
+          description: function() {
+            return description;
+          }
+        },
+        controller: [
+          '$scope', '$modalInstance', 'newContent', 'description',
+          function($scope, $modalInstance, newContent, description) {
+            $scope.newContent = newContent;
+            $scope.description = description;
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+            };
+          }
+        ]
       });
     };
 

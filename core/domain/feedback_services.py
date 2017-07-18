@@ -72,7 +72,6 @@ def _create_models_for_thread_and_first_message(
     thread.has_suggestion = has_suggestion
     thread.message_count = 0
     thread.put()
-
     create_message(
         exploration_id, thread_id, original_author_id,
         feedback_models.STATUS_CHOICES_OPEN, subject, text)
@@ -148,7 +147,7 @@ def create_message(
     msg.put()
 
     # Update the message count in the thread.
-    increase_message_count_by_one(full_thread_id)
+    thread.message_count += 1
 
     # We do a put() even if the status and subject are not updated, so that the
     # last_updated time of the thread reflects the last time a message was
@@ -176,16 +175,17 @@ def create_message(
             exploration_id, thread_id, author_id, message_id)
 
 
-def update_messages_read_by_the_user(exploration_id, thread_id,
-                                     user_id, message_ids):
-    """Updates the messages read by the user.
+def update_messages_read_by_the_user(user_id, exploration_id, thread_id,
+                                     message_ids):
+    """Replaces the list of message ids read by the message ids given to the
+    function.
 
     Args:
         exploration_id: str. The id of the exploration.
         thread_id. str. The id of the thread.
         user_id: str. The id of the user reading the messages,
-        message_ids: list(int): The ids of the messages to be added to the read
-            list of the user.
+        message_ids: list(int): The ids of the messages in the thread read by
+            the user.
     """
     feedback_thread_user_model = feedback_models.FeedbackThreadUserModel.get(
         user_id, exploration_id, thread_id)
@@ -426,48 +426,39 @@ def _get_thread_from_model(thread_model):
         thread_model.last_updated)
 
 
-def set_message_count_for_thread(full_thread_id, message_count):
-    """Assigns the message count field the number of messages present in the
-    thread.
-
-    Args:
-        full_thread_id: str. The full id of the thread.
-        message_count: int. The number of messages in the thread.
-    """
-    thread_model = feedback_models.FeedbackThreadModel.get(full_thread_id)
-    thread_model.message_count = message_count
-    thread_model.put()
-
-
-def increase_message_count_by_one(full_thread_id):
-    """Assigns the message count field the number of messages present in the
-    thread.
-
-    Args:
-        full_thread_id: str. The full id of the thread.
-        message_count: int. The number of messages in the thread.
-    """
-    thread_model = feedback_models.FeedbackThreadModel.get(full_thread_id)
-    thread_model.message_count += 1
-    thread_model.put()
-
-
 def get_thread_summaries(user_id, full_thread_ids):
     """Returns a list of summaries corresponding to each of the threads given.
 
     Args:
-        thread_ids: list(str). The ids of the threads excluding the exploration
-            id part.
-        exploration_ids: list(str). The ids of the explorations to which the
-            threads belong.
+        user_id: str. The id of the user.
+        full_thread_ids: str. The complete ids of the threads for which we have
+            to fetch the summaries.
 
     Returns:
-        list(dict). A list of dictionary containing the summaries of the threads
-            given to it.
+        list(dict). A list of dictionaries containing the summaries of the
+            threads given to it. Each dict has the following keys:
+            - 'status': str. The status of the thread.
+            - 'original_author_id': str. The id of the original author of the
+                thread.
+            - 'last_updated': datetime.datetime. When was the thread last
+                updated.
+            - 'last_message_text': str. The text of the last message.
+            - 'total_no_of_messages': int. The total number of messages in the
+                thread.
+            - 'last_message_read': boolean. Whether the last message is read by
+                the user.
+            - 'second_last_message_read': boolean. Whether the second last
+                message is read by the user,
+            - 'author_last_message': str. The name of the author of the last
+                message.
+            - 'author_second_last_message': str. The name of the author of the
+                second last message.
+            - 'exploration_title': str. The title of the exploration to which
+                exploration belongs.
     """
-    exploration_and_thread_ids = (
-        [thread_id.split('.') for thread_id in full_thread_ids])
-    exploration_ids, thread_ids = zip(*exploration_and_thread_ids)
+    exploration_ids, thread_ids = (
+        feedback_models.FeedbackThreadModel.get_exploration_and_thread_ids(
+            full_thread_ids))
 
     thread_model_ids = (
         [feedback_models.FeedbackThreadModel.generate_full_thread_id(
@@ -479,30 +470,32 @@ def get_thread_summaries(user_id, full_thread_ids):
             user_id, exploration_id, thread_id)
          for exploration_id, thread_id in zip(exploration_ids, thread_ids)])
 
-    last_two_messages_ids = (
-        feedback_models.FeedbackMessageModel.get_last_two_message_ids_of_threads( # pylint: disable=line-too-long
-            exploration_ids, thread_ids))
-
     multiple_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
                 ('FeedbackThreadModel', thread_model_ids),
                 ('FeedbackThreadUserModel', feedback_thread_user_model_ids),
                 ('ExplorationModel', exploration_ids),
-                ('FeedbackMessageModel', last_two_messages_ids)
             ]))
 
     thread_models = multiple_models[0]
     feedback_thread_user_models = multiple_models[1]
     explorations = multiple_models[2]
-    messages = multiple_models[3]
+
+    threads = [_get_thread_from_model(thread_model)
+               for thread_model in thread_models]
+
+    last_two_messages_ids = []
+    for thread in threads:
+        last_two_messages_ids += thread.get_last_two_message_ids()
+
+    messages = feedback_models.FeedbackMessageModel.get_multi(
+        last_two_messages_ids)
 
     last_two_messages = [messages[i:i + 2] for i in range(0, len(messages), 2)]
 
     thread_summaries = []
-    for index, model in enumerate(thread_models):
-
-        does_second_message_exist = (last_two_messages[index][1] is not None)
+    for index, thread in enumerate(threads):
         last_message_read = (
             last_two_messages[index][0].message_id
             in feedback_thread_user_models[index].message_ids_read_by_user)
@@ -511,6 +504,8 @@ def get_thread_summaries(user_id, full_thread_ids):
 
         second_last_message_read = None
         author_second_last_message = None
+
+        does_second_message_exist = (last_two_messages[index][1] is not None)
         if does_second_message_exist:
             second_last_message_read = (
                 last_two_messages[index][1].message_id
@@ -518,17 +513,19 @@ def get_thread_summaries(user_id, full_thread_ids):
             author_second_last_message = user_services.get_username(
                 last_two_messages[index][1].author_id)
 
-        if model.message_count:
-            total_no_of_messages = model.message_count
+        if thread.message_count:
+            total_no_of_messages = thread.message_count
+        # TODO(Arunabh): Remove else clause after each thread has a message
+        # count.
         else:
             total_no_of_messages = (
                 feedback_models.FeedbackMessageModel.get_message_count(
-                    model.exploration_id, model.get_thread_id()))
+                    thread.exploration_id, thread.get_thread_id()))
 
         thread_summary = {
-            'status': model.status,
-            'original_author_id': model.original_author_id,
-            'last_updated': utils.get_time_in_millisecs(model.last_updated),
+            'status': thread.status,
+            'original_author_id': thread.original_author_id,
+            'last_updated': utils.get_time_in_millisecs(thread.last_updated),
             'last_message_text': last_two_messages[index][0].text,
             'total_no_of_messages': total_no_of_messages,
             'last_message_read': last_message_read,

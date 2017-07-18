@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import subscription_services
@@ -132,19 +133,31 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
 
         message_ids = [m.message_id for m in messages]
         feedback_services.update_messages_read_by_the_user(
-            exploration_id, thread_id, self.user_id, message_ids)
-
-        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+            self.user_id, exploration_id, thread_id, message_ids)
 
         message_summary_list = []
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        print "Hello", exploration.states[suggestion.state_name].content.to_dict()['html']
+        if suggestion:
+            suggestion_summary = {
+                'suggestion_html': suggestion.suggestion_html,
+                'description': suggestion.description,
+                'author_username': authors_settings[0].username,
+                'author_picture_data_url': (
+                    authors_settings[0].profile_picture_data_url),
+            }
+            message_summary_list.append(suggestion_summary)
+            messages.pop(0)
+            authors_settings.pop(0)
+
         for m, author_settings in zip(messages, authors_settings):
             message_summary = {
                 'text': m.text,
                 'author_username': author_settings.username,
                 'author_picture_data_url': (
                     author_settings.profile_picture_data_url),
-                'created_on': utils.get_time_in_millisecs(m.created_on),
-                'suggestion': suggestion if suggestion else None
+                'created_on': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
 
