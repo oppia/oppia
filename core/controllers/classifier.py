@@ -136,28 +136,29 @@ class NextJobHandler(base.BaseHandler):
     """
     TTL = 5*60*60
 
-    def update_failed_jobs(job_models):
+    def update_failed_jobs(self, job_models):
         for job_model in job_models:
             classifier_services.mark_training_job_failed(job_model.id)
 
-    def fetch_training_data(exp_id, state):
+    def fetch_training_data(self, exp_id, state):
         exp_model = exp_services.get_exploration_by_id(exp_id)
         state_model = exp_model.states[state]
         training_data = state_model.get_training_data()
         return training_data
 
-    def fetch_next_job():
+    def fetch_next_job(self):
         classifier_job_models = (
-        classifier_services.get_all_classifier_training_jobs())
-        classifier_job_models.sort(key=lambda item:item.created_on)
+            classifier_services.get_all_classifier_training_jobs())
+        classifier_job_models.sort(key=lambda item: item.created_on)
         valid_job_models = []
         failed_job_models = []
         for classifier_job_model in classifier_job_models:
             if classifier_job_model.status == feconf.TRAINING_JOB_STATUS_NEW:
                 valid_job_models.append(classifier_job_model)
-            if classifier_job_model.status == feconf.TRAINING_JOB_STATUS_PENDING:
+            if classifier_job_model.status == (
+                feconf.TRAINING_JOB_STATUS_PENDING):
                 if (datetime.datetime.utcnow() - (
-                    classifier_job_model.last_updated) < TTL):
+                        classifier_job_model.last_updated) < TTL):
                     valid_job_models.append(classifier_job_model)
                 else:
                     failed_job_models.append(classifier_job_model)
