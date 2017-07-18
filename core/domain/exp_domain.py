@@ -1118,8 +1118,8 @@ class Solution(object):
             interaction_id,
             solution_dict['answer_is_exclusive'],
             interaction_registry.Registry.get_interaction_by_id(
-                interaction_id).normalize_answer(
-                    solution_dict['correct_answer']),
+            interaction_id).normalize_answer(
+                solution_dict['correct_answer']),
             solution_dict['explanation'])
 
     def validate(self, interaction_id):
@@ -1176,7 +1176,7 @@ class InteractionInstance(object):
                 self.confirmed_unclassified_answers),
             'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
             'hints': [hint.to_dict() for hint in self.hints],
-            'solution': self.solution,
+            'solution': self.solution.to_dict() if self.solution else None,
         }
 
     @classmethod
@@ -1194,6 +1194,11 @@ class InteractionInstance(object):
         default_outcome_dict = (
             Outcome.from_dict(interaction_dict['default_outcome'])
             if interaction_dict['default_outcome'] is not None else None)
+        solution_dict = (
+            Solution.from_dict(
+                interaction_dict['id'], interaction_dict['solution'])
+            if interaction_dict['solution'] else None)
+
         return cls(
             interaction_dict['id'],
             interaction_dict['customization_args'],
@@ -1203,7 +1208,7 @@ class InteractionInstance(object):
             interaction_dict['confirmed_unclassified_answers'],
             [Fallback.from_dict(f) for f in interaction_dict['fallbacks']],
             [Hint.from_dict(h) for h in interaction_dict['hints']],
-            interaction_dict['solution'])
+            solution_dict)
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
@@ -1343,8 +1348,7 @@ class InteractionInstance(object):
 
         if self.hints:
             if self.solution:
-                Solution.from_dict(
-                    self.id, self.solution).validate(self.id)
+                self.solution.validate(self.id)
 
         elif self.solution:
             raise utils.ValidationError(
@@ -2088,17 +2092,21 @@ class State(object):
         """Update the solution of interaction.
 
         Args:
-            solution_dict: dict. The dict representation of Solution object.
+            solution_dict: dict or None. The dict representation of
+                Solution object.
 
         Raises:
-            Exception: 'hint_list' is not a list.
+            Exception: 'solution_dict' is not a dict.
         """
-        if not isinstance(solution_dict, dict):
-            raise Exception(
-                'Expected solution to be a dict, received %s'
-                % solution_dict)
-        self.interaction.solution = Solution.from_dict(
-            self.interaction.id, solution_dict)
+        if solution_dict is not None:
+            if not isinstance(solution_dict, dict):
+                raise Exception(
+                    'Expected solution to be a dict, received %s'
+                    % solution_dict)
+            self.interaction.solution = Solution.from_dict(
+                self.interaction.id, solution_dict)
+        else:
+            self.interaction.solution = None
 
     def add_hint(self, hint_text):
         """Add a new hint to the list of hints.
