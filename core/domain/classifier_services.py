@@ -386,6 +386,32 @@ def mark_training_job_pending(job_id):
                                            feconf.TRAINING_JOB_STATUS_PENDING)
 
 
+def update_training_job_training_data(job_id, training_data):
+    """Checks for the existence of the model and then updates it.
+
+    Args:
+        job_id: str. ID of the ClassifierTrainingJob domain object.
+        training_data: list. The training data of the job.
+
+    Raises:
+        Exception. The ClassifierTrainingJobModel corresponding to the job_id
+            of the ClassifierTrainingJob does not exist.
+    """
+    classifier_training_job_model = (
+        classifier_models.ClassifierTrainingJobModel.get(job_id, strict=False))
+    if not classifier_training_job_model:
+        raise Exception(
+            'The ClassifierTrainingJobModel corresponding to the job_id of the'
+            'ClassifierTrainingJob does not exist.')
+
+    classifier_training_job = get_classifier_training_job_by_id(job_id)
+    classifier_training_job.update_training_data(training_data)
+    classifier_training_job.validate()
+
+    classifier_training_job_model.training_data = training_data
+    classifier_training_job_model.put()
+
+
 def delete_classifier_training_job(job_id):
     """Deletes classifier training job model in the datastore given job_id.
 

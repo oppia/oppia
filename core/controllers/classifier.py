@@ -147,8 +147,8 @@ class NextJobHandler(base.BaseHandler):
         return training_data
 
     def fetch_next_job():
-        classifier_job_models =
-        classifier_services.get_all_classifier_training_jobs()
+        classifier_job_models = (
+        classifier_services.get_all_classifier_training_jobs())
         classifier_job_models.sort(key=lambda item:item.created_on)
         valid_job_models = []
         failed_job_models = []
@@ -174,6 +174,8 @@ class NextJobHandler(base.BaseHandler):
             raise self.UnauthorizedUserException
         next_job = fetch_next_job()
         training_data = fetch_training_data(next_job.exp_id, next_job.state)
+        classifier_services.update_training_job_training_data(
+            next_job.id, training_data)
         classifier_services.mark_training_job_pending(next_job.id)
         return self.render_json({
             'job_id': next_job.id,

@@ -286,6 +286,17 @@ class ClassifierTrainingJob(object):
 
         self._status = status
 
+    def update_training_data(self, training_data):
+         """Updates the training_data attribute of the ClassifierTrainingJob
+        domain object.
+
+        Args:
+            training_data: list. The training data of the classifier training
+                job.
+        """
+
+        self._training_data = training_data
+
     def to_dict(self):
         """Constructs a dict representation of training job domain object.
 
