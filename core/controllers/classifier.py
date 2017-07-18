@@ -134,7 +134,8 @@ class NextJobHandler(base.BaseHandler):
     """ This handler fetches next job in job queue and sends back job_id,
     algorithm_id and training data to the VM.
     """
-    TTL = 5*60*60
+    
+    self.TTL = 5*60*60
 
     def update_failed_jobs(self, job_models):
         for job_model in job_models:
@@ -156,7 +157,7 @@ class NextJobHandler(base.BaseHandler):
             if classifier_job_model.status == feconf.TRAINING_JOB_STATUS_NEW:
                 valid_job_models.append(classifier_job_model)
             if classifier_job_model.status == (
-                feconf.TRAINING_JOB_STATUS_PENDING):
+                    feconf.TRAINING_JOB_STATUS_PENDING):
                 if (datetime.datetime.utcnow() - (
                         classifier_job_model.last_updated) < TTL):
                     valid_job_models.append(classifier_job_model)
