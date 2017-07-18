@@ -137,11 +137,15 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
 
         message_summary_list = []
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        print "Hello", exploration.states[suggestion.state_name].content.to_dict()['html']
+
         if suggestion:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+            current_content_html = (
+                exploration.states[
+                    suggestion.state_name].content.to_dict()['html'])
             suggestion_summary = {
                 'suggestion_html': suggestion.suggestion_html,
+                'current_content_html': current_content_html,
                 'description': suggestion.description,
                 'author_username': authors_settings[0].username,
                 'author_picture_data_url': (

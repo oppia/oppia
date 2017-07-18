@@ -493,7 +493,8 @@
                   <span ng-if="thread.total_no_of_messages > 1 && (!thread.last_message_read || !thread.second_last_message_read)">
                     <strong><[thread.exploration_title]> -</strong>
                   </span>
-                  <span><[thread.last_message_text | truncate:50]></span>
+                  <span ng-if="thread.last_message_text"><[thread.last_message_text | truncate:50]></span>
+                  <span ng-if="!thread.last_message_text"><i>Suggestion</i></span>
                 <td class="col-lg-2 col-md-2 col-sm-2">
                   <span><[getLocaleAbbreviatedDatetimeString(thread.last_updated)]></span>
                 </td>
@@ -530,7 +531,7 @@
 
                       <div>
                         <span ng-if="message.text"><[message.text]></span>
-                          <button ng-if="message.suggestion_html" class="btn btn-primary" ng-click="showSuggestionModal(message.suggestion_html, message.description)">
+                          <button style="margin-top: 5px;" ng-if="message.suggestion_html" class="btn btn-primary" ng-click="showSuggestionModal(message.suggestion_html, message.current_content_html, message.description)">
                             View Suggestion
                           </button>
                       </div>
@@ -611,6 +612,13 @@
 
     <div class="modal-body">
       <section class="oppia-suggestion-review-container">
+        <div class="oppia-suggestion-review-panel-container" style="float: left;">
+          <strong>Current:</strong>
+          <div class="oppia-suggestion-review-panel">
+            <div ng-if="oldContent" angular-html-bind="oldContent"></div>
+            <div ng-if="!oldContent" style="color: red;">Oops! This state no longer exists!</div>
+          </div>
+        </div>
         <div class="oppia-suggestion-review-panel-container" style="float: right;">
           <strong>Suggested:</strong>
           <div class="oppia-suggestion-review-panel">

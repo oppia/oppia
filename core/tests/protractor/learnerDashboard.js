@@ -168,7 +168,17 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-subscription-name')).last().getText()).toMatch(
       'creator...');
     users.logout();
-  });  
+  });
+
+  it('display learner feedback threads', function() {
+    users.login('learner@learnerDashboard.com');
+    var feedback = 'A good exploration. Would love to see a few more questions';
+
+    browser.get(general.LIBRARY_URL_SUFFIX);
+    library.playExploration('Root Linear Coefficient Theorem');
+    player.submitFeedback(feedback);
+    browser.get(general.LEARNER_DASHBOARD_URL);
+  });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);

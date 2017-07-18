@@ -255,7 +255,6 @@ oppia.controller('LearnerDashboard', [
       $http.get(threadDataUrl).then(function(response) {
         var data = response.data;
         $scope.messageSummaries = data.message_summary_list;
-        console.log($scope.messageSummaries);
       });
     };
 
@@ -289,7 +288,7 @@ oppia.controller('LearnerDashboard', [
       });
     };
 
-    $scope.showSuggestionModal = function(newContent, description) {
+    $scope.showSuggestionModal = function(newContent, oldContent, description) {
       $modal.open({
         templateUrl: 'modals/editorViewSuggestion',
         backdrop: true,
@@ -297,14 +296,19 @@ oppia.controller('LearnerDashboard', [
           newContent: function() {
             return newContent;
           },
+          oldContent: function() {
+            return oldContent;
+          },
           description: function() {
             return description;
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'newContent', 'description',
-          function($scope, $modalInstance, newContent, description) {
+          '$scope', '$modalInstance', 'newContent', 'oldContent', 'description',
+          function($scope, $modalInstance, newContent, oldContent,
+            description) {
             $scope.newContent = newContent;
+            $scope.oldContent = oldContent;
             $scope.description = description;
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
