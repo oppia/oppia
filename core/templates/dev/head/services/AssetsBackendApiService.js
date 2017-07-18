@@ -46,8 +46,6 @@ oppia.factory('AssetsBackendApiService', [
       }));
       form.append('csrf_token', GLOBALS.csrf_token);
 
-      explorationId = '11';
-
       $.ajax({
         url: _getAudioUploadUrl(explorationId),
         data: form,

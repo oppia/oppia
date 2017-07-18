@@ -25,7 +25,8 @@ oppia.factory('AudioPlayerService', [
     var _load = function(filename, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.fetchAudio(
-        '11', filename).then(function(audioBlob) {
+        explorationContextService.getExplorationId(), filename)
+        .then(function(audioBlob) {
           var blobUrl = URL.createObjectURL(audioBlob);
           _currentTrack = ngAudio.load(blobUrl);
           _currentTrackFilename = filename; 
