@@ -182,7 +182,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def query_training_jobs(cls, inlcude_deleted = False):
+    def query_training_jobs(cls, inlcude_deleted=False):
         """Generates a unique id for the training job of the form
         {{exp_id}}.{{random_hash_of_16_chars}}
 
@@ -193,9 +193,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             List of the ClassifierTrainingJobModels with status new or pending.
         """
         query = cls.query(cls.status.IN([
-            feconf.TRAINING_JOB_STATUS_NEW, feconf.TRAINING_JOB_STATUS_PENDING]))
+            feconf.TRAINING_JOB_STATUS_NEW,
+            feconf.TRAINING_JOB_STATUS_PENDING]))
         if not inlcude_deleted:
-            query = query.filter(cls.deleted == False)
+            query = query.filter(cls.deleted == False) # pylint: disable=singleton-comparison
         query = query.order(cls.created_on, cls.id)
         return query
 

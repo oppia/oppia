@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Services for classifier data models"""
+import datetime
 
 from core.domain import classifier_domain
 from core.domain import classifier_registry
@@ -419,7 +420,7 @@ def update_failed_jobs(training_job):
         exp_id: str. ID of the exploration.
         state_name: str. Name of the state.
     """
-   for training_job in training_jobs:
+    for training_job in training_jobs:
         mark_training_job_failed(training_job.id)
 
 

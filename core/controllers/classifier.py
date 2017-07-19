@@ -14,7 +14,6 @@
 
 """Controllers for communicating with the VM for training classifiers."""
 
-import datetime
 import hashlib
 import hmac
 import json
