@@ -241,3 +241,17 @@ def can_access_admin_page(handler):
         return handler(self, **kwargs)
 
     return test_super_admin
+
+
+def can_upload_exploration(handler):
+    """Decorator that checks if the current user can upload exploration."""
+
+    def test_can_upload(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if not current_user_services.is_current_user_super_admin():
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to upload exploration.')
+        return handler(self, **kwargs)
+    return test_can_upload
