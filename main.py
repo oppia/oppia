@@ -17,6 +17,7 @@
 import logging
 
 # pylint: disable=relative-import
+from constants import constants
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import collection_editor
@@ -78,21 +79,10 @@ class HomePageRedirectHandler(base.BaseHandler):
                 self.user_id)
             user_contributions = user_services.get_user_contributions(
                 self.user_id)
-
-            if not user_settings.default_dashboard:
-                # 'Creator' is a user who has created or edited an exploration.
-                user_is_creator = user_contributions and (
-                    user_contributions.created_exploration_ids or
-                    user_contributions.edited_exploration_ids)
-                if user_is_creator:
-                    self.redirect(feconf.CREATOR_DASHBOARD_URL)
-                else:
-                    self.redirect(feconf.LIBRARY_INDEX_URL)
+            if user_settings.default_dashboard == constants.DASHBOARD_TYPE_CREATOR: # pylint: disable=line-too-long
+                self.redirect(feconf.CREATOR_DASHBOARD_URL)
             else:
-                if user_settings.default_dashboard == feconf.DASHBOARD_TYPE_CREATOR: # pylint: disable=line-too-long
-                    self.redirect(feconf.CREATOR_DASHBOARD_URL)
-                else:
-                    self.redirect(feconf.LEARNER_DASHBOARD_URL)
+                self.redirect(feconf.LEARNER_DASHBOARD_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
 

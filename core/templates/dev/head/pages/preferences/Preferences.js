@@ -19,12 +19,16 @@
 oppia.controller('Preferences', [
   '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
   'alertsService', 'UrlInterpolationService', 'utilsService',
+  'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
   function(
       $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService,
-      UrlInterpolationService, utilsService) {
+      UrlInterpolationService, utilsService, DASHBOARD_TYPE_CREATOR,
+      DASHBOARD_TYPE_LEARNER) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
+    $scope.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
+    $scope.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
@@ -120,12 +124,12 @@ oppia.controller('Preferences', [
       _saveDataItem('email_preferences', data);
     };
 
-    $scope.saveDefaultDashboard = function(defaultDashboard) {
-      _saveDataItem('default_dashboard', defaultDashboard);
-    }
-
     $scope.savePreferredLanguageCodes = function(preferredLanguageCodes) {
       _saveDataItem('preferred_language_codes', preferredLanguageCodes);
+    };
+
+    $scope.saveDefaultDashboard = function(defaultDashboard) {
+      _saveDataItem('default_dashboard', defaultDashboard);
     };
 
     $scope.showEditProfilePictureModal = function() {

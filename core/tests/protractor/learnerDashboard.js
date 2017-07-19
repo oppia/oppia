@@ -111,9 +111,9 @@ describe('Learner dashboard functionality', function() {
     browser.ignoreSynchronization = true;
     browser.get(general.LEARNER_DASHBOARD_URL);
     general.acceptAlert();
-    browser.ignoreSynchronization = false;
     browser.waitForAngular();
-    element(by.id('completedSection')).click();
+    element(by.css('.protractor-test-collection-section')).click();
+    browser.waitForAngular();
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
     ).getText()).toMatch('Test Collection');
@@ -136,12 +136,36 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     element(by.css('.protractor-test-completed-section')).click();
     browser.waitForAngular();
-    element(by.id('completedSection')).click();
+    general.waitForSystem();
+    element(by.css('.protractor-test-collection-section')).click();
     browser.waitForAngular();
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
     ).getText()).toMatch('Test Collection');
     users.logout();
+
+    users.login('creator1@learnerDashboard.com');
+    browser.get(general.CREATOR_DASHBOARD_URL);
+    browser.waitForAngular();
+    element(by.css('.protractor-test-collection-card')).click();
+    collectionEditor.addExistingExploration('0');
+    collectionEditor.saveDraft();
+    browser.waitForAngular();
+    element(by.css('.protractor-test-commit-message-input')).sendKeys('Update');
+    collectionEditor.closeSaveModal();
+    browser.waitForAngular();
+    users.logout();
+
+    users.login('learner@learnerDashboard.com');
+    browser.get(general.LEARNER_DASHBOARD_URL);
+    browser.waitForAngular();
+    element(by.css('.protractor-test-collection-section')).click();
+    browser.waitForAngular();
+    expect(element.all(by.css(
+      '.protractor-test-collection-summary-tile-title')).first(
+    ).getText()).toMatch('Test Collection');
+    users.logout();
+    browser.ignoreSynchronization = false;
   });
 
   it('display learners subscriptions', function() {
