@@ -151,17 +151,24 @@ def add_to_training_queue(exploration):
         classifier = get_classifier_from_exploration_attributes(
             exp_id, exp_version, state_name)
         if classifier:
-            if not check_re_training_conditions(state, classifier.id):
+            # Here, we pass classifier.id to the below function because the
+            # ClassifierDataModel instance is created with the job_id as ID.
+            if is_retraining_necessary(state, classifier.id):
+                create_classifier_training_job(algorithm_id, interaction_id,
+                                               exp_id, exp_version, state_name,
+                                               training_data,
+                                               feconf.TRAINING_JOB_STATUS_NEW)
+            else:
                 create_classifier_exploration_mapping(exp_id, exp_version+1,
                                                       state_name, classifier.id)
-                continue
-        create_classifier_training_job(algorithm_id, interaction_id, exp_id,
-                                       exp_version, state_name,
-                                       training_data,
-                                       feconf.TRAINING_JOB_STATUS_NEW)
+        else:
+            create_classifier_training_job(algorithm_id, interaction_id, exp_id,
+                                           exp_version, state_name,
+                                           training_data,
+                                           feconf.TRAINING_JOB_STATUS_NEW)
 
 
-def check_re_training_conditions(state, job_id):
+def is_retraining_necessary(state, job_id):
     """Checks whether the classifier needs to be trained again for a state.
 
     Args:
@@ -175,19 +182,11 @@ def check_re_training_conditions(state, job_id):
     new_training_data = state.get_training_data()
     old_training_data = classifier_training_job.training_data
 
-    # Check for change in number of answer groups.
-    if len(old_training_data) != len(new_training_data):
+    # NOTE: Right now, the retraining check is triggered even if there are any
+    # changes in the answer groups. This has to be checked in the end-to-end
+    # framework and optimized if required.
+    if new_training_data != old_training_data:
         return True
-
-    # Check for change in number of training samples.
-    diff = 0
-    for (answer_group_index, answer_group) in enumerate(old_training_data):
-        diff += abs(len(answer_group['answers']) - len(new_training_data[
-            answer_group_index]['answers']))
-    if diff > feconf.MIN_SAMPLE_TO_RETRAIN:
-        return True
-
-    # No re-training condition satisfied.
     return False
 
 
