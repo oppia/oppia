@@ -23,7 +23,6 @@ oppia.factory('AssetsBackendApiService', [
   function(
       $http, $q, GCS_AUDIO_DOWNLOAD_URL_TEMPLATE,
       AUDIO_UPLOAD_URL_TEMPLATE, UrlInterpolationService) {
-
     // Map from filename to asset blob.
     var assetsCache = {};
 
