@@ -108,8 +108,8 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
 
         self._run_one_off_job()
 
-        thread_summaries, _ = (feedback_services.get_thread_summaries(
-            self.user_id, thread_ids))
+        thread_summaries, _ = feedback_services.get_thread_summaries(
+            self.user_id, thread_ids)
 
         # Check that the first message has two messages.
         self.assertEqual(thread_summaries[0]['total_no_of_messages'], 2)
