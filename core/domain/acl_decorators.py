@@ -70,9 +70,9 @@ def check_activity_accessible(
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         return bool(
             (action_play_private in user_actions) or
-            (user_id in activity_rights.viewer_ids) or
-            (user_id in activity_rights.owner_ids) or
-            (user_id in activity_rights.editor_ids) or
+            activity_rights.is_viewer(user_id) or
+            activity_rights.is_owner(user_id) or
+            activity_rights.is_editor(user_id) or
             activity_rights.viewable_if_private)
 
 
@@ -92,9 +92,7 @@ def check_exploration_editable(user_id, user_actions, exploration_id):
         exploration_id, strict=False)
     print "balle balle oh balle"
     if exploration_rights is None:
-        print "returns correct thing"
-        return False
-#        raise self.PageNotFoundException
+        raise base.UserFacingExceptions.PageNotFoundException
 
     if exploration_rights.community_owned:
         return True
@@ -108,8 +106,8 @@ def check_exploration_editable(user_id, user_actions, exploration_id):
             return True
 
     if role_services.ACTION_EDIT_OWNED_EXPLORATION in user_actions:
-        if ((user_id in exploration_rights.owner_ids) or
-                (user_id in exploration_rights.editor_ids)):
+        if (exploration_rights.is_owner(user_id) or
+                exploration_rights.is_editor(user_id)):
             return True
 
     return False
@@ -210,9 +208,8 @@ def can_access_creator_dashboard(handler):
 
     def test_can_access(self, **kwargs):
         if self.user_id is None:
-            self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url',
-                '/notifications_dashboard'))
+            raise self.NotLoggedInException
+            return
         elif role_services.ACTION_ACCESS_CREATOR_DASHBOARD in self.actions:
             if user_services.has_fully_registered(self.user_id):
                 return handler(self, **kwargs)
@@ -299,10 +296,8 @@ def can_edit_exploration(handler):
 
     def test_can_edit(self, exploration_id, escaped_state_name=None, **kwargs):
         if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
+            raise self.NotLoggedInException
             return
-
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
             exploration_rights = rights_manager.get_exploration_rights(
@@ -354,7 +349,7 @@ def can_delete_exploration(handler):
                 rights_manager.ACTIVITY_STATUS_PRIVATE)) and
                 (role_services.ACTION_DELETE_OWNED_EXPLORATION in (
                     self.actions)) and
-                (self.user_id in exploration_rights.owner_ids)):
+                exploration_rights.is_owner(self.user_id)):
             return handler(self, exploration_id, **kwargs)
         elif (exploration_rights.status == (
                 rights_manager.ACTIVITY_STATUS_PUBLIC) and
@@ -427,7 +422,7 @@ def can_publish_exploration(handler):
 
         if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
             if role_services.ACTION_PUBLISH_OWNED_EXPLORATION in self.actions:
-                if self.user_id in exploration_rights.owner_ids:
+                if exploration_rights.is_owner(self.user_id):
                     return handler(self, exploration_id, **kwargs)
 
         if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
@@ -464,7 +459,7 @@ def can_modify_exploration_roles(handler):
             return handler(self, exploration_id, **kwargs)
         if (role_services.ACTION_MODIFY_ROLES_FOR_OWNED_EXPLORATION in
                 self.actions):
-            if self.user_id in exploration_rights.owner_ids:
+            if exploration_rights.is_owner(self.user_id):
                 return handler(self, exploration_id, **kwargs)
 
         raise self.UnauthorizedUserException(

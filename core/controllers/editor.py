@@ -319,7 +319,7 @@ class ExplorationHandler(EditorHandler):
 
         return editor_dict
 
-    @acl_decorators.can_play_exploration
+    @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
         # 'apply_draft' and 'v'(version) are optional parameters because the
@@ -574,26 +574,6 @@ class UserExplorationEmailsHandler(EditorHandler):
         })
 
 
-class ResolvedAnswersHandler(EditorHandler):
-    """Allows learners' answers for a state to be marked as resolved."""
-
-    @acl_decorators.can_edit_exploration
-    def put(self, exploration_id, state_name):
-        """Marks learners' answers as resolved."""
-        resolved_answers = self.payload.get('resolved_answers')
-
-        if not isinstance(resolved_answers, list):
-            raise self.InvalidInputException(
-                'Expected a list of resolved answers; received %s.' %
-                resolved_answers)
-
-        if 'resolved_answers' in self.payload:
-            event_services.DefaultRuleAnswerResolutionEventHandler.record(
-                exploration_id, state_name, resolved_answers)
-
-        self.render_json({})
-
-
 class UntrainedAnswersHandler(EditorHandler):
     """Returns answers that learners have submitted, but that Oppia hasn't been
     explicitly trained to respond to by an exploration author.
@@ -602,6 +582,7 @@ class UntrainedAnswersHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_edit_exploration
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
