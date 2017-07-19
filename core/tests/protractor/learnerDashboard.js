@@ -193,6 +193,7 @@ describe('Learner dashboard functionality', function() {
     expect(element.all(by.css(
       '.protractor-test-feedback-message')).first().getText()).toMatch(
       feedback);
+    users.logout();
   });
 
   afterEach(function() {

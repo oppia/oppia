@@ -76,6 +76,7 @@ class LearnerDashboardHandler(base.BaseHandler):
 
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
+        number_of_unread_threads = 0
         if len(full_thread_ids) > 0:
             thread_summaries, number_of_unread_threads = (
                 feedback_services.get_thread_summaries(
