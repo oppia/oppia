@@ -456,7 +456,7 @@ def fetch_next_job():
     failed_jobs = []
     for training_job in classifier_training_jobs:
         if(training_job.status == (
-            feconf.TRAINING_JOB_STATUS_PENDING)):
+                feconf.TRAINING_JOB_STATUS_PENDING)):
             if (datetime.datetime.utcnow() - (
                     training_job.last_updated) > feconf.TTL):
                 failed_jobs.append(training_job)
