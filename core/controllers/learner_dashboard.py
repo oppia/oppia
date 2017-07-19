@@ -77,8 +77,9 @@ class LearnerDashboardHandler(base.BaseHandler):
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
         if len(full_thread_ids) > 0:
-            thread_summaries = feedback_services.get_thread_summaries(
-                self.user_id, full_thread_ids)
+            thread_summaries, number_of_unread_threads = (
+                feedback_services.get_thread_summaries(
+                    self.user_id, full_thread_ids))
         else:
             thread_summaries = []
 
@@ -111,6 +112,7 @@ class LearnerDashboardHandler(base.BaseHandler):
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
             'thread_summaries': thread_summaries,
+            'number_of_unread_threads': number_of_unread_threads,
             'subscription_list': subscription_list,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'username': user_settings.username

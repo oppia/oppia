@@ -428,6 +428,8 @@ def _get_thread_from_model(thread_model):
 
 def get_thread_summaries(user_id, full_thread_ids):
     """Returns a list of summaries corresponding to each of the threads given.
+    It also returns the number of threads that are currently not read by the
+    user.
 
     Args:
         user_id: str. The id of the user.
@@ -455,6 +457,7 @@ def get_thread_summaries(user_id, full_thread_ids):
                 second last message.
             - 'exploration_title': str. The title of the exploration to which
                 exploration belongs.
+        int. The number of threads not read by the user.
     """
     exploration_ids, thread_ids = (
         feedback_models.FeedbackThreadModel.get_exploration_and_thread_ids(
@@ -495,6 +498,7 @@ def get_thread_summaries(user_id, full_thread_ids):
     last_two_messages = [messages[i:i + 2] for i in range(0, len(messages), 2)]
 
     thread_summaries = []
+    number_of_unread_threads = 0
     for index, thread in enumerate(threads):
         last_message_read = (
             last_two_messages[index][0].message_id
@@ -512,6 +516,11 @@ def get_thread_summaries(user_id, full_thread_ids):
                 in feedback_thread_user_models[index].message_ids_read_by_user)
             author_second_last_message = user_services.get_username(
                 last_two_messages[index][1].author_id)
+            if not last_message_read or not second_last_message_read:
+                number_of_unread_threads += 1
+        else:
+            if not last_message_read:
+                number_of_unread_threads += 1
 
         if thread.message_count:
             total_no_of_messages = thread.message_count
@@ -539,7 +548,7 @@ def get_thread_summaries(user_id, full_thread_ids):
 
         thread_summaries.append(thread_summary)
 
-    return thread_summaries
+    return thread_summaries, number_of_unread_threads
 
 
 def get_most_recent_messages(exp_id):

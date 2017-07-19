@@ -245,10 +245,13 @@ oppia.controller('LearnerDashboard', [
             $scope.threadSummaries[index].thread_id === threadId) {
           $scope.threadIndex = index;
           var threadSummary = $scope.threadSummaries[index]
-          threadSummary.last_message_read = true;
           if (typeof threadSummary.second_last_message_read !== 'undefined') {
             $scope.threadSummaries[index].second_last_message_read = true;
           }
+          if (threadSummary.last_message_read === false) {
+            $scope.numberOfUnreadThreads -= 1;
+          }
+          threadSummary.last_message_read = true;
         }
       }
 
@@ -425,6 +428,7 @@ oppia.controller('LearnerDashboard', [
           responseData.completed_to_incomplete_collections
         );
         $scope.threadSummaries = responseData.thread_summaries;
+        $scope.numberOfUnreadThreads = responseData.number_of_unread_threads;
         $scope.profilePictureDataUrl = responseData.profile_picture_data_url;
         $scope.username = responseData.username;
 

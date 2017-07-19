@@ -132,6 +132,7 @@
               ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTIONS.FEEDBACK}"
               ng-click="setActiveSection(LEARNER_DASHBOARD_SECTIONS.FEEDBACK)">
             <span translate="<[LEARNER_DASHBOARD_SECTIONS.FEEDBACK]>"></span>
+            <span ng-if="numberOfUnreadThreads !== 0">(<[numberOfUnreadThreads]>)</span>
           </h4>
         </md-card>
       </div>
@@ -467,26 +468,26 @@
             <table class="table" ng-if="!feedbackThreadActive">
               <tr ng-repeat="thread in threadSummaries | orderBy:sortFeedbackFunction:isCurrentFeedbackSortDescending"
                   ng-click="onClickThread(thread.exploration_id, thread.thread_id, thread.exploration_title)"
-                  class="oppia-feedback-tab-row">
+                  class="oppia-feedback-tab-row protractor-test-feedback-thread">
                 <td class="col-lg-1 col-md-1 col-sm-1">
                   <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
                 </td>
-                <td class="col-lg-3 col-md-3 col-sm-3" style="width: 20%;">
+                <td class="col-lg-3 col-md-3 col-sm-3" style="width: 21%;">
                   <span ng-if="thread.author_second_last_message">
-                    <span ng-if="thread.second_last_message_read"><[thread.author_second_last_message]>, </span>
+                    <span ng-if="thread.second_last_message_read"><[thread.author_second_last_message | truncate:7]>, </span>
                     <span ng-if="!thread.second_last_message_read">
-                      <strong><[thread.author_second_last_message]>, </strong>
+                      <strong><[thread.author_second_last_message | truncate:7]>, </strong>
                     </span>
                   </span>
-                  <span ng-if="thread.last_message_read"><[thread.author_last_message]></span>
+                  <span ng-if="thread.last_message_read"><[thread.author_last_message | truncate:7]></span>
                   <span ng-if="!thread.last_message_read">
-                    <strong><[thread.author_last_message]></strong>
+                    <strong><[thread.author_last_message | truncate:7]></strong>
                   </span>
                   <span class="feedback-thread-message-count">(<[thread.total_no_of_messages]>)</span>
                 </td>
                 <td class="col-lg-6 col-md-6 col-sm-6" style="width: 58%;">
                   <span ng-if="thread.total_no_of_messages > 1 && thread.second_last_message_read && thread.last_message_read"><[thread.exploration_title]> -</span>
-                  <span ng-if="thread.total_no_of_messages === 1 && thread.last_message_read"><[thread.exploration_title]> -</span>
+                  <span class="protractor-test-feedback-exploration" ng-if="thread.total_no_of_messages === 1 && thread.last_message_read"><[thread.exploration_title]> -</span>
                   <span ng-if="thread.total_no_of_messages === 1 && !thread.last_message_read">
                     <strong><[thread.exploration_title]> -</strong>
                   </span>
@@ -530,8 +531,8 @@
                       </div>
 
                       <div>
-                        <span ng-if="message.text"><[message.text]></span>
-                          <button style="margin-top: 5px;" ng-if="message.suggestion_html" class="btn btn-primary" ng-click="showSuggestionModal(message.suggestion_html, message.current_content_html, message.description)">
+                        <span class="protractor-test-feedback-message" ng-if="message.text"><[message.text]></span>
+                          <button style="margin-top: 5px;" ng-if="message.current_content_html" class="btn btn-primary" ng-click="showSuggestionModal(message.suggestion_html, message.current_content_html, message.description)">
                             View Suggestion
                           </button>
                       </div>
@@ -562,7 +563,7 @@
                                 ng-click="addNewMessage(explorationId, threadId, newMessage)"
                                 ng-disabled="messageSendingInProgress">
                           <span ng-if="messageSendingInProgress">Sending...</span>
-                          <span ng-if="!messageSendingInProgress">Send</span>
+                          <span class="protractor-test-feedback-send-message" ng-if="!messageSendingInProgress">Send</span>
                         </button>
                       </div>
                     </div>

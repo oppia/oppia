@@ -175,9 +175,24 @@ describe('Learner dashboard functionality', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
 
     browser.get(general.LIBRARY_URL_SUFFIX);
-    library.playExploration('Root Linear Coefficient Theorem');
+    general.openPlayer('14');
+    player.submitAnswer('Continue', null);
+    player.submitAnswer(
+      'MultipleChoiceInput', 'Those were all the questions I had!');
+    player.submitAnswer('Continue', null);
     player.submitFeedback(feedback);
     browser.get(general.LEARNER_DASHBOARD_URL);
+    browser.waitForAngular();
+    element(by.css('.protractor-test-feedback-section')).click();
+    browser.waitForAngular();
+    expect(element.all(by.css(
+      '.protractor-test-feedback-exploration')).first().getText()).toMatch(
+      'About Oppia');
+    element(by.css('.protractor-test-feedback-thread')).click();
+    browser.waitForAngular();
+    expect(element.all(by.css(
+      '.protractor-test-feedback-message')).first().getText()).toMatch(
+      feedback);
   });
 
   afterEach(function() {
