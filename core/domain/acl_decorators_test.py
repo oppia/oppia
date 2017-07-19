@@ -240,8 +240,12 @@ class ManageEmailDashboardTest(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         @acl_decorators.can_manage_email_dashboard
-        def get(self, collection_id):
-            return self.render_json({'collection_id': collection_id})
+        def get(self):
+            return self.render_json({'success': 1})
+
+        @acl_decorators.can_manage_email_dashboard
+        def put(self, query_id):
+            return self.render_json({'query_id': query_id})
 
     def setUp(self):
 
@@ -257,12 +261,14 @@ class ManageEmailDashboardTest(test_utils.GenericTestBase):
 
     def test_moderator_cannot_access_email_dashboard(self):
         self.login(self.MODERATOR_EMAIL)
-        response = self.testapp.get('/mock/', expect_errors=True)
+        response = self.testapp.get('/mock/one', expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
     def test_admin_can_access_email_dashboard(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.testapp.get('/mock/', expect_errors=True)
+        response = self.testapp.get('/mock/one', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        response = self.testapp.put('/mock/one', expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
