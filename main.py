@@ -77,8 +77,6 @@ class HomePageRedirectHandler(base.BaseHandler):
         if self.user_id and user_services.has_fully_registered(self.user_id):
             user_settings = user_services.get_user_settings(
                 self.user_id)
-            user_contributions = user_services.get_user_contributions(
-                self.user_id)
             if user_settings.default_dashboard == constants.DASHBOARD_TYPE_CREATOR: # pylint: disable=line-too-long
                 self.redirect(feconf.CREATOR_DASHBOARD_URL)
             else:
