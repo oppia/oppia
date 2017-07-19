@@ -19,7 +19,10 @@
 from core.controllers import base
 from core.domain import rights_manager
 from core.domain import role_services
+from core.platform import models
 import feconf
+
+current_user_services = models.Registry.import_current_user_services()
 
 
 def check_activity_accessible(
