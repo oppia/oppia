@@ -26,7 +26,7 @@ import feconf
 class ModeratorPage(base.BaseHandler):
     """The moderator page."""
 
-    @base.can_access_moderator_page
+    @acl_decorators.can_access_moderator_page
     def get(self):
         """Handles GET requests."""
         self.render_template('pages/moderator/moderator.html')

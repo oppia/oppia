@@ -187,7 +187,7 @@ def can_access_moderator_page(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_FEATURED_ACTIVITIES in self.actions:
+        if role_services.ACTION_ACCESS_MODERATOR_PAGE in self.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -203,10 +203,26 @@ def can_send_moderator_emails(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_FEATURED_ACTIVITIES in self.actions:
+        if role_services.ACTION_SEND_MODERATOR_EMAILS in self.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to send moderator emails.')
 
     return test_can_send_moderator_emails
+
+
+def can_manage_own_profile(handler):
+    """Decorator to check whether user can manage his profile."""
+
+    def test_can_manage_profile(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_PROFILE in self.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to manage profile or preferences.')
+
+    return test_can_manage_profile
