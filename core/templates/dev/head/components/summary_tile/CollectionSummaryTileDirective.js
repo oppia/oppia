@@ -66,6 +66,10 @@ oppia.directive('collectionSummaryTile', [
             return UrlInterpolationService.getStaticImageUrl(
               $scope.getThumbnailIconUrl());
           };
+
+          $scope.getStaticImageUrl = function (url) {
+            return UrlInterpolationService.getStaticImageUrl(url);
+          };
         }
       ]
     };
