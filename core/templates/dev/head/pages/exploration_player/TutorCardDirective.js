@@ -55,13 +55,15 @@ oppia.directive('tutorCard', [
         'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'HINT_REQUEST_STRING_I18N_IDS', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
+        'SolutionManagerService', 'oppiaExplorationHtmlFormatterService',
         function(
           $scope, $timeout, oppiaPlayerService, HintManagerService,
           playerPositionService, playerTranscriptService,
           ExplorationPlayerStateService, windowDimensionsService,
           urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
           CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-          HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC) {
+          HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC,
+          SolutionManagerService, oppiaExplorationHtmlFormatterService) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -83,6 +85,12 @@ oppia.directive('tutorCard', [
 
             $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints.length);
+
+            SolutionManagerService.reset(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).solution);
+
+            $scope.solutionExists = Boolean(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).solution);
           };
 
           $scope.arePreviousResponsesShown = false;
@@ -101,6 +109,15 @@ oppia.directive('tutorCard', [
             }
           };
 
+          $scope.consumeSolution = function() {
+            playerTranscriptService.addNewInput(
+              'Please show me the answer.', true);
+            var answer = SolutionManagerService.consumeSolution();
+            console.log(answer);
+            console.log(oppiaPlayerService.getInteractionHtml($scope.activeCard.stateName, 'blah'));
+            playerTranscriptService.addNewResponse(answer + '');
+          };
+
           $scope.isHintAvailable = function() {
             var hintIsAvailable = (
               HintManagerService.isCurrentHintAvailable() &&
@@ -112,6 +129,9 @@ oppia.directive('tutorCard', [
             return HintManagerService.areAllHintsExhausted();
           };
 
+          $scope.isCurrentSolutionAvailable = function () {
+            return SolutionManagerService.isCurrentSolutionAvailable();
+          };
 
           $scope.isIframed = urlService.isIframed();
 

@@ -20,15 +20,14 @@
 // A service that provides a number of utility functions useful to both the
 // editor and player.
 oppia.factory('oppiaExplorationHtmlFormatterService', [
-  '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper',
-  function($filter, extensionTagAssemblerService, oppiaHtmlEscaper) {
+  '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper', 'INTERACTION_SPECS',
+  function($filter, extensionTagAssemblerService, oppiaHtmlEscaper, INTERACTION_SPECS) {
     return {
       getInteractionHtml: function(
           interactionId, interactionCustomizationArgSpecs,
           labelForFocusTarget) {
         var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
         var element = $('<oppia-interactive-' + htmlInteractionId + '>');
-
         element = (
           extensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
