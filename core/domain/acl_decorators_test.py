@@ -352,12 +352,12 @@ class ManageOwnProfileTest(test_utils.GenericTestBase):
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
-        @acl_decorators.can_send_moderator_emails
+        @acl_decorators.can_manage_own_profile
         def get(self):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(SendModeratorEmailsTest, self).setUp()
+        super(ManageOwnProfileTest, self).setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.user_name)
         self.set_banned_users([self.banned_user])
@@ -368,12 +368,12 @@ class ManageOwnProfileTest(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_update_preferences(self):
         self.login(self.banned_user_email)
-        response = self.testapp.get('/mock', expect_errors=True)
+        response = self.testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
     def test_normal_user_can_manage_preferences(self):
         self.login(self.user_email)
-        response = self.testapp.get('/mock', expect_errors=True)
+        response = self.testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
