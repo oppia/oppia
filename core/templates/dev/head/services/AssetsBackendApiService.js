@@ -25,7 +25,6 @@ oppia.factory('AssetsBackendApiService', [
       AUDIO_UPLOAD_URL_TEMPLATE, UrlInterpolationService) {
     // Map from filename to asset blob.
     var assetsCache = {};
-
     var _fetchAudio = function(
         explorationId, filename, successCallback, errorCallback) {
       $http({
