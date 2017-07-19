@@ -26,14 +26,14 @@ oppia.factory('AudioPlayerService', [
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.fetchAudio(
         explorationContextService.getExplorationId(), filename)
-        .then(function(audioBlob) {
-          var blobUrl = URL.createObjectURL(audioBlob);
-          _currentTrack = ngAudio.load(blobUrl);
-          _currentTrackFilename = filename; 
-          successCallback();
-        }, function(reason) {
-          errorCallback(reason);
-        });
+          .then(function(audioBlob) {
+            var blobUrl = URL.createObjectURL(audioBlob);
+            _currentTrack = ngAudio.load(blobUrl);
+            _currentTrackFilename = filename; 
+            successCallback();
+          }, function(reason) {
+            errorCallback(reason);
+          });
       }
     };
 
