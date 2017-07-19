@@ -226,3 +226,18 @@ def can_manage_own_profile(handler):
             'You do not have credentials to manage profile or preferences.')
 
     return test_can_manage_profile
+
+
+def can_access_admin_page(handler):
+    """Decorator that checks if the current user is a super admin."""
+    def test_super_admin(self, **kwargs):
+        """Checks if the user is logged in and is a super admin."""
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if not current_user_services.is_current_user_super_admin():
+            raise self.UnauthorizedUserException(
+                '%s is not a super admin of this application', self.user_id)
+        return handler(self, **kwargs)
+
+    return test_super_admin
