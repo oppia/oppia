@@ -414,7 +414,7 @@ def update_training_job_training_data(job_id, training_data):
     classifier_training_job_model.put()
 
 
-def update_failed_jobs(training_job):
+def update_failed_jobs(training_jobs):
     """Updates status of job_models to failed.
     Args:
         exp_id: str. ID of the exploration.
@@ -437,7 +437,7 @@ def fetch_training_data(exp_id, state_name):
         Exception: The state is not present in the exp_id.
     """
     exp = exp_services.get_exploration_by_id(exp_id)
-    if state_name not in exp_model.states.keys():
+    if state_name not in exp.states.keys():
         raise Exception('The state %s is not present in the exp_id %s.'%(
             state_name, exp_id))
     state = exp.states[state_name]
@@ -455,11 +455,13 @@ def fetch_next_job():
     valid_jobs = []
     failed_jobs = []
     for training_job in classifier_training_jobs:
-        if (datetime.datetime.utcnow() - (
-                classifier_job_model.last_updated) > feconf.TTL and (
-                    classifier_job_model.status == (
-                        feconf.TRAINING_JOB_STATUS_PENDING))):
-            failed_jobs.append(training_job)
+        if(training_job.status == (
+                        feconf.TRAINING_JOB_STATUS_PENDING)):
+            if (datetime.datetime.utcnow() - (
+                    training_job.last_updated) > feconf.TTL):
+                failed_jobs.append(training_job)
+            else:
+                valid_jobs.append(training_job)
     update_failed_jobs(failed_jobs)
     next_job = valid_jobs[0]
     return next_job
