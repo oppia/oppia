@@ -255,20 +255,89 @@ class ManageEmailDashboardTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/', self.MockHandler)],
+            [
+                webapp2.Route('/mock/', self.MockHandler),
+                webapp2.Route('/mock/<query_id>', self.MockHandler)
+            ],
             debug=feconf.DEBUG,
         ))
 
     def test_moderator_cannot_access_email_dashboard(self):
         self.login(self.MODERATOR_EMAIL)
-        response = self.testapp.get('/mock/one', expect_errors=True)
+        response = self.testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
     def test_admin_can_access_email_dashboard(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.testapp.get('/mock/one', expect_errors=True)
+        response = self.testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 200)
         response = self.testapp.put('/mock/one', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class AccessModeratorPageTest(test_utils.GenericTestBase):
+
+    user_name = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_access_moderator_page
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(AccessModeratorPageTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.user_name)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_moderator_page(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_admin_can_access_moderator_page(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get('/mock/', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class SendModeratorEmailsTest(test_utils.GenericTestBase):
+
+    user_name = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_send_moderator_emails
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(SendModeratorEmailsTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.user_name)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_send_moderator_emails(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_admin_can_send_moderator_emails(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()

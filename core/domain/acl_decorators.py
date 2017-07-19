@@ -167,7 +167,7 @@ def can_edit_collection(handler):
 def can_manage_email_dashboard(handler):
     """Decorator to check whether user can access email dashboard."""
 
-    def can_manage_emails(self, **kwargs):
+    def test_can_manage_emails(self, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -177,4 +177,36 @@ def can_manage_email_dashboard(handler):
         raise self.UnauthorizedUserException(
             'You do not have credentials to access email dashboard.')
 
-    return can_manage_emails
+    return test_can_manage_emails
+
+
+def can_access_moderator_page(handler):
+    """Decorator to check whether user can access moderator page."""
+
+    def test_can_access_moderator_page(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_FEATURED_ACTIVITIES in self.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access moderator page.')
+
+    return test_can_access_moderator_page
+
+
+def can_send_moderator_emails(handler):
+    """Decorator to check whether user can send moderator emails."""
+
+    def test_can_send_moderator_emails(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_FEATURED_ACTIVITIES in self.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to send moderator emails.')
+
+    return test_can_send_moderator_emails
