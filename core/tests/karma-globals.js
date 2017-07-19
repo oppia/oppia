@@ -32,7 +32,9 @@ var GLOBALS = {
 
 /* hashes for UrlInterpolationService tests */
 var hashes = {
+  '/hash_test.html': 'ijklmopq',
   '/path_test/hash_test.html': '123456789',
+  '/hash_test.min.js': 'zyx12345',
   '/assets_test/hash_test.json': '987654321',
   '/pages_test/hash_test.html': 'abcd12345',
   '/images/hash_test.png': '98765fghij',

@@ -33,14 +33,6 @@ oppia.factory('UrlInterpolationService', [
     };
 
     /**
-     * Given a resource path,
-     * returns resource path prefixed with url depending on dev/prod mode.
-     */
-    var getPrefixedUrl = function(resourcePath) {
-      return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
-    };
-
-    /**
      * Given a resource path relative to subfolder in /,
      * returns resource path with cache slug.
      */
@@ -56,12 +48,21 @@ oppia.factory('UrlInterpolationService', [
     };
 
     /**
+     * Given a resource path relative to subfolder in /,
+     * returns complete resource path with cache slug and prefixed with url
+     * depending on dev/prod mode.
+     */
+    var getCompleteUrl = function(prefix, path) {
+      return GLOBALS.ASSET_DIR_PREFIX + prefix + getUrlWithSlug(path);
+    };
+
+    /**
      * Given a resource path relative to extensions folder,
      * returns the complete url path to that resource.
      */
     var getExtensionResourceUrl = function(resourcePath) {
       validateResourcePath(resourcePath);
-      return getPrefixedUrl('/extensions' + getUrlWithSlug(resourcePath));
+      return getCompleteUrl('/extensions', resourcePath);
     };
 
     return {
@@ -162,8 +163,7 @@ oppia.factory('UrlInterpolationService', [
        */
       getStaticImageUrl: function(imagePath) {
         validateResourcePath(imagePath);
-        return getPrefixedUrl(
-          '/assets' + getUrlWithSlug('/images' + imagePath));
+        return getCompleteUrl('/assets', '/images' + imagePath);
       },
 
       /**
@@ -207,10 +207,13 @@ oppia.factory('UrlInterpolationService', [
        */
       getTranslateJsonUrl: function(jsonPath) {
         validateResourcePath(jsonPath);
-        return getPrefixedUrl('/assets' + getUrlWithSlug(jsonPath));
+        return getCompleteUrl('/assets', jsonPath);
       },
 
-      getExtensionResourceUrl: getExtensionResourceUrl
+      getExtensionResourceUrl: getExtensionResourceUrl,
+
+      _getUrlWithSlug: getUrlWithSlug,
+      _getCompleteUrl: getCompleteUrl
     };
   }
 ]);
