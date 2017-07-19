@@ -24,7 +24,7 @@ oppia.factory('AudioPlayerService', [
 
     var _load = function(filename, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
-        AssetsBackendApiService.fetchAudio(
+        AssetsBackendApiService.loadAudio(
         explorationContextService.getExplorationId(), filename)
           .then(function(audioBlob) {
             var blobUrl = URL.createObjectURL(audioBlob);

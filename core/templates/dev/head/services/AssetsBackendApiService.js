@@ -35,6 +35,7 @@ oppia.factory('AssetsBackendApiService', [
         url: _getAudioDownloadUrl(explorationId, filename),
       }).success(function(data) {
         var audioBlob = new Blob([data]);
+        assetsCache[filename] = audioBlob;
         successCallback(audioBlob);
       }).error(errorCallback);
     };
