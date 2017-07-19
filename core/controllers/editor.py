@@ -990,6 +990,11 @@ class AudioFileHandler(EditorHandler):
                 'Found mime types: %s' % (extension, audio.mime))
 
         mimetype = audio.mime[0]
+
+        # For a strange, unknown reason, the audio variable must be
+        # deleted before opening cloud storage. If not, cloud storage
+        # throws a very mysterious error that entails a mutagen
+        # object being recursively passed around in app engine.
         del audio
 
         bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
