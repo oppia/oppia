@@ -451,14 +451,14 @@ def fetch_next_job():
     Returns:
         ClassifierTrainingJobModel. Domain object of the next training Job.
     """
-    training_jobs = get_all_classifier_training_jobs()
+    classifier_training_jobs = get_all_classifier_training_jobs()
     valid_jobs = []
     failed_jobs = []
-    for training_job in taining_jobs:
+    for training_job in classifier_training_jobs:
         if (datetime.datetime.utcnow() - (
-                classifier_job_model.last_updated) < feconf.TTL):
-            valid_jobs.append(training_job)
-        else:
+                classifier_job_model.last_updated) > feconf.TTL and (
+                    classifier_job_model.status == (
+                        feconf.TRAINING_JOB_STATUS_PENDING))):
             failed_jobs.append(training_job)
     update_failed_jobs(failed_jobs)
     next_job = valid_jobs[0]
