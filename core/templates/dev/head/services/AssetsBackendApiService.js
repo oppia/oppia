@@ -23,6 +23,10 @@ oppia.factory('AssetsBackendApiService', [
   function(
       $http, $q, GCS_AUDIO_DOWNLOAD_URL_TEMPLATE,
       AUDIO_UPLOAD_URL_TEMPLATE, UrlInterpolationService) {
+
+    // Map from filename to asset blob.
+    var assetsCache = {};
+
     var _fetchAudio = function(
         explorationId, filename, successCallback, errorCallback) {
       $http({
@@ -78,10 +82,18 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
+    var _isCached = function(filename) {
+      return filename in assetsCache;
+    }
+
     return {
-      fetchAudio: function(explorationId, filename) {
+      loadAudio: function(explorationId, filename) {
         return $q(function(resolve, reject) {
-          _fetchAudio(explorationId, filename, resolve, reject);
+          if (_isCached(filename)) {
+            resolve(assetsCache[filename]);
+          } else {
+            _fetchAudio(explorationId, filename, resolve, reject);
+          }
         });
       },
       saveAudio: function(explorationId, filename, rawAssetData) {
