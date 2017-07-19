@@ -17,6 +17,7 @@
 from core.domain import classifier_domain
 from core.domain import classifier_registry
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import interaction_registry
 from core.platform import models
 
@@ -286,7 +287,7 @@ def get_all_classifier_training_jobs():
     """
     classifier_training_jobs = []
     classifier_training_job_models = (
-        classifier_models.ClassifierTrainingJobModel.get_all()
+        classifier_models.ClassifierTrainingJobModel.query_training_jobs()
         )
     for job_model in classifier_training_job_models:
         classifier_training_jobs.append(
@@ -410,6 +411,57 @@ def update_training_job_training_data(job_id, training_data):
 
     classifier_training_job_model.training_data = training_data
     classifier_training_job_model.put()
+
+
+def update_failed_jobs(training_job):
+    """Updates status of job_models to failed.
+    Args:
+        exp_id: str. ID of the exploration.
+        state_name: str. Name of the state.
+    """
+   for training_job in training_jobs:
+        mark_training_job_failed(training_job.id)
+
+
+def fetch_training_data(exp_id, state_name):
+    """Gets training data of the given state and exp_id.
+    Args:
+        exp_id: str. ID of the exploration.
+        state_name: str. Name of the state.
+
+    Returns:
+        List. training data.
+
+    Raises:
+        Exception: The state is not present in the exp_id.
+    """
+    exp = exp_services.get_exploration_by_id(exp_id)
+    if state_name not in exp_model.states.keys():
+        raise Exception('The state %s is not present in the exp_id %s.'%(
+            state_name, exp_id))
+    state = exp.states[state_name]
+    training_data = state.get_training_data()
+    return training_data
+
+
+def fetch_next_job():
+    """Gets next job model in the job queue.
+
+    Returns:
+        ClassifierTrainingJobModel. Domain object of the next training Job.
+    """
+    training_jobs = get_all_classifier_training_jobs()
+    valid_jobs = []
+    failed_jobs = []
+    for training_job in taining_jobs:
+        if (datetime.datetime.utcnow() - (
+                classifier_job_model.last_updated) < feconf.TTL):
+            valid_jobs.append(training_job)
+        else:
+            failed_jobs.append(training_job)
+    update_failed_jobs(failed_jobs)
+    next_job = valid_jobs[0]
+    return next_job
 
 
 def delete_classifier_training_job(job_id):

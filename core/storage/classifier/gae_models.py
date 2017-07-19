@@ -181,6 +181,24 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         training_job_instance.put()
         return instance_id
 
+    @classmethod
+    def query_training_jobs(cls, inlcude_deleted = False):
+        """Generates a unique id for the training job of the form
+        {{exp_id}}.{{random_hash_of_16_chars}}
+
+        Args:
+            include_deleted: bool. If True, then entities that have been marked
+                deleted are returned as well. Defaults to False.
+        Returns:
+            List of the ClassifierTrainingJobModels with status new or pending.
+        """
+        query = cls.query(cls.status.IN([
+            feconf.TRAINING_JOB_STATUS_NEW, feconf.TRAINING_JOB_STATUS_PENDING]))
+        if not inlcude_deleted:
+            query = query.filter(cls.deleted == False)
+        query = query.order(cls.created_on, cls.id)
+        return query
+
 
 class ClassifierExplorationMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierDataModel.
