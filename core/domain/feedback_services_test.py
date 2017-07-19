@@ -373,8 +373,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
-        thread_summaries, number_of_unread_threads = (
-            feedback_services.get_thread_summaries(self.user_id, thread_ids))
+        thread_summaries, _ = feedback_services.get_thread_summaries(
+            self.user_id, thread_ids)
         exploration_titles = ['Bridges in England', 'Sillat Suomi']
 
         # Fetch the threads.
