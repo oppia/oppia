@@ -162,3 +162,19 @@ def can_edit_collection(handler):
             'You do not have credentials to edit this collection.')
 
     return test_can_edit
+
+
+def can_manage_email_dashboard(handler):
+    """Decorator to check whether user can access email dashboard."""
+
+    def can_manage_emails(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_EMAIL_DASHBOARD in self.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access email dashboard.')
+
+    return can_manage_emails

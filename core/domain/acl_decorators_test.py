@@ -174,7 +174,7 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_collection_editors([self.OWNER_EMAIL])
+        self.set_collection_editors([self.OWNER_USERNAME])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -231,5 +231,38 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.private_col_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class ManageEmailDashboardTest(test_utils.GenericTestBase):
+    """Tests for can_manage_email_dashboard decorator."""
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_manage_email_dashboard
+        def get(self, collection_id):
+            return self.render_json({'collection_id': collection_id})
+
+    def setUp(self):
+
+        super(ManageEmailDashboardTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_moderator_cannot_access_email_dashboard(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get('/mock/', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_admin_can_access_email_dashboard(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
