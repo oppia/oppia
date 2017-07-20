@@ -108,7 +108,8 @@ oppia.controller('StateSolution', [
         correctAnswer = '[Graph Object]';
       } else if (interactionId === 'MultipleChoiceInput') {
         correctAnswer = (
-          oppiaHtmlEscaper.objToEscapedJson(responsesService.getAnswerChoices()[solution.correctAnswer].label));
+          oppiaHtmlEscaper.objToEscapedJson(
+            responsesService.getAnswerChoices()[solution.correctAnswer].label));
         console.log(correctAnswer);
       } else if (interactionId === 'MathExpressionInput') {
         correctAnswer = solution.correctAnswer.latex;
