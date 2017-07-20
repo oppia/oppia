@@ -17,15 +17,12 @@
  */
 
 oppia.factory('SolutionManagerService', [
-  '$timeout','playerTranscriptService', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
-  'HINT_REQUEST_STRING_I18N_IDS', 'WAIT_FOR_HINT_MSEC',
-  function(
-    $timeout, playerTranscriptService, DELAY_FOR_HINT_FEEDBACK_MSEC,
-    HINT_REQUEST_STRING_I18N_IDS, WAIT_FOR_HINT_MSEC) {
+  '$timeout',
+  function($timeout) {
     var solution = null;
     var solutionIsExhausted = false;
     var _getCurrentSolution = function() {
-      return solution.correctAnswer;
+      return solution;
     };
 
     return {

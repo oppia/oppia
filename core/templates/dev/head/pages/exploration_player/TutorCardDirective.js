@@ -55,7 +55,8 @@ oppia.directive('tutorCard', [
         'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'HINT_REQUEST_STRING_I18N_IDS', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
-        'SolutionManagerService', 'oppiaExplorationHtmlFormatterService',
+        'SolutionManagerService', 'stateInteractionIdService',
+        'responsesService',
         function(
           $scope, $timeout, oppiaPlayerService, HintManagerService,
           playerPositionService, playerTranscriptService,
@@ -63,7 +64,8 @@ oppia.directive('tutorCard', [
           urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
           CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
           HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC,
-          SolutionManagerService, oppiaExplorationHtmlFormatterService) {
+          SolutionManagerService, stateInteractionIdService,
+          responsesService) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -112,10 +114,23 @@ oppia.directive('tutorCard', [
           $scope.consumeSolution = function() {
             playerTranscriptService.addNewInput(
               'Please show me the answer.', true);
-            var answer = SolutionManagerService.consumeSolution();
-            console.log(answer);
-            console.log(oppiaPlayerService.getInteractionHtml($scope.activeCard.stateName, 'blah'));
-            playerTranscriptService.addNewResponse(answer + '');
+            var solution = SolutionManagerService.consumeSolution();
+            var interactionId = stateInteractionIdService.savedMemento;
+            var answer = '';
+            if (interactionId === 'MultipleChoiceInput') {
+              answer = (
+                responsesService.getAnswerChoices()[solution.correctAnswer]
+                .label);
+            } else if (interactionId === 'MathExpressionInput') {
+              answer = solution.correctAnswer.latex;
+            } else {
+              answer = solution.correctAnswer;
+            }
+            var answerIsExclusive = solution.answerIsExclusive ? 'Only' : 'One';
+            var response = (
+            answerIsExclusive + ' answer is:<br>' + answer +
+            '<br><br>Explanation:<br>' + solution.explanation);
+            playerTranscriptService.addNewResponse(response);
           };
 
           $scope.isHintAvailable = function() {

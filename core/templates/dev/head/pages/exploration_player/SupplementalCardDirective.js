@@ -35,6 +35,8 @@ oppia.directive('supplementalCard', [
         'TWO_CARD_THRESHOLD_PX', 'EVENT_ACTIVE_CARD_CHANGED',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'HINT_REQUEST_STRING_I18N_IDS',
         'DELAY_FOR_HINT_FEEDBACK_MSEC', 'SolutionManagerService',
+        'stateInteractionIdService', 'oppiaExplorationHtmlFormatterService',
+        'explorationStatesService',
         function(
           $scope, $timeout, $window, HintManagerService,
           oppiaPlayerService, playerPositionService,
@@ -42,7 +44,9 @@ oppia.directive('supplementalCard', [
           windowDimensionsService, CONTENT_FOCUS_LABEL_PREFIX,
           TWO_CARD_THRESHOLD_PX, EVENT_ACTIVE_CARD_CHANGED,
           CONTINUE_BUTTON_FOCUS_LABEL, HINT_REQUEST_STRING_I18N_IDS,
-          DELAY_FOR_HINT_FEEDBACK_MSEC, SolutionManagerService) {
+          DELAY_FOR_HINT_FEEDBACK_MSEC, SolutionManagerService,
+          stateInteractionIdService, oppiaExplorationHtmlFormatterService,
+          explorationStatesService) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -93,10 +97,31 @@ oppia.directive('supplementalCard', [
           $scope.consumeSolution = function() {
             playerTranscriptService.addNewInput(
               'Please show me the answer.', true);
-            var answer = SolutionManagerService.consumeSolution();
-            console.log(answer);
-            console.log(oppiaPlayerService.getInteractionHtml($scope.activeCard.stateName, 'blah'));
-            playerTranscriptService.addNewResponse(oppiaPlayerService.getInteractionHtml($scope.activeCard.stateName, 'blah') + '');
+            var solution = SolutionManagerService.consumeSolution();
+            var answer = '';
+            var interactionId = stateInteractionIdService.savedMemento;
+            if (interactionId === 'GraphInput' ||
+                interactionId === 'MusicNotesInput' ||
+                interactionId === 'InteractiveMap') {
+              answer = (
+                oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+                  solution.correctAnswer,
+                  interactionId,
+                  explorationStatesService
+                  .getInteractionCustomizationArgsMemento(
+                    $scope.activeCard.stateName)));
+            } else if (interactionId === 'CodeRepl' ||
+              interactionId === 'PencilCodeEditor') {
+              answer = solution.correctAnswer.code;
+            } else if (interactionId === 'ImageClickInput') {
+              answer = solution.correctAnswer.clickedRegions;
+            }
+
+            var answerIsExclusive = solution.answerIsExclusive ? 'Only' : 'One';
+            var response = (
+              answerIsExclusive + ' answer is:<br>' + answer +
+              '<br><br>Explanation:<br>' + solution.explanation);
+            playerTranscriptService.addNewResponse(response);
           };
 
           $scope.isHintAvailable = function() {

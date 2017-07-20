@@ -110,7 +110,6 @@ oppia.controller('StateSolution', [
         correctAnswer = (
           oppiaHtmlEscaper.objToEscapedJson(
             responsesService.getAnswerChoices()[solution.correctAnswer].label));
-        console.log(correctAnswer);
       } else if (interactionId === 'MathExpressionInput') {
         correctAnswer = solution.correctAnswer.latex;
       } else if (interactionId === 'CodeRepl' ||
