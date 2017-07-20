@@ -182,7 +182,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def query_training_jobs(cls, inlcude_deleted=False):
+    def query_training_jobs(cls, cursor):
         """Generates a unique id for the training job of the form
         {{exp_id}}.{{random_hash_of_16_chars}}
 
@@ -195,10 +195,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
             feconf.TRAINING_JOB_STATUS_PENDING]))
-        if not inlcude_deleted:
-            query = query.filter(cls.deleted == False) # pylint: disable=singleton-comparison
         query = query.order(cls.created_on, cls.id)
-        return query
+        job_models = query.fetch(10, cursor = cursor)
+        cursor = query.cursor()
+        return job_models, cursor
 
 
 class ClassifierExplorationMappingModel(base_models.BaseModel):

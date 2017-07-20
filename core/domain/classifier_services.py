@@ -278,25 +278,6 @@ def get_classifier_training_job_by_id(job_id):
     return classifier_training_job
 
 
-def get_all_classifier_training_jobs():
-    """Gets all classifier training jobs.
-
-    Returns:
-        classifier_training_jobs: List. Domain objects for the
-            classifier training jobs.
-
-    """
-    classifier_training_jobs = []
-    classifier_training_job_models = (
-        classifier_models.ClassifierTrainingJobModel.query_training_jobs()
-        )
-    for job_model in classifier_training_job_models:
-        classifier_training_jobs.append(
-            get_classifier_training_job_from_model(
-                job_model))
-    return classifier_training_jobs
-
-
 def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
                                    exp_version, state_name, training_data,
                                    status):
@@ -416,6 +397,7 @@ def update_training_job_training_data(job_id, training_data):
 
 def update_failed_jobs(training_jobs):
     """Updates status of job_models to failed.
+
     Args:
         exp_id: str. ID of the exploration.
         state_name: str. Name of the state.
@@ -426,6 +408,7 @@ def update_failed_jobs(training_jobs):
 
 def fetch_training_data(exp_id, state_name):
     """Gets training data of the given state and exp_id.
+
     Args:
         exp_id: str. ID of the exploration.
         state_name: str. Name of the state.
@@ -451,17 +434,29 @@ def fetch_next_job():
     Returns:
         ClassifierTrainingJobModel. Domain object of the next training Job.
     """
-    classifier_training_jobs = get_all_classifier_training_jobs()
+    classifier_training_jobs = []
+    cursor = None
     valid_jobs = []
     failed_jobs = []
-    for training_job in classifier_training_jobs:
-        if(training_job.status == (
-                feconf.TRAINING_JOB_STATUS_PENDING)):
-            if (datetime.datetime.utcnow() - (
-                    training_job.last_updated) > feconf.TTL):
-                failed_jobs.append(training_job)
-            else:
-                valid_jobs.append(training_job)
+
+    while(len(valid_jobs)==0):
+        classifier_training_job_models, cursor = (
+            classifier_models.ClassifierTrainingJobModel.query_training_jobs(
+                cursor))
+        for job_model in classifier_training_job_models:
+            classifier_training_jobs.append(
+                get_classifier_training_job_from_model(
+                    job_model))
+        for training_job in classifier_training_jobs:
+            if(training_job.status == (
+                    feconf.TRAINING_JOB_STATUS_PENDING)):
+                if (datetime.datetime.utcnow() - (
+                        training_job.last_updated) > (
+                            feconf.CLASSIFIER_JOB_TTL)):
+                    failed_jobs.append(training_job)
+                else:
+                    valid_jobs.append(training_job)
+                    break
     update_failed_jobs(failed_jobs)
     next_job = valid_jobs[0]
     return next_job
