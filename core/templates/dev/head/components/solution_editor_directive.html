@@ -50,47 +50,35 @@
           <option value="false">One</option>
           <option value="true">Only</option>
         </select> <strong>Solution is...</strong>
-        <html-select ng-if="objectType === 'select'"
-                     style="width: 250px;"
-                     options="ruleDescriptionChoices"
-                     selection="solution.correctAnswer">
-        </html-select>
-        <html-select ng-if="objectType === 'RegionSelect'"
-                     style="width: 250px;"
-                     options="ruleDescriptionChoices"
-                     selection="solution.correctAnswer.clickedRegions[0]">
-        </html-select>
-        <textarea ng-if="objectType === 'LogicQuestion'"
-                  ng-model="solution.correctAnswer">
-        </textarea>
-        <object-editor ng-if="objectType === 'UnicodeString'"
-                       obj-type="<[objectType]>"
-                       init-args="{choices: ruleDescriptionChoices}"
-                       is-editable="true"
-                       always-editable="true"
-                       value="solution.correctAnswer.latex"
-                       style="color: black;">
-        </object-editor>
-        <object-editor ng-if="objectType === 'CodeString'"
-                       obj-type="<[objectType]>"
-                       init-args="{choices: ruleDescriptionChoices}"
-                       is-editable="true"
-                       always-editable="true"
-                       value="solution.correctAnswer.code"
-                       style="color: black;">
-        </object-editor>
-        <object-editor ng-if="objectType !== 'CodeString' &&
-                              objectType !== 'select' &&
-                              objectType !== 'RegionSelect' &&
-                              objectType !== 'UnicodeString' &&
-                              objectType !== 'LogicQuestion'"
-                       obj-type="<[objectType]>"
-                       init-args="{choices: ruleDescriptionChoices}"
-                       is-editable="true"
-                       always-editable="true"
-                       value="solution.correctAnswer"
-                       style="color: black;">
-        </object-editor>
+        <div ng-if="!interactionHtml">
+          <object-editor ng-if="objectType === 'UnicodeString'"
+                         obj-type="<[objectType]>"
+                         init-args="{choices: ruleDescriptionChoices}"
+                         is-editable="true"
+                         always-editable="true"
+                         value="solution.correctAnswer.latex"
+                         style="color: black;">
+          </object-editor>
+          <object-editor ng-if="objectType === 'CodeString'"
+                         obj-type="<[objectType]>"
+                         init-args="{choices: ruleDescriptionChoices}"
+                         is-editable="true"
+                         always-editable="true"
+                         value="solution.correctAnswer.code"
+                         style="color: black;">
+          </object-editor>
+          <object-editor ng-if="objectType === 'CodeString' ||
+                              objectType === 'NormalizedString' ||
+                              objectType === 'Real'"
+                         obj-type="<[objectType]>"
+                         init-args="{choices: ruleDescriptionChoices}"
+                         is-editable="true"
+                         always-editable="true"
+                         value="solution.correctAnswer"
+                         style="color: black;">
+          </object-editor>
+        </div>
+        <span angular-html-bind="interactionHtml"></span>
         <br>
         <strong>Explanation is...</strong>
         <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"

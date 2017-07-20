@@ -23,6 +23,7 @@ oppia.directive('solutionEditor', [
       scope: {
         solution: '=',
         objectType: '=',
+        interactionHtml: '=',
         ruleDescriptionChoices: '=',
         getOnSaveFn: '&onSave'
       },
@@ -49,6 +50,10 @@ oppia.directive('solutionEditor', [
               $scope.solution.answerIsExclusive = (
                 $scope.solution.answerIsExclusive.toString());
             }
+          };
+
+          $scope.submitAnswer = function(answer, rules) {
+            $scope.solution.correctAnswer = answer;
           };
 
           $scope.saveThisSolution = function() {
