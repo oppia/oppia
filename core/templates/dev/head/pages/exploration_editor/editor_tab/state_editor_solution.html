@@ -17,7 +17,7 @@
                class="oppia-rule-tab">
               <div class="oppia-response-header-block">
                 <div class="oppia-response-header">
-                  <[getSolutionSummary()]>
+                  <span angular-html-bind="getSolutionSummary()"></span>
                   <span class="pull-right oppia-transition-200"
                         ng-click="deleteSolution($event)"
                         style="cursor: pointer; opacity: 0.5;">
@@ -31,6 +31,7 @@
               <div class="oppia-editor-card-section">
                 <solution-editor solution="stateSolutionService.savedMemento"
                                  object-type="objectType"
+                                 interaction-html="interactionHtml"
                                  rule-description-choices="ruleDescriptionChoices"
                                  on-save="onComponentSave">
                 </solution-editor>
@@ -67,39 +68,27 @@
           <option value="false">One</option>
           <option value="true">Only</option>
         </select> <strong>Solution is...</strong>
-        <html-select ng-if="objectType === 'select'"
-                     style="width: 250px;"
-                     options="ruleDescriptionChoices"
-                     selection="tmpSolution.correctAnswer">
-        </html-select>
-        <html-select ng-if="objectType === 'RegionSelect'"
-                     style="width: 250px;"
-                     options="ruleDescriptionChoices"
-                     selection="tmpSolution.correctAnswer">
-        </html-select>
-        <textarea ng-if="objectType === 'LogicQuestion'"
-                  ng-model="tmpSolution.correctAnswer">
-
-        </textarea>
-        <object-editor ng-if="objectType === 'UnicodeString'"
-                       obj-type="<[objectType]>"
-                       init-args="{choices: ruleDescriptionChoices}"
-                       is-editable="true"
-                       always-editable="true"
-                       value="tmpSolution.correctAnswer"
-                       style="color: black;">
-        </object-editor>
-        <object-editor ng-if="objectType !== 'select' &&
-                              objectType !== 'UnicodeString' &&
-                              objectType !== 'RegionSelect' &&
-                              objectType !== 'LogicQuestion'"
-                       obj-type="<[objectType]>"
-                       init-args="{choices: ruleDescriptionChoices}"
-                       is-editable="true"
-                       always-editable="true"
-                       value="tmpSolution.correctAnswer"
-                       style="color: black;">
-        </object-editor>
+        <div ng-if="!interactionHtml">
+          <object-editor ng-if="objectType === 'UnicodeString'"
+                         obj-type="<[objectType]>"
+                         init-args="{choices: ruleDescriptionChoices}"
+                         is-editable="true"
+                         always-editable="true"
+                         value="tmpSolution.correctAnswer"
+                         style="color: black;">
+          </object-editor>
+          <object-editor ng-if="objectType === 'CodeString' ||
+                                objectType === 'NormalizedString' ||
+                                objectType === 'Real'"
+                         obj-type="<[objectType]>"
+                         init-args="{choices: ruleDescriptionChoices}"
+                         is-editable="true"
+                         always-editable="true"
+                         value="tmpSolution.correctAnswer"
+                         style="color: black;">
+          </object-editor>
+        </div>
+        <div angular-html-bind="interactionHtml"></div>
         <br>
         <strong>Explanation is...</strong>
         <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
@@ -113,7 +102,8 @@
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success"
             ng-click="saveSolution()"
-            ng-disabled="!tmpSolution.explanation && !tmp.correctAnswer">
+            ng-disabled="!tmpSolution.explanation &&
+                         !tmpSolution.correctAnswer">
       Check and Save Solution
     </button>
   </div>
