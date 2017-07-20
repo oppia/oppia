@@ -771,10 +771,12 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             unsuccessful_accept_thread_id, False, csrf_token,
             expect_errors=True, expected_status_int=401)
         self.assertIn(
-            'You do not have the credentials to edit this exploration.',
+            'You do not have the credentials',
             response_dict['error'])
+        self.logout()
 
         # Get a list of all closed threads with suggestion.
+        self.login(self.EDITOR_EMAIL)
         response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed',

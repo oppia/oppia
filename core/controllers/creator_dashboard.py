@@ -271,7 +271,6 @@ class NotificationsHandler(base.BaseHandler):
 class ExplorationDashboardStatsHandler(base.BaseHandler):
     """Returns the most recent open feedback for an exploration."""
 
-    @acl_decorators.can_view_exploration_feedback
     def get(self, exploration_id):
         """Handles GET requests."""
         self.render_json({
