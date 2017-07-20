@@ -64,7 +64,7 @@ def check_activity_accessible(
         else role_services.ACTION_PLAY_ANY_PRIVATE_COLLECTION)
 
     if activity_rights is None:
-        return False
+        raise base.UserFacingExceptions.PageNotFoundException
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
         return bool(action_play_public in user_actions)
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
@@ -387,7 +387,7 @@ def can_manage_suggestions_on_exploration(handler):
 def can_publish_exploration(handler):
     """Decorator to check whether user can publish exploration."""
 
-    def test_can_publish(self, exploration_id, **kwargs):
+    def test_can_publish(self, exploration_id, *args, **kwargs):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
@@ -399,16 +399,16 @@ def can_publish_exploration(handler):
                 'You do not have credentials to publish this exploration.')
 
         if role_services.ACTION_PUBLISH_ANY_EXPLORATION in self.actions:
-            return handler(self, exploration_id, **kwargs)
+            return handler(self, exploration_id, *args, **kwargs)
 
         if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
             if role_services.ACTION_PUBLISH_OWNED_EXPLORATION in self.actions:
                 if exploration_rights.is_owner(self.user_id):
-                    return handler(self, exploration_id, **kwargs)
+                    return handler(self, exploration_id, *args, **kwargs)
 
         if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
             if role_services.ACTION_PUBLISH_PUBLIC_EXPLORATION in self.actions:
-                return handler(self, exploration_id, **kwargs)
+                return handler(self, exploration_id, *args, **kwargs)
 
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to publish this exploration.')

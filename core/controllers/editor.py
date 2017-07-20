@@ -323,7 +323,6 @@ class ExplorationHandler(EditorHandler):
 
         return editor_dict
 
-    @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
         # 'apply_draft' and 'v'(version) are optional parameters because the
