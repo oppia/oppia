@@ -31,7 +31,6 @@ from core.domain import acl_decorators
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import email_manager
-from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain

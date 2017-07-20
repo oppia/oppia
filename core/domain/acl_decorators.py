@@ -196,7 +196,7 @@ def can_create_collection(handler):
         if self.user_id is None:
             raise self.NotLoggedInException
 
-        if (role_services.ACTION_CREATE_COLLECTION in self.actions):
+        if role_services.ACTION_CREATE_COLLECTION in self.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -371,7 +371,7 @@ def can_manage_suggestions_on_exploration(handler):
 
     def test_can_manage(self, exploration_id, **kwargs):
         if not self.user_id:
-            base.UserFacingExceptions.NotLoggedInException
+            raise base.UserFacingExceptions.NotLoggedInException
 
         if check_exploration_editable(
                 self.user_id, self.actions, exploration_id):
