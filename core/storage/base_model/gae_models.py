@@ -103,8 +103,18 @@ class BaseModel(ndb.Model):
             not found, or it has been deleted and include_deleted is False,
             then the corresponding entry is None.
         """
-        entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
+        entity_keys = []
+        none_argument_indices = []
+        for index, entity_id in enumerate(entity_ids):
+            if entity_id:
+                entity_keys.append(ndb.Key(cls, entity_id))
+            else:
+                none_argument_indices.append(index)
+
         entities = ndb.get_multi(entity_keys)
+        for index in none_argument_indices:
+            entities.insert(index, None)
+
         if not include_deleted:
             for i in xrange(len(entities)):
                 if entities[i] and entities[i].deleted:

@@ -40,6 +40,12 @@ oppia.factory('SubtitledHtmlObjectFactory', [
       return this._audioTranslations;
     };
 
+    SubtitledHtml.prototype.markAudioAsNeedingUpdate = function() {
+      this._audioTranslations.forEach(function(audioTranslation) {
+        audioTranslation.markAsNeedingUpdate();
+      });
+    };
+
     SubtitledHtml.prototype.isEmpty = function() {
       return !this._html;
     };

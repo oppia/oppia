@@ -26,6 +26,10 @@ oppia.factory('AudioTranslationObjectFactory', [function() {
     this.needsUpdate = needsUpdate;
   };
 
+  AudioTranslation.prototype.markAsNeedingUpdate = function() {
+    this.needsUpdate = true;
+  };
+
   AudioTranslation.prototype.toBackendDict = function() {
     return {
       language_code: this.languageCode,

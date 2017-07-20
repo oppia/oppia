@@ -70,7 +70,7 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
-# A mapping of interaction ids to their default classifier.
+# A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'LDAStringClassifier',
@@ -89,6 +89,17 @@ ALLOWED_TRAINING_JOB_STATUSES = [
     TRAINING_JOB_STATUS_NEW,
     TRAINING_JOB_STATUS_PENDING
 ]
+
+# The maximum number of characters allowed for userbio length.
+MAX_BIO_LENGTH_IN_CHARS = 2000
+
+ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
+    TRAINING_JOB_STATUS_COMPLETE: [],
+    TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
+    TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
+                                  TRAINING_JOB_STATUS_FAILED],
+    TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
+}
 
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
@@ -184,8 +195,11 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'gif': ['gif'],
 }
 
-# An array containing the accepted audio extensions for uploaded files.
-ACCEPTED_AUDIO_EXTENSIONS = ['mp3']
+# An array containing the accepted audio extensions for uploaded files and
+# the corresponding MIME types.
+ACCEPTED_AUDIO_EXTENSIONS = {
+    'mp3': ['audio/mp3']
+}
 
 
 # A string containing the disallowed characters in state or exploration names.
@@ -366,6 +380,9 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
+
+# The maximum playback length of an audio file, in seconds.
+MAX_AUDIO_FILE_LENGTH_SEC = 300
 
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
@@ -548,6 +565,7 @@ FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
+LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -790,3 +808,5 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
 VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'
+
+GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'

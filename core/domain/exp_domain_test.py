@@ -2403,6 +2403,29 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             state_without_training_data.can_undergo_classification())
 
+    def test_get_training_data(self):
+        """Test retrieval of training data."""
+        exploration_id = 'eid'
+        test_exp_filepath = os.path.join(
+            feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            assets_list)
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        state = exploration.states['text']
+
+        expected_training_data = [{
+            'answer_group_index': 1,
+            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
+                        u'overjoyed', u'pleased', u'thrilled', u'smile']}]
+
+        observed_training_data = state.get_training_data()
+
+        self.assertEqual(observed_training_data, expected_training_data)
+
     def test_delete_state(self):
         """Test deletion of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
