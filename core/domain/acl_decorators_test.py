@@ -183,10 +183,10 @@ class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_guest_user_cannot_create_exploration(self):
+    def test_guest_user_is_redirected_to_login_page(self):
         response = self.testapp.get(
             '/mock/create', expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.assertEqual(response.status_int, 302)
 
 
 class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
@@ -211,9 +211,9 @@ class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-    def test_guest_user_cannot_create_collection(self):
+    def test_guest_user_is_redirected_to_login_page(self):
         response = self.testapp.get('/mock/create', expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.assertEqual(response.status_int, 302)
 
     def test_normal_user_cannot_create_collection(self):
         self.login(self.EDITOR_EMAIL)

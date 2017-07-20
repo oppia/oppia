@@ -22,7 +22,6 @@ from core.controllers import base
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import role_services
-from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
@@ -355,7 +354,7 @@ def can_suggest_changes_to_exploration(handler):
     exploration.
     """
     def test_can_suggest(self, exploration_id, **kwargs):
-        if role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION:
+        if role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in self.actions:
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
