@@ -58,11 +58,6 @@ oppia.controller('SettingsTab', [
     var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
-    // $scope.metadataFormObjective = 'Goal';
-    // $scope.metadataFormCategory = 'Category';
-    // $scope.metadataFormLanguage = 'Language';
-    // $scope.metadataFormTags = 'Tags';
-
     $scope.getExplorePageUrl = function() {
       return (
         window.location.protocol + '//' + window.location.host +
@@ -70,13 +65,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.initSettingsTab = function() {
-      $scope.explorationTitleService = explorationTitleService;
-      $scope.explorationCategoryService = explorationCategoryService;
-      $scope.explorationObjectiveService = explorationObjectiveService;
-      $scope.explorationLanguageCodeService = explorationLanguageCodeService;
-      $scope.explorationTagsService = explorationTagsService;
       $scope.explorationRightsService = explorationRightsService;
-      $scope.explorationInitStateNameService = explorationInitStateNameService;
       $scope.explorationParamSpecsService = explorationParamSpecsService;
       $scope.explorationParamChangesService = explorationParamChangesService;
       $scope.UserEmailPreferencesService = UserEmailPreferencesService;
@@ -127,41 +116,6 @@ oppia.controller('SettingsTab', [
       name: 'Playtester (can give feedback)',
       value: 'viewer'
     }];
-
-    $scope.saveExplorationTitle = function() {
-      explorationTitleService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationCategory = function() {
-      explorationCategoryService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationObjective = function() {
-      explorationObjectiveService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationLanguageCode = function() {
-      explorationLanguageCodeService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationTags = function() {
-      explorationTagsService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationInitStateName = function() {
-      var newInitStateName = explorationInitStateNameService.displayed;
-
-      if (!explorationStatesService.getState(newInitStateName)) {
-        alertsService.addWarning(
-          'Invalid initial state name: ' + newInitStateName);
-        explorationInitStateNameService.restoreFromMemento();
-        return;
-      }
-
-      explorationInitStateNameService.saveDisplayedValue();
-
-      $rootScope.$broadcast('refreshGraph');
-    };
 
     $scope.postSaveParamChangesHook = function() {
       explorationWarningsService.updateWarnings();
@@ -401,33 +355,5 @@ oppia.controller('SettingsTab', [
     $scope.closeRolesForm = function() {
       $scope.isRolesFormOpen = false;
     };
-  //The following sets up the labels of metadata form on the settings tab.
-    $scope.metadataForm = {
-      title: 'Title',
-      objective: 'Goal',
-      category: 'Category',
-      language: 'Language',
-      tags: 'Tags',
-      formStyle: {display:'table-cell', width:'16.66666667%'},
-      pStyle: {display: 'table', width:'100%', 'margin-bottom':'2%'},
-      CATEGORY_LIST_FOR_SELECT2: $scope.CATEGORY_LIST_FOR_SELECT2,
-      EXPLORATION_TITLE_INPUT_FOCUS_LABEL:
-      $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL,
-      TAG_REGEX: $scope.TAG_REGEX,
-      explorationTitleService: $scope.explorationTitleService,
-      explorationCategoryService: $scope.explorationCategoryService,
-      explorationObjectiveService: $scope.explorationObjectiveService,
-      explorationLanguageCodeService: $scope.explorationLanguageCodeService,
-      explorationTagsService: $scope.explorationTagsService,
-      explorationInitStateNameService: $scope.explorationInitStateNameService,
-      saveExplorationTitle: $scope.saveExplorationTitle,
-      saveExplorationCategory: $scope.saveExplorationCategory,
-      saveExplorationLanguageCode: $scope.saveExplorationLanguageCode,
-      saveExplorationObjective: $scope.saveExplorationObjective,
-      saveExplorationTags: $scope.saveExplorationTags,
-      saveExplorationInitStateName: $scope.saveExplorationInitStateName,
-      stateNames: $scope.stateNames,
-      refreshSettingsTab: $scope.refreshSettingsTab
-    }
   }
 ]);
