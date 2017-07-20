@@ -652,8 +652,7 @@ def get_filtered_incomplete_collection_summaries(collection_summaries,
         tuple. A 2-tuple whose elements are as follows:
         - list(CollectionSummary). A filtered list with the summary domain
             objects of the incomplete collections.
-        - int. The number of explorations deleted from the list as they are no
-            longer present.
+        - list(str). The ids of the collections that are no longer present.
     """
     nonexistent_incomplete_collection_ids = []
     filtered_incomplete_collection_summaries = []

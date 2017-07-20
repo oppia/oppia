@@ -112,7 +112,7 @@ describe('Learner dashboard functionality', function() {
     browser.get(general.LEARNER_DASHBOARD_URL);
     general.acceptAlert();
     browser.waitForAngular();
-    element(by.css('.protractor-test-collection-section')).click();
+    element(by.css('.protractor-test-incomplete-collection-section')).click();
     browser.waitForAngular();
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
@@ -137,7 +137,7 @@ describe('Learner dashboard functionality', function() {
     element(by.css('.protractor-test-completed-section')).click();
     browser.waitForAngular();
     general.waitForSystem();
-    element(by.css('.protractor-test-collection-section')).click();
+    element(by.css('.protractor-test-completed-collection-section')).click();
     browser.waitForAngular();
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
@@ -192,7 +192,7 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-subscription-name')).last().getText()).toMatch(
       'creator...');
     users.logout();
-  });  
+  });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
