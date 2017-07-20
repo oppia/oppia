@@ -2,7 +2,10 @@
 <script src="{{cache_slug}}/extensions/interactions/Continue/ContinueValidationService.js"></script>
 
 <script type="text/ng-template" id="interaction/Continue">
-  <md-button class="oppia-learner-continue-button" ng-click="submitAnswer()"><[buttonText]></md-button>
+  <md-button class="oppia-learner-continue-button" ng-click="submitAnswer()">
+    <[buttonText]>
+    <i class="fa fa-arrow-right" style="font-size: 19px; padding-top: 1.5px;"></i>
+  </md-button>
 </script>
 
 <script type="text/ng-template" id="response/Continue">
