@@ -310,6 +310,22 @@ def filter_hashes(file_hashes):
     return filtered_hashes
 
 
+def get_hashes_json_file_contents(file_hashes):
+    """Return JS code that loads hashes needed for frontend into variable.
+
+    Args:
+        file_hashes: dict(str, str). Dictionary of file hashes.
+
+    Returns:
+        str. JS code loading hashes as JSON into variable.
+    """
+    # Only some of the hashes are needed in the frontend.
+    filtered_hashes = filter_hashes(file_hashes)
+
+    hashes_json = json.dumps(filtered_hashes)
+    return 'var hashes = JSON.parse(\'%s\');' % (hashes_json)
+
+
 def save_hashes_as_json(target_filepath, file_hashes):
     """Save hashes in JS file containing JSON for files that
     are to be interpolated in the frontend.
@@ -320,12 +336,9 @@ def save_hashes_as_json(target_filepath, file_hashes):
             path would also contain hash.
         file_hashes: dict(str, str). Dictionary of file hashes.
     """
-    # Only some of the hashes are needed in the frontend.
-    filtered_hashes = filter_hashes(file_hashes)
 
-    hashes_json = json.dumps(filtered_hashes)
     with open(target_filepath, 'w') as f:
-        f.write('var hashes = JSON.parse(\'%s\');' % (hashes_json))
+        f.write(get_hashes_json_file_contents(file_hashes))
 
     file_hash = generate_md5_hash(target_filepath)
     relative_filepath = os.path.relpath(
