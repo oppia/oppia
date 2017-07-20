@@ -19,16 +19,18 @@
 oppia.controller('StateSolution', [
   '$scope', '$rootScope', '$modal', '$filter', '$injector',
   'editorContextService', 'alertsService', 'INTERACTION_SPECS',
-  'stateSolutionService', 'explorationStatesService', 'oppiaExplorationHtmlFormatterService',
-  'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
-  'SolutionObjectFactory', 'responsesService', 'AnswerClassificationService',
+  'stateSolutionService', 'explorationStatesService',
+  'oppiaExplorationHtmlFormatterService', 'stateInteractionIdService',
+  'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
+  'responsesService', 'AnswerClassificationService',
   'explorationContextService', 'angularNameService', 'oppiaHtmlEscaper',
   function(
     $scope, $rootScope, $modal, $filter, $injector,
     editorContextService, alertsService, INTERACTION_SPECS,
-    stateSolutionService, explorationStatesService, oppiaExplorationHtmlFormatterService,
-    stateInteractionIdService, stateHintsService, UrlInterpolationService,
-    SolutionObjectFactory, responsesService, AnswerClassificationService,
+    stateSolutionService, explorationStatesService,
+    oppiaExplorationHtmlFormatterService, stateInteractionIdService,
+    stateHintsService, UrlInterpolationService, SolutionObjectFactory,
+    responsesService, AnswerClassificationService,
     explorationContextService, angularNameService, oppiaHtmlEscaper) {
     $scope.editorContextService = editorContextService;
     $scope.stateSolutionService = stateSolutionService;
@@ -70,15 +72,15 @@ oppia.controller('StateSolution', [
     };
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
-
       stateSolutionService.init(
         editorContextService.getActiveStateName(),
         stateData.interaction.solution);
-      $rootScope.interactionHtml = oppiaExplorationHtmlFormatterService.getInteractionHtml(
-        stateInteractionIdService.savedMemento,
-        explorationStatesService.getInteractionCustomizationArgsMemento(
-          editorContextService.getActiveStateName()),
-        'currentInteractionHtml');
+      $rootScope.interactionHtml = (
+        oppiaExplorationHtmlFormatterService.getInteractionHtml(
+          stateInteractionIdService.savedMemento,
+          explorationStatesService.getInteractionCustomizationArgsMemento(
+            editorContextService.getActiveStateName()),
+          'currentInteractionHtml'));
 
       $scope.solutionIsSpecified = (
         JSON.stringify(stateSolutionService.savedMemento) ? true : false);

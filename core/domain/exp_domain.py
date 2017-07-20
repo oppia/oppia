@@ -1118,8 +1118,8 @@ class Solution(object):
             interaction_id,
             solution_dict['answer_is_exclusive'],
             interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).normalize_answer(
-                solution_dict['correct_answer']),
+                interaction_id).normalize_answer(
+                    solution_dict['correct_answer']),
             solution_dict['explanation'])
 
     def validate(self, interaction_id):
