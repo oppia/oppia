@@ -439,7 +439,7 @@ def fetch_next_job():
     valid_jobs = []
     failed_jobs = []
 
-    while(len(valid_jobs)==0):
+    while len(valid_jobs) == 0:
         classifier_training_job_models, cursor = (
             classifier_models.ClassifierTrainingJobModel.query_training_jobs(
                 cursor))
