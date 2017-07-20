@@ -20,8 +20,8 @@
 // A service that provides a number of utility functions useful to both the
 // editor and player.
 oppia.factory('oppiaExplorationHtmlFormatterService', [
-  '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper', 'INTERACTION_SPECS',
-  function($filter, extensionTagAssemblerService, oppiaHtmlEscaper, INTERACTION_SPECS) {
+  '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper',
+  function($filter, extensionTagAssemblerService, oppiaHtmlEscaper) {
     return {
       getInteractionHtml: function(
           interactionId, interactionCustomizationArgSpecs,
