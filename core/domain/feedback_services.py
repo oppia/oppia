@@ -516,11 +516,8 @@ def get_thread_summaries(user_id, full_thread_ids):
                 in feedback_thread_user_models[index].message_ids_read_by_user)
             author_second_last_message = user_services.get_username(
                 last_two_messages[index][1].author_id)
-            if not last_message_read or not second_last_message_read:
-                number_of_unread_threads += 1
-        else:
-            if not last_message_read:
-                number_of_unread_threads += 1
+        if not last_message_read:
+            number_of_unread_threads += 1
 
         if thread.message_count:
             total_no_of_messages = thread.message_count

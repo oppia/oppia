@@ -76,13 +76,12 @@ class LearnerDashboardHandler(base.BaseHandler):
 
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
-        number_of_unread_threads = 0
         if len(full_thread_ids) > 0:
             thread_summaries, number_of_unread_threads = (
                 feedback_services.get_thread_summaries(
                     self.user_id, full_thread_ids))
         else:
-            thread_summaries = []
+            thread_summaries, number_of_unread_threads = [], 0
 
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))
@@ -102,8 +101,6 @@ class LearnerDashboardHandler(base.BaseHandler):
 
             subscription_list.append(subscription_summary)
 
-        user_settings = user_services.get_user_settings(self.user_id)
-
         self.values.update({
             'completed_explorations_list': completed_exp_summary_dicts,
             'completed_collections_list': completed_collection_summary_dicts,
@@ -114,9 +111,7 @@ class LearnerDashboardHandler(base.BaseHandler):
                 completed_to_incomplete_collections),
             'thread_summaries': thread_summaries,
             'number_of_unread_threads': number_of_unread_threads,
-            'subscription_list': subscription_list,
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
-            'username': user_settings.username
+            'subscription_list': subscription_list
         })
         self.render_json(self.values)
 
@@ -145,7 +140,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             exploration = exp_services.get_exploration_by_id(exploration_id)
             current_content_html = (
                 exploration.states[
-                    suggestion.state_name].content.to_dict()['html'])
+                    suggestion.state_name].content.html)
             suggestion_summary = {
                 'suggestion_html': suggestion.suggestion_html,
                 'current_content_html': current_content_html,
