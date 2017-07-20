@@ -58,7 +58,8 @@ oppia.factory('AudioPlayerService', [
     var _rewind = function(seconds) {
       if (_currentTrack) {
         var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-        var rewindedProgress = (currentSeconds - seconds) / _currentTrack.duration;
+        var rewindedProgress =
+          (currentSeconds - seconds) / _currentTrack.duration;
         _currentTrack.progress = rewindedProgress;
       }
     };
