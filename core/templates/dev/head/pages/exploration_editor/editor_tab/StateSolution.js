@@ -102,8 +102,28 @@ oppia.controller('StateSolution', [
       var solution = stateSolutionService.displayed;
       var isExclusiveAnswer = (
         solution.answerIsExclusive ? 'Only' : 'One');
-      var correctAnswer = (
-        oppiaHtmlEscaper.objToEscapedJson(solution.correctAnswer));
+      var correctAnswer = '';
+      var interactionId = stateInteractionIdService.savedMemento;
+      if (interactionId === 'GraphInput') {
+        correctAnswer = '[Graph Object]';
+      } else if (interactionId === 'MultipleChoiceInput') {
+        correctAnswer = (
+          oppiaHtmlEscaper.objToEscapedJson(
+            responsesService.getAnswerChoices()[solution.correctAnswer].label));
+        console.log(correctAnswer);
+      } else if (interactionId === 'MathExpressionInput') {
+        correctAnswer = solution.correctAnswer.latex;
+      } else if (interactionId === 'CodeRepl' ||
+                 interactionId === 'PencilCodeEditor') {
+        correctAnswer = solution.correctAnswer.code;
+      } else if (interactionId === 'MusicNotesInput') {
+        correctAnswer = '[Music Notes Object]';
+      } else if (interactionId === 'ImageClickInput') {
+        correctAnswer = solution.correctAnswer.clickedRegions;
+      } else {
+        correctAnswer = (
+          oppiaHtmlEscaper.objToEscapedJson(solution.correctAnswer));
+      }
 
       var explanation = (
         $filter('convertToPlainText')(solution.explanation));
