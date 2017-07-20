@@ -21,11 +21,11 @@ oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   function(
       $http, $q, UrlInterpolationService) {
-    var GCS_AUDIO_DOWNLOAD_URL_TEMPLATE =
+    var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
-    var AUDIO_UPLOAD_URL_TEMPLATE = 
-      'https://storage.googleapis.com/oppia.resources/' +
-      '<exploration_id>/assets/audio/<filename>';
+    var GCS_AUDIO_DOWNLOAD_URL_TEMPLATE = 
+      'https://storage.googleapis.com/' + constants.GCS_RESOURCE_BUCKET_NAME +
+      '/<exploration_id>/assets/audio/<filename>';
 
     // Map from asset filename to asset blob.
     var assetsCache = {};
@@ -52,6 +52,8 @@ oppia.factory('AssetsBackendApiService', [
         filename: filename
       }));
       form.append('csrf_token', GLOBALS.csrf_token);
+
+      console.log(_getAudioUploadUrl(explorationId));
 
       $.ajax({
         url: _getAudioUploadUrl(explorationId),
@@ -86,8 +88,8 @@ oppia.factory('AssetsBackendApiService', [
     };
 
     var _isCached = function(filename) {
-      return filename in assetsCache;
-    }
+      return assetsCache.hasOwnProperty(filename);
+    };
 
     return {
       loadAudio: function(explorationId, filename) {
@@ -103,6 +105,9 @@ oppia.factory('AssetsBackendApiService', [
         return $q(function(resolve, reject) {
           _saveAudio(explorationId, filename, rawAssetData, resolve, reject);
         });
+      },
+      isCached: function(filename) {
+        return _isCached(filename);
       }
     };
   }
