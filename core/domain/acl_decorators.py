@@ -18,6 +18,7 @@
 
 import logging
 
+from core.controllers import base
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -90,7 +91,7 @@ def check_exploration_editable(user_id, user_actions, exploration_id):
     """
     exploration_rights = rights_manager.get_exploration_rights(
         exploration_id, strict=False)
-    print "balle balle oh balle"
+
     if exploration_rights is None:
         raise base.UserFacingExceptions.PageNotFoundException
 
@@ -177,11 +178,13 @@ def can_create_exploration(handler):
     """Decorator to check whether the user can create an exploration."""
 
     def test_can_create(self, **kwargs):
-        if ((role_services.ACTION_CREATE_EXPLORATION in self.actions) and
-                user_services.has_fully_registered(self.user_id)):
+        if self.user_id is None:
+            raise self.NotLoggedInException
+
+        if role_services.ACTION_CREATE_EXPLORATION in self.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to create an exploration.')
 
     return test_can_create
@@ -191,11 +194,13 @@ def can_create_collection(handler):
     """Decorator to check whether the user can create a collection."""
 
     def test_can_create(self, **kwargs):
-        if ((role_services.ACTION_CREATE_COLLECTION in self.actions) and
-                user_services.has_fully_registered(self.user_id)):
+        if self.user_id is None:
+            raise self.NotLoggedInException
+
+        if (role_services.ACTION_CREATE_COLLECTION in self.actions):
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to create a collection.')
 
     return test_can_create
@@ -209,16 +214,11 @@ def can_access_creator_dashboard(handler):
     def test_can_access(self, **kwargs):
         if self.user_id is None:
             raise self.NotLoggedInException
-            return
-        elif role_services.ACTION_ACCESS_CREATOR_DASHBOARD in self.actions:
-            if user_services.has_fully_registered(self.user_id):
-                return handler(self, **kwargs)
-            else:
-                self.redirect(utils.set_url_query_parameter(
-                    feconf.SIGNUP_URL, 'return_url',
-                    '/notifications_dashboard'))
+
+        if role_services.ACTION_ACCESS_CREATOR_DASHBOARD in self.actions:
+            return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to access creator dashboard.')
 
     return test_can_access
@@ -246,11 +246,10 @@ def can_rate_exploration(handler):
     """
 
     def test_can_rate(self, exploration_id, **kwargs):
-        if ((role_services.ACTION_RATE_EXPLORATION in self.actions) and
-                user_services.has_fully_registered(self.user_id)):
+        if role_services.ACTION_RATE_EXPLORATION in self.actions:
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to give ratings to explorations.')
 
     return test_can_rate
@@ -260,11 +259,10 @@ def can_flag_exploration(handler):
     """Decorator to check whether user can flag given exploration."""
 
     def test_can_flag(self, exploration_id, **kwargs):
-        if ((role_services.ACTION_FLAG_EXPLORATION in self.actions) and
-                user_services.has_fully_registered(self.user_id)):
+        if role_services.ACTION_FLAG_EXPLORATION in self.actions:
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to flag explorations.')
 
     return test_can_flag
@@ -274,11 +272,10 @@ def can_subscribe_to_users(handler):
     """Decorator to check whether user can subscribe/unsubscribe a creator."""
 
     def test_can_subscribe(self, **kwargs):
-        if ((role_services.ACTION_SUBSCRIBE_TO_USERS in self.actions) and
-                user_services.has_fully_registered(self.user_id)):
+        if role_services.ACTION_SUBSCRIBE_TO_USERS in self.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to manage subscriptions.')
 
     return test_can_subscribe
@@ -296,38 +293,29 @@ def can_edit_exploration(handler):
 
     def test_can_edit(self, exploration_id, escaped_state_name=None, **kwargs):
         if not self.user_id:
-            raise self.NotLoggedInException
-            return
-        try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-            exploration_rights = rights_manager.get_exploration_rights(
-                exploration_id, strict=False)
-        except:
-            raise self.PageNotFoundException
-
-        if (exploration is None) or (exploration_rights is None):
-            raise self.PageNotFoundException
-
-        is_state_valid = _is_state_valid(
-            escaped_state_name, exploration.states)
-        state_name = (
-            None if escaped_state_name is None
-            else utils.unescape_encoded_uri_component(escaped_state_name))
-
-        if not is_state_valid:
-            logging.error('Could not find state: %s' % (
-                utils.unescape_encoded_uri_component(escaped_state_name)))
-            logging.error('Available states: %s' % exploration.states.keys())
-            raise self.PageNotFoundException
+            raise base.UserFacingExceptions.NotLoggedInException
 
         if check_exploration_editable(
                 self.user_id, self.actions, exploration_id):
-            return (
-                handler(self, exploration_id, **kwargs)
-                if state_name is None else
-                handler(self, exploration_id, state_name, **kwargs))
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+            state_name = (
+                None if escaped_state_name is None
+                else utils.unescape_encoded_uri_component(escaped_state_name))
+
+            if state_name is None:
+                return handler(self, exploration_id, **kwargs)
+
+            if not _is_state_valid(escaped_state_name, exploration.states):
+                logging.error('Could not find state: %s' % (
+                    utils.unescape_encoded_uri_component(escaped_state_name)))
+                logging.error(
+                    'Available states: %s' % exploration.states.keys())
+                raise base.UserFacingExceptions.PageNotFoundException
+
+            return handler(self, exploration_id, state_name, **kwargs)
+
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this exploration.')
 
     return test_can_edit
@@ -338,9 +326,7 @@ def can_delete_exploration(handler):
 
     def test_can_delete(self, exploration_id, **kwargs):
         if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
+            raise base.UserFacingExceptions.NotLoggedInException
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -357,7 +343,7 @@ def can_delete_exploration(handler):
                   self.actions)):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'User %s does not have permissions to delete exploration %s' %
                 (self.user_id, exploration_id))
 
@@ -369,12 +355,10 @@ def can_suggest_changes_to_exploration(handler):
     exploration.
     """
     def test_can_suggest(self, exploration_id, **kwargs):
-        if (role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in
-                self.actions and user_services.has_fully_registered(
-                    self.user_id)):
+        if role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION:
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to give suggestions to ' +
                 'exploration.')
 
@@ -388,15 +372,13 @@ def can_manage_suggestions_on_exploration(handler):
 
     def test_can_manage(self, exploration_id, **kwargs):
         if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
+            base.UserFacingExceptions.NotLoggedInException
 
         if check_exploration_editable(
                 self.user_id, self.actions, exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have the credentials to manage suggestions for ' +
                 'this exploration.')
 
@@ -411,10 +393,10 @@ def can_publish_exploration(handler):
             exploration_id, strict=False)
 
         if exploration_rights is None:
-            raise self.PageNotFoundException
+            raise base.UserFacingExceptions.PageNotFoundException
 
         if exploration_rights.cloned_from:
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to publish this exploration.')
 
         if role_services.ACTION_PUBLISH_ANY_EXPLORATION in self.actions:
@@ -429,7 +411,7 @@ def can_publish_exploration(handler):
             if role_services.ACTION_PUBLISH_PUBLIC_EXPLORATION in self.actions:
                 return handler(self, exploration_id, **kwargs)
 
-        raise self.UnauthorizedUserException(
+        raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to publish this exploration.')
 
     return test_can_publish
@@ -446,11 +428,11 @@ def can_modify_exploration_roles(handler):
             exploration_id, strict=False)
 
         if exploration_rights is None:
-            raise self.PageNotFoundException
+            raise base.UserFacingExceptions.PageNotFoundException
 
         if (exploration_rights.community_owned or
                 exploration_rights.cloned_from):
-            raise self.UnauthorizedUserException(
+            raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to change rights for this' +
                 'exploration.')
 
@@ -462,7 +444,7 @@ def can_modify_exploration_roles(handler):
             if exploration_rights.is_owner(self.user_id):
                 return handler(self, exploration_id, **kwargs)
 
-        raise self.UnauthorizedUserException(
+        raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to change rights for this' +
             'exploration.')
 
