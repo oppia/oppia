@@ -808,5 +808,3 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
 VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'
-
-GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
