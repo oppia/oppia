@@ -440,7 +440,7 @@ def fetch_next_job():
     failed_jobs = []
 
     while len(valid_jobs) == 0:
-        classifier_training_job_models, cursor = (
+        classifier_training_job_models, cursor, more = (
             classifier_models.ClassifierTrainingJobModel.query_training_jobs(
                 cursor))
         for job_model in classifier_training_job_models:
@@ -456,7 +456,8 @@ def fetch_next_job():
                     failed_jobs.append(training_job)
                 else:
                     valid_jobs.append(training_job)
-                    break
+        if more == None:
+            break
     update_failed_jobs(failed_jobs)
     next_job = valid_jobs[0]
     return next_job

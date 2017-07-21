@@ -141,14 +141,15 @@ class NextJobHandler(base.BaseHandler):
             raise self.UnauthorizedUserException
         if not verify_signature(None, vm_id, signature):
             raise self.UnauthorizedUserException
+        response = {}
         next_job = classifier_services.fetch_next_job()
-        training_data = classifier_services.fetch_training_data(
-            next_job.exp_id, next_job.state_name)
-        classifier_services.update_training_job_training_data(
-            next_job.id, training_data)
-        classifier_services.mark_training_job_pending(next_job.id)
-        return self.render_json({
-            'job_id': next_job.id,
-            'algorithm_id': next_job.algorithm_id,
-            'training_data': training_data
-            })
+        if (len(next_job)!=None):
+            training_data = classifier_services.fetch_training_data(
+                next_job.exp_id, next_job.state_name)
+            classifier_services.update_training_job_training_data(
+                next_job.id, training_data)
+            classifier_services.mark_training_job_pending(next_job.id)
+            response['job_id'] = next_job.id
+            response['algorithm_id'] = next_job.algorithm_id
+            response['training_data'] = training_data
+        return self.render_json(response)

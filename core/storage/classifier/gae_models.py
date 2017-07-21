@@ -196,9 +196,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             feconf.TRAINING_JOB_STATUS_NEW,
             feconf.TRAINING_JOB_STATUS_PENDING]))
         query = query.order(cls.created_on, cls.id)
-        job_models = query.fetch(10, start_cursor=cursor)
-        cursor = query.cursor()
-        return job_models, cursor
+        job_models, cursor, more = query.fetch_page(10, start_cursor=cursor)
+        return job_models, cursor, more
 
 
 class ClassifierExplorationMappingModel(base_models.BaseModel):
