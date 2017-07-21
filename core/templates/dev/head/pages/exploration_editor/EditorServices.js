@@ -822,12 +822,12 @@ oppia.factory('explorationParamChangesService', [
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope',
+  '$log', '$uibModal', '$filter', '$location', '$rootScope',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'explorationGadgetsService',
   'StatesObjectFactory',
   function(
-      $log, $modal, $filter, $location, $rootScope,
+      $log, $uibModal, $filter, $location, $rootScope,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, explorationGadgetsService,
       StatesObjectFactory) {
@@ -1062,7 +1062,7 @@ oppia.factory('explorationStatesService', [
           return;
         }
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/deleteState',
           backdrop: true,
           resolve: {
@@ -1071,10 +1071,10 @@ oppia.factory('explorationStatesService', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'explorationGadgetsService',
+            '$scope', '$uibModalInstance', 'explorationGadgetsService',
             'deleteStateName',
             function(
-                $scope, $modalInstance, explorationGadgetsService,
+                $scope, $uibModalInstance, explorationGadgetsService,
                 deleteStateName) {
               $scope.deleteStateWarningText = (
                 'Are you sure you want to delete the card "' +
@@ -1094,7 +1094,7 @@ oppia.factory('explorationStatesService', [
               }
 
               $scope.reallyDelete = function() {
-                $modalInstance.close(deleteStateName);
+                $uibModalInstance.close(deleteStateName);
                 // Delete the gadgets without additional dialog when confirmed.
                 for (var i = 0; i < gadgetNamesUniqueToThisState.length; i++) {
                   // Note that explorationGadgetsService will update the data
@@ -1106,7 +1106,7 @@ oppia.factory('explorationStatesService', [
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 alertsService.clearWarnings();
               };
             }
@@ -1293,10 +1293,10 @@ oppia.factory('stateHintsService', [
 
 // Data service for keeping track of gadget data and location across panels.
 oppia.factory('explorationGadgetsService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope',
+  '$log', '$uibModal', '$filter', '$location', '$rootScope',
   'changeListService', 'editorContextService', 'alertsService',
   'gadgetValidationService', 'GADGET_SPECS',
-  function($log, $modal, $filter, $location, $rootScope,
+  function($log, $uibModal, $filter, $location, $rootScope,
            changeListService, editorContextService, alertsService,
            gadgetValidationService, GADGET_SPECS) {
     // _gadgets is a JS object with gadget_instance.name strings as keys
@@ -1626,7 +1626,7 @@ oppia.factory('explorationGadgetsService', [
           return;
         }
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/deleteGadget',
           backdrop: true,
           resolve: {
@@ -1635,16 +1635,16 @@ oppia.factory('explorationGadgetsService', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'deleteGadgetName',
-            function($scope, $modalInstance, deleteGadgetName) {
+            '$scope', '$uibModalInstance', 'deleteGadgetName',
+            function($scope, $uibModalInstance, deleteGadgetName) {
               $scope.deleteGadgetName = deleteGadgetName;
 
               $scope.reallyDelete = function() {
-                $modalInstance.close(deleteGadgetName);
+                $uibModalInstance.close(deleteGadgetName);
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 alertsService.clearWarnings();
               };
             }
@@ -2380,10 +2380,10 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$log', '$modal', '$timeout', '$window', 'lostChangesService',
+  '$log', '$uibModal', '$timeout', '$window', 'lostChangesService',
   'explorationData', 'UrlInterpolationService',
   function(
-      $log, $modal, $timeout, $window, lostChangesService,
+      $log, $uibModal, $timeout, $window, lostChangesService,
       explorationData, UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
@@ -2394,16 +2394,16 @@ oppia.factory('autosaveInfoModalsService', [
 
     return {
       showNonStrictValidationFailModal: function() {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
             'save_validation_fail_modal.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.closeAndRefresh = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 _refreshPage(20);
               };
             }
@@ -2420,7 +2420,7 @@ oppia.factory('autosaveInfoModalsService', [
         return _isModalOpen;
       },
       showVersionMismatchModal: function(lostChanges) {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
             'save_version_mismatch_modal.html'),

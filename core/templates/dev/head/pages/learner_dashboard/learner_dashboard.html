@@ -211,7 +211,7 @@
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
                  ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
-                 tooltip="Remove"
+                 uib-tooltip="Remove"
                  tooltip-placement="top"></i>
               <exploration-summary-tile
                                       exploration-id="tile.id"
@@ -320,7 +320,7 @@
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
                  ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
-                 tooltip="Remove"
+                 uib-tooltip="Remove"
                  tooltip-placement="top"></i>
               <collection-summary-tile
                                        collection-id="tile.id"
@@ -428,7 +428,7 @@
                     <strong class="protractor-test-subscription-name"
                             popover-append-to-body
                             popover-trigger="<[showUsernamePopover(subscription.creator_username)]>"
-                            ng-attr-popover="<[subscription.creator_username]>">
+                            ng-attr-uib-popover="<[subscription.creator_username]>">
                       <[subscription.creator_username| truncate:10]>
                     </strong>
                   </div>

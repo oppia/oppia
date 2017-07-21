@@ -17,10 +17,10 @@
  */
 
 oppia.controller('Preferences', [
-  '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
+  '$scope', '$http', '$rootScope', '$uibModal', '$timeout', '$translate',
   'alertsService', 'UrlInterpolationService', 'utilsService',
   function(
-      $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService,
+      $scope, $http, $rootScope, $uibModal, $timeout, $translate, alertsService,
       UrlInterpolationService, utilsService) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
@@ -125,11 +125,11 @@ oppia.controller('Preferences', [
     };
 
     $scope.showEditProfilePictureModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/editProfilePicture',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.uploadedImage = null;
             $scope.croppedImageDataUrl = '';
             $scope.invalidImageWarningIsShown = false;
@@ -164,11 +164,11 @@ oppia.controller('Preferences', [
             };
 
             $scope.confirm = function() {
-              $modalInstance.close($scope.croppedImageDataUrl);
+              $uibModalInstance.close($scope.croppedImageDataUrl);
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]

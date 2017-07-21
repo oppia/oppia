@@ -18,10 +18,10 @@
 
 // Controls adding, deleting and updating gadgets.
 oppia.controller('GadgetEditor', [
-  '$scope', '$modal', '$log', 'editorContextService',
+  '$scope', '$uibModal', '$log', 'editorContextService',
   'explorationGadgetsService', 'GADGET_SPECS',
   function(
-      $scope, $modal, $log, editorContextService,
+      $scope, $uibModal, $log, editorContextService,
       explorationGadgetsService, GADGET_SPECS) {
     $scope.GADGET_SPECS = GADGET_SPECS;
 
@@ -81,7 +81,7 @@ oppia.controller('GadgetEditor', [
      *   dismissed.
      */
     var _openCustomizeGadgetModal = function(gadgetDict, successCallback) {
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/customizeGadget',
         // Clicking outside this modal should not dismiss it.
         backdrop: 'static',
@@ -91,11 +91,11 @@ oppia.controller('GadgetEditor', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'explorationStatesService',
+          '$scope', '$uibModalInstance', 'explorationStatesService',
           'explorationGadgetsService', 'gadgetDict', 'GADGET_SPECS',
           'UrlInterpolationService',
           function(
-              $scope, $modalInstance, explorationStatesService,
+              $scope, $uibModalInstance, explorationStatesService,
               explorationGadgetsService, gadgetDict, GADGET_SPECS,
               UrlInterpolationService) {
             $scope.getGadgetImgUrl = UrlInterpolationService.getGadgetImgUrl;
@@ -188,7 +188,7 @@ oppia.controller('GadgetEditor', [
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
 
             $scope.save = function() {
@@ -202,7 +202,7 @@ oppia.controller('GadgetEditor', [
                     $scope.gadgetDict)) {
                 return;
               }
-              $modalInstance.close($scope.gadgetDict);
+              $uibModalInstance.close($scope.gadgetDict);
             };
           }
         ]

@@ -46,7 +46,7 @@ oppia.controller('ExplorationEditor', [
   'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService', '$modal', 'changeListService',
+  'explorationAdvancedFeaturesService', '$uibModal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'UrlInterpolationService',
@@ -60,7 +60,7 @@ oppia.controller('ExplorationEditor', [
       routerService, graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService, $modal, changeListService,
+      explorationAdvancedFeaturesService, $uibModal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       UrlInterpolationService) {
@@ -370,15 +370,15 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.showWelcomeExplorationModal = function() {
-      var modalInstance = $modal.open({
+      var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'welcome_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'siteAnalyticsService',
+          '$scope', '$uibModalInstance', 'siteAnalyticsService',
           'explorationContextService',
-          function($scope, $modalInstance, siteAnalyticsService,
+          function($scope, $uibModalInstance, siteAnalyticsService,
           explorationContextService) {
             var explorationId = explorationContextService.getExplorationId();
 
@@ -387,13 +387,13 @@ oppia.controller('ExplorationEditor', [
             $scope.beginTutorial = function() {
               siteAnalyticsService.registerAcceptTutorialModalEvent(
                 explorationId);
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
               siteAnalyticsService.registerDeclineTutorialModalEvent(
                 explorationId);
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
 
             $scope.editorWelcomeImgUrl = (

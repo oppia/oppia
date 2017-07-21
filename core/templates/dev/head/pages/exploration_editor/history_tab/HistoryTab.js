@@ -17,11 +17,11 @@
  */
 
 oppia.controller('HistoryTab', [
-  '$scope', '$http', '$rootScope', '$log', '$modal', 'explorationData',
+  '$scope', '$http', '$rootScope', '$log', '$uibModal', 'explorationData',
   'versionsTreeService', 'compareVersionsService', 'graphDataService',
   'oppiaDatetimeFormatter',
   function(
-      $scope, $http, $rootScope, $log, $modal, explorationData,
+      $scope, $http, $rootScope, $log, $uibModal, explorationData,
       versionsTreeService, compareVersionsService, graphDataService,
       oppiaDatetimeFormatter) {
     $scope.explorationId = explorationData.explorationId;
@@ -218,7 +218,7 @@ oppia.controller('HistoryTab', [
     };
 
     $scope.showRevertExplorationModal = function(version) {
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/revertExploration',
         backdrop: true,
         resolve: {
@@ -227,8 +227,8 @@ oppia.controller('HistoryTab', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'version', 'explorationData',
-          function($scope, $modalInstance, version, explorationData) {
+          '$scope', '$uibModalInstance', 'version', 'explorationData',
+          function($scope, $uibModalInstance, version, explorationData) {
             $scope.version = version;
 
             $scope.getExplorationUrl = function(version) {
@@ -237,11 +237,11 @@ oppia.controller('HistoryTab', [
             };
 
             $scope.revert = function() {
-              $modalInstance.close(version);
+              $uibModalInstance.close(version);
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]

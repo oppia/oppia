@@ -17,7 +17,7 @@
  */
 
 oppia.controller('SettingsTab', [
-  '$scope', '$http', '$window', '$modal', '$rootScope',
+  '$scope', '$http', '$window', '$uibModal', '$rootScope',
   'explorationData', 'explorationTitleService', 'explorationCategoryService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationTagsService', 'explorationRightsService',
@@ -29,7 +29,7 @@ oppia.controller('SettingsTab', [
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
   'ENABLE_FALLBACK_EDITOR',
   function(
-      $scope, $http, $window, $modal, $rootScope,
+      $scope, $http, $window, $uibModal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService,
       explorationTagsService, explorationRightsService,
@@ -232,11 +232,11 @@ oppia.controller('SettingsTab', [
     ********************************************/
     $scope.previewSummaryTile = function() {
       alertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/previewSummaryTile',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.getExplorationTitle = function() {
               return explorationTitleService.displayed;
             };
@@ -265,7 +265,7 @@ oppia.controller('SettingsTab', [
             };
 
             $scope.close = function() {
-              $modalInstance.dismiss();
+              $uibModalInstance.dismiss();
               alertsService.clearWarnings();
             };
           }
@@ -275,15 +275,15 @@ oppia.controller('SettingsTab', [
 
     $scope.showTransferExplorationOwnershipModal = function() {
       alertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/transferExplorationOwnership',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.transfer = $modalInstance.close;
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+            $scope.transfer = $uibModalInstance.close;
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               alertsService.clearWarnings();
             };
           }
@@ -298,15 +298,15 @@ oppia.controller('SettingsTab', [
     $scope.deleteExploration = function() {
       alertsService.clearWarnings();
 
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/deleteExploration',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.reallyDelete = $modalInstance.close;
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+            $scope.reallyDelete = $uibModalInstance.close;
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               alertsService.clearWarnings();
             };
           }
@@ -329,7 +329,7 @@ oppia.controller('SettingsTab', [
         // exposed to the mdoerator.
         var draftEmailBody = response.data.draft_email_body;
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/takeModeratorAction',
           backdrop: true,
           resolve: {
@@ -338,8 +338,8 @@ oppia.controller('SettingsTab', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'draftEmailBody',
-            function($scope, $modalInstance, draftEmailBody) {
+            '$scope', '$uibModalInstance', 'draftEmailBody',
+            function($scope, $uibModalInstance, draftEmailBody) {
               $scope.action = action;
               $scope.willEmailBeSent = Boolean(draftEmailBody);
               $scope.emailBody = draftEmailBody;
@@ -354,13 +354,13 @@ oppia.controller('SettingsTab', [
               }
 
               $scope.reallyTakeAction = function() {
-                $modalInstance.close({
+                $uibModalInstance.close({
                   emailBody: $scope.emailBody
                 });
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 alertsService.clearWarnings();
               };
             }

@@ -17,12 +17,12 @@
  */
 
 oppia.controller('StateHints', [
-  '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
+  '$scope', '$rootScope', '$uibModal', '$filter', 'editorContextService',
   'ENABLE_HINT_EDITOR', 'alertsService', 'INTERACTION_SPECS',
   'stateHintsService', 'explorationStatesService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory', 'oppiaPlayerService',
   function(
-    $scope, $rootScope, $modal, $filter, editorContextService,
+    $scope, $rootScope, $uibModal, $filter, editorContextService,
     ENABLE_HINT_EDITOR, alertsService, INTERACTION_SPECS,
     stateHintsService, explorationStatesService, stateInteractionIdService,
     UrlInterpolationService, HintObjectFactory, oppiaPlayerService) {
@@ -77,12 +77,12 @@ oppia.controller('StateHints', [
       alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/addHint',
         backdrop: 'static',
         controller: [
-          '$scope', '$modalInstance', 'editorContextService',
-          function($scope, $modalInstance, editorContextService) {
+          '$scope', '$uibModalInstance', 'editorContextService',
+          function($scope, $uibModalInstance, editorContextService) {
             $scope.HINT_FORM_SCHEMA = {
               type: 'html',
               ui_config: {}
@@ -96,14 +96,14 @@ oppia.controller('StateHints', [
 
             $scope.saveHint = function() {
               // Close the modal and save it afterwards.
-              $modalInstance.close({
+              $uibModalInstance.close({
                 hint: angular.copy(
                   HintObjectFactory.createNew($scope.tmpHint))
               });
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               alertsService.clearWarnings();
             };
           }
@@ -141,17 +141,17 @@ oppia.controller('StateHints', [
       evt.stopPropagation();
 
       alertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/deleteHint',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.reallyDelete = function() {
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               alertsService.clearWarnings();
             };
           }

@@ -18,12 +18,12 @@
  */
 
 oppia.controller('StateStatistics', [
-  '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
-  'explorationStatesService', 'trainingDataService',
+  '$rootScope', '$scope', '$uibModal', 'explorationData',
+  'editorContextService', 'explorationStatesService', 'trainingDataService',
   'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
   'trainingModalService', 'INTERACTION_SPECS',
   function(
-      $rootScope, $scope, $modal, explorationData, editorContextService,
+      $rootScope, $scope, $uibModal, explorationData, editorContextService,
       explorationStatesService, trainingDataService,
       stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
       trainingModalService, INTERACTION_SPECS) {

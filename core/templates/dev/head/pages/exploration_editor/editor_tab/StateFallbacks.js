@@ -17,12 +17,12 @@
  */
 
 oppia.controller('StateFallbacks', [
-  '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
+  '$scope', '$rootScope', '$uibModal', '$filter', 'editorContextService',
   'alertsService', 'INTERACTION_SPECS', 'stateFallbacksService',
   'explorationStatesService', 'stateInteractionIdService',
   'UrlInterpolationService', 'FallbackObjectFactory',
   function(
-      $scope, $rootScope, $modal, $filter, editorContextService,
+      $scope, $rootScope, $uibModal, $filter, editorContextService,
       alertsService, INTERACTION_SPECS, stateFallbacksService,
       explorationStatesService, stateInteractionIdService,
       UrlInterpolationService, FallbackObjectFactory) {
@@ -72,12 +72,12 @@ oppia.controller('StateFallbacks', [
       alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/addFallback',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'editorContextService',
-          function($scope, $modalInstance, editorContextService) {
+          '$scope', '$uibModalInstance', 'editorContextService',
+          function($scope, $uibModalInstance, editorContextService) {
             $scope.INT_FORM_SCHEMA = {
               type: 'int',
               ui_config: {},
@@ -106,13 +106,13 @@ oppia.controller('StateFallbacks', [
               $scope.$broadcast('saveOutcomeFeedbackDetails');
               $scope.$broadcast('saveOutcomeDestDetails');
               // Close the modal and save it afterwards.
-              $modalInstance.close({
+              $uibModalInstance.close({
                 fallback: angular.copy($scope.tmpFallback)
               });
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               alertsService.clearWarnings();
             };
           }
@@ -150,17 +150,17 @@ oppia.controller('StateFallbacks', [
       evt.stopPropagation();
 
       alertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/deleteFallback',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.reallyDelete = function() {
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               alertsService.clearWarnings();
             };
           }

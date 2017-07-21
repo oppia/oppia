@@ -74,11 +74,11 @@ oppia.constant(
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$document', '$modal', '$timeout', 'focusService',
+    '$delegate', '$document', '$uibModal', '$timeout', 'focusService',
     'taRegisterTool', 'rteHelperService', 'alertsService',
     'explorationContextService', 'PAGE_CONTEXT',
     function(
-      taOptions, $document, $modal, $timeout, focusService,
+      taOptions, $document, $uibModal, $timeout, focusService,
       taRegisterTool, rteHelperService, alertsService,
       explorationContextService, PAGE_CONTEXT) {
       taOptions.disableSanitizer = true;
@@ -97,13 +97,13 @@ oppia.config(['$provide', function($provide) {
         customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
         onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
-        var modalDialog = $modal.open({
+        var modalDialog = $uibModal.open({
           templateUrl: 'modals/customizeRteComponent',
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', '$timeout',
-            function($scope, $modalInstance, $timeout) {
+            '$scope', '$uibModalInstance', '$timeout',
+            function($scope, $uibModalInstance, $timeout) {
               $scope.customizationArgSpecs = customizationArgSpecs;
 
               // Without this code, the focus will remain in the background RTE
@@ -131,7 +131,7 @@ oppia.config(['$provide', function($provide) {
               }
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
 
               $scope.save = function() {
@@ -144,7 +144,7 @@ oppia.config(['$provide', function($provide) {
                     $scope.tmpCustomizationArgs[i].value);
                 }
 
-                $modalInstance.close(customizationArgsDict);
+                $uibModalInstance.close(customizationArgsDict);
               };
             }
           ]
