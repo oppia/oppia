@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers, services and filters for solution.
+ * @fileoverview Controller for solution.
  */
 
 oppia.controller('StateSolution', [
@@ -35,14 +35,13 @@ oppia.controller('StateSolution', [
     $scope.editorContextService = editorContextService;
     $scope.stateSolutionService = stateSolutionService;
     $scope.isActive = false;
-    $scope.answerIsExclusive = false;
     $scope.answerCheckPassed = false;
     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
-    $rootScope.interactionHtml = '';
+    $scope.interactionHtml = '';
 
     $scope.stateHintsService = stateHintsService;
     $scope.stateSolutionService = stateSolutionService;
-    $rootScope.correctAnswer = null;
+    $scope.correctAnswer = null;
 
     $scope.supportedInteractions = [
       'InteractiveMap',
@@ -63,8 +62,8 @@ oppia.controller('StateSolution', [
       LogicProof: 'LogicQuestion'
     };
 
-    $rootScope.submitAnswer = function (answer, rules) {
-      $rootScope.correctAnswer = answer;
+    $scope.submitAnswer = function (answer) {
+      $scope.correctAnswer = answer;
     };
 
     $scope.toggleIsActive = function() {
@@ -75,7 +74,7 @@ oppia.controller('StateSolution', [
       stateSolutionService.init(
         editorContextService.getActiveStateName(),
         stateData.interaction.solution);
-      $rootScope.interactionHtml = (
+      $scope.interactionHtml = (
         oppiaExplorationHtmlFormatterService.getInteractionHtml(
           stateInteractionIdService.savedMemento,
           explorationStatesService.getInteractionCustomizationArgsMemento(
@@ -83,18 +82,18 @@ oppia.controller('StateSolution', [
           'currentInteractionHtml'));
 
       $scope.solutionIsSpecified = (
-        JSON.stringify(stateSolutionService.savedMemento) ? true : false);
+        !!JSON.stringify(stateSolutionService.savedMemento));
       $scope.isActive = false;
       var interactionId = stateInteractionIdService.savedMemento;
 
       $scope.INTERACTION_SPECS = INTERACTION_SPECS[interactionId];
 
       if ($scope.supportedInteractions.indexOf(interactionId) === -1) {
-        $rootScope.interactionHtml = null;
-        $rootScope.objectType = (
+        $scope.interactionHtml = null;
+        $scope.objectType = (
           $scope.unsupportedInteractionObjectTypes[interactionId]);
       } else {
-        $rootScope.objectType = null;
+        $scope.objectType = null;
       }
     });
 
@@ -110,7 +109,6 @@ oppia.controller('StateSolution', [
         correctAnswer = (
           oppiaHtmlEscaper.objToEscapedJson(
             responsesService.getAnswerChoices()[solution.correctAnswer].label));
-        console.log(correctAnswer);
       } else if (interactionId === 'MathExpressionInput') {
         correctAnswer = solution.correctAnswer.latex;
       } else if (interactionId === 'CodeRepl' ||
@@ -146,6 +144,7 @@ oppia.controller('StateSolution', [
       $modal.open({
         templateUrl: 'modals/addSolution',
         backdrop: 'static',
+        scope: $scope,
         controller: [
           '$scope', '$rootScope', '$modalInstance', 'editorContextService',
           function($scope, $rootScope, $modalInstance, editorContextService) {
@@ -158,13 +157,13 @@ oppia.controller('StateSolution', [
             $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 
             $scope.tmpSolution = {};
-            $scope.tmpSolution.answerIsExclusive = $scope.answerIsExclusive;
+            $scope.tmpSolution.answerIsExclusive = false;
             $scope.tmpSolution.correctAnswer = '';
             $scope.tmpSolution.explanation = '';
 
             $scope.addSolutionForm = {};
 
-            if ($rootScope.objectType === 'CodeString') {
+            if ($scope.objectType === 'CodeString') {
               stateSolutionService.displayed = {
                 correctAnswer: {
                   code: '',
@@ -177,11 +176,9 @@ oppia.controller('StateSolution', [
 
             $scope.saveSolution = function() {
               // Close the modal and save it afterwards.
-              $scope.tmpSolution.answerIsExclusive = (
-                $scope.answerIsExclusive === 'true');
-              var answer = ($rootScope.correctAnswer !== null) ? (
-                $rootScope.correctAnswer) : $scope.tmpSolution.correctAnswer;
-              if ($rootScope.objectType === 'CodeString') {
+              var answer = ($scope.correctAnswer !== null) ? (
+                $scope.correctAnswer) : $scope.tmpSolution.correctAnswer;
+              if ($scope.objectType === 'CodeString') {
                 answer = {
                   code: $scope.tmpSolution.correctAnswer,
                   output: '',
@@ -189,7 +186,7 @@ oppia.controller('StateSolution', [
                   error: ''
                 };
               }
-              if ($rootScope.objectType === 'UnicodeString') {
+              if ($scope.objectType === 'UnicodeString') {
                 answer = {
                   ascii: '',
                   latex: $scope.tmpSolution.correctAnswer
@@ -231,15 +228,14 @@ oppia.controller('StateSolution', [
               result.outcome.dest)) {
                 stateSolutionService.saveDisplayedValue();
                 $scope.solutionIsSpecified = (
-                  JSON.stringify(
-                    stateSolutionService.savedMemento) ? true : false);
+                  !!JSON.stringify(stateSolutionService.savedMemento));
               } else {
-                alertsService.addInfoMessage('That solution was incorrect!');
+                alertsService.addInfoMessage('That solution does not lead ' +
+                  'to the next state!');
                 $scope.openAddSolutionModal();
               }
             });
-        }
-        catch (e) {
+        } catch (e) {
           alertsService.addInfoMessage('That solution was invalid!');
           $scope.openAddSolutionModal();
         }
@@ -256,6 +252,7 @@ oppia.controller('StateSolution', [
       $modal.open({
         templateUrl: 'modals/deleteSolution',
         backdrop: true,
+        scope: $scope,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
             $scope.reallyDelete = function() {
@@ -301,22 +298,20 @@ oppia.controller('StateSolution', [
                   stateSolutionService.savedMemento);
                 stateSolutionService.saveDisplayedValue();
                 $scope.solutionIsSpecified = (
-                  JSON.stringify(
-                    stateSolutionService.displayed) ? true : false);
+                  !!JSON.stringify(stateSolutionService.displayed));
               } else {
-                alertsService.addInfoMessage('That solution was incorrect!');
+                alertsService.addInfoMessage('That solution does not lead ' +
+                  'to the next state!');
                 stateSolutionService.saveDisplayedValue();
                 $scope.solutionIsSpecified = (
-                  JSON.stringify(
-                    stateSolutionService.displayed) ? true : false);
+                  !!JSON.stringify(stateSolutionService.displayed));
               }
             });
-      }
-      catch (e) {
+      } catch (e) {
         alertsService.addInfoMessage('That solution was invalid!');
         stateSolutionService.saveDisplayedValue();
         $scope.solutionIsSpecified = (
-          JSON.stringify(stateSolutionService.displayed) ? true : false);
+          !!JSON.stringify(stateSolutionService.displayed));
       }
     };
   }

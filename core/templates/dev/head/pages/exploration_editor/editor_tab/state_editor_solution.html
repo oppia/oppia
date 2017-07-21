@@ -63,10 +63,8 @@
     <form name="addSolutionForm.answer"
           class="form-inline">
       <div class="oppia-rule-details-header">
-        <select ng-model="answerIsExclusive">
-          <option ng-if="!answerIsExclusive" value="">-- Please select an option --</option>
-          <option value="false">One</option>
-          <option value="true">Only</option>
+        <select ng-model="tmpSolution.answerIsExclusive"
+                ng-options="(item ? 'Only' : 'One') for item in [true, false]">
         </select> <strong>Solution is...</strong>
         <div ng-if="!interactionHtml">
           <object-editor ng-if="objectType === 'UnicodeString'"

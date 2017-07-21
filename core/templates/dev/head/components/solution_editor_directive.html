@@ -46,10 +46,10 @@
           name="editSolutionForm"
           ng-submit="saveThisSolution()">
       <div class="oppia-rule-details-header">
-        <select ng-model="solution.answerIsExclusive">
-          <option value="false">One</option>
-          <option value="true">Only</option>
-        </select> <strong>Solution is...</strong>
+        <select ng-model="solution.answerIsExclusive"
+                ng-options="(item ? 'Only' : 'One') for item in [true, false]">
+        </select>
+        <strong>Solution is...</strong>
         <div ng-if="!interactionHtml">
           <object-editor ng-if="objectType === 'UnicodeString'"
                          obj-type="<[objectType]>"

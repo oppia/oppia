@@ -47,20 +47,16 @@ oppia.directive('solutionEditor', [
             if ($scope.isEditable) {
               $scope.solutionMemento = angular.copy($scope.solution);
               $scope.solutionEditorIsOpen = true;
-              $scope.solution.answerIsExclusive = (
-                $scope.solution.answerIsExclusive.toString());
             }
           };
 
-          $scope.submitAnswer = function(answer, rules) {
+          $scope.submitAnswer = function(answer) {
             $scope.solution.correctAnswer = answer;
           };
 
           $scope.saveThisSolution = function() {
             $scope.solutionEditorIsOpen = false;
             $scope.solutionMemento = null;
-            $scope.solution.answerIsExclusive = (
-              $scope.solution.answerIsExclusive === 'true');
             $scope.getOnSaveFn()();
           };
 
