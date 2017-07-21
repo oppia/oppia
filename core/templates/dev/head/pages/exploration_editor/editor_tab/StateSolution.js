@@ -20,18 +20,18 @@ oppia.controller('StateSolution', [
   '$scope', '$rootScope', '$modal', '$filter', '$injector',
   'editorContextService', 'alertsService', 'INTERACTION_SPECS',
   'stateSolutionService', 'explorationStatesService',
-  'oppiaExplorationHtmlFormatterService', 'stateInteractionIdService',
-  'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
-  'responsesService', 'AnswerClassificationService',
-  'explorationContextService', 'angularNameService', 'oppiaHtmlEscaper',
+  'StateSolutionHelperService', 'oppiaExplorationHtmlFormatterService',
+  'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
+  'SolutionObjectFactory', 'responsesService', 'AnswerClassificationService',
+  'explorationContextService', 'angularNameService',
   function(
     $scope, $rootScope, $modal, $filter, $injector,
     editorContextService, alertsService, INTERACTION_SPECS,
     stateSolutionService, explorationStatesService,
-    oppiaExplorationHtmlFormatterService, stateInteractionIdService,
-    stateHintsService, UrlInterpolationService, SolutionObjectFactory,
-    responsesService, AnswerClassificationService,
-    explorationContextService, angularNameService, oppiaHtmlEscaper) {
+    StateSolutionHelperService, oppiaExplorationHtmlFormatterService,
+    stateInteractionIdService, stateHintsService, UrlInterpolationService,
+    SolutionObjectFactory, responsesService, AnswerClassificationService,
+    explorationContextService, angularNameService) {
     $scope.editorContextService = editorContextService;
     $scope.stateSolutionService = stateSolutionService;
     $scope.isActive = false;
@@ -42,25 +42,6 @@ oppia.controller('StateSolution', [
     $scope.stateHintsService = stateHintsService;
     $scope.stateSolutionService = stateSolutionService;
     $scope.correctAnswer = null;
-
-    $scope.supportedInteractions = [
-      'InteractiveMap',
-      'MusicNotesInput',
-      'GraphInput',
-      'SetInput',
-      'MathExpressionInput',
-      'MultipleChoiceInput',
-      'ImageClickInput',
-      'ItemSelectionInput'
-    ];
-
-    $scope.unsupportedInteractionObjectTypes = {
-      CodeRepl: 'CodeString',
-      PencilCodeEditor: 'CodeString',
-      NumericInput: 'Real',
-      TextInput: 'NormalizedString',
-      LogicProof: 'LogicQuestion'
-    };
 
     $scope.submitAnswer = function (answer) {
       $scope.correctAnswer = answer;
@@ -88,10 +69,11 @@ oppia.controller('StateSolution', [
 
       $scope.INTERACTION_SPECS = INTERACTION_SPECS[interactionId];
 
-      if ($scope.supportedInteractions.indexOf(interactionId) === -1) {
+      if (StateSolutionHelperService.isSupportedInteraction(interactionId)) {
         $scope.interactionHtml = null;
         $scope.objectType = (
-          $scope.unsupportedInteractionObjectTypes[interactionId]);
+          StateSolutionHelperService.getUnsupportedInteractionObjectType(
+            interactionId));
       } else {
         $scope.objectType = null;
       }
@@ -101,28 +83,7 @@ oppia.controller('StateSolution', [
       var solution = stateSolutionService.displayed;
       var isExclusiveAnswer = (
         solution.answerIsExclusive ? 'Only' : 'One');
-      var correctAnswer = '';
-      var interactionId = stateInteractionIdService.savedMemento;
-      if (interactionId === 'GraphInput') {
-        correctAnswer = '[Graph Object]';
-      } else if (interactionId === 'MultipleChoiceInput') {
-        correctAnswer = (
-          oppiaHtmlEscaper.objToEscapedJson(
-            responsesService.getAnswerChoices()[solution.correctAnswer].label));
-      } else if (interactionId === 'MathExpressionInput') {
-        correctAnswer = solution.correctAnswer.latex;
-      } else if (interactionId === 'CodeRepl' ||
-                 interactionId === 'PencilCodeEditor') {
-        correctAnswer = solution.correctAnswer.code;
-      } else if (interactionId === 'MusicNotesInput') {
-        correctAnswer = '[Music Notes Object]';
-      } else if (interactionId === 'ImageClickInput') {
-        correctAnswer = solution.correctAnswer.clickedRegions;
-      } else {
-        correctAnswer = (
-          oppiaHtmlEscaper.objToEscapedJson(solution.correctAnswer));
-      }
-
+      var correctAnswer = StateSolutionHelperService.getCorrectAnswer(solution);
       var explanation = (
         $filter('convertToPlainText')(solution.explanation));
       return (
@@ -153,7 +114,6 @@ oppia.controller('StateSolution', [
               ui_config: {}
             };
 
-            var interactionId = stateInteractionIdService.savedMemento;
             $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 
             $scope.tmpSolution = {};
@@ -185,8 +145,7 @@ oppia.controller('StateSolution', [
                   evaluation: '',
                   error: ''
                 };
-              }
-              if ($scope.objectType === 'UnicodeString') {
+              } else if ($scope.objectType === 'UnicodeString') {
                 answer = {
                   ascii: '',
                   latex: $scope.tmpSolution.correctAnswer

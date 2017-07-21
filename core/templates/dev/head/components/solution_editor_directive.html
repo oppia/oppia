@@ -17,7 +17,6 @@
         </strong>
         <span ng-if="objectType !== 'CodeString' &&
                      objectType !== 'Graph' &&
-                     objectType !== 'RegionSelect' &&
                      objectType !== 'UnicodeString'">
           <[solution.correctAnswer]>
         </span>
@@ -26,9 +25,6 @@
         </span>
         <span ng-if="objectType === 'Graph'">
           [Graph Object]
-        </span>
-        <span ng-if="objectType === 'RegionSelect'">
-          <[solution.correctAnswer.clickedRegions[0]]>
         </span>
         <span ng-if="objectType === 'UnicodeString'">
           <[solution.correctAnswer.latex]>
@@ -67,9 +63,8 @@
                          value="solution.correctAnswer.code"
                          style="color: black;">
           </object-editor>
-          <object-editor ng-if="objectType === 'CodeString' ||
-                              objectType === 'NormalizedString' ||
-                              objectType === 'Real'"
+          <object-editor ng-if="objectType === 'NormalizedString' ||
+                                objectType === 'Real'"
                          obj-type="<[objectType]>"
                          init-args="{choices: ruleDescriptionChoices}"
                          is-editable="true"
