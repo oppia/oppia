@@ -39,38 +39,38 @@ describe('Feedback thread object factory', function() {
 
   it('should fetch the feedback thread domain objects from backend ' +
      'dicts', function() {
-    thread_summary_1 = {
-      'status': 'open',
-      'original_author_id': 'Test user 1',
-      'last_updated': 1000,
-      'last_message_text': 'last message',
-      'total_no_of_messages': 2,
-      'last_message_read': false,
-      'second_last_message_read': true,
-      'author_last_message': 'Test user 2',
-      'author_second_last_message': 'Test user 1',
-      'exploration_title': 'Sample exploration 1',
-      'exploration_id': '0',
-      'thread_id': 'thread_id_1'
+    threadSummary1 = {
+      status: 'open',
+      original_autho_id: 'Test user 1',
+      last_updated: 1000,
+      last_message_text: 'last message',
+      total_no_of_messages: 2,
+      last_message_read: false,
+      second_last_message_read: true,
+      author_last_message: 'Test user 2',
+      author_second_last_message: 'Test user 1',
+      exploration_title: 'Sample exploration 1',
+      exploration_id: '0',
+      thread_id: 'thread_id_1'
     };
 
-    thread_summary_2 = {
-      'status': 'open',
-      'original_author_id': 'Test user 3',
-      'last_updated': 2000,
-      'last_message_text': 'last message',
-      'total_no_of_messages': 3,
-      'last_message_read': false,
-      'second_last_message_read': true,
-      'author_last_message': 'Test user 4',
-      'author_second_last_message': 'Test user 3',
-      'exploration_title': 'Sample exploration 2',
-      'exploration_id': '1',
-      'thread_id': 'thread_id_2'
+    threadSummary2 = {
+      status: 'open',
+      original_author_id: 'Test user 3',
+      last_updated: 2000,
+      last_messge_text: 'last message',
+      total_no_of_messages: 3,
+      last_message_read: false,
+      second_last_message_read: true,
+      author_last_message: 'Test user 4',
+      author_second_last_message: 'Test user 3',
+      exploration_title: 'Sample exploration 2',
+      exploration_id: '1',
+      thread_id: 'thread_id_2'
     };
 
     feedbackThreads = FeedbackThreadObjectFactory.createFromBackendDicts(
-      [thread_summary_1, thread_summary_2]);
+      [threadSummary1, threadSummary2]);
 
     expect(feedbackThreads[0].explorationTitle).toEqual(
       'Sample exploration 1');

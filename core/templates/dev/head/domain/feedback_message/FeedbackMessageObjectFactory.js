@@ -18,42 +18,41 @@
  */
 
 oppia.factory('FeedbackMessageObjectFactory', [function() {
-    var FeedbackMessage = function(text, suggestionHtml, currentContentHtml,
-        description,authorUsername, authorPictureDataUrl, createdOn) {
-      this.text = text;
-      this.suggestionHtml = suggestionHtml;
-      this.currentContentHtml = currentContentHtml;
-      this.description = description;
-      this.authorUsername = authorUsername;
-      this.authorPictureDataUrl = authorPictureDataUrl;
-      this.createdOn = createdOn;
-    };
+  var FeedbackMessage = function(text, suggestionHtml, currentContentHtml,
+    description,authorUsername, authorPictureDataUrl, createdOn) {
+    this.text = text;
+    this.suggestionHtml = suggestionHtml;
+    this.currentContentHtml = currentContentHtml;
+    this.description = description;
+    this.authorUsername = authorUsername;
+    this.authorPictureDataUrl = authorPictureDataUrl;
+    this.createdOn = createdOn;
+  };
 
-    FeedbackMessage.createNewMessage = function(newMessage, authorUsername,
-        authorPictureDataUrl) {
-      return new FeedbackMessage(
-        newMessage, null, null, null, authorUsername, authorPictureDataUrl,
-        new Date());
-    };
+  FeedbackMessage.createNewMessage = function(newMessage, authorUsername,
+    authorPictureDataUrl) {
+    return new FeedbackMessage(
+      newMessage, null, null, null, authorUsername, authorPictureDataUrl,
+      new Date());
+  };
 
-    FeedbackMessage.createFromBackendDicts = function(
-      feedbackMessageBackendDicts) {
-      var FeedbackMessages = [];
-      for (index = 0; index < feedbackMessageBackendDicts.length; index++) {
-        FeedbackMessages.push(new FeedbackMessage(
-          feedbackMessageBackendDicts[index].text,
-          feedbackMessageBackendDicts[index].suggestion_html,
-          feedbackMessageBackendDicts[index].current_content_html,
-          feedbackMessageBackendDicts[index].description,
-          feedbackMessageBackendDicts[index].author_username,
-          feedbackMessageBackendDicts[index].author_picture_data_url,
-          feedbackMessageBackendDicts[index].created_on
-        ));
-      }
+  FeedbackMessage.createFromBackendDicts = function(
+    feedbackMessageBackendDicts) {
+    var FeedbackMessages = [];
+    for (index = 0; index < feedbackMessageBackendDicts.length; index++) {
+      FeedbackMessages.push(new FeedbackMessage(
+        feedbackMessageBackendDicts[index].text,
+        feedbackMessageBackendDicts[index].suggestion_html,
+        feedbackMessageBackendDicts[index].current_content_html,
+        feedbackMessageBackendDicts[index].description,
+        feedbackMessageBackendDicts[index].author_username,
+        feedbackMessageBackendDicts[index].author_picture_data_url,
+        feedbackMessageBackendDicts[index].created_on
+      ));
+    }
 
-      return FeedbackMessages;
-    };
+    return FeedbackMessages;
+  };
 
-    return FeedbackMessage;
-  }
-]);
+  return FeedbackMessage;
+}]);

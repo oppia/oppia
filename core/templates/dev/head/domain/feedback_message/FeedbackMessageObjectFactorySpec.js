@@ -28,23 +28,23 @@ describe('Feedback message object factory', function() {
 
   it('should fetch the feedback message domain objects from backend ' +
      'dicts', function() {
-    message_summary_1 = {
-      'text': 'Sample text',
-      'author_username': 'User 1',
-      'author_picture_data_url': 'sample_picture_url_1',
-      'created_on': 1000
+    messageSummary1 = {
+      text: 'Sample text',
+      author_username: 'User 1',
+      author_picture_data_url: 'sample_picture_url_1',
+      created_on: 1000
     };
 
-    message_summary_2 = {
-      'suggestion_html': 'suggested html',
-      'current_content_html': 'current html',
-      'description': 'description',
-      'author_username': 'User 2',
-      'author_picture_data_url': 'sample_picture_url_2'
+    messageSummary2 = {
+      suggestion_html: 'suggested html',
+      current_content_html: 'current html',
+      description: 'description',
+      author_username: 'User 2',
+      author_picture_data_url: 'sample_picture_url_2'
     };
 
     feedbackMessages = FeedbackMessageObjectFactory.createFromBackendDicts(
-      [message_summary_1, message_summary_2]);
+      [messageSummary1, messageSummary2]);
 
     expect(feedbackMessages[0].text).toEqual('Sample text');
     expect(feedbackMessages[0].authorUsername).toEqual('User 1');
