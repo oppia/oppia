@@ -87,7 +87,8 @@ oppia.controller('LearnerLocalNav', [
 
     $scope.showFlagExplorationModal = function() {
       $modal.open({
-        templateUrl: 'modals/flagExploration',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_player/flag_exploration_modal.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'playerPositionService',
@@ -132,7 +133,9 @@ oppia.controller('LearnerLocalNav', [
           alertsService.addWarning(error);
         });
         $modal.open({
-          templateUrl: 'modals/explorationSuccessfullyFlagged',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/' +
+            'exploration_successfully_flagged_modal.html'),
           backdrop: true,
           controller: [
             '$scope', '$modalInstance',
