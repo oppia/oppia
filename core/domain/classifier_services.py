@@ -403,7 +403,7 @@ def update_failed_jobs(training_jobs):
         state_name: str. Name of the state.
     """
     for training_job in training_jobs:
-        mark_training_job_failed(training_job.id)
+        mark_training_job_failed(training_job.job_id)
 
 
 def fetch_training_data(exp_id, state_name):
@@ -440,26 +440,27 @@ def fetch_next_job():
     failed_jobs = []
 
     while len(valid_jobs) == 0:
-        classifier_training_job_models, cursor, more = (
+        classifier_training_jobs, cursor, more = (
             classifier_models.ClassifierTrainingJobModel.query_training_jobs(
                 cursor))
-        for job_model in classifier_training_job_models:
-            classifier_training_jobs.append(
-                get_classifier_training_job_from_model(
-                    job_model))
         for training_job in classifier_training_jobs:
             if(training_job.status == (
                     feconf.TRAINING_JOB_STATUS_PENDING)):
                 if (datetime.datetime.utcnow() - (
                         training_job.last_updated) > (
-                            feconf.CLASSIFIER_JOB_TTL)):
+                            datetime.timedelta(minutes=feconf.CLASSIFIER_JOB_TTL))):
                     failed_jobs.append(training_job)
                 else:
                     valid_jobs.append(training_job)
-        if more is None:
+            else:
+                valid_jobs.append(training_job)
+        if not more:
             break
     update_failed_jobs(failed_jobs)
-    next_job = valid_jobs[0]
+    if len(valid_jobs) > 0:
+        next_job = get_classifier_training_job_from_model(valid_jobs[0])
+    else:
+        next_job = None
     return next_job
 
 

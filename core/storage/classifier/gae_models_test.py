@@ -92,6 +92,40 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(training_job.training_data,
                          [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
 
+    def test_query_training_jobs(self):
+        job1_id = classifier_models.ClassifierTrainingJobModel.create(
+            'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name2', feconf.TRAINING_JOB_STATUS_NEW)
+        job2_id = classifier_models.ClassifierTrainingJobModel.create(
+            'LDAStringClassifier', 'TextInput', 'exp_id2', 2,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING)
+        job3_id = classifier_models.ClassifierTrainingJobModel.create(
+            'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name2', feconf.TRAINING_JOB_STATUS_FAILED)
+        VALID_JOB_LENGTH = 5
+
+        training_jobs, cursor, more = (
+            classifier_models.ClassifierTrainingJobModel.query_training_jobs(
+                None))
+        
+        self.assertEqual(len(training_jobs), VALID_JOB_LENGTH)
+        self.assertEqual(training_jobs[3].algorithm_id, 'LDAStringClassifier')
+        self.assertEqual(training_jobs[3].interaction_id, 'TextInput')
+        self.assertEqual(training_jobs[3].exp_id, 'exp_id1')
+        self.assertEqual(training_jobs[3].exp_version, 1)
+        self.assertEqual(training_jobs[3].state_name, 'state_name2')
+        self.assertEqual(training_jobs[3].status,
+                         feconf.TRAINING_JOB_STATUS_NEW)
+        self.assertEqual(training_jobs[3].training_data,
+                         [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
+        self.assertEqual(training_jobs[4].status,
+                         feconf.TRAINING_JOB_STATUS_PENDING)
+        self.assertEqual(more, False)
+        self.assertEqual(cursor is not None, True)
+
 
 class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
     """Tests for the ClassifierExplorationMappingModel class."""

@@ -119,3 +119,54 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         classifier_services.create_classifier(self.job_id, self.classifier_data)
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=True, expected_status_int=500)
+
+
+class NextJobHandlerTest(test_utils.GenericTestBase):
+    """Test the handler for fetching next training job."""
+
+    def setUp(self):
+        super(NextJobHandlerTest, self).setUp()
+
+        self.exp_id = 'exp_id1'
+        self.title = 'Testing Classifier storing'
+        self.category = 'Test'
+        yaml_path = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        with open(yaml_path, 'r') as yaml_file:
+            self.yaml_content = yaml_file.read()
+
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
+            assets_list)
+        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+
+        state = self.exploration.states['Home']
+        self.algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            state.interaction.id]['algorithm_id']
+        interaction_id = 'TextInput'
+        self.training_data = state.get_training_data()
+        self.job_id = classifier_services.create_classifier_training_job(
+            self.algorithm_id, interaction_id, self.exp_id,
+            self.exploration.version, 'Home', self.training_data,
+            feconf.TRAINING_JOB_STATUS_NEW)
+        self.expected_response = {
+            u'job_id' : self.job_id.encode("utf-8"),
+            u'training_data' : self.training_data,
+            u'algorthim_id' : self.algorithm_id.encode("utf-8")
+        }
+
+        self.payload = {}
+        self.payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        self.payload['signature'] = classifier.generate_signature(
+            secret, self.payload['vm_id'])
+
+    def test_next_job_handler(self):
+        json_response = self.post_json('/ml/nextjobhandler',
+            self.payload, expect_errors=False, expected_status_int=200)
+        #self.assertEqual(json_response, self.expected_response)
+        classifier_services.mark_training_job_failed(self.job_id)
+        json_response = self.post_json('/ml/nextjobhandler',
+            self.payload, expect_errors=False, expected_status_int=200)
+        self.assertEqual(json_response, {})

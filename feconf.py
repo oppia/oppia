@@ -77,8 +77,8 @@ INTERACTION_CLASSIFIER_MAPPING = {
         'current_data_schema_version': 1
     }
 }
-#
-CLASSIFIER_JOB_TTL = 5*5*60
+# Classifier job time to live(in mins).
+CLASSIFIER_JOB_TTL = 5
 TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
 TRAINING_JOB_STATUS_FAILED = 'FAILED'
 TRAINING_JOB_STATUS_NEW = 'NEW'
