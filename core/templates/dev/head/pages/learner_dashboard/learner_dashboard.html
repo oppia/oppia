@@ -467,37 +467,37 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK" class="oppia-learner-dashboard-feedback-section">
             <table class="table" ng-if="!feedbackThreadActive">
               <tr ng-repeat="thread in threadSummaries | orderBy:sortFeedbackFunction:isCurrentFeedbackSortDescending"
-                  ng-click="onClickThread(thread.exploration_id, thread.thread_id, thread.exploration_title)"
+                  ng-click="onClickThread(thread.explorationId, thread.threadId, thread.explorationTitle)"
                   class="oppia-feedback-tab-row protractor-test-feedback-thread">
                 <td class="col-lg-1 col-md-1 col-sm-1">
                   <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
                 </td>
                 <td class="col-lg-3 col-md-3 col-sm-3" style="width: 21%;">
-                  <span ng-if="thread.author_second_last_message">
-                    <span ng-if="thread.second_last_message_read"><[thread.author_second_last_message | truncate:7]>, </span>
-                    <span ng-if="!thread.second_last_message_read">
-                      <strong><[thread.author_second_last_message | truncate:7]>, </strong>
+                  <span ng-if="thread.authorSecondLastMessage">
+                    <span ng-if="thread.secondLastMessageRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
+                    <span ng-if="!thread.secondLastMessageRead">
+                      <strong><[thread.authorSecondLastMessage | truncate:7]>, </strong>
                     </span>
                   </span>
-                  <span ng-if="thread.last_message_read"><[thread.author_last_message | truncate:7]></span>
-                  <span ng-if="!thread.last_message_read">
-                    <strong><[thread.author_last_message | truncate:7]></strong>
+                  <span ng-if="thread.lastMessageRead"><[thread.authorLastMessage | truncate:7]></span>
+                  <span ng-if="!thread.lastMessageRead">
+                    <strong><[thread.authorLastMessage | truncate:7]></strong>
                   </span>
-                  <span class="feedback-thread-message-count">(<[thread.total_no_of_messages]>)</span>
+                  <span class="feedback-thread-message-count">(<[thread.totalNoOfMessages]>)</span>
                 </td>
                 <td class="col-lg-6 col-md-6 col-sm-6" style="width: 58%;">
-                  <span ng-if="thread.total_no_of_messages > 1 && thread.second_last_message_read && thread.last_message_read"><[thread.exploration_title]> -</span>
-                  <span class="protractor-test-feedback-exploration" ng-if="thread.total_no_of_messages === 1 && thread.last_message_read"><[thread.exploration_title]> -</span>
-                  <span ng-if="thread.total_no_of_messages === 1 && !thread.last_message_read">
-                    <strong><[thread.exploration_title]> -</strong>
+                  <span ng-if="thread.totalNoOfMessages > 1 && thread.secondLastMessageRead && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
+                  <span class="protractor-test-feedback-exploration" ng-if="thread.totalNoOfMessages === 1 && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
+                  <span ng-if="thread.totalNoOfMessages === 1 && !thread.lastMessageRead">
+                    <strong><[thread.explorationTitle]> -</strong>
                   </span>
-                  <span ng-if="thread.total_no_of_messages > 1 && (!thread.last_message_read || !thread.second_last_message_read)">
-                    <strong><[thread.exploration_title]> -</strong>
+                  <span ng-if="thread.totalNoOfMessages > 1 && (!thread.lastMessageRead || !thread.secondLastMessageRead)">
+                    <strong><[thread.explorationTitle]> -</strong>
                   </span>
-                  <span ng-if="thread.last_message_text"><[thread.last_message_text | truncate:50]></span>
-                  <span ng-if="!thread.last_message_text"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
+                  <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
+                  <span ng-if="!thread.lastMessageText"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
                 <td class="col-lg-2 col-md-2 col-sm-2">
-                  <span><[getLocaleAbbreviatedDatetimeString(thread.last_updated)]></span>
+                  <span><[getLocaleAbbreviatedDatetimeString(thread.lastUpdated)]></span>
                 </td>
               </tr>
             </table>
@@ -519,7 +519,7 @@
                   <div class="row">
                     <div class="col-sm-1 feedback-message-author-picture">
                       <span>
-                        <img ng-src="<[message.author_picture_data_url]>"
+                        <img ng-src="<[message.authorPictureDataUrl]>"
                              class="oppia-navbar-profile-picture img-circle"
                              alt="User Avatar"
                              style="margin-top: 4px;">
@@ -527,15 +527,15 @@
                     </div>
                     <div class="col-sm-11">
                       <div>
-                        <span><strong><[message.author_username]></strong></span>
+                        <span><strong><[message.authorUsername]></strong></span>
                       </div>
 
                       <div>
                         <span class="protractor-test-feedback-message" ng-if="message.text"><[message.text]></span>
                           <button style="margin-top: 5px;"
-                                  ng-if="message.current_content_html"
+                                  ng-if="message.currentContentHtml"
                                   class="btn btn-primary"
-                                  ng-click="showSuggestionModal(message.suggestion_html, message.current_content_html, message.description)"
+                                  ng-click="showSuggestionModal(message.suggestionHtml, message.currentContentHtml, message.description)"
                                   translate="I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION">
                           </button>
                       </div>
@@ -593,20 +593,17 @@
 
   <script type="text/ng-template" id="modals/removeEntity">
     <div class="modal-header">
-      <h3>Remove from '<[sectionName | translate]>' list?</h3>
+      <h3 translate="I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER" translate-values="{sectionName: sectionName}"></h3>
     </div>
 
     <div class="modal-body">
-      <p>
-        Are you sure you want to remove '<[entityTitle]>' from your '<[sectionName | translate]>' list?
-      </p>
+      <p translate="I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY" translate-values="{entityTitle: entityTitle, sectionName: sectionName}"></p>
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+      <button class="btn btn-default" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
       <button class="btn btn-danger protractor-test-confirm-delete-interaction"
-              ng-click="remove()">
-        Remove
+              ng-click="remove()" translate="I18N_LEARNER_DASHBOARD_REMOVE_BUTTON">
       </button>
     </div>
   </script>
@@ -619,21 +616,21 @@
     <div class="modal-body">
       <section class="oppia-suggestion-review-container">
         <div class="oppia-suggestion-review-panel-container" style="float: left;">
-          <strong>Current:</strong>
+          <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER"></strong>
           <div class="oppia-suggestion-review-panel">
             <div ng-if="oldContent" angular-html-bind="oldContent"></div>
-            <div ng-if="!oldContent" style="color: red;">Oops! This state no longer exists!</div>
+            <div ng-if="!oldContent" style="color: red;" translate="I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE"></div>
           </div>
         </div>
         <div class="oppia-suggestion-review-panel-container" style="float: right;">
-          <strong>Suggested:</strong>
+          <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER"></strong>
           <div class="oppia-suggestion-review-panel">
             <div angular-html-bind="newContent"></div>
           </div>
         </div>
       </section>
       <div style="margin-top: 20px; margin-left: 10px;">
-        Brief Description of Changes:
+        <span translate="I18N_LEARNER_DASHBOARD_SUGGESTION_DESCRIPTION"></span>
         <div class="oppia-suggestion-review-panel">
           <div angular-html-bind="description"></div>
         </div>
@@ -641,7 +638,7 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+      <button class="btn btn-default" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
     </div>
   </script>
 {% endblock %}
@@ -653,6 +650,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_thread/FeedbackThreadObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_message/FeedbackMessageObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/learner_dashboard/LearnerDashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/learner_dashboard/LearnerDashboard.js"></script>

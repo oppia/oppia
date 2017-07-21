@@ -147,7 +147,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'description': suggestion.description,
                 'author_username': authors_settings[0].username,
                 'author_picture_data_url': (
-                    authors_settings[0].profile_picture_data_url),
+                    authors_settings[0].profile_picture_data_url)
             }
             message_summary_list.append(suggestion_summary)
             messages.pop(0)

@@ -73,6 +73,7 @@ oppia.controller('LearnerDashboard', [
   'UrlInterpolationService', 'LEARNER_DASHBOARD_SECTION_I18N_IDS',
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'threadStatusDisplayService',
   'oppiaDatetimeFormatter', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
+  'FeedbackThreadObjectFactory', 'FeedbackMessageObjectFactory',
   function(
       $scope, $rootScope, $window, $http, $modal,
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
@@ -80,7 +81,8 @@ oppia.controller('LearnerDashboard', [
       LearnerDashboardBackendApiService, UrlInterpolationService,
       LEARNER_DASHBOARD_SECTION_I18N_IDS, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
       threadStatusDisplayService, oppiaDatetimeFormatter,
-      FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS) {
+      FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS, FeedbackThreadObjectFactory,
+      FeedbackMessageObjectFactory) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
     $scope.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
@@ -242,31 +244,35 @@ oppia.controller('LearnerDashboard', [
 
     $scope.onClickThread = function(
       explorationId, threadId, explorationTitle) {
-      var threadDataUrl = (
-        '/learnerdashboardthreadhandler/' + explorationId + '/' + threadId);
+      var threadDataUrl = UrlInterpolationService.interpolateUrl(
+        '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
+          explorationId: explorationId,
+          threadId: threadId
+        });
       $scope.explorationTitle = explorationTitle;
       $scope.feedbackThreadActive = true;
       $scope.explorationId = explorationId;
       $scope.threadId = threadId;
 
       for (var index = 0; index < $scope.threadSummaries.length; index++) {
-        if ($scope.threadSummaries[index].exploration_id === explorationId &&
-            $scope.threadSummaries[index].thread_id === threadId) {
+        if ($scope.threadSummaries[index].explorationId === explorationId &&
+            $scope.threadSummaries[index].threadId === threadId) {
           threadIndex = index;
           var threadSummary = $scope.threadSummaries[index];
-          if (threadSummary.second_last_message_read) {
-            $scope.threadSummaries[index].second_last_message_read = true;
+          if (threadSummary.secondLastMessageRead) {
+            $scope.threadSummaries[index].secondLastMessageRead = true;
           }
-          if (!threadSummary.last_message_read) {
+          if (!threadSummary.lastMessageRead) {
             $scope.numberOfUnreadThreads -= 1;
           }
-          threadSummary.last_message_read = true;
+          threadSummary.lastMessageRead = true;
         }
       }
 
       $http.get(threadDataUrl).then(function(response) {
-        var data = response.data;
-        $scope.messageSummaries = data.message_summary_list;
+        $scope.messageSummaries = (
+          FeedbackMessageObjectFactory.createFromBackendDicts(
+            response.data.message_summary_list));
       });
     };
 
@@ -276,7 +282,11 @@ oppia.controller('LearnerDashboard', [
     };
 
     $scope.addNewMessage = function(explorationId, threadId, newMessage) {
-      var url = '/threadhandler/' + explorationId + '/' + threadId;
+      var url = UrlInterpolationService.interpolateUrl(
+        '/threadhandler/<explorationId>/<threadId>', {
+          explorationId: explorationId,
+          threadId: threadId
+        });
       var payload = {
         updated_status: null,
         updated_subject: null,
@@ -284,19 +294,12 @@ oppia.controller('LearnerDashboard', [
       };
       $scope.messageSendingInProgress = true;
       $http.post(url, payload).success(function() {
-        var messageSummary = {};
-        messageSummary.text = newMessage;
-        messageSummary.author_username = $scope.username;
-        messageSummary.author_picture_data_url = $scope.profilePictureDataUrl;
-        messageSummary.created_on = new Date();
-        $scope.messageSummaries.push(messageSummary);
-        $scope.threadSummary = $scope.threadSummaries[$scope.threadIndex];
-        $scope.threadSummary.last_message_text = newMessage;
-        $scope.threadSummary.last_updated = new Date();
-        $scope.threadSummary.author_second_last_message = (
-          $scope.threadSummary.author_last_message);
-        $scope.threadSummary.author_last_message = $scope.username;
-        $scope.threadSummary.total_no_of_messages += 1
+        newMessageSummary = FeedbackMessageObjectFactory.createNewMessage(
+          newMessage, $scope.username, $scope.profilePictureDataUrl);
+        $scope.messageSummaries.push(newMessageSummary);
+        $scope.threadSummary = $scope.threadSummaries[threadIndex];
+        $scope.threadSummary.updateSummaryOnNewMessage(
+          newMessage, $scope.username);
         $scope.messageSendingInProgress = false;
       });
     };
@@ -441,7 +444,9 @@ oppia.controller('LearnerDashboard', [
         $scope.completedToIncompleteCollections = (
           responseData.completed_to_incomplete_collections
         );
-        $scope.threadSummaries = responseData.thread_summaries;
+        $scope.threadSummaries = (
+          FeedbackThreadObjectFactory.createFromBackendDicts(
+            responseData.thread_summaries));
         $scope.numberOfUnreadThreads = responseData.number_of_unread_threads;
 
         $scope.activeSection = LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE;
