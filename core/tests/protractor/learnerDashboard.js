@@ -65,7 +65,7 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
-  it('display incomplete and completed explorations', function() {
+  it('displays incomplete and completed explorations', function() {
     users.login('learner@learnerDashboard.com');
 
     // Play an exploration and leave it in between. It should be added to the
@@ -94,7 +94,7 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
-  it('display incomplete and completed collections', function() {
+  it('displays incomplete and completed collections', function() {
     users.login('learner@learnerDashboard.com');
 
     // Go to the test collection.
@@ -144,7 +144,7 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
-  it('display learners subscriptions', function() {
+  it('displays learners subscriptions', function() {
     users.login('learner@learnerDashboard.com');
 
     // Subscribe to both the creators.
