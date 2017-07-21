@@ -467,10 +467,13 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK" class="oppia-learner-dashboard-feedback-section">
             <table class="table" ng-if="!feedbackThreadActive">
               <tr ng-repeat="thread in threadSummaries | orderBy:sortFeedbackFunction:isCurrentFeedbackSortDescending"
-                  ng-click="onClickThread(thread.explorationId, thread.threadId, thread.explorationTitle)"
+                  ng-click="onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"
                   class="oppia-feedback-tab-row protractor-test-feedback-thread">
-                <td class="col-lg-1 col-md-1 col-sm-1">
+                <td class="col-lg-1 col-md-1 col-sm-1" ng-if="thread.status !== 'ignored' && thread.status !== 'not_actionable'">
                   <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
+                </td>
+                <td class="col-lg-1 col-md-1 col-sm-1" ng-if="thread.status === 'ignored' || thread.status === 'not_actionable'">
+                  <span ng-class="getLabelClass(thread.status)">Closed</span>
                 </td>
                 <td class="col-lg-3 col-md-3 col-sm-3" style="width: 21%;">
                   <span ng-if="thread.authorSecondLastMessage">
@@ -495,7 +498,8 @@
                     <strong><[thread.explorationTitle]> -</strong>
                   </span>
                   <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
-                  <span ng-if="!thread.lastMessageText"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
+                  <span ng-if="!thread.lastMessageText && thread.totalNoOfMessages === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
+                  <span ng-if="!thread.lastMessageText && thread.totalNoOfMessages !== 1"><i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: (thread.status !== 'ignored' && thread.status !== not_actionable) ? getHumanReadableStatus(thread.status) : 'Closed'}"></i></span>
                 <td class="col-lg-2 col-md-2 col-sm-2">
                   <span><[getLocaleAbbreviatedDatetimeString(thread.lastUpdated)]></span>
                 </td>
@@ -532,6 +536,7 @@
 
                       <div>
                         <span class="protractor-test-feedback-message" ng-if="message.text"><[message.text]></span>
+                        <span class="protractor-test-feedback-message" ng-if="!message.text && !message.currentContentHtml" translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: (threadStatus !== 'ignored' && threadStatus !== not_actionable) ? getHumanReadableStatus(threadStatus) : 'Closed'}"></span>
                           <button style="margin-top: 5px;"
                                   ng-if="message.currentContentHtml"
                                   class="btn btn-primary"

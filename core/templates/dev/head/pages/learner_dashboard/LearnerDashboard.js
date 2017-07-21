@@ -109,6 +109,11 @@ oppia.controller('LearnerDashboard', [
 
     $scope.setActiveSection = function(newActiveSectionName) {
       $scope.activeSection = newActiveSectionName;
+      if ($scope.activeSection ===
+        LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK &&
+        $scope.feedbackThreadActive === true) {
+        $scope.feedbackThreadActive = false;
+      }
     };
 
     $scope.setActiveSubSection = function(newActiveSubSectionName) {
@@ -243,7 +248,7 @@ oppia.controller('LearnerDashboard', [
     };
 
     $scope.onClickThread = function(
-      explorationId, threadId, explorationTitle) {
+      threadStatus, explorationId, threadId, explorationTitle) {
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
         '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
           explorationId: explorationId,
@@ -251,6 +256,7 @@ oppia.controller('LearnerDashboard', [
         });
       $scope.explorationTitle = explorationTitle;
       $scope.feedbackThreadActive = true;
+      $scope.threadStatus = threadStatus;
       $scope.explorationId = explorationId;
       $scope.threadId = threadId;
 
@@ -259,7 +265,7 @@ oppia.controller('LearnerDashboard', [
             $scope.threadSummaries[index].threadId === threadId) {
           threadIndex = index;
           var threadSummary = $scope.threadSummaries[index];
-          if (threadSummary.secondLastMessageRead) {
+          if (threadSummary.authorSecondLastMessage) {
             $scope.threadSummaries[index].secondLastMessageRead = true;
           }
           if (!threadSummary.lastMessageRead) {
@@ -301,6 +307,8 @@ oppia.controller('LearnerDashboard', [
         $scope.threadSummary.updateSummaryOnNewMessage(
           newMessage, $scope.username);
         $scope.messageSendingInProgress = false;
+        console.log($scope.newMessage);
+        $scope.newMessage = null;
       });
     };
 

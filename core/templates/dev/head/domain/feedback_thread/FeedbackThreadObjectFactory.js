@@ -44,6 +44,7 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
     this.authorLastMessage = authorLastMessage;
     this.totalNoOfMessages += 1;
     this.lastMessageRead = true;
+    this.secondLastMessageRead = true;
   };
 
   FeedbackThread.create = function(
