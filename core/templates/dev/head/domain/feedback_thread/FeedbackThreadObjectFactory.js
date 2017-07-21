@@ -18,67 +18,66 @@
  */
 
 oppia.factory('FeedbackThreadObjectFactory', [function() {
-    var FeedbackThread = function(status, originalAuthorId, lastUpdated,
-        lastMessageText, totalNoOfMessages, lastMessageRead, secondLastMessageRead,
-        authorLastMessage, authorSecondLastMessage, explorationTitle, explorationId,
-        threadId) {
-      this.status = status;
-      this.originalAuthorId = originalAuthorId;
-      this.lastUpdated = lastUpdated;
-      this.lastMessageText = lastMessageText;
-      this.totalNoOfMessages = totalNoOfMessages;
-      this.lastMessageRead = lastMessageRead;
-      this.secondLastMessageRead = secondLastMessageRead;
-      this.authorLastMessage = authorLastMessage;
-      this.authorSecondLastMessage = authorSecondLastMessage;
-      this.explorationTitle = explorationTitle;
-      this.explorationId = explorationId;
-      this.threadId = threadId;
-    };
+  var FeedbackThread = function(status, originalAuthorId, lastUpdated,
+    lastMessageText, totalNoOfMessages, lastMessageRead,
+    secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
+    explorationTitle, explorationId, threadId) {
+    this.status = status;
+    this.originalAuthorId = originalAuthorId;
+    this.lastUpdated = lastUpdated;
+    this.lastMessageText = lastMessageText;
+    this.totalNoOfMessages = totalNoOfMessages;
+    this.lastMessageRead = lastMessageRead;
+    this.secondLastMessageRead = secondLastMessageRead;
+    this.authorLastMessage = authorLastMessage;
+    this.authorSecondLastMessage = authorSecondLastMessage;
+    this.explorationTitle = explorationTitle;
+    this.explorationId = explorationId;
+    this.threadId = threadId;
+  };
 
-    FeedbackThread.prototype.updateSummaryOnNewMessage = function(
-       lastMessageText, authorLastMessage) {
-      this.lastMessageText = lastMessageText;
-      this.lastUpdated = new Date();
-      this.authorSecondLastMessage = this.authorLastMessage;
-      this.authorLastMessage = authorLastMessage;
-      this.totalNoOfMessages += 1;
-      this.lastMessageRead = true;
-    };
+  FeedbackThread.prototype.updateSummaryOnNewMessage = function(
+    lastMessageText, authorLastMessage) {
+    this.lastMessageText = lastMessageText;
+    this.lastUpdated = new Date();
+    this.authorSecondLastMessage = this.authorLastMessage;
+    this.authorLastMessage = authorLastMessage;
+    this.totalNoOfMessages += 1;
+    this.lastMessageRead = true;
+  };
 
-    FeedbackThread.create = function(
-      status, originalAuthorId, lastUpdated, lastMessageText, totalNoOfMessages,
-      lastMessageRead, secondLastMessageRead, authorLastMessage,
-      authorSecondLastMessage, explorationTitle, explorationId, threadId) {
-      return new FeedbackThread(status, originalAuthorId, lastUpdated,
-        lastMessageText, totalNoOfMessages, lastMessageRead,
-        secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
-        explorationTitle, explorationId, threadId);
+  FeedbackThread.create = function(
+    status, originalAuthorId, lastUpdated, lastMessageText, totalNoOfMessages,
+    lastMessageRead, secondLastMessageRead, authorLastMessage,
+    authorSecondLastMessage, explorationTitle, explorationId, threadId) {
+    return new FeedbackThread(status, originalAuthorId, lastUpdated,
+      lastMessageText, totalNoOfMessages, lastMessageRead,
+      secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
+      explorationTitle, explorationId, threadId);
+  }
+
+  FeedbackThread.createFromBackendDicts = function(
+    feedbackThreadBackendDicts) {
+    var FeedbackThreads = [];
+    for (index = 0; index < feedbackThreadBackendDicts.length; index++) {
+      FeedbackThreads.push(new FeedbackThread(
+        feedbackThreadBackendDicts[index].status,
+        feedbackThreadBackendDicts[index].original_author_id,
+        feedbackThreadBackendDicts[index].last_updated,
+        feedbackThreadBackendDicts[index].last_message_text,
+        feedbackThreadBackendDicts[index].total_no_of_messages,
+        feedbackThreadBackendDicts[index].last_message_read,
+        feedbackThreadBackendDicts[index].second_last_message_read,
+        feedbackThreadBackendDicts[index].author_last_message,
+        feedbackThreadBackendDicts[index].author_second_last_message,
+        feedbackThreadBackendDicts[index].exploration_title,
+        feedbackThreadBackendDicts[index].exploration_id,
+        feedbackThreadBackendDicts[index].thread_id
+      ));
     }
 
-    FeedbackThread.createFromBackendDicts = function(
-      feedbackThreadBackendDicts) {
-      var FeedbackThreads = [];
-      for (index = 0; index < feedbackThreadBackendDicts.length; index++) {
-        FeedbackThreads.push(new FeedbackThread(
-          feedbackThreadBackendDicts[index].status,
-          feedbackThreadBackendDicts[index].original_author_id,
-          feedbackThreadBackendDicts[index].last_updated,
-          feedbackThreadBackendDicts[index].last_message_text,
-          feedbackThreadBackendDicts[index].total_no_of_messages,
-          feedbackThreadBackendDicts[index].last_message_read,
-          feedbackThreadBackendDicts[index].second_last_message_read,
-          feedbackThreadBackendDicts[index].author_last_message,
-          feedbackThreadBackendDicts[index].author_second_last_message,
-          feedbackThreadBackendDicts[index].exploration_title,
-          feedbackThreadBackendDicts[index].exploration_id,
-          feedbackThreadBackendDicts[index].thread_id
-        ));
-      }
+    return FeedbackThreads;
+  };
 
-      return FeedbackThreads;
-    };
-
-    return FeedbackThread;
-  }
-]);
+  return FeedbackThread;
+}]);
