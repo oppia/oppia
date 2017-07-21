@@ -456,7 +456,7 @@ def fetch_next_job():
                     failed_jobs.append(training_job)
                 else:
                     valid_jobs.append(training_job)
-        if more == None:
+        if more is None:
             break
     update_failed_jobs(failed_jobs)
     next_job = valid_jobs[0]

@@ -143,7 +143,7 @@ class NextJobHandler(base.BaseHandler):
             raise self.UnauthorizedUserException
         response = {}
         next_job = classifier_services.fetch_next_job()
-        if (len(next_job)!=None):
+        if len(next_job) != None:
             training_data = classifier_services.fetch_training_data(
                 next_job.exp_id, next_job.state_name)
             classifier_services.update_training_job_training_data(
