@@ -38,20 +38,20 @@ describe('URL Interpolation Service', function() {
   });
 
   it('should build complete URL with prefixes and hash', function () {
-    expect(uis._getCompleteUrl('/test_folder','/hash_test.html')).toBe(
+    expect(uis._getCompleteUrl('/test_folder', '/hash_test.html')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/test_folder/hash_test.' +
       hashes['/hash_test.html'] + '.html'
     );
     expect(
-      uis._getCompleteUrl('/test_folder','/path_test/hash_test.html')).toBe(
+      uis._getCompleteUrl('/test_folder', '/path_test/hash_test.html')).toBe(
         GLOBALS.ASSET_DIR_PREFIX + '/test_folder/path_test/hash_test.' +
         hashes['/path_test/hash_test.html'] + '.html'
     );
-    expect(uis._getCompleteUrl('/test_folder','/hash_test.min.js')).toBe(
+    expect(uis._getCompleteUrl('/test_folder', '/hash_test.min.js')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/test_folder/hash_test.min.' +
       hashes['/hash_test.min.js'] + '.js'
     );
-    expect(uis._getCompleteUrl('','/hash_test.html')).toBe(
+    expect(uis._getCompleteUrl('', '/hash_test.html')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/hash_test.' +
       hashes['/hash_test.html'] + '.html'
     );
