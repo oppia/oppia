@@ -90,6 +90,9 @@ ALLOWED_TRAINING_JOB_STATUSES = [
     TRAINING_JOB_STATUS_PENDING
 ]
 
+# The maximum number of characters allowed for userbio length.
+MAX_BIO_LENGTH_IN_CHARS = 2000
+
 ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_COMPLETE: [],
     TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
@@ -562,6 +565,7 @@ FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
+LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'

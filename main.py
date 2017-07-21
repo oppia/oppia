@@ -214,6 +214,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
         learner_dashboard.LearnerDashboardHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL,
+        learner_dashboard.LearnerDashboardFeedbackThreadHandler),
 
     get_redirect_route(
         r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
