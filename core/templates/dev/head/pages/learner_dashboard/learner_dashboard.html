@@ -162,7 +162,7 @@
             </select>
             <span class="sort-order fa"
                   ng-click="setExplorationsSortingOptions(currentExpSortType)"
-                  ng-class="isCurrentExpSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+                  ng-class="isCurrentExpSortDescending ? 'fa-long-arrow-down':'fa-long-arrow-up'">
             </span>
           </span>
 
@@ -179,7 +179,7 @@
             </select>
             <span class="sort-order fa"
                   ng-click="setSubscriptionSortingOptions(currentSubscribersSortType)"
-                  ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+                  ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-down':'fa-long-arrow-up'">
             </span>
           </span>
 
@@ -196,7 +196,7 @@
             </select>
             <span class="sort-order fa"
                   ng-click="setFeedbackSortingOptions(currentFeedbackThreadsSortType)"
-                  ng-class="isCurrentFeedbackSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+                  ng-class="isCurrentFeedbackSortDescending ? 'fa-long-arrow-down':'fa-long-arrow-up'">
             </span>
           </span>
         </div>
@@ -469,11 +469,8 @@
               <tr ng-repeat="thread in threadSummaries | orderBy:sortFeedbackFunction:isCurrentFeedbackSortDescending"
                   ng-click="onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"
                   class="oppia-feedback-tab-row protractor-test-feedback-thread">
-                <td class="col-lg-1 col-md-1 col-sm-1" ng-if="thread.status !== 'ignored' && thread.status !== 'not_actionable'">
+                <td class="col-lg-1 col-md-1 col-sm-1">
                   <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
-                </td>
-                <td class="col-lg-1 col-md-1 col-sm-1" ng-if="thread.status === 'ignored' || thread.status === 'not_actionable'">
-                  <span ng-class="getLabelClass(thread.status)">Closed</span>
                 </td>
                 <td class="col-lg-3 col-md-3 col-sm-3" style="width: 21%;">
                   <span ng-if="thread.authorSecondLastMessage">
@@ -499,7 +496,7 @@
                   </span>
                   <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
                   <span ng-if="!thread.lastMessageText && thread.totalNoOfMessages === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
-                  <span ng-if="!thread.lastMessageText && thread.totalNoOfMessages !== 1"><i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: (thread.status !== 'ignored' && thread.status !== not_actionable) ? getHumanReadableStatus(thread.status) : 'Closed'}"></i></span>
+                  <span ng-if="!thread.lastMessageText && thread.totalNoOfMessages !== 1"><i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: getHumanReadableStatus(thread.status)}"></i></span>
                 <td class="col-lg-2 col-md-2 col-sm-2">
                   <span><[getLocaleAbbreviatedDatetimeString(thread.lastUpdated)]></span>
                 </td>
@@ -536,7 +533,7 @@
 
                       <div>
                         <span class="protractor-test-feedback-message" ng-if="message.text"><[message.text]></span>
-                        <span class="protractor-test-feedback-message" ng-if="!message.text && !message.currentContentHtml" translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: (threadStatus !== 'ignored' && threadStatus !== not_actionable) ? getHumanReadableStatus(threadStatus) : 'Closed'}"></span>
+                        <span class="protractor-test-feedback-message" ng-if="!message.text && !message.currentContentHtml" translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: getHumanReadableStatus(threadStatus)}"></span>
                           <button style="margin-top: 5px;"
                                   ng-if="message.currentContentHtml"
                                   class="btn btn-primary"
@@ -563,12 +560,14 @@
 
                     <div class="col-sm-11">
                       <div>
-                        <textarea class="form-control feedback-thread-reply-box" placeholder="<['I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate]>" ng-model="newMessage"></textarea>
+                        <textarea class="form-control feedback-thread-reply-box"
+                                  placeholder="<['I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate]>" ng-model="newMessage.text"
+                                  style="resize: none;"></textarea>
                       </div>
                       <div>
                         <button class="btn btn-success"
                                 style="margin-top: 6px;"
-                                ng-click="addNewMessage(explorationId, threadId, newMessage)"
+                                ng-click="addNewMessage(explorationId, threadId, newMessage.text)"
                                 ng-disabled="messageSendingInProgress">
                           <span ng-if="messageSendingInProgress" translate="I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS"></span>
                           <span class="protractor-test-feedback-send-message"

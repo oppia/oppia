@@ -96,10 +96,11 @@ oppia.controller('LearnerDashboard', [
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.PAGE_SIZE = 8;
     $scope.Math = window.Math;
-    $scope.newMessage = '';
     $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
     $scope.username = GLOBALS.username;
     var threadIndex = null;
+
+    $scope.newMessage = {text: ''};
 
     $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
@@ -307,8 +308,7 @@ oppia.controller('LearnerDashboard', [
         $scope.threadSummary.updateSummaryOnNewMessage(
           newMessage, $scope.username);
         $scope.messageSendingInProgress = false;
-        console.log($scope.newMessage);
-        $scope.newMessage = null;
+        $scope.newMessage.text = null;
       });
     };
 
