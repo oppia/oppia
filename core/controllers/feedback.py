@@ -198,6 +198,7 @@ class SuggestionListHandler(base.BaseHandler):
         else:
             return None
 
+    @base.require_user
     def get(self, exploration_id):
         threads = None
         list_type = self.request.get('list_type')
