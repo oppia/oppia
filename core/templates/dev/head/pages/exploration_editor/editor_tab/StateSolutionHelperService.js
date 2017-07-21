@@ -74,4 +74,3 @@ oppia.factory('StateSolutionHelperService', [
       }
     }
   }]);
-      
