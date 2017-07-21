@@ -93,7 +93,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                          [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
 
     def test_query_training_jobs(self):
-        job1_id = classifier_models.ClassifierTrainingJobModel.create(
+        classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_NEW)

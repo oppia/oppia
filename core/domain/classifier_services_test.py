@@ -316,7 +316,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             [], feconf.TRAINING_JOB_STATUS_PENDING)
         training_data = [{'answer_group_index': 1, 'answers': ['a1', 'a2']}]
         classifier_services.update_training_job_training_data(job_id,
-                                                                training_data)
+                                                              training_data)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.training_data,
@@ -370,8 +370,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         expected_training_data = [{'answer_group_index': 1,
-            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
-                    u'overjoyed', u'pleased', u'thrilled', u'smile']}]
+                                   'answers': [u'cheerful', u'merry',
+                                               u'ecstatic', u'glad',
+                                               u'overjoyed', u'pleased',
+                                               u'thrilled', u'smile']}]
         training_data = classifier_services.fetch_training_data(
             exp_id, state_name)
         self.assertEqual(expected_training_data, training_data)
@@ -379,7 +381,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'The state %s is not present in the exp_id %s.'%(
                 incorrect_state_name, exp_id))):
             classifier_services.fetch_training_data(exp_id,
-                incorrect_state_name)
+                                                    incorrect_state_name)
 
     def test_retrieval_of_classifier_from_exploration_attributes(self):
         """Test the get_classifier_from_exploration_attributes method."""
