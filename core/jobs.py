@@ -769,7 +769,9 @@ class BaseMapReduceJobManager(BaseJobManager):
         event logs.
 
         Args:
-            entity: TODO(brianrodri): Fill out type and description.
+            entity: BaseModel. An entity this job type is responsible for
+            handling.
+
         Returns:
             bool. Whether the entity was queued before the job was created.
         """
@@ -792,11 +794,11 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
     @classmethod
     def from_json(cls, input_shard_state):
-        """Returns JSON data as list.
+        """Uses the given input_shard_state to instantiate this class as a new
+        shard.
 
         Args:
-            input_shard_state: dict(str : str). Must contain the information to
-                be transformed into mapreduce.input_readers.DatastoreInput.
+            input_shard_state: dict(str : *). TODO(brianrodri): Document.
 
         Returns:
             *. An entity of the class which calls this method.
@@ -872,7 +874,8 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         event logs.
 
         Args:
-            entity: TODO(brianrodri): Fill out type and description.
+            entity: BaseModel. An entity this job type is responsible for
+            handling.
 
         Returns:
             bool. Whether the entity was created before the given MR job was
@@ -963,7 +966,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         """Gets an entity by id.
 
         Args:
-            entity_id: str. TODO(brianrodri): Fill out description.
+            entity_id: str. Unique identifier for an entity.
             strict: bool. Whether to fail noisily if no entity with the given
                 id exists in the datastore. Default is True.
 
@@ -1092,10 +1095,12 @@ class BaseContinuousComputationManager(object):
         multiple calls for the same incoming event.
 
         Args:
-            active_realtime_layer:
-                TODO(brianrodri): Fill out type and description.
-            event_type: str or list(str).
-                TODO(brianrodri): Fill out description.
+            active_realtime_layer: int. The currently active realtime
+                datastore layer.
+            event_type: str. The event triggered by a student. For example, when
+                a student starts an exploration, event of type `start` is
+                triggered. If he/she completes an exploration, event of type
+                `complete` is triggered.
             *args: list(*). Forwarded to the _handle_event() method.
             **kwargs: dict(* : *). Forwarded to the _handle_event() method.
         """
@@ -1128,10 +1133,11 @@ class BaseContinuousComputationManager(object):
         in the currently active realtime datastore layer.
 
         Args:
-            entity_id: str. TODO(brianrodri): Fill out description.
+            entity_id: str. Unique identifier for an entity.
 
         Returns:
-            str. TODO(brianrodri): Fill out description.
+            str. Unique identifier for the given entity for storage in active
+                realtime layer.
         """
         return cls._get_realtime_datastore_class().get_realtime_id(
             cls._get_active_realtime_index(), entity_id)
@@ -1142,10 +1148,11 @@ class BaseContinuousComputationManager(object):
         datastore layer corresponding to the given entity ids.
 
         Args:
-            entity_ids: str. TODO(brianrodri): Fill out description.
+            entity_ids: str. Collection of unique identifiers for entities.
 
         Returns:
-            list(str). TODO(brianrodri): Fill out description.
+            list(str). Unique identifiers for each given entity for storage the
+                in currently active realtime layer.
         """
         realtime_datastore_class = cls._get_realtime_datastore_class()
         active_realtime_index = cls._get_active_realtime_index()
@@ -1175,8 +1182,8 @@ class BaseContinuousComputationManager(object):
         created_on date is before latest_created_on_datetime.
 
         Args:
-            latest_created_on_datetime: datetime.datetime.
-                TODO(brianrodri): Fill out description.
+            latest_created_on_datetime: datetime.datetime. Entities created
+                before this datetime will be removed.
         """
         inactive_realtime_index = 1 - cls._get_active_realtime_index()
         cls._get_realtime_datastore_class().delete_layer(
@@ -1270,7 +1277,7 @@ class BaseContinuousComputationManager(object):
 
         Args:
             user_id: str. The id of the user stopping the job.
-            unused_test_mode: bool. TODO(brianrodri): Fill out description.
+            unused_test_mode: bool. TODO: Why is this here?
         """
         # This is not an ancestor query, so it must be run outside a
         # transaction.
@@ -1313,8 +1320,10 @@ class BaseContinuousComputationManager(object):
         of the corresponding EventHandler subclass.
 
         Args:
-            event_type: str or list(str).
-                TODO(brianrodri): Fill out description.
+            event_type: str. The event triggered by a student. For example, when
+                a student starts an exploration, event of type `start` is
+                triggered. If he/she completes an exploration, event of type
+                `complete` is triggered.
             *args: Forwarded to _handle_event() method.
             *kwargs: Forwarded to _handle_event() method.
         """
@@ -1490,10 +1499,10 @@ def get_job_output(job_id):
     """Returns the output of a job.
 
     Args:
-        job_id: str. TODO(brianrodri): Fill out description.
+        job_id: str. The ID of the job to query.
 
     Returns:
-        job_models.JobModel. TODO(brianrodri): Fill out description.
+        str. The result of the job.
     """
     return job_models.JobModel.get_by_id(job_id).output
 
@@ -1568,7 +1577,8 @@ def get_stuck_jobs(recency_msecs):
     milliseconds ago and have experienced more than one retry.
 
     Returns:
-        list(job_models.JobModel). TODO(brianrodri): Fill out description.
+        list(job_models.JobModel). Jobs which have retried at least once and
+            haven't finished yet.
     """
     threshold_time = (
         datetime.datetime.utcnow() -
@@ -1592,7 +1602,7 @@ class JobCleanupManager(BaseMapReduceJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """TODO(brianrodri): Fill out description."""
+        """The entity types this job will handle."""
         return [
             mapreduce_model.MapreduceState,
             mapreduce_model.ShardState
@@ -1600,10 +1610,15 @@ class JobCleanupManager(BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        """TODO(brianrodri): Fill out description.
+        """Implements the map function which will clean up jobs that have not
+        finished.
 
         Args:
-            item: TODO(brianrodri): Fill out description.
+            item: mapreduce_model.MapreduceState or mapreduce_model.ShardState.
+                A shard or job which may still be running.
+        Yields:
+            tuple(str, int). Describes the action taken for the item, and the
+                amount of items for which this action was applied to.
         """
         max_start_time_msec = JobCleanupManager.get_mapper_param(
             MAPPER_PARAM_MAX_START_TIME_MSEC)
@@ -1628,12 +1643,15 @@ class JobCleanupManager(BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """TODO(brianrodri): Fill out description.
+        """Implements the reduce function which logs the results of the mapping
+        function.
 
         Args:
-            key: str. TODO(brianrodri): Fill out description.
-            stringified_values: list(str).
-                TODO(brianrodri): Fill out description.
+            key: str. Describes the action taken by a map call. One of:
+                'mr_state_deleted', 'mr_state_remaining', 'shard_state_deleted',
+                'shard_state_remaining'.
+            stringified_values: list(str). A list where each element is a str
+                number, counting the mapped items sharing a key.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
         if key.endswith('_deleted'):
