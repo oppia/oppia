@@ -198,7 +198,6 @@ class SuggestionListHandler(base.BaseHandler):
         else:
             return None
 
-    @acl_decorators.can_manage_suggestions_on_exploration
     def get(self, exploration_id):
         threads = None
         list_type = self.request.get('list_type')
