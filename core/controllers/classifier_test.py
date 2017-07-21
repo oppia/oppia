@@ -164,9 +164,11 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
 
     def test_next_job_handler(self):
         json_response = self.post_json('/ml/nextjobhandler',
-            self.payload, expect_errors=False, expected_status_int=200)
+                                        self.payload, expect_errors=False,
+                                        expected_status_int=200)
         #self.assertEqual(json_response, self.expected_response)
         classifier_services.mark_training_job_failed(self.job_id)
         json_response = self.post_json('/ml/nextjobhandler',
-            self.payload, expect_errors=False, expected_status_int=200)
+                                        self.payload, expect_errors=False,
+                                        expected_status_int=200)
         self.assertEqual(json_response, {})

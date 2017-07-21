@@ -97,21 +97,20 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_NEW)
-        job2_id = classifier_models.ClassifierTrainingJobModel.create(
+        classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id2', 2,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_PENDING)
-        job3_id = classifier_models.ClassifierTrainingJobModel.create(
+        classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_FAILED)
-        VALID_JOB_LENGTH = 5
 
         training_jobs, cursor, more = (
             classifier_models.ClassifierTrainingJobModel.query_training_jobs(
                 None))
-        
-        self.assertEqual(len(training_jobs), VALID_JOB_LENGTH)
+
+        self.assertEqual(len(training_jobs), 5)
         self.assertEqual(training_jobs[3].algorithm_id, 'LDAStringClassifier')
         self.assertEqual(training_jobs[3].interaction_id, 'TextInput')
         self.assertEqual(training_jobs[3].exp_id, 'exp_id1')

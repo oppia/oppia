@@ -316,7 +316,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             [], feconf.TRAINING_JOB_STATUS_PENDING)
         training_data = [{'answer_group_index': 1, 'answers': ['a1', 'a2']}]
         classifier_services.update_training_job_training_data(job_id,
-            training_data)
+                                                                training_data)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.training_data,
@@ -350,7 +350,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
                 'algorithm_id'], interaction_id, exp1_id, 1, state_name,
             [], feconf.TRAINING_JOB_STATUS_NEW)
-        job2_id = classifier_services.create_classifier_training_job(
+        classifier_services.create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
                 'algorithm_id'], interaction_id, exp2_id, 1, state_name,
             [], feconf.TRAINING_JOB_STATUS_PENDING)
@@ -363,21 +363,23 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'text'
         incorrect_state_name = 'random'
         test_exp_filepath = os.path.join(
-        feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
+            feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-        assets_list)
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
         expected_training_data = [{'answer_group_index': 1,
-        'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
+            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
                     u'overjoyed', u'pleased', u'thrilled', u'smile']}]
-        training_data = classifier_services.fetch_training_data(exp_id, state_name)
+        training_data = classifier_services.fetch_training_data(
+            exp_id, state_name)
         self.assertEqual(expected_training_data, training_data)
         with self.assertRaisesRegexp(Exception, (
-            'The state %s is not present in the exp_id %s.'%(incorrect_state_name,
-                exp_id))):
-            classifier_services.fetch_training_data(exp_id, incorrect_state_name)
+            'The state %s is not present in the exp_id %s.'%(
+                incorrect_state_name, exp_id))):
+            classifier_services.fetch_training_data(exp_id,
+                incorrect_state_name)
 
     def test_retrieval_of_classifier_from_exploration_attributes(self):
         """Test the get_classifier_from_exploration_attributes method."""

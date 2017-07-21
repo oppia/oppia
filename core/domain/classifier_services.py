@@ -448,7 +448,8 @@ def fetch_next_job():
                     feconf.TRAINING_JOB_STATUS_PENDING)):
                 if (datetime.datetime.utcnow() - (
                         training_job.last_updated) > (
-                            datetime.timedelta(minutes=feconf.CLASSIFIER_JOB_TTL))):
+                            datetime.timedelta(
+                                minutes=feconf.CLASSIFIER_JOB_TTL))):
                     failed_jobs.append(training_job)
                 else:
                     valid_jobs.append(training_job)
