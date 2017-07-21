@@ -61,7 +61,8 @@ oppia.directive('explorationMetadataForm', [
         $scope.objectiveHasBeenPreviouslyEdited = (
          explorationObjectiveService.savedMemento.length > 0);
 
-        $scope.requireTitleToBeSpecified = (!explorationTitleService.savedMemento);
+        $scope.requireTitleToBeSpecified = (
+         !explorationTitleService.savedMemento);
         $scope.requireObjectiveToBeSpecified = (
          explorationObjectiveService.savedMemento.length < 15);
         $scope.requireCategoryToBeSpecified = (
@@ -138,7 +139,7 @@ oppia.directive('explorationMetadataForm', [
             $rootScope.$broadcast('refreshGraph');
           };
         }
-       }
+      }
      ]
    }
  }
