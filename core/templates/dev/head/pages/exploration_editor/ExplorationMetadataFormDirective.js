@@ -21,14 +21,14 @@ oppia.directive('explorationMetadataForm', [
    return {
      restrict: 'E',
      scope: {
-      settingsTab: '@',
-      pStyle: '@',
-      formStyle: '@',
-      title: '@',
-      objective: '@',
-      category: '@',
-      language: '@',
-      tags: '@'
+       settingsTab: '@',
+       pStyle: '@',
+       formStyle: '@',
+       title: '@',
+       objective: '@',
+       category: '@',
+       language: '@',
+       tags: '@'
      },
      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/exploration_editor/' +
@@ -44,101 +44,101 @@ oppia.directive('explorationMetadataForm', [
        explorationStatesService, ALL_CATEGORIES,
        explorationInitStateNameService, explorationLanguageCodeService,
        explorationTagsService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
-       $scope.stateNames = explorationStatesService.getStateNames();
-       $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
-       $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL =
-        EXPLORATION_TITLE_INPUT_FOCUS_LABEL;
-       $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-       $scope.explorationTitleService = explorationTitleService;
-       $scope.explorationObjectiveService =
-        explorationObjectiveService;
-       $scope.explorationCategoryService =
-        explorationCategoryService;
-       $scope.explorationLanguageCodeService = (
-        explorationLanguageCodeService);
-       $scope.explorationTagsService = explorationTagsService;
+        $scope.stateNames = explorationStatesService.getStateNames();
+        $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
+        $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL =
+         EXPLORATION_TITLE_INPUT_FOCUS_LABEL;
+        $scope.CATEGORY_LIST_FOR_SELECT2 = [];
+        $scope.explorationTitleService = explorationTitleService;
+        $scope.explorationObjectiveService =
+         explorationObjectiveService;
+        $scope.explorationCategoryService =
+         explorationCategoryService;
+        $scope.explorationLanguageCodeService = (
+         explorationLanguageCodeService);
+        $scope.explorationTagsService = explorationTagsService;
 
-       $scope.objectiveHasBeenPreviouslyEdited = (
-        explorationObjectiveService.savedMemento.length > 0);
+        $scope.objectiveHasBeenPreviouslyEdited = (
+         explorationObjectiveService.savedMemento.length > 0);
 
-       $scope.requireTitleToBeSpecified = (!explorationTitleService.savedMemento);
-       $scope.requireObjectiveToBeSpecified = (
-        explorationObjectiveService.savedMemento.length < 15);
-       $scope.requireCategoryToBeSpecified = (
-        !explorationCategoryService.savedMemento);
-       $scope.askForLanguageCheck = (
-        explorationLanguageCodeService.savedMemento ===
-        constants.DEFAULT_LANGUAGE_CODE);
-       $scope.askForTags = (
-        explorationTagsService.savedMemento.length === 0);
+        $scope.requireTitleToBeSpecified = (!explorationTitleService.savedMemento);
+        $scope.requireObjectiveToBeSpecified = (
+         explorationObjectiveService.savedMemento.length < 15);
+        $scope.requireCategoryToBeSpecified = (
+         !explorationCategoryService.savedMemento);
+        $scope.askForLanguageCheck = (
+         explorationLanguageCodeService.savedMemento ===
+         constants.DEFAULT_LANGUAGE_CODE);
+        $scope.askForTags = (
+         explorationTagsService.savedMemento.length === 0);
 
 
-       for (var i = 0; i < ALL_CATEGORIES.length; i++) {
-        $scope.CATEGORY_LIST_FOR_SELECT2.push({
-         id: ALL_CATEGORIES[i],
-         text: ALL_CATEGORIES[i]
-        });
-       }
+        for (var i = 0; i < ALL_CATEGORIES.length; i++) {
+          $scope.CATEGORY_LIST_FOR_SELECT2.push({
+            id: ALL_CATEGORIES[i],
+            text: ALL_CATEGORIES[i]
+          });
+        }
 
-       if (explorationStatesService.isInitialized()) {
-        var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
-         .some(
-          function(categoryItem) {
-           return categoryItem.id ===
-            explorationCategoryService.savedMemento;
+        if (explorationStatesService.isInitialized()) {
+          var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
+            .some(
+              function(categoryItem) {
+                return categoryItem.id ===
+                 explorationCategoryService.savedMemento;
+              }
+            );
+
+          // If the current category is not in the dropdown, add it
+          // as the first option.
+          if (!categoryIsInSelect2 &&
+           explorationCategoryService.savedMemento) {
+            $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
+              id: explorationCategoryService.savedMemento,
+              text: explorationCategoryService.savedMemento
+            });
           }
-         );
+        }
+        if ($scope.settingsTab) {
+          $scope.explorationInitStateNameService =
+           explorationInitStateNameService;
 
-        // If the current category is not in the dropdown, add it
-        // as the first option.
-        if (!categoryIsInSelect2 &&
-         explorationCategoryService.savedMemento) {
-         $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
-          id: explorationCategoryService.savedMemento,
-          text: explorationCategoryService.savedMemento
-         });
+          $scope.saveExplorationTitle = function() {
+            explorationTitleService.saveDisplayedValue();
+          };
+
+          $scope.saveExplorationCategory = function() {
+            explorationCategoryService.saveDisplayedValue();
+          };
+
+          $scope.saveExplorationObjective = function() {
+            explorationObjectiveService.saveDisplayedValue();
+          };
+
+          $scope.saveExplorationLanguageCode = function() {
+            explorationLanguageCodeService.saveDisplayedValue();
+          };
+
+          $scope.saveExplorationTags = function() {
+            explorationTagsService.saveDisplayedValue();
+          };
+
+          $scope.saveExplorationInitStateName = function() {
+            var newInitStateName = explorationInitStateNameService.displayed;
+
+            if (!explorationStatesService.getState(newInitStateName)) {
+              alertsService.addWarning(
+               'Invalid initial state name: ' + newInitStateName);
+              explorationInitStateNameService.restoreFromMemento();
+              return;
+            }
+
+            explorationInitStateNameService.saveDisplayedValue();
+
+            $rootScope.$broadcast('refreshGraph');
+          };
         }
        }
-       if ($scope.settingsTab) {
-        $scope.explorationInitStateNameService =
-         explorationInitStateNameService;
-
-        $scope.saveExplorationTitle = function() {
-         explorationTitleService.saveDisplayedValue();
-        };
-
-        $scope.saveExplorationCategory = function() {
-         explorationCategoryService.saveDisplayedValue();
-        };
-
-        $scope.saveExplorationObjective = function() {
-         explorationObjectiveService.saveDisplayedValue();
-        };
-
-        $scope.saveExplorationLanguageCode = function() {
-         explorationLanguageCodeService.saveDisplayedValue();
-        };
-
-        $scope.saveExplorationTags = function() {
-         explorationTagsService.saveDisplayedValue();
-        };
-
-        $scope.saveExplorationInitStateName = function() {
-         var newInitStateName = explorationInitStateNameService.displayed;
-
-         if (!explorationStatesService.getState(newInitStateName)) {
-          alertsService.addWarning(
-           'Invalid initial state name: ' + newInitStateName);
-          explorationInitStateNameService.restoreFromMemento();
-          return;
-         }
-
-         explorationInitStateNameService.saveDisplayedValue();
-
-         $rootScope.$broadcast('refreshGraph');
-        };
-       }
-      }
      ]
    }
  }
