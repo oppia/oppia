@@ -211,7 +211,7 @@ oppia.controller('LearnerDashboard', [
         $scope.isCurrentSubscriptionSortDescending = (
           !$scope.isCurrentSubscriptionSortDescending);
       } else {
-        $scope.currentSubscriptionSortType = sortype;
+        $scope.currentSubscriptionSortType = sortType;
       }
     };
 
@@ -268,7 +268,7 @@ oppia.controller('LearnerDashboard', [
             $scope.threadSummaries[index].threadId === threadId) {
           threadIndex = index;
           var threadSummary = $scope.threadSummaries[index];
-          threadSummary.markAllTheLastTwoMessagesAsRead();
+          threadSummary.markTheLastTwoMessagesAsRead();
           if (!threadSummary.lastMessageRead) {
             $scope.numberOfUnreadThreads -= 1;
           }

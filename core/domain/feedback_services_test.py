@@ -392,7 +392,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 'original_author_id': thread.original_author_id,
                 'last_updated': thread_summaries[index]['last_updated'],
                 'last_message_text': 'not used here',
-                'total_no_of_messages': 1,
+                'total_message_count': 1,
                 'last_message_read': True,
                 'second_last_message_read': None,
                 'author_last_message': user_services.get_username(self.user_id),

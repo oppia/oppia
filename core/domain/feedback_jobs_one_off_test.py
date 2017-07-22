@@ -98,9 +98,9 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
             self.user_id, thread_ids)
 
         # Check that the first message has only one message.
-        self.assertEqual(thread_summaries[0]['total_no_of_messages'], 1)
+        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
         # Check that the second message has only one message.
-        self.assertEqual(thread_summaries[1]['total_no_of_messages'], 1)
+        self.assertEqual(thread_summaries[1]['total_message_count'], 1)
 
         feedback_services.create_message(
             self.EXP_ID_1, thread_ids[0].split('.')[1], self.user_id, None,
@@ -112,7 +112,7 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
             self.user_id, thread_ids)
 
         # Check that the first message has two messages.
-        self.assertEqual(thread_summaries[0]['total_no_of_messages'], 2)
+        self.assertEqual(thread_summaries[0]['total_message_count'], 2)
 
         # Get the first message so that we can delete it and check the error
         # case.

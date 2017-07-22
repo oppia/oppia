@@ -445,7 +445,7 @@ def get_thread_summaries(user_id, full_thread_ids):
             - 'last_updated': datetime.datetime. When was the thread last
                 updated.
             - 'last_message_text': str. The text of the last message.
-            - 'total_no_of_messages': int. The total number of messages in the
+            - 'total_message_count': int. The total number of messages in the
                 thread.
             - 'last_message_read': boolean. Whether the last message is read by
                 the user.
@@ -520,11 +520,11 @@ def get_thread_summaries(user_id, full_thread_ids):
             number_of_unread_threads += 1
 
         if thread.message_count:
-            total_no_of_messages = thread.message_count
+            total_message_count = thread.message_count
         # TODO(Arunabh): Remove else clause after each thread has a message
         # count.
         else:
-            total_no_of_messages = (
+            total_message_count = (
                 feedback_models.FeedbackMessageModel.get_message_count(
                     thread.exploration_id, thread.get_thread_id()))
 
@@ -533,7 +533,7 @@ def get_thread_summaries(user_id, full_thread_ids):
             'original_author_id': thread.original_author_id,
             'last_updated': utils.get_time_in_millisecs(thread.last_updated),
             'last_message_text': last_two_messages[index][0].text,
-            'total_no_of_messages': total_no_of_messages,
+            'total_message_count': total_message_count,
             'last_message_read': last_message_read,
             'second_last_message_read': second_last_message_read,
             'author_last_message': author_last_message,

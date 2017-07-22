@@ -46,7 +46,7 @@ describe('Feedback thread object factory', function() {
       original_author_id: 'Test user 1',
       last_updated: 1000,
       last_message_text: 'last message',
-      total_no_of_messages: 2,
+      total_message_count: 2,
       last_message_read: false,
       second_last_message_read: true,
       author_last_message: 'Test user 2',

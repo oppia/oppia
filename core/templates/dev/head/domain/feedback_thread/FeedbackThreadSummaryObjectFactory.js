@@ -71,7 +71,7 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
       feedbackThreadBackendDict.original_author_id,
       feedbackThreadBackendDict.last_updated,
       feedbackThreadBackendDict.last_message_text,
-      feedbackThreadBackendDict.total_no_of_messages,
+      feedbackThreadBackendDict.total_message_count,
       feedbackThreadBackendDict.last_message_read,
       feedbackThreadBackendDict.second_last_message_read,
       feedbackThreadBackendDict.author_last_message,
