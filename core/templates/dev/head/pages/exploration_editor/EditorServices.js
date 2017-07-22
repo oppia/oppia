@@ -550,9 +550,16 @@ oppia.factory('explorationRightsService', [
         var that = this;
 
         requestParams.version = explorationData.data.version;
-        var explorationRightsUrl = (
-          '/createhandler/rights/' + explorationData.explorationId);
-        $http.put(explorationRightsUrl, requestParams).then(function(response) {
+        var requestUrl = '';
+        if (requestParams.is_public || requestParams.is_publicized) {
+          requestUrl = (
+            '/createhandler/publish/' + explorationData.explorationId);
+        }
+        else {
+          requestUrl = (
+            '/createhandler/rights/' + explorationData.explorationId);
+        }
+        $http.put(requestUrl, requestParams).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
           that.init(

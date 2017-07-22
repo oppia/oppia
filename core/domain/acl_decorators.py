@@ -407,7 +407,7 @@ def can_publish_exploration(handler):
                     return handler(self, exploration_id, *args, **kwargs)
 
         if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
-            if role_services.ACTION_PUBLISH_PUBLIC_EXPLORATION in self.actions:
+            if role_services.ACTION_PUBLICIZE_EXPLORATION in self.actions:
                 return handler(self, exploration_id, *args, **kwargs)
 
         raise base.UserFacingExceptions.UnauthorizedUserException(

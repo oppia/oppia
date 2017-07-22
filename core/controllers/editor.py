@@ -323,6 +323,7 @@ class ExplorationHandler(EditorHandler):
 
         return editor_dict
 
+    @base.require_user
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
         # 'apply_draft' and 'v'(version) are optional parameters because the
@@ -390,39 +391,6 @@ class ExplorationHandler(EditorHandler):
 class ExplorationRightsHandler(EditorHandler):
     """Handles management of exploration editing rights."""
 
-    @acl_decorators.can_publish_exploration
-    def _publish_exploration(self, exploration_id, make_public):
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        if make_public:
-            try:
-                exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
-
-            exp_services.publish_exploration_and_update_user_profiles(
-                self.user_id, exploration_id)
-            exp_services.index_explorations_given_ids([exploration_id])
-        else:
-            rights_manager.unpublish_exploration(
-                self.user_id, exploration_id)
-            exp_services.delete_documents_from_search_index([
-                exploration_id])
-
-    @acl_decorators.can_publish_exploration
-    def _publicize_exploration(self, exploration_id, make_publicized):
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        if make_publicized:
-            try:
-                exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
-
-            rights_manager.publicize_exploration(
-                self.user_id, exploration_id)
-        else:
-            rights_manager.unpublicize_exploration(
-                self.user_id, exploration_id)
-
     @acl_decorators.can_modify_exploration_roles
     def put(self, exploration_id):
         """Updates the editing rights for the given exploration."""
@@ -430,8 +398,6 @@ class ExplorationRightsHandler(EditorHandler):
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
 
-        make_public = self.payload.get('is_public')
-        make_publicized = self.payload.get('is_publicized')
         make_community_owned = self.payload.get('is_community_owned')
         new_member_username = self.payload.get('new_member_username')
         new_member_role = self.payload.get('new_member_role')
@@ -450,12 +416,6 @@ class ExplorationRightsHandler(EditorHandler):
                 self.user_id, new_member_id, new_member_role, exploration_id,
                 exploration.title)
 
-        elif make_public is not None:
-            self._publish_exploration(exploration_id, make_public)
-
-        elif make_publicized is not None:
-            self._publicize_exploration(exploration_id, make_publicized)
-
         elif make_community_owned:
             exploration = exp_services.get_exploration_by_id(exploration_id)
             try:
@@ -473,6 +433,56 @@ class ExplorationRightsHandler(EditorHandler):
         else:
             raise self.InvalidInputException(
                 'No change was made to this exploration.')
+
+        self.render_json({
+            'rights': rights_manager.get_exploration_rights(
+                exploration_id).to_dict()
+        })
+
+
+class ExplorationPublishHandler(EditorHandler):
+    """Handles publishing of an exploration."""
+
+    def _publish_exploration(self, exploration_id, make_public):
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        if make_public:
+            try:
+                exploration.validate(strict=True)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
+
+            exp_services.publish_exploration_and_update_user_profiles(
+                self.user_id, exploration_id)
+            exp_services.index_explorations_given_ids([exploration_id])
+        else:
+            rights_manager.unpublish_exploration(
+                self.user_id, exploration_id)
+            exp_services.delete_documents_from_search_index([
+                exploration_id])
+
+    def _publicize_exploration(self, exploration_id, make_publicized):
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        if make_publicized:
+            try:
+                exploration.validate(strict=True)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
+
+            rights_manager.publicize_exploration(
+                self.user_id, exploration_id)
+        else:
+            rights_manager.unpublicize_exploration(
+                self.user_id, exploration_id)
+
+    @acl_decorators.can_publish_exploration
+    def put(self, exploration_id):
+        make_public = self.payload.get('is_public')
+        make_publicized = self.payload.get('is_publicized')
+
+        if make_public is not None:
+            self._publish_exploration(exploration_id, make_public)
+        elif make_publicized is not None:
+            self._publicize_exploration(exploration_id, make_publicized)
 
         self.render_json({
             'rights': rights_manager.get_exploration_rights(
