@@ -4,7 +4,7 @@
 *.swo
 gae_runtime/*
 third_party/*
-core/templates/prod/*
+backend_prod_files/*
 .coverage*
 .viminfo
 libpeerconnection.log

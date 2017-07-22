@@ -61,7 +61,7 @@ import string
 import subprocess
 # pylint: enable=wrong-import-order
 
-import common
+import common # pylint: disable=relative-import
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -184,7 +184,6 @@ def _execute_deployment():
         print 'Preprocessing release...'
         preprocess_release()
 
-        update_cache_slug()
         # Do a build; ensure there are no errors.
         print 'Building and minifying scripts...'
         subprocess.check_output(['python', 'scripts/build.py'])
@@ -210,19 +209,6 @@ def get_unique_id():
     unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
                         for _ in range(CACHE_SLUG_PROD_LENGTH))
     return unique_id
-
-
-def update_cache_slug():
-    """Updates the cache slug in cache_slug.yaml"""
-    cache_slug = get_unique_id()
-
-    # Change the cache slug in cache_slug.yaml.
-    with open('cache_slug.yaml', 'r') as f:
-        content = f.read()
-    os.remove('cache_slug.yaml')
-    content = content.replace('default', cache_slug)
-    with open('cache_slug.yaml', 'w+') as d:
-        d.write(content)
 
 
 if __name__ == '__main__':
