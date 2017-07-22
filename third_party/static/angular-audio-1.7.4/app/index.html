@@ -1,0 +1,83 @@
+<!doctype html>
+<html class="no-js">
+
+<head>
+    <meta charset="utf-8">
+    <title>angular audio</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+</head>
+
+<body>
+
+    <body ng-app=ngAudioDemo ng-controller=Demo class='container'>
+
+        <!-- Static navbar -->
+        <div class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a ng-audio='audio/button-2.mp3' ng-audio-hover='audio/button-4.mp3' volume-hover=0.2 class="navbar-brand" ui-sref='home'>ngAudio</a>
+                </div>
+                <div>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li ng-audio='audio/button-3.mp3' ng-audio-hover='audio/button-4.mp3' volume-hover=0.2 ui-sref-active='active'><a ui-sref='docs'>Docs</a>
+                        </li>
+                        <li ng-audio='audio/button-1.mp3' ng-audio-hover='audio/button-4.mp3' volume-hover=0.2 ui-sref-active='active'><a ui-sref='audio.detail({id:"audio|song1.mp3"})'>Demo #1</a>
+                        </li>
+                        <!-- <li class="dropdown">
+                            <a ui-sref='audio' ui-sref-active='active' class="dropdown-toggle" data-toggle="dropdown">Sounds <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li ng-audio='audio/button-1.mp3' ng-repeat='audio in audios' ui-sref-active="active"><a ui-sref='audio.detail({id:audio.safeId})'>{{audio.id}}</a>
+                                </li>
+                            </ul>
+                        </li> -->
+                        <li ng-audio='audio/button-2.mp3' ng-audio-hover='audio/button-4.mp3' volume-hover=0.2><a href='https://github.com/danielstern/ngAudio' target=_blank>Github</a>
+                        </li>
+                    </ul>
+
+                </div>
+                <!--/.nav-collapse -->
+            </div>
+            <!--/.container-fluid -->
+        </div>
+
+       
+
+        <div ui-view></div>
+        
+    </body>
+
+
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/angular/angular.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+    <script src="bower_components/ui-router/release/angular-ui-router.min.js"></script>
+
+    <script src="angular.audio.js"></script>
+
+    <!-- build:js({app,.tmp}) scripts/main.js -->
+    <script src="scripts/main.js"></script>
+    <!-- endbuild -->
+</body>
+
+</html>
+
+
+<script>
+</script>

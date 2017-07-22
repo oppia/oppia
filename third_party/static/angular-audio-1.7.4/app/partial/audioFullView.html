@@ -1,0 +1,10 @@
+<div class='col-md-3'>
+    <!-- <div ng-include='"partial/audioEditView.html"'></div> -->
+    <!-- <div ng-repeat="audio in audios"> -->
+    <ul class='nav nav-stacked nav-pills'>
+		<li  ng-audio='audio/button-2.mp3' ng-audio-hover='audio/button-4.mp3' volume-hover=0.2 ng-repeat='audio in audios' ui-sref-active="active"><a ui-sref='audio.detail({id:audio.safeId})'>{{audio.id}}</a></li>
+	</ul>
+    <!-- </div> -->
+</div>
+<!-- <div class='col-md-3 hidden-xs' ng-include="'partial/audioTableView.html'"></div> -->
+<div ui-view  class='col-md-9'></div>

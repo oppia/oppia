@@ -18,6 +18,7 @@ import json
 import logging
 import string
 
+from constants import constants
 from core.controllers import base
 from core.domain import collection_services
 from core.domain import exp_services
@@ -104,32 +105,20 @@ class LibraryIndexHandler(base.BaseHandler):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups([
-            feconf.DEFAULT_LANGUAGE_CODE])
-        recently_published_summary_dicts = (
-            summary_services.get_recently_published_exp_summary_dicts(
-                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
+            constants.DEFAULT_LANGUAGE_CODE])
         top_rated_activity_summary_dicts = (
             summary_services.get_top_rated_exploration_summary_dicts(
-                [feconf.DEFAULT_LANGUAGE_CODE],
+                [constants.DEFAULT_LANGUAGE_CODE],
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         featured_activity_summary_dicts = (
             summary_services.get_featured_activity_summary_dicts(
-                [feconf.DEFAULT_LANGUAGE_CODE]))
+                [constants.DEFAULT_LANGUAGE_CODE]))
 
-        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
-        if recently_published_summary_dicts:
-            summary_dicts_by_category.insert(0, {
-                'activity_summary_dicts': recently_published_summary_dicts,
-                'categories': [],
-                'header_i18n_id': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
-                'has_full_results_page': True,
-                'full_results_url': feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-                'protractor_id': 'recently-published',
-            })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': top_rated_activity_summary_dicts,
@@ -200,7 +189,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
         elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
             top_rated_activity_summary_dicts = (
                 summary_services.get_top_rated_exploration_summary_dicts(
-                    [feconf.DEFAULT_LANGUAGE_CODE],
+                    [constants.DEFAULT_LANGUAGE_CODE],
                     feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE))
             if top_rated_activity_summary_dicts:
                 activity_list = top_rated_activity_summary_dicts
@@ -217,7 +206,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
         else:
             return self.PageNotFoundException
 
-        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes

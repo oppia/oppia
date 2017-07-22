@@ -1,0 +1,859 @@
+1.38 - 2017-06-01
+-----------------
+
+* Note: New release tarballs are now hosted on github:
+  https://github.com/quodlibet/mutagen/releases
+* ID3:
+
+  * Add iTunes grouping frame `id3.GRP1` :bug:`304`
+  * Fix exposing text frames where the text can't be encoded with the
+    reported encoding due to merging of frames :bug:`307`
+
+* OGG: Fix wrong StreamInfo.length (small negative value) for all
+  ogg based formats in rare cases. :bug:`308`
+
+
+1.37 - 2017.02.24
+-----------------
+
+* Relicense "GPLv2" → "GPLv2 or later" :bug:`291`
+* DSF: add `mutagen.dsf` module for DSF (DSD Stream File) support
+  :pr:`283` (Boris Pruessmann)
+* MP3: Add `mp3.MPEGInfo.encoder_settings` containing a guess of the encoder
+  settings used, for example ``"-V2"`` for LAME :bug:`66`
+* ID3: add iTunes movement related frames `id3.MVIN` and `id3.MVNM`
+* MP4: support ``©mvi``, ``©mvc``, ``shwm``, ``stik``, ``rtng``, ``tves``,
+  ``tvsn``, ``plID``, ``cnID``, ``geID``, ``atID``, ``sfID``, ``cmID``,
+  ``akID`` :bug:`130`
+
+
+1.36.3 - 2017.02.24
+-------------------
+
+* MP3: fix error with xing frames without a frame count :bug:`292`
+
+
+1.36.2 - 2017.01.25
+-------------------
+
+* ID3: Always write little endian utf-16 with BOM.
+  Fixes tests on big endian machines :pr:`289`
+
+
+1.36.1 - 2017.01.22
+-------------------
+
+* Support GAE runtime :bug:`286`
+* FLAC: Fix crash when loading files with zero samples :bug:`287`
+* MP3: Handle broken lame tags written by older lame versions
+
+
+1.36 - 2016.12.22
+-----------------
+
+* ID3: Ignore trailing empty values for v2.3 text frames :bug:`276`
+* ID3: Write large APIC frames last :bug:`278`
+* EasyID3: support saving as v2.3 :bug:`188`
+* FLAC: Add StreamInfo.bitrate :bug:`279`
+* mid3cp: Add ``--merge`` option :bug:`277`
+* MP4: Allow loading files without audio tracks :bug:`272`
+
+
+1.35.1 - 2016.11.09
+-------------------
+
+* Revert back to distutils :bug:`273`
+
+
+1.35 - 2016.11.02
+-----------------
+
+* Tests: Require pytest
+* Tools: Install .exe launchers on Windows
+* setup.py: Require setuptools
+* ID3:
+
+  * Fix loading files with CRM frames :bug:`239`
+  * Fix loading AENC, LINK, GRID frames with no payload
+  * Merge duplicate text frames with same key on load :bug:`172`
+  * Allow parsing of duplicate APIC frames :bug:`172`
+  * Parse utf-16 text fields with missing BOM :bug:`267`
+  * Increase max resyncs for the mpeg frame search :bug:`268`
+
+
+1.34.1 - 2016.08.13
+-------------------
+
+* ID3: Expose some internals again to make Picard (mostly) work again.
+
+  * http://tickets.musicbrainz.org/browse/PICARD-833
+  * https://github.com/metabrainz/picard/pull/479
+
+
+1.34 - 2016.07.20
+-----------------
+
+* ID3:
+
+  * Add `CTOC <id3.CTOC>` and `CHAP <id3.CHAP>` frames. New classes:
+    `ID3Tags <id3.ID3Tags>`, `CTOCFlags <id3.CTOCFlags>`. :bug:`6`
+  * Add `TCAT <id3.TCAT>`, `TKWD <id3.TKWD>`, `PCST <id3.PCST>` frames.
+    :bug:`249`
+  * Validate user provided LNK/LINK frameid. :bug:`242`
+  * Add `RVAD <id3.RVAD>`, RVA frames
+  * Add TST, TSA, TS2, TSP and TSC frames
+  * Fix not writing optional fields when saving to v2.3
+  * Add default field values for all frames
+
+* Drop Python 2.6 support
+* EasyID3: Fix TXXX frame encoding when setting a non-latin1 encodable
+  value after a latin1 one. :bug:`263`
+
+
+1.33.2 - 2016.07.05
+-------------------
+
+* Fix loading of small ogg/apev2 files (1.33 regression)
+
+
+1.33.1 - 2016.06.29
+-------------------
+
+* Fix Overeager deprecation warnings :bug:`261`
+
+
+1.33 - 2016.06.29
+-----------------
+
+* FileType, Metadata: File-like object support :bug:`1`
+* mid3v2: Add APIC support. :bug:`47`
+* EasyID3: Fix handling of RVA2 frames with non-lowercase description
+  :bug:`215`
+* mid3v2: Add UFID support. :bug:`234`
+* ID3: Include human-readable representation of the picture type in
+  APIC._pprint() :bug:`244`
+* EasyID3: make albumartist use TPE2 and move performer to TXXX. :bug:`252`
+* ID3: id3.ID3TimeStamp comparator: check type :pr:`260`
+  (Fabian Peter Hammerle)
+* setup.py: follow PEP440 for the development version
+* FileType/Metadata.load/save/delete no longer raise IOError or IOError
+  subclasses. They only raise subclasses of MutagenError.
+
+
+1.32 - 2016.05.02
+-----------------
+
+* Add basic SMF (Standard MIDI File) support (:mod:`mutagen.smf`)
+* FLAC: add ``audio/flac`` mime type. :bug:`235`
+* ASF: Fixed crash when object size is longer than the header and file length
+  (Ben Ockmore)
+* ID3: Validate attributes set after frame creation :commit:`69368c31e00`
+  (:user:`Daniel Plachotich <danpla>`)
+* MP4: validate values in ``__setitem__`` so things don't fail in save()
+  :bug:`236`
+* tests: Fix SynchronizedTextSpec test on big-endian machines :bug:`247`
+  (Daniel Plachotich)
+* ID3: do type checking in ``__setitem__`` :bug:`251`
+* Building the documentation now requires sphinx >= 1.3
+* New :class:`mutagen.Tags` base class for tags
+* Moved from Bitbucket to GitHub
+
+
+1.31 - 2015.09.10
+-----------------
+
+* New padding control API for flac/id3/mp4/asf/ogg/aiff and everything
+  based on it, except oggflac :bug:`229`
+* Mutagen will now reduce padding on save if there is lots of it.
+* delete() will remove padding in addition to tags.
+
+* ASF:
+
+  * Padding support :bug:`201`
+  * Don't report negative lengths for some broken files
+  * New :class:`asf.ASFInfo`.codec_type/codec_name/codec_description
+  * Implement ASF.delete()
+
+* OGG: Padding support for Opus/Vorbis/Theora/Speex
+* M4A: Implementation removed. Every operation will raise. Use mp4 instead.
+* Tools: Support Unicode output under Windows :bug:`232`
+
+
+1.30 - 2015.08.22
+-----------------
+
+* FLAC:
+
+  * Fix :meth:`flac.FLAC.save` in case the source contained a too large
+    (invalid but recovered) image block :bug:`226`
+
+* MP3:
+
+  * Improved length and bitrate accuracy:
+
+    * Read lame "Info" tags for improved bitrate/length accuracy
+    * Use bytes info of VBRI headers for improved bitrate accuracy
+    * Subtract encoder delay/padding from length for improved length accuracy
+      (especially for short tracks)
+    * Fix rare false identification of Xing headers :bug:`182`
+
+  * New :class:`mp3.MPEGInfo`.encoder_info attribute containing the encoder
+    name and version :bug:`66`
+  * New :class:`mp3.MPEGInfo`.bitrate_mode attribute exposing if the file is
+    VBR, ABR or CBR :bug:`24` :bug:`66`
+  * New :class:`mp3.MPEGInfo`.channels attribute providing the channel count
+  * New :class:`mp3.MPEGInfo`.track_gain/track_peak/album_gain values exposing
+    the replaygain info provided by the lame header :bug:`36`
+
+* ID3:
+
+  * New :class:`id3.PictureType` enum for the picture type used in APIC frames :bug:`222`
+
+* MP4:
+
+  * Fix MP4FreeForm.__eq__ and MP4Cover.__eq__ when comparing with bytes
+    :bug:`218`
+
+* Don't raise on :meth:`FileType.save` if there are no tags. :bug:`227`
+* Minor fixes: :bug:`228`
+
+
+1.29 - 2015.05.09
+-----------------
+
+* mid3v2: Fix an error under Python 3 with files without tags :bug:`219`
+* mid3v2: Various Windows+Python2+Unicode fixes :bug:`214`
+* Don't emit warnings during loading (ID3Warning) :bug:`223`
+* py.test support
+
+
+1.28 - 2015.03.06
+-----------------
+
+* Various minor fixes to make mutagen behave the same under Python3 as under
+  Python2.
+* Update gpl text :bug:`205`
+* Documentation: Add example for how to create a new flac.Picture :bug:`209`
+
+* ID3:
+
+  * Various error handling fixes (:bug:`110`, :bug:`211`, ...)
+  * Don't hide ID3 loading errors with ID3FileType.
+  * In case a synch safe marked frame isn't sync safe, only warn :bug:`210`
+  * Removed PEDANTIC mode
+
+* Tools:
+
+  * Add signal handling :bug:`170`
+  * mid3cp: Make it work under Windows.
+  * mutagen-inspect: Make it work under Windows+Python3 :bug:`216`
+  * Support unicode file paths under Windows+Python2 :bug:`214`
+  * Support file paths with invalid encoding under Unix+Python3.
+
+
+1.27 - 2014.11.28
+-----------------
+
+* MP4:
+
+  * New ``MP4Info.codec`` for identifying the contained audio codec
+    e.g. ``"mp4a"``, ``"alac"``, ``"mp4a.40.2"``, ``"ac-3"`` etc.
+    :commit:`b2f22b81c77`
+  * New ``MP4Info.codec_description``: name of the audio codec
+    e.g. ``"ALAC"``, ``"AAC LC"``, ``"AC-3"``
+
+* OggOpus:
+
+  * Preserve data after vorbis comment (
+    See https://tools.ietf.org/html/draft-ietf-codec-oggopus-05#section-5.2)
+    :bug:`202`
+
+* AAC:
+
+  * New AAC FileType. Supports loading ADTS/ADIF AAC files. :bug:`15`
+
+
+1.26 - 2014.11.10
+-----------------
+
+* MP4:
+
+  * Parse channels/sample_rate/bits_per_sample/bitrate for ALAC files
+    :bug:`199` :commit:`192cfcaf14` (Adrian Sampson, Christoph Reiter)
+
+* ASF:
+
+  * Support writing multiple values for
+    Author/Title/Copyright/Description/Rating :bug:`151`
+  * Fix read order for multi value tags
+  * Various Python3 fixes
+
+* EasyID3: Add more tag mappings :bug:`136` (Ben Ockmore)
+
+* MPC/SV8: Fix parsing of SH packets with padding :bug:`198`
+
+* docs:
+
+  * New logo :commit:`b728fa75` (:user:`Samuel Messner <obskyr>`)
+  * Add examples for handling cover art in vorbiscomment :bug:`200`
+  * Add examples for id3v2.3
+
+
+1.25.1 - 2014.10.13
+-------------------
+
+* ID3: Fix parsing of some files with Python 3 :bug:`194`
+
+
+1.25 - 2014.10.03
+-----------------
+
+* Python 3 support (Ben Ockmore et al) :bug:`27`
+  Supported: Python 2.6, 2.7, 3.3, 3.4 (CPython and PyPy)
+* All custom exceptions now have a common mutagen.MutagenError base class
+* mutagen.File: prefer theora over vorbis/flac streams in ogg :bug:`184`
+* New mid3cp script for copying id3 tags :bug:`178`
+  (Marcus Sundman, Ben Ockmore)
+
+* ID3:
+
+  * Parse 2.3/4 frames with 2.2 names :bug:`177`
+  * Try to detect apev2 tags when looking for id3v1 tags :bug:`122`
+  * New id3.Encoding, id3.ID3v1SaveOptions enums :bug:`190`
+
+* ASF:
+
+  * Raise a proper exception on invalid utf-16 :bug:`127`
+
+* APEv2:
+
+  * Fix UnicodeDecodeError during parsing :bug:`174`
+
+* MP4:
+
+  * Fix struct.error exception during parsing :bug:`119`
+  * New AtomDataType enum for MP4FreeForm.dataformat values
+  * Read some previously ignored purl/egit atoms
+  * Read multi value reverse DNS tags written by foobar2000
+  * Read multi value atoms written by MusicBee :bug:`165`
+  * Write back unknown atoms and ones that failed to parse.
+
+
+1.24 - 2014.08.13
+-----------------
+
+* Moved to Bitbucket: https://bitbucket.org/lazka/mutagen
+* ID3:
+
+  * Parse utf-16 text frames with wrong termination :bug:`169`
+  * Fix parsing of utf-16 SYLT frames :bug:`173`
+
+* WavPack:
+
+  * Fix length calculation if sample count is missing in the header :bug:`180`
+
+* setup.py: Don't install leftover files produced by the test suite :bug:`179`
+* tests: Fix error with POSIX locale :bug:`181`
+
+1.23 - 2014.05.14
+-----------------
+
+* tools: Don't crash in misconfigured envs, fall back to utf-8.
+* mp3: Return correct mimetype for MP2 files. :bug:`163`
+* id3: deterministic sorting of frames. :bug:`166`
+* AIFF support :bug:`146` (Evan Purkhiser)
+
+1.22 - 2013.09.08
+-----------------
+
+* Minimum required Python version is now 2.6
+* Online API reference at https://mutagen.readthedocs.org/
+* EasyID3:
+
+  * Fix crash with empty TXXX values. :bug:`135`
+
+* ID3:
+
+  * id3v2.3 writing support :bug:`85`
+  * Add iTunes podcast frames (TGID, TDES, WFED) :bug:`141`
+  * Updated id3v1 genre list
+
+* MP4:
+
+  * add_tags() will not replace existing tags. :bug:`101`
+  * Don't ignore tags if parsing unknown atoms fails.
+  * Raise on invalid 64bit atom size :bug:`132` (Sidnei da Silva)
+
+* APEv2:
+
+  * Handle invalid tag item count. :bug:`145` (Dawid Zamirski)
+
+* Ogg:
+
+  * Faster parsing of files with large packets.
+
+* VComment:
+
+  * Preserve text case for field names added through the dict interface
+    :bug:`152`
+
+* mid3v2:
+
+  * New -e,--escape switch to enable interpretation of escape sequences and
+    makes escaping of the colon separator possible. :bug:`159`
+
+* mid3iconv:
+
+  * Convert COMM frames :bug:`128`
+
+1.21 - 2013.01.30
+-----------------
+
+* Fix Python 2.3 compatibility (broken in 1.19).
+* Fix many warnings triggered by -3. :bug:`27`
+* mid3v2:
+
+  * Add --TXXX support. :bug:`62` (Tim Phipps)
+  * Add --POPM support. :bug:`71`
+  * Allow setting multiple COMM or TXXX frames with one command line.
+
+* FLAC:
+
+  * Try to handle corrupt Vorbis comment block sizes. :bug:`52`
+  * Try to handle corrupt Picture block sizes :bug:`106` (Christoph Reiter)
+  * Don't leak file handle with PyPy :bug:`111` (Marien Zwart)
+
+* ID3:
+
+  * MakeID3v1: Do not generate bad tags when given short dates. :bug:`69`
+  * ParseID3v1: Parse short (< 128 byte) tags generated by old Mutagen
+    implementations of MakeID3v1, and tags with garbage on the front.
+  * pprint: Sort frames by name.
+  * Upgrade unknown 2.3 frames :bug:`97` (Christoph Reiter)
+  * Fix handling of invalid SYLT frames :bug:`105` (Christoph Reiter)
+
+* MP3:
+
+  * Fix error when loading extremely small MP3s. :bug:`72`
+  * Fix rounding error in CBR length calculation :bug:`93` (Christoph Reiter)
+
+* Use 'open' rather than 'file' everywhere. :bug:`74` (Dan Callahan)
+* mid3iconv:
+
+  * Accurately copy QL-style frame encoding behavior. :bug:`75`
+  * Skip unopenable files. :bug:`79`
+
+* ID3FileType:
+
+  * Remember which tag type load() was called with even if the file
+    doesn't yet have any ID3 tags. :bug:`89`
+
+* VComment:
+
+  * Prevent MemoryError when parsing invalid header :bug:`112`
+    (Jyrki Pulliainen)
+
+* ASF:
+
+  * Don't corrupt files on the second save() call :bug:`81` (Christoph Reiter)
+  * Always store GUID objects in the MetadataLibraryBlock :bug:`81`
+
+* OggTheora: Fix length/bitrate calculation. :bug:`99` (Christoph Reiter)
+* MP4:
+
+  * Less strict MP4 covr atom parsing. :bug:`86` (Lukáš Lalinský)
+  * Support atoms that extend to the end of the file. :bug:`109`
+    (Sidnei da Silva)
+  * Preserve freeform format flags :bug:`103` (Christoph Reiter)
+
+* OggOpus support. :bug:`115` (Christoph Reiter)
+* Musepack:
+
+  * Fix SV7 bitrate calculation :bug:`7` (Christoph Reiter)
+  * Support SV8 :bug:`7` (Christoph Reiter)
+
+1.20 - 2010.08.04
+-----------------
+
+* ASF: Don't store blocks over 64K in the MetadataObject block;
+  use the MetadataLibraryBlock instead. :bug:`60` (Lukáš Lalinský)
+* ID3: Faster parsing of files with lots of padding. :bug:`65`
+  (Christoph Reiter)
+* FLAC: Correct check for audio data start. :bug:`67`
+
+1.19 - 2010.02.18
+-----------------
+
+* ID3:
+
+  * POPM: 'count' is optional; the attribute may not exist. :bug:`33`
+  * TimeStampTextFrame: Fix a TypeError in unicode comparisons. :bug:`43`
+  * MakeID3v1: Translate TYER into ID3v1 year if TDRC is not present. :bug:`42`
+
+* mid3v2:
+
+  * Allow --delete followed by --frame, and --genre 1 --genre 2. :bug:`37`
+  * Add --quiet and --verbose flags. :bug:`40`
+
+* moggsplit: --m3u option to write an M3U playlist of the new files. :bug:`39`
+* mid3iconv: Fix crash when processing TCML or TIPL frames. :bug:`41`
+* VCommentDict: Correctly normalize key names for .keys() iterator. :bug:`45`
+* MP3: Correct length calculation for MPEG-2 files. :bug:`46`
+* oggflac: Fix typo in docstring. :bug:`53`
+* EasyID3: Force UTF-8 encoding. :bug:`54`
+* EasyMP4: Fix 'genre' translation. :bug:`56`
+
+1.18 - 2009.10.22
+-----------------
+
+* ASF:
+
+  * Distinguish between empty and absent tag values in
+    ContentDescriptionObjects. :bug:`29`
+
+* mid3iconv:
+
+  * Fix a crash when processing empty (invalid) text frames.
+
+* MAJOR API INCOMPATIBILITY!!!!
+
+  * EasyID3FileType is now in mutagen.easyid3, not mutagen.id3. This
+    change was necessary to restore API compatibility with 1.16, as
+    1.17 accidentally contained a circular import preventing
+    mutagen.easyid3 from importing by itself. :bug:`32`
+
+1.17 - 2009.10.07
+-----------------
+
+* ID3:
+
+  * Support for the iTunes non-standard TSO2 and TSOC frames.
+  * Attempt to recover from bad SYLT frames. :bug:`2`
+  * Attempt to recover from faulty extended header flags. :bug:`4` :bug:`21`
+  * Fix a bug in ID3v2.4 footer flag detection, :bug:`5`
+
+* MP4:
+
+  * Don't fail or double-encode UTF-8 strings when given a str.
+  * Don't corrupt 64 bit atom sizes when resizing atoms. :bug:`17`
+
+* EasyID3:
+
+  * Extension API for defining new "easy" tags at runtime.
+  * Support for many, many more tags.
+
+* OggVorbis, OggSpeex: Handle bitrates below 0 as per the spec. :bug:`30`
+* EasyMP4: Like EasyID3, but for iTunes MPEG-4 files.
+* mutagen.File: New 'easy=True' argument to create new EasyMP3, EasyMP4,
+  EasyTrueAudio, and EasyID3FileType instances.
+
+1.16 - 2009.06.15
+-----------------
+
+* Website / code repository move.
+* Bug Fixes:
+
+  * EasyID3: Invalid keys now raise KeyError (and ValueError).
+  * mutagen.File: .flac files with an ID3 tag will be opened as FLAC.
+
+* MAJOR API INCOMPATIBILITY!!!!
+
+  * Python 2.6 has required us to rename the .format attribute of M4A/MP4
+    cover atoms, because it conflicts with the new str.format method.
+    It has been renamed .imageformat.
+
+1.15 - 2008.12.01
+-----------------
+
+* Bug Fixes:
+
+  * mutagen.File: Import order no longer affects what type is returned.
+  * mutagen.id3: Compression of frames is now disabled.
+  * mutagen.flac.StreamInfo: Fix channel mask (support channels > 2). :bug:`35`
+  * mutagen.mp3: Ignore Xing headers if they are obviously wrong.
+
+1.14 - 2008.05.31
+-----------------
+
+* Bug Fixes:
+
+  * MP4/M4A: Fixed saving of atoms with 64-bit size on 64-bit platforms.
+  * MP4: Conversion of 'gnre' atoms to '\xa9gen' text atoms now correctly
+    produces a list of string values, not just a single value.
+  * ID3: Broken RVA2 frames are now discarded. (Vladislav Naumov)
+  * ID3: Use long integers when appropriate.
+  * VCommentDict: Raise UnicodeEncodeErrors when trying to use a Unicode
+    key that is not valid ASCII; keys are also normalized to ASCII
+    str objects. (Forest Bond)
+
+* Tests:
+  * FLAC: Use 2**64 instead of 2**32 to test overflow behavior.
+
+1.13 - 2007.12.03
+-----------------
+
+* Bug Fixes:
+
+  * FLAC: Raise IOError, instead of UnboundLocalError, when trying
+    to open a non-existant file. (Lukáš Lalinský, Debian #448734)
+  * Throw out invalid frames when upgrading from 2.3 to 2.4.
+  * Fixed reading of Unicode strings from ASF files on big-endian
+    platforms.
+
+* TCP/TCMP support. (Debian #452231)
+* Faster implementation of file-writing when mmap fails, and
+  exclusive advisory locking when available.
+* Test cases to ensure Mutagen is not vulnerable to CVE-2007-4619.
+  It is not now, nor was it ever.
+* Use VBRI header to calculate length of VBR MP3 files if the Xing
+  header is not found.
+
+1.12 - 2007.08.04
+-----------------
+
+* Write important ID3v2 frames near the start. (Lukáš Lalinský)
+* Clean up distutils functions.
+
+1.11 - 2007.04.26
+-----------------
+
+* New Features:
+
+  * mid3v2 can now set URL frames. (Vladislav Naumov)
+  * Musepack: Skip ID3v2 tags. (Lukáš Lalinský)
+
+* Bug Fixes:
+
+  * mid3iconv: Skip all timestamp frames. (Lukáš Lalinský)
+  * WavPack: More accurate length calculation. ('ak')
+  * PairedTextFrame: Fix typo in documentation. (Lukáš Lalinský)
+  * ID3: Fixed incorrect TDAT conversion. The format is DDMM, not
+    MMDD. (Lukáš Lalinský)
+
+* API:
+
+  * Metadata no longer inherits from dict.
+  * Relatedly, the MRO has changed on several types.
+  * More documentation for MP4 atoms. (Lukáš Lalinský)
+  * Prefer MP3 for files with unknown extensions and ID3 tags.
+
+1.10.1 - 2007.01.23
+-------------------
+
+* Bug Fixes:
+
+  * Documentation mentions ASF support.
+  * APEv2 flags and valid keys are fixed.
+  * Tests pass on Python 2.3 again.
+
+1.10 - 2007.01.21
+-----------------
+
+* New Features:
+
+  * FLAC: Skip ID3 tags. Added option to delete them on save.
+  * EncodedTextSpec: Make private members more private.
+  * Corrupted Oggs generated by GStreamer (e.g. Sound Juicer) can be read.
+  * FileTypes have a .mime attribute which is a list of likely MIME types
+    for the file.
+  * ASF (WMA/WMV) support.
+
+* Bug Fixes:
+
+  * ID3: Fixed reading of v2.3 tags with unsynchronized data.
+  * ID3: The data length indicator for compressed tags is written
+    as a synch-safe integer.
+
+1.9 - 2006.12.09
+----------------
+
+* New Features:
+
+  * OptimFROG support.
+  * New mutagen.mp4 module with support for multiple data fields per atom
+    and more compatible tag saving implementation.
+  * Support for embedded pictures in FLAC files (new in FLAC 1.1.3).
+
+* mutagen.m4a is deprecated in favor of mutagen.mp4.
+
+1.8 - 2006.10.02
+----------------
+
+* New Features:
+
+  * MonkeysAudio support. (#851, Lukáš Lalinský)
+  * APEv2 support on Python 2.5; see API-NOTES. (#852)
+
+1.7.1 - 2006.09.24
+------------------
+
+* Bug Fixes:
+
+  * Expose full ID3 tag size as .size. (#848)
+
+* New Features:
+
+  * Musepack Replay Gain data is available in SV7 files.
+
+1.7 - 2006.09.15
+----------------
+
+* Bug Fixes:
+
+  * Trying to save an empty tag deletes it. (#813)
+  * The semi-public API removal mentioned in 1.6's API-NOTES happened.
+  * Stricter frame ID validation. (#830, Lukáš Lalinský)
+  * Use os.path.devnull on Win32/Mac OS X. (#831, Lukáš Lalinský)
+
+* New Features:
+
+  * FLAC cuesheet and seektable support. (#791, Nuutti Kotivuori)
+  * Kwargs can be passed to ID3 constructors. (#824, Lukáš Lalinský)
+  * mutagen.musepack: Read/tag Musepack files. (#825, Lukáš Lalinský)
+
+* Tools:
+
+  * mutagen-inspect responds immediately to keyboard interrupts.
+
+1.6 - 2006.08.09
+----------------
+
+* Bug Fixes:
+
+  * IOError rather than NameError is raised when File succeeds in
+    typefinding but fails in stream parsing.
+  * errors= kwarg is correctly interpreted for FLAC tags now.
+  * Handle struct.pack API change in Python 2.5b2. (SF #1530559)
+  * Metadata 'load' methods always reset in-memory tags.
+  * Metadata 'delete' methods always clear in-memory tags.
+
+* New Features:
+
+  * Vorbis comment vendor strings include the Mutagen version.
+  * mutagen.id3: Read ASPI, ETCO, SYTC, MLLT, EQU2, and LINK frames.
+  * mutagen.m4a: Read/tag MPEG-4 AAC audio files with iTunes tags. (#681)
+  * mutagen.oggspeex: Read/tag Ogg Speex files.
+  * mutagen.trueaudio: Read/tag True Audio files.
+  * mutagen.wavpack: Read/tag WavPack files.
+
+* Tools:
+
+  * mid3v2: --delete-frames. (#635)
+
+1.5.1 - 2006.06.26
+------------------
+
+* Bug Fixes:
+
+  * Handle ENODEV from mmap (e.g. on fuse+sshfs).
+  * Reduce test rerun time.
+
+1.5 - 2006.06.20
+----------------
+
+* Bug Fixes:
+
+  * APEv2
+
+    * Invalid Lyrics3v2 tags are ignored/overwritten.
+    * Binary values are autodetected as documented.
+
+  * OggVorbis, OggFLAC:
+
+    * Write when the setup packet spans multiple pages.
+    * Zero granule position for header packets.
+
+* New Features:
+
+  * mutagen.oggtheora: Read/tag Ogg Theora files.
+  * Test Ogg formats with ogginfo, if present.
+
+1.4 - 2006.06.03
+----------------
+
+* Bug Fixes:
+
+  * EasyID3: Fix tag["key"] = "string" handler. (#693)
+  * APEv2:
+
+    * Skip Lyrics3v2 tags. (Miguel Angel Alvarez)
+    * Avoid infinite loop on malformed tags at the start of the file.
+
+  * Proper ANSI semantics for file positioning. (#707)
+
+* New Features:
+
+  * VComment: Handle malformed Vorbis comments when errors='ignore' or
+    errors='replace' is passed to VComment.load.
+    (Bastian Kleineidam, #696)
+  * Test running is now controlled through setup.py (./setup.py test).
+  * Test coverage data can be generated (./setup.py coverage).
+  * Considerably more test coverage.
+
+1.3 - 2006.05.29
+----------------
+
+* New Features:
+
+  * mutagen.File: Automatic file type detection.
+  * mutagen.ogg: Generic Ogg stream parsing. (#612)
+  * mutagen.oggflac: Read/tag Ogg FLAC files.
+  * mutagen.oggvorbis no longer depends on pyvorbis.
+  * ID3: SYLT support. (#672)
+
+1.2 - 2006.04.23
+----------------
+
+* Bug Fixes:
+
+  * MP3: Load files with zeroed Xing headers. (#626)
+  * ID3: Upgrade ID3v2.2 PIC tags to ID3v2.4 APIC tags properly.
+  * Tests exit with non-zero status if any have failed.
+  * Full dict protocol support for VCommentDict, FileType, and APEv2 objects.
+
+* New features:
+
+  * mutagen.oggvorbis gives pyvorbis a Mutagen-like API.
+  * mutagen.easyid3 makes simple ID3 tag changes easier.
+  * A brief TUTORIAL was added.
+
+* Tools:
+
+  * mid3iconv, a clone of id3iconv, was added by Emfox Zhou. (#605)
+
+1.1 - 2006.04.04
+----------------
+
+* ID3:
+
+  * Frame and Spec objects are not hashable.
+  * COMM, USER: Accept non-ASCII (completely invalid) language codes.
+  * Enable redundant data length bit for compressed frames.
+
+1.0 - 2006.03.13
+----------------
+
+* mutagen.FileType, an abstract container for tags and stream information.
+* MP3: A new FileType subclass for MPEG audio files.
+* FLAC:
+
+  * Add FLAC.delete.
+  * Raise correct exception when saving to a non-FLAC file.
+  * FLAC.vc is deprecated in favor of FLAC.tags.
+
+* VComment (used by FLAC):
+
+  * VComment.clear to clear all tags.
+  * VComment.as_dict to return a dict of the tags.
+
+* ID3:
+
+  * Fix typos in PRIV._pprint, OWNE._pprint, UFID._pprint.
+
+* mutagen-pony: Try finding lengths as well as tags.
+* mutagen-inspect: Output stream information with tags.
+
+0.9 - 2006.02.21
+----------------
+
+* Initial release.

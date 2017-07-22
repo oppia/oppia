@@ -539,9 +539,9 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
 
   ruleElement.element(by.css('.protractor-test-answer-description')).click();
 
-  element.all(by.id('select2-drop')).map(function(selectorElement) {
+  element.all(by.css('.select2-dropdown')).map(function(selectorElement) {
     selectorElement.all(by.cssContainingText(
-      'li.select2-results-dept-0', ruleDescriptionInDropdown
+      'li.select2-results__option', ruleDescriptionInDropdown
     )).filter(function(elem) {
       // We need to do this check because some options may only have
       // 'ruleDescriptionInDropdown' as a substring.

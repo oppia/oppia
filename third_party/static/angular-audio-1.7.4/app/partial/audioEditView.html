@@ -1,0 +1,89 @@
+<div class=col-md-offset-4>
+    <h3>
+        {{audio.id}} &ndash; {{audio.currentTime | trackTime}}
+        <!-- {{audio}} -->
+    </h3>
+    <p ng-if=audio.error>
+        Error playing this sound.
+    </p>
+    <p ng-if=!audio.canPlay>
+        Sound is loading, or you are viewing this on a device that doesn't support the <code>canPlay</code> property.
+    </p>
+</div>
+<div ng-if='!audio.error' class='form-group col-md-8 col-md-offset-4'>
+    <form class=form-inline>
+        <div class='form-group col-xs-9'>
+            <button class='btn btn-primary' ng-click='audio.paused ? audio.play() : audio.pause()'>{{audio.paused ? "Play" : "Pause" }}</button>
+            <button class='btn btn-danger' ng-click='audio.restart()'>Stop</button>
+            <button class='btn btn-neutral' ng-click='audio.muting = !audio.muting'>{{audio.muting ? "Unmute" : "Mute" }}</button>
+            <button class='btn btn-neutral' ng-click='audio.destroy()'>{{audio.destroyed() ? "Destroyed" : "Destroy" }}</button>
+            <!-- <div class='checkbox pull-right'>
+                <label>
+                    <input type=checkbox ng-model=audio.loop ng-click='audio.loop = !audio.loop'>Loop
+                </label>
+
+            </div> -->
+        </div>
+
+            <div class="form-group col-xs-3">
+              <label>Loop
+                <select  class='form-control input-small select' ng-model=audio.loop ng-options="value for value in [true,0,1,2,3,4,5]"></select>
+              </label>
+            </div>
+
+            <!-- <label> -->
+                <!-- Loop -->
+            <!-- </label> -->
+
+
+    </form>
+</div>
+
+<form class='form-horizontal'>
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="prependedtext">Current Time</label>
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-addon">Current Time</span>
+                <input class='form-control' type=text ng-model='audio.currentTime'>
+            </div>
+            <p class="help-block">
+                <strong>audioObject.currentTime:</strong>The current time of the object in seconds
+            </p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="prependedtext">Progress</label>
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-addon">Progress</span>
+                <input class='form-control' type=range min=0 max=1 step=0.01 ng-model='audio.progress'>
+            </div>
+            <p class="help-block">
+                <strong>audioObject.progress:</strong>The progress of the object as a percentage (0-1);
+            </p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="prependedtext">Volume</label>
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-addon">Volume</span>
+                <input class='form-control' type=range min=0 max=1 step=0.01 ng-model='audio.volume'>
+            </div>
+            <strong>audioObject.volume:</strong>The volume of the object as a percentage (0-1);
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="prependedtext">Playback Rate</label>
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-addon">Playback Rate</span>
+                <input class='form-control' type=range min=0.5 max=1.5 step=0.01 ng-model='audio.playbackRate'>
+            </div>
+            <strong>audioObject.playbackRate:</strong>The speed the audio plays at. (0.5 - 1.5);
+        </div>
+    </div>
+</form>
+
+<!-- <div class='hidden-sm' ng-include="'partial/audioTableView.html'"></div> -->

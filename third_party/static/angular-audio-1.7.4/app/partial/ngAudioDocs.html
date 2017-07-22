@@ -1,0 +1,376 @@
+<div class='jumbotron'>
+    <h2>ngAudio Documentation</h2>
+</div>
+<h3>Installation</h3>
+<p>Install the package (bower is the recommended way.)</p>
+<code><pre>bower install angular-audio --save</pre>
+</code>
+<p>Require the module in your project.</p>
+<code><pre>angular.module('yourModule',['ngAudio'])</pre>
+</code>
+
+<h3>Usage</h3>
+<p>
+
+</p>
+<p>Audio is loaded through the
+    <em>load</em>method of the
+    <strong>ngAudio service</strong>. The load method returns an
+    <strong>NgAudioObject</strong>object.</p>
+
+<code>
+    <pre>
+angular.module('yourModule',['ngAudio'])
+.controller("yourController",function($scope,ngAudio){
+    $scope.sound = ngAudio.load("sounds/mySound.mp3"); // returns NgAudioObject
+})  </pre>
+</code>
+<article>
+    <h4>ngAudio Service Reference</h4>
+    <table class="table table-striped table-bordered table-condensed">
+        <tr>
+            <td>load(path:String):NgAudioObject</td>
+            <td>
+                <p>
+                    Takes a string and returns an audio object. The audio object can be used before the sound is loaded.
+                </p>
+                <p>
+                    Tries first to find an embedded native audio tag with the same ID as the string passed. Tries secondly to load it remotely as a URL. If it fails, an error property will be set to true.
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td>play(path:String):NgAudioObject</td>
+            <td>Shortcut to load a sound and play it right away. Not recommended for remote URLs as there will be a delay.</td>
+        </tr>
+        <tr>
+            <td>mute()</td>
+            <td>Shortcut to globally mute all sounds loaded this way. Global mute is from the sounds individual mute and can't be unmuted except globally.</td>
+        </tr>
+        <tr>
+            <td>unmute()</td>
+            <td>Globally unmutes all the sounds.</td>
+        </tr>
+        <tr>
+            <td>performance : Number</td>
+            <td>Changes the interval that Angular Audio observes the audio. A lower number here will improve responsiveness at the cost of processor power.</td>
+        </tr>
+        <tr>
+            <td>unlock = true : Boolean</td>
+            <td>If true, attempts to 'unlock' audio files so that they work on mobile devices. Disabling this can break this library in mobile!</td>
+        </tr>
+    </table>
+</article>
+<article>
+    <h4>NgAudioObject Reference</h4>
+    <p>NgAudioObject can be used to control a sound file. It can be attached to the
+        <strong>$scope.</strong>
+    </p>
+    <table class="table table-striped table-bordered table-condensed">
+        <tr>
+            <td>constructor(pathOrId:String)</td>
+            <td>Returns an audio object which automatically loads an object,
+                <ul>
+                    <li>which is found at the path specified</li>
+                    <li>or on the DOM in an audio element with an ID the same as specified</li>
+                </ul>
+
+            </td>
+        </tr>
+        <tr>
+            <td>play()</td>
+            <td>Plays the sound.</td>
+        </tr>
+        <tr>
+            <td>pause()</td>
+            <td>Pauses the sound.</td>
+        </tr>
+        <tr>
+            <td>stop()</td>
+            <td>Restarts the sound.
+                <em>alias restart</em>
+            </td>
+        </tr>
+        <tr>
+            <td>unbind()</td>
+            <td><p>
+
+            Removes all the listeners from the audio object, improving performance, but disabling most read functionality.
+            </p>
+            <p>
+                For example, setting progress and currentTime will still work, but reading them will not return the correct value.
+            </p>
+            </td>
+        </tr>
+        <tr>
+            <td>currentTime:number</td>
+            <td>
+                <p>
+                    Read - reads the current time of the sound in seconds.
+                </p>
+                <p>Write - sets the current time of the sound.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>volume:number</td>
+            <td>
+                <p>
+                    Read - reads the volume of the sound from 0 - 1.
+                </p>
+                <p>Write - sets the volume of the sound.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>progress:number</td>
+            <td>
+                <p>
+                    Read - returns the playthrough progress of the sound from 0 - 1.
+                </p>
+                <p>Write - sets the current time of the of the sound as a percentage from 0 to 1.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>playbackRate:number</td>
+            <td>
+                <p>
+                    Read - returns the speed that the sound is playing at, typically from 0.5 - 1.5.
+                </p>
+                <p>Write - sets the audio speed. Values between 0.5 and 1.5 are recommended.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>muting:boolean</td>
+            <td>
+                <p>
+                    Read - whether or not the sound is muting.
+                </p>
+                <p>Write - set a boolean to mute or unmute the sound.</p>
+                <p>When a sound is muting, its will make no noise, but it can be played, be paused, and have its volume adjusted.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>loop:number or true</td>
+            <td>
+                <p>
+                    Read - the number of times the audio will play again after it's done playing, or true if it will repeat indefinitely
+                </p>
+                <p>Write - setting a number will cause the audio to play that many more times after finishing. Setting the value to true will cause the sound to loop indefinitely.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>remaining:number (read only)</td>
+            <td>
+                <p>
+                    Time remaining in seconds.
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td>audio: NativeHTMLAudio (read only)</td>
+            <td>
+                <p>
+                    Reference to the native audio file used by the object.
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td>canPlay:boolean (read only)</td>
+            <td>
+                <p>
+                    Is true if the sound is loaded enough to play.
+                    <em>This is not well supported in all browsers.</em>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td>error:boolean (read only)</td>
+            <td>
+                <p>
+                    Is true if the sound could not be loaded.
+                </p>
+            </td>
+        </tr>
+        <tr>
+          <td>destroyed:boolean (read only)</td>
+          <td>
+            <p>
+              Is true if the NgAudioObject has been destroyed.
+            </p>
+          </td>
+        </tr>
+    </table>
+</article>
+<article>
+    <h3>
+        ngAudio Directive
+    </h3>
+    <p>
+        <strong>ngAudio</strong> can be applied as a directive on any element to have it play a sound when clicked. Sounds are preloaded as soon as all other elements on the page are resolved.
+    </p>
+    <code>
+        <pre>&lt;button ng-audio=&quot;sounds/mySound.mp3&quot; volume=&quot;0.5&quot; start=&quot;0.2&quot;&gt;Click me&lt;/button&gt;</pre>
+    </code>
+
+    <table class="table table-striped table-bordered table-condensed">
+        <tr>
+            <td>ngAudio</td>
+            <td>
+                <p>
+                    Takes a string and creates a new object with
+                    <strong>ngAudio.load()</strong>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td>volume</td>
+            <td>Specifies a volume for the sound to play.</td>
+        </tr>
+        <tr>
+            <td>start</td>
+            <td>Specifies a start time for the sound.</td>
+        </tr>
+        <tr>
+            <td>loop</td>
+            <td>Set a number to repeat a sound that many times, or true to repeat indefinitely.</td>
+        </tr>
+        <tr>
+            <td>disablePreload</td>
+            <td>If enabled, will not preload the audio track. Track will only begin loading at the same time "play" is called.</td>
+        </tr>
+
+    </table>
+</article>
+
+<article>
+    <h3>
+        ngAudioHover Directive
+    </h3>
+    <p>
+        <strong>ngAudio-hover</strong> is like ngAudio but for hovering, and can be applied as a directive on any element to have it play a sound when it is hovered over. Sounds are preloaded as soon as all other elements on the page are resolved.
+    </p>
+    <code>
+        <pre>&lt;button ng-audio-hover=&quot;sounds/mySound.mp3&quot; volume-hover=&quot;0.5&quot; start-hover=&quot;0.2&quot;&gt;Click me&lt;/button&gt;</pre>
+    </code>
+
+    <table class="table table-striped table-bordered table-condensed">
+        <tr>
+            <td>ng-audio-hover</td>
+            <td>
+                <p>
+                    Takes a string and creates a new object with
+                    <strong>ngAudio.load()</strong>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td>volume-hover</td>
+            <td>Specifies a volume for the sound to play.</td>
+        </tr>
+        <tr>
+            <td>start-hover</td>
+            <td>Specifies a start time for the sound.</td>
+        </tr>
+        <tr>
+            <td>loop-hover</td>
+            <td>Set a number to repeat a sound that many times, or true to repeat indefinitely.</td>
+        </tr>
+
+    </table>
+</article>
+<article>
+    <h3>
+        Filters
+    </h3>
+    <h4>
+        Track Time Filter
+    </h4>
+    <p>
+        Takes the currentTime of the audio track and returns a human-readable time output, like what you would see in an MP3 player.
+    </p>
+    <h5>Example Usage</h5>
+    <code>
+        <pre ng-non-bindable>
+&lt;div&gt;Current Time: &#123;&#123;audio.currentTime | trackTime&#125;&#125;&lt;/div&gt;    </pre></code>
+
+    <h5>Example Table</h5>
+    <table class="table table-striped table-bordered table-condensed">
+        <thead>
+            <th>
+                currentTime Value
+            </th>
+            <th>
+                trackTime output
+            </th>
+        </thead>
+        <tr>
+            <td>
+                3.6
+            </td>
+            <td>
+                3s
+            </td>
+        </tr>
+        <tr>
+            <td>
+                106
+            </td>
+            <td>
+                01:16
+            </td>
+        </tr>
+        <tr>
+            <td>
+                3675
+            </td>
+            <td>
+                01:01:15
+            </td>
+        </tr>
+    </table>
+</article>
+<article>
+    <h3>
+        Angular Audio Example
+    </h3>
+    <code>
+        <pre>
+<!-- <div ng-controller='audioDemo'>
+<button ng-click='audio.paused ? audio.play() : audio.pause()'>{{audio.paused ? "Play" : "Pause" }}</button>
+<button ng-click='audio.restart()'>Stop</button>
+<button ng-click='audio.muting = !audio.muting'>{{audio.muting ? "Unmute" : "Mute" }}</button>
+
+
+
+
+<label>Current Time</label>
+<input class='form-control' type=text ng-model='audio.currentTime'>
+<label>Volume</label>
+<input class='form-control' type=range min=0 max=1 step=0.01 ng-model='audio.volume'>
+</div>
+<script>
+angular.module('myModule',['ngAudio'])
+.controller('audioDemo',function($scope,ngAudio){
+	$scope.audio = ngAudio.load('mySound.wav');
+})
+</script>
+ -->
+
+ &lt;div ng-controller=&#39;audioDemo&#39;&gt;
+ &lt;button ng-click=&#39;audio.paused ? audio.play() : audio.pause()&#39;&gt;{{audio.paused ? &quot;Play&quot; : &quot;Pause&quot; }}&lt;/button&gt;
+ &lt;button ng-click=&#39;audio.restart()&#39;&gt;Stop&lt;/button&gt;
+ &lt;button ng-click=&#39;audio.muting = !audio.muting&#39;&gt;{{audio.muting ? &quot;Unmute&quot; : &quot;Mute&quot; }}&lt;/button&gt;
+
+ &lt;label&gt;Current Time&lt;/label&gt;
+ &lt;input class=&#39;form-control&#39; type=text ng-model=&#39;audio.currentTime&#39;&gt;
+ &lt;label&gt;Volume&lt;/label&gt;
+ &lt;input class=&#39;form-control&#39; type=range min=0 max=1 step=0.01 ng-model=&#39;audio.volume&#39;&gt;
+ &lt;/div&gt;
+ &lt;script&gt;
+ angular.module(&#39;myModule&#39;,[&#39;ngAudio&#39;])
+ .controller(&#39;audioDemo&#39;,function($scope,ngAudio){
+ 	$scope.audio = ngAudio.load(&#39;mySound.wav&#39;);
+ })
+ &lt;/script&gt;
+		</pre>
+    </code>
+</article>
