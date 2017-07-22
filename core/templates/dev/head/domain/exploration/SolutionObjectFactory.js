@@ -20,103 +20,104 @@
 oppia.factory('SolutionObjectFactory', [
   '$filter', 'oppiaHtmlEscaper',
   function($filter, oppiaHtmlEscaper) {
-  var Solution = function(answerIsExclusive, correctAnswer, explanation) {
-    this.answerIsExclusive = answerIsExclusive;
-    this.correctAnswer = correctAnswer;
-    this.explanation = explanation;
-  };
-
-  Solution.prototype.toBackendDict = function() {
-    return {
-      answer_is_exclusive: this.answerIsExclusive,
-      correct_answer: this.correctAnswer,
-      explanation: this.explanation
+    var Solution = function(answerIsExclusive, correctAnswer, explanation) {
+      this.answerIsExclusive = answerIsExclusive;
+      this.correctAnswer = correctAnswer;
+      this.explanation = explanation;
     };
-  };
 
-  Solution.createFromBackendDict = function(solutionBackendDict) {
-    return new Solution(
-      solutionBackendDict.answer_is_exclusive,
-      solutionBackendDict.correct_answer,
-      solutionBackendDict.explanation);
-  };
+    Solution.prototype.toBackendDict = function() {
+      return {
+        answer_is_exclusive: this.answerIsExclusive,
+        correct_answer: this.correctAnswer,
+        explanation: this.explanation
+      };
+    };
 
-  Solution.createNew = function(answerIsExclusive, correctAnswer, explanation) {
-    return new Solution(answerIsExclusive, correctAnswer, explanation);
-  };
+    Solution.createFromBackendDict = function(solutionBackendDict) {
+      return new Solution(
+        solutionBackendDict.answer_is_exclusive,
+        solutionBackendDict.correct_answer,
+        solutionBackendDict.explanation);
+    };
 
-  Solution.prototype.getSolutionSummary = function(interactionId, choices) {
-    var isExclusiveAnswer = (
-      this.answerIsExclusive ? 'Only' : 'One');
-    var correctAnswer = '';
-    if (interactionId === 'GraphInput') {
-      correctAnswer = '[Graph Object]';
-    } else if (interactionId === 'MultipleChoiceInput') {
-      correctAnswer = (
-        oppiaHtmlEscaper.objToEscapedJson(
-          choices[this.correctAnswer]
-            .label));
-    } else if (interactionId === 'MathExpressionInput') {
-      correctAnswer = this.correctAnswer.latex;
-    } else if (interactionId === 'CodeRepl' ||
-      interactionId === 'PencilCodeEditor') {
-      correctAnswer = this.correctAnswer.code;
-    } else if (interactionId === 'MusicNotesInput') {
-      correctAnswer = '[Music Notes Object]';
-    } else if (interactionId === 'ImageClickInput') {
-      correctAnswer = this.correctAnswer.clickedRegions;
-    } else if (interactionId === 'LogicProof') {
-      correctAnswer = this.correctAnswer.correct;
-    } else {
-      correctAnswer = (
-        oppiaHtmlEscaper.objToEscapedJson(this.correctAnswer));
-    }
-    var explanation = (
-      $filter('convertToPlainText')(this.explanation));
-    return (
-      '[' + isExclusiveAnswer + ' solution is ' + correctAnswer + '] ' +
-      explanation);
-  };
+    Solution.createNew = function(
+      answerIsExclusive, correctAnswer, explanation) {
+      return new Solution(answerIsExclusive, correctAnswer, explanation);
+    };
 
-  Solution.prototype.setCorrectAnswer = function (correctAnswer) {
-    this.correctAnswer = correctAnswer;
-  };
+    Solution.prototype.getSolutionSummary = function(interactionId, choices) {
+      var isExclusiveAnswer = (
+        this.answerIsExclusive ? 'Only' : 'One');
+      var correctAnswer = '';
+      if (interactionId === 'GraphInput') {
+        correctAnswer = '[Graph Object]';
+      } else if (interactionId === 'MultipleChoiceInput') {
+        correctAnswer = (
+          oppiaHtmlEscaper.objToEscapedJson(
+            choices[this.correctAnswer]
+              .label));
+      } else if (interactionId === 'MathExpressionInput') {
+        correctAnswer = this.correctAnswer.latex;
+      } else if (interactionId === 'CodeRepl' ||
+        interactionId === 'PencilCodeEditor') {
+        correctAnswer = this.correctAnswer.code;
+      } else if (interactionId === 'MusicNotesInput') {
+        correctAnswer = '[Music Notes Object]';
+      } else if (interactionId === 'ImageClickInput') {
+        correctAnswer = this.correctAnswer.clickedRegions;
+      } else if (interactionId === 'LogicProof') {
+        correctAnswer = this.correctAnswer.correct;
+      } else {
+        correctAnswer = (
+          oppiaHtmlEscaper.objToEscapedJson(this.correctAnswer));
+      }
+      var explanation = (
+        $filter('convertToPlainText')(this.explanation));
+      return (
+        '[' + isExclusiveAnswer + ' solution is ' + correctAnswer + '] ' +
+        explanation);
+    };
 
-  Solution.prototype.getCorrectAnswerHtml = function (objectType) {
-    if (objectType === 'CodeString') {
-      return this.correctAnswer.code;
-    } else if (objectType === 'ImageWithRegions') {
-      return this.correctAnswer.clickedRegions;
-    } else if (objectType === 'Graph') {
-      return '[Graph Object]';
-    } else if (objectType === 'UnicodeString') {
-      return this.correctAnswer.latex;
-    } else if (objectType === 'LogicQuestion') {
-      return this.correctAnswer.correct;
-    } else if (objectType === 'MusicPhrase') {
-      return '[Music Phrase Object]';
-    } else {
-      return this.correctAnswer;
-    }
-  };
+    Solution.prototype.setCorrectAnswer = function (correctAnswer) {
+      this.correctAnswer = correctAnswer;
+    };
 
-  Solution.prototype.getInteractionHtml = function(objectType) {
-    var element = $('<object-editor>');
-    element.attr('obj-type', objectType);
-    element.attr('init-args', '{choices: ruleDescriptionChoices}');
-    element.attr('is-editable', 'true');
-    element.attr('always-editable', 'true');
-    element.attr('style', 'color: black;');
+    Solution.prototype.getCorrectAnswerHtml = function (objectType) {
+      if (objectType === 'CodeString') {
+        return this.correctAnswer.code;
+      } else if (objectType === 'ImageWithRegions') {
+        return this.correctAnswer.clickedRegions;
+      } else if (objectType === 'Graph') {
+        return '[Graph Object]';
+      } else if (objectType === 'UnicodeString') {
+        return this.correctAnswer.latex;
+      } else if (objectType === 'LogicQuestion') {
+        return this.correctAnswer.correct;
+      } else if (objectType === 'MusicPhrase') {
+        return '[Music Phrase Object]';
+      } else {
+        return this.correctAnswer;
+      }
+    };
 
-    if (objectType === 'UnicodeString') {
-      element.attr('value', 'solution.correctAnswer.latex');
-    } else if (objectType === 'CodeString') {
-      element.attr('value', 'solution.correctAnswer.code');
-    } else {
-      element.attr('value', 'solution.correctAnswer');
-    }
-    return element.get(0).outerHTML;
-  };
+    Solution.prototype.getInteractionHtml = function(objectType) {
+      var element = $('<object-editor>');
+      element.attr('obj-type', objectType);
+      element.attr('init-args', '{choices: ruleDescriptionChoices}');
+      element.attr('is-editable', 'true');
+      element.attr('always-editable', 'true');
+      element.attr('style', 'color: black;');
 
-  return Solution;
-}]);
+      if (objectType === 'UnicodeString') {
+        element.attr('value', 'solution.correctAnswer.latex');
+      } else if (objectType === 'CodeString') {
+        element.attr('value', 'solution.correctAnswer.code');
+      } else {
+        element.attr('value', 'solution.correctAnswer');
+      }
+      return element.get(0).outerHTML;
+    };
+
+    return Solution;
+  }]);
