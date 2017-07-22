@@ -399,7 +399,7 @@ class BaseJobManager(object):
             job_id: str. The ID of the job to query.
 
         Returns:
-            Depends on subclass. The output of the job.
+            *. The output of the job.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -430,7 +430,7 @@ class BaseJobManager(object):
             new_status_code: str. New status code.
 
         Raises:
-            Exception: When the given status code change is invalid.
+            Exception: The given status code change is invalid.
         """
         valid_new_status_codes = VALID_STATUS_CODE_TRANSITIONS[old_status_code]
         if new_status_code not in valid_new_status_codes:
@@ -440,7 +440,11 @@ class BaseJobManager(object):
 
     @classmethod
     def _require_correct_job_type(cls, job_type):
-        """Raises Exception if the job type is incorrect."""
+        """Returns validity of given job type.
+
+        Raises:
+            Exception: The given job type is incorrect.
+        """
         if job_type != cls.__name__:
             raise Exception(
                 'Invalid job type %s for class %s' % (job_type, cls.__name__))
@@ -706,8 +710,8 @@ class BaseMapReduceJobManager(BaseJobManager):
                 the job's _run() method.
 
         Raises:
-            Exception: Passed a parameter for the mapper when one was already
-                provided at its creation.
+            Exception: Passed a value to a parameter in the mapper which has
+                already been given a value.
         """
         entity_class_types = cls.entity_classes_to_map_over()
         entity_class_names = [
@@ -819,11 +823,11 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
         Args:
             mapper_spec: mapreduce_spec.mapper. The original mapreduce
-            configuration to split.
+                configuration to split.
 
         Returns:
             list(MultipleDatastoreEntitiesInputReader). Each ready to handle
-                subsets which spans all of mapper_spec's inputs.
+                subsets which, taken together, span all of mapper_spec's inputs.
         """
         params = mapper_spec.params
         entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
@@ -860,7 +864,9 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
     @staticmethod
     def _get_job_queued_msec():
-        """Returns the time job got queued, in milliseconds past the Epoch."""
+        """Returns the time when the job got queued, in milliseconds past the
+        Epoch.
+        """
         return float(context.get().mapreduce_spec.mapper.params[
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
 
@@ -875,7 +881,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
         Args:
             entity: BaseModel. An entity this job type is responsible for
-            handling.
+                handling.
 
         Returns:
             bool. Whether the entity was created before the given MR job was
@@ -949,15 +955,15 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def _is_valid_realtime_id(cls, realtime_id):
-        """Returns whether the realtime_id represents a valid realtime layer and
-        entity.
+        """Returns whether the realtime_id represents a valid (realtime layer,
+            entity) pair.
 
         Args:
             realtime_id: str. The id to query.
 
         Returns:
-            bool. Whether the realtime_id represents a valid realtime layer and
-                entity pair.
+            bool. Whether the realtime_id represents a valid (realtime layer,
+                entity) pair.
         """
         return realtime_id.startswith('0:') or realtime_id.startswith('1:')
 
@@ -987,8 +993,10 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         ).get(entity_id, strict=strict)
 
     def put(self):
-        """Registers self, which is an entity, into the realtime layer it's
-        currently a part of.
+        """Stores the current realtime layer entity into the database.
+        
+        Raises:
+            Exception: Self has an invalid realtime layer id.
         """
         if (self.realtime_layer is None or
                 str(self.realtime_layer) != self.id[0]):
@@ -1113,7 +1121,11 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _get_active_realtime_index(cls):
         """Returns the registered realtime id of this class, creating one if it
-        doesn't exist."""
+        doesn't exist.
+        
+        Returns:
+            str. The active realtime layer id of this class.
+        """
         def _get_active_realtime_index_transactional():
             cc_model = job_models.ContinuousComputationModel.get(
                 cls.__name__, strict=False)
@@ -1151,8 +1163,8 @@ class BaseContinuousComputationManager(object):
             entity_ids: str. Collection of unique identifiers for entities.
 
         Returns:
-            list(str). Unique identifiers for each given entity for storage the
-                in currently active realtime layer.
+            list(str). Unique identifiers for each given entity for storage in
+                the currently active realtime layer.
         """
         realtime_datastore_class = cls._get_realtime_datastore_class()
         active_realtime_index = cls._get_active_realtime_index()
@@ -1239,7 +1251,7 @@ class BaseContinuousComputationManager(object):
         """(Re)starts the continuous computation corresponding to this class.
 
         Raises:
-            Exception: if the computation is already running.
+            Exception: The computation wasn't idle before trying to start.
         """
         def _start_computation_transactional():
             """Transactional implementation for marking a continuous
@@ -1270,14 +1282,13 @@ class BaseContinuousComputationManager(object):
         cls._kickoff_batch_job()
 
     @classmethod
-    def stop_computation(cls, user_id, unused_test_mode=False):
+    def stop_computation(cls, user_id):
         """Cancels the currently-running batch job.
 
         No further batch runs will be kicked off.
 
         Args:
             user_id: str. The id of the user stopping the job.
-            unused_test_mode: bool. TODO: Why is this here?
         """
         # This is not an ancestor query, so it must be run outside a
         # transaction.
@@ -1313,8 +1324,8 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_incoming_event(cls, event_type, *args, **kwargs):
-        """Handle an incoming event with the given type by recording it in both
-        realtime datastore layers.
+        """Handles an incoming event by recording it in both realtime datastore
+        layers.
 
         The *args and **kwargs match those passed to the _handle_event() method
         of the corresponding EventHandler subclass.
@@ -1405,7 +1416,7 @@ def _get_job_dict_from_job_model(model):
                 milliseconds since the epoch.
             status_code: str. The current status of the job.
             job_type: str. The type of this job.
-            is_cancelable: bool. Whether the job can be canceled
+            is_cancelable: bool. Whether the job can be canceled.
             error: str. Any errors pertaining to this job.
             human_readable_time_started: str or None. A human-readable string
                 representing the time the job started, or None if
@@ -1443,7 +1454,7 @@ def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
         recency_msec: int. The threshold for a recent job, in milliseconds.
 
     Returns:
-        list(dict). The dict contains the following keys:
+        list(dict). Each dict contains the following keys:
             id: str. The ID of the job.
             time_started_msec: float. When the job was started, in milliseconds
                 since the epoch.
@@ -1451,7 +1462,7 @@ def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
                 milliseconds since the epoch.
             status_code: str. The current status of the job.
             job_type: str. The type of this job.
-            is_cancelable: bool. Whether the job can be canceled
+            is_cancelable: bool. Whether the job can be canceled.
             error: str. Any errors pertaining to this job.
             human_readable_time_started: str or None. A human-readable string
                 representing the time the job started, or None if
@@ -1466,8 +1477,7 @@ def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
 
 
 def get_data_for_unfinished_jobs():
-    """Returns list(job_model.JobModel) containing data about all unfinished
-    jobs.
+    """Returns a list of dicts containing data about all unfinished jobs.
 
     Returns:
         list(dict). Each dict represents a continuous computation and contains
@@ -1512,7 +1522,7 @@ def get_continuous_computations_info(cc_classes):
 
     Args:
         cc_classes: list(BaseContinuousComputationManager). List of continuous
-            computation subclass.
+            computation subclasses.
 
     Returns:
         list(dict). Each dict represents a continuous computation and contains
@@ -1618,7 +1628,8 @@ class JobCleanupManager(BaseMapReduceJobManager):
                 A shard or job which may still be running.
         Yields:
             tuple(str, int). Describes the action taken for the item, and the
-                amount of items for which this action was applied to.
+                number (items are countable) of items for which this action was
+                applied to.
         """
         max_start_time_msec = JobCleanupManager.get_mapper_param(
             MAPPER_PARAM_MAX_START_TIME_MSEC)
@@ -1650,8 +1661,8 @@ class JobCleanupManager(BaseMapReduceJobManager):
             key: str. Describes the action taken by a map call. One of:
                 'mr_state_deleted', 'mr_state_remaining', 'shard_state_deleted',
                 'shard_state_remaining'.
-            stringified_values: list(str). A list where each element is a str
-                number, counting the mapped items sharing a key.
+            stringified_values: list(str). A list where each element is a
+                stringified number, counting the mapped items sharing a key.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
         if key.endswith('_deleted'):
