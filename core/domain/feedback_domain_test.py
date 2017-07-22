@@ -42,6 +42,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'state_name': u'a_state_name',
             'summary': None,
             'original_author_username': self.VIEWER_USERNAME,
+            'message_count': 1,
             'subject': u'a subject',
             'last_updated': utils.get_time_in_millisecs(fake_date)
         }
@@ -49,7 +50,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             self.FULL_THREAD_ID, self.EXP_ID,
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
-            expected_thread_dict['summary'], False, fake_date, fake_date)
+            expected_thread_dict['summary'], False, 1, fake_date, fake_date)
         self.assertDictEqual(expected_thread_dict,
                              observed_thread.to_dict())
 
@@ -64,6 +65,28 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id(
                 self.FULL_THREAD_ID))
         self.assertEqual(self.THREAD_ID, observed_thread_id)
+
+    def test_get_last_two_message_ids(self):
+        fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+        thread_1 = feedback_domain.FeedbackThread(
+            self.FULL_THREAD_ID, self.EXP_ID, u'a_state_name', self.viewer_id,
+            u'open', u'a subject', None, False, 5, fake_date, fake_date)
+
+        last_two_message_ids = thread_1.get_last_two_message_ids()
+        self.assertEqual(
+            last_two_message_ids,
+            [thread_1.get_full_message_id(4), thread_1.get_full_message_id(3)])
+
+        # Check what happens in case the thread has only one message.
+        thread_1 = feedback_domain.FeedbackThread(
+            self.FULL_THREAD_ID, self.EXP_ID, u'a_state_name', self.viewer_id,
+            u'open', u'a subject', None, False, 1, fake_date, fake_date)
+
+        last_two_message_ids = thread_1.get_last_two_message_ids()
+        # The second last message should be given an id of -1 as it doesn't
+        # exist.
+        self.assertEqual(
+            last_two_message_ids, [thread_1.get_full_message_id(0), None])
 
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
@@ -130,14 +153,14 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'exploration_version': 1,
             'state_name': 'a state name',
             'description': 'a description',
-            'state_content': 'a state content'
+            'suggestion_html': 'suggestion HTML',
         }
         observed_suggestion = feedback_domain.Suggestion(
             self.THREAD_ID, self.owner_id, self.EXP_ID,
             expected_suggestion_dict['exploration_version'],
             expected_suggestion_dict['state_name'],
             expected_suggestion_dict['description'],
-            expected_suggestion_dict['state_content'])
+            expected_suggestion_dict['suggestion_html'])
         self.assertDictEqual(expected_suggestion_dict,
                              observed_suggestion.to_dict())
 

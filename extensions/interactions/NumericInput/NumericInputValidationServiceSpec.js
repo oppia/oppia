@@ -16,7 +16,8 @@ describe('NumericInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 
   var currentState;
-  var goodAnswerGroups, goodDefaultOutcome;
+  var answerGroups, goodDefaultOutcome;
+  var betweenNegativeOneAndOneRule, equalsZeroRule, lessThanOneRule;
 
   beforeEach(function() {
     module('oppia');
@@ -32,8 +33,27 @@ describe('NumericInputValidationService', function() {
       dest: 'Second State',
       feedback: []
     };
-    goodAnswerGroups = [{
-      rules: [],
+    equalsZeroRule = {
+      type: 'Equals',
+      inputs: {
+        x: 0
+      }
+    };
+    betweenNegativeOneAndOneRule = {
+      type: 'IsInclusivelyBetween',
+      inputs: {
+        a: -1,
+        b: 1
+      }
+    };
+    lessThanOneRule = {
+      type: 'IsLessThan',
+      inputs: {
+        x: 1
+      }
+    };
+    answerGroups = [{
+      rules: [equalsZeroRule, betweenNegativeOneAndOneRule],
       outcome: goodDefaultOutcome,
       correct: false
     }];
@@ -41,7 +61,54 @@ describe('NumericInputValidationService', function() {
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
+
+  it('should catch redundant rules', function() {
+    answerGroups[0].rules = [betweenNegativeOneAndOneRule, equalsZeroRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, {}, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched ' +
+        'because it is made redundant by rule 1 from answer group 1.'
+    }]);
+  });
+
+  it('should catch identical rules as redundant', function() {
+    answerGroups[0].rules = [equalsZeroRule, equalsZeroRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, {}, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched ' +
+        'because it is made redundant by rule 1 from answer group 1.'
+    }]);
+  });
+
+  it('should catch redundant rules in separate answer groups', function() {
+    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[0].rules = [betweenNegativeOneAndOneRule];
+    answerGroups[1].rules = [equalsZeroRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, {}, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 1 from answer group 2 will never be matched ' +
+        'because it is made redundant by rule 1 from answer group 1.'
+    }]);
+  });
+
+  it('should catch redundant rules caused by greater/less than range',
+    function() {
+      answerGroups[0].rules = [lessThanOneRule, equalsZeroRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Rule 2 from answer group 1 will never be matched ' +
+          'because it is made redundant by rule 1 from answer group 1.'
+      }]);
+    });
 });

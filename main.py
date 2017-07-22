@@ -20,6 +20,7 @@ import logging
 from constants import constants
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import classifier
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import creator_dashboard
@@ -172,6 +173,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
+    get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -209,6 +211,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
         learner_dashboard.LearnerDashboardHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL,
+        learner_dashboard.LearnerDashboardFeedbackThreadHandler),
 
     get_redirect_route(
         r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
@@ -321,6 +327,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler),
+    get_redirect_route(
+        r'/createhandler/audioupload/<exploration_id>',
+        editor.AudioFileHandler),
     get_redirect_route(r'/createhandler/state_yaml', editor.StateYamlHandler),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
@@ -433,9 +442,17 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
         collection_editor.ExplorationMetadataSearchHandler),
-
+    get_redirect_route(
+        r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
+
+    get_redirect_route(
+        r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
+
+    get_redirect_route(
+        r'/.well-known/acme-challenge/<challenge>',
+        admin.SslChallengeHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
@@ -449,6 +466,7 @@ if (feconf.ENABLE_MAINTENANCE_MODE and
     URLS_TO_SERVE = [
         get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
         get_redirect_route(r'/adminhandler', admin.AdminHandler),
+        get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
         get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
         get_redirect_route(
             r'/admintopicscsvdownloadhandler',

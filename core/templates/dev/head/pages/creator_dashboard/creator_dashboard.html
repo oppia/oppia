@@ -101,9 +101,7 @@
     </div>
 
     <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
-      <h2 class="oppia-dashboard-title">
-        Creator Dashboard
-      </h2>
+      <h2 class="oppia-dashboard-title" translate="I18N_DASHBOARD_CREATOR_DASHBOARD"></h2>
     </div>
 
     <div ng-if="activeTab === 'myExplorations'">
@@ -112,14 +110,11 @@
                  class="oppia-page-card oppia-dashboard-intro-card"
                  style="margin-top: 0;">
           <div>
-            <p>
-              It looks like you haven't created any explorations yet.
-              Let's get started!
-            </p>
+            <p translate="I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE"></p>
             <button type="button"
                     class="btn oppia-dashboard-intro-button oppia-transition-200"
-                    ng-click="createNewExploration()">
-              Create Exploration
+                    ng-click="createNewExploration()"
+                    translate="I18N_CREATE_EXPLORATION">
             </button>
           </div>
           <div class="oppia-dashboard-intro-picture">

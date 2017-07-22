@@ -14,8 +14,9 @@
 
 describe('TextInputValidationService', function() {
   var validatorService, WARNING_TYPES;
+  var INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;
 
-  var currentState;
+  var currentState, customizationArguments;
   var goodAnswerGroups, goodDefaultOutcome;
 
   beforeEach(function() {
@@ -26,11 +27,25 @@ describe('TextInputValidationService', function() {
     validatorService = $injector.get('TextInputValidationService');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
+    INTERACTION_SPECS = $injector.get('INTERACTION_SPECS');
+    customizationArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
+    rowsSpecs = customizationArgSpecs[1];
+    minRows = rowsSpecs.schema.validators[0].min_value;
+    maxRows = rowsSpecs.schema.validators[1].max_value;
 
     currentState = 'First State';
     goodDefaultOutcome = {
       dest: 'Second State',
       feedback: []
+    };
+
+    customizationArguments = {
+      placeholder: {
+        value: ''
+      },
+      rows: {
+        value: 1
+      }
     };
 
     goodAnswerGroups = [{
@@ -42,7 +57,43 @@ describe('TextInputValidationService', function() {
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([]);
+  });
+
+  it('should catch non-string value for placeholder', function() {
+    customizationArguments.placeholder.value = 1;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: ('Placeholder text must be a string.')
+    }]);
+  });
+
+  it('should catch non-integer value for # rows', function() {
+    customizationArguments.rows.value = 1.5;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: ('Number of rows must be integral.')
+    }]);
+  });
+
+  it('should catch an out of range value for # rows', function() {
+    customizationArguments.rows.value = -1;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Number of rows must be between ' + minRows + ' and ' +
+        maxRows + '.')
+    }]);
   });
 });

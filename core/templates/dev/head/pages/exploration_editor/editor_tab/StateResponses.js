@@ -577,7 +577,7 @@ oppia.controller('StateResponses', [
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
 
-            $scope.stateContent = _state.content[0].value;
+            $scope.stateContent = _state.content.getHtml();
             $scope.inputTemplate = (
               oppiaExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
@@ -593,7 +593,7 @@ oppia.controller('StateResponses', [
             // Retrieve the interaction ID.
             var interactionId = stateInteractionIdService.savedMemento;
 
-            var rulesServiceName = 
+            var rulesServiceName =
               angularNameService.getNameOfInteractionRulesService(
                 interactionId)
 
