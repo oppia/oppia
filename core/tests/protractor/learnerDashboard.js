@@ -18,6 +18,7 @@
 
 var admin = require('../protractor_utils/admin.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
+var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');
 var player = require('../protractor_utils/player.js');
@@ -29,6 +30,8 @@ describe('Learner dashboard functionality', function() {
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
     users.createUser(
       'creator2@learnerDashboard.com', 'creator2learnerDashboard');
+    users.createModerator(
+      'creator3@learnerDashboard.com', 'creator3learnerDashboard');
 
     var USERNAME = 'creator1learnerDashboard';
     users.createAndLoginAdminUser('creator1@learnerDashboard.com', USERNAME);
@@ -92,6 +95,21 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     library.expectExplorationToBeVisible('About Oppia');
     users.logout();
+
+    users.login('creator3@learnerDashboard.com');
+    general.openEditor('3');
+    editor.navigateToSettingsTab();
+    element(by.css('.protractor-test-delete-exploration-button')).click();
+    element(by.css(
+      '.protractor-test-really-delete-exploration-button')).click();
+    browser.waitForAngular();
+    users.logout();
+
+    users.login('learner@learnerDashboard.com');
+    browser.get(general.LEARNER_DASHBOARD_URL);
+    browser.waitForAngular();
+    library.expectExplorationToBeHidden('Root Linear Coefficient Theorem');
+    users.logout();
   });
 
   it('display incomplete and completed collections', function() {
@@ -112,6 +130,7 @@ describe('Learner dashboard functionality', function() {
     browser.get(general.LEARNER_DASHBOARD_URL);
     general.acceptAlert();
     browser.waitForAngular();
+    general.waitForSystem();
     element(by.css('.protractor-test-incomplete-collection-section')).click();
     browser.waitForAngular();
     expect(element.all(by.css(
@@ -137,6 +156,7 @@ describe('Learner dashboard functionality', function() {
     element(by.css('.protractor-test-completed-section')).click();
     browser.waitForAngular();
     general.waitForSystem();
+    general.waitForSystem();
     element(by.css('.protractor-test-completed-collection-section')).click();
     browser.waitForAngular();
     expect(element.all(by.css(
@@ -159,7 +179,8 @@ describe('Learner dashboard functionality', function() {
     users.login('learner@learnerDashboard.com');
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
-    element(by.css('.protractor-test-collection-section')).click();
+    general.waitForSystem();
+    element(by.css('.protractor-test-incomplete-collection-section')).click();
     browser.waitForAngular();
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
@@ -183,6 +204,7 @@ describe('Learner dashboard functionality', function() {
     // dashboard.
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
+    general.waitForSystem();
     element(by.css('.protractor-test-subscriptions-section')).click();
     browser.waitForAngular();
     expect(element.all(by.css(

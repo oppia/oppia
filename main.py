@@ -77,7 +77,8 @@ class HomePageRedirectHandler(base.BaseHandler):
         if self.user_id and user_services.has_fully_registered(self.user_id):
             user_settings = user_services.get_user_settings(
                 self.user_id)
-            if user_settings.default_dashboard == constants.DASHBOARD_TYPE_CREATOR: # pylint: disable=line-too-long
+            default_dashboard = user_settings.default_dashboard
+            if default_dashboard == constants.DASHBOARD_TYPE_CREATOR:
                 self.redirect(feconf.CREATOR_DASHBOARD_URL)
             else:
                 self.redirect(feconf.LEARNER_DASHBOARD_URL)
