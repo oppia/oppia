@@ -182,8 +182,8 @@ def mark_exploration_as_completed(user_id, exp_id):
 def mark_collection_as_completed(user_id, collection_id):
     """Adds the collection id to the list of collections completed by the user
     unless the collection has already been completed or has been created/edited
-    by the user. It is also removed from the incomplete list and the play later list
-    (if present).
+    by the user. It is also removed from the incomplete list and the play later
+    list (if present).
 
     Args:
         user_id: str. The id of the user who completed the collection.
