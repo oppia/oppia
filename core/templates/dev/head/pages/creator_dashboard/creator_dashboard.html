@@ -221,7 +221,7 @@
             <div class="title-section"
                  style="background-color: <[exploration.thumbnail_bg_color]>;">
               <img class="thumbnail-image"
-                   ng-src="<[exploration.thumbnail_icon_url]>">
+                   ng-src="<[getCompleteThumbnailIconUrl(exploration.thumbnail_icon_url)]>">
               <h2 class="activity-title protractor-test-exp-summary-tile-title">
                 <span><[(exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40]></span>
               </h2>
