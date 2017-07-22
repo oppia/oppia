@@ -2964,6 +2964,46 @@ class Exploration(object):
 
         del self.states[state_name]
 
+    def get_trainable_states_dict(self, old_states):
+        """Retrieves the state names of all trainable states in an exploration
+        segregated into state names with changed and unchanged answer groups.
+
+        Args:
+            old_states: dict. List of State Domain objects.
+
+        Returns:
+            dict. The trainable states dict.
+        """
+        trainable_states_dict = {
+            'state_names_with_changed_answer_groups': [],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_states = self.states
+        for state_name in new_states:
+            new_state = new_states[state_name]
+            if not new_state.can_undergo_classification():
+                continue
+
+            # The case where a new state is added. When this happens, there wont
+            # be a corresponding state name in the older state dict.
+            try:
+                old_state = old_states[state_name]
+                old_training_data = old_state.get_training_data()
+                new_training_data = new_state.get_training_data()
+                if new_training_data != old_training_data:
+                    trainable_states_dict[
+                        'state_names_with_changed_answer_groups'].append(
+                            state_name)
+                else:
+                    trainable_states_dict[
+                        'state_names_with_unchanged_answer_groups'].append(
+                            state_name)
+            except KeyError:
+                trainable_states_dict[
+                    'state_names_with_changed_answer_groups'].append(state_name)
+
+        return trainable_states_dict
+
     # Methods relating to gadgets.
     def add_gadget(self, gadget_dict, panel):
         """Adds a gadget to the associated panel.

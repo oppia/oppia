@@ -76,68 +76,55 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
 
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
+    # def test_string_classifier_classification(self):
+    #     """All these responses trigger the string classifier."""
+    #
+    #     with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'it\'s a permutation of 3 elements'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'There are 3 options for the first ball, and 2 for the '
+    #                 'remaining two. So 3*2=6.'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('abc acb bac bca cbb cba'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('dunno, just guessed'))
 
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
-
-    def test_is_retraining_necessary(self):
-        """Test the is_retraining_necessary method."""
+    def test_create_jobs_and_update_mappings(self):
+        """Test the create_classifier_training_jobs method and
+        update_classifier_exploration_mappings method by triggering
+        update_exploration() method."""
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
-        training_data = state.get_training_data()
-        interaction_id = state.interaction.id
-        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-            'algorithm_id']
-        job_id = classifier_services.create_classifier_training_job(
-            algorithm_id, interaction_id, exploration.id, exploration.version,
-            'Home', training_data, feconf.TRAINING_JOB_STATUS_NEW)
 
-        # Test change in number of answer groups.
+        # Now, there should be no jobs in the data store.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 0)
+
+        # Modify such that job creation is triggered.
         state.interaction.answer_groups.insert(
             3, state.interaction.answer_groups[1])
-        self.assertTrue(classifier_services.is_retraining_necessary(
-            state, job_id))
+        answer_groups = []
+        for answer_group in state.interaction.answer_groups:
+            answer_groups.append(answer_group.to_dict())
+        change_list = [{
+            'cmd': 'edit_state_property',
+            'state_name': 'Home',
+            'property_name': 'answer_groups',
+            'new_value': answer_groups
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
-        # Test change in number of samples more than MIN_SAMPLE_TO_RETRAIN.
-        state = exploration.states['Home']
-        for (answer_group_index, answer_group) in enumerate(
-                state.interaction.answer_groups):
-            classifier_rule_spec_index = (
-                answer_group.get_classifier_rule_index())
-            if classifier_rule_spec_index is not None:
-                extra_training_data = ['someval'] * 20
-                state.interaction.answer_groups[answer_group_index].rule_specs[
-                    0].inputs['training_data'].extend(extra_training_data)
-        self.assertTrue(classifier_services.is_retraining_necessary(
-            state, job_id))
-
-    def test_add_to_queue(self):
-        """Test the add_to_training_queue method."""
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
-        state = exploration.states['Home']
-        classifier_services.add_to_training_queue(exploration)
-
-        # Since the exploration has only one trainable state, there should be
-        # only one job model in data store.
+        # There should be one job in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 1)
         for job in all_jobs:
             job_id = job.id
 
-        # Create classifier for state and then modify state to trigger
-        # re-training check.
+        # Create classifier as an effect of the job.
         classifier_data = {
             '_alpha': 0.1,
             '_beta': 0.001,
@@ -158,13 +145,20 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         }
         classifier_services.create_classifier(job_id, classifier_data)
 
-        # Modify such that re-training is triggered.
-        exploration.states['Home'].interaction.answer_groups.insert(
-            3, state.interaction.answer_groups[1])
-        classifier_services.add_to_training_queue(exploration)
-        # There are two jobs in the data store now.
-        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
-        self.assertEqual(all_jobs.count(), 2)
+        # Make a change to the exploration without changing the answer groups
+        # to trigger updation of mapping.
+        change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        # There should be one mapping in the data store now.
+        all_mappings = (
+            classifier_models.ClassifierExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 1)
 
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""

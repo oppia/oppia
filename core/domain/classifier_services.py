@@ -127,67 +127,50 @@ def classify_string_classifier_rule(state, normalized_answer):
     return None
 
 
-
-
-def add_to_training_queue(exploration):
-    """Checks all states of the exploration for re-training conditions and
-    creates ClassifierTrainingJobModel instances in the datastore
-    accordingly.
+def create_classifier_training_jobs(exploration, state_names):
+    """Creates ClassifierTrainingJobModel instances for all the state names
+    passed into the function.
 
     Args:
-        exploration: Exploration. Domain object for an exploration.
+        exploration: Exploration. The Exploration Domain object.
+        state_names: list. List of state names.
     """
+    exp_id = exploration.id
+    exp_version = exploration.version
     states = exploration.states
-    for state_name in states:
+    for state_name in state_names:
         state = states[state_name]
-        if not state.can_undergo_classification():
-            continue
-        exp_id = exploration.id
-        exp_version = exploration.version
         training_data = state.get_training_data()
         interaction_id = state.interaction.id
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
-        classifier = get_classifier_from_exploration_attributes(
-            exp_id, exp_version, state_name)
-        if classifier:
-            # Here, we pass classifier.id to the below function because the
-            # ClassifierDataModel instance is created with the job_id as ID.
-            if is_retraining_necessary(state, classifier.id):
-                create_classifier_training_job(algorithm_id, interaction_id,
-                                               exp_id, exp_version, state_name,
-                                               training_data,
-                                               feconf.TRAINING_JOB_STATUS_NEW)
-            else:
-                create_classifier_exploration_mapping(exp_id, exp_version+1,
-                                                      state_name, classifier.id)
-        else:
-            create_classifier_training_job(algorithm_id, interaction_id, exp_id,
-                                           exp_version, state_name,
-                                           training_data,
-                                           feconf.TRAINING_JOB_STATUS_NEW)
+        create_classifier_training_job(algorithm_id, interaction_id,
+                                       exp_id, exp_version, state_name,
+                                       training_data,
+                                       feconf.TRAINING_JOB_STATUS_NEW)
 
 
-def is_retraining_necessary(state, job_id):
-    """Checks whether the classifier needs to be trained again for a state.
+def update_classifier_exploration_mappings(exploration, state_names):
+    """Creates new ClassifierExplorationMappingModel instances for all the
+    state names passed into the function.
 
     Args:
-        state. State. Domain object for a state of the exploration.
-        job_id: str. ID of the ClassifierTrainingJob.
-
-    Returns:
-        bool. Whether the classifier needs to be re-trained.
+        exploration: Exploration. The Exploration Domain object.
+        state_names: list. List of state names.
     """
-    classifier_training_job = get_classifier_training_job_by_id(job_id)
-    new_training_data = state.get_training_data()
-    old_training_data = classifier_training_job.training_data
-
-    # NOTE: Right now, the retraining check is triggered even if there are any
-    # changes in the answer groups. This has to be checked in the end-to-end
-    # framework and optimized if required.
-    if new_training_data != old_training_data:
-        return True
-    return False
+    exp_id = exploration.id
+    exp_version = exploration.version
+    for state_name in state_names:
+        classifier = get_classifier_from_exploration_attributes(
+            exp_id, exp_version, state_name)
+        # If classifier does not exist for a state with an unchanged answer
+        # group, the only possibility is that the classifier has not been
+        # stored by the VM for the previous state yet. So, we dont need to do
+        # anything here.
+        if not classifier:
+            continue
+        create_classifier_exploration_mapping(exp_id, exp_version, state_name,
+                                              classifier.id)
 
 
 def get_classifier_from_model(classifier_data_model):

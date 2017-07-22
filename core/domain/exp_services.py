@@ -32,6 +32,7 @@ import StringIO
 import zipfile
 
 from core.domain import activity_services
+from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import feedback_services
@@ -792,6 +793,18 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
 
+    old_states_dicts = exploration_model.states
+    old_states = {}
+    for state_name in old_states_dicts:
+        old_states[state_name] = (exp_domain.State.from_dict(
+            old_states_dicts[state_name]))
+    trainable_states_dict = (exploration.get_trainable_states_dict(
+        old_states))
+    state_names_with_changed_answer_groups = trainable_states_dict[
+        'state_names_with_changed_answer_groups']
+    state_names_with_unchanged_answer_groups = trainable_states_dict[
+        'state_names_with_unchanged_answer_groups']
+
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
@@ -815,6 +828,13 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
+
+    if len(state_names_with_changed_answer_groups) != 0:
+        classifier_services.create_classifier_training_jobs(
+            exploration, state_names_with_changed_answer_groups)
+    if len(state_names_with_unchanged_answer_groups) != 0:
+        classifier_services.update_classifier_exploration_mappings(
+            exploration, state_names_with_unchanged_answer_groups)
 
 
 def _create_exploration(
