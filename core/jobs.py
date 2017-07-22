@@ -994,7 +994,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     def put(self):
         """Stores the current realtime layer entity into the database.
-        
+
         Raises:
             Exception: Self has an invalid realtime layer id.
         """
@@ -1122,7 +1122,7 @@ class BaseContinuousComputationManager(object):
     def _get_active_realtime_index(cls):
         """Returns the registered realtime id of this class, creating one if it
         doesn't exist.
-        
+
         Returns:
             str. The active realtime layer id of this class.
         """
