@@ -17,9 +17,10 @@
    message domain objects.
  */
 
-oppia.factory('FeedbackMessageObjectFactory', [function() {
-  var FeedbackMessage = function(text, suggestionHtml, currentContentHtml,
-    description,authorUsername, authorPictureDataUrl, createdOn) {
+oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
+  var FeedbackMessage = function(
+    text, suggestionHtml, currentContentHtml, description, authorUsername,
+    authorPictureDataUrl, createdOn) {
     this.text = text;
     this.suggestionHtml = suggestionHtml;
     this.currentContentHtml = currentContentHtml;
@@ -36,22 +37,16 @@ oppia.factory('FeedbackMessageObjectFactory', [function() {
       new Date());
   };
 
-  FeedbackMessage.createFromBackendDicts = function(
-    feedbackMessageBackendDicts) {
-    var FeedbackMessages = [];
-    for (index = 0; index < feedbackMessageBackendDicts.length; index++) {
-      FeedbackMessages.push(new FeedbackMessage(
-        feedbackMessageBackendDicts[index].text,
-        feedbackMessageBackendDicts[index].suggestion_html,
-        feedbackMessageBackendDicts[index].current_content_html,
-        feedbackMessageBackendDicts[index].description,
-        feedbackMessageBackendDicts[index].author_username,
-        feedbackMessageBackendDicts[index].author_picture_data_url,
-        feedbackMessageBackendDicts[index].created_on
-      ));
-    }
-
-    return FeedbackMessages;
+  FeedbackMessage.createFromBackendDict = function(
+    feedbackMessageBackendDict) {
+    return new FeedbackMessage(
+      feedbackMessageBackendDict.text,
+      feedbackMessageBackendDict.suggestion_html,
+      feedbackMessageBackendDict.current_content_html,
+      feedbackMessageBackendDict.description,
+      feedbackMessageBackendDict.author_username,
+      feedbackMessageBackendDict.author_picture_data_url,
+      feedbackMessageBackendDict.created_on);
   };
 
   return FeedbackMessage;

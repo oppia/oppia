@@ -227,7 +227,7 @@
               </div>
             </md-card>
 
-            <div ng-repeat="tile in incompleteExplorationsList | orderBy:sortExplorationFunction:isCurrentExpSortDescending | limitTo:PAGE_SIZE:startIncompleteExpIndex track by tile.id"
+            <div ng-repeat="tile in incompleteExplorationsList | orderBy:getValueOfExplorationSortKey:isCurrentExpSortDescending | limitTo:PAGE_SIZE:startIncompleteExpIndex track by tile.id"
                  style="display: inline-block; margin-left: 1px;"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
               <i class="remove-icon fa fa-times"
@@ -285,7 +285,7 @@
               </div>
             </md-card>
 
-            <div ng-repeat="tile in completedExplorationsList | orderBy:sortExplorationFunction:isCurrentExpSortDescending track by tile.id"
+            <div ng-repeat="tile in completedExplorationsList | orderBy:getValueOfExplorationSortKey:isCurrentExpSortDescending track by tile.id"
                  style="display: inline-block; margin-left: 1px;">
               <exploration-summary-tile
                                       exploration-id="tile.id"
@@ -442,7 +442,7 @@
             </md-card>
 
             <md-card class="oppia-subscription-card"
-                     ng-repeat="subscription in subscriptionsList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending"
+                     ng-repeat="subscription in subscriptionsList | orderBy:getValueOfSubscriptionSortKey:isCurrentSubscriptionSortDescending"
                      style="margin: 0 8px 0 4px; width: 197px;">
               <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank">
                 <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
@@ -483,20 +483,20 @@
                   <span ng-if="!thread.lastMessageRead">
                     <strong><[thread.authorLastMessage | truncate:7]></strong>
                   </span>
-                  <span class="feedback-thread-message-count">(<[thread.totalNoOfMessages]>)</span>
+                  <span class="feedback-thread-message-count">(<[thread.totalMessageCount]>)</span>
                 </td>
                 <td class="col-lg-6 col-md-6 col-sm-6" style="width: 58%;">
-                  <span ng-if="thread.totalNoOfMessages > 1 && thread.secondLastMessageRead && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
-                  <span class="protractor-test-feedback-exploration" ng-if="thread.totalNoOfMessages === 1 && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
-                  <span ng-if="thread.totalNoOfMessages === 1 && !thread.lastMessageRead">
+                  <span ng-if="thread.totalMessageCount > 1 && thread.secondLastMessageRead && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
+                  <span class="protractor-test-feedback-exploration" ng-if="thread.totalMessageCount === 1 && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
+                  <span ng-if="thread.totalMessageCount === 1 && !thread.lastMessageRead">
                     <strong><[thread.explorationTitle]> -</strong>
                   </span>
-                  <span ng-if="thread.totalNoOfMessages > 1 && (!thread.lastMessageRead || !thread.secondLastMessageRead)">
+                  <span ng-if="thread.totalMessageCount > 1 && (!thread.lastMessageRead || !thread.secondLastMessageRead)">
                     <strong><[thread.explorationTitle]> -</strong>
                   </span>
                   <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
-                  <span ng-if="!thread.lastMessageText && thread.totalNoOfMessages === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
-                  <span ng-if="!thread.lastMessageText && thread.totalNoOfMessages !== 1"><i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: getHumanReadableStatus(thread.status)}"></i></span>
+                  <span ng-if="!thread.lastMessageText && thread.totalMessageCount === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
+                  <span ng-if="!thread.lastMessageText && thread.totalMessageCount !== 1"><i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: getHumanReadableStatus(thread.status)}"></i></span>
                 <td class="col-lg-2 col-md-2 col-sm-2">
                   <span><[getLocaleAbbreviatedDatetimeString(thread.lastUpdated)]></span>
                 </td>
@@ -654,8 +654,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_thread/FeedbackThreadObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_message/FeedbackMessageObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_message/FeedbackMessageSummaryObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/learner_dashboard/LearnerDashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/learner_dashboard/LearnerDashboard.js"></script>

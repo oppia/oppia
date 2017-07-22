@@ -13,33 +13,35 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for FeedbackThreadObjectFactory.
+ * @fileoverview Tests for FeedbackThreadSummaryObjectFactory.
  */
 
 describe('Feedback thread object factory', function() {
-  var FeedbackThreadObjectFactory = null;
+  var FeedbackThreadSummaryObjectFactory = null;
 
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
+    FeedbackThreadSummaryObjectFactory = $injector.get(
+      'FeedbackThreadSummaryObjectFactory');
   }));
 
   it('should update the summary of the thread on addition of a ' +
      ' message', function() {
-    feedbackThread = FeedbackThreadObjectFactory.create(
+    feedbackThread = FeedbackThreadSummaryObjectFactory.create(
       'open', 'Test user 1', new Date(), 'last message', 2, false, false,
       'Test user 2', 'Test user 2', 'Test exploration name', '0', 'thread_id');
 
-    feedbackThread.updateSummaryOnNewMessage('Looks good!', 'Test user 3');
+    feedbackThread.updateThreadSummaryOnAdditionOfNewMessage(
+      'Looks good!', 'Test user 3');
     expect(feedbackThread.authorLastMessage).toEqual('Test user 3');
     expect(feedbackThread.lastMessageText).toEqual('Looks good!');
-    expect(feedbackThread.totalNoOfMessages).toEqual(3);
+    expect(feedbackThread.totalMessageCount).toEqual(3);
   });
 
-  it('should fetch the feedback thread domain objects from backend ' +
-     'dicts', function() {
-    threadSummary1 = {
+  it('should fetch the feedback thread domain object from the backend ' +
+     'summary dict', function() {
+    threadSummary = {
       status: 'open',
       original_author_id: 'Test user 1',
       last_updated: 1000,
@@ -54,33 +56,15 @@ describe('Feedback thread object factory', function() {
       thread_id: 'thread_id_1'
     };
 
-    threadSummary2 = {
-      status: 'open',
-      original_author_id: 'Test user 3',
-      last_updated: 2000,
-      last_messge_text: 'last message',
-      total_no_of_messages: 3,
-      last_message_read: false,
-      second_last_message_read: true,
-      author_last_message: 'Test user 4',
-      author_second_last_message: 'Test user 3',
-      exploration_title: 'Sample exploration 2',
-      exploration_id: '1',
-      thread_id: 'thread_id_2'
-    };
+    feedbackThread = FeedbackThreadSummaryObjectFactory.createFromBackendDict(
+      threadSummary);
 
-    feedbackThreads = FeedbackThreadObjectFactory.createFromBackendDicts(
-      [threadSummary1, threadSummary2]);
-
-    expect(feedbackThreads[0].explorationTitle).toEqual(
+    expect(feedbackThread.explorationTitle).toEqual(
       'Sample exploration 1');
-    expect(feedbackThreads[1].explorationTitle).toEqual(
-      'Sample exploration 2');
-    // expect(feedbackThreads[0].originalAuthorId).toEqual(
-    //   'Test user 1');
-    expect(feedbackThreads[1].originalAuthorId).toEqual(
-      'Test user 3');
-    expect(feedbackThreads[0].totalNoOfMessages).toEqual(2);
-    expect(feedbackThreads[1].totalNoOfMessages).toEqual(3);
+    expect(feedbackThread.originalAuthorId).toEqual(
+      'Test user 1');
+    expect(feedbackThread.lastMessageText).toEqual(
+      'last message');
+    expect(feedbackThread.totalMessageCount).toEqual(2);
   });
 });

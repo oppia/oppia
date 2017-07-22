@@ -17,16 +17,16 @@
    domain objects.
  */
 
-oppia.factory('FeedbackThreadObjectFactory', [function() {
+oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   var FeedbackThread = function(status, originalAuthorId, lastUpdated,
-    lastMessageText, totalNoOfMessages, lastMessageRead,
+    lastMessageText, totalMessageCount, lastMessageRead,
     secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
     explorationTitle, explorationId, threadId) {
     this.status = status;
     this.originalAuthorId = originalAuthorId;
     this.lastUpdated = lastUpdated;
     this.lastMessageText = lastMessageText;
-    this.totalNoOfMessages = totalNoOfMessages;
+    this.totalMessageCount = totalMessageCount;
     this.lastMessageRead = lastMessageRead;
     this.secondLastMessageRead = secondLastMessageRead;
     this.authorLastMessage = authorLastMessage;
@@ -36,48 +36,49 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
     this.threadId = threadId;
   };
 
-  FeedbackThread.prototype.updateSummaryOnNewMessage = function(
+  FeedbackThread.prototype.markAllTheLastTwoMessagesAsRead = function() {
+    if (this.authorSecondLastMessage) {
+      this.secondLastMessageRead = true;
+    }
+    this.lastMessageRead = true;
+  }
+
+  FeedbackThread.prototype.updateThreadSummaryOnAdditionOfNewMessage = function(
     lastMessageText, authorLastMessage) {
     this.lastMessageText = lastMessageText;
     this.lastUpdated = new Date();
     this.authorSecondLastMessage = this.authorLastMessage;
     this.authorLastMessage = authorLastMessage;
-    this.totalNoOfMessages += 1;
+    this.totalMessageCount += 1;
     this.lastMessageRead = true;
     this.secondLastMessageRead = true;
   };
 
   FeedbackThread.create = function(
-    status, originalAuthorId, lastUpdated, lastMessageText, totalNoOfMessages,
+    status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
     lastMessageRead, secondLastMessageRead, authorLastMessage,
     authorSecondLastMessage, explorationTitle, explorationId, threadId) {
     return new FeedbackThread(status, originalAuthorId, lastUpdated,
-      lastMessageText, totalNoOfMessages, lastMessageRead,
+      lastMessageText, totalMessageCount, lastMessageRead,
       secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
   }
 
-  FeedbackThread.createFromBackendDicts = function(
-    feedbackThreadBackendDicts) {
-    var FeedbackThreads = [];
-    for (index = 0; index < feedbackThreadBackendDicts.length; index++) {
-      FeedbackThreads.push(new FeedbackThread(
-        feedbackThreadBackendDicts[index].status,
-        feedbackThreadBackendDicts[index].original_author_id,
-        feedbackThreadBackendDicts[index].last_updated,
-        feedbackThreadBackendDicts[index].last_message_text,
-        feedbackThreadBackendDicts[index].total_no_of_messages,
-        feedbackThreadBackendDicts[index].last_message_read,
-        feedbackThreadBackendDicts[index].second_last_message_read,
-        feedbackThreadBackendDicts[index].author_last_message,
-        feedbackThreadBackendDicts[index].author_second_last_message,
-        feedbackThreadBackendDicts[index].exploration_title,
-        feedbackThreadBackendDicts[index].exploration_id,
-        feedbackThreadBackendDicts[index].thread_id
-      ));
-    }
-
-    return FeedbackThreads;
+  FeedbackThread.createFromBackendDict = function(
+    feedbackThreadBackendDict) {
+    return new FeedbackThread(
+      feedbackThreadBackendDict.status,
+      feedbackThreadBackendDict.original_author_id,
+      feedbackThreadBackendDict.last_updated,
+      feedbackThreadBackendDict.last_message_text,
+      feedbackThreadBackendDict.total_no_of_messages,
+      feedbackThreadBackendDict.last_message_read,
+      feedbackThreadBackendDict.second_last_message_read,
+      feedbackThreadBackendDict.author_last_message,
+      feedbackThreadBackendDict.author_second_last_message,
+      feedbackThreadBackendDict.exploration_title,
+      feedbackThreadBackendDict.exploration_id,
+      feedbackThreadBackendDict.thread_id);
   };
 
   return FeedbackThread;
