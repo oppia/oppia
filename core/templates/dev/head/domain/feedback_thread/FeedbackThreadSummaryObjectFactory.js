@@ -36,7 +36,7 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
     this.threadId = threadId;
   };
 
-  FeedbackThread.prototype.markAllTheLastTwoMessagesAsRead = function() {
+  FeedbackThread.prototype.markTheLastTwoMessagesAsRead = function() {
     if (this.authorSecondLastMessage) {
       this.secondLastMessageRead = true;
     }
