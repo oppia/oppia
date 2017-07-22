@@ -1,1 +1,0 @@
-python2.7 -m unittest discover -s bs4 && ./convert-py3k

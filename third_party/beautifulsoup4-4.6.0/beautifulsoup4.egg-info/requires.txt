@@ -1,6 +1,0 @@
-
-[html5lib]
-html5lib
-
-[lxml]
-lxml

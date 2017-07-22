@@ -1,5 +1,0 @@
-language: node_js
-node_js:
-- 0.10
-before_install: npm install -g gulp testem
-script: "gulp travis && testem ci -f config/testem.json"

@@ -1,5 +1,0 @@
-generator/shell/node_modules/*
-generator/shell/build*
-generator/shell/sf2*
-generator/shell/testarea*
-soundfont-*

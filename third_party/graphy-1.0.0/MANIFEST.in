@@ -1,5 +1,0 @@
-include MANIFEST.in *.py README
-
-recursive-include graphy *.py *.tmpl *.txt *.h
-recursive-include examples *
-recursive-exclude . *.pyc *~ *.aux

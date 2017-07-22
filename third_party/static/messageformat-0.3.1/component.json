@@ -1,9 +1,0 @@
-{
-  "name": "messageformat",
-  "repo": "SlexAxton/messageformat.js",
-  "author": "Alex Sexton <alexsexton@gmail.com>",
-  "description": "PluralFormat and SelectFormat Message and i18n Tool - A JavaScript Implemenation of the ICU standards.",
-  "version": "0.3.1",
-  "scripts": ["messageformat.js"],
-  "main": "messageformat.js"
-}

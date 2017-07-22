@@ -1,3 +1,0 @@
-include distribute_setup.py
-include mapreduce/include.yaml
-recursive-include mapreduce/static *.html *.css *.js
