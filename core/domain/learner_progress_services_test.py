@@ -170,7 +170,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             play_later_services.get_all_play_later_exploration_ids(
                 self.user_id), [self.EXP_ID_3])
-        
+
         # Test that on adding an incomplete exploration to the completed list
         # it gets removed from the incomplete list.
         learner_progress_services.mark_exploration_as_completed(

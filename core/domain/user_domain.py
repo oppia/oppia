@@ -239,7 +239,7 @@ class PlayLaterActivities(object):
         self.collection_ids = collection_ids
 
     def add_exploration_id(
-        self, exploration_id, position_to_be_inserted=None):
+            self, exploration_id, position_to_be_inserted=None):
         """Inserts the exploration id at the given position. If position is not
         specified, the exploration id is added at the end."""
         if position_to_be_inserted:

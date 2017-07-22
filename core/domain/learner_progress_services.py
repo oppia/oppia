@@ -144,7 +144,8 @@ def save_last_playthrough_information(last_playthrough_information):
 def mark_exploration_as_completed(user_id, exp_id):
     """Adds the exploration id to the completed list of the user unless the
     exploration has already been completed or has been created/edited by the
-    user. It is also removed from the incomplete list (if present).
+    user. It is also removed from the incomplete list and the play later list
+    (if present).
 
     Args:
         user_id: str. The id of the user who has completed the exploration.
@@ -181,7 +182,8 @@ def mark_exploration_as_completed(user_id, exp_id):
 def mark_collection_as_completed(user_id, collection_id):
     """Adds the collection id to the list of collections completed by the user
     unless the collection has already been completed or has been created/edited
-    by the user. It is also removed from the incomplete list (if present).
+    by the user. It is also removed from the incomplete list and the play later list
+    (if present).
 
     Args:
         user_id: str. The id of the user who completed the collection.
@@ -220,7 +222,8 @@ def mark_exploration_as_incomplete(
     """Adds the exploration id to the incomplete list of the user unless the
     exploration has been already completed or has been created/edited by the
     user. If the exploration is already present in the incomplete list, just the
-    details associated with it are updated.
+    details associated with it are updated. If the exploration is present in the
+    play later list, it is removed.
 
     Args:
         user_id: str. The id of the user who partially completed the
@@ -277,6 +280,7 @@ def mark_collection_as_incomplete(user_id, collection_id):
     """Adds the collection id to the list of collections partially completed by
     the user unless the collection has already been completed or has been
     created/edited by the user or is already present in the incomplete list.
+    If the collection is present in the play later list, it is removed.
 
     Args:
         user_id: str. The id of the user who partially completed the collection.

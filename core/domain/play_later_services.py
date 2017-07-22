@@ -58,7 +58,7 @@ def save_play_later_activities(play_later_activities):
 
 
 def mark_exploration_to_be_played_later(
-    user_id, exploration_id, position_to_be_inserted=None):
+        user_id, exploration_id, position_to_be_inserted=None):
     """Adds the exploration id to the play later list of the user at the given
     position. If the position is not specified, the exploration gets added at
     the end. If the exploration is already completed or currently being
@@ -106,7 +106,7 @@ def mark_exploration_to_be_played_later(
 
 
 def mark_collection_to_be_played_later(
-    user_id, collection_id, position_to_be_inserted=None):
+        user_id, collection_id, position_to_be_inserted=None):
     """Adds the collection id to the play later list of the user at the given
     position. If the position is not specified, the collection gets added at
     the end. If the collection is already completed or currently being
@@ -199,7 +199,7 @@ def get_all_play_later_exploration_ids(user_id):
 
     Returns:
         list(str). A list of the ids of the explorations that are in the play
-            later list of the user. 
+            later list of the user.
     """
     play_later_activities_model = user_models.PlayLaterActivitiesModel.get(
         user_id, strict=False)
@@ -222,7 +222,7 @@ def get_all_play_later_collection_ids(user_id):
 
     Returns:
         list(str). A list of the ids of the collections that are in the play
-            later list of the user. 
+            later list of the user.
     """
     play_later_activities_model = user_models.PlayLaterActivitiesModel.get(
         user_id, strict=False)
