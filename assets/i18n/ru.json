@@ -15,6 +15,7 @@
 	"I18N_CREATE_YES_PLEASE": "Да, пожалуйста!",
 	"I18N_DASHBOARD_COLLECTIONS": "коллекции",
 	"I18N_DASHBOARD_EXPLORATIONS": "исследования",
+	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "Похоже, вы еще не создали никаких исследований. Давайте начнем!",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY": "Сортировать по",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_CATEGORY": "Категория",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED": "Последнее обновление",
