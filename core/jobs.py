@@ -774,7 +774,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         Args:
             entity: BaseModel. An entity this job type is responsible for
-            handling.
+                handling.
 
         Returns:
             bool. Whether the entity was queued before the job was created.
