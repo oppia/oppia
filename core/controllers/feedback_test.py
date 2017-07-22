@@ -771,7 +771,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             unsuccessful_accept_thread_id, False, csrf_token,
             expect_errors=True, expected_status_int=401)
         self.assertIn(
-            'You do not have the credentials',
+            'You do not have credentials',
             response_dict['error'])
         self.logout()
 
