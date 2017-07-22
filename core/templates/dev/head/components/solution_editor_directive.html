@@ -15,20 +15,7 @@
         <strong>
           <[solution.answerIsExclusive ? 'Only' : 'One']> Solution is...
         </strong>
-        <span ng-if="objectType !== 'CodeString' &&
-                     objectType !== 'Graph' &&
-                     objectType !== 'UnicodeString'">
-          <[solution.correctAnswer]>
-        </span>
-        <span ng-if="objectType === 'CodeString'">
-          <[solution.correctAnswer.code]>
-        </span>
-        <span ng-if="objectType === 'Graph'">
-          [Graph Object]
-        </span>
-        <span ng-if="objectType === 'UnicodeString'">
-          <[solution.correctAnswer.latex]>
-        </span>
+        <span angular-html-bind="solutionCorrectAnswerHtml"></span>
         <br>
         <strong>Explanation is...</strong>
         <span angular-html-bind="solution.explanation"></span>
@@ -46,33 +33,6 @@
                 ng-options="(item ? 'Only' : 'One') for item in [true, false]">
         </select>
         <strong>Solution is...</strong>
-        <div ng-if="!interactionHtml">
-          <object-editor ng-if="objectType === 'UnicodeString'"
-                         obj-type="<[objectType]>"
-                         init-args="{choices: ruleDescriptionChoices}"
-                         is-editable="true"
-                         always-editable="true"
-                         value="solution.correctAnswer.latex"
-                         style="color: black;">
-          </object-editor>
-          <object-editor ng-if="objectType === 'CodeString'"
-                         obj-type="<[objectType]>"
-                         init-args="{choices: ruleDescriptionChoices}"
-                         is-editable="true"
-                         always-editable="true"
-                         value="solution.correctAnswer.code"
-                         style="color: black;">
-          </object-editor>
-          <object-editor ng-if="objectType === 'NormalizedString' ||
-                                objectType === 'Real'"
-                         obj-type="<[objectType]>"
-                         init-args="{choices: ruleDescriptionChoices}"
-                         is-editable="true"
-                         always-editable="true"
-                         value="solution.correctAnswer"
-                         style="color: black;">
-          </object-editor>
-        </div>
         <span angular-html-bind="interactionHtml"></span>
         <br>
         <strong>Explanation is...</strong>

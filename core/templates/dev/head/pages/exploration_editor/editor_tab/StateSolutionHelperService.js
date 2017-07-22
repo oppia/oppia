@@ -17,19 +17,24 @@
  */
 
 oppia.constant('SUPPORTED_INTERACTIONS', [
-    'InteractiveMap',
-    'MusicNotesInput',
-    'GraphInput',
-    'SetInput',
-    'MathExpressionInput',
-    'MultipleChoiceInput',
-    'ImageClickInput',
-    'ItemSelectionInput'
+  'InteractiveMap',
+  'MusicNotesInput',
+  'GraphInput',
+  'SetInput',
+  'MathExpressionInput',
+  'MultipleChoiceInput',
+  'ImageClickInput',
+  'ItemSelectionInput',
+  'LogicProof'
 ]);
 
-oppia.constant('UNSUPPORTED_INTERACTION_OBJECT_TYPES', {
+oppia.constant('INTERACTION_OBJECT_TYPES', {
   CodeRepl: 'CodeString',
+  GraphInput: 'Graph',
+  ImageClickInput: 'ImageWithRegions',
   PencilCodeEditor: 'CodeString',
+  MathExpressionInput: 'UnicodeString',
+  MusicNotesInput: 'MusicPhrase',
   NumericInput: 'Real',
   TextInput: 'NormalizedString',
   LogicProof: 'LogicQuestion'
@@ -37,40 +42,51 @@ oppia.constant('UNSUPPORTED_INTERACTION_OBJECT_TYPES', {
 
 oppia.factory('StateSolutionHelperService', [
   'oppiaHtmlEscaper', 'responsesService', 'stateInteractionIdService',
-  'SUPPORTED_INTERACTIONS', 'UNSUPPORTED_INTERACTION_OBJECT_TYPES',
+  'explorationContextService', 'editorContextService', '$injector',
+  'explorationStatesService', 'angularNameService', 'stateSolutionService',
+  'AnswerClassificationService', 'alertsService',
+  'SUPPORTED_INTERACTIONS', 'INTERACTION_OBJECT_TYPES',
   function(oppiaHtmlEscaper, responsesService, stateInteractionIdService,
-    SUPPORTED_INTERACTIONS, UNSUPPORTED_INTERACTION_OBJECT_TYPES) {
+    explorationStatesService, editorContextService, $injector,
+    explorationContextService, angularNameService, stateSolutionService,
+    AnswerClassificationService, alertsService,
+    SUPPORTED_INTERACTIONS, INTERACTION_OBJECT_TYPES) {
     return {
       isSupportedInteraction: function (id) {
-        return (SUPPORTED_INTERACTIONS.indexOf(id) === -1);
+        return (SUPPORTED_INTERACTIONS.indexOf(id) !== -1);
       },
-      getUnsupportedInteractionObjectType: function (id) {
-        return UNSUPPORTED_INTERACTION_OBJECT_TYPES[id];
+      getInteractionObjectType: function (id) {
+        return INTERACTION_OBJECT_TYPES[id];
       },
-      getCorrectAnswer: function (solution) {
-        var correctAnswer = '';
-        var interactionId = stateInteractionIdService.savedMemento;
-        if (interactionId === 'GraphInput') {
-          correctAnswer = '[Graph Object]';
-        } else if (interactionId === 'MultipleChoiceInput') {
-          correctAnswer = (
-            oppiaHtmlEscaper.objToEscapedJson(
-              responsesService.getAnswerChoices()[solution.correctAnswer]
-              .label));
-        } else if (interactionId === 'MathExpressionInput') {
-          correctAnswer = solution.correctAnswer.latex;
-        } else if (interactionId === 'CodeRepl' ||
-          interactionId === 'PencilCodeEditor') {
-          correctAnswer = solution.correctAnswer.code;
-        } else if (interactionId === 'MusicNotesInput') {
-          correctAnswer = '[Music Notes Object]';
-        } else if (interactionId === 'ImageClickInput') {
-          correctAnswer = solution.correctAnswer.clickedRegions;
+      getCorrectAnswerObject: function(answer, objectType) {
+        if (objectType === 'CodeString') {
+          return {
+            code: answer,
+            output: '',
+            evaluation: '',
+            error: ''
+          }
         } else {
-          correctAnswer = (
-            oppiaHtmlEscaper.objToEscapedJson(solution.correctAnswer));
+          return answer;
         }
-        return correctAnswer;
+      },
+      verifyAndSaveAnswer: function(explorationId, state, correctAnswer) {
+        var interactionId = stateInteractionIdService.savedMemento;
+        var rulesServiceName = (
+          angularNameService.getNameOfInteractionRulesService(interactionId));
+        // Inject RulesService dynamically.
+        var rulesService = $injector.get(rulesServiceName);
+        AnswerClassificationService.getMatchingClassificationResult(
+          explorationId, state, correctAnswer, true, rulesService
+        ).then(function(result) {
+          if (editorContextService.getActiveStateName() !== (
+              result.outcome.dest)) {
+            stateSolutionService.saveDisplayedValue();
+          } else {
+            alertsService.addInfoMessage('That solution does not lead ' +
+              'to the next state!');
+          }
+        });
       }
     }
   }]);

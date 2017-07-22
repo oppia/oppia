@@ -154,9 +154,6 @@ oppia.controller('StateInteraction', [
           updateDefaultTerminalStateContentIfEmpty();
         }
         stateInteractionIdService.saveDisplayedValue();
-        if (stateSolutionService.displayed) {
-          stateSolutionService.saveDisplayedValue();
-        }
       }
 
       stateCustomizationArgsService.saveDisplayedValue();

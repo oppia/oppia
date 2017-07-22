@@ -1,19 +1,18 @@
 <div ng-controller="StateSolution">
   <div ng-if="!isCurrentInteractionLinear() &&
-              stateHintsService.displayed.length > 0 &&
-              objectType !== 'LogicQuestion'">
+              stateHintsService.displayed.length > 0">
     <div class="oppia-editor-header">
       <strong>Solution</strong>
     </div>
     <md-card class="oppia-editor-card-with-avatar">
       <div class="oppia-editor-card-body">
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
-            ng-if="solutionIsSpecified &&
+            ng-if="stateSolutionService.savedMemento &&
                    stateSolutionService.savedMemento.explanation">
-          <li ng-class="!isActive"
+          <li ng-class="!inlineSolutionEditorIsActive"
               class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
               style="margin-top: 0;">
-            <a ng-click="toggleIsActive()"
+            <a ng-click="toggleInlineSolutionEditorIsActive()"
                class="oppia-rule-tab">
               <div class="oppia-response-header-block">
                 <div class="oppia-response-header">
@@ -27,7 +26,7 @@
               </div>
             </a>
 
-            <div ng-if="isActive">
+            <div ng-if="inlineSolutionEditorIsActive">
               <div class="oppia-editor-card-section">
                 <solution-editor solution="stateSolutionService.savedMemento"
                                  object-type="objectType"
