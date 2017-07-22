@@ -412,18 +412,6 @@ oppia.controller('StateInteraction', [
 
         $rootScope.$broadcast('updateAnswerChoices', _answerChoices);
       } 
-      // else if ($scope.interactionId === 'LabelingInput') {
-      //   $rootScope.$broadcast(
-      //     'updateAnswerChoices',
-      //     currentCustomizationArgs.imageAndLabels.value.labeledRegions.map(function(lbl) {
-      //       console.log(lbl);
-      //       return {
-      //         val: lbl.label,
-      //         label: lbl.label
-      //       };
-      //     })
-      //   );
-      // }
        else if ($scope.interactionId === 'ItemSelectionInput') {
         $rootScope.$broadcast(
           'updateAnswerChoices',
