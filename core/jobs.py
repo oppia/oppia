@@ -798,36 +798,43 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
     @classmethod
     def from_json(cls, input_shard_state):
-        """Uses the given input_shard_state to instantiate this class as a new
-        shard.
+        """Creates an instance of the InputReader for the given input shard
+        state.
 
         Args:
-            input_shard_state: dict(str : *). TODO(brianrodri): Document.
+            input_shard_state: dict(str : *). The InputReader state as a
+                dict-like object.
 
         Returns:
-            *. An entity of the class which calls this method.
+            *. An instance of the InputReader configured using the values of
+                json.
         """
         return cls(input_readers.DatastoreInputReader.from_json(
             input_shard_state[cls._READER_LIST_PARAM]))
 
     def to_json(self):
-        """Returns JSON form of data."""
+        """Returns an input shard state for the remaining inputs.
+
+        Returns:
+            dict(str : *). A json-izable version of the remaining InputReader.
+        """
         return {
             self._READER_LIST_PARAM: self._reader_list.to_json()
         }
 
     @classmethod
     def split_input(cls, mapper_spec):
-        """Returns new input readers which will split the work the mapper_spec
-        is responsible for.
+        """Returns a list of input readers.
+
+        This method creates a list of input readers, each for one shard. It
+        attempts to split inputs among readers evenly.
 
         Args:
-            mapper_spec: mapreduce_spec.mapper. The original mapreduce
-                configuration to split.
+            mapper_spec: model.MapperSpec. Specifies the inputs and additional
+                parameters to define the behavior of input readers.
 
         Returns:
-            list(MultipleDatastoreEntitiesInputReader). Each ready to handle
-                subsets which, taken together, span all of mapper_spec's inputs.
+            list(InputReaders). None or [] when no input data can be found.
         """
         params = mapper_spec.params
         entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
@@ -848,6 +855,21 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
     @classmethod
     def validate(cls, unused_mapper_spec):
+        """Validates mapper spec and all mapper parameters.
+
+        Input reader parameters are expected to be passed as "input_reader"
+        subdictionary in mapper_spec.params.
+
+        Pre 1.6.4 API mixes input reader parameters with all other parameters.
+        Thus to be compatible, input reader check mapper_spec.params as well and
+        issue a warning if "input_reader" subdicationary is not present.
+
+        Args:
+            mapper_spec: model.MapperSpec. The MapperSpec for this InputReader.
+
+        Raises:
+            BadReaderParamsError: Required parameters are missing or invalid.
+        """
         return True  # TODO
 
 
@@ -925,11 +947,10 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def get_realtime_id(cls, layer_index, raw_entity_id):
-        """Returns a valid id for identifying the entity with the given raw id
-        from the given active realtime datastore layer.
+        """Returns a valid id for the given (realtime layer, entity) pair.
 
         Args:
-            layer_index: int. The realtime layer id, should be either 0 or 1.
+            layer_index: int. The realtime layer id, one of: 0, 1.
             raw_entity_id: int. The id of an entity that is to be stored in the
                 given realtime layer.
 
@@ -956,7 +977,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     @classmethod
     def _is_valid_realtime_id(cls, realtime_id):
         """Returns whether the realtime_id represents a valid (realtime layer,
-            entity) pair.
+        entity) pair.
 
         Args:
             realtime_id: str. The id to query.
@@ -969,7 +990,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
     @classmethod
     def get(cls, entity_id, strict=True):
-        """Gets an entity by id.
+        """Gets an entity by its id.
 
         Args:
             entity_id: str. Unique identifier for an entity.
@@ -977,13 +998,13 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
                 id exists in the datastore. Default is True.
 
         Returns:
-            None, if strict == False and no undeleted entity with the given id
-            exists in the datastore. Otherwise, the entity instance that
-            corresponds to the given id.
+            * or None. The entity instance that corresponds to the given id, or
+                None if strict == False and no undeleted entity with the given
+                id exists in the datastore.
 
         Raises:
-            base_models.BaseModel.EntityNotFoundError: if strict == True and
-                no undeleted entity with the given id exists in the datastore.
+            base_models.BaseModel.EntityNotFoundError: strict == True and no
+                undeleted entity with the given id exists in the datastore.
         """
         if not cls._is_valid_realtime_id(entity_id):
             raise ValueError('Invalid realtime id: %s' % entity_id)
