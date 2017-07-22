@@ -162,7 +162,7 @@ class SuggestionActionHandler(base.BaseHandler):
     _ACCEPT_ACTION = 'accept'
     _REJECT_ACTION = 'reject'
 
-    @acl_decorators.can_manage_suggestions_on_exploration
+    @acl_decorators.can_edit_exploration
     def put(self, exploration_id, thread_id):
         action = self.payload.get('action')
         if action == self._ACCEPT_ACTION:

@@ -290,13 +290,16 @@ def can_edit_exploration(handler):
             escaped_state_name)
         return bool(state_name in state_name_list)
 
-    def test_can_edit(self, exploration_id, escaped_state_name=None, **kwargs):
+    def test_can_edit(self, exploration_id, *args, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
         if check_exploration_editable(
                 self.user_id, self.actions, exploration_id):
             exploration = exp_services.get_exploration_by_id(exploration_id)
+            escaped_state_name = (
+                None if len(args) == 0
+                else args[0])
             state_name = (
                 None if escaped_state_name is None
                 else utils.unescape_encoded_uri_component(escaped_state_name))
@@ -362,26 +365,6 @@ def can_suggest_changes_to_exploration(handler):
                 'exploration.')
 
     return test_can_suggest
-
-
-def can_manage_suggestions_on_exploration(handler):
-    """Decorator to check whether a user can act upon the suggestions made
-    by learners.
-    """
-
-    def test_can_manage(self, exploration_id, **kwargs):
-        if not self.user_id:
-            raise base.UserFacingExceptions.NotLoggedInException
-
-        if check_exploration_editable(
-                self.user_id, self.actions, exploration_id):
-            return handler(self, exploration_id, **kwargs)
-        else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have the credentials to manage suggestions for ' +
-                'this exploration.')
-
-    return test_can_manage
 
 
 def can_publish_exploration(handler):
