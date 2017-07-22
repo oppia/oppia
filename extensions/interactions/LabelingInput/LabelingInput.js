@@ -33,19 +33,22 @@ oppia.directive('oppiaInteractiveLabelingInput', [
       templateUrl: 'interaction/LabelingInput',
       controller: [
         '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-          var imageAndLabels = oppiaHtmlEscaper.escapedJsonToObj(
+          let imageAndLabels = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.imageAndLabelsWithValue);
+
           $scope.imageTitle = $attrs.imageTitleWithValue;
-          var unicodeStripCount = 6;
-          $scope.bonusWords = $attrs.bonusWordsWithValue.slice(unicodeStripCount)
+          const unicodeStripCount = 6;
+          $scope.bonusWords = $attrs.bonusWordsWithValue.slice(unicodeStripCount);
           $scope.bonusWords = $scope.bonusWords.slice(0, -unicodeStripCount);
           $scope.bonusWords = $scope.bonusWords.split(',');
-          //Remove white spaces
-          $scope.bonusWords.map(function(word){word.trim();});
+
+          // Remove white spaces
+          $scope.bonusWords.map((word) => {word.trim();});
           console.log($scope.bonusWords);
           $scope.drawLines = ($attrs.showLinesWithValue == 'true');
-          //Need to strip unicode
-          $scope.imageTitle = $scope.imageTitle.slice(unicodeStripCount)
+
+          // Need to strip unicode off of inputs
+          $scope.imageTitle = $scope.imageTitle.slice(unicodeStripCount);
           $scope.imageTitle = $scope.imageTitle.slice(0, -unicodeStripCount);
           $scope.alwaysShowRegions = 'true';
           if ($scope.alwaysShowRegions) {
@@ -57,6 +60,8 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             $sce.trustAsResourceUrl(
               '/imagehandler/' + explorationContextService.getExplorationId() +
               '/' + encodeURIComponent($scope.filepath)) : null);
+
+          // Initializing constants
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.submitted = 0;
@@ -70,36 +75,34 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.warningRValue = 248;
           $scope.warningGValue = 148;
           $scope.warningBValue = 6;
+          $scope.allRegions = imageAndLabels.labeledRegions;
+
           /* Shuffle function to shuffle array to ensure random word bank
           Borrowed from:
           stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array */
           $scope.shuffle = function(a) {
-              var j, x, i;
+              let j, x, i;
               for (i = a.length; i; i--) {
                   j = Math.floor(Math.random() * i);
                   x = a[i - 1];
                   a[i - 1] = a[j];
                   a[j] = x;
               }
-          }
-          $scope.allRegions = imageAndLabels.labeledRegions;
+          };
 
           $scope.regionsAndBonus = $scope.allRegions.map(
-            function (x){
-              return x.label;
-          }).concat($scope.bonusWords);
+            (x) => {return x.label;}).concat($scope.bonusWords);
 
           $scope.regionsAndBonus = $scope.regionsAndBonus.filter(
-            function (x){
-              return x != '';
-          });
+            (x) => {return x != '';});
+
           $scope.shuffle($scope.allRegions);
           $scope.shuffle($scope.regionsAndBonus);
           $scope.numRegions = $scope.allRegions.length;
 
-          //Ensure no duplicates of elements in our element tracking arrays
+          // Ensure no duplicates of elements in our element tracking arrays
           $scope.checkAndRemoveElement = function(name){
-            var index = $scope.correctElements.indexOf(name);
+            let index = $scope.correctElements.indexOf(name);
             if (index > -1){
               $scope.correctElements.splice(index, 1);
             }
@@ -109,8 +112,9 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               $scope.incorrectBoxes.splice(index, 1);
             }
             return;
-          }
-          //Change the button color based on whether or not it is correct
+          };
+
+          // Change the button color based on whether or not it is correct
           $scope.getButtonColor = function(name){
             if (name === $scope.currentDraggedElement){
               return 'warning';
@@ -122,15 +126,17 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               return 'danger';              
             }
             return 'primary';
-          }
-          //Get the current element label
+          };
+
+          // Get the current element label
           $scope.getThisName = function(event, ui, name){
             $scope.checkAndRemoveElement(name);
             $scope.currentDraggedElement = name;
             $scope.$apply();
             return;
-          }
-          //If all labels have been placed, run a correctness check
+          };
+
+          // If all labels have been placed, run a correctness check
           $scope.runSubmitCheck = function(){
             console.log($scope.incorrectBoxes);
             $scope.submitted = 1;
@@ -145,11 +151,11 @@ oppia.directive('oppiaInteractiveLabelingInput', [
                 rulesService: labelingInputRulesService
               });
             }
-          }
-          //Check if our value is the one of the region, and handle acccordingly
+          };
+
+          // Check if our value is the one of the region, and handle
           $scope.checkTheValues = function(event, ui, correctName){
-            console.log(correctName);
-            console.log($scope.currentDraggedElement);
+            let correctLen, incorrectLen;
             $scope.occupiedRegions.push(correctName);
             $scope.numRegions--;
             if ($scope.numRegions < 0){
@@ -161,20 +167,21 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               $scope.incorrectElements.push($scope.currentDraggedElement);
               $scope.incorrectBoxes.push(correctName);
             }
-            var correctLen = $scope.correctElements.length;
-            var incorrectLen = $scope.incorrectElements.length;
+            correctLen = $scope.correctElements.length;
+            incorrectLen = $scope.incorrectElements.length;
             if ((correctLen + incorrectLen) === $scope.allRegions.length){
               $scope.runSubmitCheck();
             }
             $scope.currentDraggedElement = '';
-          }
-          //Find where the drop region should be placed
+          };
+
+          // Find where the drop region should be placed
           $scope.getRegionDimensions = function(index) {
-            var image = $($element).find('.oppia-image-click-img');
-            var labeledRegion = imageAndLabels.labeledRegions[index];
-            var regionArea = labeledRegion.region.area;
-            var leftDelta = image.offset().left - image.parent().offset().left;
-            var topDelta = image.offset().top - image.parent().offset().top;
+            const image = $($element).find('.oppia-image-click-img');
+            const labeledRegion = imageAndLabels.labeledRegions[index];
+            const regionArea = labeledRegion.region.area;
+            const leftDelta = image.offset().left - image.parent().offset().left;
+            const topDelta = image.offset().top - image.parent().offset().top;
             return {
               left: regionArea[0][0] * image.width() + leftDelta,
               top: regionArea[0][1] * image.height() + topDelta,
@@ -182,6 +189,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               height: (regionArea[1][1] - regionArea[0][1]) * image.height()
             };
           };
+
           $scope.getRegionDisplay = function(label) {
             if ($scope.currentlyHoveredRegions.indexOf(label) === -1) {
               return 'none';
@@ -189,66 +197,76 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               return 'inline';
             }
           };
+
           $scope.inlineRegionDisplay = function(){
             return 'inline';
           }
-          //Get the dimensions of the image
+
+          // Get the dimensions of the image
           $scope.getImageWidth = function(){
-            var image = $($element).find('.oppia-image-click-img');
+            const image = $($element).find('.oppia-image-click-img');
             return image.width();
-          }
+          };
+
           $scope.getImageHeight = function(){
-            var image = $($element).find('.oppia-image-click-img');
+            const image = $($element).find('.oppia-image-click-img');
             return image.height();
-          }
-          //Get offset to draw image lines
+          };
+
+          // Get offset to draw image lines
           $scope.getLeftDelta = function(){
-            var image = $($element).find('.oppia-image-click-img');
+            const image = $($element).find('.oppia-image-click-img');
             return image.offset().left - image.parent().offset().left;
-          }
+          };
+
           $scope.getTopDelta = function(){
-            var image = $($element).find('.oppia-image-click-img');
+            const image = $($element).find('.oppia-image-click-img');
             return image.offset().top - image.parent().offset().top;
-          }
-          //Draw line on canvas, no line HTML class is available due to div
+          };
+
+          // Draw line on canvas, no line HTML class is available due to div
           $scope.getLineDistance = function(x1, x2, y1, y2){
-            var xDiff = Math.pow((x2 - x1), 2);
-            var yDiff = Math.pow((y2 - y1), 2);
+            const xDiff = Math.pow((x2 - x1), 2);
+            const yDiff = Math.pow((y2 - y1), 2);
             return Math.sqrt(xDiff + yDiff);
-          }
+          };
+
           $scope.convertArctan = function(x1, x2, y1, y2){
             if (x2 < x1) {
               return Math.atan((y2 - y1) / (x2 - x1)) + Math.PI;
             }
             return Math.atan((y2 - y1) / (x2 - x1));
-          }
+          };
+
+          // Find any regions we are hovering over and update logic accordingly
           $scope.onMousemoveImage = function(event) {
-            var image = $($element).find('.oppia-image-click-img');
+            const image = $($element).find('.oppia-image-click-img');
+            let i, labeledRegion, regionArea;
             $scope.mouseX = (event.pageX - image.offset().left) / image.width();
             $scope.mouseY = (event.pageY - image.offset().top) / image.height();
             $scope.currentlyHoveredRegions = [];
-            for (var i = 0; i < imageAndLabels.labeledRegions.length; i++) {
-              var labeledRegion = imageAndLabels.labeledRegions[i];
-              var regionArea = labeledRegion.region.area;
+            for (i = 0; i < imageAndLabels.labeledRegions.length; i++) {
+              labeledRegion = imageAndLabels.labeledRegions[i];
+              regionArea = labeledRegion.region.area;
               if (regionArea[0][0] <= $scope.mouseX &&
                   $scope.mouseX <= regionArea[1][0] &&
                   regionArea[0][1] <= $scope.mouseY &&
                   $scope.mouseY <= regionArea[1][1]) {
-                $scope.currentlyHoveredRegions.push(labeledRegion.label);
-
+                    $scope.currentlyHoveredRegions.push(labeledRegion.label);
               }
             }
           };
+
+          // Callback when we scroll over a highlighted region
           $scope.isInRegion = function(event, ui, region){
             $scope.currentlyHoveredRegions.push(region.label);
-            console.log($scope.currentlyHoveredRegions);
             $scope.$apply();
-            console.log($scope.currentlyHoveredRegions);
-          }
+          };
+
+          // Callback when we scroll out of a region
           $scope.outOfRegion = function(event, ui, region){
-            console.log("Out");
-            var name = region.label;
-            var index = $scope.currentlyHoveredRegions.indexOf(name);
+            const name = region.label;
+            let index = $scope.currentlyHoveredRegions.indexOf(name);
             if (index > -1){
               $scope.currentlyHoveredRegions.splice(index, 1);
             }
@@ -257,30 +275,35 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               $scope.occupiedRegions.splice(index, 1);
             }            
             $scope.$apply();
-          }
+          };
+
+          // Callback to evict a label if a region is full (not supported)
           $scope.checkRevertBounce = function(){
             //TODO fix implementation to work dynamically
             return 'invalid';
           }
+
+          // Callback for releasing a draggable element
           $scope.dropHovered = function(){
             if ($scope.currentlyHoveredRegions.length == 0){
               $scope.currentDraggedElement = '';
               $scope.$apply();              
             }
-          }
-          //Change to red if the input is not correct
+          };
+
+          // Change to red if the input is not correct
           $scope.getRValue = function(region){
             if ($scope.currentlyHoveredRegions.indexOf(region.label) != -1){
               return $scope.warningRValue;
             }
-            //Get the region it is in and not the label
             if (!$scope.submitted){
               return 0;
             }
             return $scope.maxRGBValue * 
                         ($scope.incorrectBoxes.indexOf(region.label) !== -1);
           };
-          //Change to blue if the input is correct
+
+          // Change to blue if the input is correct
           $scope.getBValue = function(region){
             if ($scope.currentlyHoveredRegions.indexOf(region.label) != -1){
               return $scope.warningBValue;
@@ -292,6 +315,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
                         ($scope.incorrectBoxes.indexOf(region.label) === -1);
           };
 
+          // Provide some green coloring if the label is being hovered over
           $scope.getGValue = function(region){
             if ($scope.currentlyHoveredRegions.indexOf(region.label) != -1){
               return $scope.warningGValue;

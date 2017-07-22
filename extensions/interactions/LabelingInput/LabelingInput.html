@@ -52,7 +52,7 @@
         "
         class="btn btn-<[getButtonColor(word)]>"
         data-drag="true"
-        data-jqyoui-options="{revert: checkRevertBounce(), snap:true}"
+        data-jqyoui-options="{revert: checkRevertBounce()}"
         jqyoui-draggable="{animate:true, onStart:'getThisName(word)', 
                                          onStop: 'dropHovered()'}"
         ><[word]>
@@ -78,7 +78,8 @@
              pointer-events: none;
              position: absolute;
              display: <[getInlineDisplay()]>;
-             background: rgba(<[getRValue(region)]>,<[getGValue(region)]>,<[getBValue(region)]>,0.5);
+             background: rgba(<[getRValue(region)]>,<[getGValue(region)]>,
+              <[getBValue(region)]>,0.5);
              z-index: 10;
           ">
     </div>
@@ -96,7 +97,8 @@
             region.region.area[0][1] * getImageHeight())]>px;
     height: 2px;
     position: absolute;
-    background: rgba(<[getRValue(region)]>,<[getGValue(region)]>,<[getBValue(region)]>,0.5);
+    background: rgba(<[getRValue(region)]>,
+      <[getGValue(region)]>,<[getBValue(region)]>,0.5);
     transform: rotate(<[convertArctan(region.startX, 
                                       region.region.area[0][0] * getImageWidth(), 
                                       region.startY, 
