@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-5-3
+version: 2-5-5
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -149,7 +149,20 @@ env_variables:
   MINIFICATION: false
 
 skip_files:
+- ^(.*/)?\.zip$
+- ^(.*/)?\.md$
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?tests$
+- ^(.*/)?test$
+- ^test/(.*/)?
+- ^README\..*
 - \.gitignore
 - ^\.git/.*
 - \.*\.lint$
+- ^fabfile\.py
 - ^testrunner\.py

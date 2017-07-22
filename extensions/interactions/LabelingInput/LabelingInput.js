@@ -43,7 +43,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.bonusWords = $scope.bonusWords.split(',');
 
           // Remove white spaces
-          $scope.bonusWords.map((word) => {word.trim();});
+          $scope.bonusWords.map(function (word) {word.trim();});
           console.log($scope.bonusWords);
           $scope.drawLines = ($attrs.showLinesWithValue == 'true');
 
@@ -91,10 +91,10 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           };
 
           $scope.regionsAndBonus = $scope.allRegions.map(
-            (x) => {return x.label;}).concat($scope.bonusWords);
+            function(x) {return x.label;}).concat($scope.bonusWords);
 
           $scope.regionsAndBonus = $scope.regionsAndBonus.filter(
-            (x) => {return x != '';});
+            function(x) {return x != '';});
 
           $scope.shuffle($scope.allRegions);
           $scope.shuffle($scope.regionsAndBonus);
