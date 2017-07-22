@@ -1660,7 +1660,7 @@ class JobCleanupManager(BaseMapReduceJobManager):
                 A shard or job which may still be running.
         Yields:
             tuple(str, int). Describes the action taken for the item, and the
-                number of items for which this action was applied to.
+                number of items this action was applied to.
         """
         max_start_time_msec = JobCleanupManager.get_mapper_param(
             MAPPER_PARAM_MAX_START_TIME_MSEC)
@@ -1693,7 +1693,7 @@ class JobCleanupManager(BaseMapReduceJobManager):
                 'mr_state_deleted', 'mr_state_remaining', 'shard_state_deleted',
                 'shard_state_remaining'.
             stringified_values: list(str). A list where each element is a
-                stringified number, counting the mapped items sharing a key.
+                stringified number, counting the mapped items sharing the key.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
         if key.endswith('_deleted'):
