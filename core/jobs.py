@@ -1660,8 +1660,7 @@ class JobCleanupManager(BaseMapReduceJobManager):
                 A shard or job which may still be running.
         Yields:
             tuple(str, int). Describes the action taken for the item, and the
-                number (items are countable) of items for which this action was
-                applied to.
+                number of items for which this action was applied to.
         """
         max_start_time_msec = JobCleanupManager.get_mapper_param(
             MAPPER_PARAM_MAX_START_TIME_MSEC)
