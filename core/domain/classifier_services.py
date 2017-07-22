@@ -161,7 +161,7 @@ def update_classifier_exploration_mappings(exploration, state_names):
     exp_id = exploration.id
     exp_version = exploration.version
     for state_name in state_names:
-        classifier = get_classifier_from_exploration_attributes(
+        classifier = get_classifier(
             exp_id, exp_version, state_name)
         # If classifier does not exist for a state with an unchanged answer
         # group, the only possibility is that the classifier has not been
@@ -405,8 +405,7 @@ def delete_classifier_training_job(job_id):
         classifier_training_job_model.delete()
 
 
-def get_classifier_from_exploration_attributes(exp_id, exp_version,
-                                               state_name):
+def get_classifier(exp_id, exp_version, state_name):
     """Gets the classifier object from the exploration attributes.
 
     Args:

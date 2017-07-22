@@ -314,7 +314,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.mark_training_job_complete(job_id)
 
     def test_retrieval_of_classifier_from_exploration_attributes(self):
-        """Test the get_classifier_from_exploration_attributes method."""
+        """Test the get_classifier method."""
 
         exp_id = u'1'
         state_name = u'टेक्स्ट'
@@ -326,7 +326,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_models.ClassifierExplorationMappingModel.create(
             exp_id, 1, state_name, classifier_id)
         classifier = (
-            classifier_services.get_classifier_from_exploration_attributes(
+            classifier_services.get_classifier(
                 exp_id, 1, state_name))
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.exp_version_when_created, 1)
