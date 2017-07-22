@@ -448,6 +448,9 @@ class BaseJobManager(object):
     def _require_correct_job_type(cls, job_type):
         """Returns validity of given job type.
 
+        Args:
+            job_type: str. Name of a job class.
+
         Raises:
             Exception: The given job type is incorrect.
         """
@@ -812,8 +815,8 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
                 dict-like object.
 
         Returns:
-            *. An instance of the InputReader configured using the values of
-                json.
+            *. An instance of the InputReader configured using the input shard
+                state.
         """
         return cls(input_readers.DatastoreInputReader.from_json(
             input_shard_state[cls._READER_LIST_PARAM]))
@@ -961,7 +964,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
                 given realtime layer.
 
         Returns:
-            str. Uniquely identifies the (entity, realtime layer) pair.
+            str. Uniquely identifies the (realtime layer, entity) pair.
         """
         return '%s:%s' % (layer_index, raw_entity_id)
 
@@ -1023,7 +1026,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         """Stores the current realtime layer entity into the database.
 
         Raises:
-            Exception: Self has an invalid realtime layer id.
+            Exception: The current instance has an invalid realtime layer id.
         """
         if (self.realtime_layer is None or
                 str(self.realtime_layer) != self.id[0]):
@@ -1147,11 +1150,13 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _get_active_realtime_index(cls):
-        """Returns the registered realtime id of this class, creating one if it
-        doesn't exist.
+        """Returns the currently active realtime layer index for this class.
+
+        Additionally takes care to register the class into the model when it
+        hasn't been.
 
         Returns:
-            str. The active realtime layer id of this class.
+            str. The active realtime layer index of this class.
         """
         def _get_active_realtime_index_transactional():
             cc_model = job_models.ContinuousComputationModel.get(
