@@ -687,8 +687,8 @@ class BaseMapReduceJobManager(BaseJobManager):
         This code can assume that it is the only process handling values for the
         given key.
 
-        TODO(sll): Verify whether it can also assume that it will be called
-        exactly once for each key with all of the output.
+        TODO(brianrodri): Verify whether it can also assume that it will be
+        called exactly once for each key with all of the output.
 
         Args:
             key: *. A key value as emitted from the map() function, above.
@@ -774,7 +774,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         Args:
             entity: BaseModel. An entity this job type is responsible for
-            handling.
+                handling.
 
         Returns:
             bool. Whether the entity was queued before the job was created.
