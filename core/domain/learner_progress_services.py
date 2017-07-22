@@ -19,6 +19,7 @@
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import learner_progress_domain
+from core.domain import play_later_services
 from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
@@ -168,9 +169,11 @@ def mark_exploration_as_completed(user_id, exp_id):
 
     if (exp_id not in subscribed_exploration_ids and
             exp_id not in activities_completed.exploration_ids):
-        # Remove the exploration from the in progress list (if present) as it is
-        # now completed.
+        # Remove the exploration from the in progress and play later list
+        # (if present) as it is now completed.
         remove_exp_from_incomplete_list(user_id, exp_id)
+        play_later_services.remove_exploration_from_play_later_list(
+            user_id, exp_id)
         activities_completed.add_exploration_id(exp_id)
         save_completed_activities(activities_completed)
 
@@ -203,9 +206,11 @@ def mark_collection_as_completed(user_id, collection_id):
 
     if (collection_id not in subscribed_collection_ids and
             collection_id not in activities_completed.collection_ids):
-        # Remove the collection from the in progress list (if present) as it is
-        # now completed.
+        # Remove the collection from the in progress and play later list
+        # (if present) as it is now completed.
         remove_collection_from_incomplete_list(user_id, collection_id)
+        play_later_services.remove_collection_from_play_later_list(
+            user_id, collection_id)
         activities_completed.add_collection_id(collection_id)
         save_completed_activities(activities_completed)
 
@@ -245,6 +250,10 @@ def mark_exploration_as_incomplete(
             exploration_id not in subscribed_exploration_ids):
 
         if exploration_id not in incomplete_activities.exploration_ids:
+            # Remove the exploration from the play later list (if present) as it
+            # is currently now being completed.
+            play_later_services.remove_exploration_from_play_later_list(
+                user_id, exploration_id)
             incomplete_activities.add_exploration_id(exploration_id)
 
         last_playthrough_information_model = (
@@ -290,6 +299,10 @@ def mark_collection_as_incomplete(user_id, collection_id):
     if (collection_id not in subscribed_collection_ids and
             collection_id not in incomplete_activities.collection_ids and
             collection_id not in collection_ids):
+        # Remove the collection from the play later list (if present) as it
+        # is currently now being completed.
+        play_later_services.remove_collection_from_play_later_list(
+            user_id, collection_id)
         incomplete_activities.add_collection_id(collection_id)
         save_incomplete_activities(incomplete_activities)
 

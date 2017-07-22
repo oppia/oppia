@@ -197,3 +197,72 @@ class CompletedActivities(object):
         ids.
         """
         self.collection_ids.remove(collection_id)
+
+
+class IncompleteActivities(object):
+    """Domain object for the incomplete activities model."""
+
+    def __init__(self, user_id, exploration_ids,
+                 collection_ids):
+        self.id = user_id
+        self.exploration_ids = exploration_ids
+        self.collection_ids = collection_ids
+
+    def add_exploration_id(self, exploration_id):
+        """Adds the exploration id to the list of incomplete exploration ids."""
+        self.exploration_ids.append(exploration_id)
+
+    def remove_exploration_id(self, exploration_id):
+        """Removes the exploration id from the list of incomplete exploration
+        ids.
+        """
+        self.exploration_ids.remove(exploration_id)
+
+    def add_collection_id(self, collection_id):
+        """Adds the collection id to the list of incomplete collection ids."""
+        self.collection_ids.append(collection_id)
+
+    def remove_collection_id(self, collection_id):
+        """Removes the collection id from the list of incomplete collection
+        ids.
+        """
+        self.collection_ids.remove(collection_id)
+
+
+class PlayLaterActivities(object):
+    """Domain object for the play later activities model."""
+
+    def __init__(self, user_id, exploration_ids,
+                 collection_ids):
+        self.id = user_id
+        self.exploration_ids = exploration_ids
+        self.collection_ids = collection_ids
+
+    def add_exploration_id(
+        self, exploration_id, position_to_be_inserted=None):
+        """Inserts the exploration id at the given position. If position is not
+        specified, the exploration id is added at the end."""
+        if position_to_be_inserted:
+            self.exploration_ids.insert(position_to_be_inserted, exploration_id)
+        else:
+            self.exploration_ids.append(exploration_id)
+
+    def remove_exploration_id(self, exploration_id):
+        """Removes the exploration id from the list of play later exploration
+        ids.
+        """
+        self.exploration_ids.remove(exploration_id)
+
+    def add_collection_id(self, collection_id, position_to_be_inserted=None):
+        """Inserts the collection id at the given position. If position is not
+        specified, the collection id is added at the end."""
+        if position_to_be_inserted:
+            self.collection_ids.insert(position_to_be_inserted, collection_id)
+        else:
+            self.collection_ids.append(collection_id)
+
+    def remove_collection_id(self, collection_id):
+        """Removes the collection id from the list of play later collection
+        ids.
+        """
+        self.collection_ids.remove(collection_id)

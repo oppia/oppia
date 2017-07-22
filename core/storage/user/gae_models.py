@@ -196,6 +196,18 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             instance_id, strict=False)
 
 
+class PlayLaterActivitiesModel(base_models.BaseModel):
+    """Keeps track of all the explorations and collections which the user wants
+    to play later.
+
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of all the explorations which the user wants to play later.
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of all the collections which the user wants to play later.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+
 class UserContributionsModel(base_models.BaseModel):
     """Tracks explorations created/edited for a particular user.
 
