@@ -206,8 +206,8 @@ class BaseJobManager(object):
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
-            test_only_max_output_len: int or None. Overrides the intendend
-                max output len limit when not None.
+            test_only_max_output_len: int or None. Overrides the intended max
+                output len limit when not None.
 
         Returns:
             list(str). The compressed stringified output values.
