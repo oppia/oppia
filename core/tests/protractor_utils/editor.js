@@ -1480,8 +1480,7 @@ var HintEditor = function(hintNum) {
       general.waitForSystem();
       element(by.css('.protractor-test-save-hint-edit')).click();
     },
-    // eslint-disable-next-line quote-props
-    delete: function() {
+    deleteHint: function() {
       headerElem.element(by.css('.protractor-test-delete-response')).click();
       element(by.css('.protractor-test-confirm-delete-hint')).click();
     },

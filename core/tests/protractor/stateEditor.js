@@ -230,7 +230,7 @@ describe('State editor', function() {
     editor.closeAddResponseModal();
     editor.addHint('hint one');
     editor.HintEditor(0).setHint('modified hint one');
-    editor.HintEditor(0).delete();
+    editor.HintEditor(0).deleteHint();
     editor.saveChanges();
     users.logout();
   });
