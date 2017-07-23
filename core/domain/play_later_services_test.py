@@ -196,7 +196,8 @@ class PlayLaterTests(test_utils.GenericTestBase):
 
         # Test that the length of the play later list doesn't exceed 10.
         # List of collections to be added.
-        collection_ids = ['SAMPLE_COLLECTION_ID_%s' % index for index in range(0, 10)]
+        collection_ids = (
+            ['SAMPLE_COLLECTION_ID_%s' % index for index in range(0, 10)])
         for collection_id in collection_ids:
             play_later_services.mark_collection_to_be_played_later(
                 self.user_id, collection_id)
