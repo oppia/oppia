@@ -37,6 +37,8 @@ oppia.controller('StateSolution', [
     $scope.inlineSolutionEditorIsActive = false;
     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
     $scope.interactionHtml = '';
+    $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
+      'currentInteractionHtmlForSolutionEditor');
 
     $scope.stateHintsService = stateHintsService;
     $scope.stateSolutionService = stateSolutionService;
@@ -56,7 +58,7 @@ oppia.controller('StateSolution', [
           stateInteractionIdService.savedMemento,
           explorationStatesService.getInteractionCustomizationArgsMemento(
             editorContextService.getActiveStateName()),
-          'currentInteractionHtmlForSolutionEditor'));
+          $scope.SOLUTION_EDITOR_FOCUS_LABEL));
 
       $scope.inlineSolutionEditorIsActive = false;
       var interactionId = stateInteractionIdService.savedMemento;
@@ -91,7 +93,8 @@ oppia.controller('StateSolution', [
       $scope.inlineSolutionEditorIsActive = false;
 
       $modal.open({
-        templateUrl: 'modals/addSolution',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/addSolutionModal.html'),
         backdrop: 'static',
         resolve: {
           objectType: function() {
@@ -129,8 +132,10 @@ oppia.controller('StateSolution', [
 
             $scope.saveSolution = function() {
               // Close the modal and save it afterwards.
-              var answer = ($scope.correctAnswer) ? (
-                $scope.correctAnswer) : $scope.tmpSolution.correctAnswer;
+              var answer = $scope.correctAnswer;
+              if (!interactionHtml) {
+                answer = $scope.tmpSolution.correctAnswer;
+              }
               answer = (
                 StateSolutionHelperService.getCorrectAnswerObject(answer,
                   $scope.objectType));
@@ -170,7 +175,8 @@ oppia.controller('StateSolution', [
 
       alertsService.clearWarnings();
       $modal.open({
-        templateUrl: 'modals/deleteSolution',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/deleteSolutionModal.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance',

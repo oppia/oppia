@@ -1346,10 +1346,10 @@ class InteractionInstance(object):
         for hint in self.hints:
             hint.validate()
 
-        if self.hints and self.solution:
+        if self.solution:
             self.solution.validate(self.id)
 
-        if not self.hints and self.solution:
+        if self.solution and not self.hints:
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
