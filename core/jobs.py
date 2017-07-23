@@ -201,8 +201,8 @@ class BaseJobManager(object):
     def _compress_output_list(cls, output_list, test_only_max_output_len=None):
         """Returns compressed list of strings within a max length of chars.
 
-        Ensures that the payload (i.e. str(output) for output in output_list)
-        makes up at most max_output_chars of the data in the final output.
+        Ensures that the payload (i.e., [str(output) for output in output_list])
+        makes up at most max_output_chars of the final output data.
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
