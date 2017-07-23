@@ -598,3 +598,45 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
             'site_language_code': 'es',
         }, csrf_token)
+
+
+class LongUserBioHandlerTests(test_utils.GenericTestBase):
+    USERNAME_A = 'a'
+    EMAIL_A = 'a@example.com'
+    USERNAME_B = 'b'
+    EMAIL_B = 'b@example.com'
+
+    def test_userbio_within_limit(self):
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.login(self.EMAIL_A)
+        response = self.testapp.get('/preferences')
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json('/preferenceshandler/data', {
+            'update_type': 'user_bio',
+            'data': 'I am within 2000 char limit',
+        }, csrf_token)
+        preferences = self.get_json('/preferenceshandler/data')
+        self.assertIsNotNone(preferences)
+        self.assertEqual(
+            preferences['user_bio'], 'I am within 2000 char limit')
+        self.logout()
+
+    def test_user_bio_exceeds_limit(self):
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+        self.login(self.EMAIL_B)
+        response = self.testapp.get('/preferences')
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+        user_bio_response = self.put_json(
+            '/preferenceshandler/data', {
+                'update_type': 'user_bio',
+                'data': 'I am not within 2000 char limit' * 200
+            },
+            csrf_token=csrf_token,
+            expect_errors=True,
+            expected_status_int=400)
+        self.assertEqual(user_bio_response['code'], 400)
+        self.assertIn('User bio exceeds maximum character limit: 2000',
+                      user_bio_response['error'])
+        self.logout()

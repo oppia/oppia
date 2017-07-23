@@ -17,6 +17,7 @@
 	"I18N_CREATE_YES_PLEASE": "Kyllä, kiitos!",
 	"I18N_DASHBOARD_COLLECTIONS": "Kokoelmat",
 	"I18N_DASHBOARD_EXPLORATIONS": "Tutkimukset",
+	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "Näyttää siltä, ette ole vielä luoneet etsintöjä. Aloitetaan!",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Avoin palaute",
 	"I18N_DASHBOARD_SUBSCRIBERS": "Tilaajat",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Pudota kuva tähän",

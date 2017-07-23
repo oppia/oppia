@@ -488,16 +488,13 @@ class TestBase(unittest.TestCase):
 
     def get_static_asset_filepath(self):
         """Returns filepath for referencing static files on disk.
-        examples: '' or 'build/1234'
+        examples: '' or 'build/'
         """
-        cache_slug_filepath = ''
+        filepath = ''
         if feconf.IS_MINIFIED or not feconf.DEV_MODE:
-            yaml_file_content = utils.dict_from_yaml(
-                utils.get_file_contents('cache_slug.yaml'))
-            cache_slug = yaml_file_content['cache_slug']
-            cache_slug_filepath = os.path.join('build', cache_slug)
+            filepath = os.path.join('build')
 
-        return cache_slug_filepath
+        return filepath
 
     def get_static_asset_url(self, asset_suffix):
         """Returns the relative path for the asset, appending it to the

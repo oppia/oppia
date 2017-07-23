@@ -100,16 +100,6 @@ class ClassifierData(object):
     def data_schema_version(self):
         return self._data_schema_version
 
-    def update_state_name(self, state_name):
-        """Updates the state_name attribute of the ClassifierData domain object.
-
-        Args:
-            state_name: str. The name of the updated state to which the
-            classifier belongs.
-        """
-
-        self._state_name = state_name
-
     def to_dict(self):
         """Constructs a dict representation of ClassifierData domain object.
 
@@ -185,6 +175,8 @@ class ClassifierTrainingJob(object):
         job_id: str. The unique id of the classifier training job.
         algorithm_id: str. The id of the algorithm that will be used for
             generating the classifier.
+        interaction_id: str. The id of the interaction to which the algorithm
+            belongs.
         exp_id: str. The id of the exploration that contains the state
             for which the classifier will be generated.
         exp_version: str. The version of the exploration when
@@ -210,14 +202,16 @@ class ClassifierTrainingJob(object):
 
     """
 
-    def __init__(self, job_id, algorithm_id, exp_id, exp_version,
-                 state_name, status, training_data):
+    def __init__(self, job_id, algorithm_id, interaction_id, exp_id,
+                 exp_version, state_name, status, training_data):
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
         job_id: str. The unique id of the classifier training job.
         algorithm_id: str. The id of the algorithm that will be used for
             generating the classifier.
+        interaction_id: str. The id of the interaction to which the algorithm
+            belongs.
         exp_id: str. The id of the exploration id that contains the state
             for which classifier will be generated.
         exp_version: str. The version of the exploration when
@@ -243,6 +237,7 @@ class ClassifierTrainingJob(object):
         """
         self._job_id = job_id
         self._algorithm_id = algorithm_id
+        self._interaction_id = interaction_id
         self._exp_id = exp_id
         self._exp_version = exp_version
         self._state_name = state_name
@@ -256,6 +251,10 @@ class ClassifierTrainingJob(object):
     @property
     def algorithm_id(self):
         return self._algorithm_id
+
+    @property
+    def interaction_id(self):
+        return self._interaction_id
 
     @property
     def exp_id(self):
@@ -297,6 +296,7 @@ class ClassifierTrainingJob(object):
         return {
             'job_id': self._job_id,
             'algorithm_id': self._algorithm_id,
+            'interaction_id': self._interaction_id,
             'exp_id': self._exp_id,
             'exp_version': self._exp_version,
             'state_name': self._state_name,
@@ -331,6 +331,15 @@ class ClassifierTrainingJob(object):
                 'Expected status to be in %s, received %s' %
                 feconf.ALLOWED_TRAINING_JOB_STATUSES,
                 self.exp_version)
+
+        if not isinstance(self.interaction_id, basestring):
+            raise utils.ValidationError(
+                'Expected interaction_id to be a string, received %s' %
+                self.interaction_id)
+
+        if self.interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
+            raise utils.ValidationError(
+                'Invalid interaction id: %s' % self.interaction_id)
 
         if not isinstance(self.algorithm_id, basestring):
             raise utils.ValidationError(
