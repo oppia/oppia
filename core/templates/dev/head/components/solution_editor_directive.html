@@ -15,7 +15,7 @@
         <strong>
           <[solution.answerIsExclusive ? 'Only' : 'One']> Solution is...
         </strong>
-        <span angular-html-bind="solutionCorrectAnswerHtml"></span>
+        <span angular-html-bind="solution.getCorrectAnswerHtml($scope.objectType)"></span>
         <br>
         <strong>Explanation is...</strong>
         <span angular-html-bind="solution.explanation"></span>

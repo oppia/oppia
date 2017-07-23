@@ -38,11 +38,6 @@ oppia.directive('solutionEditor', [
           $scope.solutionEditorIsOpen = false;
           $scope.solutionCorrectAnswerHtml = '';
 
-          $scope.getCorrectAnswerHtml = function() {
-            $scope.solutionCorrectAnswerHtml = (
-              $scope.solution.getCorrectAnswerHtml($scope.objectType));
-          };
-
           $scope.getInteractionHtml = function() {
             if (!$scope.interactionHtml) {
               $scope.interactionHtml = (
@@ -66,13 +61,11 @@ oppia.directive('solutionEditor', [
             // This function sets correctAnswer. interactionHtml calls this
             // function when an answer is input.
             $scope.solution.setCorrectAnswer(answer);
-            $scope.getCorrectAnswerHtml();
           };
 
           $scope.saveThisSolution = function() {
             $scope.solutionEditorIsOpen = false;
             $scope.getOnSaveFn()();
-            $scope.getCorrectAnswerHtml();
           };
 
           $scope.cancelThisSolutionEdit = function() {
@@ -86,8 +79,6 @@ oppia.directive('solutionEditor', [
               $scope.saveThisSolution();
             }
           });
-
-          $scope.getCorrectAnswerHtml();
         }
       ]
     };
