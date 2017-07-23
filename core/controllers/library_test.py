@@ -17,6 +17,7 @@
 import json
 import os
 
+from constants import constants
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
@@ -306,7 +307,7 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
 class CategoryConfigTest(test_utils.GenericTestBase):
 
     def test_thumbnail_icons_exist_for_each_category(self):
-        all_categories = feconf.CATEGORIES_TO_COLORS.keys()
+        all_categories = constants.CATEGORIES_TO_COLORS.keys()
 
         # Test that an icon exists for each default category.
         for category in all_categories:
@@ -317,7 +318,7 @@ class CategoryConfigTest(test_utils.GenericTestBase):
         # Test that the default icon exists.
         utils.get_file_contents(os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'subjects',
-            '%s.svg' % feconf.DEFAULT_THUMBNAIL_ICON))
+            '%s.svg' % constants.DEFAULT_THUMBNAIL_ICON))
 
 
 class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):

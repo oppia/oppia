@@ -50,21 +50,11 @@ class ImageClickInput(base.BaseInteraction):
     }]
 
     _answer_visualization_specs = [{
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
+        # Bar chart with answer counts.
+        'id': 'BarChart',
         'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top 5 answers'
-        },
-        'calculation_id': 'Top5AnswerFrequencies',
-    }, {
-        # Table with answer counts.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'All answers'
+            'x_axis_label': 'Answer',
+            'y_axis_label': 'Count',
         },
         'calculation_id': 'AnswerFrequencies',
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

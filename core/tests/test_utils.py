@@ -26,6 +26,7 @@ import unittest
 
 import webtest
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -369,7 +370,7 @@ class TestBase(unittest.TestCase):
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
             end_state_name=None,
             interaction_id='TextInput'):
         """Saves a new strictly-validated exploration.
@@ -439,7 +440,7 @@ class TestBase(unittest.TestCase):
     def save_new_default_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default collection written by owner_id.
 
         Returns the collection domain object.
@@ -453,7 +454,7 @@ class TestBase(unittest.TestCase):
     def save_new_valid_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
         collection = collection_domain.Collection.create_default_collection(
@@ -487,16 +488,13 @@ class TestBase(unittest.TestCase):
 
     def get_static_asset_filepath(self):
         """Returns filepath for referencing static files on disk.
-        examples: '' or 'build/1234'
+        examples: '' or 'build/'
         """
-        cache_slug_filepath = ''
+        filepath = ''
         if feconf.IS_MINIFIED or not feconf.DEV_MODE:
-            yaml_file_content = utils.dict_from_yaml(
-                utils.get_file_contents('cache_slug.yaml'))
-            cache_slug = yaml_file_content['cache_slug']
-            cache_slug_filepath = os.path.join('build', cache_slug)
+            filepath = os.path.join('build')
 
-        return cache_slug_filepath
+        return filepath
 
     def get_static_asset_url(self, asset_suffix):
         """Returns the relative path for the asset, appending it to the

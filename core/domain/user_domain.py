@@ -182,6 +182,18 @@ class CompletedActivities(object):
         """Adds the exploration id to the list of completed exploration ids."""
         self.exploration_ids.append(exploration_id)
 
+    def remove_exploration_id(self, exploration_id):
+        """Removes the exploration id from the list of completed exploration
+        ids.
+        """
+        self.exploration_ids.remove(exploration_id)
+
     def add_collection_id(self, collection_id):
         """Adds the collection id to the list of completed collection ids."""
         self.collection_ids.append(collection_id)
+
+    def remove_collection_id(self, collection_id):
+        """Removes the collection id from the list of completed collection
+        ids.
+        """
+        self.collection_ids.remove(collection_id)

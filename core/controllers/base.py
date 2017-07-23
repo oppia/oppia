@@ -33,6 +33,7 @@ from google.appengine.api import users
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
+from core.domain import role_services
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -153,6 +154,25 @@ class LogoutPage(webapp2.RequestHandler):
             self.redirect(url_to_redirect_to)
 
 
+class UserFacingExceptions(object):
+    """This class contains all the exception class definitions used."""
+
+    class NotLoggedInException(Exception):
+        """Error class for users that are not logged in (error code 401)."""
+
+    class InvalidInputException(Exception):
+        """Error class for invalid input on the user side (error code 400)."""
+
+    class UnauthorizedUserException(Exception):
+        """Error class for unauthorized access."""
+
+    class PageNotFoundException(Exception):
+        """Error class for a page not found error (error code 404)."""
+
+    class InternalErrorException(Exception):
+        """Error class for an internal server side error (error code 500)."""
+
+
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
 
@@ -191,9 +211,12 @@ class BaseHandler(webapp2.RequestHandler):
         self.preferred_site_language_code = None
 
         if self.user_id:
-            email = current_user_services.get_user_email(self.user)
-            user_settings = user_services.get_or_create_user(
-                self.user_id, email)
+            user_settings = user_services.get_user_settings(
+                self.user_id, strict=False)
+            if user_settings is None:
+                email = current_user_services.get_user_email(self.user)
+                user_settings = user_services.create_new_user(
+                    self.user_id, email)
             self.values['user_email'] = user_settings.email
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
@@ -218,6 +241,11 @@ class BaseHandler(webapp2.RequestHandler):
                             datetime.datetime.utcnow(),
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
+
+        self.role = (
+            feconf.ROLE_ID_GUEST
+            if self.user_id is None else user_settings.role)
+        self.actions = role_services.get_all_actions(self.role)
 
         rights_mgr_user = rights_manager.Actor(self.user_id)
         self.is_moderator = rights_mgr_user.is_moderator()
@@ -329,16 +357,9 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
-            'ALL_CATEGORIES': feconf.ALL_CATEGORIES,
-            'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ASSET_DIR_PREFIX': utils.get_asset_dir_prefix(),
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
-            'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
-            'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
-            'DEFAULT_CATEGORY_ICON': feconf.DEFAULT_THUMBNAIL_ICON,
-            'DEFAULT_COLOR': feconf.DEFAULT_COLOR,
             'DEV_MODE': feconf.DEV_MODE,
             'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
@@ -356,7 +377,6 @@ class BaseHandler(webapp2.RequestHandler):
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'SITE_NAME': feconf.SITE_NAME,
 
-            'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
             'can_create_collections': (
@@ -454,7 +474,8 @@ class BaseHandler(webapp2.RequestHandler):
         # GET_HANDLER_ERROR_RETURN_TYPE.
         # Otherwise, we check whether self.payload exists.
         if (self.payload is not None or
-                self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON):
+                self.GET_HANDLER_ERROR_RETURN_TYPE ==
+                feconf.HANDLER_TYPE_JSON):
             self.render_json(values)
         else:
             self.values.update(values)
@@ -505,20 +526,11 @@ class BaseHandler(webapp2.RequestHandler):
         self.error(500)
         self._render_exception(500, {'error': unicode(exception)})
 
-    class UnauthorizedUserException(Exception):
-        """Error class for unauthorized access."""
-
-    class NotLoggedInException(Exception):
-        """Error class for users that are not logged in (error code 401)."""
-
-    class InvalidInputException(Exception):
-        """Error class for invalid input on the user side (error code 400)."""
-
-    class PageNotFoundException(Exception):
-        """Error class for a page not found error (error code 404)."""
-
-    class InternalErrorException(Exception):
-        """Error class for an internal server side error (error code 500)."""
+    InternalErrorException = UserFacingExceptions.InternalErrorException
+    InvalidInputException = UserFacingExceptions.InvalidInputException
+    NotLoggedInException = UserFacingExceptions.NotLoggedInException
+    PageNotFoundException = UserFacingExceptions.PageNotFoundException
+    UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
 
 
 class Error404Handler(BaseHandler):

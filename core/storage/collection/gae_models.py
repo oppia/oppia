@@ -18,6 +18,7 @@
 
 import datetime
 
+from constants import constants
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
@@ -53,7 +54,7 @@ class CollectionModel(base_models.VersionedModel):
     objective = ndb.TextProperty(default='', indexed=False)
     # The language code of this collection.
     language_code = ndb.StringProperty(
-        default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
+        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True)
     # Tags associated with this collection.
     tags = ndb.StringProperty(repeated=True, indexed=True)
 

@@ -25,6 +25,7 @@ oppia.factory('explorationData', [
     ReadOnlyExplorationBackendApiService,$q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
+    var draftChangeListId = null;
     var pathnameArray = window.location.pathname.split('/');
     for (var i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create') {
@@ -54,6 +55,7 @@ oppia.factory('explorationData', [
           version: explorationData.data.version
         }).then(function(response) {
           if (successCallback) {
+            draftChangeListId = response.data.draft_change_list_id;
             successCallback(response);
           }
         }, function() {
@@ -92,7 +94,7 @@ oppia.factory('explorationData', [
             explorationId).then(function(response) {
               $log.info('Retrieved exploration data.');
               $log.info(response);
-
+              draftChangeListId = response.draft_change_list_id;
               explorationData.data = response;
 
               return response;
@@ -264,6 +266,7 @@ oppia.factory('changeListService', [
       content: true,
       default_outcome: true,
       fallbacks: true,
+      hints: true,
       param_changes: true,
       state_name: true,
       widget_customization_args: true,
@@ -741,17 +744,17 @@ oppia.factory('explorationLanguageCodeService', [
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'language_code';
     child.getAllLanguageCodes = function() {
-      return GLOBALS.ALL_LANGUAGE_CODES;
+      return constants.ALL_LANGUAGE_CODES;
     };
     child.getCurrentLanguageDescription = function() {
-      for (var i = 0; i < GLOBALS.ALL_LANGUAGE_CODES.length; i++) {
-        if (GLOBALS.ALL_LANGUAGE_CODES[i].code === child.displayed) {
-          return GLOBALS.ALL_LANGUAGE_CODES[i].description;
+      for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
+        if (constants.ALL_LANGUAGE_CODES[i].code === child.displayed) {
+          return constants.ALL_LANGUAGE_CODES[i].description;
         }
       }
     };
     child._isValid = function(value) {
-      return GLOBALS.ALL_LANGUAGE_CODES.some(function(elt) {
+      return constants.ALL_LANGUAGE_CODES.some(function(elt) {
         return elt.code === value;
       });
     };
@@ -838,6 +841,9 @@ oppia.factory('explorationStatesService', [
           return answerGroup.toBackendDict();
         });
       },
+      content: function(content) {
+        return content.toBackendDict()
+      },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
           return defaultOutcome.toBackendDict();
@@ -848,6 +854,11 @@ oppia.factory('explorationStatesService', [
       fallbacks: function(fallbacks) {
         return fallbacks.map(function(fallback) {
           return fallback.toBackendDict();
+        });
+      },
+      hints: function(hints) {
+        return hints.map(function(hint) {
+          return hint.toBackendDict();
         });
       },
       param_changes: function(paramChanges) {
@@ -866,6 +877,7 @@ oppia.factory('explorationStatesService', [
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
       fallbacks: ['interaction', 'fallbacks'],
+      hints: ['interaction', 'hints'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs']
     };
@@ -879,7 +891,6 @@ oppia.factory('explorationStatesService', [
 
     var getStatePropertyMemento = function(stateName, backendName) {
       var accessorList = PROPERTY_REF_DATA[backendName];
-
       var propertyRef = _states.getState(stateName);
       accessorList.forEach(function(key) {
         propertyRef = propertyRef[key];
@@ -1009,6 +1020,12 @@ oppia.factory('explorationStatesService', [
       },
       saveFallbacks: function(stateName, newFallbacks) {
         saveStateProperty(stateName, 'fallbacks', newFallbacks);
+      },
+      getHintsMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'hints')
+      },
+      saveHints: function(stateName, newHints) {
+        saveStateProperty(stateName, 'hints', newHints);
       },
       isInitialized: function() {
         return _states != null;
@@ -1214,7 +1231,6 @@ oppia.factory('statePropertyService', [
 
         var setterFunc = explorationStatesService[this.setterMethodKey];
         setterFunc(this.stateName, angular.copy(this.displayed));
-
         this.savedMemento = angular.copy(this.displayed);
       },
       // Reverts the displayed value to the saved memento.
@@ -1262,6 +1278,15 @@ oppia.factory('stateFallbacksService', [
   'statePropertyService', function(statePropertyService) {
     var child = Object.create(statePropertyService);
     child.setterMethodKey = 'saveFallbacks';
+    return child;
+  }
+]);
+
+// A data service that stores the current interaction hints.
+oppia.factory('stateHintsService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveHints';
     return child;
   }
 ]);
@@ -2038,10 +2063,12 @@ oppia.factory('explorationWarningsService', [
       }
 
       if (Object.keys(stateWarnings).length) {
+        var errorString = (
+          Object.keys(stateWarnings).length > 1 ? 'cards have' : 'card has');
         _warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'The following states have errors: ' +
+            'The following ' + errorString + ' errors: ' +
             Object.keys(stateWarnings).join(', ') + '.')
         });
       }
@@ -2189,10 +2216,11 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
           switch (lostChange.property_name) {
             case 'content':
               if (newValue !== null) {
+                // TODO(sll): Also add display of audio translations here.
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div></div>').html(
                     '<strong>Edited content: </strong><div class="content">' +
-                      newValue.value + '</div>')
+                      newValue.html + '</div>')
                     .addClass('state-edit-desc'));
               }
               break;

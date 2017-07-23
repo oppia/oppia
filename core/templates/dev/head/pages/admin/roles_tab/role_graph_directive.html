@@ -1,0 +1,49 @@
+<style>
+  .oppia-static-graph path.link {
+    fill: none;
+    stroke: rgb(179, 179, 179);
+    stroke-width: 3px;
+  }
+  .oppia-static-graph text {
+    font: 12px sans-serif;
+    pointer-events: none;
+  }
+  .oppia-static-graph text.shadow {
+    stroke: #fff;
+    stroke-width: 3px;
+    stroke-opacity: .8;
+  }
+  .oppia-static-graph .node rect {
+    fill: #fff;
+    pointer-events: all;
+    stroke: rgb(0, 0, 0);
+    -moz-transition: all 0.15s;
+    -webkit-transition: all 0.15s;
+    -o-transition: all 0.15s;
+    transition: all 0.15s;
+  }
+</style>
+
+<div style="height: <[getGraphHeightInPixels()]>px;">
+
+  <svg class="oppia-static-graph" width="100%" height="100%">
+    <g>
+      <g ng-repeat="link in augmentedLinks">
+        <path class="link protractor-test-link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)" ng-attr-style="<[link.style]>">
+        </path>
+      </g>
+
+      <g class="node protractor-test-node" ng-repeat="node in nodeList">
+        <rect rx="2" ry="2" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
+              class="protractor-test-node-background <[node.nodeClass]>"
+              ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
+              ng-attr-style="<[node.style]>">
+        </rect>
+        <title><[getNodeTitle(node)]></title>
+        <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">
+          <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
+        </text>
+      </g>
+    </g>
+  </svg>
+</div>

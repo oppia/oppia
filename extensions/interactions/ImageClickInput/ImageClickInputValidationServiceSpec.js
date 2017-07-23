@@ -99,7 +99,7 @@ describe('ImageClickInputValidationService', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the image region strings are nonempty.'
+        message: 'Please ensure the region labels are nonempty.'
       }]);
 
       regions[0].label = 'SecondLabel';
@@ -108,7 +108,7 @@ describe('ImageClickInputValidationService', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the image region strings are unique.'
+        message: 'Please ensure the region labels are unique.'
       }]);
 
       regions[0].label = '@';
@@ -117,8 +117,7 @@ describe('ImageClickInputValidationService', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
-        message: 'The image region strings should consist of characters ' +
-          'from [A-Za-z0-9].'
+        message: 'The region labels should consist of alphanumeric characters.'
       }]);
 
       customizationArguments.imageAndRegions.value.labeledRegions = [];
@@ -128,7 +127,7 @@ describe('ImageClickInputValidationService', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Please specify at least one image region to click on.'
+        message: 'Please specify at least one region in the image.'
       }]);
     });
 

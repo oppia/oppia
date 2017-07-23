@@ -27,6 +27,20 @@ var addExistingExploration = function(explorationId) {
   element(by.css('.protractor-test-add-exploration-button')).click();
 };
 
+// Search and add existing exploration to the node graph.
+var searchForAndAddExistingExploration = function(query) {
+  element(
+    by.css('.protractor-test-add-exploration-input')
+  ).sendKeys(query);
+  // Waits until the button becomes active after debouncing.
+  browser.driver.sleep(300);
+  // Selects the exploration from dropdown.
+  element(
+    by.css('.protractor-test-add-exploration-input')
+  ).sendKeys(protractor.Key.TAB);
+  element(by.css('.protractor-test-add-exploration-button')).click();
+};
+
 // Shift a node left in the node graph.
 var shiftNodeLeft = function(number) {
   element.all(
@@ -92,6 +106,7 @@ var saveChanges = function () {
 };
 
 exports.addExistingExploration = addExistingExploration;
+exports.searchForAndAddExistingExploration = searchForAndAddExistingExploration;
 exports.shiftNodeLeft = shiftNodeLeft;
 exports.shiftNodeRight = shiftNodeRight;
 exports.deleteNode = deleteNode;

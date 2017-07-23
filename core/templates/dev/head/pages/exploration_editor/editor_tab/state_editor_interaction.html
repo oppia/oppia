@@ -84,13 +84,13 @@
     <button class="btn btn-default" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
     <div class="btn-group"
          ng-if="hasCustomizationArgs"
-         title="<[getSaveInteractionButtonTooltip()]>">
+         popover-append-to-body
+         popover-placement="bottom"
+         popover-trigger="<[isSaveInteractionButtonEnabled() ? 'none' : 'mouseenter']>"
+         ng-attr-popover="<[getSaveInteractionButtonTooltip()]>">
       <button class="btn btn-success protractor-test-save-interaction"
               ng-click="save()"
               ng-disabled="!isSaveInteractionButtonEnabled()">
-        <i class="material-icons"
-           style="margin-right: 2px; font-size: 22px;"
-           ng-if="!isSaveInteractionButtonEnabled()">&#xE002;</i>
         Save Interaction
       </button>
     </div>

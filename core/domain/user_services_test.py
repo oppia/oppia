@@ -31,6 +31,7 @@ import utils
 
 from google.appengine.api import urlfetch
 
+
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
@@ -40,7 +41,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.set_username(user_id, username)
 
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
 
         user_services.set_username(user_id, username)
         self.assertEquals(username, user_services.get_username(user_id))
@@ -50,7 +51,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_username('fakeUser')
 
     def test_get_username_none(self):
-        user_services.get_or_create_user('fakeUser', 'user@example.com')
+        user_services.create_new_user('fakeUser', 'user@example.com')
         self.assertEquals(None, user_services.get_username('fakeUser'))
 
     def test_is_username_taken_false(self):
@@ -59,20 +60,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_is_username_taken_true(self):
         user_id = 'someUser'
         username = 'newUsername'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_is_username_taken_different_case(self):
         user_id = 'someUser'
         username = 'camelCase'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
     def test_set_invalid_usernames(self):
         user_id = 'someUser'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
         bad_usernames = [
             ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020']
         for username in bad_usernames:
@@ -83,7 +84,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
         for email in bad_email_addresses:
             with self.assertRaises(utils.ValidationError):
-                user_services.get_or_create_user('user_id', email)
+                user_services.create_new_user('user_id', email)
 
     def test_email_truncation(self):
         email_addresses = [
@@ -94,7 +95,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             ('abcdefgh@efg.h', 'abcde..@efg.h'),
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
-            user_settings = user_services.get_or_create_user(
+            user_settings = user_services.create_new_user(
                 str(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
@@ -103,7 +104,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
         self.assertEquals(user_services.get_username(user_id), username)
 
@@ -124,7 +125,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
         self.assertEquals(user_services.get_username(user_id), username)
 
@@ -211,7 +212,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
 
         # When UserEmailPreferencesModel is yet to be created,
@@ -259,7 +260,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
 
         # When ExplorationUserDataModel is yet to be created, the value
@@ -315,6 +316,47 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_id, exploration_id)
         self.assertTrue(email_preferences.mute_feedback_notifications)
         self.assertTrue(email_preferences.mute_suggestion_notifications)
+
+    def test_get_usernames_by_role(self):
+        user_ids = ['test1', 'test2', 'test3', 'test4']
+        user_names = ['name1', 'name2', 'name3', 'name4']
+        user_emails = [
+            'test1@email.com', 'test2@email.com',
+            'test3@email.com', 'test4@email.com']
+
+        for uid, email, name in zip(user_ids, user_emails, user_names):
+            user_services.create_new_user(uid, email)
+            user_services.set_username(uid, name)
+
+        user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[2], feconf.ROLE_ID_BANNED_USER)
+        user_services.update_user_role(user_ids[3], feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            set(user_services.get_usernames_by_role(feconf.ROLE_ID_MODERATOR)),
+            set(['name1', 'name2']))
+
+        self.assertEqual(
+            set(user_services.get_usernames_by_role(
+                feconf.ROLE_ID_BANNED_USER)),
+            set(['name3', 'name4']))
+
+    def test_update_user_role(self):
+        user_id = 'test_id'
+        user_name = 'testname'
+        user_email = 'test@email.com'
+
+        user_services.create_new_user(user_id, user_email)
+        user_services.set_username(user_id, user_name)
+
+        self.assertEqual(user_services.get_user_role_from_id(user_id),
+                         feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(user_services.get_user_role_from_id(user_id),
+                         feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
@@ -720,7 +762,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         self.username = 'username'
         self.user_email = 'user@example.com'
 
-        user_services.get_or_create_user(self.user_id, self.user_email)
+        user_services.create_new_user(self.user_id, self.user_email)
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self):

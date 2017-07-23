@@ -533,6 +533,27 @@ class StateAnswersModel(base_models.BaseModel):
         return cls.get(entity_id, strict=False)
 
     @classmethod
+    def get_master_model(cls, exploration_id, exploration_version, state_name):
+        """Retrieves the master model associated with the specific exploration
+        state. Returns None if no answers have yet been submitted to the
+        specified exploration state.
+
+        Args:
+            exploration_id: str. The exploration ID.
+            exploration_version: int. The version of the exploration to fetch
+                answers for.
+            state_name: str. The name of the state to fetch answers for.
+
+        Returns:
+            StateAnswersModel|None. The master model associated with the
+            specified exploration state, or None if no answers have been
+            submitted to this state.
+        """
+        main_shard = cls._get_model(
+            exploration_id, exploration_version, state_name, 0)
+        return main_shard if main_shard else None
+
+    @classmethod
     def get_all_models(cls, exploration_id, exploration_version, state_name):
         """Retrieves all models and shards associated with the specific
         exploration state. Returns None if no answers have yet been submitted to
@@ -544,10 +565,10 @@ class StateAnswersModel(base_models.BaseModel):
         # shard is added after the master shard is retrieved, it will simply be
         # ignored in the result of this function. It will be included during the
         # next call.
-        main_shard = cls._get_model(
-            exploration_id, exploration_version, state_name, 0)
+        main_shard = cls.get_master_model(
+            exploration_id, exploration_version, state_name)
 
-        if main_shard:
+        if main_shard is not None:
             all_models = [main_shard]
             if main_shard.shard_count > 0:
                 shard_ids = [
@@ -570,8 +591,8 @@ class StateAnswersModel(base_models.BaseModel):
         """
         # The main shard always needs to be retrieved. At most one other shard
         # needs to be retrieved (the last one).
-        main_shard = cls._get_model(
-            exploration_id, exploration_version, state_name, 0)
+        main_shard = cls.get_master_model(
+            exploration_id, exploration_version, state_name)
         last_shard = main_shard
 
         if not main_shard:

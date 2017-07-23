@@ -52,7 +52,7 @@ oppia.factory('explorationSaveService', [
         !explorationObjectiveService.savedMemento ||
         !explorationCategoryService.savedMemento ||
         explorationLanguageCodeService.savedMemento ===
-          GLOBALS.DEFAULT_LANGUAGE_CODE ||
+          constants.DEFAULT_LANGUAGE_CODE ||
         explorationTagsService.savedMemento.length === 0);
     };
 
@@ -294,7 +294,7 @@ oppia.factory('explorationSaveService', [
                   !explorationCategoryService.savedMemento);
                 $scope.askForLanguageCheck = (
                   explorationLanguageCodeService.savedMemento ===
-                  GLOBALS.DEFAULT_LANGUAGE_CODE);
+                  constants.DEFAULT_LANGUAGE_CODE);
                 $scope.askForTags = (
                   explorationTagsService.savedMemento.length === 0);
 

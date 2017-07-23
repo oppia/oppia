@@ -75,21 +75,10 @@ class CodeRepl(base.BaseInteraction):
     }]
 
     _answer_visualization_specs = [{
-        # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
             'column_headers': ['Answer', 'Count'],
-            'title': 'Top 5 answers'
+            'title': 'Top 10 answers'
         },
-        'calculation_id': 'Top5AnswerFrequencies',
-    }, {
-        # Table with answer counts.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'All answers'
-        },
-        'calculation_id': 'AnswerFrequencies',
+        'calculation_id': 'Top10AnswerFrequencies',
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

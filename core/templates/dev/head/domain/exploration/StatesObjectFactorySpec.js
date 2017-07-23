@@ -27,10 +27,10 @@ describe('States object factory', function() {
 
       GLOBALS.NEW_STATE_TEMPLATE = {
         classifier_model_id: null,
-        content: [{
-          type: 'text',
-          value: ''
-        }],
+        content: {
+          html: '',
+          audio_translations: []
+        },
         interaction: {
           answer_groups: [],
           confirmed_unclassified_answers: [],
@@ -48,6 +48,7 @@ describe('States object factory', function() {
             param_changes: []
           },
           fallbacks: [],
+          hints: [],
           id: 'TextInput'
         },
         param_changes: []
@@ -55,10 +56,10 @@ describe('States object factory', function() {
 
       statesDict = {
         'first state': {
-          content: [{
-            type: 'text',
-            value: 'content'
-          }],
+          content: {
+            html: 'content',
+            audio_translations: []
+          },
           interaction: {
             id: 'RuleTest',
             answer_groups: [{
@@ -80,7 +81,8 @@ describe('States object factory', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: []
+            fallbacks: [],
+            hints: []
           },
           param_changes: []
         }
@@ -93,10 +95,10 @@ describe('States object factory', function() {
       expect(newStates.getState('new state')).toEqual(
         sof.createFromBackendDict('new state', {
           classifier_model_id: null,
-          content: [{
-            type: 'text',
-            value: ''
-          }],
+          content: {
+            html: '',
+            audio_translations: []
+          },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],
@@ -114,6 +116,7 @@ describe('States object factory', function() {
               param_changes: []
             },
             fallbacks: [],
+            hints: [],
             id: 'TextInput'
           },
           param_changes: []

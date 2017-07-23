@@ -30,6 +30,7 @@ describe('Collections', function() {
       '.protractor-test-reload-collection-button')).first().click();
     general.acceptAlert();
     browser.waitForAngular();
+    admin.reloadAllExplorations();
     admin.editConfigProperty(
       'Names of users allowed to use the collection editor',
       'List', function(listEditor) {
@@ -54,6 +55,10 @@ describe('Collections', function() {
     collectionEditor.addExistingExploration('0');
     collectionEditor.addExistingExploration('4');
     collectionEditor.addExistingExploration('13');
+    // Search and add existing explorations.
+    collectionEditor.searchForAndAddExistingExploration('Lazy');
+    collectionEditor.searchForAndAddExistingExploration('Linear');
+    collectionEditor.searchForAndAddExistingExploration('The');
     // Shifting nodes in the node graph.
     collectionEditor.shiftNodeLeft(1);
     collectionEditor.shiftNodeRight(1);

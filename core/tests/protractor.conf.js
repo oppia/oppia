@@ -68,7 +68,6 @@ exports.config = {
 
     editorFeatures: [
       'protractor/gadgetEditor.js',
-      'protractor/fallbacks.js',
       'protractor/historyTab.js',
       'protractor/parameters.js'
     ],
@@ -85,6 +84,10 @@ exports.config = {
       'protractor/publicationAndLibrary.js'
     ],
 
+    learnerDashboard: [
+      'protractor/learnerDashboard.js',
+    ],
+
     users: [
       'protractor/userManagement.js',
       'protractor/loginFlow.js',
@@ -97,9 +100,12 @@ exports.config = {
       'protractor/cacheSlugs.js',
       'protractor/staticPagesTour.js',
       'protractor/collections.js',
-      'protractor/embedding.js',
       'protractor/accessibility.js',
       'protractor/i18n.js'
+    ],
+
+    embedding: [
+      'protractor/embedding.js'
     ]
   },
 

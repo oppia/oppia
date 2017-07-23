@@ -291,6 +291,8 @@ oppia.directive('conversationSkin', [
           $scope.OPPIA_AVATAR_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg'));
+          $scope.getStaticImageUrl = (
+            UrlInterpolationService.getStaticImageUrl);
 
           $scope.activeCard = null;
           $scope.numProgressDots = 0;
@@ -464,7 +466,7 @@ oppia.directive('conversationSkin', [
               // If the exploration is embedded, use the exploration language
               // as site language. If the exploration language is not supported
               // as site language, English is used as default.
-              var langCodes = $window.GLOBALS.SUPPORTED_SITE_LANGUAGES.map(
+              var langCodes = constants.SUPPORTED_SITE_LANGUAGES.map(
                 function(language) {
                   return language.id;
                 });
@@ -505,7 +507,7 @@ oppia.directive('conversationSkin', [
             hasInteractedAtLeastOnce = true;
 
             var _oldStateName = playerTranscriptService.getLastCard().stateName;
-            playerTranscriptService.addNewAnswer(answer);
+            playerTranscriptService.addNewInput(answer, false);
 
             var timeAtServerCall = new Date().getTime();
 
@@ -525,12 +527,12 @@ oppia.directive('conversationSkin', [
                 $timeout(function() {
                   $scope.$broadcast('oppiaFeedbackAvailable');
                   var pairs = (
-                    playerTranscriptService.getLastCard().answerFeedbackPairs);
+                    playerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
 
                   if (_oldStateName === newStateName) {
                     // Stay on the same card.
-                    playerTranscriptService.addNewFeedback(feedbackHtml);
+                    playerTranscriptService.addNewResponse(feedbackHtml);
                     if (feedbackHtml &&
                         !ExplorationPlayerStateService.isInteractionInline(
                           $scope.activeCard.stateName)) {
@@ -580,7 +582,7 @@ oppia.directive('conversationSkin', [
                         $scope.upcomingStateName));
 
                     if (feedbackHtml) {
-                      playerTranscriptService.addNewFeedback(feedbackHtml);
+                      playerTranscriptService.addNewResponse(feedbackHtml);
 
                       if (!ExplorationPlayerStateService.isInteractionInline(
                             $scope.activeCard.stateName)) {
@@ -594,7 +596,7 @@ oppia.directive('conversationSkin', [
                       focusService.setFocusIfOnDesktop(_nextFocusLabel);
                       scrollToBottom();
                     } else {
-                      playerTranscriptService.addNewFeedback(feedbackHtml);
+                      playerTranscriptService.addNewResponse(feedbackHtml);
                       $scope.showPendingCard(
                         newStateName,
                         newParams,

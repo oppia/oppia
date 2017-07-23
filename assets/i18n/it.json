@@ -33,7 +33,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED": "Ultimo aggiornamento",
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Valutazione",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Trascina l'immagine qui",
-	"I18N_DIRECTIVES_OR_SELECT_FILE": "o seleziona un file di immagine:",
+	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Seleziona un file di immagine",
 	"I18N_ERROR_HEADER_400": "Errore 400",
 	"I18N_ERROR_HEADER_401": "Errore 401",
 	"I18N_ERROR_HEADER_404": "Errore 404",

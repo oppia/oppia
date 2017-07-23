@@ -62,11 +62,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '- type: text',
+        text: '  audio_translations: []',
         highlighted: false
       },
       4: {
-        text: '  value: <p>enter 6 to continue</p>',
+        text: '  html: <p>enter 6 to continue</p>',
         highlighted: true
       },
       5: {
@@ -142,14 +142,22 @@ describe('Exploration history', function() {
         highlighted: false
       },
       23: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      24: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      24: {
+      25: {
+        text: '  solution: {}',
+        highlighted: false
+      },
+      26: {
         text: 'param_changes: []',
         highlighted: false
       },
-      25: {
+      27: {
         text: ' ',
         highlighted: false
       }
@@ -165,11 +173,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '- type: text',
+        text: '  audio_translations: []',
         highlighted: false
       },
       4: {
-        text: '  value: \'\'',
+        text: '  html: \'\'',
         highlighted: true
       },
       5: {
@@ -211,14 +219,22 @@ describe('Exploration history', function() {
         highlighted: false
       },
       14: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      15: {
         text: '  id: null',
         highlighted: true
       },
-      15: {
+      16: {
+        text: '  solution: {}',
+        highlighted: false
+      },
+      17: {
         text: 'param_changes: []',
         highlighted: false
       },
-      16: {
+      18: {
         text: ' ',
         highlighted: false
       }
@@ -227,8 +243,8 @@ describe('Exploration history', function() {
     var STATE_2_STRING =
       'classifier_model_id: null\n' +
       'content:\n' +
-      '- type: text\n' +
-      '  value: <p>this is card 2</p>\n' +
+      '  audio_translations: []\n' +
+      '  html: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
@@ -240,7 +256,9 @@ describe('Exploration history', function() {
       '    feedback: []\n' +
       '    param_changes: []\n' +
       '  fallbacks: []\n' +
+      '  hints: []\n' +
       '  id: Continue\n' +
+      '  solution: {}\n' +
       'param_changes: []\n' +
       ' ';
 

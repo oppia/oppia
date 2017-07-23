@@ -46,7 +46,7 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            random_number = random.randrange(0, 5)
+            random_number = random.choice([0, 5, 6])
             if random_number == 0:
                 self.render_template('pages/splash/splash.html')
             else:

@@ -57,7 +57,7 @@ describe('Site language', function() {
     users.login('varda@example.com');
     browser.get('/preferences');
     element(by.css('.protractor-test-system-language-selector')).click();
-    var options = element.all(by.css('.select2-drop-active li div')).filter(
+    var options = element.all(by.css('.select2-dropdown li')).filter(
       function(elem) {
         return elem.getText().then(function(text) {
           return text === 'Español';
@@ -82,7 +82,7 @@ describe('Site language', function() {
       // The preference page shows the last selected language
       browser.get('/preferences');
       language = element(by.css('.protractor-test-system-language-selector'))
-        .element(by.css('.select2-chosen'));
+        .element(by.css('.select2-selection__rendered'));
       expect(language.getText(), 'Español');
       expect(browser.getTitle()).toEqual(
         'Cambiar sus preferencias de perfil - Oppia');

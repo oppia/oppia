@@ -17,11 +17,13 @@
  */
 
 oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
+oppia.constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
 oppia.constant('PROFILE_URL_TEMPLATE', '/profile/<username>');
 oppia.constant(
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
 oppia.constant(
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
+oppia.constant('ADMIN_SHOW_UPDATE_ROLE', false);
 
 oppia.controller('Admin', [
   '$scope', '$http', '$window', 'AdminRouterService',
@@ -38,6 +40,7 @@ oppia.controller('Admin', [
     $scope.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
     $scope.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
     $scope.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
+    $scope.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
     $scope.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
 
     $scope.setStatusMessage = function(statusMessage) {

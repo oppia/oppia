@@ -1107,7 +1107,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             '<li>Message 1.3<br></li>'
             '</ul></li></ul>'
             'You can view and reply to your messages from your '
-            '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+            '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
             '<br>'
             '<br>Thanks, and happy teaching!<br>'
             '<br>'
@@ -1805,7 +1805,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         emails = ('user1@example.com', 'user2@example.com')
 
         for user_id, username, user_email in zip(user_ids, usernames, emails):
-            user_services.get_or_create_user(user_id, user_email)
+            user_services.create_new_user(user_id, user_email)
             user_services.set_username(user_id, username)
 
         # Both users can receive all emails in default setting.

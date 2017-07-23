@@ -31,7 +31,8 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
 
         var dataArray = [['Answers', '']];
         for (var i = 0; i < $scope.data.length; i++) {
-          dataArray.push([$scope.data[i].answer, $scope.data[i].frequency]);
+          dataArray.push([
+            String($scope.data[i].answer), $scope.data[i].frequency]);
         }
 
         var data = google.visualization.arrayToDataTable(dataArray);
@@ -46,6 +47,9 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
           },
           legend: {
             position: 'none'
+          },
+          vAxis: {
+            title: 'Answer choice'
           }
         };
 

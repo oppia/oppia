@@ -37,13 +37,38 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_LOADING: 'Loading'
 });
 
+oppia.factory('I18nFileHashLoader', [
+  '$http', '$q', 'UrlInterpolationService',
+  function($http, $q, UrlInterpolationService) {
+    /* Options object contains:
+     *  prefix: added before key, defined by developer
+     *  key: language key, determined internally by i18n library
+     *  suffix: added after key, defined by developer
+     */
+    return function(options) {
+      var fileUrl = [
+        options.prefix,
+        options.key,
+        options.suffix
+      ].join('');
+      return $http.get(
+        UrlInterpolationService.getTranslateJsonUrl(fileUrl)
+      ).then(function(result) {
+        return result.data;
+      }, function () {
+        return $q.reject(options.key);
+      });
+    };
+  }
+]);
+
 oppia.controller('I18nFooter', [
   '$http', '$rootScope', '$scope', '$translate', '$timeout',
   function($http, $rootScope, $scope, $translate, $timeout) {
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
-    $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
+    $scope.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
     if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
       $translate.use(GLOBALS.preferredSiteLanguageCode);
     }
@@ -75,7 +100,7 @@ oppia.config([
   function($translateProvider, DEFAULT_TRANSLATIONS) {
     var availableLanguageKeys = [];
     var availableLanguageKeysMap = {};
-    GLOBALS.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+    constants.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
       availableLanguageKeys.push(language.id);
       availableLanguageKeysMap[language.id + '*'] = language.id;
     });
@@ -84,8 +109,8 @@ oppia.config([
     $translateProvider
       .registerAvailableLanguageKeys(
         availableLanguageKeys, availableLanguageKeysMap)
-      .useStaticFilesLoader({
-        prefix: GLOBALS.ASSET_DIR_PREFIX + '/assets/i18n/',
+      .useLoader('I18nFileHashLoader', {
+        prefix: '/i18n/',
         suffix: '.json'
       })
       // The use of default translation improves the loading time when English

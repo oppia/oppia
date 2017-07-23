@@ -23,7 +23,6 @@ oppia.factory('StatesObjectFactory', [
     var States = function(states) {
       this._states = states;
     };
-
     States.prototype.getState = function(stateName) {
       return angular.copy(this._states[stateName]);
     };

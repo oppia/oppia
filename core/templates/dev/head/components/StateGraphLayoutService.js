@@ -430,6 +430,131 @@ oppia.factory('StateGraphLayoutService', [
       },
       getLastComputedArrangement: function() {
         return angular.copy(lastComputedArrangement);
+      },
+      getGraphBoundaries: function(nodeData) {
+        var INFINITY = 1e30;
+        var BORDER_PADDING = 5;
+
+        var leftEdge = INFINITY;
+        var topEdge = INFINITY;
+        var bottomEdge = -INFINITY;
+        var rightEdge = -INFINITY;
+
+        for (var nodeId in nodeData) {
+          leftEdge = Math.min(
+            nodeData[nodeId].x0 - BORDER_PADDING, leftEdge);
+          topEdge = Math.min(
+            nodeData[nodeId].y0 - BORDER_PADDING, topEdge);
+          rightEdge = Math.max(
+            nodeData[nodeId].x0 + BORDER_PADDING + nodeData[nodeId].width,
+            rightEdge);
+          bottomEdge = Math.max(
+            nodeData[nodeId].y0 + BORDER_PADDING + nodeData[nodeId].height,
+            bottomEdge);
+        }
+
+        return {
+          bottom: bottomEdge,
+          left: leftEdge,
+          right: rightEdge,
+          top: topEdge
+        };
+      },
+      getAugmentedLinks: function(nodeData, nodeLinks) {
+        var links = angular.copy(nodeLinks);
+        var augmentedLinks = links.map(function(link) {
+          return {
+            source: angular.copy(nodeData[link.source]),
+            target: angular.copy(nodeData[link.target])
+          };
+        });
+
+        for (var i = 0; i < augmentedLinks.length; i++) {
+          var link = augmentedLinks[i];
+          if (link.source.label !== link.target.label) {
+            var sourcex = link.source.xLabel;
+            var sourcey = link.source.yLabel;
+            var targetx = link.target.xLabel;
+            var targety = link.target.yLabel;
+
+            if (sourcex === targetx && sourcey === targety) {
+              // TODO(sll): Investigate why this happens.
+              return;
+            }
+
+            var sourceWidth = link.source.width;
+            var sourceHeight = link.source.height;
+            var targetWidth = link.target.width;
+            var targetHeight = link.target.height;
+
+            var dx = targetx - sourcex;
+            var dy = targety - sourcey;
+
+            /* Fractional amount of truncation to be applied to the end of
+               each link. */
+            var startCutoff = (sourceWidth / 2) / Math.abs(dx);
+            var endCutoff = (targetWidth / 2) / Math.abs(dx);
+            if (dx === 0 || dy !== 0) {
+              startCutoff = (
+                (dx === 0) ? (sourceHeight / 2) / Math.abs(dy) :
+                Math.min(startCutoff, (sourceHeight / 2) / Math.abs(dy)));
+              endCutoff = (
+                (dx === 0) ? (targetHeight / 2) / Math.abs(dy) :
+                Math.min(endCutoff, (targetHeight / 2) / Math.abs(dy)));
+            }
+
+            var dxperp = targety - sourcey;
+            var dyperp = sourcex - targetx;
+            var norm = Math.sqrt(dxperp * dxperp + dyperp * dyperp);
+            dxperp /= norm;
+            dyperp /= norm;
+
+            var midx = sourcex + dx / 2 + dxperp * (sourceHeight / 4);
+            var midy = sourcey + dy / 2 + dyperp * (targetHeight / 4);
+            var startx = sourcex + startCutoff * dx;
+            var starty = sourcey + startCutoff * dy;
+            var endx = targetx - endCutoff * dx;
+            var endy = targety - endCutoff * dy;
+
+            // Draw a quadratic bezier curve.
+            augmentedLinks[i].d = (
+              'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
+              ' ' + endx + ' ' + endy);
+          }
+        }
+        return augmentedLinks;
+      },
+      modifyPositionValues: function(nodeData, graphWidth, graphHeight) {
+        var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
+        var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];  
+
+        // Change the position values in nodeData to use pixels.
+        for (var nodeId in nodeData) {
+          for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
+            nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
+              graphWidth *
+              nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
+            nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
+              graphHeight *
+              nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
+          }
+        }
+        return nodeData;
+      },
+      getGraphWidth: function(maxNodesPerRow, maxNodeLabelLength) {
+        // A rough upper bound for the width of a single letter, in pixels,
+        // to use as a scaling factor to determine the width of graph nodes.
+        // This is not an entirely accurate description because it also takes
+        // into account the horizontal whitespace between graph nodes.
+        var letterWidthInPixels = 10.5;          
+        return maxNodesPerRow * maxNodeLabelLength * letterWidthInPixels;
+      },
+      getGraphHeight: function(nodeData) {
+        var maxDepth = 0;
+        for (var nodeId in nodeData) {
+          maxDepth = Math.max(maxDepth, nodeData[nodeId].depth);
+        }
+        return 70.0 * (maxDepth + 1);
       }
     };
   }

@@ -16,7 +16,7 @@
  * @fileoverview End-to-end tests for suggestions on explorations
  */
 
-var dashboard = require('../protractor_utils/dashboard.js');
+var creatorDashboard = require('../protractor_utils/creatorDashboard.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
@@ -63,7 +63,7 @@ describe('Suggestions on Explorations', function() {
     // Exploration author reviews the suggestion and accepts it
     users.login('user1@ExplorationSuggestions.com');
     browser.get(general.SERVER_URL_PREFIX);
-    dashboard.navigateToExplorationEditor();
+    creatorDashboard.navigateToExplorationEditor();
     editor.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);

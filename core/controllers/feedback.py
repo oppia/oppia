@@ -63,9 +63,13 @@ class ThreadHandler(base.BaseHandler):
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        messages = [m.to_dict() for m in feedback_services.get_messages(
+            exploration_id, thread_id)]
+        message_ids = [message['message_id'] for message in messages]
+        feedback_services.update_messages_read_by_the_user(
+            self.user_id, exploration_id, thread_id, message_ids)
         self.values.update({
-            'messages': [m.to_dict() for m in feedback_services.get_messages(
-                exploration_id, thread_id)],
+            'messages': messages,
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)
@@ -148,7 +152,7 @@ class SuggestionHandler(base.BaseHandler):
             self.payload.get('exploration_version'),
             self.payload.get('state_name'),
             self.payload.get('description'),
-            self.payload.get('suggestion_content'))
+            self.payload.get('suggestion_html'))
         self.render_json(self.values)
 
 
@@ -166,7 +170,8 @@ class SuggestionActionHandler(base.BaseHandler):
                 self.user_id,
                 thread_id,
                 exploration_id,
-                self.payload.get('commit_message'))
+                self.payload.get('commit_message'),
+                self.payload.get('audio_update_required'))
         elif action == self._REJECT_ACTION:
             exp_services.reject_suggestion(
                 self.user_id, thread_id, exploration_id)

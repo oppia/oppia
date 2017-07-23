@@ -25,7 +25,7 @@
                            on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
       </schema-based-editor>
     </td>
-    <td ng-if="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 1" style="vertical-align: top;">
+    <td ng-if="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 0" style="vertical-align: top;">
       <button class="oppia-delete-list-entry-button oppia-transition-200 protractor-test-delete-list-entry" type="button"
               ng-click="deleteElement($index)"
               ng-disabled="isDisabled()">

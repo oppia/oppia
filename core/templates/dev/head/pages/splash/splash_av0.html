@@ -131,7 +131,7 @@
           {% if not user_is_logged_in %}
             <!-- User must complete the registration process. -->
             <button type="button"
-                    ng-click="onRedirectToLogin('/dashboard?mode=create')"
+                    ng-click="onRedirectToLogin('/creator_dashboard?mode=create')"
                     class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
                     style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
                     translate="I18N_ACTION_CREATE_LESSON">
@@ -175,7 +175,7 @@
             <img ng-src="<[getStaticImageUrl('/splash/bullet2icon.svg')]>" alt="">
           </div>
           <div class="oppia-splash-bullet-block oppia-splash-block-left-text">
-            It's easy and free to create a lesson in Oppia. Just <a ng-click="onRedirectToLogin('/dashboard?mode=create')">sign up</a> and get
+            It's easy and free to create a lesson in Oppia. Just <a ng-click="onRedirectToLogin('/creator_dashboard?mode=create')">sign up</a> and get
             started! You'll be able to see how many students have started your
             lessons, and get detailed information on their progress.
           </div>

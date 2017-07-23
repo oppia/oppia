@@ -1,0 +1,483 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Learner Dashboard - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <background-banner></background-banner>
+  <div class="oppia-learner-dashboard-container" ng-controller="LearnerDashboard" style="position: relative;">
+    <div>
+      <h2 class="oppia-learner-dashboard-title"
+          translate="I18N_TOPNAV_LEARNER_DASHBOARD"
+          ng-class="{'oppia-learner-dashboard-title-mobile': checkMobileView()}">
+      </h2>
+    </div>
+
+    <div class="oppia-dashboard-aggregated-stats oppia-learner-dashboard-main-content"
+         style="padding-top: 10px; margin: auto;"
+         ng-class="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}"
+         ng-if="!noActivity">
+      <md-card layout="row"
+               ng-style="checkMobileView() ? {'margin-bottom': '10px'} : {'margin-bottom': '40px'}">
+        <div class="stats-card">
+          <p class="stat-description">Completed Explorations</p>
+          <h1 class="stat-value"><[completedExplorationsList.length]></h1>
+        </div>
+        <div class="stats-card">
+          <p class="stat-description">Completed Collections</p>
+          <h1 class="stat-value"><[completedCollectionsList.length]></h1>
+        </div>
+        <div class="stats-card">
+          <p class="stat-description">Subscriptions</p>
+          <h1 class="stat-value"><[subscriptionsList.length]></h1>
+        </div>
+      </md-card>
+    </div>
+
+    <div class="row"
+         ng-style="checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
+         style="display: flex;"
+         ng-if="noActivity">
+      <div class="col-sm-2"
+           ng-style="checkMobileView() ? {'text-align': 'center'} : {'text-align': 'left'}">
+        <div style="height: 100%;" ng-if="!checkMobileView()"></div>
+        <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>"
+             ng-class="{'oppia-learner-dashboard-mascot-mobile': checkMobileView()}"
+             class="oppia-learner-dashboard-mascot">
+      </div>
+
+      <div class="col-sm-8">
+        <blockquote class="oppia-learner-dashboard-intro-card ">
+          <p class="oppia-learner-dashboard-intro-card-message" style="padding-top: 6px;"
+             translate="I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE">
+          </p>
+          <p class="oppia-learner-dashboard-intro-card-message" style="padding-top: 15px;"
+             translate="I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_TWO">
+          </p>
+          <a class="btn oppia-learner-dashboard-intro-button oppia-transition-200"
+             translate="I18N_ACTION_BROWSE_LESSONS"
+             ng-href="/library">
+          </a>
+        </blockquote>
+      </div>
+
+      <div class="col-sm-2">
+
+      </div>
+    </div>
+
+    <div class="row"
+         ng-style="checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
+         ng-class="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}"
+         style="display: flex;"
+         ng-if="!noActivity">
+      <div class="col-md-2 oppia-learner-dashboard-side-content"
+           ng-class="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}"
+           style="min-width: 200px;">
+        <md-card class="oppia-learner-dashboard-main-menu">
+          <h4 class="oppia-learner-dashboard-menu"
+              ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE}"
+              ng-click="setActiveSection(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE)">
+            <span translate="<[LEARNER_DASHBOARD_SECTIONS.INCOMPLETE]>"></span>
+            <span class="caret"></span>
+          </h4>
+          <div ng-show="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE" class="menu-sub-section">
+            <div class="oppia-learner-dashboard-submenu"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)"
+                 translate="I18N_DASHBOARD_EXPLORATIONS">
+            </div>
+            <div id="completedSection"
+                 class="oppia-learner-dashboard-submenu"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)"
+                 translate="I18N_DASHBOARD_COLLECTIONS">
+            </div>
+          </div>
+          <h4 class="oppia-learner-dashboard-menu protractor-test-completed-section"
+              ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED}"
+              ng-click="setActiveSection(LEARNER_DASHBOARD_SECTIONS.COMPLETED)">
+            <span translate="<[LEARNER_DASHBOARD_SECTIONS.COMPLETED]>"></span>
+            <span class="caret"></span>
+          </h4>
+          <div ng-show="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED" class="menu-sub-section">
+            <div class="oppia-learner-dashboard-submenu"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)"
+                 translate="I18N_DASHBOARD_EXPLORATIONS">
+            </div>
+            <div id="completedSection"
+                 class="oppia-learner-dashboard-submenu"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)"
+                 translate="I18N_DASHBOARD_COLLECTIONS">
+            </div>
+          </div>
+          <h4 class="oppia-learner-dashboard-menu protractor-test-subscriptions-section"
+              ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS}"
+              ng-click="setActiveSection(LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS)">
+            <span translate="<[LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS]>"></span>
+          </h4>
+        </md-card>
+      </div>
+
+      <div class="col-md-8 oppia-learner-dashboard-main-content"
+           ng-class="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
+        <div>
+          <span class="oppia-learner-dashboard-main-content-title">
+            <span translate="<[activeSection]>"></span>
+            <span ng-if="activeSection !== LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS">
+              <span class="oppia-navbar-breadcrumb-separator"
+                    style="margin: 0 1px;">
+              </span>
+              <span translate="<[activeSubSection]>"></span>
+            </span>
+          </span>
+
+          <span class="sort-explorations-select oppia-learner-dashboard-sort"
+                ng-class="{'oppia-learner-dashboard-sort-mobile': checkMobileView()}"
+                ng-if="activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS && ((activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && completedExplorationsList.length !== 0) || (activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && incompleteExplorationsList.length !== 0))">
+            <p class="sort-by-text" style="margin-top: 0;">Sort By</p>
+            <select ng-model="currentExpSortType"
+                    class="sort-options"
+                    style="margin-top: 0;"
+                    ng-change="setExplorationsSortingOptions(currentExpSortType)"
+                    ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value | translate for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
+            </select>
+            <span class="sort-order fa"
+                  ng-click="setExplorationsSortingOptions(currentExpSortType)"
+                  ng-class="isCurrentExpSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+            </span>
+          </span>
+
+          <span class="sort-explorations-select oppia-learner-dashboard-sort"
+                ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS && subscriptionsList.length !== 0"
+                ng-class="{'oppia-learner-dashboard-sort-mobile': checkMobileView()}"
+                style="margin-bottom: 7px;">
+            <p class="sort-by-text" style="margin-top: 0;">Sort By</p>
+            <select ng-model="currentSubscribersSortType"
+                    class="sort-options"
+                    ng-change="setSubscriptionSortingOptions(currentSubscribersSortType)"
+                    ng-options="SUBSCRIPTION_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS"
+                    style="width: 160px;">
+            </select>
+            <span class="sort-order fa"
+                  ng-click="setSubscriptionSortingOptions(currentSubscribersSortType)"
+                  ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+            </span>
+          </span>
+        </div>
+        <div class="oppia-learner-dashboard-main-content-container">
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS">
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="numberDeletedIncompleteExplorations !== 0">
+              <span ng-if="numberDeletedIncompleteExplorations === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATION"
+                    translate-values="{numberDeleted: numberDeletedIncompleteExplorations}"></span>
+              <span ng-if="numberDeletedIncompleteExplorations > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATIONS"
+                    translate-values="{numberDeleted: numberDeletedIncompleteExplorations}"></span>
+              &#9785
+            </span>
+
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="incompleteExplorationsList.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
+            <div ng-repeat="tile in incompleteExplorationsList | orderBy:sortExplorationFunction:isCurrentExpSortDescending | limitTo:PAGE_SIZE:startIncompleteExpIndex track by tile.id"
+                 style="display: inline-block; margin-left: 1px;"
+                 ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
+              <i class="remove-icon fa fa-times"
+                 ng-show="showRemoveIcon"
+                 aria-hidden="true"
+                 ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
+                 tooltip="Remove"
+                 tooltip-placement="top"></i>
+              <exploration-summary-tile
+                                      exploration-id="tile.id"
+                                      exploration-title="tile.title"
+                                      last-updated-msec="tile.last_updated_msec"
+                                      objective="tile.objective"
+                                      category="tile.category"
+                                      ratings="tile.ratings"
+                                      num-views="tile.num_views"
+                                      thumbnail-icon-url="tile.thumbnail_icon_url"
+                                      thumbnail-bg-color="tile.thumbnail_bg_color"
+                                      class="protractor-test-exp-summary-tile">
+              </exploration-summary-tile>
+            </div>
+
+            <div class="oppia-learner-dashboard-page-portfolio"
+                 ng-if="incompleteExplorationsList.length > 8">
+              <i class="material-icons md-18"
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)">&#xE5C4;</i>
+              Showing <[startIncompleteExpIndex + 1]> - <[Math.min(startIncompleteExpIndex + PAGE_SIZE, incompleteExplorationsList.length)]> of <[incompleteExplorationsList.length]>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)">&#xE5C8;</i>
+            </div>
+          </div>
+
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS">
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="numberDeletedCompletedExplorations !== 0">
+              <span ng-if="numberDeletedCompletedExplorations === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATION"
+                    translate-values="{numberDeleted: numberDeletedCompletedExplorations}"></span>
+              <span ng-if="numberDeletedCompletedExplorations > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATIONS"
+                    translate-values="{numberDeleted: numberDeletedCompletedExplorations}"></span>
+              &#9785
+            </span>
+
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="completedExplorationsList.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
+            <div ng-repeat="tile in completedExplorationsList | orderBy:sortExplorationFunction:isCurrentExpSortDescending track by tile.id"
+                 style="display: inline-block; margin-left: 1px;">
+              <exploration-summary-tile
+                                      exploration-id="tile.id"
+                                      exploration-title="tile.title"
+                                      last-updated-msec="tile.last_updated_msec"
+                                      objective="tile.objective"
+                                      category="tile.category"
+                                      ratings="tile.ratings"
+                                      num-views="tile.num_views"
+                                      thumbnail-icon-url="tile.thumbnail_icon_url"
+                                      thumbnail-bg-color="tile.thumbnail_bg_color"
+                                      class="protractor-test-exp-summary-tile">
+              </exploration-summary-tile>
+            </div>
+
+            <div class="oppia-learner-dashboard-page-portfolio"
+                 ng-if="completedExplorationsList.length > 8">
+              <i class="material-icons md-18"
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)">&#xE5C4;</i>
+              Showing <[startCompletedExpIndex + 1]> - <[Math.min(startCompletedExpIndex + PAGE_SIZE, completedExplorationsList.length)]> of <[completedExplorationsList.length]>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUBSECTIONS.EXPLORATIONS)">&#xE5C8;</i>
+            </div>
+          </div>
+
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS">
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="numberDeletedIncompleteCollections !== 0">
+              <span ng-if="numberDeletedIncompleteCollections === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTION"
+                    translate-values="{numberDeleted: numberDeletedIncompleteCollections}"></span>
+              <span ng-if="numberDeletedIncompleteCollections > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTIONS"
+                    translate-values="{numberDeleted: numberDeletedIncompleteCollections}"></span>
+              &#9785
+            </span>
+
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="incompleteCollectionsList.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
+            <div ng-repeat="tile in incompleteCollectionsList"
+                 style="display: inline-block; margin-left: 1px;"
+                 ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
+              <i class="remove-icon fa fa-times"
+                 ng-show="showRemoveIcon"
+                 aria-hidden="true"
+                 ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
+                 tooltip="Remove"
+                 tooltip-placement="top"></i>
+              <collection-summary-tile
+                                       collection-id="tile.id"
+                                       collection-title="tile.title"
+                                       last-updated-msec="tile.last_updated_msec"
+                                       objective="tile.objective"
+                                       node-count="tile.node_count"
+                                       category="tile.category"
+                                       thumbnail-icon-url="tile.thumbnail_icon_url"
+                                       thumbnail-bg-color="tile.thumbnail_bg_color">
+              </collection-summary-tile>
+            </div>
+
+            <div class="oppia-learner-dashboard-page-portfolio"
+                 ng-if="incompleteCollectionsList.length > 8">
+              <i class="material-icons md-18"
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)">&#xE5C4;</i>
+              Showing <[startIncompleteCollectionIndex + 1]> - <[Math.min(startIncompleteCollectionIndex + PAGE_SIZE, incompleteCollectionsList.length)]> of <[incompleteCollectionsList.length]>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)">&#xE5C8;</i>
+            </div>
+          </div>
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS">
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="completedToIncompleteCollections.length !== 0">
+              <span translate="I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS"
+                    translate-values="{numberMoved: completedToIncompleteCollections.length}">
+              </span>
+              <span>
+                <ul>
+                  <li ng-repeat="title in completedToIncompleteCollections"><[title]></li>
+                </ul>
+              </span>
+            </span>
+
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="numberDeletedCompletedCollections !== 0">
+              <span ng-if="numberDeletedCompletedCollections === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTION"
+                    translate-values="{numberDeleted: numberDeletedCompletedCollections}"></span>
+              <span ng-if="numberDeletedCompletedCollections > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTIONS"
+                    translate-values="{numberDeleted: numberDeletedCompletedCollections}"></span>
+              &#9785
+            </span>
+
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="completedCollectionsList.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
+            <div ng-repeat="tile in completedCollectionsList"
+                 style="display: inline-block; margin-left: 1px;">
+              <collection-summary-tile
+                                       collection-id="tile.id"
+                                       collection-title="tile.title"
+                                       last-updated-msec="tile.last_updated_msec"
+                                       objective="tile.objective"
+                                       node-count="tile.node_count"
+                                       category="tile.category"
+                                       thumbnail-icon-url="tile.thumbnail_icon_url"
+                                       thumbnail-bg-color="tile.thumbnail_bg_color">
+              </collection-summary-tile>
+            </div>
+
+            <div class="oppia-learner-dashboard-page-portfolio"
+                 ng-if="completedCollectionsList.length > 8">
+              <i class="material-icons md-18"
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)">&#xE5C4;</i>
+              Showing <[startCompletedCollectionIndex + 1]> - <[Math.min(startCompletedCollectionIndex + PAGE_SIZE, completedCollectionsList.length)]> of <[completedCollectionsList.length]>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.COMPLETE, LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)">&#xE5C8;</i>
+            </div>
+          </div>
+
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS" style="margin-top: 5px;">
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="subscriptionsList.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
+            <md-card class="oppia-subscription-card"
+                     ng-repeat="subscription in subscriptionsList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending""
+                     style="margin: 0 8px 0 4px; width: 197px;">
+              <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank">
+                <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
+                <span class="oppia-subscription-card-summary" style="color: black;">
+                  <div style="margin-bottom: 5px; font-size: 17.5px;">
+                    <strong class="protractor-test-subscription-name"
+                            popover-append-to-body
+                            popover-trigger="<[showUsernamePopover(subscription.creator_username)]>"
+                            ng-attr-popover="<[subscription.creator_username]>">
+                      <[subscription.creator_username| truncate:10]>
+                    </strong>
+                  </div>
+                  <div style="font-size: 14.5px;">
+                    <span>Impact</span>
+                    <span><[subscription.creator_impact || 0]></span>
+                  </div>
+                </span>
+              </a>
+            </md-card>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-2 oppia-learner-dashboard-side-content"
+           ng-class="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
+
+      </div>
+    </div>
+  </div>
+
+  <script type="text/ng-template" id="modals/removeEntity">
+    <div class="modal-header">
+      <h3>Remove from '<[sectionName | translate]>' list?</h3>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        Are you sure you want to remove '<[entityTitle]>' from your '<[sectionName | translate]>' list?
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+      <button class="btn btn-danger protractor-test-confirm-delete-interaction"
+              ng-click="remove()">
+        Remove
+      </button>
+    </div>
+  </script>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/learner_dashboard/LearnerDashboardBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/learner_dashboard/LearnerDashboard.js"></script>
+{% endblock footer_js %}

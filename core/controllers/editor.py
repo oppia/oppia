@@ -19,11 +19,15 @@
 import datetime
 import imghdr
 import logging
+import StringIO
 
+import cloudstorage
 import jinja2
+import mutagen
 
 from constants import constants
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import email_manager
@@ -41,9 +45,11 @@ from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import visualization_registry
 from core.platform import models
+
 import feconf
 import utils
 
+app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -55,10 +61,10 @@ current_user_services = models.Registry.import_current_user_services()
 # changed to the desired new state name.
 NEW_STATE_TEMPLATE = {
     'classifier_model_id': None,
-    'content': [{
-        'type': 'text',
-        'value': ''
-    }],
+    'content': {
+        'html': '',
+        'audio_translations': [],
+    },
     'interaction': exp_domain.State.NULL_INTERACTION_DICT,
     'param_changes': [],
 }
@@ -242,7 +248,6 @@ class ExplorationPage(EditorHandler):
                 get_value_generators_js()),
             'title': exploration.title,
             'visualizations_html': jinja2.utils.Markup(visualizations_html),
-            'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
@@ -288,11 +293,14 @@ class ExplorationHandler(EditorHandler):
                 exploration_id, exp_user_data.draft_change_list_exp_version)
             if exp_user_data and exp_user_data.draft_change_list_exp_version
             else None)
+        draft_change_list_id = (exp_user_data.draft_change_list_id
+                                if exp_user_data else 0)
         exploration_email_preferences = (
             user_services.get_email_preferences_for_exploration(
                 self.user_id, exploration_id))
         editor_dict = {
             'category': exploration.category,
+            'draft_change_list_id': draft_change_list_id,
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'language_code': exploration.language_code,
@@ -640,11 +648,12 @@ class UntrainedAnswersHandler(EditorHandler):
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to the classifier individually.
-        submitted_answers = stats_services.get_top_state_rule_answers(
-            exploration_id, state_name, [
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
-                exp_domain.TRAINING_DATA_CLASSIFICATION])[
-                    :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
+
+        # TODO(sll): Functionality for retrieving untrained answers was removed
+        # in PR 3489 due to infeasibility of the calculation approach. It needs
+        # to be reinstated in the future so that the training interface can
+        # function.
+        submitted_answers = []
 
         interaction = state.interaction
         unhandled_answers = []
@@ -697,15 +706,12 @@ class ExplorationDownloadHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_download_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
-            raise self.PageNotFoundException
-
-        if not rights_manager.Actor(self.user_id).can_view(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)
@@ -824,6 +830,7 @@ class ExplorationStatisticsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id, exploration_version):
         """Handles GET requests."""
         try:
@@ -840,6 +847,7 @@ class ExplorationStatsVersionsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
@@ -857,6 +865,7 @@ class StateRulesStatsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
@@ -888,43 +897,118 @@ class ImageUploadHandler(EditorHandler):
         if not raw:
             raise self.InvalidInputException('No image supplied')
 
+        allowed_formats = ', '.join(
+            feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
+
+        # Verify that the data is recognized as an image.
         file_format = imghdr.what(None, h=raw)
         if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
-            allowed_formats = ', '.join(
-                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
-            raise Exception('Image file not recognized: it should be in '
-                            'one of the following formats: %s.' %
-                            allowed_formats)
+            raise self.InvalidInputException('Image not recognized')
 
+        # Verify that the file type matches the supplied extension.
         if not filename:
             raise self.InvalidInputException('No filename supplied')
         if '/' in filename or '..' in filename:
             raise self.InvalidInputException(
                 'Filenames should not include slashes (/) or consecutive dot '
                 'characters.')
-        if '.' in filename:
-            dot_index = filename.rfind('.')
-            primary_name = filename[:dot_index]
-            extension = filename[dot_index + 1:].lower()
-            if (extension not in
-                    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
-                raise self.InvalidInputException(
-                    'Expected a filename ending in .%s; received %s' %
-                    (file_format, filename))
-        else:
-            primary_name = filename
+        if '.' not in filename:
+            raise self.InvalidInputException(
+                'Image filename with no extension: it should have '
+                'one of the following extensions: %s.' % allowed_formats)
 
-        filepath = '%s.%s' % (primary_name, file_format)
+        dot_index = filename.rfind('.')
+        extension = filename[dot_index + 1:].lower()
+        if (extension not in
+                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
+            raise self.InvalidInputException(
+                'Expected a filename ending in .%s, received %s' %
+                (file_format, filename))
 
+        # Save the file.
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))
-        if fs.isfile(filepath):
+        if fs.isfile(filename):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
-                'different name.' % filepath)
-        fs.commit(self.user_id, filepath, raw)
+                'different name.' % filename)
+        fs.commit(self.user_id, filename, raw)
 
-        self.render_json({'filepath': filepath})
+        self.render_json({'filepath': filename})
+
+
+class AudioFileHandler(EditorHandler):
+    """Handles audio file uploads to Google Cloud Storage."""
+
+    @require_editor
+    def post(self, exploration_id):
+        """Saves an audio file uploaded by a content creator."""
+
+        raw = self.request.get('raw')
+        filename = self.payload.get('filename')
+        allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
+
+        if not raw:
+            raise self.InvalidInputException('No audio supplied')
+        dot_index = filename.rfind('.')
+        extension = filename[dot_index + 1:].lower()
+
+        if dot_index == -1 or dot_index == 0:
+            raise self.InvalidInputException(
+                'No filename extension: it should have '
+                'one of the following extensions: %s' % allowed_formats)
+        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
+            raise self.InvalidInputException(
+                'Invalid filename extension: it should have '
+                'one of the following extensions: %s' % allowed_formats)
+
+        tempbuffer = StringIO.StringIO()
+        tempbuffer.write(raw)
+        tempbuffer.seek(0)
+        try:
+            audio = mutagen.File(tempbuffer)
+        except mutagen.MutagenError:
+            # Mutagen occasionally has problems with certain files
+            # for unknown reasons.
+            raise self.InvalidInputException('Could not open uploaded'
+                                             'audio file')
+        tempbuffer.close()
+
+        if audio is None:
+            raise self.InvalidInputException('Audio not recognized '
+                                             'as a %s file' % extension)
+        if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
+            raise self.InvalidInputException(
+                'Audio must be under %s seconds in length. '
+                'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC,
+                                     audio.info.length))
+        if len(set(audio.mime).intersection(
+                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
+            raise self.InvalidInputException(
+                'Although the filename extension indicates the file '
+                'is a %s file, it was not recognized as one. '
+                'Found mime types: %s' % (extension, audio.mime))
+
+        mimetype = audio.mime[0]
+
+        # For a strange, unknown reason, the audio variable must be
+        # deleted before opening cloud storage. If not, cloud storage
+        # throws a very mysterious error that entails a mutagen
+        # object being recursively passed around in app engine.
+        del audio
+
+        bucket_name = constants.GCS_RESOURCE_BUCKET_NAME
+
+        # Upload to GCS bucket with filepath
+        # "<bucket>/<exploration-id>/assets/audio/<filename>".
+        gcs_file_url = ('/%s/%s/assets/audio/%s'
+                        % (bucket_name, exploration_id, filename))
+        gcs_file = cloudstorage.open(
+            gcs_file_url, 'w', content_type=mimetype)
+        gcs_file.write(raw)
+        gcs_file.close()
+
+        self.render_json({'filename': filename})
 
 
 class StartedTutorialEventHandler(EditorHandler):
@@ -952,11 +1036,14 @@ class EditorAutosaveHandler(ExplorationHandler):
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
-
-        # If the value passed here is False, have the user discard the draft
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.user_id, exploration_id)
+        draft_change_list_id = exp_user_data.draft_change_list_id
+        # If the draft_change_list_id is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
         self.render_json({
+            'draft_change_list_id': draft_change_list_id,
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 

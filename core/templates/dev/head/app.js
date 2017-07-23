@@ -21,7 +21,7 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
+    'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
     'toastr'
@@ -43,11 +43,15 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_STRING_CLASSIFIER', false);
-
+// Feature still in development.
+oppia.constant('ENABLE_HINT_EDITOR', true);
+oppia.constant('ENABLE_FALLBACK_EDITOR', false);
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
 });
+oppia.constant('ACTION_ACCEPT_SUGGESTION', 'accept');
+oppia.constant('ACTION_REJECT_SUGGESTION', 'reject');
 
 // The maximum number of nodes to show in a row of the state graph.
 oppia.constant('MAX_NODES_PER_ROW', 4);
@@ -833,12 +837,6 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
     isWindowNarrow: function() {
       var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
       return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
-    },
-    isExplorationPlayerNavHidden: function() {
-      // NOTE TO DEVELOPERS: This value should be updated in oppia.css if
-      // changed.
-      var EXPLORATION_PLAYER_NAV_CUTOFF_WIDTH_PX = 651;
-      return this.getWidth() < EXPLORATION_PLAYER_NAV_CUTOFF_WIDTH_PX;
     }
   };
 }]);
@@ -866,8 +864,7 @@ oppia.factory('BackgroundMaskService', function() {
 // turned on. This flag must be turned on explicitly by the application
 // owner in feconf.py.
 oppia.factory('siteAnalyticsService', ['$window', function($window) {
-  var CAN_SEND_ANALYTICS_EVENTS = GLOBALS.CAN_SEND_ANALYTICS_EVENTS;
-
+  var CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/events
   var _sendEventToGoogleAnalytics = function(

@@ -44,10 +44,10 @@ describe('Editable exploration backend API service', function() {
       states: {
         Introduction: {
           param_changes: [],
-          content: [{
-            type: 'text',
-            value: ''
-          }],
+          content: {
+            html: '',
+            audio_translations: []
+          },
           unresolved_answers: {},
           interaction: {
             customization_args: {},

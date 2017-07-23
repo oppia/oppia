@@ -83,5 +83,15 @@ var reloadExploration = function(name) {
   );
 };
 
+// Imports all the demo explorations.
+var reloadAllExplorations = function(name) {
+  browser.get(general.ADMIN_URL_SUFFIX);
+  element.all(by.css(
+    '.protractor-test-reload-all-explorations-button')).click();
+  general.acceptAlert();
+  browser.waitForAngular();
+};
+
 exports.editConfigProperty = editConfigProperty;
 exports.reloadExploration = reloadExploration;
+exports.reloadAllExplorations = reloadAllExplorations;

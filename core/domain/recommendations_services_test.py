@@ -238,7 +238,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         for name, user in self.USER_DATA.iteritems():
             user['id'] = self.get_user_id_from_email(
                 user['email'])
-            user_services.get_or_create_user(user['id'], user['email'])
+            user_services.create_new_user(user['id'], user['email'])
             self.signup(user['email'], name)
             self.USER_DATA[name]['id'] = user['id']
 
@@ -253,8 +253,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             rights_manager.publish_exploration(exp['owner_id'], exp_id)
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        user_services.get_or_create_user(
-            self.admin_id, self.ADMIN_EMAIL)
+        user_services.create_new_user(self.admin_id, self.ADMIN_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
 
