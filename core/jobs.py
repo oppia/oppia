@@ -198,8 +198,7 @@ class BaseJobManager(object):
         cls._post_completed_hook(job_id)
 
     @classmethod
-    def _compress_output_list(
-            cls, output_list, test_only_max_output_chars=None):
+    def _compress_output_list(cls, output_list, test_only_max_output_len=None):
         """Returns compressed list of strings within a max length of chars.
 
         Ensures that the payload (i.e. str(output) for output in output_list)
@@ -207,13 +206,13 @@ class BaseJobManager(object):
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
-            test_only_max_output_chars: int or None. Overrides the rigid
-                max output chars limit when not None.
+            test_only_max_output_len: int or None. Overrides the intendend
+                max output len limit when not None.
 
         Returns:
             list(str). The compressed stringified output values.
         """
-        _MAX_OUTPUT_CHARS = 900000
+        _MAX_OUTPUT_LEN = 900000
 
         # Consolidate the lines of output since repeating them isn't useful.
         counter = collections.Counter(str(output) for output in output_list)
@@ -223,10 +222,10 @@ class BaseJobManager(object):
         ]
 
         # Truncate outputs to fit within given max length.
-        if test_only_max_output_chars is None:
-            remaining_len = _MAX_OUTPUT_CHARS
+        if test_only_max_output_len is None:
+            remaining_len = _MAX_OUTPUT_LEN
         else:
-            remaining_len = test_only_max_output_chars
+            remaining_len = test_only_max_output_len
 
         for idx, output_str in enumerate(output_str_list):
             remaining_len -= len(output_str)
