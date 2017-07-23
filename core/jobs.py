@@ -171,24 +171,24 @@ class BaseJobManager(object):
     @classmethod
     def _compress_output_list(
             cls, output_list, test_only_max_output_chars=None):
-        """Returns compressed list of strings with a max length of chars.
+        """Returns compressed list of strings within a max length of chars.
+
+        Ensures that: `sum(len(s) for s in output) <= max output chars`.
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
-            test_only_max_output_chars: int or None. Used to help test this
-                method.
+            test_only_max_output_chars: int or None. Overrides the rigid
+                max output chars limit when not None.
 
         Returns:
             list(str). The compressed stringified output values.
         """
         _MAX_OUTPUT_CHARS = 900000
-        class _OrderedCounter(collections.Counter, collections.OrderedDict):
-            """Counter that remembers the order elements are first seen."""
 
         # Consolidate the lines of output since repeating them isn't useful.
-        counter = _OrderedCounter(str(output) for output in output_list)
+        counter = collections.Counter(str(output) for output in output_list)
         output_str_list = [
-            output_str if count == 1 else '%s (%d times)' % (output_str, count)
+            output_str if count == 1 else '(%dx) %s' % (count, output_str)
             for (output_str, count) in counter.iteritems()
         ]
 
