@@ -202,7 +202,8 @@ class BaseJobManager(object):
             cls, output_list, test_only_max_output_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
-        Ensures that: `sum(len(s) for s in output) <= max output chars`.
+        Ensures that the payload (i.e. str(output) for output in output_list)
+        makes up at most max_output_chars of the data in the final output.
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
