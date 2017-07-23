@@ -2969,16 +2969,20 @@ class Exploration(object):
         segregated into state names with changed and unchanged answer groups.
 
         Args:
-            old_states: dict. List of State Domain objects.
+            old_states: dict. Dictionary containing all State domain objects.
 
         Returns:
-            dict. The trainable states dict.
+            dict. The trainable states dict. This dict has two keys representing
+                state names with changed and unchanged answer groups
+                respectively.
         """
         trainable_states_dict = {
             'state_names_with_changed_answer_groups': [],
             'state_names_with_unchanged_answer_groups': []
         }
         new_states = self.states
+        for l in new_states['Home'].interaction.answer_groups:
+            print l.outcome.feedback
         for state_name in new_states:
             new_state = new_states[state_name]
             if not new_state.can_undergo_classification():
@@ -2986,21 +2990,20 @@ class Exploration(object):
 
             # The case where a new state is added. When this happens, there wont
             # be a corresponding state name in the older state dict.
-            try:
-                old_state = old_states[state_name]
-                old_training_data = old_state.get_training_data()
-                new_training_data = new_state.get_training_data()
-                if new_training_data != old_training_data:
-                    trainable_states_dict[
-                        'state_names_with_changed_answer_groups'].append(
-                            state_name)
-                else:
-                    trainable_states_dict[
-                        'state_names_with_unchanged_answer_groups'].append(
-                            state_name)
-            except KeyError:
+            if state_name not in old_states:
                 trainable_states_dict[
                     'state_names_with_changed_answer_groups'].append(state_name)
+            old_state = old_states[state_name]
+            old_training_data = old_state.get_training_data()
+            new_training_data = new_state.get_training_data()
+            if new_training_data != old_training_data:
+                trainable_states_dict[
+                    'state_names_with_changed_answer_groups'].append(
+                        state_name)
+            else:
+                trainable_states_dict[
+                    'state_names_with_unchanged_answer_groups'].append(
+                        state_name)
 
         return trainable_states_dict
 

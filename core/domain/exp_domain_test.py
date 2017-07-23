@@ -16,14 +16,18 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 
+import copy
 import os
 
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
@@ -1027,6 +1031,37 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ):
             with self.swap(subtitled_html, 'audio_translations', 'not_list'):
                 subtitled_html.validate()
+
+    def test_get_trainable_states_dict(self):
+        """Test the get_trainable_states_dict() method."""
+        exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+
+        exploration_model = exp_models.ExplorationModel.get(
+            exp_id, strict=False)
+        old_states_dicts = copy.deepcopy(exploration_model.states)
+        old_states = {}
+        for state_name in old_states_dicts:
+            old_states[state_name] = (exp_domain.State.from_dict(
+                old_states_dicts[state_name]))
+
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        state = exploration.states['Home']
+        exploration.states['Home'].interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[3])
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Home'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        actual_dict = exploration.get_trainable_states_dict(old_states)
+        self.assertEqual(actual_dict, expected_dict)
 
     def test_is_demo_property(self):
         """Test the is_demo property."""

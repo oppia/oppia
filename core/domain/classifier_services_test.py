@@ -76,26 +76,27 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
 
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
-
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
+    # def test_string_classifier_classification(self):
+    #     """All these responses trigger the string classifier."""
+    #
+    #     with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'it\'s a permutation of 3 elements'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'There are 3 options for the first ball, and 2 for the '
+    #                 'remaining two. So 3*2=6.'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('abc acb bac bca cbb cba'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('dunno, just guessed'))
 
     def test_create_jobs_and_update_mappings(self):
         """Test the create_classifier_training_jobs method and
         update_classifier_exploration_mappings method by triggering
-        update_exploration() method."""
+        update_exploration() method.
+        """
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
 
@@ -146,7 +147,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_services.create_classifier(job_id, classifier_data)
 
         # Make a change to the exploration without changing the answer groups
-        # to trigger updation of mapping.
+        # to trigger mapping update.
         change_list = [{
             'cmd': 'edit_exploration_property',
             'property_name': 'title',

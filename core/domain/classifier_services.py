@@ -132,8 +132,8 @@ def create_classifier_training_jobs(exploration, state_names):
     passed into the function.
 
     Args:
-        exploration: Exploration. The Exploration Domain object.
-        state_names: list. List of state names.
+        exploration: Exploration. The Exploration domain object.
+        state_names: list(str). List of state names.
     """
     exp_id = exploration.id
     exp_version = exploration.version
@@ -150,13 +150,13 @@ def create_classifier_training_jobs(exploration, state_names):
                                        feconf.TRAINING_JOB_STATUS_NEW)
 
 
-def update_classifier_exploration_mappings(exploration, state_names):
+def create_classifier_exploration_mappings(exploration, state_names):
     """Creates new ClassifierExplorationMappingModel instances for all the
     state names passed into the function.
 
     Args:
-        exploration: Exploration. The Exploration Domain object.
-        state_names: list. List of state names.
+        exploration: Exploration. The Exploration domain object.
+        state_names: list(str). List of state names.
     """
     exp_id = exploration.id
     exp_version = exploration.version
@@ -165,7 +165,7 @@ def update_classifier_exploration_mappings(exploration, state_names):
             exp_id, exp_version, state_name)
         # If classifier does not exist for a state with an unchanged answer
         # group, the only possibility is that the classifier has not been
-        # stored by the VM for the previous state yet. So, we dont need to do
+        # stored by the VM for the previous state yet. So, we don't need to do
         # anything here.
         if not classifier:
             continue
