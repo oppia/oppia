@@ -405,6 +405,13 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             sample_output_list, test_only_max_output_len=0)
         self.assertEquals(expected, sorted(actual))
 
+    def test_compress_output_list_with_exact_max_output_len(self):
+        sample_output_list = ['abc']
+        expected = ['abc']
+        actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+            sample_output_list, test_only_max_output_len=3)
+        self.assertEquals(expected, sorted(actual))
+
 
 SUM_MODEL_ID = 'all_data_id'
 
