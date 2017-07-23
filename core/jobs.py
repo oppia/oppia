@@ -1146,8 +1146,8 @@ class BaseContinuousComputationManager(object):
     def _get_active_realtime_index(cls):
         """Returns the currently active realtime layer index for this class.
 
-        Additionally takes care to register the class into the model when it
-        hasn't been.
+        Additionally, takes care to register the relevant
+        ContinuousComputationModel, if it does not already exist.
 
         Returns:
             str. The active realtime layer index of this class.
