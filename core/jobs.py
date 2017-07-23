@@ -153,18 +153,11 @@ class BaseJobManager(object):
         cls._post_start_hook(job_id)
 
     @classmethod
-    def register_completion(cls, job_id, output_list):
-        """Marks a job as completed."""
+    def _compress_output_list(
+            cls, output_list, test_only_max_output_chars=None):
         _MAX_OUTPUT_LENGTH_CHARS = 900000
-
-        # Ensure that preconditions are met.
-        model = job_models.JobModel.get(job_id, strict=True)
-        cls._require_valid_transition(
-            job_id, model.status_code, STATUS_CODE_COMPLETED)
-        cls._require_correct_job_type(model.job_type)
-
-        model.status_code = STATUS_CODE_COMPLETED
-        model.time_finished_msec = utils.get_current_time_in_millisecs()
+        if test_only_max_output_chars is not None:
+            _MAX_OUTPUT_LENGTH_CHARS = test_only_max_output_chars
 
         # TODO(bhenning): Add tests for this.
         output_str_list = ['%s' % output_value for output_value in output_list]
@@ -190,7 +183,21 @@ class BaseJobManager(object):
                 output_str_list[idx] = output_str[:max_element_length]
                 output_str_list[idx] += ' <TRUNCATED>'
                 break
-        model.output = output_str_list[:cutoff_index]
+        return output_str_list[:cutoff_index]
+
+    @classmethod
+    def register_completion(cls, job_id, output_list):
+        """Marks a job as completed."""
+        # Ensure that preconditions are met.
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_valid_transition(
+            job_id, model.status_code, STATUS_CODE_COMPLETED)
+        cls._require_correct_job_type(model.job_type)
+
+        model.status_code = STATUS_CODE_COMPLETED
+        model.time_finished_msec = utils.get_current_time_in_millisecs()
+
+        model.output = cls._compress_output_list(output_list)
         model.put()
 
         cls._post_completed_hook(job_id)
