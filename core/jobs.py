@@ -182,6 +182,8 @@ class BaseJobManager(object):
             job_id: str. The ID of the job to complete.
             output_list: list(object). The output produced by the job.
         """
+        _MAX_OUTPUT_LENGTH_CHARS = 900000
+
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -190,18 +192,8 @@ class BaseJobManager(object):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
-        model.output = cls._compress_outputs(output_list)
-        model.put()
 
-        cls._post_completed_hook(job_id)
-
-    @classmethod
-    def _compress_outputs(cls, output_list, max_output_length_chars=900000):
-        """Returns compressed list of strigified input with a max length of
-        chars.
-
-        TODO(bhenning): Add tests for this.
-        """
+        # TODO(bhenning): Add tests for this.
         output_str_list = ['%s' % output_value for output_value in output_list]
 
         # De-duplicate the lines of output since it's not very useful to repeat
@@ -219,14 +211,16 @@ class BaseJobManager(object):
         for idx, output_str in enumerate(output_str_list):
             cutoff_index += 1
             total_output_size += len(output_str)
-            if total_output_size >= max_output_length_chars:
+            if total_output_size >= _MAX_OUTPUT_LENGTH_CHARS:
                 max_element_length = (
-                    total_output_size - max_output_length_chars)
+                    total_output_size - _MAX_OUTPUT_LENGTH_CHARS)
                 output_str_list[idx] = output_str[:max_element_length]
                 output_str_list[idx] += ' <TRUNCATED>'
                 break
+        model.output = output_str_list[:cutoff_index]
+        model.put()
 
-        return output_str_list[:cutoff_index]
+        cls._post_completed_hook(job_id)
 
     @classmethod
     def register_failure(cls, job_id, error):
