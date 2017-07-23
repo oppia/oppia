@@ -7,8 +7,23 @@
       <img class="conversation-skin-oppia-avatar"
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
       <div class="conversation-skin-tutor-card-top-content protractor-test-conversation-content"
-           angular-html-bind="activeCard.contentHtml"
            focus-on="<[getContentFocusLabel($index)]>">
+        <span angular-html-bind="activeCard.contentHtml">
+        </span>
+        <span ng-if="contentAudioTranslationAvailable()" 
+              class="audio-controls">
+          <img class="audio-control-button"
+               ng-if="showExtraAudioControls"
+               ng-src="<[AUDIO_SETTINGS_BUTTON_IMAGE_URL]>"
+               ng-click="openAudioTranslationSettings()">
+          <img class="audio-control-button"
+               ng-if="showExtraAudioControls"
+               ng-src="<[REWIND_AUDIO_BUTTON_IMAGE_URL]>"
+               ng-click="rewindAudioFiveSec()">
+          <img class="audio-control-button"
+               ng-src="<[playPauseButtonImageUrl()]>"
+               ng-click="playPauseAudioTranslation()">
+        </span>
       </div>
     </div>
 
@@ -236,6 +251,19 @@
   .conversation-skin-inline-interaction .conversation-skin-user-avatar {
     left: -20px;
     top: 14px;
+  }
+
+  .audio-control-button {
+    width: 24px;
+    height: 24px;
+  }
+
+  .audio-control-button:hover {
+    cursor: pointer
+  }
+
+  .audio-controls {
+    float: right;
   }
 
   @media screen and (max-width: 959px) {

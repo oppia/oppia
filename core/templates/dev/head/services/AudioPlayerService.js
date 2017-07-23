@@ -17,8 +17,11 @@
  */
 
 oppia.factory('AudioPlayerService', [
-  '$q', 'ngAudio', 'AssetsBackendApiService', 'explorationContextService',
-  function($q, ngAudio, AssetsBackendApiService, explorationContextService) {
+  '$q', '$timeout', 'ngAudio', 'AssetsBackendApiService',
+  'explorationContextService',
+  function(
+      $q, $timeout, ngAudio, AssetsBackendApiService,
+      explorationContextService) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
 
@@ -30,6 +33,18 @@ oppia.factory('AudioPlayerService', [
             var blobUrl = URL.createObjectURL(audioBlob);
             _currentTrack = ngAudio.load(blobUrl);
             _currentTrackFilename = filename; 
+
+            // Doesn't seem to be any way of detecing when native
+            // audio object has finished loading. Use a timeout
+            // to grab native audio.
+            // TODO(tjiang11): Find a better way to handle this.
+            $timeout(function() {
+              _currentTrack.audio.onended = function() {
+                _currentTrack = null;
+                _currentTrackFilename = null;
+              }
+            }, 100);
+
             successCallback();
           }, function(reason) {
             errorCallback(reason);
@@ -81,6 +96,19 @@ oppia.factory('AudioPlayerService', [
       },
       rewind: function(seconds) {
         _rewind(seconds);
+      },
+      isPlaying: function() {
+        if (!_currentTrack) {
+          return false;
+        }
+        return !_currentTrack.paused;
+      },
+      trackLoaded: function() {
+        return Boolean(_currentTrack);
+      },
+      clear: function() {
+        _currentTrack = null;
+        _currentTrackFilename = null;
       }
     };
   }

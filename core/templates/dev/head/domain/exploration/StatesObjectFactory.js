@@ -107,6 +107,18 @@ oppia.factory('StatesObjectFactory', [
       return finalStateNames;
     };
 
+    States.prototype.getAllAudioLanguageCodes = function() {
+      var allAudioLanguageCodes = new Set();
+      for (var stateName in this._states) {
+        var audioTranslationsForState =
+          this._states[stateName].content.getBindableAudioTranslations()
+        for (var languageCode in audioTranslationsForState) {
+          allAudioLanguageCodes.add(languageCode);
+        }
+      }
+      return Array.from(allAudioLanguageCodes);
+    };
+
     States.createFromBackendDict = function(statesBackendDict) {
       var stateObjectsDict = {};
       for (var stateName in statesBackendDict) {

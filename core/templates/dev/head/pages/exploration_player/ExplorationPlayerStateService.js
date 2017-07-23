@@ -45,6 +45,15 @@ oppia.factory('ExplorationPlayerStateService', [function() {
 
     getGadgetPanelsContents: function() {
       return exploration.getGadgetPanelsContents();
+    },
+
+    getLanguageCode: function() {
+      return exploration.getLanguageCode();
+    },
+
+    getAllAudioLanguageCodes: function() {
+      return exploration.getAllAudioLanguageCodes();
     }
+    
   };
 }]);

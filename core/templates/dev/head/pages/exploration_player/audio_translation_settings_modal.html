@@ -1,0 +1,23 @@
+<script type="text/ng-template" id="modals/audioTranslationSettings">
+  <div class="modal-header">
+    <h3>
+      Audio Translation Settings
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      Pick Language
+    </p>
+<!--     <select2-drdopdown
+      width="100%"
+      choices="$scope.allLanguageCodes">
+    </select2-drdopdown> -->
+    <select ng-model="selectedLanguage" ng-options="o as o for o in <[allLanguageCodes]> | languageDescriptions">
+    </select>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" ng-click="save()">Save</button>
+  </div>  
+</script>

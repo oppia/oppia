@@ -52,14 +52,16 @@ oppia.directive('tutorCard', [
         '$scope', '$timeout', 'oppiaPlayerService', 'HintManagerService',
         'playerPositionService', 'playerTranscriptService',
         'ExplorationPlayerStateService', 'windowDimensionsService',
-        'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
+        'urlService', 'AudioPlayerService', 'AudioTranslationManagerService',
+        'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'HINT_REQUEST_STRING_I18N_IDS', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
         function(
           $scope, $timeout, oppiaPlayerService, HintManagerService,
           playerPositionService, playerTranscriptService,
           ExplorationPlayerStateService, windowDimensionsService,
-          urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
+          urlService, AudioPlayerService, AudioTranslationManagerService,
+          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
           CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
           HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC) {
           var updateActiveCard = function() {
@@ -88,6 +90,8 @@ oppia.directive('tutorCard', [
           $scope.arePreviousResponsesShown = false;
 
           $scope.waitingForOppiaFeedback = false;
+
+          $scope.currentAudioLanguageCode = null;
 
           $scope.consumeHint = function() {
             if (!HintManagerService.areAllHintsExhausted()) {
@@ -120,12 +124,33 @@ oppia.directive('tutorCard', [
           $scope.OPPIA_AVATAR_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg'));
+
+          $scope.AUDIO_SETTINGS_BUTTON_IMAGE_URL = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/icons/settings.svg'));
+
+          var PLAY_AUDIO_BUTTON_IMAGE_URL = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/icons/speaker-not-playing.svg'));
+
+          var PAUSE_AUDIO_BUTTON_IMAGE_URL = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/icons/speaker-playing.svg'));
+
+          $scope.REWIND_AUDIO_BUTTON_IMAGE_URL = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/icons/rewind-five.svg'));
+
           $scope.profilePicture = UrlInterpolationService.getStaticImageUrl(
             '/avatar/user_blue_72px.png');
+
+          var cardIndexOfPlayingAudio;
 
           oppiaPlayerService.getUserProfileImage().then(function(result) {
             $scope.profilePicture = result;
           });
+
+          $scope.showExtraAudioControls = false;
 
           $scope.getContentFocusLabel = function(index) {
             return CONTENT_FOCUS_LABEL_PREFIX + index;
@@ -146,6 +171,79 @@ oppia.directive('tutorCard', [
               answer: answer,
               rulesService: interactionRulesService
             });
+          };
+
+          $scope.playPauseAudioTranslation = function() {
+            // TODO(tjiang11): Change from on-demand loading to pre-loading.
+
+            if (cardIndexOfPlayingAudio === undefined) {
+              cardIndexOfPlayingAudio =
+                playerPositionService.getActiveCardIndex();
+
+              // TODO(tjiang11): On first play, ask learner to pick language
+              // and subsequently for confirmation to use bandwidth 
+              // to download audio files.
+            }
+
+            $scope.showExtraAudioControls = true;
+
+            if (!AudioPlayerService.isPlaying()) {
+              if (AudioPlayerService.trackLoaded() && isSameAudio()) {
+                AudioPlayerService.play();
+              } else {
+                loadAndPlayAudioTranslation();
+              }
+            } else {
+              AudioPlayerService.pause();
+              if (!isSameAudio()) {
+                loadAndPlayAudioTranslation();
+              }
+            }
+          };
+
+          var isSameAudio = function() {
+            return cardIndexOfPlayingAudio == 
+              playerPositionService.getActiveCardIndex();
+          };
+
+          var loadAndPlayAudioTranslation = function() {
+            cardIndexOfPlayingAudio =
+              playerPositionService.getActiveCardIndex();
+            var currentAudioLanguageCode =
+              AudioTranslationManagerService.getCurrentAudioLanguageCode();
+            var audioTranslation =
+              oppiaPlayerService.getStateContentAudioTranslation(
+                $scope.activeCard.stateName, currentAudioLanguageCode);
+
+            // TODO(tjiang11): If audio translation is not available
+            // in the current language, then inform the learner with
+            // a piece of text below the audio controls.
+            if (audioTranslation != null) {
+              AudioPlayerService.load(
+                  audioTranslation.filename).then(function() {
+                    AudioPlayerService.play();
+                  });
+            }
+          };
+
+          $scope.rewindAudioFiveSec = function() {
+            AudioPlayerService.rewind(5);
+          };
+
+          $scope.playPauseButtonImageUrl = function() {
+            return AudioPlayerService.isPlaying() && isSameAudio() ?
+              PAUSE_AUDIO_BUTTON_IMAGE_URL : PLAY_AUDIO_BUTTON_IMAGE_URL;
+          };
+
+          $scope.openAudioTranslationSettings = function() {
+            AudioTranslationManagerService
+              .showAudioTranslationSettingsModal();
+          };
+
+          $scope.contentAudioTranslationAvailable = function() {
+            return Object.keys(oppiaPlayerService
+              .getStateContentAudioTranslations(
+              $scope.activeCard.stateName)).length > 0;
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
