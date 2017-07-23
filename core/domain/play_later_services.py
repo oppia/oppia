@@ -62,7 +62,8 @@ def mark_exploration_to_be_played_later(
     """Adds the exploration id to the play later list of the user at the given
     position. If the position is not specified, the exploration gets added at
     the end. If the exploration is already completed or currently being
-    completed it is not added.
+    completed it is not added. The maximum limit of the play later list is 10.
+    If the count exceeds 10, the exploration is not added.
 
     Args:
         user_id: str. The id of the user.
@@ -96,7 +97,8 @@ def mark_exploration_to_be_played_later(
             exploration_id not in completed_exploration_ids and
             exploration_id not in incomplete_exploration_ids):
         if not position_to_be_inserted:
-            play_later_activities.add_exploration_id(exploration_id)
+            if len(play_later_activities.exploration_ids) < 10:
+                play_later_activities.add_exploration_id(exploration_id)
         else:
             play_later_activities.remove_exploration_id(exploration_id)
             print "Hello"
@@ -110,7 +112,8 @@ def mark_collection_to_be_played_later(
     """Adds the collection id to the play later list of the user at the given
     position. If the position is not specified, the collection gets added at
     the end. If the collection is already completed or currently being
-    completed it is not added.
+    completed it is not added. The maximum limit of the play later list is 10.
+    If the count exceeds 10, the collection is not added.
 
     Args:
         user_id: str. The id of the user.
@@ -144,7 +147,8 @@ def mark_collection_to_be_played_later(
             collection_id not in completed_collection_ids and
             collection_id not in incomplete_collection_ids):
         if not position_to_be_inserted:
-            play_later_activities.add_collection_id(collection_id)
+            if len(play_later_activities.collection_ids) < 10:
+                play_later_activities.add_collection_id(collection_id)
         else:
             play_later_activities.remove_collection_id(collection_id)
             play_later_activities.add_collection_id(

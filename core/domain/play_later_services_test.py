@@ -119,6 +119,35 @@ class PlayLaterTests(test_utils.GenericTestBase):
             self._get_all_play_later_exp_ids(
                 self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
 
+        # Empty the play later list.
+        play_later_services.remove_exploration_from_play_later_list(
+            self.user_id, self.EXP_ID_0)
+        play_later_services.remove_exploration_from_play_later_list(
+            self.user_id, self.EXP_ID_1)
+        self.assertEqual(
+            self._get_all_play_later_exp_ids(
+                self.user_id), [])
+
+        # Test that the length of the play later list doesn't exceed 10.
+        # List of explorations to be added.
+        exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(0, 10)]
+        for exp_id in exp_ids:
+            play_later_services.mark_exploration_to_be_played_later(
+                self.user_id, exp_id)
+        self.assertEqual(
+            self._get_all_play_later_exp_ids(
+                self.user_id), exp_ids)
+
+        # Now if we try adding another exploration, it shouldn't be added as the
+        # list length would exceed 10.
+        play_later_services.mark_exploration_to_be_played_later(
+            self.user_id, 'SAMPLE_EXP_ID_10')
+
+        # The list still remains the same.
+        self.assertEqual(
+            self._get_all_play_later_exp_ids(
+                self.user_id), exp_ids)
+
     def test_mark_collection_to_be_played_later(self):
         self.assertEqual(
             self._get_all_play_later_collection_ids(self.user_id), [])
@@ -155,6 +184,35 @@ class PlayLaterTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_play_later_collection_ids(
                 self.user_id), [self.COL_ID_1, self.COL_ID_0])
+
+        # Empty the play later list.
+        play_later_services.remove_collection_from_play_later_list(
+            self.user_id, self.COL_ID_0)
+        play_later_services.remove_collection_from_play_later_list(
+            self.user_id, self.COL_ID_1)
+        self.assertEqual(
+            self._get_all_play_later_collection_ids(
+                self.user_id), [])
+
+        # Test that the length of the play later list doesn't exceed 10.
+        # List of collections to be added.
+        collection_ids = ['SAMPLE_COLLECTION_ID_%s' % index for index in range(0, 10)]
+        for collection_id in collection_ids:
+            play_later_services.mark_collection_to_be_played_later(
+                self.user_id, collection_id)
+        self.assertEqual(
+            self._get_all_play_later_collection_ids(
+                self.user_id), collection_ids)
+
+        # Now if we try adding another collection, it shouldn't be added as the
+        # list length would exceed 10.
+        play_later_services.mark_collection_to_be_played_later(
+            self.user_id, 'SAMPLE_COLLECTION_ID_10')
+
+        # The list still remains the same.
+        self.assertEqual(
+            self._get_all_play_later_collection_ids(
+                self.user_id), collection_ids)
 
     def test_remove_exploration_from_play_later_list(self):
         self.assertEqual(self._get_all_play_later_exp_ids(
