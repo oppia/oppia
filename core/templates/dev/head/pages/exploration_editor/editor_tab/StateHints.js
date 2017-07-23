@@ -20,12 +20,14 @@ oppia.controller('StateHints', [
   '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
   'ENABLE_HINT_EDITOR', 'alertsService', 'INTERACTION_SPECS',
   'stateHintsService', 'explorationStatesService', 'stateInteractionIdService',
-  'UrlInterpolationService', 'HintObjectFactory', 'stateSolutionService',
+  'UrlInterpolationService', 'HintObjectFactory', 'oppiaPlayerService',
+  'stateSolutionService',
   function(
     $scope, $rootScope, $modal, $filter, editorContextService,
     ENABLE_HINT_EDITOR, alertsService, INTERACTION_SPECS,
     stateHintsService, explorationStatesService, stateInteractionIdService,
-    UrlInterpolationService, HintObjectFactory, stateSolutionService) {
+    UrlInterpolationService, HintObjectFactory, oppiaPlayerService,
+    stateSolutionService) {
     $scope.editorContextService = editorContextService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
