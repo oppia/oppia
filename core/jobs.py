@@ -153,39 +153,6 @@ class BaseJobManager(object):
         cls._post_start_hook(job_id)
 
     @classmethod
-    def _compress_output_list(
-            cls, output_list, test_only_max_output_chars=None):
-        _MAX_OUTPUT_LENGTH_CHARS = 900000
-        if test_only_max_output_chars is not None:
-            _MAX_OUTPUT_LENGTH_CHARS = test_only_max_output_chars
-
-        # TODO(bhenning): Add tests for this.
-        output_str_list = ['%s' % output_value for output_value in output_list]
-
-        # De-duplicate the lines of output since it's not very useful to repeat
-        # them.
-        counter = collections.Counter(list(output_str_list))
-        output_str_frequency_list = [
-            (output_str, counter[output_str]) for output_str in counter]
-        output_str_list = [
-            line if freq == 1 else '%s (%d times)' % (line, freq)
-            for (line, freq) in output_str_frequency_list
-        ]
-
-        cutoff_index = 0
-        total_output_size = 0
-        for idx, output_str in enumerate(output_str_list):
-            cutoff_index += 1
-            total_output_size += len(output_str)
-            if total_output_size >= _MAX_OUTPUT_LENGTH_CHARS:
-                max_element_length = (
-                    total_output_size - _MAX_OUTPUT_LENGTH_CHARS)
-                output_str_list[idx] = output_str[:max_element_length]
-                output_str_list[idx] += ' <TRUNCATED>'
-                break
-        return output_str_list[:cutoff_index]
-
-    @classmethod
     def register_completion(cls, job_id, output_list):
         """Marks a job as completed."""
         # Ensure that preconditions are met.
@@ -196,11 +163,52 @@ class BaseJobManager(object):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
-
         model.output = cls._compress_output_list(output_list)
         model.put()
 
         cls._post_completed_hook(job_id)
+
+    @classmethod
+    def _compress_output_list(
+            cls, output_list, test_only_max_output_chars=None):
+        """Returns compressed list of strings with a max length of chars.
+
+        Args:
+            output_list: list(*). Collection of objects to be stringified.
+            test_only_max_output_chars: int or None. Used to help test this
+                method.
+
+        Returns:
+            list(str). The compressed stringified output values.
+        """
+        _MAX_OUTPUT_CHARS = 900000
+        class _OrderedCounter(collections.Counter, collections.OrderedDict):
+            """Counter that remembers the order elements are first seen."""
+
+        # Consolidate the lines of output since repeating them isn't useful.
+        counter = _OrderedCounter(str(output) for output in output_list)
+        output_str_list = [
+            output_str if count == 1 else '%s (%d times)' % (output_str, count)
+            for (output_str, count) in counter.iteritems()
+        ]
+
+        # Truncate outputs to fit within given max length.
+        if test_only_max_output_chars is None:
+            remaining_len = _MAX_OUTPUT_CHARS
+        else:
+            remaining_len = test_only_max_output_chars
+
+        for idx, output_str in enumerate(output_str_list):
+            remaining_len -= len(output_str)
+            if remaining_len < 0:
+                # Truncate all remaining output to fit in the limit.
+                kept_str = output_str[:remaining_len]
+                output_str_list[idx:] = [
+                    ('%s <TRUNCATED>' % kept_str) if kept_str else '<TRUNCATED>'
+                ]
+                break
+
+        return output_str_list
 
     @classmethod
     def register_failure(cls, job_id, error):
