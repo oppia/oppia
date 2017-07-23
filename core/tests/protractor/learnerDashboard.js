@@ -131,8 +131,10 @@ describe('Learner dashboard functionality', function() {
     general.acceptAlert();
     browser.waitForAngular();
     general.waitForSystem();
+    browser.ignoreSynchronization = false;
     element(by.css('.protractor-test-incomplete-collection-section')).click();
     browser.waitForAngular();
+    general.waitForSystem();
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
     ).getText()).toMatch('Test Collection');
@@ -140,8 +142,10 @@ describe('Learner dashboard functionality', function() {
     // Go to the test collection.
     browser.get('/search/find?q=');
     browser.waitForAngular();
+    general.waitForSystem();
     element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first().click();
+    general.waitForSystem();
     // Go to the first and only exploration.
     element.all(by.css(
       '.protractor-test-collection-exploration')).first().click();
@@ -153,12 +157,13 @@ describe('Learner dashboard functionality', function() {
     player.submitAnswer('Continue', null);
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
+    general.waitForSystem();
     element(by.css('.protractor-test-completed-section')).click();
     browser.waitForAngular();
     general.waitForSystem();
-    general.waitForSystem();
     element(by.css('.protractor-test-completed-collection-section')).click();
     browser.waitForAngular();
+    general.waitForSystem();
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
     ).getText()).toMatch('Test Collection');
@@ -167,13 +172,21 @@ describe('Learner dashboard functionality', function() {
     users.login('creator1@learnerDashboard.com');
     browser.get(general.CREATOR_DASHBOARD_URL);
     browser.waitForAngular();
+    general.waitForSystem();
     element(by.css('.protractor-test-collection-card')).click();
+    browser.waitForAngular();
+    general.waitForSystem();
     collectionEditor.addExistingExploration('0');
+    browser.waitForAngular();
+    general.waitForSystem();
     collectionEditor.saveDraft();
     browser.waitForAngular();
+    general.waitForSystem();
     element(by.css('.protractor-test-commit-message-input')).sendKeys('Update');
+    browser.driver.sleep(300);
     collectionEditor.closeSaveModal();
-    browser.waitForAngular();
+    general.waitForSystem();
+    browser.driver.sleep(300);
     users.logout();
 
     users.login('learner@learnerDashboard.com');
@@ -182,11 +195,11 @@ describe('Learner dashboard functionality', function() {
     general.waitForSystem();
     element(by.css('.protractor-test-incomplete-collection-section')).click();
     browser.waitForAngular();
+    general.waitForSystem();
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
     ).getText()).toMatch('Test Collection');
     users.logout();
-    browser.ignoreSynchronization = false;
   });
 
   it('display learners subscriptions', function() {
