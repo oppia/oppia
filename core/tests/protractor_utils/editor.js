@@ -1474,13 +1474,13 @@ var HintEditor = function(hintNum) {
   return {
     setHint: function(hint) {
       hintBodyElem.click();
-      //element(by.css('.protractor-test-oppia-click-to-start-editing')).click();
       hintBodyElem.all(by.tagName('p')).click();
       browser.switchTo().activeElement().clear();
       browser.switchTo().activeElement().sendKeys(hint);
       general.waitForSystem();
       element(by.css('.protractor-test-save-hint-edit')).click();
     },
+    // eslint-disable-next-line quote-props
     delete: function() {
       headerElem.element(by.css('.protractor-test-delete-response')).click();
       element(by.css('.protractor-test-confirm-delete-hint')).click();
@@ -1501,13 +1501,6 @@ var addSolution = function(solution) {
   general.waitForSystem();
   element(by.css('.protractor-test-submit-solution-button')).click();
   general.waitForSystem();
-  /*
-   element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
-   .last().click();
-   browser.switchTo().activeElement().sendKeys(hint);
-   general.waitForSystem();
-   element(by.css('.protractor-test-save-hint')).click();
-   */
 };
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;

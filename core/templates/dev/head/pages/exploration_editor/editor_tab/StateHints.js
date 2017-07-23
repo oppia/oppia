@@ -155,8 +155,8 @@ oppia.controller('StateHints', [
             stateHintsService.saveDisplayedValue();
           } else {
             alertsService.addWarning('Atleast one hint is required to be ' +
-              'specified for a solution to exist. Please delete the solution and ' +
-              'try again.');
+              'specified for a solution to exist. Please delete the ' +
+              'solution and try again.');
           }
         } else {
           stateHintsService.displayed.splice(index, 1);

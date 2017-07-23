@@ -42,7 +42,7 @@ describe('Solution object factory', function() {
 
     it('should create summary correctly', function() {
       expect(solution.getSolutionSummary('TextInput')).toEqual(
-        '[One solution is &quot;This is a correct answer!&quot;] '+
+        '[One solution is &quot;This is a correct answer!&quot;] ' +
         'This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
@@ -67,7 +67,7 @@ describe('Solution object factory', function() {
           val: 2,
           label: '<p>three</p>'
         }
-      ])).toEqual('[One solution is &quot;&lt;p&gt;one&lt;/p&gt;&quot;] '+
+      ])).toEqual('[One solution is &quot;&lt;p&gt;one&lt;/p&gt;&quot;] ' +
         'This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
