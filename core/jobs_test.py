@@ -362,21 +362,21 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             'Canceled by admin_user_id', DummyJobManager.get_error(job1_id))
         self.assertIsNone(DummyJobManager.get_error(job2_id))
 
-    def test_compress_with_single_char_outputs(self):
+    def test_compress_output_list_with_single_char_outputs(self):
         sample_output_list = [1, 2, 3, 4, 5]
         expected = ['1', '2', '3', '<TRUNCATED>']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list, test_only_max_output_chars=3)
         self.assertEquals(expected, actual)
 
-    def test_compress_with_multi_char_outputs(self):
+    def test_compress_output_list_with_multi_char_outputs(self):
         sample_output_list = ['abcd', 'efgh', 'ijkl']
         expected = ['abcd', 'efgh', 'ij <TRUNCATED>']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list, test_only_max_output_chars=10)
         self.assertEquals(expected, actual)
 
-    def test_compress_with_duplicate_outputs(self):
+    def test_compress_output_list_with_duplicate_outputs(self):
         sample_output_list = ['foo', 'bar'] * 3
         expected = ['foo (3 times)', 'bar (3 times)']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
@@ -385,20 +385,20 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             test_only_max_output_chars=sum(len(s) for s in expected))
         self.assertEquals(expected, actual)
 
-    def test_compress_with_truncated_duplicate_outputs(self):
+    def test_compress_output_list_with_truncated_duplicate_outputs(self):
         sample_output_list = ['foo', 'bar'] * 3
         expected = ['foo (3 times)', 'ba <TRUNCATED>']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list, test_only_max_output_chars=15)
         self.assertEquals(expected, actual)
 
-    def test_compress_with_empty_outputs(self):
+    def test_compress_output_list_with_empty_outputs(self):
         sample_output_list = []
         expected = []
         actual = jobs.BaseJobManager._compress_output_list(sample_output_list)  # pylint: disable=protected-access
         self.assertEquals(expected, actual)
 
-    def test_compress_with_zero_max_output_len(self):
+    def test_compress_output_list_with_zero_max_output_len(self):
         sample_output_list = [1, 2, 3]
         expected = ['<TRUNCATED>']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
