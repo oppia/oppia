@@ -6,11 +6,13 @@
   <form name="addSolutionForm.answer"
         class="form-inline">
     <div class="oppia-rule-details-header">
-      <select ng-model="tmpSolution.answerIsExclusive"
+      <select class="protractor-test-answer-is-exclusive-select"
+              ng-model="tmpSolution.answerIsExclusive"
               ng-options="(item ? 'Only' : 'One') for item in [true, false]">
       </select> <strong>Solution is...</strong>
       <div ng-if="!interactionHtml">
-        <object-editor obj-type="<[objectType]>"
+        <object-editor class='protractor-test-interaction-html'
+                       obj-type="<[objectType]>"
                        init-args="{choices: ruleDescriptionChoices}"
                        is-editable="true"
                        always-editable="true"
@@ -18,10 +20,13 @@
                        style="color: black;">
         </object-editor>
       </div>
-      <div angular-html-bind="interactionHtml"></div>
+      <div class='protractor-test-interaction-html'
+           angular-html-bind="interactionHtml">
+      </div>
       <br>
       <strong>Explanation is...</strong>
-      <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
+      <schema-based-editor class="protractor-test-explanation-text-area"
+                           schema="EXPLANATION_FORM_SCHEMA"
                            local-value="tmpSolution.explanation">
       </schema-based-editor>
     </div>
@@ -30,7 +35,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success"
+    <button class="btn btn-success protractor-test-submit-solution-button"
             ng-click="saveSolution()"
             ng-disabled="!tmpSolution.explanation &&
                          !tmpSolution.correctAnswer">
