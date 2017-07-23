@@ -32,7 +32,7 @@ def get_play_later_activities_from_model(play_later_activities_model):
 
     Returns:
         PlayLaterActivities. The play later activities corresponding to the
-        given model.
+            given model.
     """
     return user_domain.PlayLaterActivities(
         play_later_activities_model.id,
@@ -74,7 +74,7 @@ def mark_exploration_to_be_played_later(
             end.
     """
     # Need to import learner_progress_services so that we are able to fetch the
-    # ids of the completed explorations.
+    # ids of the completed and incomplete explorations.
     from core.domain import learner_progress_services
 
     play_later_activities_model = user_models.PlayLaterActivitiesModel.get(
@@ -101,7 +101,6 @@ def mark_exploration_to_be_played_later(
                 play_later_activities.add_exploration_id(exploration_id)
         else:
             play_later_activities.remove_exploration_id(exploration_id)
-            print "Hello"
             play_later_activities.add_exploration_id(
                 exploration_id, position_to_be_inserted)
         save_play_later_activities(play_later_activities)
@@ -124,7 +123,7 @@ def mark_collection_to_be_played_later(
             the end.
     """
     # Need to import learner_progress_services so that we are able to fetch the
-    # ids of the completed explorations.
+    # ids of the completed and incomplete collections.
     from core.domain import learner_progress_services
 
     play_later_activities_model = user_models.PlayLaterActivitiesModel.get(
