@@ -324,7 +324,7 @@ class AdminHandler(base.BaseHandler):
                                'Wonder Anatomy',
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
-            dummy_exp_list = []
+            dummy_exploration_ids = []
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(feconf.SEARCH_DROPDOWN_CATEGORIES)
@@ -333,11 +333,11 @@ class AdminHandler(base.BaseHandler):
                     new_exploration_id, title=title, category=category,
                     objective='Dummy Objective')
                 exp_services.save_new_exploration(self.user_id, exploration)
-                dummy_exp_list.append(new_exploration_id)
+                dummy_exploration_ids.append(new_exploration_id)
                 if i <= num_dummy_exps_to_publish - 1:
                     rights_manager.publish_exploration(
                         self.user_id, new_exploration_id)
-            exp_services.index_explorations_given_ids(dummy_exp_list)
+            exp_services.index_explorations_given_ids(dummy_exploration_ids)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
