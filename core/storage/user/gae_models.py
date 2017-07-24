@@ -196,15 +196,15 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             instance_id, strict=False)
 
 
-class PlayLaterActivitiesModel(base_models.BaseModel):
-    """Keeps track of all the explorations and collections which the user wants
-    to play later.
+class LearnerPlaylistModel(base_models.BaseModel):
+    """Keeps track of all the explorations and collections in the playlist of
+    the user.
 
     Instances of this class are keyed by the user id.
     """
-    # IDs of all the explorations which the user wants to play later.
+    # IDs of all the explorations in the playlist of the user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
-    # IDs of all the collections which the user wants to play later.
+    # IDs of all the collections in the playlist of the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 

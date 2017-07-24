@@ -21,7 +21,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import learner_progress_services
-from core.domain import play_later_services
+from core.domain import learner_playlist_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -164,11 +164,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_1, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_1])
-        # Add an exploration to the play later list of the learner.
-        play_later_services.mark_exploration_to_be_played_later(
+        # Add an exploration to the learner playlist of the learner.
+        learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_3)
         self.assertEqual(
-            play_later_services.get_all_play_later_exploration_ids(
+            learner_playlist_services.get_all_exp_ids_learner_playlist(
                 self.user_id), [self.EXP_ID_3])
 
         # Test that on adding an incomplete exploration to the completed list
@@ -181,13 +181,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [])
 
         # Test that on adding an exploration to the completed list, it gets
-        # removed from the play later list.
+        # removed from the learner playlist.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_3)
         self.assertEqual(self._get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
         self.assertEqual(
-            play_later_services.get_all_play_later_exploration_ids(
+            learner_playlist_services.get_all_exp_ids_learner_playlist(
                 self.user_id), [])
 
         # Test that an exploration created by the user is not added to the
@@ -229,21 +229,21 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-        # Add a collection to the play later list of the learner.
-        play_later_services.mark_collection_to_be_played_later(
+        # Add a collection to the learner playlist of the learner.
+        learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_3)
         self.assertEqual(
-            play_later_services.get_all_play_later_collection_ids(
+            learner_playlist_services.get_all_collection_ids_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [self.COL_ID_3])
 
         # Test that on adding a collection to the completed list, it gets
-        # removed from the play later list.
+        # removed from the learner playlist.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_3)
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
         self.assertEqual(
-            play_later_services.get_all_play_later_collection_ids(
+            learner_playlist_services.get_all_collection_ids_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [])
 
         # Test that a collection created by the user is not added to the
@@ -302,21 +302,21 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
 
-        # Add an exploration to the play later list.
-        play_later_services.mark_exploration_to_be_played_later(
+        # Add an exploration to the learner playlist.
+        learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_3)
         self.assertEqual(
-            play_later_services.get_all_play_later_exploration_ids(
+            learner_playlist_services.get_all_exp_ids_learner_playlist(
                 self.user_id), [self.EXP_ID_3])
 
         # Test that on adding an exploration to the incomplete list, it gets
-        # removed from the play later list.
+        # removed from the learner playlist.
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_3, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_3])
         self.assertEqual(
-            play_later_services.get_all_play_later_exploration_ids(
+            learner_playlist_services.get_all_exp_ids_learner_playlist(
                 self.user_id), [])
 
         # Test that an exploration created by the user is not added to the
@@ -351,21 +351,21 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0])
 
-        # Add a collection to the play later list of the learner.
-        play_later_services.mark_collection_to_be_played_later(
+        # Add a collection to the learner playlist of the learner.
+        learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_3)
         self.assertEqual(
-            play_later_services.get_all_play_later_collection_ids(
+            learner_playlist_services.get_all_collection_ids_learner_playlist(
                 self.user_id), [self.COL_ID_3])
 
         # Test that on adding a collection to the incomplete list, it gets
-        # removed from the play later list.
+        # removed from the learner playlist.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_3)
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_3])
         self.assertEqual(
-            play_later_services.get_all_play_later_collection_ids(
+            learner_playlist_services.get_all_collection_ids_learner_playlist(
                 self.user_id), [])
 
         # Test that a collection created by the user is not added to the
