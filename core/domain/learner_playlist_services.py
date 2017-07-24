@@ -20,7 +20,12 @@ from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
 
+import feconf
+
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
+max_learner_playlist_activity_count = (
+    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
 
 
 def get_learner_playlist_from_model(learner_playlist_model):
@@ -62,8 +67,9 @@ def mark_exploration_to_be_played_later(
     """Adds the exploration id to the learner playlist of the user at the given
     position. If the position is not specified, the exploration gets added at
     the end. If the exploration is one of the subscribed explorations of the
-    user, it is not added. The maximum limit of the learner playlist is 10.
-    If the count exceeds 10, the exploration is not added.
+    user, it is not added. The maximum limit of the learner playlist is
+    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT. If the count exceeds
+    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT, the exploration is not added.
 
     Args:
         user_id: str. The id of the user.
@@ -86,13 +92,14 @@ def mark_exploration_to_be_played_later(
         learner_playlist_model)
 
     if exploration_id not in subscribed_exploration_ids:
+        exploration_ids_count = len(learner_playlist.exploration_ids)
         if not position_to_be_inserted:
             if exploration_id not in learner_playlist.exploration_ids:
-                if len(learner_playlist.exploration_ids) < 10:
+                if exploration_ids_count < max_learner_playlist_activity_count:
                     learner_playlist.add_exploration_id_to_list(exploration_id)
         else:
             if exploration_id not in learner_playlist.exploration_ids:
-                if len(learner_playlist.exploration_ids) < 10:
+                if exploration_ids_count < max_learner_playlist_activity_count:
                     learner_playlist.insert_exploration_id_at_given_position(
                         exploration_id, position_to_be_inserted)
             else:
@@ -107,8 +114,9 @@ def mark_collection_to_be_played_later(
     """Adds the collection id to the learner playlist of the user at the given
     position. If the position is not specified, the collection gets added at
     the end. If the collection is one of the subscribed explorations of the
-    user, it is not added. The maximum limit of the learner playlist is 10.
-    If the count exceeds 10, the collection is not added.
+    user, it is not added. The maximum limit of the learner playlist is
+    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT. If the count exceeds
+    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT, the collection is not added.
 
     Args:
         user_id: str. The id of the user.
@@ -131,13 +139,14 @@ def mark_collection_to_be_played_later(
         learner_playlist_model)
 
     if collection_id not in subscribed_collection_ids:
+        collection_ids_count = len(learner_playlist.collection_ids)
         if not position_to_be_inserted:
             if collection_id not in learner_playlist.collection_ids:
-                if len(learner_playlist.collection_ids) < 10:
+                if collection_ids_count < max_learner_playlist_activity_count:
                     learner_playlist.add_collection_id_to_list(collection_id)
         else:
             if collection_id not in learner_playlist.collection_ids:
-                if len(learner_playlist.collection_ids) < 10:
+                if collection_ids_count < max_learner_playlist_activity_count:
                     learner_playlist.insert_collection_id_at_given_position(
                         collection_id, position_to_be_inserted)
             else:

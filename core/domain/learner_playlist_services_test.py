@@ -20,8 +20,12 @@ from core.domain import learner_progress_services
 from core.domain import learner_playlist_services
 from core.tests import test_utils
 from core.platform import models
+import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
+max_learner_playlist_activity_count = (
+    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
 
 
 class LearnerPlaylistTests(test_utils.GenericTestBase):
@@ -138,9 +142,11 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [])
 
-        # Test that the length of the learner playlist doesn't exceed 10.
+        # Test that the length of the learner playlist doesn't exceed
+        # max_learner_playlist_activity_count.
         # List of explorations to be added.
-        exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(0, 10)]
+        exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
+            0, max_learner_playlist_activity_count)]
         for exp_id in exp_ids:
             learner_progress_services.add_exp_to_learner_playlist(
                 self.user_id, exp_id)
@@ -149,9 +155,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), exp_ids)
 
         # Now if we try adding another exploration, it shouldn't be added as the
-        # list length would exceed 10.
+        # list length would exceed max_learner_playlist_activity_count.
         learner_playlist_services.mark_exploration_to_be_played_later(
-            self.user_id, 'SAMPLE_EXP_ID_10')
+            self.user_id, 'SAMPLE_EXP_ID')
 
         # The list still remains the same.
         self.assertEqual(
@@ -204,10 +210,12 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [])
 
-        # Test that the length of the learner playlist doesn't exceed 10.
+        # Test that the length of the learner playlist doesn't exceed
+        # max_learner_playlist_activity_count.
         # List of collections to be added.
         collection_ids = (
-            ['SAMPLE_COLLECTION_ID_%s' % index for index in range(0, 10)])
+            ['SAMPLE_COLLECTION_ID_%s' % index for index in range(
+                0, max_learner_playlist_activity_count)])
         for collection_id in collection_ids:
             learner_progress_services.add_collection_to_learner_playlist(
                 self.user_id, collection_id)
@@ -216,9 +224,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), collection_ids)
 
         # Now if we try adding another collection, it shouldn't be added as the
-        # list length would exceed 10.
+        # list length would exceed max_learner_playlist_activity_count.
         learner_playlist_services.mark_collection_to_be_played_later(
-            self.user_id, 'SAMPLE_COLLECTION_ID_10')
+            self.user_id, 'SAMPLE_COLLECTION_ID')
 
         # The list still remains the same.
         self.assertEqual(
