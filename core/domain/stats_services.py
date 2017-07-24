@@ -82,8 +82,8 @@ def get_visualizations_info(exploration_id, state_name):
 
 # TODO(bhenning): Test
 def get_versions_for_exploration_stats(exploration_id):
-    """Returns a list of string, each string representing a version of the given
-    exploration_id for which statistics data exits. These versions are retrieved
+    """Returns a list of strings, each string representing a version of the given
+    exploration_id for which statistics data exists. These versions are retrieved
     from ExplorationAnnotationsModel created when StatisticsAggregator job is
     run.
 
@@ -95,8 +95,10 @@ def get_versions_for_exploration_stats(exploration_id):
         exploration_id: str. The exploration ID.
 
     Returns:
-        list(str). A list of strings, each string representing version of the
-        given exploration ID.
+        list(str). The versions of the given exploration for which statistics
+        data exists. These may either be 'all' (which indicates that the
+        statistics have been aggregated over all versions), or specific
+        (stringified) version numbers.
     """
     return stats_models.ExplorationAnnotationsModel.get_versions(
         exploration_id)
@@ -108,7 +110,7 @@ def get_exploration_stats(exploration_id, exploration_version):
 
     Args:
         exploration_id: str. The exploration ID.
-        exploration_version: str. The value is version of the exploration from
+        exploration_version: str. The version of the exploration from
             ExplorationAnnotationsModel. It can be 'all' or version number as
             string like '3'.
 
@@ -116,7 +118,7 @@ def get_exploration_stats(exploration_id, exploration_version):
         dict. A dict with state statistics for the given exploration ID.
         The keys and values of the dict are as follows:
         - 'last_updated': float. Last updated timestamp of the exploration.
-        - 'num_starts': int. The number of "start exploration" recorded.
+        - 'num_starts': int. The number of "start exploration" events recorded.
         - 'num_completions': int. The number of "complete exploration" events
             recorded.
         - 'state_stats': dict(dict). Contains state stats of states
@@ -125,7 +127,7 @@ def get_exploration_stats(exploration_id, exploration_version):
             statistics data of the respective state in the key.
             The keys and values of the dict are as follows:
             - state_name: dict. The statistics data of the state.
-                The keys and values of the dict are as follows:
+                The keys and values of the statistics data dict are as follows:
                 - "first_entry_count": int. The number of sessions which hit
                     the state.
                 - "name": str. The name of the state.
