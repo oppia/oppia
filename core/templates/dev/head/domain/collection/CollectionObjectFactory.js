@@ -18,8 +18,11 @@
  */
 
 oppia.factory('CollectionObjectFactory', [
-  'CollectionNodeObjectFactory', 'SkillListObjectFactory',
-  function(CollectionNodeObjectFactory, SkillListObjectFactory) {
+  'CollectionNodeObjectFactory', 'CollectionSkillObjectFactory',
+  'SkillListObjectFactory',
+  function(
+      CollectionNodeObjectFactory, CollectionSkillObjectFactory,
+      SkillListObjectFactory) {
     var Collection = function(collectionBackendObject) {
       this._id = collectionBackendObject.id;
       this._title = collectionBackendObject.title;
@@ -29,6 +32,8 @@ oppia.factory('CollectionObjectFactory', [
       this._category = collectionBackendObject.category;
       this._version = collectionBackendObject.version;
       this._nodes = [];
+      this._skills = {};
+      this._nextSkillId = Number(collectionBackendObject.next_skill_id);
 
       // This map acts as a fast way of looking up a collection node for a given
       // exploration ID.
@@ -38,6 +43,15 @@ oppia.factory('CollectionObjectFactory', [
           collectionBackendObject.nodes[i]);
         var explorationId = this._nodes[i].getExplorationId();
         this._explorationIdToNodeIndexMap[explorationId] = i;
+      }
+
+      // Populates skills.
+      var skills = collectionBackendObject.skills;
+      for (var skillId in skills) {
+        if (skills.hasOwnProperty(skillId)) {
+          this._skills[skillId] = CollectionSkillObjectFactory.create(
+            skillId, skills[skillId]);
+        }
       }
     };
 
@@ -89,6 +103,18 @@ oppia.factory('CollectionObjectFactory', [
 
     Collection.prototype.getVersion = function() {
       return this._version;
+    };
+
+    // This gets the next skill ID number. It is the smallest integer not
+    // already used for a skill ID in this collection node, including deleted
+    // skills.
+    Collection.prototype.getNextSkillId = function() {
+      return this._nextSkillId;
+    };
+
+    // This sets the next skill ID number.
+    Collection.prototype.setNextSkillId = function(nextSkillId) {
+      this._nextSkillId = nextSkillId;
     };
 
     // Adds a new frontend collection node domain object to this collection.
@@ -192,6 +218,7 @@ oppia.factory('CollectionObjectFactory', [
     // skills from all collections nodes within this domain object. Please note
     // this operation returns a new skill list everytime this function is
     // called.
+    // TODO(wxy): migrate this to use the skills dict instead.
     Collection.prototype.getSkillList = function() {
       var skillList = SkillListObjectFactory.create([]);
       for (var i = 0; i < this._nodes.length; i++) {
@@ -201,6 +228,87 @@ oppia.factory('CollectionObjectFactory', [
         skillList.addSkillsFromSkillList(collectionNode.getAcquiredSkillList());
       }
       return skillList;
+    };
+
+    // Gets a new ID for a skill. This should be of the same form as in the
+    // backend, in collection_domain.CollectionSkill.get_skill_id_from_index.
+    // This increments nextSkillId.
+    Collection.prototype.getNewSkillId = function() {
+      var newId = 'skill' + String(this._nextSkillId);
+      this._nextSkillId++;
+      return newId;
+    };
+
+    // Adds a new frontend collection skill domain object to this collection.
+    // This will return true if the skill was successfully added, or false if
+    // the given collection skill has an ID already used by another skill.
+    // Changes to the provided object will be reflected in this collection.
+    Collection.prototype.addCollectionSkill = function(collectionSkillObject) {
+      if (!this._skills.hasOwnProperty(collectionSkillObject.getId())) {
+        this._skills[collectionSkillObject.getId()] = collectionSkillObject;
+        return true;
+      }
+      return false;
+    };
+
+    // Attempts to remove a collection skill from this collection given the
+    // specified skill ID. Returns whether the collection skill was
+    // removed, which depends on whether any collection skills reference the
+    // given skill ID.
+    Collection.prototype.deleteCollectionSkill = function(skillId) {
+      if (this._skills.hasOwnProperty(skillId)) {
+        delete this._skills[skillId];
+        this._nodes.forEach(function(node) {
+          var prerequisiteSkillList = node.getPrerequisiteSkillList();
+          var acquiredSkillList = node.getAcquiredSkillList();
+          if (prerequisiteSkillList.containsSkill(skillId)) {
+            prerequisiteSkillList.removeSkillById(skillId);
+          }
+          if (acquiredSkillList.containsSkill(skillId)) {
+            acquiredSkillList.removeSkillById(skillId);
+          }
+        });
+        return true;
+      }
+      return false;
+    };
+
+    // Deletes all collection skills within this collection.
+    Collection.prototype.clearCollectionSkills = function() {
+      this._skills = {};
+      this.setNextSkillId(0);
+    };
+
+    // Returns a dict mapping ids to collection skill objects for this
+    // collection.
+    Collection.prototype.getCollectionSkills = function() {
+      return this._skills;
+    };
+
+    // Returns whether collection contains a skill with the given ID.
+    Collection.prototype.containsCollectionSkill = function(skillId) {
+      return this._skills.hasOwnProperty(skillId);
+    };
+
+    // Gets the ID of the skill with a given name. Returns null if skill name
+    // is not found.
+    Collection.prototype.getSkillIdFromName = function(skillName) {
+      for (var skillId in this._skills) {
+        if (this._skills.hasOwnProperty(skillId) &&
+            this._skills[skillId].getName() === skillName) {
+          return skillId;
+        }
+      }
+      return null;
+    };
+
+    // Gets the skill object of from the collection by ID. Returns null if the
+    // collection does not contain a skill with the specified ID.
+    Collection.prototype.getSkill = function(skillId) {
+      if (this._skills.hasOwnProperty(skillId)) {
+        return this._skills[skillId];
+      }
+      return null;
     };
 
     // Reassigns all values within this collection to match the existing
@@ -217,10 +325,20 @@ oppia.factory('CollectionObjectFactory', [
       this.setTags(otherCollection.getTags());
       this._version = otherCollection.getVersion();
       this.clearCollectionNodes();
+      this.clearCollectionSkills();
+      this.setNextSkillId(otherCollection.getNextSkillId());
 
       var nodes = otherCollection.getCollectionNodes();
       for (var i = 0; i < nodes.length; i++) {
         this.addCollectionNode(angular.copy(nodes[i]));
+      }
+
+      var skills = otherCollection.getCollectionSkills();
+      for (var skillId in skills) {
+        if (skills.hasOwnProperty(skillId)) {
+          this.addCollectionSkill(angular.copy(
+            skills[skillId]));
+        }
       }
     };
 
@@ -235,7 +353,9 @@ oppia.factory('CollectionObjectFactory', [
     // tests.
     Collection.createEmptyCollection = function() {
       return new Collection({
-        nodes: []
+        nodes: [],
+        skills: {},
+        next_skill_id: 0
       });
     };
 

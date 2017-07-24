@@ -152,7 +152,7 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 11
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 3
+CURRENT_COLLECTION_SCHEMA_VERSION = 4
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
