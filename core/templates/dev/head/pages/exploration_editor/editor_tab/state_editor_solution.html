@@ -1,6 +1,7 @@
 <div ng-controller="StateSolution">
   <div ng-if="!isCurrentInteractionLinear() &&
-              stateHintsService.displayed.length > 0">
+              stateHintsService.displayed.length > 0 &&
+              currentInteractionCanHaveSolution">
     <div class="oppia-editor-header">
       <strong>Solution</strong>
     </div>

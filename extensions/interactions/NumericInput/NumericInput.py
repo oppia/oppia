@@ -30,6 +30,7 @@ class NumericInput(base.BaseInteraction):
     instructions = None
     narrow_instructions = None
     needs_summary = False
+    can_have_solution = True
 
     _customization_arg_specs = []
 

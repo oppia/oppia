@@ -35,7 +35,6 @@ oppia.controller('StateSolution', [
     $scope.editorContextService = editorContextService;
     $scope.stateSolutionService = stateSolutionService;
     $scope.inlineSolutionEditorIsActive = false;
-    $scope.INTERACTION_SPECS = INTERACTION_SPECS;
     $scope.interactionHtml = '';
     $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
       'currentInteractionHtmlForSolutionEditor');
@@ -63,7 +62,8 @@ oppia.controller('StateSolution', [
       $scope.inlineSolutionEditorIsActive = false;
       var interactionId = stateInteractionIdService.savedMemento;
 
-      $scope.INTERACTION_SPECS = INTERACTION_SPECS[interactionId];
+      $scope.currentInteractionCanHaveSolution = (
+        INTERACTION_SPECS[interactionId].can_have_solution);
 
       if (!StateSolutionHelperService.isSupportedInteraction(interactionId)) {
         // In this case the interaction UI is constructed by the Solution
