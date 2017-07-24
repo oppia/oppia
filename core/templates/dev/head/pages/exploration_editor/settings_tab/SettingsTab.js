@@ -198,7 +198,7 @@ oppia.controller('SettingsTab', [
     $scope.editRole = function(newMemberUsername, newMemberRole) {
       $scope.closeRolesForm();
       explorationRightsService.saveRoleChanges(
-        newMemberUsername, new_member_role: newMemberRole);
+        newMemberUsername, newMemberRole);
     };
 
     $scope.toggleViewabilityIfPrivate = function() {

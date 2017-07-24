@@ -565,8 +565,8 @@ oppia.factory('explorationRightsService', [
           whenCommunityOwnedSet.resolve();
         });
         return whenCommunityOwnedSet.promise;
-      }
-      setViewability: function(viewable_if_private) {
+      },
+      setViewability: function(viewableIfPrivate) {
         var whenViewabilityChanged = $q.defer();
         var that = this;
 
@@ -574,7 +574,7 @@ oppia.factory('explorationRightsService', [
             '/createhandler/rights/' + explorationData.explorationId);
         $http.put(requestUrl, {
           version: explorationData.data.version,
-          viewable_if_private: viewable_if_private
+          viewable_if_private: viewableIfPrivate
         }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
@@ -587,7 +587,7 @@ oppia.factory('explorationRightsService', [
         });
         return whenViewabilityChanged.promise;          
       },
-      saveRoleChanges: function(new_member_username, new_member_role) {
+      saveRoleChanges: function(newMemberUsername, newMemberRole) {
         var whenRolesSaved = $q.defer();
         var that = this;
 
@@ -595,8 +595,8 @@ oppia.factory('explorationRightsService', [
             '/createhandler/rights/' + explorationData.explorationId);
         $http.put(requestUrl, {
           version: explorationData.data.version,
-          new_member_role: new_member_role,
-          new_member_username: new_member_username
+          new_member_role: newMemberRole,
+          new_member_username: newMemberUsername
         }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
@@ -609,14 +609,14 @@ oppia.factory('explorationRightsService', [
         });
         return whenRolesSaved.promise;  
       },
-      makePublic: function(make_public) {
+      makePublic: function(makePublic) {
         var whenPublishStatusChanged = $q.defer();
         var that = this;
 
         var requestUrl = (
           '/createhandler/status/' + explorationData.explorationId);
         $http.put(requestUrl, {
-          make_public: make_public
+          make_public: makePublic
         }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
@@ -629,14 +629,14 @@ oppia.factory('explorationRightsService', [
         });
         return whenPublishStatusChanged.promise;
       },
-      makePublicized: function(make_publicized) {
+      makePublicized: function(makePublicized) {
         var whenPublicizedStatusChanged = $q.defer();
         var that = this;
 
         var requestUrl = (
           '/createhandler/status/' + explorationData.explorationId);
         $http.put(requestUrl, {
-          make_publicized: make_publicized
+          make_publicized: makePublicized
         }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
