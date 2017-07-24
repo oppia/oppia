@@ -137,6 +137,35 @@ oppia.controller('StateHints', [
       }
     };
 
+    var openDeleteLastHintModal = function() {
+      alertsService.clearWarnings();
+
+        $modal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/editor_tab/DeleteLastHintModal.html'),
+          backdrop: true,
+          controller: [
+            '$scope', '$modalInstance',
+            function($scope, $modalInstance) {
+
+              $scope.deleteBothSolutionAndHint = function() {
+                $modalInstance.close();
+              };
+
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+                alertsService.clearWarnings();
+              };
+            }
+          ]
+        }).result.then(function() {
+          stateSolutionService.displayed = null;
+          stateSolutionService.saveDisplayedValue();
+          stateHintsService.displayed = [];
+          stateHintsService.saveDisplayedValue();
+        });
+    };
+
     $scope.deleteHint = function(index, evt) {
       // Prevent clicking on the delete button from also toggling the display
       // state of the answer group.
@@ -164,9 +193,7 @@ oppia.controller('StateHints', [
             stateHintsService.displayed.splice(index, 1);
             stateHintsService.saveDisplayedValue();
           } else {
-            alertsService.addWarning('Atleast one hint is required to be ' +
-              'specified for a solution to exist. Please delete the ' +
-              'solution and try again.');
+            openDeleteLastHintModal();
           }
         } else {
           stateHintsService.displayed.splice(index, 1);

@@ -46,7 +46,7 @@
         <button type="button"
                 class="btn btn-default btn-lg oppia-add-hint-button protractor-test-oppia-add-solution-button"
                 ng-click="openAddSolutionModal()">
-          + Add Solution
+          + <[stateSolutionService.savedMemento ? 'Change Solution' : 'Add Solution']>
         </button>
       </div>
     </md-card>
