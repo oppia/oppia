@@ -140,30 +140,29 @@ oppia.controller('StateHints', [
     var openDeleteLastHintModal = function() {
       alertsService.clearWarnings();
 
-        $modal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/editor_tab/DeleteLastHintModal.html'),
-          backdrop: true,
-          controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+      $modal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/DeleteLastHintModal.html'),
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance',
+          function($scope, $modalInstance) {
+            $scope.deleteBothSolutionAndHint = function() {
+              $modalInstance.close();
+            };
 
-              $scope.deleteBothSolutionAndHint = function() {
-                $modalInstance.close();
-              };
-
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
-              };
-            }
-          ]
-        }).result.then(function() {
-          stateSolutionService.displayed = null;
-          stateSolutionService.saveDisplayedValue();
-          stateHintsService.displayed = [];
-          stateHintsService.saveDisplayedValue();
-        });
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              alertsService.clearWarnings();
+            };
+          }
+        ]
+      }).result.then(function() {
+        stateSolutionService.displayed = null;
+        stateSolutionService.saveDisplayedValue();
+        stateHintsService.displayed = [];
+        stateHintsService.saveDisplayedValue();
+      });
     };
 
     $scope.deleteHint = function(index, evt) {
