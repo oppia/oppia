@@ -82,10 +82,10 @@ def get_visualizations_info(exploration_id, state_name):
 
 # TODO(bhenning): Test
 def get_versions_for_exploration_stats(exploration_id):
-    """Returns a list of strings, each string representing a version of the given
-    exploration_id for which statistics data exists. These versions are retrieved
-    from ExplorationAnnotationsModel created when StatisticsAggregator job is
-    run.
+    """Returns a list of strings, each string representing a version of the
+    given exploration_id for which statistics data exists. These versions are
+    retrieved from ExplorationAnnotationsModel created when StatisticsAggregator
+    job is run.
 
     An example of the return list may look like [u'3', u'all']
     where '3' and 'all' are versions of the given exploration ID from
