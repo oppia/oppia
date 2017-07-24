@@ -27,7 +27,7 @@ describe('Feedback message object factory', function() {
   }));
 
   it('should create a new message', function() {
-    feedbackMessageSummary = (
+    var feedbackMessageSummary = (
       FeedbackMessageSummaryObjectFactory.createNewMessage(
         'Sample message', 'Test user', 'profile_picture_url'));
 
@@ -39,7 +39,7 @@ describe('Feedback message object factory', function() {
 
   it('should fetch the feedback message domain object from the backend ' +
      'summary dict', function() {
-    messageSummary = {
+    var messageSummary = {
       text: 'Sample text',
       author_username: 'User 1',
       author_picture_data_url: 'sample_picture_url_1',

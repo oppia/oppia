@@ -18,10 +18,10 @@
  */
 
 oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
-  var FeedbackThreadSummary = function(status, originalAuthorId, lastUpdated,
-    lastMessageText, totalMessageCount, lastMessageRead,
-    secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
-    explorationTitle, explorationId, threadId) {
+  var FeedbackThreadSummary = function(
+    status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
+    lastMessageRead, secondLastMessageRead, authorLastMessage,
+    authorSecondLastMessage, explorationTitle, explorationId, threadId) {
     this.status = status;
     this.originalAuthorId = originalAuthorId;
     this.lastUpdated = lastUpdated;
@@ -65,20 +65,20 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   }
 
   FeedbackThreadSummary.createFromBackendDict = function(
-    FeedbackThreadSummaryBackendDict) {
+    feedbackThreadSummaryBackendDict) {
     return new FeedbackThreadSummary(
-      FeedbackThreadSummaryBackendDict.status,
-      FeedbackThreadSummaryBackendDict.original_author_id,
-      FeedbackThreadSummaryBackendDict.last_updated,
-      FeedbackThreadSummaryBackendDict.last_message_text,
-      FeedbackThreadSummaryBackendDict.total_message_count,
-      FeedbackThreadSummaryBackendDict.last_message_read,
-      FeedbackThreadSummaryBackendDict.second_last_message_read,
-      FeedbackThreadSummaryBackendDict.author_last_message,
-      FeedbackThreadSummaryBackendDict.author_second_last_message,
-      FeedbackThreadSummaryBackendDict.exploration_title,
-      FeedbackThreadSummaryBackendDict.exploration_id,
-      FeedbackThreadSummaryBackendDict.thread_id);
+      feedbackThreadSummaryBackendDict.status,
+      feedbackThreadSummaryBackendDict.original_author_id,
+      feedbackThreadSummaryBackendDict.last_updated,
+      feedbackThreadSummaryBackendDict.last_message_text,
+      feedbackThreadSummaryBackendDict.total_message_count,
+      feedbackThreadSummaryBackendDict.last_message_read,
+      feedbackThreadSummaryBackendDict.second_last_message_read,
+      feedbackThreadSummaryBackendDict.author_last_message,
+      feedbackThreadSummaryBackendDict.author_second_last_message,
+      feedbackThreadSummaryBackendDict.exploration_title,
+      feedbackThreadSummaryBackendDict.exploration_id,
+      feedbackThreadSummaryBackendDict.thread_id);
   };
 
   return FeedbackThreadSummary;

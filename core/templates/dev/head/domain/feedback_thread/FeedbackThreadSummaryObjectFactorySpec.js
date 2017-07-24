@@ -28,7 +28,7 @@ describe('Feedback thread object factory', function() {
 
   it('should update the summary of the thread on addition of a ' +
      ' message', function() {
-    feedbackThreadSummary = FeedbackThreadSummaryObjectFactory.create(
+    var feedbackThreadSummary = FeedbackThreadSummaryObjectFactory.create(
       'open', 'Test user 1', new Date(), 'last message', 2, false, false,
       'Test user 2', 'Test user 2', 'Test exploration name', '0', 'thread_id');
 
@@ -41,7 +41,7 @@ describe('Feedback thread object factory', function() {
 
   it('should fetch the feedback thread domain object from the backend ' +
      'summary dict', function() {
-    threadSummary = {
+    var threadSummary = {
       status: 'open',
       original_author_id: 'Test user 1',
       last_updated: 1000,
@@ -56,7 +56,7 @@ describe('Feedback thread object factory', function() {
       thread_id: 'thread_id_1'
     };
 
-    feedbackThreadSummary = (
+    var feedbackThreadSummary = (
       FeedbackThreadSummaryObjectFactory.createFromBackendDict(threadSummary));
 
     expect(feedbackThreadSummary.explorationTitle).toEqual(
