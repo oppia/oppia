@@ -41,7 +41,7 @@ describe('Collection linearizer service', function() {
     var firstCollectionNodeBackendObject = {
       exploration_id: 'exp_id0',
       prerequisite_skill_ids: [],
-      acquired_skill_ids: ['skill0'],
+      acquired_skill_ids: [],
       exploration_summary: {
         title: 'exp title0',
         category: 'exp category',
@@ -87,11 +87,11 @@ describe('Collection linearizer service', function() {
   // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2
   var createLinearCollection = function() {
     var collection = CollectionObjectFactory.createEmptyCollection();
-    firstCollectionNode.getAcquiredSkillList().setSkills(['skill0']);
-    secondCollectionNode.getPrerequisiteSkillList().setSkills(['skill0']);
-    secondCollectionNode.getAcquiredSkillList().setSkills(['skill1']);
-    thirdCollectionNode.getPrerequisiteSkillList().setSkills(['skill1']);
-    thirdCollectionNode.getAcquiredSkillList().setSkills(['skill2']);
+    firstCollectionNode.addAcquiredSkillId('skill0');
+    secondCollectionNode.addPrerequisiteSkillId('skill0');
+    secondCollectionNode.addAcquiredSkillId('skill1');
+    thirdCollectionNode.addPrerequisiteSkillId('skill1');
+    thirdCollectionNode.addAcquiredSkillId('skill2');
 
     // Add collections in a different order from which they will be displayed
     // by the linearizer for robustness.
@@ -110,11 +110,11 @@ describe('Collection linearizer service', function() {
   //                                          \--->exp_id2
   var createNonLinearCollection = function() {
     var collection = CollectionObjectFactory.createEmptyCollection();
-    firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
-    secondCollectionNode.getPrerequisiteSkillList().setSkills(['exp title0']);
-    secondCollectionNode.getAcquiredSkillList().setSkills(['exp title1']);
-    thirdCollectionNode.getPrerequisiteSkillList().setSkills(['exp title0']);
-    thirdCollectionNode.getAcquiredSkillList().setSkills(['exp title2']);
+    firstCollectionNode.addAcquiredSkillId('skill0');
+    secondCollectionNode.addPrerequisiteSkillId('skill0');
+    secondCollectionNode.addAcquiredSkillId('skill1');
+    thirdCollectionNode.addPrerequisiteSkillId('skill0');
+    thirdCollectionNode.addAcquiredSkillId('skill2');
     collection.addCollectionNode(firstCollectionNode);
     collection.addCollectionNode(secondCollectionNode);
     collection.addCollectionNode(thirdCollectionNode);
@@ -158,6 +158,7 @@ describe('Collection linearizer service', function() {
       function() {
         var collection = CollectionObjectFactory.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
+        firstCollectionNode.addAcquiredSkillId('skill0');
         collection.setNextSkillId(1);
         collection.addCollectionSkill(firstCollectionSkill);
         expect(collection.containsCollectionNode('exp_id0')).toBe(true);
@@ -303,7 +304,7 @@ describe('Collection linearizer service', function() {
     it('should correctly shift a node in a single node collection',
       function() {
         var collection = CollectionObjectFactory.createEmptyCollection();
-        firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
+        firstCollectionNode.addAcquiredSkillId('exp title0');
         collection.addCollectionNode(firstCollectionNode);
         expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -381,7 +382,7 @@ describe('Collection linearizer service', function() {
     it('should correctly shift a node in a single node collection',
       function() {
         var collection = CollectionObjectFactory.createEmptyCollection();
-        firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
+        firstCollectionNode.addAcquiredSkillId('exp title0');
         collection.addCollectionNode(firstCollectionNode);
         expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -507,7 +508,7 @@ describe('Collection linearizer service', function() {
     it('should correctly return a list for a collection with a single node',
       function() {
         var collection = CollectionObjectFactory.createEmptyCollection();
-        firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
+        firstCollectionNode.addAcquiredSkillId('exp title0');
         collection.addCollectionNode(firstCollectionNode);
         expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
