@@ -24,7 +24,7 @@ import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-max_learner_playlist_activity_count = (
+MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = (
     feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
 
 
@@ -143,10 +143,10 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), [])
 
         # Test that the length of the learner playlist doesn't exceed
-        # max_learner_playlist_activity_count.
+        # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         # List of explorations to be added.
         exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
-            0, max_learner_playlist_activity_count)]
+            0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
         for exp_id in exp_ids:
             learner_progress_services.add_exp_to_learner_playlist(
                 self.user_id, exp_id)
@@ -155,7 +155,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), exp_ids)
 
         # Now if we try adding another exploration, it shouldn't be added as the
-        # list length would exceed max_learner_playlist_activity_count.
+        # list length would exceed MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, 'SAMPLE_EXP_ID')
 
@@ -211,11 +211,11 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), [])
 
         # Test that the length of the learner playlist doesn't exceed
-        # max_learner_playlist_activity_count.
+        # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         # List of collections to be added.
         collection_ids = (
             ['SAMPLE_COLLECTION_ID_%s' % index for index in range(
-                0, max_learner_playlist_activity_count)])
+                0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)])
         for collection_id in collection_ids:
             learner_progress_services.add_collection_to_learner_playlist(
                 self.user_id, collection_id)
@@ -224,7 +224,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), collection_ids)
 
         # Now if we try adding another collection, it shouldn't be added as the
-        # list length would exceed max_learner_playlist_activity_count.
+        # list length would exceed MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, 'SAMPLE_COLLECTION_ID')
 

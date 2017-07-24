@@ -24,7 +24,7 @@ import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-max_learner_playlist_activity_count = (
+MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = (
     feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
 
 
@@ -95,11 +95,11 @@ def mark_exploration_to_be_played_later(
         exploration_ids_count = len(learner_playlist.exploration_ids)
         if not position_to_be_inserted:
             if exploration_id not in learner_playlist.exploration_ids:
-                if exploration_ids_count < max_learner_playlist_activity_count:
+                if exploration_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.add_exploration_id_to_list(exploration_id)
         else:
             if exploration_id not in learner_playlist.exploration_ids:
-                if exploration_ids_count < max_learner_playlist_activity_count:
+                if exploration_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.insert_exploration_id_at_given_position(
                         exploration_id, position_to_be_inserted)
             else:
@@ -142,11 +142,11 @@ def mark_collection_to_be_played_later(
         collection_ids_count = len(learner_playlist.collection_ids)
         if not position_to_be_inserted:
             if collection_id not in learner_playlist.collection_ids:
-                if collection_ids_count < max_learner_playlist_activity_count:
+                if collection_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.add_collection_id_to_list(collection_id)
         else:
             if collection_id not in learner_playlist.collection_ids:
-                if collection_ids_count < max_learner_playlist_activity_count:
+                if collection_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.insert_collection_id_at_given_position(
                         collection_id, position_to_be_inserted)
             else:
