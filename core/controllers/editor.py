@@ -441,7 +441,7 @@ class ExplorationRightsHandler(EditorHandler):
         })
 
 
-class ExplorationPublishHandler(EditorHandler):
+class ExplorationStatusHandler(EditorHandler):
     """Handles publishing of an exploration."""
 
     def _publish_exploration(self, exploration_id, make_public):

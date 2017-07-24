@@ -344,8 +344,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
         editor.ExplorationRightsHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EXPLORATION_PUBLISH_PREFIX,
-        editor.ExplorationPublishHandler),
+        r'%s/<exploration_id>' % feconf.EXPLORATION_STATUS_PREFIX,
+        editor.ExplorationStatusHandler),
     get_redirect_route(
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
