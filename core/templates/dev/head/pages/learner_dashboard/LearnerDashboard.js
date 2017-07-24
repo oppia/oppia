@@ -252,6 +252,8 @@ oppia.controller('LearnerDashboard', [
 
     $scope.onClickThread = function(
       threadStatus, explorationId, threadId, explorationTitle) {
+      console.log(threadId);
+      console.log(explorationId);
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
         '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
           explorationId: explorationId,
@@ -309,7 +311,7 @@ oppia.controller('LearnerDashboard', [
             newMessage, $scope.username, $scope.profilePictureDataUrl));
         $scope.messageSummaries.push(newMessageSummary);
         $scope.threadSummary = $scope.threadSummaries[threadIndex];
-        $scope.threadSummary.updateThreadSummaryOnAdditionOfNewMessage(
+        $scope.threadSummary.appendNewMessage(
           newMessage, $scope.username);
         $scope.messageSendingInProgress = false;
         $scope.newMessage.text = null;

@@ -415,7 +415,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_get_thread_summaries_load_test(self):
         # The speed of fetching the summaries of 100 threads having 5 messages
-        # should be less than 1.5 second.
+        # should be less than 1.5 second. In reality, the time taken to fetch
+        # all the summaries is less than 0.2s. However since it seems to take
+        # longer on Travis, the constant has been set to 1.5s.
         # Create 100 threads.
         for _ in range(100):
             feedback_services.create_thread(

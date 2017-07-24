@@ -136,7 +136,7 @@
 .          <div>
             <button class="btn btn-success protractor-test-oppia-feedback-response-send-btn" style="margin-top: 10px;"
                     ng-click="addNewMessage(activeThread.thread_id, tmpMessage.text, tmpMessage.status)"
-                    ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status)">
+                    ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status) || (!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'))">
               <span ng-if="messageSendingInProgress">Sending...</span>
               <span ng-if="!messageSendingInProgress">Send</span>
             </button>

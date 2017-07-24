@@ -28,15 +28,15 @@ describe('Feedback thread object factory', function() {
 
   it('should update the summary of the thread on addition of a ' +
      ' message', function() {
-    feedbackThread = FeedbackThreadSummaryObjectFactory.create(
+    feedbackThreadSummary = FeedbackThreadSummaryObjectFactory.create(
       'open', 'Test user 1', new Date(), 'last message', 2, false, false,
       'Test user 2', 'Test user 2', 'Test exploration name', '0', 'thread_id');
 
-    feedbackThread.updateThreadSummaryOnAdditionOfNewMessage(
+    feedbackThreadSummary.appendNewMessage(
       'Looks good!', 'Test user 3');
-    expect(feedbackThread.authorLastMessage).toEqual('Test user 3');
-    expect(feedbackThread.lastMessageText).toEqual('Looks good!');
-    expect(feedbackThread.totalMessageCount).toEqual(3);
+    expect(feedbackThreadSummary.authorLastMessage).toEqual('Test user 3');
+    expect(feedbackThreadSummary.lastMessageText).toEqual('Looks good!');
+    expect(feedbackThreadSummary.totalMessageCount).toEqual(3);
   });
 
   it('should fetch the feedback thread domain object from the backend ' +
@@ -56,15 +56,15 @@ describe('Feedback thread object factory', function() {
       thread_id: 'thread_id_1'
     };
 
-    feedbackThread = FeedbackThreadSummaryObjectFactory.createFromBackendDict(
+    feedbackThreadSummary = FeedbackThreadSummaryObjectFactory.createFromBackendDict(
       threadSummary);
 
-    expect(feedbackThread.explorationTitle).toEqual(
+    expect(feedbackThreadSummary.explorationTitle).toEqual(
       'Sample exploration 1');
-    expect(feedbackThread.originalAuthorId).toEqual(
+    expect(feedbackThreadSummary.originalAuthorId).toEqual(
       'Test user 1');
-    expect(feedbackThread.lastMessageText).toEqual(
+    expect(feedbackThreadSummary.lastMessageText).toEqual(
       'last message');
-    expect(feedbackThread.totalMessageCount).toEqual(2);
+    expect(feedbackThreadSummary.totalMessageCount).toEqual(2);
   });
 });

@@ -18,7 +18,7 @@
  */
 
 oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
-  var FeedbackThread = function(status, originalAuthorId, lastUpdated,
+  var FeedbackThreadSummary = function(status, originalAuthorId, lastUpdated,
     lastMessageText, totalMessageCount, lastMessageRead,
     secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
     explorationTitle, explorationId, threadId) {
@@ -36,14 +36,14 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
     this.threadId = threadId;
   };
 
-  FeedbackThread.prototype.markTheLastTwoMessagesAsRead = function() {
+  FeedbackThreadSummary.prototype.markTheLastTwoMessagesAsRead = function() {
     if (this.authorSecondLastMessage) {
       this.secondLastMessageRead = true;
     }
     this.lastMessageRead = true;
   }
 
-  FeedbackThread.prototype.updateThreadSummaryOnAdditionOfNewMessage = function(
+  FeedbackThreadSummary.prototype.appendNewMessage = function(
     lastMessageText, authorLastMessage) {
     this.lastMessageText = lastMessageText;
     this.lastUpdated = new Date();
@@ -54,32 +54,32 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
     this.secondLastMessageRead = true;
   };
 
-  FeedbackThread.create = function(
+  FeedbackThreadSummary.create = function(
     status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
     lastMessageRead, secondLastMessageRead, authorLastMessage,
     authorSecondLastMessage, explorationTitle, explorationId, threadId) {
-    return new FeedbackThread(status, originalAuthorId, lastUpdated,
+    return new FeedbackThreadSummary(status, originalAuthorId, lastUpdated,
       lastMessageText, totalMessageCount, lastMessageRead,
       secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
   }
 
-  FeedbackThread.createFromBackendDict = function(
-    feedbackThreadBackendDict) {
-    return new FeedbackThread(
-      feedbackThreadBackendDict.status,
-      feedbackThreadBackendDict.original_author_id,
-      feedbackThreadBackendDict.last_updated,
-      feedbackThreadBackendDict.last_message_text,
-      feedbackThreadBackendDict.total_message_count,
-      feedbackThreadBackendDict.last_message_read,
-      feedbackThreadBackendDict.second_last_message_read,
-      feedbackThreadBackendDict.author_last_message,
-      feedbackThreadBackendDict.author_second_last_message,
-      feedbackThreadBackendDict.exploration_title,
-      feedbackThreadBackendDict.exploration_id,
-      feedbackThreadBackendDict.thread_id);
+  FeedbackThreadSummary.createFromBackendDict = function(
+    FeedbackThreadSummaryBackendDict) {
+    return new FeedbackThreadSummary(
+      FeedbackThreadSummaryBackendDict.status,
+      FeedbackThreadSummaryBackendDict.original_author_id,
+      FeedbackThreadSummaryBackendDict.last_updated,
+      FeedbackThreadSummaryBackendDict.last_message_text,
+      FeedbackThreadSummaryBackendDict.total_message_count,
+      FeedbackThreadSummaryBackendDict.last_message_read,
+      FeedbackThreadSummaryBackendDict.second_last_message_read,
+      FeedbackThreadSummaryBackendDict.author_last_message,
+      FeedbackThreadSummaryBackendDict.author_second_last_message,
+      FeedbackThreadSummaryBackendDict.exploration_title,
+      FeedbackThreadSummaryBackendDict.exploration_id,
+      FeedbackThreadSummaryBackendDict.thread_id);
   };
 
-  return FeedbackThread;
+  return FeedbackThreadSummary;
 }]);

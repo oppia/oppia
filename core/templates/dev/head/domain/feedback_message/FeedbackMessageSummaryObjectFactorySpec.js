@@ -27,12 +27,12 @@ describe('Feedback message object factory', function() {
   }));
 
   it('should create a new message', function() {
-    feedbackMessage = FeedbackMessageSummaryObjectFactory.createNewMessage(
+    feedbackMessageSummary = FeedbackMessageSummaryObjectFactory.createNewMessage(
       'Sample message', 'Test user', 'profile_picture_url');
 
-    expect(feedbackMessage.text).toEqual('Sample message');
-    expect(feedbackMessage.authorUsername).toEqual('Test user');
-    expect(feedbackMessage.authorPictureDataUrl).toEqual(
+    expect(feedbackMessageSummary.text).toEqual('Sample message');
+    expect(feedbackMessageSummary.authorUsername).toEqual('Test user');
+    expect(feedbackMessageSummary.authorPictureDataUrl).toEqual(
       'profile_picture_url');
   });
 
@@ -45,12 +45,12 @@ describe('Feedback message object factory', function() {
       created_on: 1000
     };
 
-    feedbackMessage = FeedbackMessageSummaryObjectFactory.createFromBackendDict(
+    feedbackMessageSummary = FeedbackMessageSummaryObjectFactory.createFromBackendDict(
       messageSummary);
 
-    expect(feedbackMessage.text).toEqual('Sample text');
-    expect(feedbackMessage.authorUsername).toEqual('User 1');
-    expect(feedbackMessage.authorPictureDataUrl).toEqual(
+    expect(feedbackMessageSummary.text).toEqual('Sample text');
+    expect(feedbackMessageSummary.authorUsername).toEqual('User 1');
+    expect(feedbackMessageSummary.authorPictureDataUrl).toEqual(
       'sample_picture_url_1')
   });
 });

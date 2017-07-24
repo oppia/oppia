@@ -18,7 +18,7 @@
  */
 
 oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
-  var FeedbackMessage = function(
+  var FeedbackMessageSummary = function(
     text, suggestionHtml, currentContentHtml, description, authorUsername,
     authorPictureDataUrl, createdOn) {
     this.text = text;
@@ -30,24 +30,24 @@ oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
     this.createdOn = createdOn;
   };
 
-  FeedbackMessage.createNewMessage = function(newMessage, authorUsername,
+  FeedbackMessageSummary.createNewMessage = function(newMessage, authorUsername,
     authorPictureDataUrl) {
-    return new FeedbackMessage(
+    return new FeedbackMessageSummary(
       newMessage, null, null, null, authorUsername, authorPictureDataUrl,
       new Date());
   };
 
-  FeedbackMessage.createFromBackendDict = function(
-    feedbackMessageBackendDict) {
-    return new FeedbackMessage(
-      feedbackMessageBackendDict.text,
-      feedbackMessageBackendDict.suggestion_html,
-      feedbackMessageBackendDict.current_content_html,
-      feedbackMessageBackendDict.description,
-      feedbackMessageBackendDict.author_username,
-      feedbackMessageBackendDict.author_picture_data_url,
-      feedbackMessageBackendDict.created_on);
+  FeedbackMessageSummary.createFromBackendDict = function(
+    FeedbackMessageSummaryBackendDict) {
+    return new FeedbackMessageSummary(
+      FeedbackMessageSummaryBackendDict.text,
+      FeedbackMessageSummaryBackendDict.suggestion_html,
+      FeedbackMessageSummaryBackendDict.current_content_html,
+      FeedbackMessageSummaryBackendDict.description,
+      FeedbackMessageSummaryBackendDict.author_username,
+      FeedbackMessageSummaryBackendDict.author_picture_data_url,
+      FeedbackMessageSummaryBackendDict.created_on);
   };
 
-  return FeedbackMessage;
+  return FeedbackMessageSummary;
 }]);
