@@ -41,9 +41,9 @@ oppia.factory('SubtitledHtmlObjectFactory', [
     };
 
     SubtitledHtml.prototype.markAudioAsNeedingUpdate = function() {
-      this._audioTranslations.forEach(function(audioTranslation) {
-        audioTranslation.markAsNeedingUpdate();
-      });
+      for (var languageCode in this._audioTranslations) {
+        this._audioTranslations[languageCode].markAsNeedingUpdate();
+      }
     };
 
     SubtitledHtml.prototype.isEmpty = function() {
@@ -51,26 +51,35 @@ oppia.factory('SubtitledHtmlObjectFactory', [
     };
 
     SubtitledHtml.prototype.toBackendDict = function() {
+      var audioTranslationsBackendDict = {};
+      for (var languageCode in this._audioTranslations) {
+        audioTranslationsBackendDict[languageCode] = (
+          this._audioTranslations[languageCode].toBackendDict());
+      }
+
       return {
         html: this._html,
-        audio_translations: this._audioTranslations.map(function(translation) {
-          return translation.toBackendDict();
-        })
+        audio_translations: audioTranslationsBackendDict
       };
     };
 
     SubtitledHtml.createFromBackendDict = function(subtitledHtmlBackendDict) {
+      var audioTranslationsBackendDict = (
+        subtitledHtmlBackendDict.audio_translations);
+
+      var audioTranslations = {};
+      for (var languageCode in audioTranslationsBackendDict) {
+        audioTranslations[languageCode] = (
+          AudioTranslationObjectFactory.createFromBackendDict(
+            audioTranslationsBackendDict[languageCode]));
+      }
+
       return new SubtitledHtml(
-        subtitledHtmlBackendDict.html,
-        subtitledHtmlBackendDict.audio_translations.map(function(translation) {
-          return AudioTranslationObjectFactory.createFromBackendDict(
-            translation);
-        })
-      );
+        subtitledHtmlBackendDict.html, audioTranslations);
     };
 
     SubtitledHtml.createDefault = function(html) {
-      return new SubtitledHtml(html, []);
+      return new SubtitledHtml(html, {});
     };
 
     return SubtitledHtml;

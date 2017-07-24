@@ -63,7 +63,7 @@ NEW_STATE_TEMPLATE = {
     'classifier_model_id': None,
     'content': {
         'html': '',
-        'audio_translations': [],
+        'audio_translations': {},
     },
     'interaction': exp_domain.State.NULL_INTERACTION_DICT,
     'param_changes': [],

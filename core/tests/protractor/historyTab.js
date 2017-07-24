@@ -62,7 +62,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '  audio_translations: []',
+        text: '  audio_translations: {}',
         highlighted: false
       },
       4: {
@@ -173,7 +173,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '  audio_translations: []',
+        text: '  audio_translations: {}',
         highlighted: false
       },
       4: {
@@ -243,7 +243,7 @@ describe('Exploration history', function() {
     var STATE_2_STRING =
       'classifier_model_id: null\n' +
       'content:\n' +
-      '  audio_translations: []\n' +
+      '  audio_translations: {}\n' +
       '  html: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
