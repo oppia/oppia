@@ -19,8 +19,16 @@
             ng-click="reloadAllExplorations()">
       Reload All Explorations
     </button>
+  </div>
+</md-card>
+
+<md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+  <div class="container" style="margin-left: 0;">
+    <h3>Generate dummy explorations</h3>
+    <p style="margin: 0;">
+      Use this form to generate dummy explorations with random titles.
+    </p>
     <span class="row">
-      <h3>Generate dummy explorations</h3>
       <label for="explorations to generate">Number of explorations to generate</label>
       <input class="form-control form-inline" style="width: 50%; margin-bottom: 5px"
              ng-model="numDummyExpsToGenerate"
@@ -38,7 +46,7 @@
               class="btn btn-primary"
               ng-click="generateDummyExplorations()"
               ng-disabled="!numDummyExpsToGenerate"
-              style="margin: 5px 0">
+              style="margin-top: 20px;">
         Generate Explorations
       </button>
     </span>
