@@ -24,11 +24,13 @@
            angular-html-bind="interactionHtml">
       </div>
       <br>
-      <strong>Explanation is...</strong>
-      <schema-based-editor class="protractor-test-explanation-text-area"
-                           schema="EXPLANATION_FORM_SCHEMA"
-                           local-value="tmpSolution.explanation">
-      </schema-based-editor>
+      <div ng-show="tmpSolution.correctAnswer || correctAnswer">
+        <strong>Explanation is...</strong>
+        <schema-based-editor class="protractor-test-explanation-text-area"
+                             schema="EXPLANATION_FORM_SCHEMA"
+                             local-value="tmpSolution.explanation">
+        </schema-based-editor>
+      </div>
     </div>
   </form>
 </div>
@@ -37,8 +39,9 @@
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success protractor-test-submit-solution-button"
             ng-click="saveSolution()"
-            ng-disabled="!tmpSolution.explanation &&
-                         !tmpSolution.correctAnswer">
+            ng-disabled="!tmpSolution.correctAnswer &&
+                         !correctAnswer ||
+                         !tmpSolution.explanation">
       Check and Save Solution
     </button>
   </div>

@@ -112,6 +112,7 @@ oppia.controller('StateSolution', [
           'interactionHtml',
           function($scope, $modalInstance, objectType, correctAnswer,
             interactionHtml) {
+            $scope.correctAnswer = correctAnswer;
             $scope.objectType = objectType;
             $scope.interactionHtml = interactionHtml;
             $scope.EXPLANATION_FORM_SCHEMA = {

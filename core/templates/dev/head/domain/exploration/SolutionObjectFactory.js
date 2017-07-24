@@ -47,8 +47,6 @@ oppia.factory('SolutionObjectFactory', [
     };
 
     Solution.prototype.getSolutionSummary = function(interactionId, choices) {
-      console.log(this.correctAnswer);
-      console.log(choices);
       var isExclusiveAnswer = (
         this.answerIsExclusive ? 'Only' : 'One');
       var correctAnswer = '';
