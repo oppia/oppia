@@ -333,8 +333,8 @@ class AdminHandler(base.BaseHandler):
                     new_exploration_id, title=title, category=category,
                     objective='Dummy Objective')
                 exp_services.save_new_exploration(self.user_id, exploration)
-                dummy_exploration_ids.append(new_exploration_id)
                 if i <= num_dummy_exps_to_publish - 1:
+                    dummy_exploration_ids.append(new_exploration_id)
                     rights_manager.publish_exploration(
                         self.user_id, new_exploration_id)
             exp_services.index_explorations_given_ids(dummy_exploration_ids)
