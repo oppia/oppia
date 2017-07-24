@@ -5,93 +5,17 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-if="editabilityService.isEditable()">
           <div role="form" class="form-horizontal">
-            <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
-              <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40" ng-trim="false">
-                <span class="help-block" style="font-size: smaller">
-                  <em>Please use at most 40 characters, so that this fits in the summary card.</em>
-                  <span ng-if="explorationTitleService.displayed.length > 0">
-                    <em>Characters used: <[(explorationTitleService.displayed.length)]>/40</em>
-                  </span>
-                </span>
-              </div>
-            </div>
-            <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed || ((explorationObjectiveService.displayed.length < 15) || (explorationObjectiveService.displayed.length > 100))}">
-              <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationObjective" type="text"
-                       class="form-control protractor-test-exploration-objective-input"
-                       ng-model="explorationObjectiveService.displayed"
-                       ng-blur="saveExplorationObjective()" placeholder="Learn how to..." ng-trim="false">
-                <span class="help-block" style="font-size: smaller">
-                  <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
-                  <span ng-if="explorationObjectiveService.displayed.length > 0">
-                    <em>Characters used: <[(explorationObjectiveService.displayed.length)]>/100</em>
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
-              <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <div ng-if="hasPageLoaded">
-                  <select2-dropdown id="explorationCategory"
-                                    class="protractor-test-exploration-category-input"
-                                    item="explorationCategoryService.displayed"
-                                    choices="CATEGORY_LIST_FOR_SELECT2"
-                                    placeholder="Choose or type new"
-                                    new-choice-regex="^[A-Z a-z]+$"
-                                    on-selection-change="saveExplorationCategory()"
-                                    width="100%"
-                                    invalid-search-term-message="Invalid category name">
-                  </select2-dropdown>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2">Language</label>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
-                </select>
-                <span class="help-block" style="font-size: smaller">
-                  <em>
-                    Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank">Tell us.</a>
-                  </em>
-                </span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">Name of first card</label>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames track by name">
-                </select>
-                <span class="help-block" style="font-size: smaller">
-                  <em>This is the first card the learner sees when playing your exploration.</em>
-                </span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <div ng-if="hasPageLoaded">
-                  <select2-dropdown
-                    item="$parent.explorationTagsService.displayed"
-                    allow-multiple-choices="true"
-                    invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
-                    new-choice-regex="<[::TAG_REGEX]>"
-                    width="100%"
-                    placeholder="Skills, concepts, topics, ..."
-                    on-selection-change="saveExplorationTags()">
-                  </select2-dropdown>
-                </div>
-                <span class="help-block" style="font-size: smaller">
-                  <em>Tags help learners discover your exploration when searching.</em>
-                </span>
-              </div>
-            </div>
+            
+            <exploration-metadata-form
+                      settings-tab="True"
+                      form-style="{display:'table-cell', width:'16.66666667%'}"
+                      p-style="{display:'table', width:'100%', 'margin-bottom':'2%'}"
+                      title="Title"
+                      objective="Goal"
+                      category="Category"
+                      language="Language"
+                      tags="Tags">
+            </exploration-metadata-form>
             <div class="text-right">
               <button type="button" class="btn btn-default protractor-test-open-preview-summary-modal"
                       ng-click="previewSummaryTile()"

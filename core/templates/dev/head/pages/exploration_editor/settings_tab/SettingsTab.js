@@ -65,13 +65,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.initSettingsTab = function() {
-      $scope.explorationTitleService = explorationTitleService;
-      $scope.explorationCategoryService = explorationCategoryService;
-      $scope.explorationObjectiveService = explorationObjectiveService;
-      $scope.explorationLanguageCodeService = explorationLanguageCodeService;
-      $scope.explorationTagsService = explorationTagsService;
       $scope.explorationRightsService = explorationRightsService;
-      $scope.explorationInitStateNameService = explorationInitStateNameService;
       $scope.explorationParamSpecsService = explorationParamSpecsService;
       $scope.explorationParamChangesService = explorationParamChangesService;
       $scope.UserEmailPreferencesService = UserEmailPreferencesService;
@@ -122,41 +116,6 @@ oppia.controller('SettingsTab', [
       name: 'Playtester (can give feedback)',
       value: 'viewer'
     }];
-
-    $scope.saveExplorationTitle = function() {
-      explorationTitleService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationCategory = function() {
-      explorationCategoryService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationObjective = function() {
-      explorationObjectiveService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationLanguageCode = function() {
-      explorationLanguageCodeService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationTags = function() {
-      explorationTagsService.saveDisplayedValue();
-    };
-
-    $scope.saveExplorationInitStateName = function() {
-      var newInitStateName = explorationInitStateNameService.displayed;
-
-      if (!explorationStatesService.getState(newInitStateName)) {
-        alertsService.addWarning(
-          'Invalid initial state name: ' + newInitStateName);
-        explorationInitStateNameService.restoreFromMemento();
-        return;
-      }
-
-      explorationInitStateNameService.saveDisplayedValue();
-
-      $rootScope.$broadcast('refreshGraph');
-    };
 
     $scope.postSaveParamChangesHook = function() {
       explorationWarningsService.updateWarnings();
@@ -226,7 +185,6 @@ oppia.controller('SettingsTab', [
     $scope.unmuteSuggestionNotifications = function() {
       UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
     };
-
     /********************************************
     * Methods relating to control buttons.
     ********************************************/

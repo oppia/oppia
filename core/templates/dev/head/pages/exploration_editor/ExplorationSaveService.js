@@ -368,6 +368,7 @@ oppia.factory('explorationSaveService', [
                   explorationLanguageCodeService.saveDisplayedValue();
                   explorationTagsService.saveDisplayedValue();
 
+
                   // TODO(sll): Get rid of the $timeout here.
                   // It's currently used because there is a race condition: the
                   // saveDisplayedValue() calls above result in autosave calls.
