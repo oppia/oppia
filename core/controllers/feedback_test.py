@@ -537,7 +537,8 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             exp_domain.SubtitledHtml('old content', {
                 self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
                     'filename.mp3', 20, False)
-            }))
+            }).to_dict()
+        )
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
