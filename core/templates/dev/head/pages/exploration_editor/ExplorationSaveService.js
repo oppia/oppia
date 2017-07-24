@@ -124,9 +124,8 @@ oppia.factory('explorationSaveService', [
           onStartSaveCallback();
         }
 
-        explorationRightsService.saveChangeToBackend({
-          is_public: true
-        }).then(function() {
+        explorationRightsService.makePublic(
+          true).then(function() {
           if (onSaveDoneCallback) {
             onSaveDoneCallback();
           }

@@ -283,38 +283,14 @@ def can_subscribe_to_users(handler):
 def can_edit_exploration(handler):
     """Decorator to check whether the user can edit given exploration."""
 
-    def _is_state_valid(escaped_state_name, state_name_list):
-        if escaped_state_name is None:
-            return True
-        state_name = utils.unescape_encoded_uri_component(
-            escaped_state_name)
-        return bool(state_name in state_name_list)
-
-    def test_can_edit(self, exploration_id, *args, **kwargs):
+    def test_can_edit(self, exploration_id, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
         if check_exploration_editable(
                 self.user_id, self.actions, exploration_id):
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-            escaped_state_name = (
-                None if len(args) == 0
-                else args[0])
-            state_name = (
-                None if escaped_state_name is None
-                else utils.unescape_encoded_uri_component(escaped_state_name))
 
-            if state_name is None:
-                return handler(self, exploration_id, **kwargs)
-
-            if not _is_state_valid(escaped_state_name, exploration.states):
-                logging.error('Could not find state: %s' % (
-                    utils.unescape_encoded_uri_component(escaped_state_name)))
-                logging.error(
-                    'Available states: %s' % exploration.states.keys())
-                raise base.UserFacingExceptions.PageNotFoundException
-
-            return handler(self, exploration_id, state_name, **kwargs)
+            return handler(self, exploration_id, **kwargs)
 
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -353,7 +329,7 @@ def can_delete_exploration(handler):
 
 
 def can_suggest_changes_to_exploration(handler):
-    """"Decorator to check whether a user can make suggestions to an
+    """Decorator to check whether a user can make suggestions to an
     exploration.
     """
     def test_can_suggest(self, exploration_id, **kwargs):
@@ -361,7 +337,7 @@ def can_suggest_changes_to_exploration(handler):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to give suggestions to ' +
+                'You do not have credentials to give suggestions to this '
                 'exploration.')
 
     return test_can_suggest
@@ -405,7 +381,6 @@ def can_modify_exploration_roles(handler):
     """
 
     def test_can_modify(self, exploration_id, **kwargs):
-
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
@@ -415,7 +390,7 @@ def can_modify_exploration_roles(handler):
         if (exploration_rights.community_owned or
                 exploration_rights.cloned_from):
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to change rights for this' +
+                'You do not have credentials to change rights for this '
                 'exploration.')
 
         if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_EXPLORATION in
@@ -427,7 +402,7 @@ def can_modify_exploration_roles(handler):
                 return handler(self, exploration_id, **kwargs)
 
         raise base.UserFacingExceptions.UnauthorizedUserException(
-            'You do not have credentials to change rights for this' +
+            'You do not have credentials to change rights for this '
             'exploration.')
 
     return test_can_modify

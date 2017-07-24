@@ -164,6 +164,7 @@ class ExplorationPage(EditorHandler):
 
     EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         if exploration_id in constants.DISABLED_EXPLORATION_IDS:
@@ -323,7 +324,7 @@ class ExplorationHandler(EditorHandler):
 
         return editor_dict
 
-    @base.require_user
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
         # 'apply_draft' and 'v'(version) are optional parameters because the
@@ -476,8 +477,8 @@ class ExplorationPublishHandler(EditorHandler):
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id):
-        make_public = self.payload.get('is_public')
-        make_publicized = self.payload.get('is_publicized')
+        make_public = self.payload.get('make_public')
+        make_publicized = self.payload.get('make_publicized')
 
         if make_public is not None:
             self._publish_exploration(exploration_id, make_public)

@@ -545,21 +545,16 @@ oppia.factory('explorationRightsService', [
       viewableIfPrivate: function() {
         return this._viewableIfPrivate;
       },
-      saveChangeToBackend: function(requestParams) {
-        var whenRightsSaved = $q.defer();
+      makeCommunityOwned: function() {
+        var whenCommunityOwnedSet = $q.defer();
         var that = this;
 
-        requestParams.version = explorationData.data.version;
-        var requestUrl = '';
-        if (requestParams.is_public || requestParams.is_publicized) {
-          requestUrl = (
-            '/createhandler/publish/' + explorationData.explorationId);
-        }
-        else {
-          requestUrl = (
-            '/createhandler/rights/' + explorationData.explorationId);
-        }
-        $http.put(requestUrl, requestParams).then(function(response) {
+        var requestUrl = (
+          '/createhandler/rights/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          version: explorationData.data.version,
+          make_community_owned: true
+        }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
           that.init(
@@ -567,9 +562,92 @@ oppia.factory('explorationRightsService', [
             data.rights.viewer_names, data.rights.status,
             data.rights.cloned_from, data.rights.community_owned,
             data.rights.viewable_if_private);
-          whenRightsSaved.resolve();
+          whenCommunityOwnedSet.resolve();
         });
-        return whenRightsSaved.promise;
+        return whenCommunityOwnedSet.promise;
+      }
+      setViewability: function(viewable_if_private) {
+        var whenViewabilityChanged = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+            '/createhandler/rights/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          version: explorationData.data.version,
+          viewable_if_private: viewable_if_private
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenViewabilityChanged.resolve();
+        });
+        return whenViewabilityChanged.promise;          
+      },
+      saveRoleChanges: function(new_member_username, new_member_role) {
+        var whenRolesSaved = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+            '/createhandler/rights/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          version: explorationData.data.version,
+          new_member_role: new_member_role,
+          new_member_username: new_member_username
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenRolesSaved.resolve();
+        });
+        return whenRolesSaved.promise;  
+      },
+      makePublic: function(make_public) {
+        var whenPublishStatusChanged = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+          '/createhandler/status/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          make_public: make_public
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenPublishStatusChanged.resolve();
+        });
+        return whenPublishStatusChanged.promise;
+      },
+      makePublicized: function(make_publicized) {
+        var whenPublicizedStatusChanged = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+          '/createhandler/status/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          make_publicized: make_publicized
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenPublicizedStatusChanged.resolve();
+        });
+        return whenPublicizedStatusChanged.promise;
       },
       saveModeratorChangeToBackend: function(action, emailBody) {
         var that = this;

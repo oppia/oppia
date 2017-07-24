@@ -676,7 +676,7 @@ class ModifyExplorationRolesTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-    def test_admin_can_modigy_roles_of_any_exploration(self):
+    def test_admin_can_modify_roles_of_any_exploration(self):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.private_exp_id, expect_errors=True)
