@@ -29,8 +29,8 @@ describe('Collection node object factory', function() {
       explorationId, prerequisiteSkills, acquiredSkills) {
     return CollectionNodeObjectFactory.create({
       exploration_id: explorationId,
-      prerequisite_skills: prerequisiteSkills ? prerequisiteSkills : [],
-      acquired_skills: acquiredSkills ? acquiredSkills : [],
+      prerequisite_skill_ids: prerequisiteSkills ? prerequisiteSkills : [],
+      acquired_skill_ids: acquiredSkills ? acquiredSkills : [],
       exploration_summary: {
         title: 'Title',
         status: 'private'
@@ -38,7 +38,7 @@ describe('Collection node object factory', function() {
     });
   };
 
-  it('should contain initial prerequisite skills', function() {
+  it('should contain initial prerequisite skill ids', function() {
     var collectionNode = _createEmptyCollectionNode(
       'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
     expect(collectionNode.getPrerequisiteSkillList().getSkills()).toEqual([
@@ -46,7 +46,7 @@ describe('Collection node object factory', function() {
     ]);
   });
 
-  it('should contain initial acquired skills', function() {
+  it('should contain initial acquired skill ids', function() {
     var collectionNode = _createEmptyCollectionNode(
       'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
     expect(collectionNode.getAcquiredSkillList().getSkills()).toEqual([
@@ -77,8 +77,8 @@ describe('Collection node object factory', function() {
     };
     var collectionNodeBackendObject = {
       exploration_id: 'exp_id0',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration_summary: explorationSummaryBackendObject
     };
 

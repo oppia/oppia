@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import subscription_services
 from core.domain import summary_services
@@ -101,3 +102,35 @@ class LearnerDashboardHandler(base.BaseHandler):
             'subscription_list': subscription_list
         })
         self.render_json(self.values)
+
+
+class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
+    """Gets all the messages in a thread."""
+
+    def get(self, exploration_id, thread_id):
+        """Handles GET requests."""
+        if self.user_id is None:
+            raise self.PageNotFoundException
+
+        messages = feedback_services.get_messages(
+            exploration_id, thread_id)
+        author_ids = [m.author_id for m in messages]
+        authors_settings = user_services.get_users_settings(author_ids)
+
+        message_ids = [m.message_id for m in messages]
+        feedback_services.update_messages_read_by_the_user(
+            self.user_id, exploration_id, thread_id, message_ids)
+
+        message_summary_list = []
+        for m, author_settings in zip(messages, authors_settings):
+            message_summary = {
+                'text': m.text,
+                'author_username': author_settings.username,
+                'author_picture_data_url': (
+                    author_settings.profile_picture_data_url)
+            }
+            message_summary_list.append(message_summary)
+
+        self.render_json({
+            'message_summary_list': message_summary_list
+        })

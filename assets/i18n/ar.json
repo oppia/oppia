@@ -16,6 +16,7 @@
 	"I18N_CREATE_YES_PLEASE": "نعم من فضلك!",
 	"I18N_DASHBOARD_COLLECTIONS": "مجموعة",
 	"I18N_DASHBOARD_EXPLORATIONS": "الاكتشافات",
+	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "يبدو أنك لم تنشئ أي استكشافات بعد. هيا بنا نبدأ!",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "أرسل تعليقا",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "سحب صورة هنا",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "عذرا، لكن التنقيب الذي نقرت علىه معطل حاليا. الرجاء معاودة المحاولة في وقت لاحق.",

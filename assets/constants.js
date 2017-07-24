@@ -222,7 +222,7 @@ var constants = {
     "text": "Deutsch"
   }, {
     "id": "fr",
-    "text": "français"
+    "text": "Français"
   }, {
     "id": "nl",
     "text": "Nederlands"
@@ -231,7 +231,7 @@ var constants = {
     "text": "Español"
   }, {
     "id": "hu",
-    "text": "magyar"
+    "text": "Magyar"
   }, {
     "id": "pt",
     "text": "Português"
@@ -267,5 +267,7 @@ var constants = {
   }, {
     "id": "hi-en",
     "text": "Hinglish"
-  }]
+  }],
+
+  "GCS_RESOURCE_BUCKET_NAME": "oppia.resources"
 };

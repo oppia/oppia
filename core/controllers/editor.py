@@ -19,7 +19,7 @@
 import datetime
 import imghdr
 import logging
-import tempfile
+import StringIO
 
 import cloudstorage
 import jinja2
@@ -943,7 +943,8 @@ class AudioFileHandler(EditorHandler):
     @require_editor
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
-        raw = self.request.get('audio')
+
+        raw = self.request.get('raw')
         filename = self.payload.get('filename')
         allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 
@@ -951,6 +952,7 @@ class AudioFileHandler(EditorHandler):
             raise self.InvalidInputException('No audio supplied')
         dot_index = filename.rfind('.')
         extension = filename[dot_index + 1:].lower()
+
         if dot_index == -1 or dot_index == 0:
             raise self.InvalidInputException(
                 'No filename extension: it should have '
@@ -960,30 +962,49 @@ class AudioFileHandler(EditorHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        temp_suffix = '.' + extension
-        with tempfile.NamedTemporaryFile(suffix=temp_suffix) as f:
-            f.write(raw)
-            try:
-                audio = mutagen.File(f.name)
-            except mutagen.MutagenError:
-                raise self.InvalidInputException('Audio not recognized '
-                                                 'as a %s file' % extension)
-            f.close()
+        tempbuffer = StringIO.StringIO()
+        tempbuffer.write(raw)
+        tempbuffer.seek(0)
+        try:
+            audio = mutagen.File(tempbuffer)
+        except mutagen.MutagenError:
+            # Mutagen occasionally has problems with certain files
+            # for unknown reasons.
+            raise self.InvalidInputException('Could not open uploaded'
+                                             'audio file')
+        tempbuffer.close()
 
+        if audio is None:
+            raise self.InvalidInputException('Audio not recognized '
+                                             'as a %s file' % extension)
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
                 'Audio must be under %s seconds in length. '
                 'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC,
                                      audio.info.length))
+        if len(set(audio.mime).intersection(
+                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
+            raise self.InvalidInputException(
+                'Although the filename extension indicates the file '
+                'is a %s file, it was not recognized as one. '
+                'Found mime types: %s' % (extension, audio.mime))
+
+        mimetype = audio.mime[0]
+
+        # For a strange, unknown reason, the audio variable must be
+        # deleted before opening cloud storage. If not, cloud storage
+        # throws a very mysterious error that entails a mutagen
+        # object being recursively passed around in app engine.
+        del audio
+
+        bucket_name = constants.GCS_RESOURCE_BUCKET_NAME
 
         # Upload to GCS bucket with filepath
-        # "<bucket>/<exploration-id>/assets/audio/filename".
-        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
+        # "<bucket>/<exploration-id>/assets/audio/<filename>".
         gcs_file_url = ('/%s/%s/assets/audio/%s'
                         % (bucket_name, exploration_id, filename))
-
-        gcs_file = cloudstorage.open(gcs_file_url, 'w',
-                                     content_type=audio.mime[0])
+        gcs_file = cloudstorage.open(
+            gcs_file_url, 'w', content_type=mimetype)
         gcs_file.write(raw)
         gcs_file.close()
 

@@ -61,28 +61,29 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ClassifierTrainingJobModelUnitTests, self).setUp()
         classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'exp_id1', 1,
+            'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1')
+            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'exp_id2', 2,
+            'LDAStringClassifier', 'TextInput', 'exp_id2', 2,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1')
+            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'exp_id3', 3,
+            'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1')
+            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
 
     def test_create_and_get_new_training_job_runs_successfully(self):
         job_id = classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'exp_id1', 1,
+            'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2')
+            'state_name2', feconf.TRAINING_JOB_STATUS_NEW)
 
         training_job = (
             classifier_models.ClassifierTrainingJobModel.get(job_id))
 
         self.assertEqual(training_job.algorithm_id, 'LDAStringClassifier')
+        self.assertEqual(training_job.interaction_id, 'TextInput')
         self.assertEqual(training_job.exp_id, 'exp_id1')
         self.assertEqual(training_job.exp_version, 1)
         self.assertEqual(training_job.state_name, 'state_name2')

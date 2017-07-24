@@ -52,7 +52,6 @@ class CollectionPage(base.BaseHandler):
             'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
             'collection_title': collection.title,
-            'collection_skills': collection.skills,
             'is_private': rights_manager.is_collection_private(collection_id),
             'meta_name': collection.title,
             'meta_description': utils.capitalize_string(collection.objective)

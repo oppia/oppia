@@ -20,6 +20,7 @@ import feconf
 from core.tests import test_utils
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -27,7 +28,7 @@ from core.platform import models
 
 EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
-    'thread_id', 'subject', 'last_updated']
+    'thread_id', 'subject', 'last_updated', 'message_count']
 EXPECTED_MESSAGE_KEYS = [
     'author_username', 'created_on', 'exploration_id', 'message_id',
     'text', 'updated_status', 'updated_subject', 'received_via_email']
@@ -336,6 +337,163 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 response_dict['messages'][num + 1]['text'],
                 'New Message %s' % num)
+
+
+class FeedbackThreadTests(test_utils.GenericTestBase):
+
+    OWNER_EMAIL_1 = 'owner1@example.com'
+    OWNER_USERNAME_1 = 'owner1'
+
+    OWNER_EMAIL_2 = 'owner2@example.com'
+    OWNER_USERNAME_2 = 'owner2'
+
+    USER_EMAIL = 'user@example.com'
+    USER_USERNAME = 'user'
+
+    EXP_ID = 'exp_id'
+    EXP_TITLE = 'Exploration title'
+
+    def setUp(self):
+        super(FeedbackThreadTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
+        self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
+        self.signup(self.USER_EMAIL, self.USER_USERNAME)
+        self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
+        self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+
+        # Create an exploration.
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id_1, title=self.EXP_TITLE,
+            category='Architecture', language_code='en')
+
+        rights_manager.create_new_exploration_rights(
+            self.EXP_ID, self.owner_id_2)
+
+    def _get_messages_read_by_user(self, user_id, exploration_id, thread_id):
+        feedback_thread_user_model = (
+            feedback_models.FeedbackThreadUserModel.get(
+                user_id, exploration_id, thread_id))
+
+        return (
+            feedback_thread_user_model.message_ids_read_by_user
+            if feedback_thread_user_model else [])
+
+    def _get_message_ids_in_a_thread(self, exploration_id, thread_id):
+        messages = feedback_services.get_messages(exploration_id, thread_id)
+
+        return [message.message_id for message in messages]
+
+    def test_feedback_threads(self):
+        self.login(self.USER_EMAIL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        self.post_json('%s/%s' % (
+            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
+        ), {
+            'state_name': 'statename',
+            'subject': 'subject',
+            'text': 'a sample message',
+        }, csrf_token)
+
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
+
+        # Get the id of the thread.
+        thread_id = response_dict['threads'][0]['thread_id']
+
+        # This user created the thread. The message should be there in
+        # his/her read list.
+        self.assertEqual(
+            self._get_messages_read_by_user(
+                self.user_id, self.EXP_ID, thread_id),
+            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+
+        self.logout()
+
+        self.login(self.OWNER_EMAIL_1)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # The owner opens the feedback thread.
+        thread_url = '%s/%s/%s' % (
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
+        response_dict = self.get_json(thread_url)
+
+        # The message should be added to the read list of the owner.
+        self.assertEqual(
+            self._get_messages_read_by_user(
+                self.owner_id_1, self.EXP_ID, thread_id),
+            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+
+        # Now the owner adds a message to the feedback thread.
+        thread_url = '%s/%s/%s' % (
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
+        self.post_json(thread_url, {
+            'updated_status': None,
+            'updated_subject': None,
+            'text': 'Message 1'
+        }, csrf_token)
+
+        # Both the messages in the thread should have been read by the user.
+        self.assertEqual(
+            self._get_messages_read_by_user(
+                self.owner_id_1, self.EXP_ID, thread_id),
+            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+
+        self.logout()
+
+        self.login(self.USER_EMAIL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # The user opens the feedback thread.
+        thread_url = '%s/%s/%s' % (
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
+        response_dict = self.get_json(thread_url)
+
+        # All the messages should have been read by the user.
+        self.assertEqual(
+            self._get_messages_read_by_user(
+                self.user_id, self.EXP_ID, thread_id),
+            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+
+        # User adds another message.
+        thread_url = '%s/%s/%s' % (
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
+        self.post_json(thread_url, {
+            'updated_status': None,
+            'updated_subject': None,
+            'text': 'Message 2'
+        }, csrf_token)
+
+        # Check if the new message is also added to the read list.
+        self.assertEqual(
+            self._get_messages_read_by_user(
+                self.user_id, self.EXP_ID, thread_id),
+            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+
+        self.logout()
+
+        # Another owner logs in.
+        self.login(self.OWNER_EMAIL_2)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # The second owner opens the feedback thread.
+        thread_url = '%s/%s/%s' % (
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
+        response_dict = self.get_json(thread_url)
+
+        # All the messages should be added to the read-by list.
+        self.assertEqual(
+            self._get_messages_read_by_user(
+                self.owner_id_2, self.EXP_ID, thread_id),
+            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+
+        self.logout()
 
 
 class SuggestionsIntegrationTests(test_utils.GenericTestBase):

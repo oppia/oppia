@@ -154,6 +154,25 @@ class LogoutPage(webapp2.RequestHandler):
             self.redirect(url_to_redirect_to)
 
 
+class UserFacingExceptions(object):
+    """This class contains all the exception class definitions used."""
+
+    class NotLoggedInException(Exception):
+        """Error class for users that are not logged in (error code 401)."""
+
+    class InvalidInputException(Exception):
+        """Error class for invalid input on the user side (error code 400)."""
+
+    class UnauthorizedUserException(Exception):
+        """Error class for unauthorized access."""
+
+    class PageNotFoundException(Exception):
+        """Error class for a page not found error (error code 404)."""
+
+    class InternalErrorException(Exception):
+        """Error class for an internal server side error (error code 500)."""
+
+
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
 
@@ -507,20 +526,11 @@ class BaseHandler(webapp2.RequestHandler):
         self.error(500)
         self._render_exception(500, {'error': unicode(exception)})
 
-    class UnauthorizedUserException(Exception):
-        """Error class for unauthorized access."""
-
-    class NotLoggedInException(Exception):
-        """Error class for users that are not logged in (error code 401)."""
-
-    class InvalidInputException(Exception):
-        """Error class for invalid input on the user side (error code 400)."""
-
-    class PageNotFoundException(Exception):
-        """Error class for a page not found error (error code 404)."""
-
-    class InternalErrorException(Exception):
-        """Error class for an internal server side error (error code 500)."""
+    InternalErrorException = UserFacingExceptions.InternalErrorException
+    InvalidInputException = UserFacingExceptions.InvalidInputException
+    NotLoggedInException = UserFacingExceptions.NotLoggedInException
+    PageNotFoundException = UserFacingExceptions.PageNotFoundException
+    UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
 
 
 class Error404Handler(BaseHandler):

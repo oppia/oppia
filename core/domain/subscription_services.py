@@ -104,6 +104,20 @@ def unsubscribe_from_creator(user_id, creator_id):
         subscriptions_model_user.put()
 
 
+def get_all_threads_subscribed_to(user_id):
+    """Returns a list with ids of all the feedback and suggestion threads to
+    which the user is subscribed.
+
+    Callers of this function should ensure that the user_id is valid.
+    """
+    subscriptions_model = user_models.UserSubscriptionsModel.get(
+        user_id, strict=False)
+
+    return (
+        subscriptions_model.feedback_thread_ids
+        if subscriptions_model else [])
+
+
 def get_all_creators_subscribed_to(user_id):
     """Returns a list with ids of all the creators to which this learner has
     subscribed.

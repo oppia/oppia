@@ -291,6 +291,8 @@ oppia.directive('conversationSkin', [
           $scope.OPPIA_AVATAR_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg'));
+          $scope.getStaticImageUrl = (
+            UrlInterpolationService.getStaticImageUrl);
 
           $scope.activeCard = null;
           $scope.numProgressDots = 0;
