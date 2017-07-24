@@ -56,8 +56,8 @@ describe('Feedback thread object factory', function() {
       thread_id: 'thread_id_1'
     };
 
-    feedbackThreadSummary = FeedbackThreadSummaryObjectFactory.createFromBackendDict(
-      threadSummary);
+    feedbackThreadSummary = (
+      FeedbackThreadSummaryObjectFactory.createFromBackendDict(threadSummary));
 
     expect(feedbackThreadSummary.explorationTitle).toEqual(
       'Sample exploration 1');

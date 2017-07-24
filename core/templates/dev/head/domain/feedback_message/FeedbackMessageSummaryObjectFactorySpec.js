@@ -27,8 +27,9 @@ describe('Feedback message object factory', function() {
   }));
 
   it('should create a new message', function() {
-    feedbackMessageSummary = FeedbackMessageSummaryObjectFactory.createNewMessage(
-      'Sample message', 'Test user', 'profile_picture_url');
+    feedbackMessageSummary = (
+      FeedbackMessageSummaryObjectFactory.createNewMessage(
+        'Sample message', 'Test user', 'profile_picture_url'));
 
     expect(feedbackMessageSummary.text).toEqual('Sample message');
     expect(feedbackMessageSummary.authorUsername).toEqual('Test user');
@@ -45,8 +46,9 @@ describe('Feedback message object factory', function() {
       created_on: 1000
     };
 
-    feedbackMessageSummary = FeedbackMessageSummaryObjectFactory.createFromBackendDict(
-      messageSummary);
+    feedbackMessageSummary = (
+      FeedbackMessageSummaryObjectFactory.createFromBackendDict(
+        messageSummary));
 
     expect(feedbackMessageSummary.text).toEqual('Sample text');
     expect(feedbackMessageSummary.authorUsername).toEqual('User 1');
