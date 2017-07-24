@@ -192,35 +192,52 @@ class BaseJobManager(object):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
-
-        # TODO(bhenning): Add tests for this.
-        output_str_list = ['%s' % output_value for output_value in output_list]
-
-        # De-duplicate the lines of output since it's not very useful to repeat
-        # them.
-        counter = collections.Counter(list(output_str_list))
-        output_str_frequency_list = [
-            (output_str, counter[output_str]) for output_str in counter]
-        output_str_list = [
-            line if freq == 1 else '%s (%d times)' % (line, freq)
-            for (line, freq) in output_str_frequency_list
-        ]
-
-        cutoff_index = 0
-        total_output_size = 0
-        for idx, output_str in enumerate(output_str_list):
-            cutoff_index += 1
-            total_output_size += len(output_str)
-            if total_output_size >= _MAX_OUTPUT_LENGTH_CHARS:
-                max_element_length = (
-                    total_output_size - _MAX_OUTPUT_LENGTH_CHARS)
-                output_str_list[idx] = output_str[:max_element_length]
-                output_str_list[idx] += ' <TRUNCATED>'
-                break
-        model.output = output_str_list[:cutoff_index]
+        model.output = cls._compress_output_list(output_list)
         model.put()
 
         cls._post_completed_hook(job_id)
+
+    @classmethod
+    def _compress_output_list(cls, output_list, test_only_max_output_len=None):
+        """Returns compressed list of strings within a max length of chars.
+
+        Ensures that the payload (i.e., [str(output) for output in output_list])
+        makes up at most max_output_chars of the final output data.
+
+        Args:
+            output_list: list(*). Collection of objects to be stringified.
+            test_only_max_output_len: int or None. Overrides the intended max
+                output len limit when not None.
+
+        Returns:
+            list(str). The compressed stringified output values.
+        """
+        _MAX_OUTPUT_LEN = 900000
+
+        # Consolidate the lines of output since repeating them isn't useful.
+        counter = collections.Counter(str(output) for output in output_list)
+        output_str_list = [
+            output_str if count == 1 else '(%dx) %s' % (count, output_str)
+            for (output_str, count) in counter.iteritems()
+        ]
+
+        # Truncate outputs to fit within given max length.
+        if test_only_max_output_len is None:
+            remaining_len = _MAX_OUTPUT_LEN
+        else:
+            remaining_len = test_only_max_output_len
+
+        for idx, output_str in enumerate(output_str_list):
+            remaining_len -= len(output_str)
+            if remaining_len < 0:
+                # Truncate all remaining output to fit in the limit.
+                kept_str = output_str[:remaining_len]
+                output_str_list[idx:] = [
+                    ('%s <TRUNCATED>' % kept_str) if kept_str else '<TRUNCATED>'
+                ]
+                break
+
+        return output_str_list
 
     @classmethod
     def register_failure(cls, job_id, error):
