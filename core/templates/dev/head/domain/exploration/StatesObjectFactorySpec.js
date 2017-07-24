@@ -29,7 +29,7 @@ describe('States object factory', function() {
         classifier_model_id: null,
         content: {
           html: '',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           answer_groups: [],
@@ -58,7 +58,7 @@ describe('States object factory', function() {
         'first state': {
           content: {
             html: 'content',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'RuleTest',
@@ -97,7 +97,7 @@ describe('States object factory', function() {
           classifier_model_id: null,
           content: {
             html: '',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             answer_groups: [],

@@ -705,7 +705,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'new_value': {
                     'html': 'New content description',
-                    'audio_translations': [],
+                    'audio_translations': {},
                 }
             }], 'Change content description')
 

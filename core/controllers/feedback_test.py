@@ -499,6 +499,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 class SuggestionsIntegrationTests(test_utils.GenericTestBase):
 
     EXP_ID = '0'
+    TRANSLATION_LANGUAGE_CODE = 'en'
 
     def setUp(self):
         super(SuggestionsIntegrationTests, self).setUp()
@@ -533,9 +534,11 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         exploration.states['State A'].update_interaction_id('TextInput')
         # Create content in State A with a single audio subtitle.
         exploration.states['State A'].update_content(
-            exp_domain.SubtitledHtml('old content', [
-                exp_domain.AudioTranslation('en', 'filename.mp3', 20, False)
-            ]).to_dict())
+            exp_domain.SubtitledHtml('old content', {
+                self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
+                    'filename.mp3', 20, False)
+            }).to_dict()
+        )
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
@@ -805,8 +808,10 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         audio_translations = (
             updated_exploration.states['State A'].content.audio_translations)
-        self.assertEqual(len(audio_translations), 1)
-        self.assertFalse(audio_translations[0].needs_update)
+        self.assertEqual(
+            audio_translations.keys(), [self.TRANSLATION_LANGUAGE_CODE])
+        self.assertFalse(
+            audio_translations[self.TRANSLATION_LANGUAGE_CODE].needs_update)
 
     def test_accept_suggestion_requiring_audio_update(self):
         self.login(self.EDITOR_EMAIL)
@@ -825,5 +830,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         audio_translations = (
             updated_exploration.states['State A'].content.audio_translations)
-        self.assertEqual(len(audio_translations), 1)
-        self.assertTrue(audio_translations[0].needs_update)
+        self.assertEqual(
+            audio_translations.keys(), [self.TRANSLATION_LANGUAGE_CODE])
+        self.assertTrue(
+            audio_translations[self.TRANSLATION_LANGUAGE_CODE].needs_update)
