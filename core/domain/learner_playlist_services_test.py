@@ -24,7 +24,9 @@ import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT =  (
+print "Hello"
+
+MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = (
     feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
 
 
