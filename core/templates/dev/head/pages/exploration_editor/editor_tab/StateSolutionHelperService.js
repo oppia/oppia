@@ -109,8 +109,8 @@ oppia.factory('StateSolutionHelperService', [
         AnswerClassificationService.getMatchingClassificationResult(
           explorationId, state, correctAnswer, true, rulesService
         ).then(function(result) {
-          currentSolutionIsValid = editorContextService.getActiveStateName() !== (
-            result.outcome.dest);
+          currentSolutionIsValid = (
+            editorContextService.getActiveStateName() !== result.outcome.dest);
         });
       }
     }
