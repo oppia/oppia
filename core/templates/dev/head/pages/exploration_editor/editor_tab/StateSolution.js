@@ -34,6 +34,7 @@ oppia.controller('StateSolution', [
     explorationContextService, angularNameService) {
     $scope.editorContextService = editorContextService;
     $scope.stateSolutionService = stateSolutionService;
+    $scope.StateSolutionHelperService = StateSolutionHelperService;
     $scope.inlineSolutionEditorIsActive = false;
     $scope.interactionHtml = '';
     $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
@@ -195,15 +196,14 @@ oppia.controller('StateSolution', [
       }).result.then(function() {
         stateSolutionService.displayed = null;
         stateSolutionService.saveDisplayedValue();
+        StateSolutionHelperService.unsetSolutionIsValidFlag();
       });
     };
 
     $scope.onComponentSave = function() {
       alertsService.clearWarnings();
-      var explorationId =
-        explorationContextService.getExplorationId();
-      var currentStateName =
-        editorContextService.getActiveStateName();
+      var explorationId = explorationContextService.getExplorationId();
+      var currentStateName = editorContextService.getActiveStateName();
       var state = explorationStatesService.getState(currentStateName);
       var interactionId = stateInteractionIdService.savedMemento;
       var rulesServiceName =
@@ -224,10 +224,12 @@ oppia.controller('StateSolution', [
                 stateSolutionService.displayed = (
                   stateSolutionService.savedMemento);
                 stateSolutionService.savedMemento = tmpDisplayedSolution;
+                StateSolutionHelperService.setSolutionIsValidFlag();
                 stateSolutionService.saveDisplayedValue();
               } else {
                 alertsService.addInfoMessage('That solution does not lead ' +
                   'to the next state!');
+                StateSolutionHelperService.unsetSolutionIsValidFlag();
                 stateSolutionService.saveDisplayedValue();
               }
             });

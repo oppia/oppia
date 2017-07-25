@@ -331,12 +331,16 @@ oppia.controller('StateResponses', [
   'explorationContextService', 'trainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
+  'StateSolutionHelperService', 'stateSolutionService',
+  'explorationStatesService',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
+      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory,
+      StateSolutionHelperService, stateSolutionService,
+      explorationStatesService) {
     $scope.editorContextService = editorContextService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
@@ -733,6 +737,11 @@ oppia.controller('StateResponses', [
           [result.tmpRule], result.tmpOutcome, false));
         responsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
+        var currentStateName = editorContextService.getActiveStateName();
+        StateSolutionHelperService.verifySolution(
+          explorationContextService.getExplorationId(),
+          explorationStatesService.getState(currentStateName),
+          stateSolutionService.displayed.correctAnswer);
 
         // After saving it, check if the modal should be reopened right away.
         if (result.reopen) {
@@ -804,6 +813,11 @@ oppia.controller('StateResponses', [
       responsesService.updateActiveAnswerGroup({
         rules: updatedRules
       });
+      var currentStateName = editorContextService.getActiveStateName();
+      StateSolutionHelperService.verifySolution(
+        explorationContextService.getExplorationId(),
+        explorationStatesService.getState(currentStateName),
+        stateSolutionService.displayed.correctAnswer);
     };
 
     $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {

@@ -1848,7 +1848,9 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   ADD_INTERACTION: 'Please add an interaction to this card.',
   STATE_UNREACHABLE: 'This card is unreachable.',
   UNABLE_TO_END_EXPLORATION: (
-    'There\'s no way to complete the exploration starting from this card.')
+    'There\'s no way to complete the exploration starting from this card.'),
+  INCORRECT_SOLUTION: (
+    'This solution does not lead to another state.')
 });
 
 // Service for the list of exploration warnings.
@@ -1856,12 +1858,14 @@ oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
   'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
+  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER', 'StateSolutionHelperService',
+  'explorationData', 'angularNameService', 'AnswerClassificationService',
   function(
       $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
+      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER, StateSolutionHelperService,
+      explorationData, angularNameService, AnswerClassificationService) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1878,6 +1882,48 @@ oppia.factory('explorationWarningsService', [
       });
 
       return statesWithoutInteractionIds;
+    };
+
+    var _getStatesWithIncorrectSolution = function() {
+      var statesWithIncorrectSolution = [];
+
+      var states = explorationStatesService.getStates();
+
+      states.getStateNames().forEach(function(stateName) {
+        var interaction = states.getState(stateName).interaction;
+        if (interaction.solution !== null) {
+          var rulesServiceName = (
+            angularNameService.getNameOfInteractionRulesService(
+              interaction.id));
+          var rulesService = $injector.get(rulesServiceName);
+          AnswerClassificationService.getMatchingClassificationResult(
+            explorationData.explorationId,
+            states.getState(stateName),
+            interaction.solution.correctAnswer,
+            true,
+            rulesService
+          ).then(function(result) {
+            if (stateName === result.outcome.dest) {
+              if (stateWarnings.hasOwnProperty(stateName)) {
+                stateWarnings[stateName].push(
+                  STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
+              } else {
+                stateWarnings[stateName] = [
+                  STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
+              }
+              var errorString = (
+                Object.keys(stateWarnings).length > 1 ? 'cards have' : (
+                  'card has'));
+              _warningsList.push({
+                type: WARNING_TYPES.ERROR,
+                message: (
+                'The following ' + errorString + ' errors: ' +
+                Object.keys(stateWarnings).join(', ') + '.')
+              });
+            }
+          });
+        }
+      });
     };
 
     // Returns a list of names of all nodes which are unreachable from the
@@ -2045,6 +2091,8 @@ oppia.factory('explorationWarningsService', [
             STATE_ERROR_MESSAGES.ADD_INTERACTION];
         }
       });
+
+      _getStatesWithIncorrectSolution();
 
       if (_graphData) {
         // Note that it is fine for states to be reachable by means of fallback

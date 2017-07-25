@@ -51,6 +51,7 @@ oppia.factory('StateSolutionHelperService', [
     explorationContextService, angularNameService, stateSolutionService,
     AnswerClassificationService, alertsService,
     SUPPORTED_INTERACTIONS, INTERACTION_OBJECT_TYPES) {
+    var currentSolutionIsValid = true;
     return {
       isSupportedInteraction: function (id) {
         return (SUPPORTED_INTERACTIONS.indexOf(id) !== -1);
@@ -81,11 +82,35 @@ oppia.factory('StateSolutionHelperService', [
         ).then(function(result) {
           if (editorContextService.getActiveStateName() !== (
               result.outcome.dest)) {
+            currentSolutionIsValid = true;
             stateSolutionService.saveDisplayedValue();
           } else {
             alertsService.addInfoMessage('That solution does not lead ' +
               'to the next state!');
+            currentSolutionIsValid = false;
+            stateSolutionService.saveDisplayedValue();
           }
+        });
+      },
+      isCurrentSolutionValid: function() {
+        return currentSolutionIsValid;
+      },
+      unsetSolutionIsValidFlag: function() {
+        currentSolutionIsValid = false;
+      },
+      setSolutionIsValidFlag: function() {
+        currentSolutionIsValid = true;
+      },
+      verifySolution: function(explorationId, state, correctAnswer) {
+        var interactionId = stateInteractionIdService.savedMemento;
+        var rulesServiceName = (
+          angularNameService.getNameOfInteractionRulesService(interactionId));
+        var rulesService = $injector.get(rulesServiceName);
+        AnswerClassificationService.getMatchingClassificationResult(
+          explorationId, state, correctAnswer, true, rulesService
+        ).then(function(result) {
+          currentSolutionIsValid = editorContextService.getActiveStateName() !== (
+            result.outcome.dest);
         });
       }
     }
