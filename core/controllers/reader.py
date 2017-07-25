@@ -491,7 +491,7 @@ class RatingHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @base.require_user
+    @acl_decorators.can_rate_exploration
     def put(self, exploration_id):
         """Handles PUT requests for submitting ratings at the end of an
         exploration.
@@ -566,7 +566,7 @@ class RecommendationsHandler(base.BaseHandler):
 class FlagExplorationHandler(base.BaseHandler):
     """Handles operations relating to learner flagging of explorations."""
 
-    @base.require_user
+    @acl_decorators.can_flag_exploration
     def post(self, exploration_id):
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,

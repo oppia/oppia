@@ -48,16 +48,12 @@ handlers:
   application_readable: true
   http_headers:
     Cache-Control: 'public, max-age=60'
-- url: /css
-  # NB: not minified. TODO(sll): fix.
-  static_dir: core/templates/dev/head/css
-  secure: always
-# Serve js scripts under core/templates/dev/head. This regex allows
-# us to recursively serve js scripts. "\1" inserts text captured by
-# the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(js))$
+# Serve js scripts and css files under core/templates/dev/head.
+# This regex allows us to recursively serve js scripts.
+# "\1" inserts text captured by the capture group in the URL pattern.
+- url: /templates/dev/head/(.*\.(js|css))$
   static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(js))$
+  upload: core/templates/dev/head/(.*\.(js|css))$
   secure: always
 - url: /templates/dev/head/(.*\.(html))$
   static_files: core/templates/dev/head/\1

@@ -401,7 +401,6 @@ class AudioTranslation(object):
             dict. A dict, mapping all fields of AudioTranslation instance.
         """
         return {
-            'language_code': self.language_code,
             'filename': self.filename,
             'file_size_bytes': self.file_size_bytes,
             'needs_update': self.needs_update,
@@ -419,25 +418,20 @@ class AudioTranslation(object):
             AudioTranslation. The corresponding AudioTranslation domain object.
         """
         return cls(
-            audio_translation_dict['language_code'],
             audio_translation_dict['filename'],
             audio_translation_dict['file_size_bytes'],
             audio_translation_dict['needs_update'])
 
-    def __init__(self, language_code, filename, file_size_bytes, needs_update):
+    def __init__(self, filename, file_size_bytes, needs_update):
         """Initializes a AudioTranslation domain object.
 
         Args:
-            language_code: str. The language code of the audio.
             filename: str. The corresponding audio file path.
             file_size_bytes: int. The file size, in bytes. Used to display
                 potential bandwidth usage to the learner before they download
                 the file.
             needs_update: bool. Whether audio is marked for needing review.
         """
-        # str. A language code, such as ‘en’ or ‘hi’. A hybrid language will be
-        # represented for example as ‘hi-en’ for Hinglish.
-        self.language_code = language_code
         # str. The corresponding audio file path, e.g.
         # "content-en-2-h7sjp8s.mp3".
         self.filename = filename
@@ -454,16 +448,6 @@ class AudioTranslation(object):
             ValidationError: One or more attributes of the AudioTranslation are
             invalid.
         """
-        if not isinstance(self.language_code, basestring):
-            raise utils.ValidationError(
-                'Expected language code to be a string, received: %s' %
-                self.language_code)
-        allowed_audio_language_codes = [
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
-        if self.language_code not in allowed_audio_language_codes:
-            raise utils.ValidationError(
-                'Unrecognized language code: %s' % self.language_code)
-
         if not isinstance(self.filename, basestring):
             raise utils.ValidationError(
                 'Expected audio filename to be a string, received %s' %
@@ -496,6 +480,21 @@ class AudioTranslation(object):
 class SubtitledHtml(object):
     """Value object representing subtitled HTML."""
 
+    def __init__(self, html, audio_translations):
+        """Initializes a SubtitledHtml domain object.
+
+        Args:
+            html: str. A piece of user submitted HTML. This is cleaned in such
+                a way as to contain a restricted set of HTML tags.
+            audio_translations: dict(str: AudioTranslation). Dict mapping
+                language codes (such as "en" or "hi") to AudioTranslation
+                domain objects. Hybrid languages will be represented using
+                composite language codes, such as "hi-en" for Hinglish.
+        """
+        self.html = html_cleaner.clean(html)
+        self.audio_translations = audio_translations
+        self.validate()
+
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.
 
@@ -504,9 +503,11 @@ class SubtitledHtml(object):
         """
         return {
             'html': self.html,
-            'audio_translations': [
-                audio_translation.to_dict()
-                for audio_translation in self.audio_translations]
+            'audio_translations': {
+                language_code: audio_translation.to_dict()
+                for language_code, audio_translation
+                in self.audio_translations.iteritems()
+            }
         }
 
     @classmethod
@@ -520,23 +521,11 @@ class SubtitledHtml(object):
         Returns:
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
-        return cls(subtitled_html_dict['html'], [
-            AudioTranslation.from_dict(audio_translation_dict)
-            for audio_translation_dict in
-            subtitled_html_dict['audio_translations']])
-
-    def __init__(self, html, audio_translations):
-        """Initializes a SubtitledHtml domain object.
-
-        Args:
-            html: str. A piece of user submitted HTML. This is cleaned in such
-                a way as to contain a restricted set of HTML tags.
-            audio_translations: list(AudioTranslation). List of
-                AudioTranslation domain object.
-        """
-        self.html = html_cleaner.clean(html)
-        self.audio_translations = audio_translations
-        self.validate()
+        return cls(subtitled_html_dict['html'], {
+            language_code: AudioTranslation.from_dict(audio_translation_dict)
+            for language_code, audio_translation_dict in
+            subtitled_html_dict['audio_translations'].iteritems()
+        })
 
     def validate(self):
         """Validates properties of the SubtitledHtml.
@@ -551,12 +540,24 @@ class SubtitledHtml(object):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
-        if not isinstance(self.audio_translations, list):
+        if not isinstance(self.audio_translations, dict):
             raise utils.ValidationError(
-                'Expected audio_translations to be a list, received %s'
+                'Expected audio_translations to be a dict, received %s'
                 % self.audio_translations)
-        for audio_translation in self.audio_translations:
-            audio_translation.validate()
+
+        allowed_audio_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
+        for language_code, translation in self.audio_translations.iteritems():
+            if not isinstance(language_code, basestring):
+                raise utils.ValidationError(
+                    'Expected language code to be a string, received: %s' %
+                    language_code)
+
+            if language_code not in allowed_audio_language_codes:
+                raise utils.ValidationError(
+                    'Unrecognized language code: %s' % language_code)
+
+            translation.validate()
 
     def to_html(self, params):
         """Exports this SubtitledHTML object to an HTML string. The HTML is
@@ -2065,7 +2066,6 @@ class State(object):
                         Hint(fallback.outcome.feedback[0]).to_dict())
         self.update_interaction_hints(hint_list)
 
-
     def update_interaction_hints(self, hints_list):
         """Update the list of hints.
 
@@ -2171,7 +2171,7 @@ class State(object):
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
-            SubtitledHtml(content_html, []),
+            SubtitledHtml(content_html, {}),
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name))
@@ -2331,12 +2331,11 @@ class Exploration(object):
             state = exploration.states[state_name]
 
             state.content = SubtitledHtml(
-                html_cleaner.clean(sdict['content']['html']),
-                [
-                    AudioTranslation.from_dict(audio_translation)
-                    for audio_translation in
-                    sdict['content']['audio_translations']
-                ])
+                html_cleaner.clean(sdict['content']['html']), {
+                    language_code: AudioTranslation.from_dict(translation)
+                    for language_code, translation in
+                    sdict['content']['audio_translations'].iteritems()
+                })
 
             state.param_changes = [param_domain.ParamChange(
                 pc['name'], pc['generator_id'], pc['customization_args']
@@ -3506,6 +3505,23 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v11_dict_to_v12_dict(cls, states_dict):
+        """Converts from version 11 to 12. Version 12 refactors audio
+        translations from a list to a dict keyed by language code.
+        """
+        for state_dict in states_dict.values():
+            old_audio_translations = state_dict['content']['audio_translations']
+            state_dict['content']['audio_translations'] = {
+                old_translation['language_code']: {
+                    'filename': old_translation['filename'],
+                    'file_size_bytes': old_translation['file_size_bytes'],
+                    'needs_update': old_translation['needs_update'],
+                }
+                for old_translation in old_audio_translations
+            }
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3536,7 +3552,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 14
+    CURRENT_EXP_SCHEMA_VERSION = 15
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3852,6 +3868,19 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v14_dict_to_v15_dict(cls, exploration_dict):
+        """Converts a v14 exploration dict into a v15 exploration dict."""
+
+        exploration_dict['schema_version'] = 15
+
+        exploration_dict['states'] = cls._convert_states_v11_dict_to_v12_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 12
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3952,6 +3981,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v13_dict_to_v14_dict(
                 exploration_dict)
             exploration_schema_version = 14
+
+        if exploration_schema_version == 14:
+            exploration_dict = cls._convert_v14_dict_to_v15_dict(
+                exploration_dict)
+            exploration_schema_version = 15
 
         return (exploration_dict, initial_schema_version)
 

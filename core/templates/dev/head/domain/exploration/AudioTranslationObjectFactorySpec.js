@@ -26,7 +26,6 @@ describe('AudioTranslation object factory', function() {
       scope = $rootScope.$new();
       atof = $injector.get('AudioTranslationObjectFactory');
       audioTranslation = atof.createFromBackendDict({
-        language_code: 'en',
         filename: 'a.mp3',
         file_size_bytes: 20,
         needs_update: false
@@ -35,7 +34,6 @@ describe('AudioTranslation object factory', function() {
 
     it('should convert to backend dict correctly', inject(function() {
       expect(audioTranslation.toBackendDict()).toEqual({
-        language_code: 'en',
         filename: 'a.mp3',
         file_size_bytes: 20,
         needs_update: false

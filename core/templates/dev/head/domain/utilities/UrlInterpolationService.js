@@ -32,9 +32,37 @@ oppia.factory('UrlInterpolationService', [
       }
     };
 
-    var getCachePrefixedUrl = function(resourcePath) {
+    /**
+     * Given a resource path relative to subfolder in /,
+     * returns resource path with cache slug.
+     */
+    var getUrlWithSlug = function(resourcePath) {
+      if (GLOBALS.MINIFICATION || !GLOBALS.DEV_MODE) {
+        if (hashes[resourcePath]) {
+          var index = resourcePath.lastIndexOf('.');
+          return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
+                  resourcePath.slice(index));
+        }
+      }
+      return resourcePath;
+    };
+
+    /**
+     * Given a resource path relative to subfolder in /,
+     * returns complete resource path with cache slug and prefixed with url
+     * depending on dev/prod mode.
+     */
+    var getCompleteUrl = function(prefix, path) {
+      return GLOBALS.ASSET_DIR_PREFIX + prefix + getUrlWithSlug(path);
+    };
+
+    /**
+     * Given a resource path relative to extensions folder,
+     * returns the complete url path to that resource.
+     */
+    var getExtensionResourceUrl = function(resourcePath) {
       validateResourcePath(resourcePath);
-      return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
+      return getCompleteUrl('/extensions', resourcePath);
     };
 
     return {
@@ -130,57 +158,62 @@ oppia.factory('UrlInterpolationService', [
       },
 
       /**
-       * Given an resource path, returns the relative url path to that resource
-       * prefixing the appropriate cache_slug to it.
-       */
-      getStaticResourceUrl: function(resourcePath) {
-        return getCachePrefixedUrl(resourcePath);
-      },
-
-      /**
-       * Given an image path, returns the complete url path to that image
-       * prefixing the appropriate cache_slug to it.
+       * Given an image path relative to /assets/images folder,
+       * returns the complete url path to that image.
        */
       getStaticImageUrl: function(imagePath) {
         validateResourcePath(imagePath);
-        return getCachePrefixedUrl('/assets/images' + imagePath);
+        return getCompleteUrl('/assets', '/images' + imagePath);
       },
 
       /**
        * Given a gadget type, returns the complete url path to that
-       * gadget type image, prefixing the appropriate cache_slug to it.
+       * gadget type image.
        */
       getGadgetImgUrl: function(gadgetType) {
         if (!gadgetType) {
           alertsService.fatalWarning(
             'Empty gadgetType passed in getGadgetImgUrl.');
         }
-        return getCachePrefixedUrl('/extensions/gadgets/' + gadgetType +
+        return getExtensionResourceUrl('/gadgets/' + gadgetType +
           '/static/images/' + gadgetType + '.png');
       },
 
       /**
-       * Given an interaction id, returns the complete url path to the thumbnail
-       * image for the interaction, prefixing the appropriate cache_slug to it.
+       * Given an interaction id, returns the complete url path to
+       * the thumbnail image for the interaction.
        */
       getInteractionThumbnailImageUrl: function(interactionId) {
         if (!interactionId) {
           alertsService.fatalWarning(
             'Empty interactionId passed in getInteractionThumbnailImageUrl.');
         }
-        return getCachePrefixedUrl('/extensions/interactions/' +
-          interactionId + '/static/' + interactionId + '.png');
+        return getExtensionResourceUrl('/interactions/' + interactionId +
+          '/static/' + interactionId + '.png');
       },
 
       /**
        * Given a directive path relative to head folder,
-       * returns the complete url path to that directive, prefixing the
-       * appropriate cache_slug to it.
+       * returns the complete url path to that directive.
        */
       getDirectiveTemplateUrl: function(path) {
         validateResourcePath(path);
-        return GLOBALS.TEMPLATE_DIR_PREFIX + path;
-      }
+        return GLOBALS.TEMPLATE_DIR_PREFIX + getUrlWithSlug(path);
+      },
+
+      /**
+       * Given a json path relative to assets folder,
+       * returns the complete url path to that json.
+       */
+      getTranslateJsonUrl: function(jsonPath) {
+        validateResourcePath(jsonPath);
+        return getCompleteUrl('/assets', jsonPath);
+      },
+
+      getExtensionResourceUrl: getExtensionResourceUrl,
+
+      _getUrlWithSlug: getUrlWithSlug,
+      _getCompleteUrl: getCompleteUrl
     };
   }
 ]);

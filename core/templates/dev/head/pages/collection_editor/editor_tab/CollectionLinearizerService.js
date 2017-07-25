@@ -184,8 +184,11 @@ oppia.factory('CollectionLinearizerService', [
         var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
         CollectionUpdateService.addCollectionNode(
           collection, explorationId, summaryBackendObject);
+        var skillName = summaryBackendObject.title;
+        CollectionUpdateService.addCollectionSkill(collection, skillName);
+        var skillId = collection.getSkillIdFromName(skillName);
         CollectionUpdateService.setAcquiredSkills(
-          collection, explorationId, [summaryBackendObject.title]);
+          collection, explorationId, [skillId]);
 
         if (linearNodeList.length > 0) {
           var lastNode = linearNodeList[linearNodeList.length - 1];
@@ -205,12 +208,15 @@ oppia.factory('CollectionLinearizerService', [
           return false;
         }
 
+        var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
+        var nodeIndex = findNodeIndex(linearNodeList, explorationId);
+        var collectionNode = linearNodeList[nodeIndex];
+        var acquiredSkill =
+          collectionNode.getAcquiredSkillList().getSkills()[0];
+
         // Relinking is only needed if more than just the specified node is in
         // the collection.
         if (collection.getCollectionNodeCount() > 1) {
-          var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
-          var nodeIndex = findNodeIndex(linearNodeList, explorationId);
-
           // Ensure any present left/right nodes are appropriately linked after
           // the node is removed.
           var leftNode = getNodeLeftOf(linearNodeList, nodeIndex);
@@ -224,6 +230,12 @@ oppia.factory('CollectionLinearizerService', [
               collection, rightNode.getExplorationId(), newPrerequisiteSkills);
           }
         }
+
+        // Delete the skill
+        CollectionUpdateService.deleteCollectionSkill(
+          collection, acquiredSkill);
+
+        // Delete the node
         CollectionUpdateService.deleteCollectionNode(collection, explorationId);
         return true;
       },

@@ -112,7 +112,6 @@ var frontendDependencies = manifest.dependencies.frontend;
 var cssFilePaths = [];
 var jsFilePaths = [];
 var fontFolderPaths = [];
-var cssBackgroundFilepaths = [];
 
 // TODO(gvishal): Issue: https://github.com/oppia/oppia/issues/2324
 // This code needs refactoring, reasons for which are documented in the above
@@ -155,12 +154,6 @@ gulp.task('collectDependencyFilepaths', function() {
         fontFolderPaths.push(path.join('third_party', 'static', dependencyDir,
           dependency.bundle.fontsPath, fontPrefix));
       }
-      if (dependency.bundle.hasOwnProperty('cssBackgroundImage')) {
-        dependency.bundle.cssBackgroundImage.forEach(function(imagePath) {
-          cssBackgroundFilepaths.push(path.join(
-            'third_party', 'static', dependencyDir, imagePath));
-        });
-      }
     }
   }
 });
@@ -199,17 +192,6 @@ gulp.task('copyFonts', function() {
     .pipe(gulp.dest(path.join(generatedFontsTargetDir)));
 });
 
-// This is a task which copies background image used by css.
-// TODO(Barnabas) find a way of removing this task. It is a bit of a hack,
-// because it depends on the relative location of the CSS background images
-// of a third-party library with respect to the CSS file that uses them.
-// The currently-affected libraries include select2.css.
-gulp.task('copyCssBackgroundImages', function() {
-  requireFilesExist(cssBackgroundFilepaths);
-  gulp.src(cssBackgroundFilepaths)
-    .pipe(gulp.dest(generatedCssTargetDir));
-});
-
 gulp.task('gulpStartGae', function() {
   gulp.src('app.yaml')
     .pipe(gulpStartGae(gaeDevserverPath, [], params));
@@ -218,8 +200,7 @@ gulp.task('gulpStartGae', function() {
 // This takes all functions  that are required for the build
 // e.g css, Js and Images
 gulp.task('build', [
-  'collectDependencyFilepaths', 'generateCss', 'copyFonts',
-  'copyCssBackgroundImages', 'generateJs']);
+  'collectDependencyFilepaths', 'generateCss', 'copyFonts', 'generateJs']);
 
 gulp.slurped = false;
 gulp.task('watch', function() {
