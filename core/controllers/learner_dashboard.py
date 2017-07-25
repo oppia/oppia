@@ -155,7 +155,9 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
 
         for m, author_settings in zip(messages, authors_settings):
             message_summary = {
+                'message_id': m.message_id,
                 'text': m.text,
+                'updated_status': m.updated_status,
                 'author_username': author_settings.username,
                 'author_picture_data_url': (
                     author_settings.profile_picture_data_url),

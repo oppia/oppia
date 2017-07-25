@@ -304,15 +304,16 @@ oppia.controller('LearnerDashboard', [
       };
       $scope.messageSendingInProgress = true;
       $http.post(url, payload).success(function() {
-        var newMessageSummary = (
-          FeedbackMessageSummaryObjectFactory.createNewMessage(
-            newMessage, $scope.username, $scope.profilePictureDataUrl));
-        $scope.messageSummaries.push(newMessageSummary);
         $scope.threadSummary = $scope.threadSummaries[threadIndex];
         $scope.threadSummary.appendNewMessage(
           newMessage, $scope.username);
         $scope.messageSendingInProgress = false;
         $scope.newMessage.text = null;
+        var newMessageSummary = (
+          FeedbackMessageSummaryObjectFactory.createNewMessage(
+            $scope.threadSummary.totalMessageCount, newMessage, $scope.username,
+            $scope.profilePictureDataUrl));
+        $scope.messageSummaries.push(newMessageSummary);
       });
     };
 

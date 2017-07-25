@@ -29,8 +29,9 @@ describe('Feedback message object factory', function() {
   it('should create a new message', function() {
     var feedbackMessageSummary = (
       FeedbackMessageSummaryObjectFactory.createNewMessage(
-        'Sample message', 'Test user', 'profile_picture_url'));
+        0, 'Sample message', 'Test user', 'profile_picture_url'));
 
+    expect(feedbackMessageSummary.messageId).toEqual(0);
     expect(feedbackMessageSummary.text).toEqual('Sample message');
     expect(feedbackMessageSummary.authorUsername).toEqual('Test user');
     expect(feedbackMessageSummary.authorPictureDataUrl).toEqual(
@@ -40,7 +41,9 @@ describe('Feedback message object factory', function() {
   it('should fetch the feedback message domain object from the backend ' +
      'summary dict', function() {
     var messageSummary = {
+      messageId: 0,
       text: 'Sample text',
+      updatedStatus: null,
       author_username: 'User 1',
       author_picture_data_url: 'sample_picture_url_1',
       created_on: 1000

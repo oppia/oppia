@@ -495,8 +495,11 @@
                     <strong><[thread.explorationTitle]> -</strong>
                   </span>
                   <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
+                  <span ng-if="!thread.lastMessageText && thread.totalMessageCount !== 1">
+                    <i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
+                       translate-values="{threadStatus: getHumanReadableStatus(thread.status)}"></i>
+                  </span>
                   <span ng-if="!thread.lastMessageText && thread.totalMessageCount === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
-                  <span ng-if="!thread.lastMessageText && thread.totalMessageCount !== 1"><i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: getHumanReadableStatus(thread.status)}"></i></span>
                 <td class="col-lg-2 col-md-2 col-sm-2">
                   <span><[getLocaleAbbreviatedDatetimeString(thread.lastUpdated)]></span>
                 </td>
@@ -529,11 +532,17 @@
                     <div class="col-sm-11">
                       <div>
                         <span><strong><[message.authorUsername]></strong></span>
+                        <span style="float: right; margin-right: 15px;"
+                              ng-if="message.messageId !== 0 && message.updatedStatus">
+                          <em translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
+                              translate-values="{threadStatus: getHumanReadableStatus(message.updatedStatus)}"></em>
+                        </span>
+                        <div ng-if="message.messageId !== 0 && message.updatedStatus">
+                        </div>
                       </div>
 
                       <div>
                         <span class="protractor-test-feedback-message" ng-if="message.text"><[message.text]></span>
-                        <span class="protractor-test-feedback-message" ng-if="!message.text && !message.currentContentHtml" translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE" translate-values="{threadStatus: getHumanReadableStatus(threadStatus)}"></span>
                           <button style="margin-top: 5px;"
                                   ng-if="message.currentContentHtml"
                                   class="btn btn-primary"
