@@ -187,13 +187,8 @@ oppia.controller('StateHints', [
           }
         ]
       }).result.then(function() {
-        if (stateSolutionService.displayed) {
-          if (index > 0) {
-            stateHintsService.displayed.splice(index, 1);
-            stateHintsService.saveDisplayedValue();
-          } else {
-            openDeleteLastHintModal();
-          }
+        if (stateSolutionService.displayed && index === 0) {
+          openDeleteLastHintModal();
         } else {
           stateHintsService.displayed.splice(index, 1);
           stateHintsService.saveDisplayedValue();

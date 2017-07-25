@@ -84,8 +84,8 @@ oppia.controller('StateSolution', [
 
     // This returns false if the current interaction ID is null.
     $scope.isCurrentInteractionLinear = function() {
-      var interactionId = stateInteractionIdService.savedMemento;
-      return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+      return (stateInteractionIdService.savedMemento &&
+        INTERACTION_SPECS[interactionId].is_linear);
     };
 
     $scope.openAddSolutionModal = function() {
