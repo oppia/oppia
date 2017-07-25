@@ -370,6 +370,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
         rights_manager.create_new_exploration_rights(
             self.EXP_ID, self.owner_id_2)
+        rights_manager.publish_exploration(self.owner_id_2, self.EXP_ID)
 
     def _get_messages_read_by_user(self, user_id, exploration_id, thread_id):
         feedback_thread_user_model = (
@@ -696,6 +697,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
+
         threads = response_dict['threads']
         accepted_suggestion_thread_id = threads[0]['thread_id']
         rejected_suggestion_thread_id = threads[1]['thread_id']
@@ -768,14 +770,17 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
+
         response_dict = self._accept_suggestion(
             unsuccessful_accept_thread_id, False, csrf_token,
             expect_errors=True, expected_status_int=401)
         self.assertIn(
-            'You do not have the credentials to edit this exploration.',
+            'You do not have credentials',
             response_dict['error'])
+        self.logout()
 
         # Get a list of all closed threads with suggestion.
+        self.login(self.EDITOR_EMAIL)
         response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed',
