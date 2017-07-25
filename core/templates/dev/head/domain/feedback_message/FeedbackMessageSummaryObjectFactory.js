@@ -19,11 +19,11 @@
 
 oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
   var FeedbackMessageSummary = function(
-    message_id, text, updated_status, suggestionHtml, currentContentHtml,
+    messageId, text, updatedStatus, suggestionHtml, currentContentHtml,
     description, authorUsername, authorPictureDataUrl, createdOn) {
-    this.messageId = message_id;
+    this.messageId = messageId;
     this.text = text;
-    this.updatedStatus = updated_status;
+    this.updatedStatus = updatedStatus;
     this.suggestionHtml = suggestionHtml;
     this.currentContentHtml = currentContentHtml;
     this.description = description;
