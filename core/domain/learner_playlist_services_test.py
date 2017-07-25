@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for play later services."""
+"""Tests for learner playlist services."""
 
 from core.domain import learner_progress_services
 from core.domain import learner_playlist_services
@@ -119,6 +119,13 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
 
+        # Add the first exploration in the first position.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_0, 0)
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+
         # Add an exploration to the in progress list of the user.
         state_name = 'state_name'
         version = 1
@@ -131,7 +138,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_3)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
-                self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Empty the learner playlist.
         learner_playlist_services.remove_exploration_from_learner_playlist(
@@ -189,6 +196,13 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_1, self.COL_ID_0])
 
+        # Add the first collection in the first position.
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_0, 0)
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
         # Add a collection to the in progress list of the user.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_3)
@@ -199,7 +213,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_3)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
-                self.user_id), [self.COL_ID_1, self.COL_ID_0])
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Empty the learner playlist.
         learner_playlist_services.remove_collection_from_learner_playlist(
@@ -293,40 +307,40 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_learner_playlist_collection_ids(
             self.user_id), [])
 
-    def test_get_all_exp_ids_learner_playlist(self):
+    def test_get_all_exp_ids_in_learner_playlist(self):
         self.assertEqual(
-            learner_playlist_services.get_all_exp_ids_learner_playlist(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.user_id), [])
 
         # Add an exploration to the learner playlist.
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
-            learner_playlist_services.get_all_exp_ids_learner_playlist(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.user_id), [self.EXP_ID_0])
 
         # Add another exploration.
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_1)
         self.assertEqual(
-            learner_playlist_services.get_all_exp_ids_learner_playlist(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
     def test_get_all_learner_playlist_collection_ids(self):
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
                 self.user_id), [])
 
         # Add a collection to the learner playlist.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_0)
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
                 self.user_id), [self.COL_ID_0])
 
         # Add another collection.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_1)
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
