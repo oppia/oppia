@@ -14,7 +14,8 @@
 
 /**
  * @fileoverview Factory for creating and mutating frontend instances of skill
- * lists used in frontend collection domain objects.
+ * lists used in frontend collection domain objects. This contains lists of
+ * skill IDs.
  */
 
 // TODO(bhenning): Implement validation functions and related tests.
@@ -26,41 +27,39 @@ oppia.factory('SkillListObjectFactory', [function() {
 
   // Instance methods
 
-  // Returns whether the given skill is contained in this list, where skill
-  // names are case-insensitive.
-  SkillList.prototype.containsSkill = function(skillName) {
-    var lowercaseSkillName = skillName.toLowerCase();
+  // Returns whether the given skill ID is contained in this list.
+  SkillList.prototype.containsSkill = function(skillId) {
     return this._skillList.some(function(arrayItem) {
-      return arrayItem.toLowerCase() === lowercaseSkillName;
+      return arrayItem === skillId;
     });
   };
 
-  // Adds a new skill, by name. This returns whether the skill was
-  // successfully added, where the add will fail if the name is already
-  // contained in the list.
-  SkillList.prototype.addSkill = function(skillName) {
-    if (this.containsSkill(skillName)) {
+  // Adds a new skill ID. This returns whether the skill was successfully
+  // added, where the add will fail if the ID is already contained in the
+  // list.
+  SkillList.prototype.addSkill = function(skillId) {
+    if (this.containsSkill(skillId)) {
       return false;
     }
-    this._skillList.push(skillName);
+    this._skillList.push(skillId);
     return true;
   };
 
-  // Adds many skills. Returns false if not every skill was successfully
+  // Adds many skill IDs. Returns false if not every skill was successfully
   // added. See addSkill() for criteria on why individual skill adds may fail.
-  SkillList.prototype.addSkills = function(skillNames) {
+  SkillList.prototype.addSkills = function(skillIds) {
     var succeeded = true;
-    for (var i = 0; i < skillNames.length; i++) {
-      succeeded &= this.addSkill(skillNames[i]);
+    for (var i = 0; i < skillIds.length; i++) {
+      succeeded &= this.addSkill(skillIds[i]);
     }
     return succeeded;
   };
 
-  // Resets the list to the given array of skill names. This is equivalent to
+  // Resets the list to the given array of skill IDs. This is equivalent to
   // clearing the list and then adding all of the skills again.
-  SkillList.prototype.setSkills = function(skillNames) {
+  SkillList.prototype.setSkills = function(skillIds) {
     this.clearSkills();
-    this.addSkills(skillNames);
+    this.addSkills(skillIds);
   };
 
   // Returns the skill at the given index, or null if the index is out of
@@ -72,7 +71,7 @@ oppia.factory('SkillListObjectFactory', [function() {
     return this._skillList[skillIndex];
   };
 
-  // Returns all of the skill names in the list. The changes to the returned
+  // Returns all of the skill IDs in the list. The changes to the returned
   // list will not be reflected in this domain object.
   SkillList.prototype.getSkills = function() {
     return this._skillList.slice();
@@ -87,13 +86,11 @@ oppia.factory('SkillListObjectFactory', [function() {
     return this._skillList;
   };
 
-  // Returns the index for the given skill, based on a case-insensitive search
-  // of the SkillList, or -1 if the skill name is not contained within the
-  // list.
-  SkillList.prototype.indexOfSkill = function(skillName) {
-    var lowercaseSkillName = skillName.toLowerCase();
+  // Returns the index for the given skill ID, based on a search of the
+  // SkillList, or -1 if the skill ID is not contained within the list.
+  SkillList.prototype.indexOfSkill = function(skillId) {
     for (var i = 0; i < this._skillList.length; i++) {
-      if (this._skillList[i] === lowercaseSkillName) {
+      if (this._skillList[i] === skillId) {
         return i;
       }
     }
@@ -111,11 +108,11 @@ oppia.factory('SkillListObjectFactory', [function() {
     return true;
   };
 
-  // Removes a skill based on a search name. Returns whether or not this was
-  // successful, which depends on whether the given skill name is actually in
+  // Removes a skill based on an ID. Returns whether or not this was
+  // successful, which depends on whether the given skill ID is actually in
   // the skills list.
-  SkillList.prototype.removeSkillByName = function(skillName) {
-    var index = this.indexOfSkill(skillName);
+  SkillList.prototype.removeSkillById = function(skillId) {
+    var index = this.indexOfSkill(skillId);
     return (index >= 0) && this.removeSkillByIndex(index);
   };
 
@@ -148,7 +145,7 @@ oppia.factory('SkillListObjectFactory', [function() {
     }).length === 0;
   };
 
-  // Empties this list of all skill names. This will not invalidate previous
+  // Empties this list of all skill IDs. This will not invalidate previous
   // references to the underlying skills list returned by getBindableSkills().
   SkillList.prototype.clearSkills = function() {
     // Clears the existing array in-place, since there may be Angular bindings

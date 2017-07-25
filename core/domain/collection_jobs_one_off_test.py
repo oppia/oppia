@@ -166,7 +166,11 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             objective='An objective',
             tags=[],
             schema_version=2,
-            nodes=[node.to_dict()],
+            nodes=[{
+                'exploration_id': self.EXP_ID,
+                'prerequisite_skills': [],
+                'acquired_skills': []
+            }],
         )
         model.commit(self.albert_id, 'Made a new collection!', [{
             'cmd': collection_services.CMD_CREATE_NEW,
@@ -185,4 +189,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
         self.assertEqual(
-            new_model.collection_contents, {'nodes': [node.to_dict()]})
+            new_model.collection_contents, {
+                'nodes': [node.to_dict()],
+                'skills': {},
+                'next_skill_id': 0
+            })

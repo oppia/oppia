@@ -370,6 +370,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
         rights_manager.create_new_exploration_rights(
             self.EXP_ID, self.owner_id_2)
+        rights_manager.publish_exploration(self.owner_id_2, self.EXP_ID)
 
     def _get_messages_read_by_user(self, user_id, exploration_id, thread_id):
         feedback_thread_user_model = (
@@ -499,6 +500,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 class SuggestionsIntegrationTests(test_utils.GenericTestBase):
 
     EXP_ID = '0'
+    TRANSLATION_LANGUAGE_CODE = 'en'
 
     def setUp(self):
         super(SuggestionsIntegrationTests, self).setUp()
@@ -533,9 +535,11 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         exploration.states['State A'].update_interaction_id('TextInput')
         # Create content in State A with a single audio subtitle.
         exploration.states['State A'].update_content(
-            exp_domain.SubtitledHtml('old content', [
-                exp_domain.AudioTranslation('en', 'filename.mp3', 20, False)
-            ]).to_dict())
+            exp_domain.SubtitledHtml('old content', {
+                self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
+                    'filename.mp3', 20, False)
+            }).to_dict()
+        )
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
@@ -693,6 +697,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
+
         threads = response_dict['threads']
         accepted_suggestion_thread_id = threads[0]['thread_id']
         rejected_suggestion_thread_id = threads[1]['thread_id']
@@ -765,14 +770,17 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
+
         response_dict = self._accept_suggestion(
             unsuccessful_accept_thread_id, False, csrf_token,
             expect_errors=True, expected_status_int=401)
         self.assertIn(
-            'You do not have the credentials to edit this exploration.',
+            'You do not have credentials',
             response_dict['error'])
+        self.logout()
 
         # Get a list of all closed threads with suggestion.
+        self.login(self.EDITOR_EMAIL)
         response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed',
@@ -805,8 +813,10 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         audio_translations = (
             updated_exploration.states['State A'].content.audio_translations)
-        self.assertEqual(len(audio_translations), 1)
-        self.assertFalse(audio_translations[0].needs_update)
+        self.assertEqual(
+            audio_translations.keys(), [self.TRANSLATION_LANGUAGE_CODE])
+        self.assertFalse(
+            audio_translations[self.TRANSLATION_LANGUAGE_CODE].needs_update)
 
     def test_accept_suggestion_requiring_audio_update(self):
         self.login(self.EDITOR_EMAIL)
@@ -825,5 +835,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         audio_translations = (
             updated_exploration.states['State A'].content.audio_translations)
-        self.assertEqual(len(audio_translations), 1)
-        self.assertTrue(audio_translations[0].needs_update)
+        self.assertEqual(
+            audio_translations.keys(), [self.TRANSLATION_LANGUAGE_CODE])
+        self.assertTrue(
+            audio_translations[self.TRANSLATION_LANGUAGE_CODE].needs_update)
