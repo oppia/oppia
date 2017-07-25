@@ -379,7 +379,7 @@ URLS = MAPREDUCE_HANDLERS + [
         feedback.RecentFeedbackMessagesHandler),
 
     get_redirect_route(
-        r'%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
+        r'%s/<exploration_id>' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
         feedback.FeedbackThreadViewEventHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,

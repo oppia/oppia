@@ -228,8 +228,8 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     viewed feedback messages from emails that might be sent in future to this
     user."""
 
-    def post(self):
-        exploration_id = self.payload.get('exploration_id')
+    @acl_decorators.can_view_exploration_feedback
+    def post(self, exploration_id):
         thread_id = self.payload.get('thread_id')
         transaction_services.run_in_transaction(
             feedback_services.clear_feedback_message_references, self.user_id,
