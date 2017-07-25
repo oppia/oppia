@@ -370,7 +370,6 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
         rights_manager.create_new_exploration_rights(
             self.EXP_ID, self.owner_id_2)
-
         rights_manager.publish_exploration(self.owner_id_2, self.EXP_ID)
 
     def _get_messages_read_by_user(self, user_id, exploration_id, thread_id):
@@ -423,28 +422,12 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         thread_url = '%s/%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
         response_dict = self.get_json(thread_url)
-        print """
-
-        
-        hello1
-
-
-        """
-
 
         # The message should be added to the read list of the owner.
         self.assertEqual(
             self._get_messages_read_by_user(
                 self.owner_id_1, self.EXP_ID, thread_id),
             self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
-
-        print """
-
-
-        hello
-
-
-        """
 
         # Now the owner adds a message to the feedback thread.
         thread_url = '%s/%s/%s' % (
