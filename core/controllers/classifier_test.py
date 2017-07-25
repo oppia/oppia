@@ -134,15 +134,15 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
         self.training_data = [
-                {
-                    u'answer_group_index': 1,
-                    u'answers': [u'a1', u'a2']
-                },
-                {
-                    u'answer_group_index': 2,
-                    u'answers': [u'a2', u'a3']
-                }
-            ]
+            {
+                u'answer_group_index': 1,
+                u'answers': [u'a1', u'a2']
+            },
+            {
+                u'answer_group_index': 2,
+                u'answers': [u'a2', u'a3']
+            }
+        ]
         self.job_id = classifier_services.create_classifier_training_job(
             self.algorithm_id, interaction_id, self.exp_id,
             1, 'Home', self.training_data,

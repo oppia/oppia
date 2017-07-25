@@ -18,7 +18,6 @@ import datetime
 from core.domain import classifier_domain
 from core.domain import classifier_registry
 from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import interaction_registry
 from core.platform import models
 
