@@ -135,6 +135,7 @@ def create_classifier_training_jobs(exploration, state_names):
         exploration: Exploration. The Exploration domain object.
         state_names: list(str). List of state names.
     """
+    job_dicts_list = []
     exp_id = exploration.id
     exp_version = exploration.version
     states = exploration.states
@@ -144,10 +145,16 @@ def create_classifier_training_jobs(exploration, state_names):
         interaction_id = state.interaction.id
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
-        create_classifier_training_job(algorithm_id, interaction_id,
-                                       exp_id, exp_version, state_name,
-                                       training_data,
-                                       feconf.TRAINING_JOB_STATUS_NEW)
+        job_dicts_list.append({
+            'algorithm_id': algorithm_id,
+            'interaction_id': interaction_id,
+            'exp_id': exp_id,
+            'exp_version': exp_version,
+            'state_name': state_name,
+            'training_data': training_data,
+            'status': feconf.TRAINING_JOB_STATUS_NEW
+        })
+    create_multi_classifier_training_jobs(job_dicts_list)
 
 
 def create_classifier_exploration_mappings(exploration, state_names):
@@ -350,6 +357,28 @@ def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
         algorithm_id, interaction_id, exp_id, exp_version, training_data,
         state_name, status)
     return job_id
+
+
+def create_multi_classifier_training_jobs(job_dicts_list):
+    """Creates multiple ClassifierTrainingJobModel instances in data store.
+
+    Args:
+        job_dicts_list: list(dict). The list of dicts where each dict represents
+            the attributes of one ClassifierTrainingJobModel.
+
+    Returns:
+        job_ids: list(str). List of job IDs.
+    """
+    for job_dict in job_dicts_list:
+        dummy_classifier_training_job = classifier_domain.ClassifierTrainingJob(
+            'job_id_dummy', job_dict['algorithm_id'],
+            job_dict['interaction_id'], job_dict['exp_id'],
+            job_dict['exp_version'], job_dict['state_name'],
+            job_dict['status'], job_dict['training_data'])
+        dummy_classifier_training_job.validate()
+    job_ids = classifier_models.ClassifierTrainingJobModel.create_multi(
+        job_dicts_list)
+    return job_ids
 
 
 def _update_classifier_training_job_status(job_id, status):

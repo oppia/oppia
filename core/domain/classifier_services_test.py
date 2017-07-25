@@ -283,6 +283,63 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 job_id))):
             classifier_services.get_classifier_training_job_by_id(job_id)
 
+    def test_create_multi_jobs(self):
+        """Test the create_multi_classifier_training_jobs method."""
+
+        job_dicts_list = []
+        job_dicts_list.append({
+            'exp_id': u'1',
+            'exp_version': 1,
+            'state_name': 'Home',
+            'interaction_id': 'TextInput',
+            'algorithm_id': feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'],
+            'training_data': [],
+            'status': feconf.TRAINING_JOB_STATUS_NEW
+        })
+        job_dicts_list.append({
+            'exp_id': u'1',
+            'exp_version': 2,
+            'state_name': 'Home',
+            'interaction_id': 'TextInput',
+            'algorithm_id': feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'],
+            'training_data': [],
+            'status': feconf.TRAINING_JOB_STATUS_NEW
+        })
+
+        job_ids = classifier_services.create_multi_classifier_training_jobs(
+            job_dicts_list)
+        self.assertEqual(len(job_ids), 2)
+
+        classifier_training_job1 = (
+            classifier_services.get_classifier_training_job_by_id(job_ids[0]))
+        self.assertEqual(classifier_training_job1.algorithm_id,
+                         feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                             'algorithm_id'])
+        self.assertEqual(classifier_training_job1.interaction_id,
+                         'TextInput')
+        self.assertEqual(classifier_training_job1.exp_id, '1')
+        self.assertEqual(classifier_training_job1.exp_version, 1)
+        self.assertEqual(classifier_training_job1.training_data, [])
+        self.assertEqual(classifier_training_job1.state_name, 'Home')
+        self.assertEqual(classifier_training_job1.status,
+                         feconf.TRAINING_JOB_STATUS_NEW)
+
+        classifier_training_job2 = (
+            classifier_services.get_classifier_training_job_by_id(job_ids[1]))
+        self.assertEqual(classifier_training_job2.algorithm_id,
+                         feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                             'algorithm_id'])
+        self.assertEqual(classifier_training_job2.interaction_id,
+                         'TextInput')
+        self.assertEqual(classifier_training_job2.exp_id, '1')
+        self.assertEqual(classifier_training_job2.exp_version, 2)
+        self.assertEqual(classifier_training_job2.training_data, [])
+        self.assertEqual(classifier_training_job2.state_name, 'Home')
+        self.assertEqual(classifier_training_job2.status,
+                         feconf.TRAINING_JOB_STATUS_NEW)
+
 
     def test_mark_training_job_complete(self):
         """Test the mark_training_job_complete method."""

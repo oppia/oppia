@@ -92,6 +92,61 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(training_job.training_data,
                          [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
 
+    def test_create_multi_jobs(self):
+        job_dicts_list = []
+        job_dicts_list.append({
+            'exp_id': u'1',
+            'exp_version': 1,
+            'state_name': 'Home',
+            'interaction_id': 'TextInput',
+            'algorithm_id': feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'],
+            'training_data': [],
+            'status': feconf.TRAINING_JOB_STATUS_NEW
+        })
+        job_dicts_list.append({
+            'exp_id': u'1',
+            'exp_version': 2,
+            'state_name': 'Home',
+            'interaction_id': 'TextInput',
+            'algorithm_id': feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'],
+            'training_data': [],
+            'status': feconf.TRAINING_JOB_STATUS_NEW
+        })
+
+        job_ids = classifier_models.ClassifierTrainingJobModel.create_multi(
+            job_dicts_list)
+        self.assertEqual(len(job_ids), 2)
+
+        training_job1 = (
+            classifier_models.ClassifierTrainingJobModel.get(job_ids[0]))
+        self.assertEqual(training_job1.algorithm_id,
+                         feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                             'algorithm_id'])
+        self.assertEqual(training_job1.interaction_id,
+                         'TextInput')
+        self.assertEqual(training_job1.exp_id, '1')
+        self.assertEqual(training_job1.exp_version, 1)
+        self.assertEqual(training_job1.training_data, [])
+        self.assertEqual(training_job1.state_name, 'Home')
+        self.assertEqual(training_job1.status,
+                         feconf.TRAINING_JOB_STATUS_NEW)
+
+        training_job2 = (
+            classifier_models.ClassifierTrainingJobModel.get(job_ids[1]))
+        self.assertEqual(training_job2.algorithm_id,
+                         feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                             'algorithm_id'])
+        self.assertEqual(training_job2.interaction_id,
+                         'TextInput')
+        self.assertEqual(training_job2.exp_id, '1')
+        self.assertEqual(training_job2.exp_version, 2)
+        self.assertEqual(training_job2.training_data, [])
+        self.assertEqual(training_job2.state_name, 'Home')
+        self.assertEqual(training_job2.status,
+                         feconf.TRAINING_JOB_STATUS_NEW)
+
 
 class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
     """Tests for the ClassifierExplorationMappingModel class."""

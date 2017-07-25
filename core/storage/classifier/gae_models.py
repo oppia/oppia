@@ -181,6 +181,33 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         training_job_instance.put()
         return instance_id
 
+    @classmethod
+    def create_multi(cls, job_dicts_list):
+        """Creates multiplenew  ClassifierTrainingJobModel entries.
+
+        Args:
+            job_dicts_list: list(dict). The list of dicts where each dict
+                represents the attributes of one ClassifierTrainingJobModel.
+        """
+        list_job_models = []
+        list_job_ids = []
+        for job_dict in job_dicts_list:
+            print job_dict
+            instance_id = cls._generate_id(job_dict['exp_id'])
+            training_job_instance = cls(
+                id=instance_id, algorithm_id=job_dict['algorithm_id'],
+                interaction_id=job_dict['interaction_id'],
+                exp_id=job_dict['exp_id'],
+                exp_version=job_dict['exp_version'],
+                state_name=job_dict['state_name'], status=job_dict['status'],
+                training_data=job_dict['training_data']
+                )
+
+            list_job_models.append(training_job_instance)
+            list_job_ids.append(instance_id)
+        cls.put_multi(list_job_models)
+        return list_job_ids
+
 
 class ClassifierExplorationMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierDataModel.
