@@ -431,12 +431,6 @@ body {
   margin-left: 6px;
 }
 
-@media (max-width: 500px) {
-  .oppia-learner-dashboard-feedback-section .table {
-    margin-left: 0;
-  }
-}
-
 .oppia-learner-dashboard-feedback-section .feedback-thread-message-count {
   color: #757575;
   font-size: 100.25%;
