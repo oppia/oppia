@@ -197,16 +197,13 @@ oppia.controller('SettingsTab', [
 
     $scope.editRole = function(newMemberUsername, newMemberRole) {
       $scope.closeRolesForm();
-      explorationRightsService.saveChangeToBackend({
-        new_member_username: newMemberUsername,
-        new_member_role: newMemberRole
-      });
+      explorationRightsService.saveRoleChanges(
+        newMemberUsername, newMemberRole);
     };
 
     $scope.toggleViewabilityIfPrivate = function() {
-      explorationRightsService.saveChangeToBackend({
-        viewable_if_private: !explorationRightsService.viewableIfPrivate()
-      });
+      explorationRightsService.setViewability(
+        !explorationRightsService.viewableIfPrivate());
     };
 
     /********************************************
@@ -251,8 +248,7 @@ oppia.controller('SettingsTab', [
               if (constants.ALL_CATEGORIES.indexOf(category) === -1) {
                 category = constants.DEFAULT_CATEGORY_ICON;
               }
-              return UrlInterpolationService.getStaticImageUrl(
-                '/subjects/' + category + '.svg');
+              return '/subjects/' + category + '.svg';
             };
             $scope.getThumbnailBgColor = function() {
               var category = explorationCategoryService.displayed;
@@ -289,9 +285,7 @@ oppia.controller('SettingsTab', [
           }
         ]
       }).result.then(function() {
-        explorationRightsService.saveChangeToBackend({
-          is_community_owned: true
-        });
+        explorationRightsService.makeCommunityOwned();
       });
     };
 
@@ -385,9 +379,7 @@ oppia.controller('SettingsTab', [
       // 'moderator action' path, and implement an option for different actions
       // saying whether emails should be sent for these, or not. At present,
       // we don't expect to send an email when an exploration is unpublicized.
-      explorationRightsService.saveChangeToBackend({
-        is_publicized: false
-      });
+      explorationRightsService.makePublicized(false);
     };
 
     $scope.isExplorationLockedForEditing = function() {

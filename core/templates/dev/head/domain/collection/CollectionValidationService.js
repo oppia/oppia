@@ -117,6 +117,19 @@ oppia.factory('CollectionValidationService', [
           'learner.');
       }
 
+      var collectionSkills = collection.getCollectionSkills();
+      var skillNames = [];
+      for (var skillId in collectionSkills) {
+        if (collectionSkills.hasOwnProperty(skillId)) {
+          skillNames.push(collectionSkills[skillId].getName());
+        }
+      }
+      skillNames.forEach(function(skillName, index) {
+        if (skillNames.indexOf(skillName) !== index) {
+          issues.push('Skill name \'' + skillName + '\' is not unique.');
+        }
+      });
+
       collection.getCollectionNodes().forEach(function(collectionNode) {
         var overlappingSkills = _getOverlappingPrerequisiteAcquiredSkills(
           collectionNode);

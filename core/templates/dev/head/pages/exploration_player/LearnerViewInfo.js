@@ -55,9 +55,9 @@ oppia.controller('LearnerViewInfo', [
         },
         controller: [
           '$scope', '$window', '$modalInstance', 'oppiaDatetimeFormatter',
-          'RatingComputationService', 'expInfo',
+          'RatingComputationService', 'expInfo', 'UrlInterpolationService',
           function($scope, $window, $modalInstance, oppiaDatetimeFormatter,
-                   RatingComputationService, expInfo) {
+                   RatingComputationService, expInfo, UrlInterpolationService) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
               var tagsInTooltip = [];
@@ -107,6 +107,8 @@ oppia.controller('LearnerViewInfo', [
               'background-color': expInfo.thumbnail_bg_color
             };
             $scope.infoCardBackgroundImageUrl = expInfo.thumbnail_icon_url;
+            $scope.getStaticImageUrl = (
+              UrlInterpolationService.getStaticImageUrl);
             $scope.lastUpdatedString = getLastUpdatedString(
               expInfo.last_updated_msec);
             $scope.numViews = expInfo.num_views;

@@ -1834,7 +1834,7 @@ def _create_change_list_from_suggestion(
     """
     audio_translations = old_content.audio_translations
     if audio_update_required:
-        for translation in audio_translations:
+        for _, translation in audio_translations.iteritems():
             translation.needs_update = True
 
     return [{
@@ -1843,8 +1843,10 @@ def _create_change_list_from_suggestion(
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'new_value': {
             'html': suggestion.suggestion_html,
-            'audio_translations': [
-                translation.to_dict() for translation in audio_translations],
+            'audio_translations': {
+                language_code: translation.to_dict()
+                for language_code, translation in audio_translations.iteritems()
+            }
         }
     }]
 

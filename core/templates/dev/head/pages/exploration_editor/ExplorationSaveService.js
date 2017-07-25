@@ -124,18 +124,17 @@ oppia.factory('explorationSaveService', [
           onStartSaveCallback();
         }
 
-        explorationRightsService.saveChangeToBackend({
-          is_public: true
-        }).then(function() {
-          if (onSaveDoneCallback) {
-            onSaveDoneCallback();
-          }
+        explorationRightsService.makePublic(true).then(
+          function() {
+            if (onSaveDoneCallback) {
+              onSaveDoneCallback();
+            }
 
-          showCongratulatorySharingModal();
-          siteAnalyticsService.registerPublishExplorationEvent(
-            explorationData.explorationId);
-          whenModalClosed.resolve();
-        });
+            showCongratulatorySharingModal();
+            siteAnalyticsService.registerPublishExplorationEvent(
+              explorationData.explorationId);
+            whenModalClosed.resolve();
+          });
       });
 
       return whenModalClosed.promise;

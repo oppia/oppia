@@ -51,18 +51,26 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
-INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
-GADGETS_DIR = os.path.join('extensions', 'gadgets')
-RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
+
+EXTENSIONS_DIR_PREFIX = (
+    'backend_prod_files' if (IS_MINIFIED or not DEV_MODE) else '')
+INTERACTIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+GADGETS_DIR = os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'gadgets')
+RTE_EXTENSIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
-# Choose production template if minification flag is used or
+# Choose production templates folder if minification flag is used or
 # if in production mode
-TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
-FRONTEND_TEMPLATES_DIR = os.path.join(
-    'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
-DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
+if IS_MINIFIED or not DEV_MODE:
+    FRONTEND_TEMPLATES_DIR = (
+        os.path.join('backend_prod_files', 'templates', 'head'))
+else:
+    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+DEPENDENCIES_TEMPLATES_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
@@ -138,13 +146,13 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 11
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 12
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 3
+CURRENT_COLLECTION_SCHEMA_VERSION = 4
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -548,12 +556,12 @@ COLLECTION_URL_PREFIX = '/collection'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
-DASHBOARD_EXPLORATION_STATS_PREFIX = '/creatordashboardhandler/explorationstats'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
+EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
 EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'

@@ -27,12 +27,13 @@ describe('SubtitledHtml object factory', function() {
       shof = $injector.get('SubtitledHtmlObjectFactory');
       subtitledHtml = shof.createFromBackendDict({
         html: '<p>some html</p>',
-        audio_translations: [{
-          language_code: 'en',
-          filename: 'a.mp3',
-          file_size_bytes: 20,
-          needs_update: false
-        }]
+        audio_translations: {
+          en: {
+            filename: 'a.mp3',
+            file_size_bytes: 20,
+            needs_update: false
+          }
+        }
       });
     }));
 
@@ -51,19 +52,20 @@ describe('SubtitledHtml object factory', function() {
     it('should convert to backend dict correctly', inject(function() {
       expect(subtitledHtml.toBackendDict()).toEqual({
         html: '<p>some html</p>',
-        audio_translations: [{
-          language_code: 'en',
-          filename: 'a.mp3',
-          file_size_bytes: 20,
-          needs_update: false
-        }]
+        audio_translations: {
+          en: {
+            filename: 'a.mp3',
+            file_size_bytes: 20,
+            needs_update: false
+          }
+        }
       });
     }));
 
     it('should create default object', inject(function() {
       var defaultSubtitledHtml = shof.createDefault('test html');
       expect(defaultSubtitledHtml.getHtml()).toEqual('test html');
-      expect(defaultSubtitledHtml.getBindableAudioTranslations()).toEqual([]);
+      expect(defaultSubtitledHtml.getBindableAudioTranslations()).toEqual({});
     }));
   });
 });

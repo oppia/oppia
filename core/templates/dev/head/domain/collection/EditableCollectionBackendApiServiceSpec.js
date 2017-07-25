@@ -45,8 +45,8 @@ describe('Editable collection backend API service', function() {
         version: '1',
         nodes: [{
           exploration_id: '0',
-          prerequisite_skills: [],
-          acquired_skills: []
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: []
         }],
         next_exploration_ids: [],
         completed_exploration_ids: []

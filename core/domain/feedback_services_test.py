@@ -426,7 +426,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         feedback_services.get_thread_summaries(self.user_id, thread_ids)
         elapsed_time = time.time() - start
         print "Time for fetching all the thread summaries -", elapsed_time
-        self.assertLessEqual(elapsed_time, 1)
+        # Note (1995YogeshSharma): changing the below check from 1 to 1.5 as
+        #   this backend test fails on travis sometimes with 1 second.
+        self.assertLessEqual(elapsed_time, 1.5)
 
     def test_update_messages_read_by_the_user(self):
         feedback_services.create_thread(
@@ -939,9 +941,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_csrf_token_from_response(
                 self.testapp.get('/create/%s' % self.exploration.id))
-            self.post_json('%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, {
-                'exploration_id': self.exploration.id,
-                'thread_id': thread_id}, csrf_token)
+            self.post_json(
+                '%s/%s' % (
+                    feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, self.exploration.id),
+                {'thread_id': thread_id}, csrf_token)
 
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
