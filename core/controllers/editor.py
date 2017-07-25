@@ -175,11 +175,6 @@ class ExplorationPage(EditorHandler):
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
-        if (exploration is None or
-                not rights_manager.Actor(self.user_id).can_view(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)):
-            self.redirect('/')
-            return
 
         can_edit = (
             bool(self.user_id) and

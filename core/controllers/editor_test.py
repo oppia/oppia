@@ -131,9 +131,9 @@ class EditorTest(BaseEditorControllerTest):
 
         response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
-        publish_url = '%s/%s' % (feconf.EXPLORATION_PUBLISH_PREFIX, exp_id)
+        publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
         self.put_json(publish_url, {
-            'is_public': True,
+            'make_public': True,
         }, csrf_token, expect_errors=True, expected_status_int=400)
 
         self.logout()

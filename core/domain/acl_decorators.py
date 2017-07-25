@@ -118,7 +118,8 @@ def can_play_exploration(handler):
                 exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.PageNotFoundException
+            self.redirect('/')
+            return
 
     return test_can_play
 
