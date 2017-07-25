@@ -437,9 +437,19 @@ class ExplorationRightsHandler(EditorHandler):
 
 
 class ExplorationStatusHandler(EditorHandler):
-    """Handles publishing of an exploration."""
+    """Handles publishing or publicizing of an exploration."""
 
     def _publish_exploration(self, exploration_id, make_public):
+        """Publish/Unpublish an exploration based on make_public boolean.
+
+        Args:
+            exploration_id: str. Id of the exploration.
+            make_public: bool. Whether to publish the exploration or
+                unpublish it.
+
+        Raises:
+            InvalidInputException: Given exploration is invalid.
+        """
         exploration = exp_services.get_exploration_by_id(exploration_id)
         if make_public:
             try:
@@ -457,6 +467,17 @@ class ExplorationStatusHandler(EditorHandler):
                 exploration_id])
 
     def _publicize_exploration(self, exploration_id, make_publicized):
+        """Publicize/Unpublicize and exploration based on make_publicized
+        boolean.
+
+        Args:
+            exploration_id: str. Id of the exploration.
+            make_publicized: bool. Whether to publicize the exploration or
+                unpublicize it.
+
+        Raises:
+            InvalidInputException: Given exploration is invalid.
+        """
         exploration = exp_services.get_exploration_by_id(exploration_id)
         if make_publicized:
             try:

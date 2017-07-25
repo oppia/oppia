@@ -118,8 +118,7 @@ def can_play_exploration(handler):
                 exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
-            self.redirect('/')
-            return
+            raise self.PageNotFoundException
 
     return test_can_play
 
@@ -226,12 +225,16 @@ def can_view_exploration_feedback(handler):
     """
 
     def test_can_access(self, exploration_id, **kwargs):
-        if check_exploration_editable(
-                self.user_id, self.actions, exploration_id):
-            return handler(self, exploration_id, **kwargs)
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if check_activity_accessible(
+                self.user_id, self.actions,
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                'You do not have credentials to view feedbacks.')
+                'You do not have credentials to view exploration feedback.')
 
     return test_can_access
 
@@ -286,9 +289,7 @@ def can_edit_exploration(handler):
 
         if check_exploration_editable(
                 self.user_id, self.actions, exploration_id):
-
             return handler(self, exploration_id, **kwargs)
-
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this exploration.')

@@ -296,12 +296,12 @@ class ViewExplorationFeedbackTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(
             self.owner_id, self.published_exp_id)
 
-    def test_guest_cannot_view_feedbacks(self):
+    def test_guest_cannot_view_feedback_threads(self):
         response = self.testapp.get(
             '/mock/%s' % self.private_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.assertEqual(response.status_int, 302)
 
-    def test_owner_can_view_feedback(self):
+    def test_owner_can_view_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.private_exp_id, expect_errors=True)
@@ -313,13 +313,6 @@ class ViewExplorationFeedbackTest(test_utils.GenericTestBase):
         response = self.testapp.get(
             '/mock/%s' % self.published_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
-        self.logout()
-
-    def test_moderator_cannot_view_feedback_private_exploration(self):
-        self.login(self.MODERATOR_EMAIL)
-        response = self.testapp.get(
-            '/mock/%s' % self.private_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
         self.logout()
 
     def test_admin_can_view_feeback_private_exploration(self):
