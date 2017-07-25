@@ -129,28 +129,27 @@ class TrainedClassifierHandler(base.BaseHandler):
 
 
 class NextJobHandler(base.BaseHandler):
-    """ This handler fetches next job in job queue and sends back job_id,
+    """This handler fetches next job in job queue and sends back job_id,
     algorithm_id and training data to the VM.
     """
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     def post(self):
-        """ Handels POST requests. """
+        """Handles POST requests. """
         signature = self.payload.get('signature')
         vm_id = self.payload.get('vm_id')
+
         if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
             raise self.UnauthorizedUserException
         if not verify_signature(None, vm_id, signature):
             raise self.UnauthorizedUserException
+
         response = {}
         next_job = classifier_services.fetch_next_job()
         if next_job is not None:
-            training_data = classifier_services.fetch_training_data(
-                next_job.exp_id, next_job.state_name)
-            classifier_services.update_training_job_training_data(
-                next_job.job_id, training_data)
             classifier_services.mark_training_job_pending(next_job.job_id)
             response['job_id'] = next_job.job_id
             response['algorithm_id'] = next_job.algorithm_id
-            response['training_data'] = training_data
+            response['training_data'] = next_job.training_data
+
         return self.render_json(response)

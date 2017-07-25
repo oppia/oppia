@@ -369,63 +369,14 @@ def mark_training_job_pending(job_id):
                                            feconf.TRAINING_JOB_STATUS_PENDING)
 
 
-def update_training_job_training_data(job_id, training_data):
-    """Checks for the existence of the model and then updates it.
-
-    Args:
-        job_id: str. ID of the ClassifierTrainingJob domain object.
-        training_data: list. The training data of the job.
-
-    Raises:
-        Exception. The ClassifierTrainingJobModel corresponding to the job_id
-            of the ClassifierTrainingJob does not exist.
-    """
-    classifier_training_job_model = (
-        classifier_models.ClassifierTrainingJobModel.get(job_id, strict=False))
-    if not classifier_training_job_model:
-        raise Exception(
-            'The ClassifierTrainingJobModel corresponding to the job_id of the'
-            'ClassifierTrainingJob does not exist.')
-
-    classifier_training_job = get_classifier_training_job_by_id(job_id)
-    classifier_training_job.update_training_data(training_data)
-    classifier_training_job.validate()
-
-    classifier_training_job_model.training_data = training_data
-    classifier_training_job_model.put()
-
-
 def update_failed_jobs(training_jobs):
     """Updates status of job_models to failed.
 
     Args:
-        exp_id: str. ID of the exploration.
-        state_name: str. Name of the state.
+        training_jobs: list. List of jobs to be updated as failed.
     """
     for training_job in training_jobs:
         mark_training_job_failed(training_job.job_id)
-
-
-def fetch_training_data(exp_id, state_name):
-    """Gets training data of the given state and exp_id.
-
-    Args:
-        exp_id: str. ID of the exploration.
-        state_name: str. Name of the state.
-
-    Returns:
-        List. training data.
-
-    Raises:
-        Exception: The state is not present in the exp_id.
-    """
-    exp = exp_services.get_exploration_by_id(exp_id)
-    if state_name not in exp.states.keys():
-        raise Exception('The state %s is not present in the exp_id %s.'%(
-            state_name, exp_id))
-    state = exp.states[state_name]
-    training_data = state.get_training_data()
-    return training_data
 
 
 def fetch_next_job():
@@ -457,7 +408,9 @@ def fetch_next_job():
                 valid_jobs.append(training_job)
         if not more:
             break
+
     update_failed_jobs(failed_jobs)
+
     if len(valid_jobs) > 0:
         next_job = get_classifier_training_job_from_model(valid_jobs[0])
     else:

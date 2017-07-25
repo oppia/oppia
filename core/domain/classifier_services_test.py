@@ -304,24 +304,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 feconf.TRAINING_JOB_STATUS_FAILED))):
             classifier_services.mark_training_job_failed(job_id)
 
-    def test_update_training_job_training_data(self):
-        """Test the update_training_job_training_data method."""
-        exp_id = u'1'
-        state_name = 'Home'
-        interaction_id = 'TextInput'
-
-        job_id = classifier_services.create_classifier_training_job(
-            feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_PENDING)
-        training_data = [{'answer_group_index': 1, 'answers': ['a1', 'a2']}]
-        classifier_services.update_training_job_training_data(job_id,
-                                                              training_data)
-        classifier_training_job = (
-            classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.training_data,
-                         training_data)
-
     def test_update_failed_jobs(self):
         """Test the update_failed_jobs method."""
         exp_id = u'1'
@@ -356,32 +338,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             [], feconf.TRAINING_JOB_STATUS_PENDING)
         next_job = classifier_services.fetch_next_job()
         self.assertEqual(job1_id, next_job.job_id)
-
-    def test_fetch_training_data(self):
-        """Test the fetch_training_data method."""
-        exp_id = u'1'
-        state_name = 'text'
-        incorrect_state_name = 'random'
-        test_exp_filepath = os.path.join(
-            feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-            assets_list)
-        expected_training_data = [{'answer_group_index': 1,
-                                   'answers': [u'cheerful', u'merry',
-                                               u'ecstatic', u'glad',
-                                               u'overjoyed', u'pleased',
-                                               u'thrilled', u'smile']}]
-        training_data = classifier_services.fetch_training_data(
-            exp_id, state_name)
-        self.assertEqual(expected_training_data, training_data)
-        with self.assertRaisesRegexp(Exception, (
-            'The state %s is not present in the exp_id %s.'%(
-                incorrect_state_name, exp_id))):
-            classifier_services.fetch_training_data(exp_id,
-                                                    incorrect_state_name)
 
     def test_retrieval_of_classifier_from_exploration_attributes(self):
         """Test the get_classifier_from_exploration_attributes method."""

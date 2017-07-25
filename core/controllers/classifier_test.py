@@ -130,30 +130,27 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
         self.category = 'Test'
-        yaml_path = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with open(yaml_path, 'r') as yaml_file:
-            self.yaml_content = yaml_file.read()
-
-        assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
-            assets_list)
-        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
-
-        state = self.exploration.states['Home']
-        self.algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
-            state.interaction.id]['algorithm_id']
         interaction_id = 'TextInput'
-        self.training_data = state.get_training_data()
+        self.algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_id']
+        self.training_data = [
+                {
+                    u'answer_group_index': 1,
+                    u'answers': [u'a1', u'a2']
+                },
+                {
+                    u'answer_group_index': 2,
+                    u'answers': [u'a2', u'a3']
+                }
+            ]
         self.job_id = classifier_services.create_classifier_training_job(
             self.algorithm_id, interaction_id, self.exp_id,
-            self.exploration.version, 'Home', self.training_data,
+            1, 'Home', self.training_data,
             feconf.TRAINING_JOB_STATUS_NEW)
         self.expected_response = {
-            u'job_id' : self.job_id.encode("utf-8"),
+            u'job_id' : unicode(self.job_id, "utf-8"),
             u'training_data' : self.training_data,
-            u'algorthim_id' : self.algorithm_id.encode("utf-8")
+            u'algorithm_id' : unicode(self.algorithm_id, "utf-8")
         }
 
         self.payload = {}
@@ -166,9 +163,27 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         json_response = self.post_json('/ml/nextjobhandler',
                                        self.payload, expect_errors=False,
                                        expected_status_int=200)
-        #self.assertEqual(json_response, self.expected_response)
+        self.assertEqual(json_response, self.expected_response)
         classifier_services.mark_training_job_failed(self.job_id)
         json_response = self.post_json('/ml/nextjobhandler',
                                        self.payload, expect_errors=False,
                                        expected_status_int=200)
         self.assertEqual(json_response, {})
+
+    def test_error_on_prod_mode_and_default_vm_id(self):
+        # Turn off DEV_MODE.
+        with self.swap(feconf, 'DEV_MODE', False):
+            self.post_json('/ml/nextjobhandler', self.payload,
+                           expect_errors=True, expected_status_int=401)
+
+    def test_error_on_different_signatures(self):
+        # Altering data to result in different signatures.
+        self.payload['vm_id'] = 'different_vm_id'
+        self.post_json('/ml/nextjobhandler', self.payload,
+                       expect_errors=True, expected_status_int=401)
+
+    def test_error_on_invalid_message(self):
+        # Altering message dict to result in invalid dict.
+        self.payload['vm_id'] = 1
+        self.post_json('/ml/nextjobhandler', self.payload,
+                       expect_errors=True, expected_status_int=401)
