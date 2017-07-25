@@ -3528,7 +3528,7 @@ class Exploration(object):
             }
             old_solution = state_dict['interaction']['solution']
             state_dict['interaction']['solution'] = (
-                None if !old_solution else old_solution)
+                None if not old_solution else old_solution)
         return states_dict
 
     @classmethod
