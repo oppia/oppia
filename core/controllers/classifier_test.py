@@ -182,8 +182,8 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.post_json('/ml/nextjobhandler', self.payload,
                        expect_errors=True, expected_status_int=401)
 
-    def test_error_on_invalid_message(self):
-        # Altering message dict to result in invalid dict.
+    def test_error_on_invalid_vm_id(self):
+        # Altering vm_id to result in invalid signature.
         self.payload['vm_id'] = 1
         self.post_json('/ml/nextjobhandler', self.payload,
                        expect_errors=True, expected_status_int=401)
