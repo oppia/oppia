@@ -355,7 +355,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_3)
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [self.COL_ID_3])
 
         # Test that on adding a collection to the incomplete list, it gets
@@ -365,7 +365,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_3])
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [])
 
         # Test that a collection created by the user is not added to the

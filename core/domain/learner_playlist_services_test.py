@@ -328,19 +328,19 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_get_all_learner_playlist_collection_ids(self):
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [])
 
         # Add a collection to the learner playlist.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_0)
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [self.COL_ID_0])
 
         # Add another collection.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_1)
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
