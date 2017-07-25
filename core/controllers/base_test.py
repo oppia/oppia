@@ -329,7 +329,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
         )).keys())
 
     def _extract_keys_from_html_file(self, filename):
-        regex_pattern = r'(I18N_[A-Z/_\d]*)'
+        regex_pattern = r'(I18N_[A-Z/_\d]*)(?=.*_I18N_IDS$).*$'
         return re.findall(regex_pattern, utils.get_file_contents(
             filename))
 

@@ -521,26 +521,27 @@
               <tr ng-repeat="message in messageSummaries" style="padding: 13px 8px 7px 8px;">
                 <td>
                   <div class="row">
-                    <div class="col-sm-1 feedback-message-author-picture">
-                      <span>
-                        <img ng-src="<[message.authorPictureDataUrl]>"
-                             class="oppia-navbar-profile-picture img-circle"
-                             alt="User Avatar"
-                             style="margin-top: 4px;">
+                    <div class="col-sm-12">
+                      <span class="feedback-message-header">
+                        <span style="display: inline-block;">
+                          <img ng-src="<[message.authorPictureDataUrl]>"
+                               class="oppia-navbar-profile-picture img-circle"
+                               alt="User Avatar"
+                               style="margin-top: 4px; min-width: 32px;">
+                        </span>
+                      </span>
+
+                      <span class="feedback-message-author-name"><strong><[message.authorUsername]></strong></span>
+                      <span style="float: right; margin-right: 15px;"
+                            ng-if="message.messageId !== 0 && message.updatedStatus">
+                        <em translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
+                            translate-values="{threadStatus: getHumanReadableStatus(message.updatedStatus)}"></em>
                       </span>
                     </div>
-                    <div class="col-sm-11">
-                      <div>
-                        <span><strong><[message.authorUsername]></strong></span>
-                        <span style="float: right; margin-right: 15px;"
-                              ng-if="message.messageId !== 0 && message.updatedStatus">
-                          <em translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
-                              translate-values="{threadStatus: getHumanReadableStatus(message.updatedStatus)}"></em>
-                        </span>
-                        <div ng-if="message.messageId !== 0 && message.updatedStatus">
-                        </div>
-                      </div>
-
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-2 feedback-message-spacing" style="width: 8%;"></div>
+                    <div class="col-sm-10 feedback-thread-message-body">
                       <div>
                         <span class="protractor-test-feedback-message" ng-if="message.text"><[message.text]></span>
                           <button style="margin-top: 5px;"
@@ -558,24 +559,24 @@
               <tr>
                 <td>
                   <div class="row">
-                    <div class="col-sm-1 feedback-message-author-picture">
-                      <span>
-                        <img ng-src="<[profilePictureDataUrl]>"
-                             class="oppia-navbar-profile-picture img-circle"
-                             alt="User Avatar"
-                             style="margin-top: 4px;">
+                    <div class="col-sm-1 feedback-message-author-picture" style="width: 8%; padding: 0;">
+                      <span class="feedback-message-header">
+                        <span style="display: inline-block;">
+                          <img ng-src="<[profilePictureDataUrl]>"
+                               class="oppia-navbar-profile-picture img-circle feedback-thread-learner-profile-pic"
+                               alt="User Avatar">
+                        </span>
                       </span>
                     </div>
 
                     <div class="col-sm-11">
-                      <div>
+                      <div class="feedback-thread-new-message">
                         <textarea class="form-control feedback-thread-reply-box"
                                   placeholder="<['I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate]>" ng-model="newMessage.text"
-                                  style="resize: vertical;"></textarea>
+                                  style=""></textarea>
                       </div>
                       <div>
-                        <button class="btn btn-success"
-                                style="margin-top: 6px;"
+                        <button class="btn btn-success feedback-thread-new-message-send"
                                 ng-click="addNewMessage(explorationId, threadId, newMessage.text)"
                                 ng-disabled="messageSendingInProgress">
                           <span ng-if="messageSendingInProgress" translate="I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS"></span>
