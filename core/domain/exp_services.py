@@ -793,17 +793,14 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
 
-    old_states_dicts = copy.deepcopy(exploration_model.states)
-    old_states = {}
-    for state_name in old_states_dicts:
-        old_states[state_name] = exp_domain.State.from_dict(
-            old_states_dicts[state_name])
-    trainable_states_dict = exploration.get_trainable_states_dict(
-        old_states)
-    state_names_with_changed_answer_groups = trainable_states_dict[
-        'state_names_with_changed_answer_groups']
-    state_names_with_unchanged_answer_groups = trainable_states_dict[
-        'state_names_with_unchanged_answer_groups']
+    if feconf.ENABLE_STRING_CLASSIFIER:
+        old_states = get_exploration_from_model(exploration_model).states
+        trainable_states_dict = exploration.get_trainable_states_dict(
+            old_states)
+        state_names_with_changed_answer_groups = trainable_states_dict[
+            'state_names_with_changed_answer_groups']
+        state_names_with_unchanged_answer_groups = trainable_states_dict[
+            'state_names_with_unchanged_answer_groups']
 
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
@@ -829,12 +826,13 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
-    if state_names_with_changed_answer_groups:
-        classifier_services.create_classifier_training_jobs(
-            exploration, state_names_with_changed_answer_groups)
-    if state_names_with_unchanged_answer_groups:
-        classifier_services.create_classifier_exploration_mappings(
-            exploration, state_names_with_unchanged_answer_groups)
+    if feconf.ENABLE_STRING_CLASSIFIER:
+        if state_names_with_changed_answer_groups:
+            classifier_services.create_classifier_training_jobs(
+                exploration, state_names_with_changed_answer_groups)
+        if state_names_with_unchanged_answer_groups:
+            classifier_services.create_classifier_exploration_mappings(
+                exploration, state_names_with_unchanged_answer_groups)
 
 
 def _create_exploration(

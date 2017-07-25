@@ -2981,8 +2981,6 @@ class Exploration(object):
             'state_names_with_unchanged_answer_groups': []
         }
         new_states = self.states
-        for l in new_states['Home'].interaction.answer_groups:
-            print l.outcome.feedback
         for state_name in new_states:
             new_state = new_states[state_name]
             if not new_state.can_undergo_classification():
@@ -2993,6 +2991,7 @@ class Exploration(object):
             if state_name not in old_states:
                 trainable_states_dict[
                     'state_names_with_changed_answer_groups'].append(state_name)
+                continue
             old_state = old_states[state_name]
             old_training_data = old_state.get_training_data()
             new_training_data = new_state.get_training_data()

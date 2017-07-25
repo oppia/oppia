@@ -1051,6 +1051,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             old_states[state_name] = (exp_domain.State.from_dict(
                 old_states_dicts[state_name]))
 
+        # Modify answer groups to trigger change in answer groups.
         exploration = exp_services.get_exploration_by_id(exp_id)
         state = exploration.states['Home']
         exploration.states['Home'].interaction.answer_groups.insert(
@@ -1058,6 +1059,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         expected_dict = {
             'state_names_with_changed_answer_groups': ['Home'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        actual_dict = exploration.get_trainable_states_dict(old_states)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Add new state to trigger change in answer groups.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Home'])
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Home', 'New state'],
             'state_names_with_unchanged_answer_groups': []
         }
         actual_dict = exploration.get_trainable_states_dict(old_states)

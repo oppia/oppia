@@ -116,8 +116,9 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'property_name': 'answer_groups',
             'new_value': answer_groups
         }]
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be one job in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
