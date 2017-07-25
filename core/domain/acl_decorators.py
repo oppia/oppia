@@ -231,7 +231,7 @@ def can_view_exploration_feedback(handler):
         if check_activity_accessible(
                 self.user_id, self.actions,
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-                return handler(self, exploration_id, **kwargs)
+            return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to view exploration feedback.')
