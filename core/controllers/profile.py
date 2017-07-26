@@ -218,6 +218,7 @@ class ProfilePictureHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
