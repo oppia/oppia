@@ -21,6 +21,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import learner_progress_services
+from core.domain import learner_playlist_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -33,9 +34,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     EXP_ID_0 = '0_en_arch_bridges_in_england'
     EXP_ID_1 = '1_fi_arch_sillat_suomi'
     EXP_ID_2 = '2_en_welcome_introduce_oppia'
+    EXP_ID_3 = '3_welcome_oppia'
     COL_ID_0 = '0_arch_bridges_in_england'
     COL_ID_1 = '1_welcome_introduce_oppia'
     COL_ID_2 = '2_welcome_introduce_oppia_interactions'
+    COL_ID_3 = '3_welcome_oppia_collection'
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
@@ -57,6 +60,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_id, title='Introduce Oppia',
             category='Welcome', language_code='en')
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.owner_id, title='Welcome Oppia',
+            category='Welcome', language_code='en')
 
         # Save a few collections.
         self.save_new_default_collection(
@@ -68,6 +74,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.save_new_default_collection(
             self.COL_ID_2, self.user_id,
             title='Introduce Interactions in Oppia', category='Welcome')
+        self.save_new_default_collection(
+            self.COL_ID_3, self.owner_id, title='Welcome Oppia Collection',
+            category='Welcome')
 
     def _get_all_completed_exp_ids(self, user_id):
         completed_activities_model = (
@@ -155,6 +164,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_1, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_1])
+        # Add an exploration to the learner playlist of the learner.
+        learner_playlist_services.mark_exploration_to_be_played_later(
+            self.user_id, self.EXP_ID_3)
+        self.assertEqual(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
+                self.user_id), [self.EXP_ID_3])
+
         # Test that on adding an incomplete exploration to the completed list
         # it gets removed from the incomplete list.
         learner_progress_services.mark_exploration_as_completed(
@@ -164,12 +180,22 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
+        # Test that on adding an exploration to the completed list, it gets
+        # removed from the learner playlist.
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_3)
+        self.assertEqual(self._get_all_completed_exp_ids(
+            self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
+        self.assertEqual(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
+                self.user_id), [])
+
         # Test that an exploration created by the user is not added to the
         # completed list.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_2)
         self.assertEqual(self._get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+            self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
 
     def test_mark_collection_as_completed(self):
         self.assertEqual(
@@ -203,12 +229,29 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
+        # Add a collection to the learner playlist of the learner.
+        learner_playlist_services.mark_collection_to_be_played_later(
+            self.user_id, self.COL_ID_3)
+        self.assertEqual(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
+                self.user_id), [self.COL_ID_3])
+
+        # Test that on adding a collection to the completed list, it gets
+        # removed from the learner playlist.
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_3)
+        self.assertEqual(self._get_all_completed_collection_ids(
+            self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
+        self.assertEqual(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
+                self.user_id), [])
+
         # Test that a collection created by the user is not added to the
         # completed list.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_2)
         self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [self.COL_ID_0, self.COL_ID_1])
+            self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
     def test_mark_exploration_as_incomplete(self):
         self.assertEqual(self._get_all_incomplete_exp_ids(
@@ -259,12 +302,29 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
 
+        # Add an exploration to the learner playlist.
+        learner_playlist_services.mark_exploration_to_be_played_later(
+            self.user_id, self.EXP_ID_3)
+        self.assertEqual(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
+                self.user_id), [self.EXP_ID_3])
+
+        # Test that on adding an exploration to the incomplete list, it gets
+        # removed from the learner playlist.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_3, state_name, version)
+        self.assertEqual(self._get_all_incomplete_exp_ids(
+            self.user_id), [self.EXP_ID_0, self.EXP_ID_3])
+        self.assertEqual(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
+                self.user_id), [])
+
         # Test that an exploration created by the user is not added to the
         # incomplete list.
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_2, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_0])
+            self.user_id), [self.EXP_ID_0, self.EXP_ID_3])
 
     def test_mark_collection_as_incomplete(self):
         self.assertEqual(self._get_all_incomplete_collection_ids(
@@ -291,12 +351,29 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0])
 
+        # Add a collection to the learner playlist of the learner.
+        learner_playlist_services.mark_collection_to_be_played_later(
+            self.user_id, self.COL_ID_3)
+        self.assertEqual(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
+                self.user_id), [self.COL_ID_3])
+
+        # Test that on adding a collection to the incomplete list, it gets
+        # removed from the learner playlist.
+        learner_progress_services.mark_collection_as_incomplete(
+            self.user_id, self.COL_ID_3)
+        self.assertEqual(self._get_all_incomplete_collection_ids(
+            self.user_id), [self.COL_ID_0, self.COL_ID_3])
+        self.assertEqual(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
+                self.user_id), [])
+
         # Test that a collection created by the user is not added to the
         # incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_2)
         self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_0])
+            self.user_id), [self.COL_ID_0, self.COL_ID_3])
 
     def test_remove_exp_from_incomplete_list(self):
         self.assertEqual(self._get_all_incomplete_exp_ids(

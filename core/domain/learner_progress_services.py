@@ -19,6 +19,7 @@
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import learner_progress_domain
+from core.domain import learner_playlist_services
 from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
@@ -143,7 +144,8 @@ def save_last_playthrough_information(last_playthrough_information):
 def mark_exploration_as_completed(user_id, exp_id):
     """Adds the exploration id to the completed list of the user unless the
     exploration has already been completed or has been created/edited by the
-    user. It is also removed from the incomplete list (if present).
+    user. It is also removed from the incomplete list and the learner playlist
+    (if present).
 
     Args:
         user_id: str. The id of the user who has completed the exploration.
@@ -168,9 +170,11 @@ def mark_exploration_as_completed(user_id, exp_id):
 
     if (exp_id not in subscribed_exploration_ids and
             exp_id not in activities_completed.exploration_ids):
-        # Remove the exploration from the in progress list (if present) as it is
-        # now completed.
+        # Remove the exploration from the in progress and learner playlist
+        # (if present) as it is now completed.
         remove_exp_from_incomplete_list(user_id, exp_id)
+        learner_playlist_services.remove_exploration_from_learner_playlist(
+            user_id, exp_id)
         activities_completed.add_exploration_id(exp_id)
         save_completed_activities(activities_completed)
 
@@ -178,7 +182,8 @@ def mark_exploration_as_completed(user_id, exp_id):
 def mark_collection_as_completed(user_id, collection_id):
     """Adds the collection id to the list of collections completed by the user
     unless the collection has already been completed or has been created/edited
-    by the user. It is also removed from the incomplete list (if present).
+    by the user. It is also removed from the incomplete list and the play later
+    list (if present).
 
     Args:
         user_id: str. The id of the user who completed the collection.
@@ -203,9 +208,11 @@ def mark_collection_as_completed(user_id, collection_id):
 
     if (collection_id not in subscribed_collection_ids and
             collection_id not in activities_completed.collection_ids):
-        # Remove the collection from the in progress list (if present) as it is
-        # now completed.
+        # Remove the collection from the in progress and learner playlist
+        # (if present) as it is now completed.
         remove_collection_from_incomplete_list(user_id, collection_id)
+        learner_playlist_services.remove_collection_from_learner_playlist(
+            user_id, collection_id)
         activities_completed.add_collection_id(collection_id)
         save_completed_activities(activities_completed)
 
@@ -215,7 +222,8 @@ def mark_exploration_as_incomplete(
     """Adds the exploration id to the incomplete list of the user unless the
     exploration has been already completed or has been created/edited by the
     user. If the exploration is already present in the incomplete list, just the
-    details associated with it are updated.
+    details associated with it are updated. If the exploration is present in the
+    learner playlist, it is removed.
 
     Args:
         user_id: str. The id of the user who partially completed the
@@ -245,6 +253,10 @@ def mark_exploration_as_incomplete(
             exploration_id not in subscribed_exploration_ids):
 
         if exploration_id not in incomplete_activities.exploration_ids:
+            # Remove the exploration from the learner playlist (if present) as
+            # it is currently now being completed.
+            learner_playlist_services.remove_exploration_from_learner_playlist(
+                user_id, exploration_id)
             incomplete_activities.add_exploration_id(exploration_id)
 
         last_playthrough_information_model = (
@@ -268,6 +280,7 @@ def mark_collection_as_incomplete(user_id, collection_id):
     """Adds the collection id to the list of collections partially completed by
     the user unless the collection has already been completed or has been
     created/edited by the user or is already present in the incomplete list.
+    If the collection is present in the learner playlist, it is removed.
 
     Args:
         user_id: str. The id of the user who partially completed the collection.
@@ -290,8 +303,58 @@ def mark_collection_as_incomplete(user_id, collection_id):
     if (collection_id not in subscribed_collection_ids and
             collection_id not in incomplete_activities.collection_ids and
             collection_id not in collection_ids):
+        # Remove the collection from the learner playlist (if present) as it
+        # is currently now being completed.
+        learner_playlist_services.remove_collection_from_learner_playlist(
+            user_id, collection_id)
         incomplete_activities.add_collection_id(collection_id)
         save_incomplete_activities(incomplete_activities)
+
+
+def add_exp_to_learner_playlist(
+        user_id, exploration_id, position_to_be_inserted=None):
+    """This function checks if the exploration exists in the completed list or
+    the incomplete list. If it does not exist we call the function in learner
+    playlist services to add the exploration to the play later list.
+
+    Args:
+        user_id: str. The id of the user.
+        exploration_id: str. The id of the exploration to be added to the
+            learner playlist.
+        position_to_be_inserted: int|None. If this is specified the exploration
+            gets inserted at the given position. Otherwise it gets added at the
+            end.
+    """
+    completed_exploration_ids = get_all_completed_exp_ids(user_id)
+    incomplete_exploration_ids = get_all_incomplete_exp_ids(user_id)
+
+    if (exploration_id not in completed_exploration_ids and
+            exploration_id not in incomplete_exploration_ids):
+        learner_playlist_services.mark_exploration_to_be_played_later(
+            user_id, exploration_id, position_to_be_inserted)
+
+
+def add_collection_to_learner_playlist(
+        user_id, collection_id, position_to_be_inserted=None):
+    """This function checks if the collection exists in the completed list or
+    the incomplete list. If it does not exist we call the function in learner
+    playlist services to add the collection to the play later list.
+
+    Args:
+        user_id: str. The id of the user.
+        collection_id: str. The id of the collection to be added to the
+            learner playlist.
+        position_to_be_inserted: int|None. If this is specified the collection
+            gets inserted at the given position. Otherwise it gets added at the
+            end.
+    """
+    completed_collection_ids = get_all_completed_collection_ids(user_id)
+    incomplete_collection_ids = get_all_incomplete_collection_ids(user_id)
+
+    if (collection_id not in completed_collection_ids and
+            collection_id not in incomplete_collection_ids):
+        learner_playlist_services.mark_collection_to_be_played_later(
+            user_id, collection_id, position_to_be_inserted)
 
 
 def remove_exp_from_completed_list(user_id, exploration_id):
