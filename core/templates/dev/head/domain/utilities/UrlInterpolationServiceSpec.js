@@ -144,6 +144,13 @@ describe('URL Interpolation Service', function() {
       })).toBe('/test_url/SEARCH?title%20or%20website=oppia');
   });
 
+  it('should escape the "=" symbol correctly', function() {
+    expect(uis.interpolateUrl(
+      '/test_url/<first_param>', {
+        first_param: 'first=param',
+      })).toBe('/test_url/first%3Dparam');
+  });
+
   it('should not interpolate bad parameter names and values', function() {
     // Empty angle brackets indicate a malformed URL.
     expect(uis.interpolateUrl.bind(null, '/test_url/<>', {})).toThrow(
