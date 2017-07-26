@@ -110,6 +110,40 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
             response['incomplete_collections_list'][0]['id'], self.COL_ID)
         self.logout()
 
+    def test_can_see_exploration_playlist(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['exploration_playlist']), 0)
+
+        self.save_new_default_exploration(
+            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
+
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.viewer_id, self.EXP_ID)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['exploration_playlist']), 1)
+        self.assertEqual(
+            response['exploration_playlist'][0]['id'], self.EXP_ID)
+        self.logout()
+
+    def test_can_see_collection_playlist(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['collection_playlist']), 0)
+
+        self.save_new_default_collection(
+            self.COL_ID, self.owner_id, title=self.COL_TITLE)
+
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.viewer_id, self.COL_ID)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['collection_playlist']), 1)
+        self.assertEqual(
+            response['collection_playlist'][0]['id'], self.COL_ID)
+        self.logout()
+
     def test_can_see_subscription(self):
         self.login(self.VIEWER_EMAIL)
 

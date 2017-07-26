@@ -516,17 +516,25 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_get_activity_progress(self):
         # Add an entity to each of the sections.
+        # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
 
+        # Add activities to the incomplete section.
         state_name = 'state name'
         version = 1
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_1, state_name, version)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
+
+        # Add activities to the playlist section.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_3)
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_3)
 
         # Get the progress of the user.
         activity_progress = learner_progress_services.get_activity_progress(
@@ -540,11 +548,17 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activity_progress[0].completed_exp_summaries)
         completed_collection_summaries = (
             activity_progress[0].completed_collection_summaries)
+        exploration_playlist_summaries = (
+            activity_progress[0].exploration_playlist_summaries)
+        collection_playlist_summaries = (
+            activity_progress[0].collection_playlist_summaries)
 
         self.assertEqual(len(incomplete_exp_summaries), 1)
         self.assertEqual(len(incomplete_collection_summaries), 1)
         self.assertEqual(len(completed_exp_summaries), 1)
         self.assertEqual(len(completed_collection_summaries), 1)
+        self.assertEqual(len(exploration_playlist_summaries), 1)
+        self.assertEqual(len(collection_playlist_summaries), 1)
 
         self.assertEqual(
             incomplete_exp_summaries[0].title, 'Sillat Suomi')
@@ -554,6 +568,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_exp_summaries[0].title, 'Bridges in England')
         self.assertEqual(
             completed_collection_summaries[0].title, 'Bridges')
+        self.assertEqual(
+            exploration_playlist_summaries[0].title, 'Welcome Oppia')
+        self.assertEqual(
+            collection_playlist_summaries[0].title, 'Welcome Oppia Collection')
 
         # Delete an exploration.
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)

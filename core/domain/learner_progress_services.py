@@ -357,6 +357,32 @@ def add_collection_to_learner_playlist(
             user_id, collection_id, position_to_be_inserted)
 
 
+def remove_entity_ids_from_playlist(user_id, exploration_ids,
+                                    collection_ids):
+    """Removes the explorations and collections from the playlist of the user.
+
+    Args:
+        user_id: str. The id of the user.
+        exploration_ids: list(str). The ids of the explorations to be removed.
+        collection_ids: list(str). The ids of the collections to be removed.
+    """
+    learner_playlist_model = user_models.LearnerPlaylistModel.get(
+        user_id, strict=False)
+
+    if learner_playlist_model:
+        learner_playlist = (
+            learner_playlist_services.get_learner_playlist_from_model(
+                learner_playlist_model))
+
+        for exploration_id in exploration_ids:
+            learner_playlist.remove_exploration_id(exploration_id)
+
+        for collection_id in collection_ids:
+            learner_playlist.remove_collection_id(collection_id)
+
+        learner_playlist_services.save_learner_playlist(learner_playlist)
+
+
 def remove_exp_from_completed_list(user_id, exploration_id):
     """Removes the exploration from the completed list of the user
     (if present).
@@ -399,7 +425,8 @@ def remove_collection_from_completed_list(user_id, collection_id):
 
 def remove_entity_ids_from_completed_list(user_id, exploration_ids,
                                           collection_ids):
-    """Removes the collections from the completed list of the user.
+    """Removes the explorations and collections from the completed list of the
+    learner.
 
     Args:
         user_id: str. The id of the user.
@@ -729,6 +756,63 @@ def get_filtered_incomplete_collection_summaries(collection_summaries,
             nonexistent_incomplete_collection_ids)
 
 
+def get_filtered_exp_playlist_summaries(exploration_summaries,
+                                        exploration_ids):
+    """Returns a list of summaries of the explorations in the learner playlist
+    and the ids of explorations that are no longer present.
+
+    Args:
+        exploration_summaries: list(ExplorationSummary). The list of exploration
+            summary domain objects to be filtered.
+        exploration_ids: list(str). The ids of the explorations corresponding to
+            the exploration summary domain objects.
+
+    Returns:
+        tuple. A 2-tuple whose elements are as follows:
+        - list(ExplorationSummary). Filtered list of ExplorationSummary domain
+            objects of the explorations in the learner playlist.
+        - list(str). The ids of the explorations that are no longer present.
+    """
+    nonexistent_playlist_exp_ids = []
+    filtered_exp_playlist_summaries = []
+    for index, exploration_summary in enumerate(exploration_summaries):
+        if exploration_summary is None:
+            nonexistent_playlist_exp_ids.append(exploration_ids[index])
+        else:
+            filtered_exp_playlist_summaries.append(exploration_summary)
+
+    return filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids
+
+
+def get_filtered_collection_playlist_summaries(collection_summaries,
+                                               collection_ids):
+    """Returns a list of summaries of the collections in the learner playlist
+    and the ids of collections that are no longer present.
+
+    Args:
+        collection_summaries: list(CollectionSummary). The list of collection
+            summary domain objects to be filtered.
+        collection_ids: list(str). The ids of the collections corresponding to
+            the collection summary domain objects.
+
+    Returns:
+        tuple. A 2-tuple whose elements are as follows:
+        - list(CollectionSummary). Filtered list of CollectionSummary domain
+            objects of the collections in the learner playlist.
+        - list(str). The ids of the collections that are no longer present.
+    """
+    nonexistent_playlist_collection_ids = []
+    filtered_collection_playlist_summaries = []
+    for index, collection_summary in enumerate(collection_summaries):
+        if collection_summary is None:
+            nonexistent_playlist_collection_ids.append(collection_ids[index])
+        else:
+            filtered_collection_playlist_summaries.append(collection_summary)
+
+    return (filtered_collection_playlist_summaries,
+            nonexistent_playlist_collection_ids)
+
+
 def get_collection_summary_dicts(collection_summaries):
     """Returns a displayable summary dict of the the collection summaries
     given to it.
@@ -794,7 +878,8 @@ def get_activity_progress(user_id):
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
                 ('CompletedActivitiesModel', [user_id]),
-                ('IncompleteActivitiesModel', [user_id])
+                ('IncompleteActivitiesModel', [user_id]),
+                ('LearnerPlaylistModel', [user_id])
             ]))
 
     # If completed model is present.
@@ -817,19 +902,34 @@ def get_activity_progress(user_id):
         incomplete_exploration_ids = []
         incomplete_collection_ids = []
 
+    # If learner playlist model is present.
+    if learner_progress_models[2][0]:
+        learner_playlist = (
+            learner_playlist_services.get_learner_playlist_from_model(
+                learner_progress_models[2][0]))
+        exploration_playlist_ids = learner_playlist.exploration_ids
+        collection_playlist_ids = learner_playlist.collection_ids
+    else:
+        exploration_playlist_ids = []
+        collection_playlist_ids = []
+
     activity_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
                 ('ExpSummaryModel', incomplete_exploration_ids),
                 ('CollectionSummaryModel', incomplete_collection_ids),
                 ('ExpSummaryModel', completed_exploration_ids),
-                ('CollectionSummaryModel', completed_collection_ids)
+                ('CollectionSummaryModel', completed_collection_ids),
+                ('ExpSummaryModel', exploration_playlist_ids),
+                ('CollectionSummaryModel', collection_playlist_ids)
             ]))
 
     incomplete_exploration_models = activity_models[0]
     incomplete_collection_models = activity_models[1]
     completed_exploration_models = activity_models[2]
     completed_collection_models = activity_models[3]
+    exploration_playlist_models = activity_models[4]
+    collection_playlist_models = activity_models[5]
 
     incomplete_exp_summaries = (
         [exp_services.get_exploration_summary_from_model(model)
@@ -843,6 +943,12 @@ def get_activity_progress(user_id):
     completed_collection_summaries = (
         [collection_services.get_collection_summary_from_model(model)
          if model else None for model in completed_collection_models])
+    exploration_playlist_summaries = (
+        [exp_services.get_exploration_summary_from_model(model)
+         if model else None for model in exploration_playlist_models])
+    collection_playlist_summaries = (
+        [collection_services.get_collection_summary_from_model(model)
+         if model else None for model in collection_playlist_models])
 
     filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids = (
         get_filtered_incomplete_exp_summaries(
@@ -870,11 +976,22 @@ def get_activity_progress(user_id):
          get_filtered_incomplete_collection_summaries(
              incomplete_collection_summaries, incomplete_collection_ids))
 
+    filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids = (
+        get_filtered_exp_playlist_summaries(
+            exploration_playlist_summaries, exploration_playlist_ids))
+
+    (filtered_collection_playlist_summaries,
+     nonexistent_playlist_collection_ids) = (
+         get_filtered_collection_playlist_summaries(
+             collection_playlist_summaries, collection_playlist_ids))
+
     number_of_deleted_activities = {
         'incomplete_explorations': len(nonexistent_incomplete_exp_ids),
         'incomplete_collections': len(nonexistent_incomplete_collection_ids),
         'completed_explorations': len(nonexistent_completed_exp_ids),
-        'completed_collections': len(nonexistent_completed_collection_ids)
+        'completed_collections': len(nonexistent_completed_collection_ids),
+        'exploration_playlist': len(nonexistent_playlist_exp_ids),
+        'collection_playlist': len(nonexistent_playlist_collection_ids)
     }
 
     remove_entity_ids_from_incomplete_list(
@@ -883,12 +1000,17 @@ def get_activity_progress(user_id):
     remove_entity_ids_from_completed_list(
         user_id, nonexistent_completed_exp_ids,
         nonexistent_completed_collection_ids)
+    remove_entity_ids_from_playlist(
+        user_id, nonexistent_playlist_exp_ids,
+        nonexistent_playlist_collection_ids)
 
     learner_progress = learner_progress_domain.LearnerProgress(
         filtered_incomplete_exp_summaries,
         filtered_incomplete_collection_summaries,
         filtered_completed_exp_summaries,
-        filtered_completed_collection_summaries)
+        filtered_completed_collection_summaries,
+        filtered_exp_playlist_summaries,
+        filtered_collection_playlist_summaries)
 
     return (learner_progress, number_of_deleted_activities,
             completed_to_incomplete_collection_titles)

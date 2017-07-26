@@ -73,6 +73,13 @@ class LearnerDashboardHandler(base.BaseHandler):
             learner_progress_services.get_collection_summary_dicts(
                 learner_progress.incomplete_collection_summaries))
 
+        exploration_playlist_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts(
+                learner_progress.exploration_playlist_summaries))
+        collection_playlist_summary_dicts = (
+            learner_progress_services.get_collection_summary_dicts(
+                learner_progress.collection_playlist_summaries))
+
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))
         creators_settings = user_services.get_users_settings(
@@ -96,6 +103,8 @@ class LearnerDashboardHandler(base.BaseHandler):
             'completed_collections_list': completed_collection_summary_dicts,
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
             'incomplete_collections_list': incomplete_collection_summary_dicts,
+            'exploration_playlist': exploration_playlist_summary_dicts,
+            'collection_playlist': collection_playlist_summary_dicts,
             'number_of_deleted_activities': number_of_deleted_activities,
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),

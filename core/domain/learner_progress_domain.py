@@ -21,7 +21,8 @@ class LearnerProgress(object):
 
     def __init__(self, incomplete_exp_summaries,
                  incomplete_collection_summaries, completed_exp_summaries,
-                 completed_collection_summaries):
+                 completed_collection_summaries, exploration_playlist,
+                 collection_playlist):
         """Constructs a LearnerProgress domain object.
 
         Args:
@@ -34,8 +35,14 @@ class LearnerProgress(object):
                 the explorations partially completed by the learner.
             completed_collection_summaries: list(CollectionSummary). The
                 summaries of the collections partially completed by the learner.
+            exploration_playlist: list(ExplorationSummary). The summaries of the
+                explorations in the learner playlist.
+            collection_playlist: list(CollectionSummary). The summaries of the
+                collections in the learner playlist.
         """
         self.incomplete_exp_summaries = incomplete_exp_summaries
         self.incomplete_collection_summaries = incomplete_collection_summaries
         self.completed_exp_summaries = completed_exp_summaries
         self.completed_collection_summaries = completed_collection_summaries
+        self.exploration_playlist_summaries = exploration_playlist
+        self.collection_playlist_summaries = collection_playlist
