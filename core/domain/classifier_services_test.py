@@ -162,6 +162,19 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_models.ClassifierExplorationMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 1)
 
+        # Check that renaming a state does not create an extra job.
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Home2'
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        # There should still be only one job in the data store now.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 1)
+
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""
 

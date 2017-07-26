@@ -192,7 +192,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         list_job_models = []
         list_job_ids = []
         for job_dict in job_dicts_list:
-            print job_dict
             instance_id = cls._generate_id(job_dict['exp_id'])
             training_job_instance = cls(
                 id=instance_id, algorithm_id=job_dict['algorithm_id'],

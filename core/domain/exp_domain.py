@@ -33,10 +33,13 @@ from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import trigger_registry
+from core.platform import models
 import feconf
 import jinja_utils
 import schema_utils
 import utils
+
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -2980,19 +2983,30 @@ class Exploration(object):
             'state_names_with_changed_answer_groups': [],
             'state_names_with_unchanged_answer_groups': []
         }
+
+        commit_log_id = 'exploration-%s-%s' % (self.id, self.version)
+        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
+            commit_log_id)
+
         new_states = self.states
         for state_name in new_states:
             new_state = new_states[state_name]
             if not new_state.can_undergo_classification():
                 continue
 
+            old_state_name = state_name
+            for commit_cmd in commit_log_model.commit_cmds:
+                if (commit_cmd['cmd'] == 'rename_state') and commit_cmd[
+                        'new_state_name'] == state_name:
+                    old_state_name = commit_cmd['old_state_name']
+
             # The case where a new state is added. When this happens, there wont
             # be a corresponding state name in the older state dict.
-            if state_name not in old_states:
+            if old_state_name not in old_states:
                 trainable_states_dict[
                     'state_names_with_changed_answer_groups'].append(state_name)
                 continue
-            old_state = old_states[state_name]
+            old_state = old_states[old_state_name]
             old_training_data = old_state.get_training_data()
             new_training_data = new_state.get_training_data()
             if new_training_data != old_training_data:
