@@ -244,7 +244,6 @@ class CollectionRightsHandler(CollectionEditorHandler):
 class ExplorationMetadataSearchHandler(base.BaseHandler):
     """Provides data for exploration search."""
 
-    @acl_decorators.can_edit_collection
     def get(self):
         """Handles GET requests."""
         query_string = self.request.get('q')
