@@ -45,7 +45,7 @@ describe('Read only exploration backend API service', function() {
             param_changes: [],
             content: {
               html: '',
-              audio_translations: []
+              audio_translations: {}
             },
             unresolved_answers: {},
             interaction: {

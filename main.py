@@ -197,9 +197,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CREATOR_DASHBOARD_DATA_URL,
         creator_dashboard.CreatorDashboardHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.DASHBOARD_EXPLORATION_STATS_PREFIX,
-        creator_dashboard.ExplorationDashboardStatsHandler),
-    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL, creator_dashboard.NewExploration),
     get_redirect_route(
         r'%s' % feconf.NEW_COLLECTION_URL, creator_dashboard.NewCollection),
@@ -214,6 +211,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
         learner_dashboard.LearnerDashboardHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL,
+        learner_dashboard.LearnerDashboardFeedbackThreadHandler),
 
     get_redirect_route(
         r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
@@ -343,6 +344,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
         editor.ExplorationRightsHandler),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_STATUS_PREFIX,
+        editor.ExplorationStatusHandler),
+    get_redirect_route(
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
     get_redirect_route(
@@ -375,7 +379,7 @@ URLS = MAPREDUCE_HANDLERS + [
         feedback.RecentFeedbackMessagesHandler),
 
     get_redirect_route(
-        r'%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
+        r'%s/<exploration_id>' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
         feedback.FeedbackThreadViewEventHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,

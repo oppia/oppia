@@ -60,7 +60,7 @@ describe('State Editor controller', function() {
         'First State': {
           content: {
             html: 'First State Content',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'TextInput',
@@ -86,7 +86,7 @@ describe('State Editor controller', function() {
         'Second State': {
           content: {
             html: 'Second State Content',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'TextInput',
@@ -112,7 +112,7 @@ describe('State Editor controller', function() {
         'Third State': {
           content: {
             html: 'This is some content.',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'TextInput',
@@ -147,7 +147,7 @@ describe('State Editor controller', function() {
       scope.getContent = function(contentString) {
         return shof.createFromBackendDict({
           html: contentString,
-          audio_translations: []
+          audio_translations: {}
         });
       };
 
@@ -274,7 +274,7 @@ describe('State Editor controller', function() {
         State: {
           content: {
             html: 'State Content',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'TextInput',

@@ -15,7 +15,7 @@
 """Controllers for the feedback thread page."""
 
 from core.controllers import base
-from core.controllers import editor
+from core.domain import acl_decorators
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.platform import models
@@ -35,7 +35,7 @@ class ThreadListHandler(base.BaseHandler):
                 exploration_id, False)]})
         self.render_json(self.values)
 
-    @base.require_user
+    @acl_decorators.can_view_exploration_feedback
     def post(self, exploration_id):
         subject = self.payload.get('subject')
         if not subject:
@@ -63,14 +63,18 @@ class ThreadHandler(base.BaseHandler):
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        messages = [m.to_dict() for m in feedback_services.get_messages(
+            exploration_id, thread_id)]
+        message_ids = [message['message_id'] for message in messages]
+        feedback_services.update_messages_read_by_the_user(
+            self.user_id, exploration_id, thread_id, message_ids)
         self.values.update({
-            'messages': [m.to_dict() for m in feedback_services.get_messages(
-                exploration_id, thread_id)],
+            'messages': messages,
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)
 
-    @base.require_user
+    @acl_decorators.can_view_exploration_feedback
     def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         text = self.payload.get('text')
@@ -140,7 +144,7 @@ class FeedbackStatsHandler(base.BaseHandler):
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to learner suggestions."""
 
-    @base.require_user
+    @acl_decorators.can_suggest_changes_to_exploration
     def post(self, exploration_id):
         feedback_services.create_suggestion(
             exploration_id,
@@ -158,7 +162,7 @@ class SuggestionActionHandler(base.BaseHandler):
     _ACCEPT_ACTION = 'accept'
     _REJECT_ACTION = 'reject'
 
-    @editor.require_editor
+    @acl_decorators.can_edit_exploration
     def put(self, exploration_id, thread_id):
         action = self.payload.get('action')
         if action == self._ACCEPT_ACTION:
@@ -194,7 +198,7 @@ class SuggestionListHandler(base.BaseHandler):
         else:
             return None
 
-    @base.require_user
+    @acl_decorators.can_view_exploration_feedback
     def get(self, exploration_id):
         threads = None
         list_type = self.request.get('list_type')
@@ -224,9 +228,8 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     viewed feedback messages from emails that might be sent in future to this
     user."""
 
-    @base.require_user
-    def post(self):
-        exploration_id = self.payload.get('exploration_id')
+    @acl_decorators.can_view_exploration_feedback
+    def post(self, exploration_id):
         thread_id = self.payload.get('thread_id')
         transaction_services.run_in_transaction(
             feedback_services.clear_feedback_message_references, self.user_id,

@@ -58,7 +58,7 @@ describe('Sidebar state name controller', function() {
         'First State': {
           content: {
             html: 'First State Content',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             answer_groups: [],
@@ -75,7 +75,7 @@ describe('Sidebar state name controller', function() {
         'Second State': {
           content: {
             html: 'Second State Content',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             answer_groups: [],
@@ -92,7 +92,7 @@ describe('Sidebar state name controller', function() {
         'Third State': {
           content: {
             html: 'This is some content.',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             answer_groups: [],

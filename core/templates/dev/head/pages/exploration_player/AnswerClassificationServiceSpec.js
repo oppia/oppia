@@ -50,7 +50,7 @@ describe('Answer classification service with string classifier disabled',
       state = sof.createFromBackendDict('stateName', {
         content: {
           html: 'content',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -190,7 +190,7 @@ describe('Answer classification service with string classifier disabled',
       var state2 = sof.createFromBackendDict('stateName', {
         content: {
           html: 'content',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -264,7 +264,7 @@ describe('Answer classification service with string classifier enabled',
       state = sof.createFromBackendDict('stateName', {
         content: {
           html: 'content',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           id: 'TrainableInteraction',

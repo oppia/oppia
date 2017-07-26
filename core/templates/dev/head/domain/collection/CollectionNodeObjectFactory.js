@@ -28,9 +28,9 @@ oppia.factory('CollectionNodeObjectFactory', [
     var CollectionNode = function(collectionNodeBackendObject) {
       this._explorationId = collectionNodeBackendObject.exploration_id;
       this._prerequisiteSkillList = SkillListObjectFactory.create(
-        collectionNodeBackendObject.prerequisite_skills);
+        collectionNodeBackendObject.prerequisite_skill_ids);
       this._acquiredSkillList = SkillListObjectFactory.create(
-        collectionNodeBackendObject.acquired_skills);
+        collectionNodeBackendObject.acquired_skill_ids);
       this._explorationSummaryObject = angular.copy(
         collectionNodeBackendObject.exploration_summary);
     };
@@ -72,14 +72,14 @@ oppia.factory('CollectionNodeObjectFactory', [
       }
     };
 
-    // Returns a SkillsList object of the prerequisite skills of this collection
-    // node. Changes to the return SkillList object will be reflected in this
-    // collection node object.
+    // Returns a SkillsList object of the prerequisite skill ids of this
+    // collection node. Changes to the return SkillList object will be reflected
+    // in this collection node object.
     CollectionNode.prototype.getPrerequisiteSkillList = function() {
       return this._prerequisiteSkillList;
     };
 
-    // Returns a SkillsList object of the acquired skills of this collection
+    // Returns a SkillsList object of the acquired skill ids of this collection
     // node. Changes to the return SkillList object will be reflected in this
     // collection node object.
     CollectionNode.prototype.getAcquiredSkillList = function() {
@@ -120,8 +120,8 @@ oppia.factory('CollectionNodeObjectFactory', [
     CollectionNode.createFromExplorationId = function(explorationId) {
       return CollectionNode.create({
         exploration_id: explorationId,
-        acquired_skills: [],
-        prerequisite_skills: [],
+        acquired_skill_ids: [],
+        prerequisite_skill_ids: [],
         exploration_summary: null
       });
     };
