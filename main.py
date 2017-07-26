@@ -29,6 +29,7 @@ from core.controllers import email_dashboard
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import learner_dashboard
+from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
@@ -219,6 +220,24 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
         reader.RemoveCollectionFromIncompleteListHandler),
+
+    get_redirect_route(
+        r'%s/add_exploration_to_learner_playlist' %
+        feconf.LEARNER_PLAYLIST_DATA_URL,
+        learner_playlist.AddExplorationToLearnerPlaylistHandler),
+    get_redirect_route(
+        r'%s/add_collection_to_learner_playlist' %
+        feconf.LEARNER_PLAYLIST_DATA_URL,
+        learner_playlist.AddCollectionToLearnerPlaylistHandler),
+    get_redirect_route(
+        r'%s/remove_exploration_from_learner_playlist' %
+        feconf.LEARNER_PLAYLIST_DATA_URL,
+        learner_playlist.RemoveExplorationFromPlaylistHandler),
+    get_redirect_route(
+        r'%s/remove_collection_from_learner_playlist' %
+        feconf.LEARNER_PLAYLIST_DATA_URL,
+        learner_playlist.RemoveCollectionFromPlaylistHandler),
+
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
         resources.ImageHandler),
