@@ -51,7 +51,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!stateSolutionService.displayed.correctAnswer &&
+                ng-disabled="!stateSolutionService.displayed.correctAnswer ||
                              !stateSolutionService.displayed.explanation"
                 ng-click="saveThisSolution()">
           Save
