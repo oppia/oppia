@@ -88,7 +88,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=False, expected_status_int=200)
         classifier_obj = (
-            classifier_services.get_classifier_from_exploration_attributes(
+            classifier_services.get_classifier(
                 self.exp_id, self.exploration.version, 'Home'))
         self.assertEqual(classifier_obj.id, self.job_id)
         self.assertEqual(classifier_obj.exp_id, self.exp_id)
