@@ -14,7 +14,6 @@
 
 """Tests for email dashboard handler."""
 
-from core.domain import config_services
 from core.platform import models
 from core.tests import test_utils
 
