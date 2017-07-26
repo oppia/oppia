@@ -24,6 +24,7 @@ from core.domain import user_services
 import feconf
 import utils
 
+
 class LearnerDashboardPage(base.BaseHandler):
     """Page showing the user's learner dashboard."""
 
@@ -49,11 +50,9 @@ class LearnerDashboardHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @base.require_user
     def get(self):
         """Handles GET requests."""
-        if self.user_id is None:
-            raise self.PageNotFoundException
-
         (learner_progress, number_of_deleted_activities,
          completed_to_incomplete_collections) = (
              learner_progress_services.get_activity_progress(self.user_id))
@@ -107,11 +106,9 @@ class LearnerDashboardHandler(base.BaseHandler):
 class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
 
+    @base.require_user
     def get(self, exploration_id, thread_id):
         """Handles GET requests."""
-        if self.user_id is None:
-            raise self.PageNotFoundException
-
         messages = feedback_services.get_messages(
             exploration_id, thread_id)
         author_ids = [m.author_id for m in messages]

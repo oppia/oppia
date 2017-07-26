@@ -70,52 +70,9 @@ def require_user(handler):
                 self.request.uri))
             return
         return handler(self, **kwargs)
+    test_login.__wrapped__ = True
 
     return test_login
-
-
-def require_moderator(handler):
-    """Decorator that checks whether the current user is a moderator."""
-
-    def test_is_moderator(self, **kwargs):
-        """Check that the user is a moderator.
-
-        Raises:
-            UnauthorizedUserException: The user is not a moderator.
-        """
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if not rights_manager.Actor(self.user_id).is_moderator():
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        return handler(self, **kwargs)
-    return test_is_moderator
-
-
-def require_fully_signed_up(handler):
-    """Decorator that checks if the user is logged in and has completed the
-    signup process.
-    """
-
-    def test_registered_as_editor(self, **kwargs):
-        """Check that the user has registered as an editor.
-
-        Raises:
-            UnauthorizedUserException: The user has insufficient credentials.
-        """
-        if (not self.user_id
-                or self.username in config_domain.BANNED_USERNAMES.value
-                or not user_services.has_fully_registered(self.user_id)):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        return handler(self, **kwargs)
-
-    return test_registered_as_editor
 
 
 def _clear_login_cookies(response_headers):

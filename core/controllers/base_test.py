@@ -494,3 +494,33 @@ class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
             response = self.get_json('/fake', expect_errors=True)
             self.assertTrue(isinstance(response, dict))
             self.assertEqual(500, response['code'])
+
+
+class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
+    """Tests that all methods in handlers have authentication decorators
+    applied on them."""
+
+    def test_every_method_has_decorator(self):
+        for route in main.URLS:
+            if isinstance(route, tuple):
+                continue
+            else:
+                handler = route.handler
+
+            # Following handler are present in base.py where acl_decorators
+            # cannot be imported.
+            if (handler.__name__ == 'LogoutPage' or
+                    handler.__name__ == 'Error404Handler'):
+                continue
+
+            if handler.get != base.BaseHandler.get:
+                self.assertTrue(hasattr(handler.get, '__wrapped__'))
+
+            if handler.post != base.BaseHandler.post:
+                self.assertTrue(hasattr(handler.post, '__wrapped__'))
+
+            if handler.put != base.BaseHandler.put:
+                self.assertTrue(hasattr(handler.put, '__wrapped__'))
+
+            if handler.delete != base.BaseHandler.delete:
+                self.assertTrue(hasattr(handler.delete, '__wrapped__'))

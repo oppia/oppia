@@ -198,6 +198,7 @@ class ExplorationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
         version = self.request.get('v')

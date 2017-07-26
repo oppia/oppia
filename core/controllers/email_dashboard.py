@@ -16,7 +16,6 @@
 
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import config_domain
 from core.domain import email_manager
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
@@ -28,22 +27,6 @@ import feconf
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 current_user_services = models.Registry.import_current_user_services()
-
-def require_valid_sender(handler):
-    """Decorator that checks if the current user is a authorized sender."""
-    def test_user(self, **kwargs):
-        """Checks if the user is logged in and is authorized sender."""
-        if not self.user_id:
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
-            return
-        if self.username not in config_domain.WHITELISTED_EMAIL_SENDERS.value:
-            raise self.UnauthorizedUserException(
-                '%s is not an authorized user of this application',
-                self.user_id)
-        return handler(self, **kwargs)
-
-    return test_user
 
 
 class EmailDashboardPage(base.BaseHandler):

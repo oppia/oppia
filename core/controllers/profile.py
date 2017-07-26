@@ -39,6 +39,7 @@ def require_user_id_else_redirect_to_homepage(handler):
             self.redirect('/')
             return
         return handler(self, **kwargs)
+    test_login.__wrapped__ = True
 
     return test_login
 
@@ -67,6 +68,7 @@ class ProfileHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self, username):
         """Handles GET requests."""
 
@@ -237,6 +239,7 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self, username):
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -361,6 +364,7 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
+    @acl_decorators.open_access
     def put(self):
         """Handles PUT requests."""
         if user_services.has_fully_registered(self.user_id):
