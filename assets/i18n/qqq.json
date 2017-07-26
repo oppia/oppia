@@ -212,6 +212,7 @@
 	"I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATIONS": "Text displayed in the learner dashboard. - This text is shown when more than one exploration in progress has been deleted.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS": "Text displayed in the learner dashboard. - This text is shown when there are no collections in the completed section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS": "Text displayed in the learner dashboard. - This text is shown when there are no explorations in the completed section of the user.",
+	"I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "Text displayed in the learner dashboard. - This text is shown when there are no feedback threads to which the user is subscribed.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS": "Text displayed in the learner dashboard. - This text is shown when there are no collections in the incomplete section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS": "Text displayed in the learner dashboard. - This text is shown when there are no explorations in the incomplete section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS": "Text displayed in the learner dashboard. - This text is shown when the user hasn't subscribed to any creator.",

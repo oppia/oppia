@@ -93,13 +93,13 @@
           </h4>
           <div ng-show="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE" class="menu-sub-section">
             <div class="oppia-learner-dashboard-submenu"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
+                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">
             </div>
             <div class="oppia-learner-dashboard-submenu protractor-test-incomplete-collection-section"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
+                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
                  translate="I18N_DASHBOARD_COLLECTIONS">
             </div>
           </div>
@@ -111,13 +111,13 @@
           </h4>
           <div ng-show="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED" class="menu-sub-section">
             <div class="oppia-learner-dashboard-submenu"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
+                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">
             </div>
             <div class="oppia-learner-dashboard-submenu protractor-test-completed-collection-section"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
+                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
                  translate="I18N_DASHBOARD_COLLECTIONS">
             </div>
           </div>
@@ -144,13 +144,13 @@
               <span class="oppia-navbar-breadcrumb-separator"
                     style="margin: 0 1px;">
               </span>
-              <span translate="<[activeSubSection]>"></span>
+              <span translate="<[activeSubsection]>"></span>
             </span>
           </span>
 
           <span class="sort-explorations-select oppia-learner-dashboard-sort"
                 ng-class="{'oppia-learner-dashboard-sort-mobile': checkMobileView()}"
-                ng-if="activeSubSection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS && ((activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && completedExplorationsList.length !== 0) || (activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && incompleteExplorationsList.length !== 0))">
+                ng-if="activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS && ((activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && completedExplorationsList.length !== 0) || (activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && incompleteExplorationsList.length !== 0))">
             <p class="sort-by-text" style="margin-top: 0;">Sort By</p>
             <select ng-model="currentExpSortType"
                     class="sort-options"
@@ -199,7 +199,7 @@
           </span>
         </div>
         <div class="oppia-learner-dashboard-main-content-container">
-          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteExplorations !== 0">
               <span ng-if="numberDeletedIncompleteExplorations === 1"
@@ -231,7 +231,7 @@
               <i class="remove-icon fa fa-times"
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
-                 ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
+                 ng-click="openRemoveEntityModal(activeSection, activeSubsection, tile)"
                  tooltip="Remove"
                  tooltip-placement="top"></i>
               <exploration-summary-tile
@@ -257,7 +257,7 @@
             </div>
           </div>
 
-          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCompletedExplorations !== 0">
               <span ng-if="numberDeletedCompletedExplorations === 1"
@@ -308,7 +308,7 @@
             </div>
           </div>
 
-          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteCollections !== 0">
               <span ng-if="numberDeletedIncompleteCollections === 1"
@@ -340,7 +340,7 @@
               <i class="remove-icon fa fa-times"
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
-                 ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
+                 ng-click="openRemoveEntityModal(activeSection, activeSubsection, tile)"
                  tooltip="Remove"
                  tooltip-placement="top"></i>
               <collection-summary-tile
@@ -363,7 +363,7 @@
               <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C8;</i>
             </div>
           </div>
-          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="completedToIncompleteCollections.length !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS"
@@ -463,6 +463,20 @@
           </div>
 
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK" class="oppia-learner-dashboard-feedback-section">
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="threadSummaries.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
             <table class="table" ng-if="!feedbackThreadActive">
               <tr ng-repeat="thread in threadSummaries | orderBy:sortFeedbackFunction:isCurrentFeedbackSortDescending"
                   ng-click="onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"

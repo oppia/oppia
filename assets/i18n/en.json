@@ -212,6 +212,7 @@
     "I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATIONS": "<[numberDeleted]> of the explorations in progress have been recently deleted. We are sorry for the inconvenience",
     "I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS": "It looks like you haven't completed any collections yet. Head over to the library to start an exciting new collection!",
     "I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS": "It looks like you haven't completed any explorations yet. Head over to the library to start an exciting new exploration!",
+    "I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "It looks like you don't have any active feedback threads. Your feedback helps us improve the quality of our lessons. Head over to the library to learn something exciting and submit your valuable feedback!",
     "I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS": "It looks like you haven't started any collections yet. Head over to the library to start an exciting new collection!",
     "I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS": "It looks like you haven't started any explorations yet. Head over to the library to start an exciting new exploration!",
     "I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS": "It looks like you haven't subscribed to any creators yet. Head over to the library to discover new creators and their amazing explorations!",

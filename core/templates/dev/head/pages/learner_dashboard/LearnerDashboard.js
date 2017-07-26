@@ -119,8 +119,8 @@ oppia.controller('LearnerDashboard', [
       }
     };
 
-    $scope.setActiveSubSection = function(newActiveSubSectionName) {
-      $scope.activeSubSection = newActiveSubSectionName;
+    $scope.setActiveSubsection = function(newActiveSubsectionName) {
+      $scope.activeSubsection = newActiveSubsectionName;
     };
 
     $scope.getExplorationUrl = function(explorationId) {
@@ -467,7 +467,7 @@ oppia.controller('LearnerDashboard', [
         $scope.numberOfUnreadThreads = responseData.number_of_unread_threads;
 
         $scope.activeSection = LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE;
-        $scope.activeSubSection = (
+        $scope.activeSubsection = (
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
         $scope.feedbackThreadActive = false;
 
