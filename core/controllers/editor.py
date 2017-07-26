@@ -559,7 +559,7 @@ class UntrainedAnswersHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_exploration
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
