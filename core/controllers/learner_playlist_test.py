@@ -16,7 +16,6 @@
 
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
-from core.platform import models
 from core.tests import test_utils
 import feconf
 
@@ -155,7 +154,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/add_collection_to_learner_playlist' %
             feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2, self.COL_ID_1])
 
         # If an exploration belongs to the incomplete list or completed list, it
@@ -169,7 +168,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/add_collection_to_learner_playlist' %
             feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2, self.COL_ID_1])
 
         self.logout()
