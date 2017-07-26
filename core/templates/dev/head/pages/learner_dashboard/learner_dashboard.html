@@ -57,7 +57,7 @@
       </div>
 
       <div class="col-sm-8">
-        <blockquote class="oppia-learner-dashboard-intro-card ">
+        <blockquote class="oppia-learner-dashboard-intro-card">
           <p class="oppia-learner-dashboard-intro-card-message" style="padding-top: 6px;"
              translate="I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE">
           </p>
@@ -97,10 +97,9 @@
                  ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">
             </div>
-            <div id="completedSection"
-                 class="oppia-learner-dashboard-submenu"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
+            <div class="oppia-learner-dashboard-submenu protractor-test-incomplete-collection-section"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)"
                  translate="I18N_DASHBOARD_COLLECTIONS">
             </div>
           </div>
@@ -116,10 +115,9 @@
                  ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">
             </div>
-            <div id="completedSection"
-                 class="oppia-learner-dashboard-submenu"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
-                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
+            <div class="oppia-learner-dashboard-submenu protractor-test-completed-collection-section"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS}"
+                 ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUBSECTIONS.COLLECTIONS)"
                  translate="I18N_DASHBOARD_COLLECTIONS">
             </div>
           </div>
