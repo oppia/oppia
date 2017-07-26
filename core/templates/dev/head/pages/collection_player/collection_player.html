@@ -148,7 +148,8 @@
 
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-mascot">
         <a ng-repeat="node in collection.getCollectionNodes()" href="<[getExplorationUrl(node.getExplorationId())]>">
-          <svg width="100"
+          <svg class="protractor-test-collection-exploration"
+               width="100"
                height="125"
                xmlns="http://www.w3.org/2000/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -220,7 +221,8 @@
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
         <div class="mobile-path-segment" ng-repeat="node in collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
           <a href="<[getExplorationUrl(node.getExplorationId())]>">
-            <svg width="100"
+            <svg class="protractor-test-collection-exploration"
+                 width="100"
                  height="150"
                  xmlns="http://www.w3.org/2000/svg"
                  xmlns:xlink="http://www.w3.org/1999/xlink"

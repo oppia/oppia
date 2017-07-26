@@ -165,6 +165,7 @@ class PreferencesHandler(base.BaseHandler):
             'preferred_site_language_code': (
                 user_settings.preferred_site_language_code),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'can_receive_email_updates': (
@@ -201,6 +202,8 @@ class PreferencesHandler(base.BaseHandler):
                 self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
+        elif update_type == 'default_dashboard':
+            user_services.update_user_default_dashboard(self.user_id, data)
         elif update_type == 'email_preferences':
             user_services.update_email_preferences(
                 self.user_id, data['can_receive_email_updates'],

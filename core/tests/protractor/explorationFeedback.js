@@ -54,7 +54,7 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
-    browser.get(general.SERVER_URL_PREFIX);
+    browser.get(general.CREATOR_DASHBOARD_URL);
     var numberOfFeedbackMessages = (
       creatorDashboard.getNumberOfFeedbackMessages());
     expect(numberOfFeedbackMessages).toEqual(0);
@@ -69,7 +69,7 @@ describe('ExplorationFeedback', function() {
 
     // Creator reads the feedback and responds
     users.login('user1@ExplorationFeedback.com');
-    browser.get(general.SERVER_URL_PREFIX);
+    browser.get(general.CREATOR_DASHBOARD_URL);
     numberOfFeedbackMessages = creatorDashboard.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(1);
     creatorDashboard.navigateToExplorationEditor();

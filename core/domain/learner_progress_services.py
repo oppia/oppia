@@ -457,7 +457,7 @@ def get_all_completed_exp_ids(user_id):
 def get_filtered_completed_exp_summaries(exploration_summaries,
                                          exploration_ids):
     """Returns a list of summaries of the completed exploration ids and the
-    number of explorations deleted from the list as they are no longer present.
+    ids of explorations that are no longer present.
 
     Args:
         exploration_summaries: list(ExplorationSummary). The list of exploration
@@ -508,10 +508,10 @@ def get_all_completed_collection_ids(user_id):
 
 def get_filtered_completed_collection_summaries(user_id, collection_summaries,
                                                 collection_ids):
-    """Returns a list of summaries of the completed collection ids, the
-    number of collections deleted from the list as they are no longer present
-    and the number of collections being shifted to the incomplete section on
-    account of new addition of explorations.
+    """Returns a list of summaries of the completed collection ids, the ids
+    of collections that are no longer present and the summaries of the
+    collections being shifted to the incomplete section on account of new
+    addition of explorations.
 
     Args:
         user_id: str. The id of the learner.
@@ -588,8 +588,8 @@ def get_all_incomplete_exp_ids(user_id):
 
 def get_filtered_incomplete_exp_summaries(exploration_summaries,
                                           exploration_ids):
-    """Returns a list of summaries of the incomplete exploration ids and the
-    number of explorations deleted from the list as they are no longer present.
+    """Returns a list of summaries of the incomplete exploration ids and the ids
+    of explorations that are no longer present.
 
     Args:
         exploration_summaries: list(ExplorationSummary). The list of exploration
@@ -639,8 +639,8 @@ def get_all_incomplete_collection_ids(user_id):
 
 def get_filtered_incomplete_collection_summaries(collection_summaries,
                                                  collection_ids):
-    """Returns a list of summaries of the incomplete collection ids and the
-    number of collections deleted from the list as they are no longer present.
+    """Returns a list of summaries of the incomplete collection ids and the ids
+    of collections that are no longer present.
 
     Args:
         collection_summaries: list(CollectionSummary). The list of collection
@@ -652,8 +652,7 @@ def get_filtered_incomplete_collection_summaries(collection_summaries,
         tuple. A 2-tuple whose elements are as follows:
         - list(CollectionSummary). A filtered list with the summary domain
             objects of the incomplete collections.
-        - int. The number of explorations deleted from the list as they are no
-            longer present.
+        - list(str). The ids of the collections that are no longer present.
     """
     nonexistent_incomplete_collection_ids = []
     filtered_incomplete_collection_summaries = []

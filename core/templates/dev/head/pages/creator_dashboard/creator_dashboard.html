@@ -363,7 +363,8 @@
         <ul class="oppia-dashboard-tiles"
             ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
           <span ng-repeat="collection in collectionsList">
-            <collection-summary-tile collection-id="collection.id"
+            <collection-summary-tile class="protractor-test-collection-card"
+                                     collection-id="collection.id"
                                      collection-title="collection.title"
                                      last-updated-msec="collection.last_updated"
                                      node-count="collection.node_count"

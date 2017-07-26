@@ -125,11 +125,12 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
-        # Since no exploration has been created, going to '/' should redirect
-        # to the library page.
+        # Since by default the homepage for all logged in users is the
+        # learner dashboard, going to '/' should redirect to the learner
+        # dashboard page.
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
+        self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_users_with_no_user_contribution_model(
@@ -142,35 +143,25 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             user_id)
         user_contribution_model.delete()
 
-        # Since no exploration has been created, going to '/' should redirect
-        # to the library page.
+        # Since by default the homepage for all logged in users is the
+        # learner dashboard, going to '/' should redirect to the learner
+        # dashboard page.
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
+        self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_logged_in_creators(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        exploration_id = '0_en_test_exploration'
-        self.save_new_valid_exploration(
-            exploration_id, creator_user_id, title='Test',
-            category='Test', language_code='en')
+        # Set the default dashboard as creator dashboard.
+        user_services.update_user_default_dashboard(
+            creator_user_id, constants.DASHBOARD_TYPE_CREATOR)
 
-        # Since at least one exploration has been created, going to '/' should
-        # redirect to the dashboard page.
+        # Since the default dashboard has been set as creator dashboard, going
+        # to '/' should redirect to the creator dashboard.
         response = self.testapp.get('/')
-        self.assertIn('dashboard', response.headers['location'])
-        exp_services.delete_exploration(creator_user_id, exploration_id)
-        self.logout()
-        self.login(self.TEST_CREATOR_EMAIL)
-        response = self.testapp.get('/')
-
-        # Even though the exploration is deleted, the user is still redirected
-        # to the dashboard. This is because deleted explorations are still
-        # associated with their creators.
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('dashboard', response.headers['location'])
+        self.assertIn('creator_dashboard', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)

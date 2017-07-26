@@ -17,6 +17,7 @@
 import logging
 
 # pylint: disable=relative-import
+from constants import constants
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import classifier
@@ -75,17 +76,13 @@ class HomePageRedirectHandler(base.BaseHandler):
     """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
-            user_contributions = user_services.get_user_contributions(
+            user_settings = user_services.get_user_settings(
                 self.user_id)
-
-            # 'Creator' is a user who has created or edited an exploration.
-            user_is_creator = user_contributions and (
-                user_contributions.created_exploration_ids or
-                user_contributions.edited_exploration_ids)
-            if user_is_creator:
+            default_dashboard = user_settings.default_dashboard
+            if default_dashboard == constants.DASHBOARD_TYPE_CREATOR:
                 self.redirect(feconf.CREATOR_DASHBOARD_URL)
             else:
-                self.redirect(feconf.LIBRARY_INDEX_URL)
+                self.redirect(feconf.LEARNER_DASHBOARD_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
 

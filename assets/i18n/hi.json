@@ -347,6 +347,7 @@
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "आपने अभी तक किसी भी निर्माता की सदस्यता नहीं ली है।",
 	"I18N_PREFERENCES_PAGE_TITLE": "अपने प्रोफ़ाइल प्राथमिकताएँ बदले - Oppia",
 	"I18N_PREFERENCES_PICTURE": "चित्र",
+	"I18N_PREFERENCES_PREFERRED_DASHBOARD": "पसंदीदा डैशबोर्ड",
 	"I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE": "पसंदीदा एक्सप्लोरेशन की भाषा",
 	"I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN": "यह भाषाएँ डिफ़ॉल्ट रूप से चयन कि जाती है जब आप एक्सप्लोरेशन के लिए गैलरी कि खोज करते हैं।",
 	"I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE": "पसंदीदा साइट की भाषा",

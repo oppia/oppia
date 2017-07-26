@@ -356,6 +356,7 @@
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Text displayed in the preferences page. - Text shown if the user has no subscribed creators",
 	"I18N_PREFERENCES_PAGE_TITLE": "Title of the preferences page.",
 	"I18N_PREFERENCES_PICTURE": "Text displayed in the preferences page. - Text shown in the space for the user profile picture if no picture has been selected.\n{{Identical|Picture}}",
+	"I18N_PREFERENCES_PREFERRED_DASHBOARD": "Text displayed in the preferences page. - Text shown to the left of the choices to select the preferred dashboard.",
 	"I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE": "Text displayed in the preferences page. - Text shown to the left of text entry to select the preferred language for explorations.",
 	"I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN": "Text displayed in the preferences page. - Text shown below the text entry to select the preferred language for explorations, explaining what the field is for.",
 	"I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE": "Text displayed in the preferences page. - Text shown to the left of the entry where the user can select the preferred language of the site (not the explorations). When a different language is selected, the page is translated.",

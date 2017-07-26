@@ -356,6 +356,7 @@
     "I18N_PREFERENCES_NO_SUBSCRIPTIONS": "You've not subscribed to any creators yet.",
     "I18N_PREFERENCES_PAGE_TITLE": "Change your profile preferences - Oppia",
     "I18N_PREFERENCES_PICTURE": "Picture",
+    "I18N_PREFERENCES_PREFERRED_DASHBOARD": "Preferred Dashboard",
     "I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE": "Preferred Exploration Languages",
     "I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN": "These languages will be selected by default when you search the gallery for explorations.",
     "I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE": "Preferred Site Language",

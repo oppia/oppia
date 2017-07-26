@@ -22,7 +22,8 @@ var constants = {
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
-
+  "DASHBOARD_TYPE_CREATOR": "creator",
+  "DASHBOARD_TYPE_LEARNER": "learner",
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
