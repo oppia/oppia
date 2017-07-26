@@ -25,6 +25,23 @@ import feconf
 current_user_services = models.Registry.import_current_user_services()
 
 
+def _is_activity_public(activity_rights):
+    """Checks whether activity is in public domain.
+
+    Args:
+        activity_rights: object. Activity rights object.
+
+    Returns:
+        bool. Whether activity is in public domain or not.
+    """
+    if activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        return True
+    elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
+        return True
+    else:
+        return False
+
+
 def check_activity_accessible(
         user_id, user_actions, activity_type, activity_id):
     """Returns a boolean to signify whether given activity is accessible
@@ -61,7 +78,7 @@ def check_activity_accessible(
 
     if activity_rights is None:
         raise base.UserFacingExceptions.PageNotFoundException
-    elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+    elif _is_activity_public(activity_rights):
         return bool(action_play_public in user_actions)
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         return bool(
@@ -96,7 +113,7 @@ def check_exploration_editable(user_id, user_actions, exploration_id):
     if role_services.ACTION_EDIT_ANY_EXPLORATION in user_actions:
         return True
 
-    if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+    if _is_activity_public(exploration_rights):
         if (role_services.ACTION_EDIT_ANY_PUBLIC_EXPLORATION in
                 user_actions):
             return True
@@ -201,7 +218,7 @@ def can_edit_collection(handler):
         if role_services.ACTION_EDIT_ANY_COLLECTION in self.actions:
             return handler(self, collection_id, **kwargs)
 
-        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if _is_activity_public(collection_rights):
             if (role_services.ACTION_EDIT_ANY_PUBLIC_COLLECTION in
                     self.actions):
                 return handler(self, collection_id, **kwargs)
@@ -471,8 +488,7 @@ def can_delete_exploration(handler):
                     self.actions)) and
                 exploration_rights.is_owner(self.user_id)):
             return handler(self, exploration_id, **kwargs)
-        elif (exploration_rights.status == (
-                rights_manager.ACTIVITY_STATUS_PUBLIC) and
+        elif (_is_activity_public(exploration_rights) and
               role_services.ACTION_DELETE_ANY_PUBLIC_EXPLORATION in (
                   self.actions)):
             return handler(self, exploration_id, **kwargs)
@@ -545,7 +561,7 @@ def can_manage_collection_publish_status(handler):
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if _is_activity_public(collection_rights):
             if role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in self.actions:
                 return handler(self, collection_id, **kwargs)
             raise self.UnauthorizedUserException(

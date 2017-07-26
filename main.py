@@ -365,7 +365,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
         editor.StateRulesStatsHandler),
     get_redirect_route(
-        r'/createhandler/started_tutorial_event',
+        r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',

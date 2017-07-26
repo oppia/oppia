@@ -960,8 +960,8 @@ class AudioFileHandler(EditorHandler):
 class StartedTutorialEventHandler(EditorHandler):
     """Records that this user has started the state editor tutorial."""
 
-    @acl_decorators.open_access
-    def post(self):
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id): # pylint: disable=unused-argument
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)
 
