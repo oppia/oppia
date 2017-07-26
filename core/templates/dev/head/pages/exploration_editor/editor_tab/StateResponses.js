@@ -739,7 +739,7 @@ oppia.controller('StateResponses', [
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
         if (
           INTERACTION_SPECS[stateInteractionIdService.savedMemento]
-          .can_have_solution && stateSolutionService.displayed !== null) {
+            .can_have_solution && stateSolutionService.displayed !== null) {
           if (stateSolutionService.displayed.correctAnswer !== null) {
             var currentStateName = editorContextService.getActiveStateName();
             StateSolutionHelperService.verifySolution(
