@@ -501,6 +501,37 @@ def can_publish_exploration(handler):
     return test_can_publish
 
 
+def can_manage_collection_publish_status(handler):
+    """Decorator to check whether user can publish exploration."""
+
+    def test_can_manage_collection_publish_status(
+            self, collection_id, **kwargs):
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id)
+
+        if collection_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+            if role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in self.actions:
+                return handler(self, collection_id, **kwargs)
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to unpublish this collection.')
+
+        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            if role_services.ACTION_PUBLISH_ANY_COLLECTION in self.actions:
+                return handler(self, collection_id, **kwargs)
+
+            if role_services.ACTION_PUBLISH_OWNED_COLLECTION in self.actions:
+                if collection_rights.is_owner(self.user_id):
+                    return handler(self, collection_id, **kwargs)
+
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to publish this collection.')
+
+    return test_can_manage_collection_publish_status
+
+
 def can_modify_exploration_roles(handler):
     """Decorators to check whether user can manage rights related to an
     exploration.

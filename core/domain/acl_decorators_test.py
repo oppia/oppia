@@ -231,6 +231,8 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.private_col_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
 
 
 class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
@@ -897,5 +899,78 @@ class ModifyExplorationRolesTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
+    """Tests can_manage_collection_publish_status decorator."""
+
+    user_email = 'user@example.com'
+    user_name = 'user'
+    published_exp_id = 'exp_id_1'
+    private_exp_id = 'exp_id_2'
+    published_col_id = 'col_id_1'
+    private_col_id = 'col_id_2'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_manage_collection_publish_status
+        def get(self, collection_id):
+            return self.render_json({'collection_id': collection_id})
+
+    def setUp(self):
+        super(ManageCollectionPublishStatusTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.user_email, self.user_name)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_collection_editors([self.OWNER_USERNAME])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        self.save_new_valid_collection(
+            self.published_col_id, self.owner_id,
+            exploration_id=self.published_col_id)
+        self.save_new_valid_collection(
+            self.private_col_id, self.owner_id,
+            exploration_id=self.private_col_id)
+        rights_manager.publish_exploration(
+            self.owner_id, self.published_exp_id)
+        rights_manager.publish_collection(
+            self.owner_id, self.published_col_id)
+
+    def test_owner_can_publish_collection(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_col_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_owner_cannot_unpublish_public_collection(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.published_col_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_moderator_can_unpublish_public_collection(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.published_col_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_admin_can_publish_any_collection(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
