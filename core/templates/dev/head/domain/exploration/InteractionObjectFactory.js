@@ -34,7 +34,10 @@ oppia.factory('InteractionObjectFactory', [
       this.hints = hints;
       this.id = id;
       this.solution = solution;
+      this.solutionIsValid = true;
     };
+
+    var solutionIsValid = true;
 
     Interaction.prototype.toBackendDict = function() {
       return {
@@ -98,6 +101,18 @@ oppia.factory('InteractionObjectFactory', [
 
     var generateSolutionFromBackend = function(solutionBackendDict) {
       return SolutionObjectFactory.createFromBackendDict(solutionBackendDict);
+    };
+
+    Interaction.prototype.isSolutionValid = function() {
+      return solutionIsValid;
+    };
+
+    Interaction.prototype.markSolutionAsValid = function() {
+      solutionIsValid = true;
+    };
+
+    Interaction.prototype.markSolutionAsInvalid = function() {
+      solutionIsValid = false;
     };
 
     return Interaction;

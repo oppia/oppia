@@ -17,11 +17,11 @@
  */
 
 oppia.directive('solutionEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'stateSolutionService',
+  function(UrlInterpolationService, stateSolutionService) {
     return {
       restrict: 'E',
       scope: {
-        solution: '=',
         objectType: '=',
         interactionHtml: '=',
         ruleDescriptionChoices: '=',
@@ -35,13 +35,15 @@ oppia.directive('solutionEditor', [
           $scope.isEditable = editabilityService.isEditable();
 
           $scope.editSolutionForm = {};
+          $scope.stateSolutionService = stateSolutionService;
           $scope.solutionEditorIsOpen = false;
           $scope.solutionCorrectAnswerHtml = '';
 
           $scope.getInteractionHtml = function() {
             if (!$scope.interactionHtml) {
               $scope.interactionHtml = (
-                $scope.solution.getInteractionHtml($scope.objectType));
+                stateSolutionService.displayed.getInteractionHtml(
+                  $scope.objectType));
             }
           };
 
@@ -60,7 +62,7 @@ oppia.directive('solutionEditor', [
           $scope.submitAnswer = function(answer) {
             // This function sets correctAnswer. interactionHtml calls this
             // function when an answer is input.
-            $scope.solution.setCorrectAnswer(answer);
+            stateSolutionService.displayed.setCorrectAnswer(answer);
           };
 
           $scope.saveThisSolution = function() {
@@ -69,7 +71,8 @@ oppia.directive('solutionEditor', [
           };
 
           $scope.cancelThisSolutionEdit = function() {
-            $scope.solution = angular.copy(stateSolutionService.savedMemento);
+            stateSolutionService.displayed = (
+              angular.copy(stateSolutionService.savedMemento));
             $scope.solutionEditorIsOpen = false;
           };
 

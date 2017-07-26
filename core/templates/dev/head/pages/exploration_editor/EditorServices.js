@@ -1977,36 +1977,9 @@ oppia.factory('explorationWarningsService', [
       states.getStateNames().forEach(function(stateName) {
         var interaction = states.getState(stateName).interaction;
         if (interaction.solution !== null) {
-          var rulesServiceName = (
-            angularNameService.getNameOfInteractionRulesService(
-              interaction.id));
-          var rulesService = $injector.get(rulesServiceName);
-          AnswerClassificationService.getMatchingClassificationResult(
-            explorationData.explorationId,
-            states.getState(stateName),
-            interaction.solution.correctAnswer,
-            true,
-            rulesService
-          ).then(function(result) {
-            if (stateName === result.outcome.dest) {
-              if (stateWarnings.hasOwnProperty(stateName)) {
-                stateWarnings[stateName].push(
-                  STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
-              } else {
-                stateWarnings[stateName] = [
-                  STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
-              }
-              var errorString = (
-                Object.keys(stateWarnings).length > 1 ? 'cards have' : (
-                  'card has'));
-              _warningsList.push({
-                type: WARNING_TYPES.ERROR,
-                message: (
-                'The following ' + errorString + ' errors: ' +
-                Object.keys(stateWarnings).join(', ') + '.')
-              });
-            }
-          });
+          if (!interaction.isSolutionValid()) {
+            statesWithIncorrectSolution.push(stateName);
+          }
         }
       });
     };
@@ -2177,7 +2150,17 @@ oppia.factory('explorationWarningsService', [
         }
       });
 
-      _getStatesWithIncorrectSolution();
+      var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
+      angular.forEach(statesWithIncorrectSolution, function(
+        stateWithIncorrectSolution) {
+        if (stateWarnings.hasOwnProperty(stateWithIncorrectSolution)) {
+          stateWarnings[stateWithIncorrectSolution].push(
+            STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
+        } else {
+          stateWarnings[stateWithIncorrectSolution] = [
+            STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
+        }
+      });
 
       if (_graphData) {
         // Note that it is fine for states to be reachable by means of fallback

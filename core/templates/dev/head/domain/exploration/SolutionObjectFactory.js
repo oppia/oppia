@@ -46,9 +46,9 @@ oppia.factory('SolutionObjectFactory', [
       return new Solution(answerIsExclusive, correctAnswer, explanation);
     };
 
-    Solution.prototype.getSolutionSummary = function(interactionId, choices) {
+    Solution.prototype.getSummary = function(interactionId, choices) {
       var isExclusiveAnswer = (
-        this.answerIsExclusive ? 'Only' : 'One');
+        this.answerIsExclusive ? 'The only' : 'One');
       var correctAnswer = '';
       if (interactionId === 'GraphInput') {
         correctAnswer = '[Graph Object]';
@@ -110,11 +110,14 @@ oppia.factory('SolutionObjectFactory', [
       element.attr('style', 'color: black;');
 
       if (objectType === 'UnicodeString') {
-        element.attr('value', 'solution.correctAnswer.latex');
+        element.attr('value',
+          'stateSolutionService.displayed.correctAnswer.latex');
       } else if (objectType === 'CodeString') {
-        element.attr('value', 'solution.correctAnswer.code');
+        element.attr('value',
+          'stateSolutionService.displayed.correctAnswer.code');
       } else {
-        element.attr('value', 'solution.correctAnswer');
+        element.attr('value',
+          'stateSolutionService.displayed.correctAnswer');
       }
       return element.get(0).outerHTML;
     };

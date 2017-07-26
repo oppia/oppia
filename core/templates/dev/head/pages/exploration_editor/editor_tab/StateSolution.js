@@ -44,6 +44,30 @@ oppia.controller('StateSolution', [
     $scope.stateSolutionService = stateSolutionService;
     $scope.correctAnswer = null;
 
+    $scope.interactionHtml = (
+      oppiaExplorationHtmlFormatterService.getInteractionHtml(
+        stateInteractionIdService.savedMemento,
+        explorationStatesService.getInteractionCustomizationArgsMemento(
+          editorContextService.getActiveStateName()),
+        $scope.SOLUTION_EDITOR_FOCUS_LABEL));
+
+    $scope.isSolutionValid = function() {
+      return explorationStatesService.getState(
+        editorContextService.getActiveStateName()
+      ).interaction.isSolutionValid();
+    };
+
+    $scope.inlineSolutionEditorIsActive = false;
+    var interactionId = stateInteractionIdService.savedMemento;
+
+    if (!StateSolutionHelperService.isSupportedInteraction(interactionId)) {
+      // In this case the interactionHtml is constructed in the Solution
+      // object using the objectType. So interactionHtml is set to null here.
+      $scope.interactionHtml = null;
+    }
+    $scope.objectType = StateSolutionHelperService.getInteractionObjectType(
+      interactionId);
+
     $scope.toggleInlineSolutionEditorIsActive = function() {
       $scope.inlineSolutionEditorIsActive = (
         !$scope.inlineSolutionEditorIsActive);
@@ -53,39 +77,18 @@ oppia.controller('StateSolution', [
       stateSolutionService.init(
         editorContextService.getActiveStateName(),
         stateData.interaction.solution);
-      $scope.interactionHtml = (
-        oppiaExplorationHtmlFormatterService.getInteractionHtml(
-          stateInteractionIdService.savedMemento,
-          explorationStatesService.getInteractionCustomizationArgsMemento(
-            editorContextService.getActiveStateName()),
-          $scope.SOLUTION_EDITOR_FOCUS_LABEL));
-
-      $scope.inlineSolutionEditorIsActive = false;
-      var interactionId = stateInteractionIdService.savedMemento;
-
-      $scope.currentInteractionCanHaveSolution = (
-        INTERACTION_SPECS[interactionId].can_have_solution);
-
-      if (!StateSolutionHelperService.isSupportedInteraction(interactionId)) {
-        // In this case the interaction UI is constructed by the Solution
-        // object. So interactionHtml is set to null.
-        $scope.interactionHtml = null;
-      }
-      $scope.objectType = StateSolutionHelperService.getInteractionObjectType(
-        interactionId);
     });
 
     $scope.getSolutionSummary = function() {
       var solution = stateSolutionService.displayed;
-      return solution.getSolutionSummary(
-        stateInteractionIdService.savedMemento,
+      return solution.getSummary(stateInteractionIdService.savedMemento,
         responsesService.getAnswerChoices());
     };
 
     // This returns false if the current interaction ID is null.
     $scope.isCurrentInteractionLinear = function() {
       return (stateInteractionIdService.savedMemento &&
-        INTERACTION_SPECS[interactionId].is_linear);
+        INTERACTION_SPECS[stateInteractionIdService.savedMemento].is_linear);
     };
 
     $scope.openAddSolutionModal = function() {
@@ -138,14 +141,14 @@ oppia.controller('StateSolution', [
               if (!interactionHtml) {
                 answer = $scope.tmpSolution.correctAnswer;
               }
-              answer = (
+              var answerObject = (
                 StateSolutionHelperService.getCorrectAnswerObject(answer,
                   $scope.objectType));
               $modalInstance.close({
                 solution: SolutionObjectFactory.createNew(
-                    $scope.tmpSolution.answerIsExclusive,
-                    answer,
-                    $scope.tmpSolution.explanation)
+                  $scope.tmpSolution.answerIsExclusive,
+                  answerObject,
+                  $scope.tmpSolution.explanation)
               });
             };
 
@@ -196,43 +199,22 @@ oppia.controller('StateSolution', [
       }).result.then(function() {
         stateSolutionService.displayed = null;
         stateSolutionService.saveDisplayedValue();
-        StateSolutionHelperService.unsetSolutionIsValidFlag();
+        explorationStatesService.getState(
+          editorContextService.getActiveStateName()
+        ).interaction.markSolutionAsInvalid();
       });
     };
 
     $scope.onComponentSave = function() {
       alertsService.clearWarnings();
-      var explorationId = explorationContextService.getExplorationId();
       var currentStateName = editorContextService.getActiveStateName();
       var state = explorationStatesService.getState(currentStateName);
-      var interactionId = stateInteractionIdService.savedMemento;
-      var rulesServiceName =
-        angularNameService.getNameOfInteractionRulesService(
-          interactionId);
-      // Inject RulesService dynamically.
-      var rulesService = $injector.get(rulesServiceName);
       var answer = stateSolutionService.savedMemento.correctAnswer;
       try {
-        AnswerClassificationService.getMatchingClassificationResult(
-          explorationId, state, answer, true, rulesService).then(
-            function(result) {
-              if (editorContextService.getActiveStateName() !== (
-              result.outcome.dest)) {
-                // Swapping savedMemento and displayed value for saving
-                // the latest value.
-                var tmpDisplayedSolution = stateSolutionService.displayed;
-                stateSolutionService.displayed = (
-                  stateSolutionService.savedMemento);
-                stateSolutionService.savedMemento = tmpDisplayedSolution;
-                StateSolutionHelperService.setSolutionIsValidFlag();
-                stateSolutionService.saveDisplayedValue();
-              } else {
-                alertsService.addInfoMessage('That solution does not lead ' +
-                  'to the next state!');
-                StateSolutionHelperService.unsetSolutionIsValidFlag();
-                stateSolutionService.saveDisplayedValue();
-              }
-            });
+        StateSolutionHelperService.verifyAndSaveAnswer(
+          explorationContextService.getExplorationId(),
+          state,
+          answer);
       } catch (e) {
         alertsService.addInfoMessage('That solution was invalid!');
         stateSolutionService.saveDisplayedValue();

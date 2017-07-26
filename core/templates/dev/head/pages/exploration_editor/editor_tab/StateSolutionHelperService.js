@@ -17,13 +17,10 @@
  */
 
 oppia.constant('SUPPORTED_INTERACTIONS', [
-  'InteractiveMap',
   'MusicNotesInput',
   'GraphInput',
   'SetInput',
   'MathExpressionInput',
-  'MultipleChoiceInput',
-  'ImageClickInput',
   'ItemSelectionInput',
   'LogicProof'
 ]);
@@ -51,7 +48,6 @@ oppia.factory('StateSolutionHelperService', [
     explorationContextService, angularNameService, stateSolutionService,
     AnswerClassificationService, alertsService,
     SUPPORTED_INTERACTIONS, INTERACTION_OBJECT_TYPES) {
-    var currentSolutionIsValid = true;
     return {
       isSupportedInteraction: function (id) {
         return (SUPPORTED_INTERACTIONS.indexOf(id) !== -1);
@@ -82,24 +78,19 @@ oppia.factory('StateSolutionHelperService', [
         ).then(function(result) {
           if (editorContextService.getActiveStateName() !== (
               result.outcome.dest)) {
-            currentSolutionIsValid = true;
             stateSolutionService.saveDisplayedValue();
+            explorationStatesService.getState(
+              editorContextService.getActiveStateName()
+            ).interaction.markSolutionAsValid();
           } else {
             alertsService.addInfoMessage('That solution does not lead ' +
               'to the next state!');
-            currentSolutionIsValid = false;
+            explorationContextService.getState(
+              editorContextService.getActiveStateName()
+            ).interaction.markSolutionAsInvalid();
             stateSolutionService.saveDisplayedValue();
           }
         });
-      },
-      isCurrentSolutionValid: function() {
-        return currentSolutionIsValid;
-      },
-      unsetSolutionIsValidFlag: function() {
-        currentSolutionIsValid = false;
-      },
-      setSolutionIsValidFlag: function() {
-        currentSolutionIsValid = true;
       },
       verifySolution: function(explorationId, state, correctAnswer) {
         var interactionId = stateInteractionIdService.savedMemento;
@@ -109,8 +100,16 @@ oppia.factory('StateSolutionHelperService', [
         AnswerClassificationService.getMatchingClassificationResult(
           explorationId, state, correctAnswer, true, rulesService
         ).then(function(result) {
-          currentSolutionIsValid = (
-            editorContextService.getActiveStateName() !== result.outcome.dest);
+          if (
+            editorContextService.getActiveStateName() !== result.outcome.dest) {
+            explorationContextService.getState(
+              editorContextService.getActiveStateName()
+            ).interaction.markSolutionAsValid();
+          } else {
+            explorationContextService.getState(
+              editorContextService.getActiveStateName()
+            ).interaction.markSolutionAsInvalid();
+          }
         });
       }
     }

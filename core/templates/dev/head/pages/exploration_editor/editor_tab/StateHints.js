@@ -166,8 +166,6 @@ oppia.controller('StateHints', [
     };
 
     $scope.deleteHint = function(index, evt) {
-      // Prevent clicking on the delete button from also toggling the display
-      // state of the answer group.
       evt.stopPropagation();
 
       alertsService.clearWarnings();

@@ -8,8 +8,8 @@
     <div class="oppia-rule-details-header">
       <select class="protractor-test-answer-is-exclusive-select"
               ng-model="tmpSolution.answerIsExclusive"
-              ng-options="(item ? 'Only' : 'One') for item in [true, false]">
-      </select> <strong>Solution is...</strong>
+              ng-options="(item ? 'The only' : 'One') for item in [true, false]">
+      </select> <strong>solution is...</strong>
       <div ng-if="!interactionHtml">
         <object-editor class='protractor-test-interaction-html'
                        obj-type="<[objectType]>"
@@ -25,7 +25,7 @@
       </div>
       <br>
       <div ng-show="tmpSolution.correctAnswer || correctAnswer">
-        <strong>Explanation is...</strong>
+        <strong>Explanation:</strong>
         <schema-based-editor class="protractor-test-explanation-text-area"
                              schema="EXPLANATION_FORM_SCHEMA"
                              local-value="tmpSolution.explanation">

@@ -737,11 +737,17 @@ oppia.controller('StateResponses', [
           [result.tmpRule], result.tmpOutcome, false));
         responsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
-        var currentStateName = editorContextService.getActiveStateName();
-        StateSolutionHelperService.verifySolution(
-          explorationContextService.getExplorationId(),
-          explorationStatesService.getState(currentStateName),
-          stateSolutionService.displayed.correctAnswer);
+        if (
+          INTERACTION_SPECS[stateInteractionIdService.savedMemento]
+          .can_have_solution && stateSolutionService.displayed !== null) {
+          if (stateSolutionService.displayed.correctAnswer !== null) {
+            var currentStateName = editorContextService.getActiveStateName();
+            StateSolutionHelperService.verifySolution(
+              explorationContextService.getExplorationId(),
+              explorationStatesService.getState(currentStateName),
+              stateSolutionService.displayed.correctAnswer);
+          }
+        }
 
         // After saving it, check if the modal should be reopened right away.
         if (result.reopen) {

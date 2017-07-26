@@ -3526,9 +3526,8 @@ class Exploration(object):
                 }
                 for old_translation in old_audio_translations
             }
-            old_solution = state_dict['interaction']['solution']
-            state_dict['interaction']['solution'] = (
-                None if not old_solution else old_solution)
+            if not state_dict['interaction']['solution']:
+                state_dict['interaction']['solution'] = None
         return states_dict
 
     @classmethod
