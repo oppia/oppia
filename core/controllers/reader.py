@@ -447,7 +447,7 @@ class RemoveExpFromIncompleteListHandler(base.BaseHandler):
     completed list of a user.
     """
 
-    @base.require_user
+    @acl_decorators.can_access_learner_dashboard
     def post(self):
         """Handles POST requests."""
         exploration_id = self.payload.get('exploration_id')
@@ -461,7 +461,7 @@ class RemoveCollectionFromIncompleteListHandler(base.BaseHandler):
     completed list of a user.
     """
 
-    @base.require_user
+    @acl_decorators.can_access_learner_dashboard
     def post(self):
         """Handles POST requests."""
         collection_id = self.payload.get('collection_id')

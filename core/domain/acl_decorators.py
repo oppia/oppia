@@ -615,3 +615,16 @@ def can_perform_cron_tasks(handler):
     can_perform.__wrapped__ = True
 
     return can_perform
+
+
+def can_access_learner_dashboard(handler):
+    """Decorator to check access to learner dashboard."""
+
+    def test_can_access(self, **kwargs):
+        if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.NotLoggedInException
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
