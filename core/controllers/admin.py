@@ -23,6 +23,7 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import base
 from core.controllers import editor
+from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -62,22 +63,6 @@ SSL_CHALLENGE_RESPONSES = config_domain.ConfigProperty(
     'Challenge-response pairs for SSL validation.', [])
 
 
-def require_super_admin(handler):
-    """Decorator that checks if the current user is a super admin."""
-    def test_super_admin(self, **kwargs):
-        """Checks if the user is logged in and is a super admin."""
-        if not self.user_id:
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
-            return
-        if not current_user_services.is_current_user_super_admin():
-            raise self.UnauthorizedUserException(
-                '%s is not a super admin of this application', self.user_id)
-        return handler(self, **kwargs)
-
-    return test_super_admin
-
-
 def assign_roles(changed_user_roles):
     """Assigns roles to users based on given dict.
 
@@ -92,7 +77,7 @@ def assign_roles(changed_user_roles):
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
         demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
@@ -162,7 +147,7 @@ class AdminHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
 
@@ -171,7 +156,7 @@ class AdminHandler(base.BaseHandler):
                 config_domain.Registry.get_config_property_schemas()),
         })
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def post(self):
         """Handles POST requests."""
         try:
@@ -348,7 +333,7 @@ class AdminRoleHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         view_method = self.request.get('method')
 
@@ -378,7 +363,7 @@ class AdminRoleHandler(base.BaseHandler):
         else:
             raise self.InvalidInputException('Invalid method to view roles.')
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def post(self):
         username = self.payload.get('username')
         role = self.payload.get('role')
@@ -398,7 +383,7 @@ class AdminJobOutput(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
         job_id = self.request.get('job_id')
@@ -410,7 +395,7 @@ class AdminJobOutput(base.BaseHandler):
 class AdminTopicsCsvDownloadHandler(base.BaseHandler):
     """Retrieves topic similarity data for download."""
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         self.response.headers['Content-Type'] = 'text/csv'
         self.response.headers['Content-Disposition'] = (
@@ -424,7 +409,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         exp_id = self.request.get('exp_id')
         exp_version = self.request.get('exp_version')

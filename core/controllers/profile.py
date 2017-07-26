@@ -15,6 +15,7 @@
 """Controllers for the profile page."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import email_manager
 from core.domain import subscription_services
 from core.domain import summary_services
@@ -45,10 +46,9 @@ def require_user_id_else_redirect_to_homepage(handler):
 class ProfilePage(base.BaseHandler):
     """The world-viewable profile page."""
 
+    @acl_decorators.can_manage_own_profile
     def get(self, username):
         """Handles GET requests for the publicly-viewable profile page."""
-        if not username:
-            raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
 
@@ -69,8 +69,6 @@ class ProfileHandler(base.BaseHandler):
 
     def get(self, username):
         """Handles GET requests."""
-        if not username:
-            raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
         if not user_settings:
@@ -117,7 +115,7 @@ class ProfileHandler(base.BaseHandler):
 class PreferencesPage(base.BaseHandler):
     """The preferences page."""
 
-    @base.require_user
+    @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -135,7 +133,7 @@ class PreferencesHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @base.require_user
+    @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -180,7 +178,7 @@ class PreferencesHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @base.require_user
+    @acl_decorators.can_manage_own_profile
     def put(self):
         """Handles POST requests."""
         update_type = self.payload.get('update_type')
@@ -223,7 +221,7 @@ class ProfilePictureHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @base.require_user
+    @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)

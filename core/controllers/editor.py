@@ -510,7 +510,7 @@ class ExplorationStatusHandler(EditorHandler):
 class ExplorationModeratorRightsHandler(EditorHandler):
     """Handles management of exploration rights by moderators."""
 
-    @base.require_moderator
+    @acl_decorators.can_access_moderator_page
     def put(self, exploration_id):
         """Updates the publication status of the given exploration, and sends
         an email to all its owners.

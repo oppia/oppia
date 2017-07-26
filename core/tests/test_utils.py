@@ -361,6 +361,11 @@ class TestBase(unittest.TestCase):
             config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
             collection_editor_usernames)
 
+    def set_email_senders(self, email_sender_usernames):
+        """Set the WHITELISTED_EMAIL_SENDERS property."""
+        self.set_config_property(
+            config_domain.WHITELISTED_EMAIL_SENDERS, email_sender_usernames)
+
     def get_current_logged_in_user_id(self):
         return os.environ['USER_ID']
 

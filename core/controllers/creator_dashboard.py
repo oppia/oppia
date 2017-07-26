@@ -305,7 +305,7 @@ class NewCollection(base.BaseHandler):
 class UploadExploration(base.BaseHandler):
     """Uploads a new exploration."""
 
-    @base.require_fully_signed_up
+    @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
         yaml_content = self.request.get('yaml_file')

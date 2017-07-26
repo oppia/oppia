@@ -169,6 +169,134 @@ def can_view_exploration_stats(handler):
     return test_can_view_stats
 
 
+def can_edit_collection(handler):
+    """Decorator to check whether the user can edit collection."""
+
+    def test_can_edit(self, collection_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
+        if collection_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if collection_rights.community_owned:
+            return handler(self, collection_id, **kwargs)
+
+        if role_services.ACTION_EDIT_ANY_COLLECTION in self.actions:
+            return handler(self, collection_id, **kwargs)
+
+        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+            if (role_services.ACTION_EDIT_ANY_PUBLIC_COLLECTION in
+                    self.actions):
+                return handler(self, collection_id, **kwargs)
+
+        if (role_services.ACTION_EDIT_OWNED_COLLECTION in
+                self.actions):
+            if (collection_rights.is_owner(self.user_id) or
+                    collection_rights.is_editor(self.user_id)):
+                return handler(self, collection_id, **kwargs)
+
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You do not have credentials to edit this collection.')
+
+    return test_can_edit
+
+
+def can_manage_email_dashboard(handler):
+    """Decorator to check whether user can access email dashboard."""
+
+    def test_can_manage_emails(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_EMAIL_DASHBOARD in self.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access email dashboard.')
+
+    return test_can_manage_emails
+
+
+def can_access_moderator_page(handler):
+    """Decorator to check whether user can access moderator page."""
+
+    def test_can_access_moderator_page(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_MODERATOR_PAGE in self.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access moderator page.')
+
+    return test_can_access_moderator_page
+
+
+def can_send_moderator_emails(handler):
+    """Decorator to check whether user can send moderator emails."""
+
+    def test_can_send_moderator_emails(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_SEND_MODERATOR_EMAILS in self.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to send moderator emails.')
+
+    return test_can_send_moderator_emails
+
+
+def can_manage_own_profile(handler):
+    """Decorator to check whether user can manage his profile."""
+
+    def test_can_manage_profile(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_PROFILE in self.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to manage profile or preferences.')
+
+    return test_can_manage_profile
+
+
+def can_access_admin_page(handler):
+    """Decorator that checks if the current user is a super admin."""
+    def test_super_admin(self, **kwargs):
+        """Checks if the user is logged in and is a super admin."""
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if not current_user_services.is_current_user_super_admin():
+            raise self.UnauthorizedUserException(
+                '%s is not a super admin of this application', self.user_id)
+        return handler(self, **kwargs)
+
+    return test_super_admin
+
+
+def can_upload_exploration(handler):
+    """Decorator that checks if the current user can upload exploration."""
+
+    def test_can_upload(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if not current_user_services.is_current_user_super_admin():
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to upload exploration.')
+        return handler(self, **kwargs)
+    return test_can_upload
+
+
 def can_create_exploration(handler):
     """Decorator to check whether the user can create an exploration."""
 
@@ -371,6 +499,37 @@ def can_publish_exploration(handler):
             'You do not have credentials to publish this exploration.')
 
     return test_can_publish
+
+
+def can_manage_collection_publish_status(handler):
+    """Decorator to check whether user can publish exploration."""
+
+    def test_can_manage_collection_publish_status(
+            self, collection_id, **kwargs):
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id)
+
+        if collection_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+            if role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in self.actions:
+                return handler(self, collection_id, **kwargs)
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to unpublish this collection.')
+
+        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            if role_services.ACTION_PUBLISH_ANY_COLLECTION in self.actions:
+                return handler(self, collection_id, **kwargs)
+
+            if role_services.ACTION_PUBLISH_OWNED_COLLECTION in self.actions:
+                if collection_rights.is_owner(self.user_id):
+                    return handler(self, collection_id, **kwargs)
+
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to publish this collection.')
+
+    return test_can_manage_collection_publish_status
 
 
 def can_modify_exploration_roles(handler):
