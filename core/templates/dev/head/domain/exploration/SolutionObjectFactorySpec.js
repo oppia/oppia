@@ -41,7 +41,7 @@ describe('Solution object factory', function() {
     });
 
     it('should create summary correctly', function() {
-      expect(solution.getSolutionSummary('TextInput')).toEqual(
+      expect(solution.getSummary('TextInput')).toEqual(
         '[One solution is &quot;This is a correct answer!&quot;] ' +
         'This is the explanation to the answer.');
 
@@ -49,12 +49,12 @@ describe('Solution object factory', function() {
         clickPosition: [0, 0],
         clickedRegions: ['Region1']
       });
-      expect(solution.getSolutionSummary('ImageClickInput',
+      expect(solution.getSummary('ImageClickInput',
         ['Region1', 'Region2'])).toEqual('[One solution is Region1] ' +
         'This is the explanation to the answer.');
 
       solution.setCorrectAnswer(0);
-      expect(solution.getSolutionSummary('MultipleChoiceInput', [
+      expect(solution.getSummary('MultipleChoiceInput', [
         {
           val: 0,
           label: '<p>one</p>'
@@ -74,7 +74,7 @@ describe('Solution object factory', function() {
         ascii: 'one',
         latex: 'one'
       });
-      expect(solution.getSolutionSummary('MathExpressionInput')).toEqual(
+      expect(solution.getSummary('MathExpressionInput')).toEqual(
         '[One solution is one] This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
@@ -83,7 +83,7 @@ describe('Solution object factory', function() {
         evaluation: '',
         output: ''
       });
-      expect(solution.getSolutionSummary('CodeRepl')).toEqual(
+      expect(solution.getSummary('CodeRepl')).toEqual(
         '[One solution is a=10] This is the explanation to the answer.');
     })
   });
