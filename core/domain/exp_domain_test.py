@@ -16,6 +16,7 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 
+import copy
 import os
 
 from core.domain import exp_domain
@@ -1031,62 +1032,121 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'audio_translations', 'not_list'):
                 subtitled_html.validate()
 
-    # def test_get_trainable_states_dict(self):
-    #     """Test the get_trainable_states_dict() method."""
-    #     exp_id = 'exp_id1'
-    #     test_exp_filepath = os.path.join(
-    #         feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-    #     yaml_content = utils.get_file_contents(test_exp_filepath)
-    #     assets_list = []
-    #     exp_services.save_new_exploration_from_yaml_and_assets(
-    #         feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-    #         assets_list)
-    #
-    #     exploration_model = exp_models.ExplorationModel.get(
-    #         exp_id, strict=False)
-    #     old_states = exp_services.get_exploration_from_model(
-    #         exploration_model).states
-    #
-    #     # Modify answer groups to trigger change in answer groups.
-    #     exploration = exp_services.get_exploration_by_id(exp_id)
-    #     state = exploration.states['Home']
-    #     exploration.states['Home'].interaction.answer_groups.insert(
-    #         3, state.interaction.answer_groups[3])
-    #     answer_groups = []
-    #     for answer_group in state.interaction.answer_groups:
-    #         answer_groups.append(answer_group.to_dict())
-    #     change_list = [{
-    #         'cmd': 'edit_state_property',
-    #         'state_name': 'Home',
-    #         'property_name': 'answer_groups',
-    #         'new_value': answer_groups
-    #     }]
-    #     with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-    #         exp_services.update_exploration(
-    #             feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
-    #
-    #     expected_dict = {
-    #         'state_names_with_changed_answer_groups': ['Home'],
-    #         'state_names_with_unchanged_answer_groups': []
-    #     }
-    #     actual_dict = exploration.get_trainable_states_dict(old_states)
-    #     self.assertEqual(actual_dict, expected_dict)
-    #
-    #     # Add new state to trigger change in answer groups.
-    #     change_list = [{
-    #         'cmd': 'add_state',
-    #         'state_name': 'New state',
-    #     }]
-    #     exp_services.update_exploration(
-    #         feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
-    #     exploration = exp_services.get_exploration_by_id(exp_id)
-    #
-    #     expected_dict = {
-    #         'state_names_with_changed_answer_groups': ['Home', 'New state'],
-    #         'state_names_with_unchanged_answer_groups': []
-    #     }
-    #     actual_dict = exploration.get_trainable_states_dict(old_states)
-    #     self.assertEqual(actual_dict, expected_dict)
+    def test_get_trainable_states_dict(self):
+        """Test the get_trainable_states_dict() method."""
+        exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+
+        exploration_model = exp_models.ExplorationModel.get(
+            exp_id, strict=False)
+        old_states = exp_services.get_exploration_from_model(
+            exploration_model).states
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Rename a state to add it in unchanged answer group.
+        exploration.rename_state('Home', 'Renamed state')
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        }]
+        exploration.version += 1
+        commit_log_model = exp_models.ExplorationCommitLogEntryModel(
+            id=('exploration-%s-%s' % (exp_id, exploration.version)),
+            user_id=feconf.SYSTEM_COMMITTER_ID,
+            username='',
+            exploration_id=exp_id,
+            commit_type='commit_type',
+            commit_message='commit_message',
+            commit_cmds=change_list,
+            version=exploration.version,
+            post_commit_status='',
+            post_commit_community_owned=True,
+            post_commit_is_private=False
+        )
+        commit_log_model.put()
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [],
+            'state_names_with_unchanged_answer_groups': ['Renamed state']
+        }
+        actual_dict = exploration.get_trainable_states_dict(old_states)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Modify answer groups to trigger change in answer groups.
+        state = exploration.states['Renamed state']
+        exploration.states['Renamed state'].interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[3])
+        answer_groups = []
+        for answer_group in state.interaction.answer_groups:
+            answer_groups.append(answer_group.to_dict())
+        change_list = [{
+            'cmd': 'edit_state_property',
+            'state_name': 'Renamed state',
+            'property_name': 'answer_groups',
+            'new_value': answer_groups
+        }]
+        exploration.version += 1
+        commit_log_model = exp_models.ExplorationCommitLogEntryModel(
+            id=('exploration-%s-%s' % (exp_id, exploration.version)),
+            user_id=feconf.SYSTEM_COMMITTER_ID,
+            username='',
+            exploration_id=exp_id,
+            commit_type='commit_type',
+            commit_message='commit_message',
+            commit_cmds=change_list,
+            version=exploration.version,
+            post_commit_status='',
+            post_commit_community_owned=True,
+            post_commit_is_private=False
+        )
+        commit_log_model.put()
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        actual_dict = exploration.get_trainable_states_dict(old_states)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Add new state to trigger change in answer groups.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }]
+        exploration.version += 1
+        commit_log_model = exp_models.ExplorationCommitLogEntryModel(
+            id=('exploration-%s-%s' % (exp_id, exploration.version)),
+            user_id=feconf.SYSTEM_COMMITTER_ID,
+            username='',
+            exploration_id=exp_id,
+            commit_type='commit_type',
+            commit_message='commit_message',
+            commit_cmds=change_list,
+            version=exploration.version,
+            post_commit_status='',
+            post_commit_community_owned=True,
+            post_commit_is_private=False
+        )
+        commit_log_model.put()
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'New state', 'Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        actual_dict = exploration.get_trainable_states_dict(old_states)
+        self.assertEqual(actual_dict, expected_dict)
+
 
     def test_is_demo_property(self):
         """Test the is_demo property."""
