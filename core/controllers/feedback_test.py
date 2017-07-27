@@ -61,10 +61,11 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         }, self.csrf_token)
         self.logout()
 
-    def test_invalid_exploration_ids_return_empty_threadlist(self):
+    def test_invalid_exploration_ids_return_page_not_found(self):
         response_dict = self.get_json(
-            '%s/bad_exp_id' % feconf.FEEDBACK_THREADLIST_URL_PREFIX)
-        self.assertEqual(response_dict['threads'], [])
+            '%s/bad_exp_id' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
+            expect_errors=True)
+        self.assertEqual(response_dict['code'], 404)
 
     def test_invalid_thread_ids_return_empty_message_list(self):
         response_dict = self.get_json(

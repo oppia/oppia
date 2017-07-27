@@ -344,11 +344,10 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    @acl_decorators.open_access
+    @acl_decorators.can_manage_own_profile
     def put(self):
         """Handles PUT requests."""
-        if user_services.has_fully_registered(self.user_id):
-            site_language_code = self.payload.get('site_language_code')
-            user_services.update_preferred_site_language_code(
-                self.user_id, site_language_code)
+        site_language_code = self.payload.get('site_language_code')
+        user_services.update_preferred_site_language_code(
+            self.user_id, site_language_code)
         self.render_json({})

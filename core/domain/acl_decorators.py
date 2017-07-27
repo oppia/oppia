@@ -25,23 +25,6 @@ import feconf
 current_user_services = models.Registry.import_current_user_services()
 
 
-def _is_activity_published(activity_rights):
-    """Checks whether activity is published.
-
-    Args:
-        activity_rights: object. Activity rights object.
-
-    Returns:
-        bool. Whether activity is in published.
-    """
-    if activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
-        return True
-    elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
-        return True
-    else:
-        return False
-
-
 def check_activity_accessible(
         user_id, user_actions, activity_type, activity_id):
     """Returns a boolean to signify whether given activity is accessible
@@ -78,7 +61,7 @@ def check_activity_accessible(
 
     if activity_rights is None:
         raise base.UserFacingExceptions.PageNotFoundException
-    elif _is_activity_published(activity_rights):
+    elif activity_rights.is_published():
         return bool(action_play_public in user_actions)
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         return bool(
@@ -113,7 +96,7 @@ def check_exploration_editable(user_id, user_actions, exploration_id):
     if role_services.ACTION_EDIT_ANY_EXPLORATION in user_actions:
         return True
 
-    if _is_activity_published(exploration_rights):
+    if exploration_rights.is_published():
         if (role_services.ACTION_EDIT_ANY_PUBLIC_EXPLORATION in
                 user_actions):
             return True
@@ -218,7 +201,7 @@ def can_edit_collection(handler):
         if role_services.ACTION_EDIT_ANY_COLLECTION in self.actions:
             return handler(self, collection_id, **kwargs)
 
-        if _is_activity_published(collection_rights):
+        if collection_rights.is_published():
             if (role_services.ACTION_EDIT_ANY_PUBLIC_COLLECTION in
                     self.actions):
                 return handler(self, collection_id, **kwargs)
@@ -389,7 +372,7 @@ def can_access_creator_dashboard(handler):
     return test_can_access
 
 
-def can_view_exploration_feedback(handler):
+def can_comment_on_feedback_thread(handler):
     """Decorator to check whether the user can view feedback for a given
     exploration.
     """
@@ -488,7 +471,7 @@ def can_delete_exploration(handler):
                     self.actions)) and
                 exploration_rights.is_owner(self.user_id)):
             return handler(self, exploration_id, **kwargs)
-        elif (_is_activity_published(exploration_rights) and
+        elif (exploration_rights.is_published() and
               role_services.ACTION_DELETE_ANY_PUBLIC_EXPLORATION in (
                   self.actions)):
             return handler(self, exploration_id, **kwargs)
@@ -561,7 +544,7 @@ def can_manage_collection_publish_status(handler):
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if _is_activity_published(collection_rights):
+        if collection_rights.is_published():
             if role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in self.actions:
                 return handler(self, collection_id, **kwargs)
             raise self.UnauthorizedUserException(

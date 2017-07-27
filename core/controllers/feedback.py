@@ -37,7 +37,7 @@ class ThreadListHandler(base.BaseHandler):
                 exploration_id, False)]})
         self.render_json(self.values)
 
-    @acl_decorators.can_view_exploration_feedback
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id):
         subject = self.payload.get('subject')
         if not subject:
@@ -77,7 +77,7 @@ class ThreadHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @acl_decorators.can_view_exploration_feedback
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         text = self.payload.get('text')
@@ -202,7 +202,7 @@ class SuggestionListHandler(base.BaseHandler):
         else:
             return None
 
-    @acl_decorators.can_view_exploration_feedback
+    @acl_decorators.can_comment_on_feedback_thread
     def get(self, exploration_id):
         threads = None
         list_type = self.request.get('list_type')
@@ -232,7 +232,7 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     viewed feedback messages from emails that might be sent in future to this
     user."""
 
-    @acl_decorators.can_view_exploration_feedback
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id):
         thread_id = self.payload.get('thread_id')
         transaction_services.run_in_transaction(
