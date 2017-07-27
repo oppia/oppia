@@ -25,14 +25,14 @@ import feconf
 current_user_services = models.Registry.import_current_user_services()
 
 
-def _is_activity_public(activity_rights):
-    """Checks whether activity is in public domain.
+def _is_activity_published(activity_rights):
+    """Checks whether activity is published.
 
     Args:
         activity_rights: object. Activity rights object.
 
     Returns:
-        bool. Whether activity is in public domain or not.
+        bool. Whether activity is in published.
     """
     if activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
         return True
@@ -78,7 +78,7 @@ def check_activity_accessible(
 
     if activity_rights is None:
         raise base.UserFacingExceptions.PageNotFoundException
-    elif _is_activity_public(activity_rights):
+    elif _is_activity_published(activity_rights):
         return bool(action_play_public in user_actions)
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         return bool(
@@ -113,7 +113,7 @@ def check_exploration_editable(user_id, user_actions, exploration_id):
     if role_services.ACTION_EDIT_ANY_EXPLORATION in user_actions:
         return True
 
-    if _is_activity_public(exploration_rights):
+    if _is_activity_published(exploration_rights):
         if (role_services.ACTION_EDIT_ANY_PUBLIC_EXPLORATION in
                 user_actions):
             return True
@@ -218,7 +218,7 @@ def can_edit_collection(handler):
         if role_services.ACTION_EDIT_ANY_COLLECTION in self.actions:
             return handler(self, collection_id, **kwargs)
 
-        if _is_activity_public(collection_rights):
+        if _is_activity_published(collection_rights):
             if (role_services.ACTION_EDIT_ANY_PUBLIC_COLLECTION in
                     self.actions):
                 return handler(self, collection_id, **kwargs)
@@ -488,7 +488,7 @@ def can_delete_exploration(handler):
                     self.actions)) and
                 exploration_rights.is_owner(self.user_id)):
             return handler(self, exploration_id, **kwargs)
-        elif (_is_activity_public(exploration_rights) and
+        elif (_is_activity_published(exploration_rights) and
               role_services.ACTION_DELETE_ANY_PUBLIC_EXPLORATION in (
                   self.actions)):
             return handler(self, exploration_id, **kwargs)
@@ -561,7 +561,7 @@ def can_manage_collection_publish_status(handler):
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if _is_activity_public(collection_rights):
+        if _is_activity_published(collection_rights):
             if role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in self.actions:
                 return handler(self, collection_id, **kwargs)
             raise self.UnauthorizedUserException(
@@ -621,16 +621,16 @@ def can_perform_cron_tasks(handler):
     superadmin of the application.
     """
 
-    def can_perform(self, **kwargs):
+    def test_can_perform(self, **kwargs):
         if (self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
         else:
             return handler(self, **kwargs)
-    can_perform.__wrapped__ = True
+    test_can_perform.__wrapped__ = True
 
-    return can_perform
+    return test_can_perform
 
 
 def can_access_learner_dashboard(handler):
@@ -644,3 +644,23 @@ def can_access_learner_dashboard(handler):
     test_can_access.__wrapped__ = True
 
     return test_can_access
+
+
+def require_user_id_else_redirect_to_homepage(handler):
+    """Decorator that checks if a user_id is associated to the current
+    session. If not, the user is redirected to the main page.
+
+    Note that the user may not yet have registered.
+    """
+    def test_login(self, **kwargs):
+        """Checks if the user for the current session is logged in.
+
+        If not, redirects the user to the home page.
+        """
+        if not self.user_id:
+            self.redirect('/')
+            return
+        return handler(self, **kwargs)
+    test_login.__wrapped__ = True
+
+    return test_login

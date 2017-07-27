@@ -500,7 +500,9 @@ oppia.factory('explorationSaveService', [
             windowClass: 'oppia-save-exploration-modal',
             controller: [
               '$scope', '$modalInstance', 'isExplorationPrivate',
-              function($scope, $modalInstance, isExplorationPrivate) {
+              'explorationContextService', function(
+                $scope, $modalInstance, isExplorationPrivate,
+                explorationContextService) {
                 $scope.showDiff = false;
                 $scope.onClickToggleDiffButton = function() {
                   $scope.showDiff = !$scope.showDiff;
@@ -515,6 +517,8 @@ oppia.factory('explorationSaveService', [
 
                 $scope.diffData = diffData;
                 $scope.isExplorationPrivate = isExplorationPrivate;
+                $scope.explorationId = (
+                  explorationContextService.explorationId);
 
                 $scope.earlierVersionHeader = 'Last saved';
                 $scope.laterVersionHeader = 'New changes';

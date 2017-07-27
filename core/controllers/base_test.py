@@ -498,10 +498,15 @@ class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
 
 class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
     """Tests that all methods in handlers have authentication decorators
-    applied on them."""
+    applied on them.
+    """
 
     def test_every_method_has_decorator(self):
+        handlers_checked = set([])
+
         for route in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
+            # are touples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
             else:
@@ -514,13 +519,22 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
                 continue
 
             if handler.get != base.BaseHandler.get:
+                handlers_checked.add(handler)
                 self.assertTrue(hasattr(handler.get, '__wrapped__'))
 
             if handler.post != base.BaseHandler.post:
+                handlers_checked.add(handler)
                 self.assertTrue(hasattr(handler.post, '__wrapped__'))
 
             if handler.put != base.BaseHandler.put:
+                handlers_checked.add(handler)
                 self.assertTrue(hasattr(handler.put, '__wrapped__'))
 
             if handler.delete != base.BaseHandler.delete:
+                handlers_checked.add(handler)
                 self.assertTrue(hasattr(handler.delete, '__wrapped__'))
+
+        self.log_line(
+            'Total number of handlers checked: %s' % len(handlers_checked))
+
+        self.assertGreater(len(handlers_checked), 0)

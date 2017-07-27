@@ -30,7 +30,7 @@ class ThreadListHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         self.values.update({
             'threads': [t.to_dict() for t in feedback_services.get_all_threads(
@@ -63,7 +63,7 @@ class ThreadHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         messages = [m.to_dict() for m in feedback_services.get_messages(

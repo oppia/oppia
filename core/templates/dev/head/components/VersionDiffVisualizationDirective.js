@@ -46,7 +46,9 @@ oppia.directive('versionDiffVisualization', [
         getEarlierVersionHeader: '&earlierVersionHeader',
         // The header for the pane of the state comparison modal corresponding
         // to the later version of the exploration.
-        getLaterVersionHeader: '&laterVersionHeader'
+        getLaterVersionHeader: '&laterVersionHeader',
+        // Id of the exploration.
+        explorationId: '&explorationId'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/' +
@@ -254,7 +256,8 @@ oppia.directive('versionDiffVisualization', [
               function(
                   $scope, $http, $modalInstance, $timeout, newStateName,
                   oldStateName, newState, oldState, headers) {
-                var STATE_YAML_URL = '/createhandler/state_yaml';
+                var STATE_YAML_URL = (
+                  '/createhandler/state_yaml/' + $scope.explorationId);
 
                 $scope.headers = headers;
                 $scope.newStateName = newStateName;
