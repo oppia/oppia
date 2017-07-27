@@ -19,6 +19,7 @@ import logging
 import string
 
 from constants import constants
+from core.domain import acl_decorators
 from core.controllers import base
 from core.domain import collection_services
 from core.domain import exp_services
@@ -70,7 +71,7 @@ class LibraryPage(base.BaseHandler):
     """The main library page. Used for both the default list of categories and
     for search results.
     """
-
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
@@ -101,6 +102,7 @@ class LibraryIndexHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
@@ -150,6 +152,7 @@ class LibraryGroupPage(base.BaseHandler):
     """The page for displaying top rated and recently published explorations.
     """
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
 
@@ -171,6 +174,7 @@ class LibraryGroupPage(base.BaseHandler):
 class LibraryGroupIndexHandler(base.BaseHandler):
     """Provides data for categories such as top rated and recently published."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests for group pages."""
         # TODO(sll): Support index pages for other language codes.
@@ -224,6 +228,7 @@ class SearchHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         query_string = utils.unescape_encoded_uri_component(
@@ -257,6 +262,7 @@ class SearchHandler(base.BaseHandler):
 class LibraryRedirectPage(base.BaseHandler):
     """An old 'gallery' page that should redirect to the library index page."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.redirect('/library')
@@ -269,6 +275,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         try:
@@ -310,6 +317,7 @@ class CollectionSummariesHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         try:

@@ -974,3 +974,40 @@ class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
             '/mock/%s' % self.private_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
+
+
+class AccessLearnerDashboardDecoratorTest(test_utils.GenericTestBase):
+    """Tests the decorator can_access_learner_dashboard."""
+
+    user = 'user'
+    user_email = 'user@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+
+        @acl_decorators.can_access_learner_dashboard
+        def get(self):
+            return self.render_json({})
+
+    def setUp(self):
+        super(AccessLearnerDashboardDecoratorTest, self).setUp()
+        self.signup(self.user_email, self.user)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.set_banned_users([self.banned_user])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_is_redirected(self):
+        self.login(self.banned_user_email)
+        response = self.testapp.get('/mock/', expect_errors=True)
+        self.assertEqual(response.status_int, 302)
+        self.logout()
+
+    def test_exploration_editor_can_access_learner_dashboard(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()

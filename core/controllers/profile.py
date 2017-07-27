@@ -24,29 +24,10 @@ import feconf
 import utils
 
 
-def require_user_id_else_redirect_to_homepage(handler):
-    """Decorator that checks if a user_id is associated to the current
-    session. If not, the user is redirected to the main page.
-
-    Note that the user may not yet have registered.
-    """
-    def test_login(self, **kwargs):
-        """Checks if the user for the current session is logged in.
-
-        If not, redirects the user to the home page.
-        """
-        if not self.user_id:
-            self.redirect('/')
-            return
-        return handler(self, **kwargs)
-
-    return test_login
-
-
 class ProfilePage(base.BaseHandler):
     """The world-viewable profile page."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.open_access
     def get(self, username):
         """Handles GET requests for the publicly-viewable profile page."""
 
@@ -67,6 +48,7 @@ class ProfileHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self, username):
         """Handles GET requests."""
 
@@ -237,6 +219,7 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self, username):
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -255,7 +238,7 @@ class SignupPage(base.BaseHandler):
 
     REDIRECT_UNFINISHED_SIGNUPS = False
 
-    @require_user_id_else_redirect_to_homepage
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
         return_url = str(self.request.get('return_url', self.request.uri))
@@ -279,7 +262,7 @@ class SignupHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_user_id_else_redirect_to_homepage
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -293,7 +276,7 @@ class SignupHandler(base.BaseHandler):
             'username': user_settings.username,
         })
 
-    @require_user_id_else_redirect_to_homepage
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
         username = self.payload.get('username')
@@ -343,7 +326,7 @@ class UsernameCheckHandler(base.BaseHandler):
 
     REDIRECT_UNFINISHED_SIGNUPS = False
 
-    @require_user_id_else_redirect_to_homepage
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
         username = self.payload.get('username')
@@ -361,10 +344,10 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
+    @acl_decorators.can_manage_own_profile
     def put(self):
         """Handles PUT requests."""
-        if user_services.has_fully_registered(self.user_id):
-            site_language_code = self.payload.get('site_language_code')
-            user_services.update_preferred_site_language_code(
-                self.user_id, site_language_code)
+        site_language_code = self.payload.get('site_language_code')
+        user_services.update_preferred_site_language_code(
+            self.user_id, site_language_code)
         self.render_json({})

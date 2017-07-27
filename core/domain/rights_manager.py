@@ -176,6 +176,22 @@ class ActivityRights(object):
         """
         return bool(user_id in self.viewer_ids)
 
+    def is_published(self):
+        """Checks whether activity is published.
+
+        Args:
+            activity_rights: object. Activity rights object.
+
+        Returns:
+            bool. Whether activity is published.
+        """
+        if self.status == ACTIVITY_STATUS_PUBLIC:
+            return True
+        elif self.status == ACTIVITY_STATUS_PUBLICIZED:
+            return True
+        else:
+            return False
+
 
 def _get_activity_rights_from_model(activity_rights_model, activity_type):
     """Constructs an ActivityRights object from the given activity rights model.

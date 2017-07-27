@@ -61,7 +61,7 @@ def check_activity_accessible(
 
     if activity_rights is None:
         raise base.UserFacingExceptions.PageNotFoundException
-    elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+    elif activity_rights.is_published():
         return bool(action_play_public in user_actions)
     elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         return bool(
@@ -96,7 +96,7 @@ def check_exploration_editable(user_id, user_actions, exploration_id):
     if role_services.ACTION_EDIT_ANY_EXPLORATION in user_actions:
         return True
 
-    if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+    if exploration_rights.is_published():
         if (role_services.ACTION_EDIT_ANY_PUBLIC_EXPLORATION in
                 user_actions):
             return True
@@ -109,6 +109,16 @@ def check_exploration_editable(user_id, user_actions, exploration_id):
     return False
 
 
+def open_access(handler):
+    """Decorator to give access to everyone."""
+
+    def test_can_access(self, **kwargs):
+        return handler(self, **kwargs)
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
 def can_play_exploration(handler):
     """Decorator to check whether user can play given exploration."""
 
@@ -119,6 +129,7 @@ def can_play_exploration(handler):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
+    test_can_play.__wrapped__ = True
 
     return test_can_play
 
@@ -133,6 +144,7 @@ def can_play_collection(handler):
             return handler(self, collection_id, **kwargs)
         else:
             raise self.PageNotFoundException
+    test_can_play.__wrapped__ = True
 
     return test_can_play
 
@@ -149,6 +161,7 @@ def can_download_exploration(handler):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
+    test_can_download.__wrapped__ = True
 
     return test_can_download
 
@@ -165,6 +178,7 @@ def can_view_exploration_stats(handler):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
+    test_can_view_stats.__wrapped__ = True
 
     return test_can_view_stats
 
@@ -187,7 +201,7 @@ def can_edit_collection(handler):
         if role_services.ACTION_EDIT_ANY_COLLECTION in self.actions:
             return handler(self, collection_id, **kwargs)
 
-        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if collection_rights.is_published():
             if (role_services.ACTION_EDIT_ANY_PUBLIC_COLLECTION in
                     self.actions):
                 return handler(self, collection_id, **kwargs)
@@ -200,6 +214,7 @@ def can_edit_collection(handler):
 
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to edit this collection.')
+    test_can_edit.__wrapped__ = True
 
     return test_can_edit
 
@@ -216,6 +231,7 @@ def can_manage_email_dashboard(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to access email dashboard.')
+    test_can_manage_emails.__wrapped__ = True
 
     return test_can_manage_emails
 
@@ -232,6 +248,7 @@ def can_access_moderator_page(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to access moderator page.')
+    test_can_access_moderator_page.__wrapped__ = True
 
     return test_can_access_moderator_page
 
@@ -248,6 +265,7 @@ def can_send_moderator_emails(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to send moderator emails.')
+    test_can_send_moderator_emails.__wrapped__ = True
 
     return test_can_send_moderator_emails
 
@@ -264,6 +282,7 @@ def can_manage_own_profile(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to manage profile or preferences.')
+    test_can_manage_profile.__wrapped__ = True
 
     return test_can_manage_profile
 
@@ -279,6 +298,7 @@ def can_access_admin_page(handler):
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application', self.user_id)
         return handler(self, **kwargs)
+    test_super_admin.__wrapped__ = True
 
     return test_super_admin
 
@@ -294,6 +314,8 @@ def can_upload_exploration(handler):
             raise self.UnauthorizedUserException(
                 'You do not have credentials to upload exploration.')
         return handler(self, **kwargs)
+    test_can_upload.__wrapped__ = True
+
     return test_can_upload
 
 
@@ -309,6 +331,7 @@ def can_create_exploration(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to create an exploration.')
+    test_can_create.__wrapped__ = True
 
     return test_can_create
 
@@ -325,6 +348,7 @@ def can_create_collection(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to create a collection.')
+    test_can_create.__wrapped__ = True
 
     return test_can_create
 
@@ -343,11 +367,12 @@ def can_access_creator_dashboard(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to access creator dashboard.')
+    test_can_access.__wrapped__ = True
 
     return test_can_access
 
 
-def can_view_exploration_feedback(handler):
+def can_comment_on_feedback_thread(handler):
     """Decorator to check whether the user can view feedback for a given
     exploration.
     """
@@ -363,6 +388,7 @@ def can_view_exploration_feedback(handler):
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to view exploration feedback.')
+    test_can_access.__wrapped__ = True
 
     return test_can_access
 
@@ -378,6 +404,7 @@ def can_rate_exploration(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to give ratings to explorations.')
+    test_can_rate.__wrapped__ = True
 
     return test_can_rate
 
@@ -391,6 +418,7 @@ def can_flag_exploration(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to flag explorations.')
+    test_can_flag.__wrapped__ = True
 
     return test_can_flag
 
@@ -404,6 +432,7 @@ def can_subscribe_to_users(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to manage subscriptions.')
+    test_can_subscribe.__wrapped__ = True
 
     return test_can_subscribe
 
@@ -421,6 +450,7 @@ def can_edit_exploration(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this exploration.')
+    test_can_edit.__wrapped__ = True
 
     return test_can_edit
 
@@ -441,8 +471,7 @@ def can_delete_exploration(handler):
                     self.actions)) and
                 exploration_rights.is_owner(self.user_id)):
             return handler(self, exploration_id, **kwargs)
-        elif (exploration_rights.status == (
-                rights_manager.ACTIVITY_STATUS_PUBLIC) and
+        elif (exploration_rights.is_published() and
               role_services.ACTION_DELETE_ANY_PUBLIC_EXPLORATION in (
                   self.actions)):
             return handler(self, exploration_id, **kwargs)
@@ -450,6 +479,7 @@ def can_delete_exploration(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'User %s does not have permissions to delete exploration %s' %
                 (self.user_id, exploration_id))
+    test_can_delete.__wrapped__ = True
 
     return test_can_delete
 
@@ -465,6 +495,7 @@ def can_suggest_changes_to_exploration(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to give suggestions to this '
                 'exploration.')
+    test_can_suggest.__wrapped__ = True
 
     return test_can_suggest
 
@@ -497,6 +528,7 @@ def can_publish_exploration(handler):
 
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to publish this exploration.')
+    test_can_publish.__wrapped__ = True
 
     return test_can_publish
 
@@ -512,7 +544,7 @@ def can_manage_collection_publish_status(handler):
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if collection_rights.is_published():
             if role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in self.actions:
                 return handler(self, collection_id, **kwargs)
             raise self.UnauthorizedUserException(
@@ -528,6 +560,7 @@ def can_manage_collection_publish_status(handler):
 
             raise self.UnauthorizedUserException(
                 'You do not have credentials to publish this collection.')
+    test_can_manage_collection_publish_status.__wrapped__ = True
 
     return test_can_manage_collection_publish_status
 
@@ -561,5 +594,56 @@ def can_modify_exploration_roles(handler):
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to change rights for this '
             'exploration.')
+    test_can_modify.__wrapped__ = True
 
     return test_can_modify
+
+
+def can_perform_cron_tasks(handler):
+    """Decorator to ensure that the handler is being called by cron or by a
+    superadmin of the application.
+    """
+
+    def test_can_perform(self, **kwargs):
+        if (self.request.headers.get('X-AppEngine-Cron') is None and
+                not self.is_super_admin):
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+        else:
+            return handler(self, **kwargs)
+    test_can_perform.__wrapped__ = True
+
+    return test_can_perform
+
+
+def can_access_learner_dashboard(handler):
+    """Decorator to check access to learner dashboard."""
+
+    def test_can_access(self, **kwargs):
+        if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.NotLoggedInException
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def require_user_id_else_redirect_to_homepage(handler):
+    """Decorator that checks if a user_id is associated to the current
+    session. If not, the user is redirected to the main page.
+
+    Note that the user may not yet have registered.
+    """
+    def test_login(self, **kwargs):
+        """Checks if the user for the current session is logged in.
+
+        If not, redirects the user to the home page.
+        """
+        if not self.user_id:
+            self.redirect('/')
+            return
+        return handler(self, **kwargs)
+    test_login.__wrapped__ = True
+
+    return test_login

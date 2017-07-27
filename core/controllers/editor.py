@@ -100,60 +100,6 @@ def _require_valid_version(version_from_payload, exploration_version):
             % (exploration_version, version_from_payload))
 
 
-def require_editor(handler):
-    """Decorator that checks if the user can edit the given exploration."""
-    def test_editor(self, exploration_id, escaped_state_name=None, **kwargs):
-        """Gets the user and exploration id if the user can edit it.
-
-        Args:
-            self: the handler instance
-            exploration_id: the exploration id
-            escaped_state_name: the URL-escaped state name, if it exists
-            **kwargs: any other arguments passed to the handler
-
-        Returns:
-            The relevant handler, if the user is authorized to edit this
-            exploration.
-
-        Raises:
-            self.PageNotFoundException: if no such exploration or state exists.
-            self.UnauthorizedUserException: if the user exists but does not
-                have the right credentials.
-        """
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if self.username in config_domain.BANNED_USERNAMES.value:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-        except:
-            raise self.PageNotFoundException
-
-        if not rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to edit this exploration.',
-                self.user_id)
-
-        if not escaped_state_name:
-            return handler(self, exploration_id, **kwargs)
-
-        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
-        if state_name not in exploration.states:
-            logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % exploration.states.keys())
-            raise self.PageNotFoundException
-
-        return handler(self, exploration_id, state_name, **kwargs)
-
-    return test_editor
-
-
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
     pass
@@ -572,6 +518,7 @@ class UserExplorationEmailsHandler(EditorHandler):
     exploration.
     """
 
+    @acl_decorators.can_edit_exploration
     def put(self, exploration_id):
         """Updates the email notification preferences for the given exploration.
 
@@ -612,6 +559,7 @@ class UntrainedAnswersHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
@@ -739,7 +687,8 @@ class StateYamlHandler(EditorHandler):
     layer.
     """
 
-    def post(self):
+    @acl_decorators.can_play_exploration
+    def post(self, unused_exploration_id):
         """Handles POST requests."""
         try:
             state_dict = self.payload.get('state_dict')
@@ -772,6 +721,7 @@ class ExplorationSnapshotsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
 
@@ -936,7 +886,7 @@ class ImageUploadHandler(EditorHandler):
 class AudioFileHandler(EditorHandler):
     """Handles audio file uploads to Google Cloud Storage."""
 
-    @require_editor
+    @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
 
@@ -1010,7 +960,8 @@ class AudioFileHandler(EditorHandler):
 class StartedTutorialEventHandler(EditorHandler):
     """Records that this user has started the state editor tutorial."""
 
-    def post(self):
+    @acl_decorators.can_play_exploration
+    def post(self, unused_exploration_id):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)
 

@@ -37,6 +37,7 @@ from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import subscriptions
+from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -56,6 +57,7 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    @acl_decorators.open_access
     def post(self):
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
@@ -65,6 +67,7 @@ class FrontendErrorHandler(base.BaseHandler):
 class WarmupHandler(base.BaseHandler):
     """Handles warmup requests."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET warmup requests."""
         pass
@@ -74,6 +77,8 @@ class HomePageRedirectHandler(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
+
+    @acl_decorators.open_access
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
             user_settings = user_services.get_user_settings(
@@ -201,8 +206,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExploration),
     get_redirect_route(
-        r'/my_explorations', creator_dashboard.CreatorDashboardRedirectPage),
-    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
@@ -327,7 +330,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
         editor.AudioFileHandler),
-    get_redirect_route(r'/createhandler/state_yaml', editor.StateYamlHandler),
+    get_redirect_route(
+        r'/createhandler/state_yaml/<exploration_id>',
+        editor.StateYamlHandler),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
         editor.UntrainedAnswersHandler),
@@ -362,7 +367,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
         editor.StateRulesStatsHandler),
     get_redirect_route(
-        r'/createhandler/started_tutorial_event',
+        r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',

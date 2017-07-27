@@ -15,6 +15,7 @@
 """Controllers for the learner dashboard."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -25,10 +26,11 @@ from core.domain import user_services
 import feconf
 import utils
 
+
 class LearnerDashboardPage(base.BaseHandler):
     """Page showing the user's learner dashboard."""
 
-    @base.require_user
+    @acl_decorators.can_access_learner_dashboard
     def get(self):
         if self.username in config_domain.BANNED_USERNAMES.value:
             raise self.UnauthorizedUserException(
@@ -50,11 +52,9 @@ class LearnerDashboardHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        if self.user_id is None:
-            raise self.PageNotFoundException
-
         (learner_progress, number_of_deleted_activities,
          completed_to_incomplete_collections) = (
              learner_progress_services.get_activity_progress(self.user_id))
@@ -119,11 +119,9 @@ class LearnerDashboardHandler(base.BaseHandler):
 class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
 
+    @acl_decorators.can_access_learner_dashboard
     def get(self, exploration_id, thread_id):
         """Handles GET requests."""
-        if self.user_id is None:
-            raise self.PageNotFoundException
-
         messages = feedback_services.get_messages(
             exploration_id, thread_id)
         author_ids = [m.author_id for m in messages]
