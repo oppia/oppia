@@ -373,8 +373,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
-        thread_summaries = feedback_services.get_thread_summaries(
-            self.user_id, thread_ids)
+        thread_summaries, number_of_unread_threads = (
+            feedback_services.get_thread_summaries(self.user_id, thread_ids))
         exploration_titles = ['Bridges in England', 'Sillat Suomi']
 
         # Fetch the threads.
@@ -384,25 +384,40 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         threads.append(feedback_services.get_thread(
             thread_ids[1].split('.')[0], thread_ids[1].split('.')[1]))
 
+        # Check if the number of unread messages match.
+        self.assertEqual(number_of_unread_threads, 0)
         for index, thread in enumerate(threads):
             thread_summary = {
                 'status': thread.status,
                 'original_author_id': thread.original_author_id,
                 'last_updated': thread_summaries[index]['last_updated'],
                 'last_message_text': 'not used here',
-                'total_no_of_messages': 1,
+                'total_message_count': 1,
                 'last_message_read': True,
                 'second_last_message_read': None,
-                'author_last_message': self.user_id,
+                'author_last_message': user_services.get_username(self.user_id),
                 'author_second_last_message': None,
                 'exploration_title': exploration_titles[index]
             }
             # Check if the summaries match.
-            self.assertEqual(thread_summary, thread_summaries[index])
+            self.assertDictContainsSubset(
+                thread_summary, thread_summaries[index])
+
+        feedback_services.create_message(
+            self.EXP_ID_1, threads[0].get_thread_id(), self.owner_id, None,
+            None, 'editor message')
+        _, number_of_unread_threads = (
+            feedback_services.get_thread_summaries(self.user_id, thread_ids))
+
+        # Check if the number of unread messages is equal to 1.
+        self.assertEqual(number_of_unread_threads, 1)
+
 
     def test_get_thread_summaries_load_test(self):
         # The speed of fetching the summaries of 100 threads having 5 messages
-        # should be less than 1 second.
+        # should be less than 1.7 second. In reality, the time taken to fetch
+        # all the summaries is less than 0.2s. However since it seems to take
+        # longer on Travis, the constant has been set to 1.7s.
         # Create 100 threads.
         for _ in range(100):
             feedback_services.create_thread(
@@ -426,9 +441,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         feedback_services.get_thread_summaries(self.user_id, thread_ids)
         elapsed_time = time.time() - start
         print "Time for fetching all the thread summaries -", elapsed_time
-        # Note (1995YogeshSharma): changing the below check from 1 to 1.5 as
-        #   this backend test fails on travis sometimes with 1 second.
-        self.assertLessEqual(elapsed_time, 1.5)
+        self.assertLessEqual(elapsed_time, 1.7)
 
     def test_update_messages_read_by_the_user(self):
         feedback_services.create_thread(

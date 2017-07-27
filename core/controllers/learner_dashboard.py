@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import subscription_services
@@ -73,6 +74,15 @@ class LearnerDashboardHandler(base.BaseHandler):
             learner_progress_services.get_collection_summary_dicts(
                 learner_progress.incomplete_collection_summaries))
 
+        full_thread_ids = subscription_services.get_all_threads_subscribed_to(
+            self.user_id)
+        if len(full_thread_ids) > 0:
+            thread_summaries, number_of_unread_threads = (
+                feedback_services.get_thread_summaries(
+                    self.user_id, full_thread_ids))
+        else:
+            thread_summaries, number_of_unread_threads = [], 0
+
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))
         creators_settings = user_services.get_users_settings(
@@ -99,6 +109,8 @@ class LearnerDashboardHandler(base.BaseHandler):
             'number_of_deleted_activities': number_of_deleted_activities,
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
+            'thread_summaries': thread_summaries,
+            'number_of_unread_threads': number_of_unread_threads,
             'subscription_list': subscription_list
         })
         self.render_json(self.values)
@@ -122,12 +134,34 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             self.user_id, exploration_id, thread_id, message_ids)
 
         message_summary_list = []
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+
+        if suggestion:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+            current_content_html = (
+                exploration.states[
+                    suggestion.state_name].content.html)
+            suggestion_summary = {
+                'suggestion_html': suggestion.suggestion_html,
+                'current_content_html': current_content_html,
+                'description': suggestion.description,
+                'author_username': authors_settings[0].username,
+                'author_picture_data_url': (
+                    authors_settings[0].profile_picture_data_url)
+            }
+            message_summary_list.append(suggestion_summary)
+            messages.pop(0)
+            authors_settings.pop(0)
+
         for m, author_settings in zip(messages, authors_settings):
             message_summary = {
+                'message_id': m.message_id,
                 'text': m.text,
+                'updated_status': m.updated_status,
                 'author_username': author_settings.username,
                 'author_picture_data_url': (
-                    author_settings.profile_picture_data_url)
+                    author_settings.profile_picture_data_url),
+                'created_on': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
 
