@@ -356,6 +356,7 @@
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Vous n'avez encore souscrit à aucun créateur.",
 	"I18N_PREFERENCES_PAGE_TITLE": "Modifie les préférences dans votre profil - Oppia",
 	"I18N_PREFERENCES_PICTURE": "Photo",
+	"I18N_PREFERENCES_PREFERRED_DASHBOARD": "Tableau de bord préféré",
 	"I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE": "Langues d’exploration préférées",
 	"I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN": "Ces langues seront sélectionnées par défaut quand vous rechercherez des explorations dans la galerie.",
 	"I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE": "Langue préférée du site",
