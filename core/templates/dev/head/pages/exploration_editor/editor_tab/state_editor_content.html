@@ -6,13 +6,13 @@
        title="Edit Card Content">&#xE254;
     </i>
     <div class="oppia-state-content-display oppia-transition-200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="Card Content">
-      <span ng-show="content[0].value == '' && isCurrentStateInitialState()" class="oppia-placeholder">
+      <span ng-show="content.isEmpty() && isCurrentStateInitialState()" class="oppia-placeholder">
         This is the first card of your exploration. Use this space to introduce your topic and engage the learner, then ask them a question.
       </span>
-      <span ng-show="content[0].value == '' && !isCurrentStateInitialState()" class="oppia-placeholder">
+      <span ng-show="content.isEmpty() && !isCurrentStateInitialState()" class="oppia-placeholder">
         You can speak to the learner here, then ask them a question.
       </span>
-      <span angular-html-bind="content[0].value" class="oppia-state-content-display-html protractor-test-state-content-display"></span>
+      <span angular-html-bind="content.getHtml()" class="oppia-state-content-display-html protractor-test-state-content-display"></span>
     </div>
     <!-- This is a dummy div created to mask the contents when hovered above user contents-->
     <div class="oppia-editable-section-mask protractor-test-state-edit-content"></div>
@@ -20,7 +20,8 @@
 </div>
 
 <div ng-if="contentEditorIsOpen" class="protractor-test-state-content-editor">
-  <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
+  <!-- TODO(sll): Instead of relying on content._html, create a state property for content with the usual 'displayed' and 'savedMemento' fields, and bind to the 'displayed' field. -->
+  <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content._html">
   </schema-based-editor>
   <div style="margin-top: 2px;">
     <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content pull-right" ng-click="onSaveContentButtonClicked()">Save Content</button>

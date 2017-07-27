@@ -20,14 +20,14 @@ oppia.controller('FeedbackTab', [
   '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
   'oppiaDatetimeFormatter', 'threadStatusDisplayService',
   'threadDataService', 'explorationStatesService', 'explorationData',
-  'changeListService', 'StateObjectFactory',
+  'changeListService', 'StateObjectFactory', 'ACTION_ACCEPT_SUGGESTION',
+  'ACTION_REJECT_SUGGESTION',
   function(
     $scope, $http, $modal, $timeout, $rootScope, alertsService,
     oppiaDatetimeFormatter, threadStatusDisplayService,
     threadDataService, explorationStatesService, explorationData,
-    changeListService, StateObjectFactory) {
-    var ACTION_ACCEPT_SUGGESTION = 'accept';
-    var ACTION_REJECT_SUGGESTION = 'reject';
+    changeListService, StateObjectFactory, ACTION_ACCEPT_SUGGESTION,
+    ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = threadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = threadDataService.data;
     $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
@@ -136,10 +136,10 @@ oppia.controller('FeedbackTab', [
           currentContent: function() {
             var state = explorationStatesService.getState(
               $scope.activeThread.suggestion.state_name);
-            return state !== undefined ? state.content[0].value : null;
+            return state !== undefined ? state.content.getHtml() : null;
           },
           newContent: function() {
-            return $scope.activeThread.suggestion.state_content.value;
+            return $scope.activeThread.suggestion.suggestion_html;
           }
         },
         controller: [
@@ -185,7 +185,14 @@ oppia.controller('FeedbackTab', [
             $scope.acceptSuggestion = function() {
               $modalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
-                commitMessage: $scope.commitMessage
+                commitMessage: $scope.commitMessage,
+                // TODO(sll): If audio files exist for the content being
+                // replaced, implement functionality in the modal for the
+                // exploration creator to indicate whether this change
+                // requires the corresponding audio subtitles to be updated.
+                // For now, we default to assuming that the changes are
+                // sufficiently small as to warrant no updates.
+                audioUpdateRequired: false
               });
             };
 
@@ -203,6 +210,7 @@ oppia.controller('FeedbackTab', [
       }).result.then(function(result) {
         threadDataService.resolveSuggestion(
           $scope.activeThread.thread_id, result.action, result.commitMessage,
+          result.audioUpdateRequired,
           function() {
             threadDataService.fetchThreads(function() {
               $scope.setActiveThread($scope.activeThread.thread_id);
@@ -214,7 +222,10 @@ oppia.controller('FeedbackTab', [
               var stateDict = explorationData.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
-              state.content[0].value = suggestion.state_content.value;
+              state.content.setHtml(suggestion.suggestion_html);
+              if (result.audioUpdateRequired) {
+                state.content.markAudioAsNeedingUpdate();
+              }
               explorationData.data.version += 1;
               explorationStatesService.setState(stateName, state);
               $rootScope.$broadcast('refreshVersionHistory', {

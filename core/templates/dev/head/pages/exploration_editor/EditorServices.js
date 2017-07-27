@@ -550,14 +550,16 @@ oppia.factory('explorationRightsService', [
       viewableIfPrivate: function() {
         return this._viewableIfPrivate;
       },
-      saveChangeToBackend: function(requestParams) {
-        var whenRightsSaved = $q.defer();
+      makeCommunityOwned: function() {
+        var whenCommunityOwnedSet = $q.defer();
         var that = this;
 
-        requestParams.version = explorationData.data.version;
-        var explorationRightsUrl = (
+        var requestUrl = (
           '/createhandler/rights/' + explorationData.explorationId);
-        $http.put(explorationRightsUrl, requestParams).then(function(response) {
+        $http.put(requestUrl, {
+          version: explorationData.data.version,
+          make_community_owned: true
+        }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
           that.init(
@@ -565,9 +567,92 @@ oppia.factory('explorationRightsService', [
             data.rights.viewer_names, data.rights.status,
             data.rights.cloned_from, data.rights.community_owned,
             data.rights.viewable_if_private);
-          whenRightsSaved.resolve();
+          whenCommunityOwnedSet.resolve();
         });
-        return whenRightsSaved.promise;
+        return whenCommunityOwnedSet.promise;
+      },
+      setViewability: function(viewableIfPrivate) {
+        var whenViewabilityChanged = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+            '/createhandler/rights/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          version: explorationData.data.version,
+          viewable_if_private: viewableIfPrivate
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenViewabilityChanged.resolve();
+        });
+        return whenViewabilityChanged.promise;          
+      },
+      saveRoleChanges: function(newMemberUsername, newMemberRole) {
+        var whenRolesSaved = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+            '/createhandler/rights/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          version: explorationData.data.version,
+          new_member_role: newMemberRole,
+          new_member_username: newMemberUsername
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenRolesSaved.resolve();
+        });
+        return whenRolesSaved.promise;  
+      },
+      makePublic: function(makePublic) {
+        var whenPublishStatusChanged = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+          '/createhandler/status/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          make_public: makePublic
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenPublishStatusChanged.resolve();
+        });
+        return whenPublishStatusChanged.promise;
+      },
+      makePublicized: function(makePublicized) {
+        var whenPublicizedStatusChanged = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+          '/createhandler/status/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          make_publicized: makePublicized
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenPublicizedStatusChanged.resolve();
+        });
+        return whenPublicizedStatusChanged.promise;
       },
       saveModeratorChangeToBackend: function(action, emailBody) {
         var that = this;
@@ -845,6 +930,9 @@ oppia.factory('explorationStatesService', [
         return answerGroups.map(function(answerGroup) {
           return answerGroup.toBackendDict();
         });
+      },
+      content: function(content) {
+        return content.toBackendDict()
       },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
@@ -2065,10 +2153,12 @@ oppia.factory('explorationWarningsService', [
       }
 
       if (Object.keys(stateWarnings).length) {
+        var errorString = (
+          Object.keys(stateWarnings).length > 1 ? 'cards have' : 'card has');
         _warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'The following states have errors: ' +
+            'The following ' + errorString + ' errors: ' +
             Object.keys(stateWarnings).join(', ') + '.')
         });
       }
@@ -2216,10 +2306,11 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
           switch (lostChange.property_name) {
             case 'content':
               if (newValue !== null) {
+                // TODO(sll): Also add display of audio translations here.
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div></div>').html(
                     '<strong>Edited content: </strong><div class="content">' +
-                      newValue.value + '</div>')
+                      newValue.html + '</div>')
                     .addClass('state-edit-desc'));
               }
               break;

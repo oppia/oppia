@@ -41,7 +41,7 @@ class FeedbackThread(object):
 
     def __init__(self, full_thread_id, exploration_id, state_name,
                  original_author_id, status, subject, summary, has_suggestion,
-                 created_on, last_updated):
+                 message_count, created_on, last_updated):
         """Initializes a FeedbackThread object."""
 
         self.id = full_thread_id
@@ -52,6 +52,7 @@ class FeedbackThread(object):
         self.subject = subject
         self.summary = summary
         self.has_suggestion = has_suggestion
+        self.message_count = message_count
 
         self.created_on = created_on
         self.last_updated = last_updated
@@ -78,7 +79,8 @@ class FeedbackThread(object):
             'status': self.status,
             'subject': self.subject,
             'summary': self.summary,
-            'thread_id': self.get_thread_id()
+            'thread_id': self.get_thread_id(),
+            'message_count': self.message_count
         }
 
     @staticmethod
@@ -106,6 +108,37 @@ class FeedbackThread(object):
             str. The ID of the feedback thread.
         """
         return full_thread_id.split('.')[1]
+
+    def get_full_message_id(self, message_id):
+        """Returns the full id of the message.
+
+        Args:
+            message_id: int. The id of the message for which we have to fetch
+                the complete message id.
+
+        Returns:
+            str. The full id corresponding to the given message id.
+        """
+        return '.'.join([self.id, str(message_id)])
+
+    def get_last_two_message_ids(self):
+        """Returns the full message ids of the last two messages of the thread.
+        If the thread has only one message, the id of the second last message is
+        None.
+
+        Returns:
+            list(str|None). The ids of the last two messages of the thread. If
+                the message does not exist, None is returned.
+        """
+        message_ids = []
+        last_message_id = self.message_count - 1
+        message_ids.append(self.get_full_message_id(last_message_id))
+        if self.message_count > 1:
+            second_last_message_id = self.message_count - 2
+            message_ids.append(self.get_full_message_id(second_last_message_id))
+        else:
+            message_ids.append(None)
+        return message_ids
 
 
 class FeedbackMessage(object):
@@ -214,11 +247,11 @@ class Suggestion(object):
             with the suggestion.
         state_name: str. The name of the state associated with the suggestion.
         description: str. A description of the suggestion.
-        state_content: str. The state's suggested content.
+        suggestion_html: str. The state's suggested content.
         """
 
     def __init__(self, full_thread_id, author_id, exploration_id,
-                 exploration_version, state_name, description, state_content):
+                 exploration_version, state_name, description, suggestion_html):
         """Initializes a Suggestion object."""
         self.id = full_thread_id
         self.author_id = author_id
@@ -226,7 +259,7 @@ class Suggestion(object):
         self.exploration_version = exploration_version
         self.state_name = state_name
         self.description = description
-        self.state_content = state_content
+        self.suggestion_html = suggestion_html
 
     def get_author_name(self):
         """Returns the author's username.
@@ -248,7 +281,7 @@ class Suggestion(object):
             'exploration_version': self.exploration_version,
             'state_name': self.state_name,
             'description': self.description,
-            'state_content': self.state_content
+            'suggestion_html': self.suggestion_html
         }
 
 

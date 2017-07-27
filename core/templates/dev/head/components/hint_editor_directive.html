@@ -41,7 +41,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="editHintForm.$invalid"
+                ng-disabled="!hint.hintText || editHintForm.$invalid"
                 ng-click="saveThisHint()">
           Save
         </button>

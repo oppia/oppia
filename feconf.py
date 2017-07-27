@@ -51,18 +51,26 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
-INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
-GADGETS_DIR = os.path.join('extensions', 'gadgets')
-RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
+
+EXTENSIONS_DIR_PREFIX = (
+    'backend_prod_files' if (IS_MINIFIED or not DEV_MODE) else '')
+INTERACTIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+GADGETS_DIR = os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'gadgets')
+RTE_EXTENSIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
-# Choose production template if minification flag is used or
+# Choose production templates folder if minification flag is used or
 # if in production mode
-TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
-FRONTEND_TEMPLATES_DIR = os.path.join(
-    'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
-DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
+if IS_MINIFIED or not DEV_MODE:
+    FRONTEND_TEMPLATES_DIR = (
+        os.path.join('backend_prod_files', 'templates', 'head'))
+else:
+    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+DEPENDENCIES_TEMPLATES_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
@@ -70,7 +78,7 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
-# A mapping of interaction ids to their default classifier.
+# A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'LDAStringClassifier',
@@ -89,6 +97,21 @@ ALLOWED_TRAINING_JOB_STATUSES = [
     TRAINING_JOB_STATUS_NEW,
     TRAINING_JOB_STATUS_PENDING
 ]
+
+# The maximum number of characters allowed for userbio length.
+MAX_BIO_LENGTH_IN_CHARS = 2000
+
+ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
+    TRAINING_JOB_STATUS_COMPLETE: [],
+    TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
+    TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
+                                  TRAINING_JOB_STATUS_FAILED],
+    TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
+}
+
+# The maximum number of activities allowed in the playlist of the learner. This
+# limit applies to both the explorations playlist and the collections playlist.
+MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
@@ -127,13 +150,13 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 10
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 12
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 3
+CURRENT_COLLECTION_SCHEMA_VERSION = 4
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -175,8 +198,21 @@ DEFAULT_VM_ID = 'vm_default'
 # Shared secret key for default VM.
 DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 
-# An array containing the accepted image extensions for uploaded files.
-ACCEPTED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif']
+# An array containing the accepted image formats (as determined by the imghdr
+# module) and the corresponding allowed extensions in the filenames of uploaded
+# images.
+ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
+    'jpeg': ['jpg', 'jpeg'],
+    'png': ['png'],
+    'gif': ['gif'],
+}
+
+# An array containing the accepted audio extensions for uploaded files and
+# the corresponding MIME types.
+ACCEPTED_AUDIO_EXTENSIONS = {
+    'mp3': ['audio/mp3']
+}
+
 
 # A string containing the disallowed characters in state or exploration names.
 # The underscore is needed because spaces in names must be converted to
@@ -357,6 +393,9 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
+# The maximum playback length of an audio file, in seconds.
+MAX_AUDIO_FILE_LENGTH_SEC = 300
+
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
 DEFAULT_SKIN_ID = 'conversation_v1'
@@ -521,12 +560,12 @@ COLLECTION_URL_PREFIX = '/collection'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
-DASHBOARD_EXPLORATION_STATS_PREFIX = '/creatordashboardhandler/explorationstats'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
+EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
 EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
@@ -538,6 +577,7 @@ FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
+LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -771,7 +811,6 @@ ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
-ROLE_ID_SUPER_ADMIN = 'SUPER_ADMIN'
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role Ids.

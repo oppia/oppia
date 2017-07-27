@@ -98,17 +98,29 @@ describe('Collection editor state service', function() {
       title: 'Collection Under Test',
       category: 'Test',
       objective: 'To pass',
-      schema_version: '1',
+      language_code: 'en',
+      schema_version: '3',
       version: '1',
       nodes: [{
         exploration_id: '0',
-        prerequisite_skills: [],
-        acquired_skills: ['skill2']
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: ['skill0']
       }, {
         exploration_id: '1',
-        prerequisite_skills: ['skill2'],
-        acquired_skills: ['skill1']
-      }]
+        prerequisite_skill_ids: ['skill0'],
+        acquired_skill_ids: ['skill1']
+      }],
+      next_skill_id: 2,
+      skills: {
+        skill0: {
+          name: '0',
+          question_ids: []
+        },
+        skill1: {
+          name: '1',
+          question_ids: []
+        }
+      }
     };
     secondBackendCollectionObject = {
       id: '5',
@@ -117,13 +129,20 @@ describe('Collection editor state service', function() {
       objective: 'To be interesting',
       language_code: 'en',
       tags: [],
-      schema_version: '2',
+      schema_version: '3',
       version: '3',
       nodes: [{
         exploration_id: '0',
-        prerequisite_skills: [],
-        acquired_skills: ['interest']
-      }]
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: ['skill0']
+      }],
+      next_skill_id: 1,
+      skills: {
+        skill0: {
+          name: '0',
+          question_ids: []
+        }
+      }
     };
 
     privateCollectionRightsObject = {
@@ -464,7 +483,7 @@ describe('Collection editor state service', function() {
 
     var collectionSkillList = (
       CollectionEditorStateService.getCollectionSkillList());
-    expect(collectionSkillList.getSkills()).toEqual(['skill1', 'skill2']);
+    expect(collectionSkillList.getSkills()).toEqual(['skill0', 'skill1']);
     expect(collectionSkillList).toBe(prevCollectionSkillList);
   });
 
@@ -475,18 +494,18 @@ describe('Collection editor state service', function() {
 
       var prevCollectionSkillList = (
         CollectionEditorStateService.getCollectionSkillList());
-      expect(prevCollectionSkillList.getSkills()).toEqual(['skill1', 'skill2']);
+      expect(prevCollectionSkillList.getSkills()).toEqual(['skill0', 'skill1']);
 
       // Simply applying a change is adequate for updating the skill list.
       var collection = CollectionEditorStateService.getCollection();
       CollectionUpdateService.setAcquiredSkills(
-        collection, '0', ['skill2', 'skill3']);
+        collection, '0', ['skill1', 'skill3']);
       $rootScope.$apply();
 
       var collectionSkillList = (
         CollectionEditorStateService.getCollectionSkillList());
       expect(collectionSkillList.getSkills()).toEqual([
-        'skill1', 'skill2', 'skill3']);
+        'skill0', 'skill1', 'skill3']);
       expect(collectionSkillList).toBe(prevCollectionSkillList);
     }
   );

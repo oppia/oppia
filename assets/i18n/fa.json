@@ -17,6 +17,7 @@
 	"I18N_CREATE_YES_PLEASE": "بله, لطفا",
 	"I18N_DASHBOARD_COLLECTIONS": "مجموعه‌ها",
 	"I18N_DASHBOARD_EXPLORATIONS": "تجارب من",
+	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "به نظر می رسد هنوز کشفیات ایجاد نکرده اید. بیا شروع کنیم!",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "بازخورد باز",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "تصویر را به اینجا بکشید",
 	"I18N_ERROR_DISABLED_EXPLORATION": "تجارب غیر فعال",

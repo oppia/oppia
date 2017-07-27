@@ -19,23 +19,29 @@
 describe('Collection linearizer service', function() {
   var CollectionObjectFactory = null;
   var CollectionNodeObjectFactory = null;
+  var CollectionSkillObjectFactory = null;
   var CollectionLinearizerService = null;
 
   var firstCollectionNode = null;
   var secondCollectionNode = null;
   var thirdCollectionNode = null;
+  var firstCollectionSkill = null;
+  var secondCollectionSkill = null;
+  var thirdCollectionSkill = null;
 
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    CollectionSkillObjectFactory = $injector.get(
+      'CollectionSkillObjectFactory');
     CollectionLinearizerService = $injector.get('CollectionLinearizerService');
 
     var firstCollectionNodeBackendObject = {
       exploration_id: 'exp_id0',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: ['skill0'],
       exploration_summary: {
         title: 'exp title0',
         category: 'exp category',
@@ -44,11 +50,13 @@ describe('Collection linearizer service', function() {
     };
     firstCollectionNode = CollectionNodeObjectFactory.create(
       firstCollectionNodeBackendObject);
+    firstCollectionSkill = CollectionSkillObjectFactory.createFromIdAndName(
+      'skill0', 'exp title0');
 
     var secondCollectionNodeBackendObject = {
       exploration_id: 'exp_id1',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration_summary: {
         title: 'exp title1',
         category: 'exp category',
@@ -57,11 +65,13 @@ describe('Collection linearizer service', function() {
     };
     secondCollectionNode = CollectionNodeObjectFactory.create(
       secondCollectionNodeBackendObject);
+    secondCollectionSkill = CollectionSkillObjectFactory.createFromIdAndName(
+      'skill1', 'exp title1');
 
     var thirdCollectionNodeBackendObject = {
       exploration_id: 'exp_id2',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration_summary: {
         title: 'exp title2',
         category: 'exp category',
@@ -70,22 +80,28 @@ describe('Collection linearizer service', function() {
     };
     thirdCollectionNode = CollectionNodeObjectFactory.create(
       thirdCollectionNodeBackendObject);
+    thirdCollectionSkill = CollectionSkillObjectFactory.createFromIdAndName(
+      'skill2', 'exp title2');
   }));
 
   // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2
   var createLinearCollection = function() {
     var collection = CollectionObjectFactory.createEmptyCollection();
-    firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
-    secondCollectionNode.getPrerequisiteSkillList().setSkills(['exp title0']);
-    secondCollectionNode.getAcquiredSkillList().setSkills(['exp title1']);
-    thirdCollectionNode.getPrerequisiteSkillList().setSkills(['exp title1']);
-    thirdCollectionNode.getAcquiredSkillList().setSkills(['exp title2']);
+    firstCollectionNode.getAcquiredSkillList().setSkills(['skill0']);
+    secondCollectionNode.getPrerequisiteSkillList().setSkills(['skill0']);
+    secondCollectionNode.getAcquiredSkillList().setSkills(['skill1']);
+    thirdCollectionNode.getPrerequisiteSkillList().setSkills(['skill1']);
+    thirdCollectionNode.getAcquiredSkillList().setSkills(['skill2']);
 
     // Add collections in a different order from which they will be displayed
     // by the linearizer for robustness.
     collection.addCollectionNode(thirdCollectionNode);
     collection.addCollectionNode(secondCollectionNode);
     collection.addCollectionNode(firstCollectionNode);
+    collection.setNextSkillId(3);
+    collection.addCollectionSkill(thirdCollectionSkill);
+    collection.addCollectionSkill(secondCollectionSkill);
+    collection.addCollectionSkill(firstCollectionSkill);
     return collection;
   };
 
@@ -142,11 +158,15 @@ describe('Collection linearizer service', function() {
       function() {
         var collection = CollectionObjectFactory.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
+        collection.setNextSkillId(1);
+        collection.addCollectionSkill(firstCollectionSkill);
         expect(collection.containsCollectionNode('exp_id0')).toBe(true);
+        expect(collection.containsCollectionSkill('skill0')).toBe(true);
         expect(
           CollectionLinearizerService.removeCollectionNode(
             collection, 'exp_id0')).toBe(true);
         expect(collection.containsCollectionNode('exp_id0')).toBe(false);
+        expect(collection.containsCollectionSkill('skill0')).toBe(false);
         expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([]);
@@ -155,6 +175,9 @@ describe('Collection linearizer service', function() {
 
     it('should correctly remove the first node from a collection', function() {
       var collection = createLinearCollection();
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
+      expect(collection.containsCollectionSkill('skill1')).toBe(true);
+      expect(collection.containsCollectionSkill('skill2')).toBe(true);
       expect(collection.containsCollectionNode('exp_id0')).toBe(true);
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -164,6 +187,9 @@ describe('Collection linearizer service', function() {
         CollectionLinearizerService.removeCollectionNode(
           collection, 'exp_id0')).toBe(true);
       expect(collection.containsCollectionNode('exp_id0')).toBe(false);
+      expect(collection.containsCollectionSkill('skill0')).toBe(false);
+      expect(collection.containsCollectionSkill('skill1')).toBe(true);
+      expect(collection.containsCollectionSkill('skill2')).toBe(true);
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([secondCollectionNode, thirdCollectionNode]);
@@ -172,6 +198,9 @@ describe('Collection linearizer service', function() {
     it('should correctly remove the last node from a collection', function() {
       var collection = createLinearCollection();
       expect(collection.containsCollectionNode('exp_id2')).toBe(true);
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
+      expect(collection.containsCollectionSkill('skill1')).toBe(true);
+      expect(collection.containsCollectionSkill('skill2')).toBe(true);
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
@@ -180,6 +209,9 @@ describe('Collection linearizer service', function() {
         CollectionLinearizerService.removeCollectionNode(
           collection, 'exp_id2')).toBe(true);
       expect(collection.containsCollectionNode('exp_id2')).toBe(false);
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
+      expect(collection.containsCollectionSkill('skill1')).toBe(true);
+      expect(collection.containsCollectionSkill('skill2')).toBe(false);
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([firstCollectionNode, secondCollectionNode]);
@@ -188,6 +220,9 @@ describe('Collection linearizer service', function() {
     it('should correctly remove a middle node from a collection', function() {
       var collection = createLinearCollection();
       expect(collection.containsCollectionNode('exp_id1')).toBe(true);
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
+      expect(collection.containsCollectionSkill('skill1')).toBe(true);
+      expect(collection.containsCollectionSkill('skill2')).toBe(true);
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
@@ -196,6 +231,9 @@ describe('Collection linearizer service', function() {
         CollectionLinearizerService.removeCollectionNode(
           collection, 'exp_id1')).toBe(true);
       expect(collection.containsCollectionNode('exp_id1')).toBe(false);
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
+      expect(collection.containsCollectionSkill('skill1')).toBe(false);
+      expect(collection.containsCollectionSkill('skill2')).toBe(true);
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([firstCollectionNode, thirdCollectionNode]);
@@ -206,6 +244,7 @@ describe('Collection linearizer service', function() {
     it('should correctly append a node to an empty collection', function() {
       var collection = CollectionObjectFactory.createEmptyCollection();
       expect(collection.containsCollectionNode('exp_id0')).toBe(false);
+      expect(collection.containsCollectionSkill('skill0')).toBe(false);
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([]);
@@ -218,14 +257,15 @@ describe('Collection linearizer service', function() {
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([firstCollectionNode]);
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
     });
 
     it('should correctly append a node to a non-empty collection', function() {
       var collection = createLinearCollection();
       var newCollectionNodeBackendObject = {
         exploration_id: 'exp_id3',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration_summary: {
           title: 'exp title3',
           category: 'exp category',
@@ -238,6 +278,9 @@ describe('Collection linearizer service', function() {
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
             [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
+      expect(collection.containsCollectionSkill('skill1')).toBe(true);
+      expect(collection.containsCollectionSkill('skill2')).toBe(true);
       CollectionLinearizerService.appendCollectionNode(
         collection, 'exp_id3', newCollectionNode.getExplorationSummaryObject());
       newCollectionNode = collection.getCollectionNodeByExplorationId(
@@ -249,6 +292,10 @@ describe('Collection linearizer service', function() {
             collection.getCollectionNodeByExplorationId('exp_id1'),
             collection.getCollectionNodeByExplorationId('exp_id2'),
             collection.getCollectionNodeByExplorationId('exp_id3')]);
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
+      expect(collection.containsCollectionSkill('skill1')).toBe(true);
+      expect(collection.containsCollectionSkill('skill2')).toBe(true);
+      expect(collection.containsCollectionSkill('skill3')).toBe(true);
     });
   });
 

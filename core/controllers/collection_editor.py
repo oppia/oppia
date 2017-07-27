@@ -17,6 +17,7 @@
 """Controllers for the collections editor."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
@@ -95,7 +96,7 @@ class CollectionEditorHandler(base.BaseHandler):
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def get(self, collection_id):
         """Handles GET requests."""
 
@@ -131,7 +132,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
                 'which is too old. Please reload the page and try again.'
                 % (collection_version, version_from_payload))
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
 
@@ -150,7 +151,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
         self.render_json(self.values)
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def put(self, collection_id):
         """Updates properties of the given collection."""
 
@@ -182,7 +183,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 class CollectionRightsHandler(CollectionEditorHandler):
     """Handles management of collection editing rights."""
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def get(self, collection_id):
         """Gets the editing rights for the given collection."""
         collection = collection_services.get_collection_by_id(collection_id)
@@ -200,7 +201,7 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
         self.render_json(self.values)
 
-    @require_editor
+    @acl_decorators.can_manage_collection_publish_status
     def put(self, collection_id):
         """Updates the editing rights for the given collection."""
         collection = collection_services.get_collection_by_id(collection_id)
@@ -208,10 +209,10 @@ class CollectionRightsHandler(CollectionEditorHandler):
         _require_valid_version(version, collection.version)
 
         # TODO(bhenning): Implement other rights changes here.
-        is_public = self.payload.get('is_public')
+        make_public = self.payload.get('is_public')
 
-        if is_public is not None:
-            if is_public:
+        if make_public is not None:
+            if make_public:
                 try:
                     collection.validate(strict=True)
                     collection_services.validate_exps_in_collection_are_public(
@@ -223,14 +224,10 @@ class CollectionRightsHandler(CollectionEditorHandler):
                     self.user_id, collection_id)
                 collection_services.index_collections_given_ids([
                     collection_id])
-            elif rights_manager.Actor(self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id):
+            else:
                 rights_manager.unpublish_collection(self.user_id, collection_id)
                 collection_services.delete_documents_from_search_index([
                     collection_id])
-            else:
-                raise self.InvalidInputException(
-                    'Cannot unpublish a collection.')
 
         self.values.update({
             'can_edit': True,

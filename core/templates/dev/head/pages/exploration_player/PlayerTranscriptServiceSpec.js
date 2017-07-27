@@ -69,7 +69,7 @@ describe('Player transcript service', function() {
       },
       contentHtml: 'Content HTML',
       interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
-      answerFeedbackPairs: [],
+      inputResponsePairs: [],
       destStateName: null
     });
   });
@@ -78,30 +78,33 @@ describe('Player transcript service', function() {
     pts.addNewCard('First state', {
       a: 'b'
     }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
-    pts.addNewAnswer('first answer');
+    pts.addNewInput('first answer', false);
     expect(function() {
-      pts.addNewAnswer('invalid answer');
+      pts.addNewInput('invalid answer');
     }).toThrow(
       new Error(
-        'Trying to add an answer before the feedback for the previous answer ' +
-        'has been received.'));
+        'Trying to add an input before the response for the previous ' +
+        'input has been received.'));
 
-    pts.addNewFeedback('feedback');
+    pts.addNewResponse('feedback');
     expect(function() {
-      pts.addNewFeedback('invalid feedback');
+      pts.addNewResponse('invalid feedback');
     }).toThrow(
-      new Error('Trying to add feedback when it has already been added.'));
+      new Error('Trying to add a response when it has already been added.'));
 
-    pts.addNewAnswer('second answer', null);
+    pts.addNewInput('second answer', true);
 
     var firstCard = pts.getCard(0);
-    expect(firstCard.answerFeedbackPairs).toEqual([{
-      learnerAnswer: 'first answer',
-      oppiaFeedbackHtml: 'feedback'
+    expect(firstCard.inputResponsePairs).toEqual([{
+      learnerInput: 'first answer',
+      oppiaResponse: 'feedback',
+      isHint: false
     }, {
-      learnerAnswer: 'second answer',
-      oppiaFeedbackHtml: null
+      learnerInput: 'second answer',
+      oppiaResponse: null,
+      isHint: true
     }]);
+    expect(pts.getNumSubmitsForLastCard()).toBe(1);
   });
 
   it('should set a destination name correctly', function() {
@@ -132,11 +135,11 @@ describe('Player transcript service', function() {
     expect(pts.getLastStateName()).toBe('Second state');
 
     expect(pts.getNumSubmitsForLastCard()).toBe(0);
-    pts.addNewAnswer('first answer', null);
+    pts.addNewInput('first answer', false);
     expect(pts.getNumSubmitsForLastCard()).toBe(1);
-    pts.addNewFeedback('first feedback');
+    pts.addNewResponse('first feedback');
     expect(pts.getNumSubmitsForLastCard()).toBe(1);
-    pts.addNewAnswer('second answer', null);
+    pts.addNewInput('second answer', false);
     expect(pts.getNumSubmitsForLastCard()).toBe(2);
   });
 });
