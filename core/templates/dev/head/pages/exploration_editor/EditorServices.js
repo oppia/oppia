@@ -20,9 +20,10 @@
 oppia.factory('explorationData', [
   '$http', '$log', 'alertsService',
   'EditableExplorationBackendApiService',
+  'localSaveService',
   'ReadOnlyExplorationBackendApiService','$q',
   function($http, $log, alertsService, EditableExplorationBackendApiService,
-    ReadOnlyExplorationBackendApiService,$q) {
+    localSaveService, ReadOnlyExplorationBackendApiService,$q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
@@ -33,21 +34,6 @@ oppia.factory('explorationData', [
         break;
       }
     }
-    var localSaveKey = 'draft_' + explorationId;
-    // check that local storage exists and works as expected.
-    // If it does storage stores the localStorage object,
-    // else storage is undefined.
-    var storage = (function() {
-      var test = 'test';
-      var result;
-      try {
-        localStorage.setItem(test, test);
-        result = localStorage.getItem(test) == test;
-        localStorage.removeItem(test);
-        return result && localStorage;
-      } catch (exception) {}
-    }());
-
     if (!explorationId) {
       $log.error(
         'Unexpected call to explorationData for pathname ', pathnameArray[i]);
@@ -64,22 +50,15 @@ oppia.factory('explorationData', [
     var explorationData = {
       explorationId: explorationId,
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
-        // Firt save locally to be retrieved later if save is unsuccessful.
-        if (storage) {
-          var saveObject = {
-            draftChanges: changeList,
-            draftChangeListId: draftChangeListId};
-          saveObject = JSON.stringify(saveObject);
-          storage.setItem(localSaveKey, saveObject);
-        }
+        // First save locally to be retrieved later if save is unsuccessful.
+        localSaveService.saveExplorationDraft(explorationId, changeList,
+          draftChangeListId);
         $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
         }).then(function(response) {
           draftChangeListId = response.data.draft_change_list_id;
-          if (storage) {
-            storage.removeItem(localSaveKey);            
-          }
+          localSaveService.removeExplorationDraft(explorationId);
           if (successCallback) {
             successCallback(response);
           }
@@ -91,6 +70,7 @@ oppia.factory('explorationData', [
       },
       discardDraft: function(successCallback, errorCallback) {
         $http.post(explorationDraftAutosaveUrl, {}).then(function() {
+          localSaveService.removeExplorationDraft(explorationId);
           if (successCallback) {
             successCallback();
           }
