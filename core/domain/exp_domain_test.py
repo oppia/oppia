@@ -1056,27 +1056,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'old_state_name': 'Home',
             'new_state_name': 'Renamed state'
         }]
-        exploration.version += 1
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (exp_id, exploration.version)),
-            user_id=feconf.SYSTEM_COMMITTER_ID,
-            username='',
-            exploration_id=exp_id,
-            commit_type='commit_type',
-            commit_message='commit_message',
-            commit_cmds=change_list,
-            version=exploration.version,
-            post_commit_status='',
-            post_commit_community_owned=True,
-            post_commit_is_private=False
-        )
-        commit_log_model.put()
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [],
             'state_names_with_unchanged_answer_groups': ['Renamed state']
         }
-        actual_dict = exploration.get_trainable_states_dict(old_states)
+        actual_dict = exploration.get_trainable_states_dict(old_states,
+                                                            change_list)
         self.assertEqual(actual_dict, expected_dict)
 
         # Modify answer groups to trigger change in answer groups.
@@ -1092,27 +1078,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'property_name': 'answer_groups',
             'new_value': answer_groups
         }]
-        exploration.version += 1
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (exp_id, exploration.version)),
-            user_id=feconf.SYSTEM_COMMITTER_ID,
-            username='',
-            exploration_id=exp_id,
-            commit_type='commit_type',
-            commit_message='commit_message',
-            commit_cmds=change_list,
-            version=exploration.version,
-            post_commit_status='',
-            post_commit_community_owned=True,
-            post_commit_is_private=False
-        )
-        commit_log_model.put()
 
         expected_dict = {
             'state_names_with_changed_answer_groups': ['Renamed state'],
             'state_names_with_unchanged_answer_groups': []
         }
-        actual_dict = exploration.get_trainable_states_dict(old_states)
+        actual_dict = exploration.get_trainable_states_dict(old_states,
+                                                            change_list)
         self.assertEqual(actual_dict, expected_dict)
 
         # Add new state to trigger change in answer groups.
@@ -1123,28 +1095,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'cmd': 'add_state',
             'state_name': 'New state',
         }]
-        exploration.version += 1
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (exp_id, exploration.version)),
-            user_id=feconf.SYSTEM_COMMITTER_ID,
-            username='',
-            exploration_id=exp_id,
-            commit_type='commit_type',
-            commit_message='commit_message',
-            commit_cmds=change_list,
-            version=exploration.version,
-            post_commit_status='',
-            post_commit_community_owned=True,
-            post_commit_is_private=False
-        )
-        commit_log_model.put()
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [
                 'New state', 'Renamed state'],
             'state_names_with_unchanged_answer_groups': []
         }
-        actual_dict = exploration.get_trainable_states_dict(old_states)
+        actual_dict = exploration.get_trainable_states_dict(old_states,
+                                                            change_list)
         self.assertEqual(actual_dict, expected_dict)
 
 

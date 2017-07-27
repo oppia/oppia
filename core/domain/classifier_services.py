@@ -157,13 +157,14 @@ def handle_jobs_creation(exploration, state_names):
     create_multi_classifier_training_jobs(job_dicts_list)
 
 
-def handle_mappings_creation(exploration, state_names):
+def handle_mappings_creation(exploration, state_names, change_list):
     """Creates new TrainingJobExplorationMappingModel instances for all the
     state names passed into the function.
 
     Args:
         exploration: Exploration. The Exploration domain object.
         state_names: list(str). List of state names.
+        change_list: list(dict). A list of changes introduced in this commit.
     """
     exp_id = exploration.id
     exp_version = exploration.version
@@ -171,13 +172,10 @@ def handle_mappings_creation(exploration, state_names):
         old_state_name = state_name
         classifier_training_job = get_job(exp_id, exp_version-1, old_state_name)
         if not classifier_training_job:
-            commit_log_id = 'exploration-%s-%s' % (exp_id, exp_version-1)
-            commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-                commit_log_id)
-            for commit_cmd in commit_log_model.commit_cmds:
-                if (commit_cmd['cmd'] == 'rename_state') and commit_cmd[
-                        'new_state_name'] == state_name:
-                    old_state_name = commit_cmd['old_state_name']
+            for change_dict in change_list:
+                if (change_dict['cmd'] == 'rename_state') and (
+                        change_dict['new_state_name'] == state_name):
+                    old_state_name = change_dict['old_state_name']
             classifier_training_job = get_job(exp_id, exp_version-1,
                                               old_state_name)
         create_job_exploration_mapping(exp_id, exp_version, state_name,

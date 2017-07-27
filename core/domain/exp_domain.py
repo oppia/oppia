@@ -2967,12 +2967,14 @@ class Exploration(object):
 
         del self.states[state_name]
 
-    def get_trainable_states_dict(self, old_states):
+    def get_trainable_states_dict(self, old_states, change_list):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
 
         Args:
             old_states: dict. Dictionary containing all State domain objects.
+            change_list: list(dict). A list of changes introduced in this
+                commit.
 
         Returns:
             dict. The trainable states dict. This dict has two keys representing
@@ -2983,11 +2985,6 @@ class Exploration(object):
             'state_names_with_changed_answer_groups': [],
             'state_names_with_unchanged_answer_groups': []
         }
-
-        commit_log_id = 'exploration-%s-%s' % (self.id, self.version)
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-            commit_log_id)
-
         new_states = self.states
         for state_name in new_states:
             new_state = new_states[state_name]
@@ -2995,10 +2992,10 @@ class Exploration(object):
                 continue
 
             old_state_name = state_name
-            for commit_cmd in commit_log_model.commit_cmds:
-                if (commit_cmd['cmd'] == 'rename_state') and commit_cmd[
-                        'new_state_name'] == state_name:
-                    old_state_name = commit_cmd['old_state_name']
+            for change_dict in change_list:
+                if change_dict['cmd'] == 'rename_state' and (
+                        change_dict['new_state_name'] == state_name):
+                    old_state_name = change_dict['old_state_name']
 
             # The case where a new state is added. When this happens, there wont
             # be a corresponding state name in the older state dict.

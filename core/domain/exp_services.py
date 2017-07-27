@@ -796,7 +796,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     if feconf.ENABLE_STRING_CLASSIFIER:
         old_states = get_exploration_from_model(exploration_model).states
         trainable_states_dict = exploration.get_trainable_states_dict(
-            old_states)
+            old_states, change_list)
         state_names_with_changed_answer_groups = trainable_states_dict[
             'state_names_with_changed_answer_groups']
         state_names_with_unchanged_answer_groups = trainable_states_dict[
@@ -832,7 +832,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exploration, state_names_with_changed_answer_groups)
         if state_names_with_unchanged_answer_groups:
             classifier_services.handle_mappings_creation(
-                exploration, state_names_with_unchanged_answer_groups)
+                exploration, state_names_with_unchanged_answer_groups,
+                change_list)
 
 
 def _create_exploration(
