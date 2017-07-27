@@ -519,39 +519,33 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
                 continue
 
             if handler.get != base.BaseHandler.get:
-                if hasattr(handler.get, '__wrapped__'):
-                    handlers_checked.append((handler.__name__, 'GET', True))
-                else:
-                    handlers_checked.append((handler.__name__, 'GET', False))
+                handler_is_decorated = hasattr(handler.get, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'GET', handler_is_decorated))
 
             if handler.post != base.BaseHandler.post:
-                if hasattr(handler.post, '__wrapped__'):
-                    handlers_checked.append((handler.__name__, 'POST', True))
-                else:
-                    handlers_checked.append((handler.__name__, 'POST', False))
+                handler_is_decorated = hasattr(handler.post, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'POST', handler_is_decorated))
 
             if handler.put != base.BaseHandler.put:
-                if hasattr(handler.put, '__wrapped__'):
-                    handlers_checked.append((handler.__name__, 'PUT', True))
-                else:
-                    handlers_checked.append((handler.__name__, 'PUT', False))
+                handler_is_decorated = hasattr(handler.put, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'PUT', handler_is_decorated))
 
             if handler.delete != base.BaseHandler.delete:
-                if hasattr(handler.delete, '__wrapped__'):
-                    handlers_checked.append((handler.__name__, 'DELETE', True))
-                else:
-                    handlers_checked.append(
-                        (handler.__name__, 'DELETE', False))
+                handler_is_decorated = hasattr(handler.delete, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'DELETE', handler_is_decorated))
 
         self.log_line('Verifying decorators for handlers .... ')
-        for (name, method, status) in handlers_checked:
-            self.log_line('%s %s method' % (
-                name, method))
-            self.log_line('status: %s' % status)
+        for (name, method, handler_is_decorated) in handlers_checked:
+            self.log_line('%s %s method: %s' % (
+                name, method, 'PASS' if handler_is_decorated else 'FAIL'))
         self.log_line(
             'Total number of handlers checked: %s' % len(handlers_checked))
 
         self.assertGreater(len(handlers_checked), 0)
 
-        for (name, method, status) in handlers_checked:
-            self.assertTrue(status)
+        for (name, method, handler_is_decorated) in handlers_checked:
+            self.assertTrue(handler_is_decorated)
