@@ -502,11 +502,11 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
     """
 
     def test_every_method_has_decorator(self):
-        handlers_checked = set([])
+        handlers_checked = []
 
         for route in main.URLS:
             # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
-            # are touples. So, below check is to handle them.
+            # are tuples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
             else:
@@ -519,22 +519,39 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
                 continue
 
             if handler.get != base.BaseHandler.get:
-                handlers_checked.add(handler)
-                self.assertTrue(hasattr(handler.get, '__wrapped__'))
+                if hasattr(handler.get, '__wrapped__'):
+                    handlers_checked.append((handler.__name__, 'GET', True))
+                else:
+                    handlers_checked.append((handler.__name__, 'GET', False))
 
             if handler.post != base.BaseHandler.post:
-                handlers_checked.add(handler)
-                self.assertTrue(hasattr(handler.post, '__wrapped__'))
+                if hasattr(handler.post, '__wrapped__'):
+                    handlers_checked.append((handler.__name__, 'POST', True))
+                else:
+                    handlers_checked.append((handler.__name__, 'POST', False))
 
             if handler.put != base.BaseHandler.put:
-                handlers_checked.add(handler)
-                self.assertTrue(hasattr(handler.put, '__wrapped__'))
+                if hasattr(handler.put, '__wrapped__'):
+                    handlers_checked.append((handler.__name__, 'PUT', True))
+                else:
+                    handlers_checked.append((handler.__name__, 'PUT', False))
 
             if handler.delete != base.BaseHandler.delete:
-                handlers_checked.add(handler)
-                self.assertTrue(hasattr(handler.delete, '__wrapped__'))
+                if hasattr(handler.delete, '__wrapped__'):
+                    handlers_checked.append((handler.__name__, 'DELETE', True))
+                else:
+                    handlers_checked.append(
+                        (handler.__name__, 'DELETE', False))
 
+        self.log_line('Verifying decorators for handlers .... ')
+        for (name, method, status) in handlers_checked:
+            self.log_line('%s %s method' % (
+                name, method))
+            self.log_line('status: %s' % status)
         self.log_line(
             'Total number of handlers checked: %s' % len(handlers_checked))
 
         self.assertGreater(len(handlers_checked), 0)
+
+        for (name, method, status) in handlers_checked:
+            self.assertTrue(status)

@@ -47,8 +47,6 @@ oppia.directive('versionDiffVisualization', [
         // The header for the pane of the state comparison modal corresponding
         // to the later version of the exploration.
         getLaterVersionHeader: '&laterVersionHeader',
-        // Id of the exploration.
-        explorationId: '&explorationId'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/' +
@@ -109,7 +107,6 @@ oppia.directive('versionDiffVisualization', [
             'stroke: #B22222; stroke-opacity: 0.8; ' +
             'marker-end: url(#arrowhead-red)')
         };
-
         var diffGraphNodes = {};
         $scope.diffGraphSecondaryLabels = {};
         $scope.diffGraphNodeColors = {};
@@ -253,11 +250,11 @@ oppia.directive('versionDiffVisualization', [
             controller: [
               '$scope', '$http', '$modalInstance', '$timeout', 'newStateName',
               'oldStateName', 'newState', 'oldState', 'headers',
-              function(
-                  $scope, $http, $modalInstance, $timeout, newStateName,
-                  oldStateName, newState, oldState, headers) {
+              'explorationData', function($scope, $http, $modalInstance,
+              $timeout, newStateName, oldStateName, newState, oldState,
+              headers, explorationData) {
                 var STATE_YAML_URL = (
-                  '/createhandler/state_yaml/' + $scope.explorationId);
+                  '/createhandler/state_yaml/' + explorationData.explorationId);
 
                 $scope.headers = headers;
                 $scope.newStateName = newStateName;
