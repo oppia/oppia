@@ -148,44 +148,47 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                          feconf.TRAINING_JOB_STATUS_NEW)
 
 
-class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
-    """Tests for the ClassifierExplorationMappingModel class."""
+class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
+    """Tests for the TrainingJobExplorationMappingModel class."""
 
     def test_create_and_get_new_mapping_runs_successfully(self):
-        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
-            'exp_id1', 2, 'state_name4', 'classifier_id4')
+        mapping_id = (
+            classifier_models.TrainingJobExplorationMappingModel.create(
+                'exp_id1', 2, 'state_name4', 'job_id4'))
 
-        mapping = classifier_models.ClassifierExplorationMappingModel.get(
+        mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
         self.assertEqual(mapping.exp_id, 'exp_id1')
         self.assertEqual(mapping.exp_version, 2)
         self.assertEqual(mapping.state_name, 'state_name4')
-        self.assertEqual(mapping.classifier_id, 'classifier_id4')
+        self.assertEqual(mapping.job_id, 'job_id4')
 
         # Test that exception is raised when creating mapping with same id.
         with self.assertRaisesRegexp(Exception, (
             'A model with the same ID already exists.')):
             mapping_id = (
-                classifier_models.ClassifierExplorationMappingModel.create(
-                    'exp_id1', 2, 'state_name4', 'classifier_id4'))
+                classifier_models.TrainingJobExplorationMappingModel.create(
+                    'exp_id1', 2, 'state_name4', 'job_id4'))
 
         # Test that state names with unicode characters get saved correctly.
         state_name1 = u'Klüft'
-        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
-            'exp_id1', 2, state_name1, 'classifier_id4')
+        mapping_id = (
+            classifier_models.TrainingJobExplorationMappingModel.create(
+                'exp_id1', 2, state_name1, 'job_id4'))
 
-        mapping = classifier_models.ClassifierExplorationMappingModel.get(
+        mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
         self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name1.encode(
             'utf-8')))
 
         state_name2 = u'टेक्स्ट'
-        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
-            'exp_id1', 2, state_name2, 'classifier_id4')
+        mapping_id = (
+            classifier_models.TrainingJobExplorationMappingModel.create(
+                'exp_id1', 2, state_name2, 'job_id4'))
 
-        mapping = classifier_models.ClassifierExplorationMappingModel.get(
+        mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
         self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name2.encode(
@@ -195,14 +198,15 @@ class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         exp_id = 'exp_id1'
         exp_version = 1
         state_name = 'state_name1'
-        classifier_id = 'classifier_id1'
-        classifier_models.ClassifierExplorationMappingModel.create(
-            exp_id, exp_version, state_name, classifier_id)
+        job_id = 'job_id1'
+        classifier_models.TrainingJobExplorationMappingModel.create(
+            exp_id, exp_version, state_name, job_id)
 
-        mapping = classifier_models.ClassifierExplorationMappingModel.get_model(
-            exp_id, exp_version, state_name)
+        mapping = (
+            classifier_models.TrainingJobExplorationMappingModel.get_model(
+                exp_id, exp_version, state_name))
 
         self.assertEqual(mapping.exp_id, exp_id)
         self.assertEqual(mapping.exp_version, 1)
         self.assertEqual(mapping.state_name, state_name)
-        self.assertEqual(mapping.classifier_id, classifier_id)
+        self.assertEqual(mapping.job_id, job_id)

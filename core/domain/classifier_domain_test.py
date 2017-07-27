@@ -276,15 +276,15 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job.validate()
 
 
-class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
-    """Tests for the ClassifierExplorationMapping domain."""
+class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
+    """Tests for the TrainingJobExplorationMapping domain."""
 
     def _get_mapping_from_dict(self, mapping_dict):
-        mapping = classifier_domain.ClassifierExplorationMapping(
+        mapping = classifier_domain.TrainingJobExplorationMapping(
             mapping_dict['exp_id'],
             mapping_dict['exp_version'],
             mapping_dict['state_name'],
-            mapping_dict['classifier_id'])
+            mapping_dict['job_id'])
 
         return mapping
 
@@ -293,7 +293,7 @@ class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
             'exp_id': 'exp_id1',
             'exp_version': 2,
             'state_name': u'網站有中',
-            'classifier_id': 'classifier_id1'
+            'job_id': 'job_id1'
         }
         observed_mapping = self._get_mapping_from_dict(
             expected_mapping_dict)
@@ -301,7 +301,7 @@ class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
                              observed_mapping.to_dict())
 
     def test_validation(self):
-        """Tests to verify validate method of ClassifierExplorationMapping
+        """Tests to verify validate method of TrainingJobExplorationMapping
         domain."""
 
         # Verify no errors are raised for correct data.
@@ -309,7 +309,7 @@ class ClassifierExplorationMappingDomainTests(test_utils.GenericTestBase):
             'exp_id': 'exp_id1',
             'exp_version': 2,
             'state_name': u'網站有中',
-            'classifier_id': 'classifier_id1'
+            'job_id': 'job_id1'
         }
         mapping = self._get_mapping_from_dict(mapping_dict)
         mapping.validate()

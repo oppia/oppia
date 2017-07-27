@@ -183,7 +183,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def create_multi(cls, job_dicts_list):
-        """Creates multiplenew  ClassifierTrainingJobModel entries.
+        """Creates multiple new  ClassifierTrainingJobModel entries.
 
         Args:
             job_dicts_list: list(dict). The list of dicts where each dict
@@ -208,8 +208,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return list_job_ids
 
 
-class ClassifierExplorationMappingModel(base_models.BaseModel):
-    """Model for mapping exploration attributes to a ClassifierDataModel.
+class TrainingJobExplorationMappingModel(base_models.BaseModel):
+    """Model for mapping exploration attributes to a ClassifierTrainingJob.
 
     The id of instances of this class has the form
     {{exp_id}}.{{exp_version}}.{{utf8_encoded_state_name}}
@@ -222,8 +222,8 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
-    # The ID of the classifier corresponding to the exploration attributes.
-    classifier_id = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the training job corresponding to the exploration attributes.
+    job_id = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
@@ -265,7 +265,7 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, classifier_id):
+            cls, exp_id, exp_version, state_name, job_id):
         """Creates a new ClassifierExplorationMappingModel entry.
 
         Args:
@@ -274,7 +274,7 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
                 this training job was created.
             state_name: unicode. The name of the state to which the classifier
                 belongs.
-            classifier_id: str. The ID of the classifier corresponding to this
+            job_id: str. The ID of the training job corresponding to this
                 combination of <exp_id, exp_version, state_name>.
 
         Returns:
@@ -288,7 +288,7 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
         if not cls.get_by_id(instance_id):
             mapping_instance = cls(
                 id=instance_id, exp_id=exp_id, exp_version=exp_version,
-                state_name=state_name, classifier_id=classifier_id)
+                state_name=state_name, job_id=job_id)
 
             mapping_instance.put()
             return instance_id

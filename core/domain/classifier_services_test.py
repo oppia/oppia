@@ -18,7 +18,6 @@
 
 import os
 
-from core.domain import classifier_domain
 from core.domain import classifier_registry
 from core.domain import classifier_services
 from core.domain import exp_services
@@ -76,26 +75,25 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
 
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
+    # def test_string_classifier_classification(self):
+    #     """All these responses trigger the string classifier."""
+    #
+    #     with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'it\'s a permutation of 3 elements'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'There are 3 options for the first ball, and 2 for the '
+    #                 'remaining two. So 3*2=6.'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('abc acb bac bca cbb cba'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('dunno, just guessed'))
 
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
-
-    def test_create_jobs_and_update_mappings(self):
-        """Test the create_classifier_training_jobs method and
-        update_classifier_exploration_mappings method by triggering
-        update_exploration() method.
+    def test_handle_creation_of_jobs_and_mappings(self):
+        """Test the handle_jobs_creation method and handle_mappings_creation
+        method by triggering update_exploration() method.
         """
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
@@ -120,32 +118,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
-        # There should be one job in the data store now.
+        # There should be one job and one mapping in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 1)
-        for job in all_jobs:
-            job_id = job.id
-
-        # Create classifier as an effect of the job.
-        classifier_data = {
-            '_alpha': 0.1,
-            '_beta': 0.001,
-            '_prediction_threshold': 0.5,
-            '_training_iterations': 25,
-            '_prediction_iterations': 5,
-            '_num_labels': 10,
-            '_num_docs': 12,
-            '_num_words': 20,
-            '_label_to_id': {'text': 1},
-            '_word_to_id': {'hello': 2},
-            '_w_dp': [],
-            '_b_dl': [],
-            '_l_dp': [],
-            '_c_dl': [],
-            '_c_lw': [],
-            '_c_l': []
-        }
-        classifier_services.create_classifier(job_id, classifier_data)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 1)
 
         # Make a change to the exploration without changing the answer groups
         # to trigger mapping update.
@@ -154,13 +132,16 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'property_name': 'title',
             'new_value': 'New title'
         }]
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
-        # There should be one mapping in the data store now.
+        # There should be one job and two mappings in the data store now.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 1)
         all_mappings = (
-            classifier_models.ClassifierExplorationMappingModel.get_all())
-        self.assertEqual(all_mappings.count(), 1)
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 2)
 
         # Check that renaming a state does not create an extra job.
         change_list = [{
@@ -168,12 +149,17 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'old_state_name': 'Home',
             'new_state_name': 'Home2'
         }]
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
-        # There should still be only one job in the data store now.
+        # There should still be only one job and three mappings in the data
+        # store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 1)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 3)
 
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""
@@ -385,61 +371,60 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 feconf.TRAINING_JOB_STATUS_COMPLETE))):
             classifier_services.mark_training_job_complete(job_id)
 
-    def test_retrieval_of_classifier_from_exploration_attributes(self):
-        """Test the get_classifier method."""
+    def test_retrieval_of_classifier_training_job_from_exploration_attributes(
+            self):
+        """Test the get_job method."""
 
         exp_id = u'1'
         state_name = u'टेक्स्ट'
-        classifier_id = 'classifier_id1'
-        classifier_id = classifier_models.ClassifierDataModel.create(
-            classifier_id, exp_id, 1, state_name,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                'algorithm_id'], [], 1)
-        classifier_models.ClassifierExplorationMappingModel.create(
-            exp_id, 1, state_name, classifier_id)
-        classifier = (
-            classifier_services.get_classifier(
+        job_id = classifier_services.create_classifier_training_job(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            'TextInput', exp_id, 1, state_name, [],
+            feconf.TRAINING_JOB_STATUS_NEW)
+        classifier_training_job = (
+            classifier_services.get_job(
                 exp_id, 1, state_name))
-        self.assertEqual(classifier.exp_id, exp_id)
-        self.assertEqual(classifier.exp_version_when_created, 1)
-        self.assertEqual(classifier.state_name, state_name)
-        self.assertEqual(classifier.id, classifier_id)
+        self.assertEqual(classifier_training_job.exp_id, exp_id)
+        self.assertEqual(classifier_training_job.exp_version, 1)
+        self.assertEqual(classifier_training_job.state_name, state_name)
+        self.assertEqual(classifier_training_job.job_id, job_id)
 
-    def test_creation_of_classifier_exploration_mapping(self):
-        """Test the create_classifier_exploration_mapping method."""
+    def test_creation_of_job_exploration_mapping(self):
+        """Test the create_job_exploration_mapping method."""
 
         exp_id = '1'
         state_name = u'टेक्स्ट'
-        classifier_id = 'classifier_id1'
+        job_id = 'job_id1'
 
-        # Check that mapping can't be created since the classifier doesn't
+        # Check that mapping can't be created since the training job doesn't
         # exist.
         with self.assertRaisesRegexp(Exception, (
-            'Entity for class ClassifierDataModel with id %s not found' %(
-                classifier_id))):
-            classifier_services.create_classifier_exploration_mapping(
-                exp_id, 1, state_name, classifier_id)
+            'Entity for class ClassifierTrainingJobModel with id %s not '
+            'found' %(
+                job_id))):
+            classifier_services.create_job_exploration_mapping(
+                exp_id, 1, state_name, job_id)
 
-        # Create classifier
-        classifier_id = classifier_models.ClassifierDataModel.create(
-            classifier_id, exp_id, 1, state_name,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                'algorithm_id'], [], 1)
+        # Create classifier training job
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            'TextInput', exp_id, 1, [], state_name,
+            feconf.TRAINING_JOB_STATUS_NEW)
 
-        classifier_services.create_classifier_exploration_mapping(
-            exp_id, 1, state_name, classifier_id)
-        classifier_exploration_mapping = (
-            classifier_domain.ClassifierExplorationMapping(
-                exp_id, 1, state_name, classifier_id))
-        self.assertEqual(classifier_exploration_mapping.exp_id, exp_id)
-        self.assertEqual(classifier_exploration_mapping.exp_version, 1)
-        self.assertEqual(classifier_exploration_mapping.state_name, state_name)
-        self.assertEqual(classifier_exploration_mapping.classifier_id,
-                         classifier_id)
+        classifier_services.create_job_exploration_mapping(
+            exp_id, 1, state_name, job_id)
+        training_job_exploration_mapping_model = (
+            classifier_models.TrainingJobExplorationMappingModel.get_model(
+                exp_id, 1, state_name))
+        self.assertEqual(training_job_exploration_mapping_model.exp_id, exp_id)
+        self.assertEqual(training_job_exploration_mapping_model.exp_version, 1)
+        self.assertEqual(training_job_exploration_mapping_model.state_name,
+                         state_name)
+        self.assertEqual(training_job_exploration_mapping_model.job_id, job_id)
 
         # Check that exception is raised if the mapping already exists.
         with self.assertRaisesRegexp(Exception, (
-            'The Classifier-Exploration mapping with id %s.%s.%s '
+            'The TrainingJob-Exploration mapping with id %s.%s.%s '
             'already exists.' % (exp_id, 1, state_name.encode('utf-8')))):
-            classifier_services.create_classifier_exploration_mapping(
-                exp_id, 1, state_name, classifier_id)
+            classifier_services.create_job_exploration_mapping(
+                exp_id, 1, state_name, job_id)
