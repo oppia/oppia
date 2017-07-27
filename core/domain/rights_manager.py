@@ -183,7 +183,7 @@ class ActivityRights(object):
             activity_rights: object. Activity rights object.
 
         Returns:
-            bool. Whether activity is in published.
+            bool. Whether activity is published.
         """
         if self.status == ACTIVITY_STATUS_PUBLIC:
             return True
