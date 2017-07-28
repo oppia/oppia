@@ -27,8 +27,7 @@ current_user_services = models.Registry.import_current_user_services()
 
 def check_can_access_activity(
         user_id, user_actions, activity_type, activity_id):
-    """Returns a boolean to signify whether given activity is accessible
-    by the user or not.
+    """Checks whether the user can access given activity.
 
     Args:
         user_id: str. Id of the given user.
@@ -74,12 +73,11 @@ def check_can_access_activity(
 
 def check_can_edit_activity(
         user_id, user_actions, activity_type, activity_id):
-    """Returns a boolean to signify whether given activity is editable
-    by the user or not.
+    """Checks whether the user can edit given activity.
 
     Args:
         user_id: str. Id of the given user.
-        user_actions: list(str). List of actions given user can perform.
+        user_actions: list(str). List of actions the user can perform.
         activity_id: str. Id of the given activity.
 
     Returns:
@@ -88,8 +86,9 @@ def check_can_edit_activity(
     if user_id is None:
         return False
 
-    activity_rights = (rights_manager.get_exploration_rights(
-        activity_id, strict=False)
+    activity_rights = (
+        rights_manager.get_exploration_rights(
+            activity_id, strict=False)
         if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
         else rights_manager.get_collection_rights(activity_id, strict=False))
 
@@ -116,21 +115,28 @@ def check_can_edit_activity(
     else:
         return False
 
-    if activity_rights.community_owned:
+    if (activity_rights.community_owned or
+            (action_edit_any_activity in user_actions)):
         return True
 
-    if action_edit_any_activity in user_actions:
+    if (activity_rights.is_published() and
+            (action_edit_any_public_activity in user_actions)):
         return True
-
-    if activity_rights.is_published():
-        if action_edit_any_public_activity in user_actions:
-            return True
 
     return False
 
 
 def check_can_unpublish_collection(user_id, user_actions, collection_id):
-    """Checks whether the user can unpublish collection or not."""
+    """Checks whether the user can unpublish given collection.
+
+    Args:
+        user_id: str. Id of the user.
+        user_actions: list(str). List of actions the user can perform.
+        collection_id: str. Id of given collection.
+
+    Returns:
+        bool. Whether the user an unpublish given collection.
+    """
     if not user_id:
         return False
 
@@ -146,6 +152,16 @@ def check_can_unpublish_collection(user_id, user_actions, collection_id):
 
 
 def check_can_delete_exploration(user_id, user_actions, exploration_id):
+    """Checks whether the user can delete given exploration.
+
+    Args:
+        user_id: str. Id of the user.
+        user_actions: list(str). List of actions the user can perform.
+        exploration_id: str. Id of given exploration.
+
+    Returns:
+        bool. Whether the user can delete given exploration.
+    """
     if not user_id:
         return False
 
@@ -168,6 +184,16 @@ def check_can_delete_exploration(user_id, user_actions, exploration_id):
 
 
 def check_can_modify_exploration_roles(user_id, user_actions, exploration_id):
+    """Checks whether the user can modify roles for given exploration.
+
+    Args:
+        user_id: str. Id of the user.
+        user_actions: list(str). List of actions the user can perform.
+        exploration_id: str. Id of given exploration.
+
+    Returns:
+        bool. Whether the user can modify roles for given exploration.
+    """
     if not user_id:
         return False
 
@@ -191,6 +217,16 @@ def check_can_modify_exploration_roles(user_id, user_actions, exploration_id):
 
 
 def check_can_release_ownership(user_id, user_actions, exploration_id):
+    """Checks whether the user can release ownership for given exploration.
+
+    Args:
+        user_id: str. Id of the user.
+        user_actions: list(str). List of actions the user can perform.
+        exploration_id: str. Id of given exploration.
+
+    Returns:
+        bool. Whether the user can release ownership for given exploration.
+    """
     if not user_id:
         return False
 
@@ -208,6 +244,16 @@ def check_can_release_ownership(user_id, user_actions, exploration_id):
 
 
 def check_can_publicize_exploration(user_id, user_actions, exploration_id):
+    """Checks whether the user can publicize given exploration.
+
+    Args:
+        user_id: str. Id of the user.
+        user_actions: list(str). List of actions the user can perform.
+        exploration_id: str. Id of given exploration.
+
+    Returns:
+        bool. Whether the user can publicize given exploration.
+    """
     if not user_id:
         return False
 
@@ -223,6 +269,16 @@ def check_can_publicize_exploration(user_id, user_actions, exploration_id):
 
 
 def check_can_publish_exploration(user_id, user_actions, exploration_id):
+    """Checks whether the user can publish given exploration.
+
+    Args:
+        user_id: str. Id of the user.
+        user_actions: list(str). List of actions the user can perform.
+        exploration_id: str. Id of given exploration.
+
+    Returns:
+        bool. Whether the user can publish given exploration.
+    """
     if not user_id:
         return False
 
@@ -245,6 +301,16 @@ def check_can_publish_exploration(user_id, user_actions, exploration_id):
 
 
 def check_can_unpublicize_exploration(user_id, user_actions, exploration_id):
+    """Checks whether the user can unpublicize given exploration.
+
+    Args:
+        user_id: str. Id of the user.
+        user_actions: list(str). List of actions the user can perform.
+        exploration_id: str. Id of given exploration.
+
+    Returns:
+        bool. Whether the user can unpublicize given exploration.
+    """
     if not user_id:
         return False
 
@@ -260,6 +326,16 @@ def check_can_unpublicize_exploration(user_id, user_actions, exploration_id):
 
 
 def check_can_unpublish_exploration(user_id, user_actions, exploration_id):
+    """Checks whether the user can unpublish given exploration.
+
+    Args:
+        user_id: str. Id of the user.
+        user_actions: list(str). List of actions the user can perform.
+        exploration_id: str. Id of given exploration.
+
+    Returns:
+        bool. Whether the user can unpublish given exploration.
+    """
     if not user_id:
         return False
 
