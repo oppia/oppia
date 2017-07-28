@@ -58,14 +58,14 @@
      */
      saveExplorationDraft: function(explorationId, changeList,
        draftChangeListId) {
-      var localSaveKey = _createLocalSaveKey(explorationId);
-      if (storage) {
-        var saveObject = {
-          draftChanges: changeList,
-          draftChangeListId: draftChangeListId};
-        saveObject = JSON.stringify(saveObject);
-        storage.setItem(localSaveKey, saveObject);
-      }
+       var localSaveKey = _createLocalSaveKey(explorationId);
+       if (storage) {
+         var saveObject = {
+           draftChanges: changeList,
+           draftChangeListId: draftChangeListId};
+         saveObject = JSON.stringify(saveObject);
+         storage.setItem(localSaveKey, saveObject);
+       }
      },
      /**
      * Retrieve the local save of the changeList associated with the given
