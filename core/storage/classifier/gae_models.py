@@ -187,8 +187,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         {{exp_id}}.{{random_hash_of_16_chars}}
 
         Args:
-            include_deleted: bool. If True, then entities that have been marked
-                deleted are returned as well. Defaults to False.
+            cursor: str. It represent the position of cursor in the query
+            result.
         Returns:
             List of the ClassifierTrainingJobModels with status new or pending.
         """

@@ -79,10 +79,7 @@ def verify_signature(message, vm_id, received_signature):
     if secret is None:
         return False
 
-    if message is None:
-        generated_signature = generate_signature(secret, vm_id)
-    else:
-        generated_signature = generate_signature(secret, message)
+    generated_signature = generate_signature(secret, message)
     if generated_signature != received_signature:
         return False
     return True
@@ -141,7 +138,7 @@ class NextJobHandler(base.BaseHandler):
 
         if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
             raise self.UnauthorizedUserException
-        if not verify_signature(None, vm_id, signature):
+        if not verify_signature(vm_id, vm_id, signature):
             raise self.UnauthorizedUserException
 
         response = {}
