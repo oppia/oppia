@@ -647,3 +647,17 @@ def require_user_id_else_redirect_to_homepage(handler):
     test_login.__wrapped__ = True
 
     return test_login
+
+
+def check_can_unpublish_collection(user_actions, collection_id):
+    """Checks whether the user can unpublish collection or not."""
+
+    collection_rights = rights_manager.get_collection_rights(collection_id)
+    if collection_rights is None:
+        return False
+
+    if (collection_rights.is_published() and
+            role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in user_actions):
+        return True
+
+    return False
