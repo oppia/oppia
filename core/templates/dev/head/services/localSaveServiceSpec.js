@@ -40,8 +40,8 @@
      it('should correctly save the draft', function() {
        localSaveService.saveExplorationDraft(explorationIdOne,
          changeList, draftChangeListIdOne);
-        localSaveService.saveExplorationDraft(explorationIdTwo,
-          changeList, draftChangeListIdTwo);
+       localSaveService.saveExplorationDraft(explorationIdTwo,
+         changeList, draftChangeListIdTwo);
        expect(localSaveService.getExplorationDraft(
          explorationIdOne)).toEqual(saveOne);
        expect(localSaveService.getExplorationDraft(
@@ -49,7 +49,7 @@
      });
 
      it('should correctly remove the draft', function() {
-      localSaveService.saveExplorationDraft(explorationIdTwo,
+       localSaveService.saveExplorationDraft(explorationIdTwo,
          changeList, draftChangeListIdTwo);
        localSaveService.removeExplorationDraft(explorationIdTwo);
        expect(localSaveService.getExplorationDraft(

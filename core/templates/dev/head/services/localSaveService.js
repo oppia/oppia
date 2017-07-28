@@ -49,7 +49,8 @@
        return Boolean(storage);
      },
      /**
-     * Save the given changeList to localStorage along with it's draftChangeListId
+     * Save the given changeList to localStorage along with it's
+     * draftChangeListId
      * @param {String} explorationId - The id of the exploration
      *   associated with the changeList to be saved.
      * @param {Object} changeList - The exploration change list to be saved.
@@ -57,14 +58,14 @@
      */
      saveExplorationDraft: function(explorationId, changeList,
        draftChangeListId) {
-         var localSaveKey = _createLocalSaveKey(explorationId);
-         if (storage) {
-           var saveObject = {
-             draftChanges: changeList,
-             draftChangeListId: draftChangeListId};
-           saveObject = JSON.stringify(saveObject);
-           storage.setItem(localSaveKey, saveObject);
-         }
+      var localSaveKey = _createLocalSaveKey(explorationId);
+      if (storage) {
+        var saveObject = {
+          draftChanges: changeList,
+          draftChangeListId: draftChangeListId};
+        saveObject = JSON.stringify(saveObject);
+        storage.setItem(localSaveKey, saveObject);
+      }
      },
      /**
      * Retrieve the local save of the changeList associated with the given
