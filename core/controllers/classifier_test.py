@@ -90,11 +90,12 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         classifier_training_job = (
             classifier_services.get_job(
                 self.exp_id, self.exploration.version, 'Home'))
-        self.assertEqual(classifier_training_job.job_id, self.job_id)
-        self.assertEqual(classifier_training_job.exp_id, self.exp_id)
-        self.assertEqual(classifier_training_job.state_name, 'Home')
-        self.assertEqual(classifier_training_job.algorithm_id,
-                         'LDAStringClassifier')
+        classifier_obj = classifier_services.get_classifier_by_id(
+            classifier_training_job.job_id)
+        self.assertEqual(classifier_obj.id, classifier_training_job.job_id)
+        self.assertEqual(classifier_obj.exp_id, self.exp_id)
+        self.assertEqual(classifier_obj.state_name, 'Home')
+        self.assertEqual(classifier_obj.algorithm_id, 'LDAStringClassifier')
 
     def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.

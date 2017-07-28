@@ -92,8 +92,9 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 self._is_string_classifier_called('dunno, just guessed'))
 
     def test_handle_creation_of_jobs_and_mappings(self):
-        """Test the handle_jobs_creation method and handle_mappings_creation
-        method by triggering update_exploration() method.
+        """Test the handle_classifier_training_job_creation method and
+        handle_mappings_creation method by triggering update_exploration()
+        method.
         """
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
@@ -148,6 +149,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'cmd': 'rename_state',
             'old_state_name': 'Home',
             'new_state_name': 'Home2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'Home2',
+            'new_state_name': 'Home3'
         }]
         with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
             exp_services.update_exploration(

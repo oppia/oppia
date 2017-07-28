@@ -2992,10 +2992,18 @@ class Exploration(object):
                 continue
 
             old_state_name = state_name
+            renamed_cmds = []
             for change_dict in change_list:
-                if change_dict['cmd'] == 'rename_state' and (
-                        change_dict['new_state_name'] == state_name):
-                    old_state_name = change_dict['old_state_name']
+                if change_dict['cmd'] == 'rename_state':
+                    renamed_cmds.append(change_dict)
+            count = len(renamed_cmds)
+            while count:
+                for change_dict in renamed_cmds:
+                    if change_dict['cmd'] == 'rename_state' and (
+                            change_dict['new_state_name'] == old_state_name):
+                        old_state_name = change_dict['old_state_name']
+                        renamed_cmds.remove(change_dict)
+                count -= 1
 
             # The case where a new state is added. When this happens, there wont
             # be a corresponding state name in the older state dict.

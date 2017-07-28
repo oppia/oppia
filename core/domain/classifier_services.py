@@ -127,7 +127,7 @@ def classify_string_classifier_rule(state, normalized_answer):
     return None
 
 
-def handle_jobs_creation(exploration, state_names):
+def handle_classifier_training_job_creation(exploration, state_names):
     """Creates ClassifierTrainingJobModel instances for all the state names
     passed into the function.
 
@@ -172,10 +172,19 @@ def handle_mappings_creation(exploration, state_names, change_list):
         old_state_name = state_name
         classifier_training_job = get_job(exp_id, exp_version-1, old_state_name)
         if not classifier_training_job:
+            old_state_name = state_name
+            renamed_cmds = []
             for change_dict in change_list:
-                if (change_dict['cmd'] == 'rename_state') and (
-                        change_dict['new_state_name'] == state_name):
-                    old_state_name = change_dict['old_state_name']
+                if change_dict['cmd'] == 'rename_state':
+                    renamed_cmds.append(change_dict)
+            count = len(renamed_cmds)
+            while count:
+                for change_dict in renamed_cmds:
+                    if change_dict['cmd'] == 'rename_state' and (
+                            change_dict['new_state_name'] == old_state_name):
+                        old_state_name = change_dict['old_state_name']
+                        renamed_cmds.remove(change_dict)
+                count -= 1
             classifier_training_job = get_job(exp_id, exp_version-1,
                                               old_state_name)
         create_job_exploration_mapping(exp_id, exp_version, state_name,

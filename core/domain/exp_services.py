@@ -828,7 +828,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     if feconf.ENABLE_STRING_CLASSIFIER:
         if state_names_with_changed_answer_groups:
-            classifier_services.handle_jobs_creation(
+            classifier_services.handle_classifier_training_job_creation(
                 exploration, state_names_with_changed_answer_groups)
         if state_names_with_unchanged_answer_groups:
             classifier_services.handle_mappings_creation(
