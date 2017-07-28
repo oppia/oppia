@@ -39,7 +39,7 @@ class CollectionPage(base.BaseHandler):
             raise self.PageNotFoundException(e)
         self.values.update({
             'nav_mode': feconf.NAV_MODE_COLLECTION,
-            'can_edit': acl_decorators.check_activity_editable(
+            'can_edit': acl_decorators.check_can_edit_activity(
                 self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
                 collection_id),
             'is_logged_in': bool(self.user_id),
@@ -71,7 +71,7 @@ class CollectionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(e)
 
         self.values.update({
-            'can_edit': acl_decorators.check_activity_editable(
+            'can_edit': acl_decorators.check_can_edit_activity(
                 self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
                 collection_id),
             'collection': collection_dict,

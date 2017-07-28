@@ -189,7 +189,8 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.actions = role_services.get_all_actions(self.role)
 
-        self.is_moderator = bool(self.role == feconf.ROLE_ID_MODERATOR)
+        self.is_moderator = bool(
+            role_services.ACTION_ACCESS_MODERATOR_PAGE in self.actions)
         self.is_admin = bool(self.role == feconf.ROLE_ID_ADMIN)
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())

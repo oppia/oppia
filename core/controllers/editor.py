@@ -77,6 +77,7 @@ DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
         'Check out this interactive lesson I created on Oppia - a free '
         'platform for teaching and learning!'))
 
+
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
     all_value_generators = (
@@ -122,12 +123,6 @@ class ExplorationPage(EditorHandler):
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
 
-        can_edit = (
-            bool(self.user_id) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
-
         visualizations_html = visualization_registry.Registry.get_full_html()
 
         interaction_ids = (
@@ -157,28 +152,27 @@ class ExplorationPage(EditorHandler):
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
-            'can_delete': rights_manager.Actor(
-                self.user_id).can_delete(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_edit': can_edit,
-            'can_modify_roles': rights_manager.Actor(
-                self.user_id).can_modify_roles(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_publicize': rights_manager.Actor(
-                self.user_id).can_publicize(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_publish': rights_manager.Actor(
-                self.user_id).can_publish(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_release_ownership': rights_manager.Actor(
-                self.user_id).can_release_ownership(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_unpublicize': rights_manager.Actor(
-                self.user_id).can_unpublicize(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+            'can_delete': acl_decorators.check_can_delete_exploration(
+                self.user_id, self.actions, exploration_id),
+            'can_edit': acl_decorators.check_can_edit_activity(
+                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                exploration_id),
+            'can_modify_roles': (
+                acl_decorators.check_can_modify_exploration_roles(
+                    self.user_id, self.actions, exploration_id)),
+            'can_publicize': acl_decorators.check_can_publicize_exploration(
+                self.user_id, self.actions, exploration_id),
+            'can_publish': acl_decorators.check_can_publish_exploration(
+                self.user_id, self.actions, exploration_id),
+            'can_release_ownership': (
+                acl_decorators.check_can_release_ownership(
+                    self.user_id, self.actions, exploration_id)),
+            'can_unpublicize': (
+                acl_decorators.check_can_unpublicize_exploration(
+                    self.user_id, self.actions, exploration_id)),
+            'can_unpublish': (
+                acl_decorators.check_can_unpublish_exploration(
+                    self.user_id, self.actions, exploration_id)),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(

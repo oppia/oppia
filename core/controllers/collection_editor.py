@@ -143,9 +143,8 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
         self.values.update({
             'can_edit': True,
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
+            'can_unpublish': acl_decorators.check_can_unpublish_collection(
+                self.user_id, self.actions, collection_id),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(
@@ -185,7 +184,7 @@ class CollectionRightsHandler(CollectionEditorHandler):
         self.values.update({
             'can_edit': True,
             'can_unpublish': acl_decorators.check_can_unpublish_collection(
-                self.actions, collection_id),
+                self.user_id, self.actions, collection_id),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(

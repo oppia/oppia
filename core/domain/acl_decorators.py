@@ -25,7 +25,7 @@ import feconf
 current_user_services = models.Registry.import_current_user_services()
 
 
-def check_activity_accessible(
+def check_can_access_activity(
         user_id, user_actions, activity_type, activity_id):
     """Returns a boolean to signify whether given activity is accessible
     by the user or not.
@@ -72,7 +72,7 @@ def check_activity_accessible(
             activity_rights.viewable_if_private)
 
 
-def check_activity_editable(
+def check_can_edit_activity(
         user_id, user_actions, activity_type, activity_id):
     """Returns a boolean to signify whether given activity is editable
     by the user or not.
@@ -85,6 +85,9 @@ def check_activity_editable(
     Returns:
         bool. Whether the given user can edit this activity.
     """
+    if user_id is None:
+        return False
+
     activity_rights = (rights_manager.get_exploration_rights(
         activity_id, strict=False)
         if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
@@ -92,9 +95,6 @@ def check_activity_editable(
 
     if activity_rights is None:
         raise base.UserFacingExceptions.PageNotFoundException
-
-    if activity_rights.community_owned:
-        return True
 
     action_edit_any_activity = (
         role_services.ACTION_EDIT_ANY_EXPLORATION
@@ -109,6 +109,16 @@ def check_activity_editable(
         if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
         else role_services.ACTION_EDIT_OWNED_COLLECTION)
 
+    if action_edit_owned_activity in user_actions:
+        if (activity_rights.is_owner(user_id) or
+                activity_rights.is_editor(user_id)):
+            return True
+    else:
+        return False
+
+    if activity_rights.community_owned:
+        return True
+
     if action_edit_any_activity in user_actions:
         return True
 
@@ -116,11 +126,155 @@ def check_activity_editable(
         if action_edit_any_public_activity in user_actions:
             return True
 
-    if action_edit_owned_activity in user_actions:
-        if (activity_rights.is_owner(user_id) or
-                activity_rights.is_editor(user_id)):
+    return False
+
+
+def check_can_unpublish_collection(user_id, user_actions, collection_id):
+    """Checks whether the user can unpublish collection or not."""
+    if not user_id:
+        return False
+
+    collection_rights = rights_manager.get_collection_rights(collection_id)
+    if collection_rights is None:
+        return False
+
+    if (collection_rights.is_published() and
+            role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in user_actions):
+        return True
+
+    return False
+
+
+def check_can_delete_exploration(user_id, user_actions, exploration_id):
+    if not user_id:
+        return False
+
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False)
+
+    if exploration_rights is None:
+        return False
+
+    if ((exploration_rights.status == (
+            rights_manager.ACTIVITY_STATUS_PRIVATE)) and
+            (role_services.ACTION_DELETE_OWNED_EXPLORATION in (
+                user_actions)) and
+            exploration_rights.is_owner(user_id)):
+        return True
+    elif (exploration_rights.is_published() and
+          role_services.ACTION_DELETE_ANY_PUBLIC_EXPLORATION in (
+              user_actions)):
+        return True
+
+
+def check_can_modify_exploration_roles(user_id, user_actions, exploration_id):
+    if not user_id:
+        return False
+
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False)
+
+    if exploration_rights is None:
+        return False
+
+    if (exploration_rights.community_owned or
+            exploration_rights.cloned_from):
+        return False
+
+    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_EXPLORATION in
+            user_actions):
+        return True
+    if (role_services.ACTION_MODIFY_ROLES_FOR_OWNED_EXPLORATION in
+            user_actions):
+        if exploration_rights.is_owner(user_id):
             return True
 
+
+def check_can_release_ownership(user_id, user_actions, exploration_id):
+    if not user_id:
+        return False
+
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False)
+
+    if exploration_rights is None:
+        return False
+
+    if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+        return False
+
+    return check_can_modify_exploration_roles(
+        user_id, user_actions, exploration_id)
+
+
+def check_can_publicize_exploration(user_id, user_actions, exploration_id):
+    if not user_id:
+        return False
+
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False)
+
+    if exploration_rights is None:
+        return False
+
+    if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if role_services.ACTION_PUBLICIZE_EXPLORATION in user_actions:
+            return True
+
+
+def check_can_publish_exploration(user_id, user_actions, exploration_id):
+    if not user_id:
+        return False
+
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False)
+
+    if exploration_rights is None:
+        return False
+
+    if exploration_rights.cloned_from:
+        return False
+
+    if role_services.ACTION_PUBLISH_ANY_EXPLORATION in user_actions:
+        return True
+
+    if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+        if role_services.ACTION_PUBLISH_OWNED_EXPLORATION in user_actions:
+            if exploration_rights.is_owner(user_id):
+                return True
+
+
+def check_can_unpublicize_exploration(user_id, user_actions, exploration_id):
+    if not user_id:
+        return False
+
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False)
+
+    if exploration_rights is None:
+        return False
+
+    if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
+        if role_services.ACTION_UNPUBLICIZE_EXPLORATION in user_actions:
+            return True
+
+
+def check_can_unpublish_exploration(user_id, user_actions, exploration_id):
+    if not user_id:
+        return False
+
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False)
+
+    if exploration_rights is None:
+        return False
+
+    if exploration_rights.community_owned:
+        return False
+
+    if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if role_services.ACTION_UNPUBLISH_PUBLIC_EXPLORATION in user_actions:
+            return True
     return False
 
 
@@ -138,7 +292,7 @@ def can_play_exploration(handler):
     """Decorator to check whether user can play given exploration."""
 
     def test_can_play(self, exploration_id, **kwargs):
-        if check_activity_accessible(
+        if check_can_access_activity(
                 self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
                 exploration_id):
             return handler(self, exploration_id, **kwargs)
@@ -153,7 +307,7 @@ def can_play_collection(handler):
     """Decorator to check whether user can play given collection."""
 
     def test_can_play(self, collection_id, **kwargs):
-        if check_activity_accessible(
+        if check_can_access_activity(
                 self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
                 collection_id):
             return handler(self, collection_id, **kwargs)
@@ -170,7 +324,7 @@ def can_download_exploration(handler):
     """
 
     def test_can_download(self, exploration_id, **kwargs):
-        if check_activity_accessible(
+        if check_can_access_activity(
                 self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
                 exploration_id):
             return handler(self, exploration_id, **kwargs)
@@ -187,7 +341,7 @@ def can_view_exploration_stats(handler):
     """
 
     def test_can_view_stats(self, exploration_id, **kwargs):
-        if check_activity_accessible(
+        if check_can_access_activity(
                 self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
                 exploration_id):
             return handler(self, exploration_id, **kwargs)
@@ -205,7 +359,7 @@ def can_edit_collection(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if check_activity_editable(
+        if check_can_edit_activity(
                 self.user_id, self.actions,
                 feconf.ACTIVITY_TYPE_COLLECTION, collection_id):
             return handler(self, collection_id, **kwargs)
@@ -379,7 +533,7 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if check_activity_accessible(
+        if check_can_access_activity(
                 self.user_id, self.actions,
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
@@ -442,7 +596,7 @@ def can_edit_exploration(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if check_activity_editable(
+        if check_can_edit_activity(
                 self.user_id, self.actions,
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
@@ -461,18 +615,8 @@ def can_delete_exploration(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
-
-        if ((exploration_rights.status == (
-                rights_manager.ACTIVITY_STATUS_PRIVATE)) and
-                (role_services.ACTION_DELETE_OWNED_EXPLORATION in (
-                    self.actions)) and
-                exploration_rights.is_owner(self.user_id)):
-            return handler(self, exploration_id, **kwargs)
-        elif (exploration_rights.is_published() and
-              role_services.ACTION_DELETE_ANY_PUBLIC_EXPLORATION in (
-                  self.actions)):
+        if check_can_delete_exploration(
+                self.user_id, self.actions, exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -509,21 +653,13 @@ def can_publish_exploration(handler):
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if exploration_rights.cloned_from:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to publish this exploration.')
-
-        if role_services.ACTION_PUBLISH_ANY_EXPLORATION in self.actions:
+        if check_can_publish_exploration(
+                self.user_id, self.actions, exploration_id):
             return handler(self, exploration_id, *args, **kwargs)
 
-        if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-            if role_services.ACTION_PUBLISH_OWNED_EXPLORATION in self.actions:
-                if exploration_rights.is_owner(self.user_id):
-                    return handler(self, exploration_id, *args, **kwargs)
-
-        if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
-            if role_services.ACTION_PUBLICIZE_EXPLORATION in self.actions:
-                return handler(self, exploration_id, *args, **kwargs)
+        if check_can_publicize_exploration(
+                self.user_id, self.actions, exploration_id):
+            return handler(self, exploration_id, *args, **kwargs)
 
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to publish this exploration.')
@@ -570,29 +706,14 @@ def can_modify_exploration_roles(handler):
     """
 
     def test_can_modify(self, exploration_id, **kwargs):
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
 
-        if exploration_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if (exploration_rights.community_owned or
-                exploration_rights.cloned_from):
+        if check_can_modify_exploration_roles(
+                self.user_id, self.actions, exploration_id):
+            return handler(self, exploration_id, **kwargs)
+        else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to change rights for this '
                 'exploration.')
-
-        if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_EXPLORATION in
-                self.actions):
-            return handler(self, exploration_id, **kwargs)
-        if (role_services.ACTION_MODIFY_ROLES_FOR_OWNED_EXPLORATION in
-                self.actions):
-            if exploration_rights.is_owner(self.user_id):
-                return handler(self, exploration_id, **kwargs)
-
-        raise base.UserFacingExceptions.UnauthorizedUserException(
-            'You do not have credentials to change rights for this '
-            'exploration.')
     test_can_modify.__wrapped__ = True
 
     return test_can_modify
@@ -646,17 +767,3 @@ def require_user_id_else_redirect_to_homepage(handler):
     test_login.__wrapped__ = True
 
     return test_login
-
-
-def check_can_unpublish_collection(user_actions, collection_id):
-    """Checks whether the user can unpublish collection or not."""
-
-    collection_rights = rights_manager.get_collection_rights(collection_id)
-    if collection_rights is None:
-        return False
-
-    if (collection_rights.is_published() and
-            role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in user_actions):
-        return True
-
-    return False
