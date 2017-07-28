@@ -72,38 +72,53 @@ def check_activity_accessible(
             activity_rights.viewable_if_private)
 
 
-def check_exploration_editable(user_id, user_actions, exploration_id):
-    """Returns a boolean to signify whether given exploration is editable
+def check_activity_editable(
+        user_id, user_actions, activity_type, activity_id):
+    """Returns a boolean to signify whether given activity is editable
     by the user or not.
 
     Args:
         user_id: str. Id of the given user.
         user_actions: list(str). List of actions given user can perform.
-        exploration_id: str. Exploration id.
+        activity_id: str. Id of the given activity.
 
     Returns:
-        bool. Whether the given exploration can be accessed.
+        bool. Whether the given user can edit this activity.
     """
-    exploration_rights = rights_manager.get_exploration_rights(
-        exploration_id, strict=False)
+    activity_rights = (rights_manager.get_exploration_rights(
+        activity_id, strict=False)
+        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
+        else rights_manager.get_collection_rights(activity_id, strict=False))
 
-    if exploration_rights is None:
+    if activity_rights is None:
         raise base.UserFacingExceptions.PageNotFoundException
 
-    if exploration_rights.community_owned:
+    if activity_rights.community_owned:
         return True
 
-    if role_services.ACTION_EDIT_ANY_EXPLORATION in user_actions:
+    action_edit_any_activity = (
+        role_services.ACTION_EDIT_ANY_EXPLORATION
+        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
+        else role_services.ACTION_EDIT_ANY_COLLECTION)
+    action_edit_any_public_activity = (
+        role_services.ACTION_EDIT_ANY_PUBLIC_EXPLORATION
+        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
+        else role_services.ACTION_EDIT_ANY_PUBLIC_COLLECTION)
+    action_edit_owned_activity = (
+        role_services.ACTION_EDIT_OWNED_EXPLORATION
+        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
+        else role_services.ACTION_EDIT_OWNED_COLLECTION)
+
+    if action_edit_any_activity in user_actions:
         return True
 
-    if exploration_rights.is_published():
-        if (role_services.ACTION_EDIT_ANY_PUBLIC_EXPLORATION in
-                user_actions):
+    if activity_rights.is_published():
+        if action_edit_any_public_activity in user_actions:
             return True
 
-    if role_services.ACTION_EDIT_OWNED_EXPLORATION in user_actions:
-        if (exploration_rights.is_owner(user_id) or
-                exploration_rights.is_editor(user_id)):
+    if action_edit_owned_activity in user_actions:
+        if (activity_rights.is_owner(user_id) or
+                activity_rights.is_editor(user_id)):
             return True
 
     return False
@@ -190,30 +205,13 @@ def can_edit_collection(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
-        if collection_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if collection_rights.community_owned:
+        if check_activity_editable(
+                self.user_id, self.actions,
+                feconf.ACTIVITY_TYPE_COLLECTION, collection_id):
             return handler(self, collection_id, **kwargs)
-
-        if role_services.ACTION_EDIT_ANY_COLLECTION in self.actions:
-            return handler(self, collection_id, **kwargs)
-
-        if collection_rights.is_published():
-            if (role_services.ACTION_EDIT_ANY_PUBLIC_COLLECTION in
-                    self.actions):
-                return handler(self, collection_id, **kwargs)
-
-        if (role_services.ACTION_EDIT_OWNED_COLLECTION in
-                self.actions):
-            if (collection_rights.is_owner(self.user_id) or
-                    collection_rights.is_editor(self.user_id)):
-                return handler(self, collection_id, **kwargs)
-
-        raise base.UserFacingExceptions.UnauthorizedUserException(
-            'You do not have credentials to edit this collection.')
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to edit this collection.')
     test_can_edit.__wrapped__ = True
 
     return test_can_edit
@@ -444,8 +442,9 @@ def can_edit_exploration(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if check_exploration_editable(
-                self.user_id, self.actions, exploration_id):
+        if check_activity_editable(
+                self.user_id, self.actions,
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
