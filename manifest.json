@@ -112,6 +112,14 @@
           "js": ["app/angular.audio.js"]
         }
       },
+      "angular-dragdrop": {
+        "version": "1.0.13",
+        "downloadFormat": "zip",
+        "url": "https://github.com/codef0rmer/angular-dragdrop/archive/v1.0.13.zip",
+        "rootDir": "angular-dragdrop-1.0.13/src",
+        "targetDirPrefix": "angular-dragdrop",
+        "files": ["angular-dragdrop.min.js"]
+      },
       "angularTest": {
         "version": "1.5.8",
         "downloadFormat": "files",

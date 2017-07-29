@@ -37,14 +37,13 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             $attrs.imageAndLabelsWithValue);
 
           $scope.imageTitle = $attrs.imageTitleWithValue;
-          const unicodeStripCount = 6;
+          var unicodeStripCount = 6;
           $scope.bonusWords = $attrs.bonusWordsWithValue.slice(unicodeStripCount);
           $scope.bonusWords = $scope.bonusWords.slice(0, -unicodeStripCount);
           $scope.bonusWords = $scope.bonusWords.split(',');
 
           // Remove white spaces
           $scope.bonusWords.map(function (word) {word.trim();});
-          console.log($scope.bonusWords);
           $scope.drawLines = ($attrs.showLinesWithValue == 'true');
 
           // Need to strip unicode off of inputs
@@ -138,7 +137,6 @@ oppia.directive('oppiaInteractiveLabelingInput', [
 
           // If all labels have been placed, run a correctness check
           $scope.runSubmitCheck = function(){
-            console.log($scope.incorrectBoxes);
             $scope.submitted = 1;
             if ($scope.numRegions == 0){
               $scope.numRegions = $scope.incorrectElements.length;

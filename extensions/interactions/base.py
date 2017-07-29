@@ -165,7 +165,6 @@ class BaseInteraction(object):
 
         rules_index_dict = json.loads(
             utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
-        print(feconf.RULES_DESCRIPTIONS_FILE_PATH)
         self._cached_rules_dict = rules_index_dict[self.id]
 
         return self._cached_rules_dict
