@@ -26,9 +26,8 @@ describe('Language util service', function() {
   }));
 
   it('should get the correct description given an audio ' +
-    'language code', function() {
-      expect(lus.getAudioLanguageDescription('en')).toEqual('English');
-      expect(lus.getAudioLanguageDescription('hi-en')).toEqual('Hinglish');
+      'language code', function() {
+    expect(lus.getAudioLanguageDescription('en')).toEqual('English');
+    expect(lus.getAudioLanguageDescription('hi-en')).toEqual('Hinglish');
   });
-
 });

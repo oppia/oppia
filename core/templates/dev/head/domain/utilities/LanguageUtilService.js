@@ -17,7 +17,6 @@
  */
 
 oppia.factory('LanguageUtilService', [function() {
-  
   var _getAudioLanguageDescription = function(languageCode) {
     for (var i = 0; i < constants.SUPPORTED_AUDIO_LANGUAGES.length; i++) {
       if (constants.SUPPORTED_AUDIO_LANGUAGES[i].id === languageCode) {
@@ -31,5 +30,4 @@ oppia.factory('LanguageUtilService', [function() {
       return _getAudioLanguageDescription(languageAudioCode);
     }
   }
-
 }]);
