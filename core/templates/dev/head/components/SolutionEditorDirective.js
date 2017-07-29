@@ -22,9 +22,12 @@ oppia.directive('solutionEditor', [
     return {
       restrict: 'E',
       scope: {
-        objectType: '=',
+        // Some interactions are created manually based on the
+        // ObjectType while other interactions are directly passed in
+        // interactionHtml. If an interaction is manually constructed the
+        // interactionHtml will be null.
+        getObjectType: '&objectType',
         interactionHtml: '=',
-        ruleDescriptionChoices: '=',
         getOnSaveFn: '&onSave'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -42,8 +45,8 @@ oppia.directive('solutionEditor', [
           $scope.getInteractionHtml = function() {
             if (!$scope.interactionHtml) {
               $scope.interactionHtml = (
-                stateSolutionService.displayed.getInteractionHtml(
-                  $scope.objectType));
+                stateSolutionService.displayed.getObjectEditorHtml(
+                  $scope.getObjectType()));
             }
           };
 
@@ -55,7 +58,6 @@ oppia.directive('solutionEditor', [
           $scope.openSolutionEditor = function() {
             if ($scope.isEditable) {
               $scope.solutionEditorIsOpen = true;
-              $scope.getInteractionHtml();
             }
           };
 
@@ -82,6 +84,8 @@ oppia.directive('solutionEditor', [
               $scope.saveThisSolution();
             }
           });
+
+          $scope.getInteractionHtml();
         }
       ]
     };

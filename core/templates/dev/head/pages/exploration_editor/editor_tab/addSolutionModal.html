@@ -11,20 +11,20 @@
               ng-options="(item ? 'The only' : 'One') for item in [true, false]">
       </select> <strong>solution is...</strong>
       <div ng-if="!interactionHtml">
-        <object-editor class='protractor-test-interaction-html'
+        <object-editor class="protractor-test-interaction-html"
                        obj-type="<[objectType]>"
                        init-args="{choices: ruleDescriptionChoices}"
                        is-editable="true"
                        always-editable="true"
-                       value="tmpSolution.correctAnswer"
+                       value="data.correctAnswer"
                        style="color: black;">
         </object-editor>
       </div>
-      <div class='protractor-test-interaction-html'
+      <div class="protractor-test-interaction-html"
            angular-html-bind="interactionHtml">
       </div>
       <br>
-      <div ng-show="tmpSolution.correctAnswer || correctAnswer">
+      <div ng-show="data.correctAnswer">
         <strong>Explanation:</strong>
         <schema-based-editor class="protractor-test-explanation-text-area"
                              schema="EXPLANATION_FORM_SCHEMA"
@@ -35,13 +35,12 @@
   </form>
 </div>
 
-  <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-submit-solution-button"
-            ng-click="saveSolution()"
-            ng-disabled="!tmpSolution.correctAnswer &&
-                         !correctAnswer ||
-                         !tmpSolution.explanation">
-      Check and Save Solution
-    </button>
-  </div>
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success protractor-test-submit-solution-button"
+          ng-click="saveSolution()"
+          ng-disabled="!data.correctAnswer ||
+                       !tmpSolution.explanation">
+    Check and Save Solution
+  </button>
+</div>

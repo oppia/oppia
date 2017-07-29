@@ -13,12 +13,12 @@
           </i>
         </div>
         <strong>
-          <[stateSolutionService.displayed.answerIsExclusive ? 'The only' : 'One']> solution is...
+          <[stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
         </strong>
-        <span angular-html-bind="stateSolutionService.displayed.getCorrectAnswerHtml($scope.objectType)"></span>
+        <span angular-html-bind="stateSolutionService.savedMemento.getCorrectAnswerHtml(getObjectType())"></span>
         <br>
         <strong>Explanation:</strong>
-        <span angular-html-bind="stateSolutionService.displayed.explanation"></span>
+        <span angular-html-bind="stateSolutionService.savedMemento.explanation"></span>
       </div>
     </div>
   </div>

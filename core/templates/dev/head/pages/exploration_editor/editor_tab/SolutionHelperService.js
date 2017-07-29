@@ -37,25 +37,32 @@ oppia.constant('INTERACTION_OBJECT_TYPES', {
   LogicProof: 'LogicQuestion'
 });
 
-oppia.factory('StateSolutionHelperService', [
-  'oppiaHtmlEscaper', 'responsesService', 'stateInteractionIdService',
+oppia.factory('SolutionHelperService', [
+  'oppiaHtmlEscaper', 'stateInteractionIdService',
   'explorationContextService', 'editorContextService', '$injector',
   'explorationStatesService', 'angularNameService', 'stateSolutionService',
   'AnswerClassificationService', 'alertsService',
   'SUPPORTED_INTERACTIONS', 'INTERACTION_OBJECT_TYPES',
-  function(oppiaHtmlEscaper, responsesService, stateInteractionIdService,
+  function(oppiaHtmlEscaper, stateInteractionIdService,
     explorationStatesService, editorContextService, $injector,
     explorationContextService, angularNameService, stateSolutionService,
     AnswerClassificationService, alertsService,
     SUPPORTED_INTERACTIONS, INTERACTION_OBJECT_TYPES) {
     return {
-      isSupportedInteraction: function (id) {
-        return (SUPPORTED_INTERACTIONS.indexOf(id) !== -1);
+      isConstructedUsingObjectType: function (id) {
+        return (SUPPORTED_INTERACTIONS.indexOf(id) === -1);
       },
       getInteractionObjectType: function (id) {
         return INTERACTION_OBJECT_TYPES[id];
       },
       getCorrectAnswerObject: function(answer, objectType) {
+        // The codeRepl interaction is built manually using objectType but
+        // the creator view for this interaction will be different from that of
+        // the learner view as there will be no compilation/error checking
+        // option. The code is entered into an unicode editor and this gets
+        // stored as correctAnswer. But since validation of this solution
+        // requires extra parameters ('error', 'evaluation', 'output') these
+        // are added.
         if (objectType === 'CodeString') {
           return {
             code: answer,
@@ -67,32 +74,7 @@ oppia.factory('StateSolutionHelperService', [
           return answer;
         }
       },
-      verifyAndSaveAnswer: function(explorationId, state, correctAnswer) {
-        var interactionId = stateInteractionIdService.savedMemento;
-        var rulesServiceName = (
-          angularNameService.getNameOfInteractionRulesService(interactionId));
-        // Inject RulesService dynamically.
-        var rulesService = $injector.get(rulesServiceName);
-        AnswerClassificationService.getMatchingClassificationResult(
-          explorationId, state, correctAnswer, true, rulesService
-        ).then(function(result) {
-          if (editorContextService.getActiveStateName() !== (
-              result.outcome.dest)) {
-            stateSolutionService.saveDisplayedValue();
-            explorationStatesService.getState(
-              editorContextService.getActiveStateName()
-            ).interaction.markSolutionAsValid();
-          } else {
-            alertsService.addInfoMessage('That solution does not lead ' +
-              'to the next state!');
-            explorationContextService.getState(
-              editorContextService.getActiveStateName()
-            ).interaction.markSolutionAsInvalid();
-            stateSolutionService.saveDisplayedValue();
-          }
-        });
-      },
-      verifySolution: function(explorationId, state, correctAnswer) {
+      verifySolution: function(explorationId, state, correctAnswer, callback) {
         var interactionId = stateInteractionIdService.savedMemento;
         var rulesServiceName = (
           angularNameService.getNameOfInteractionRulesService(interactionId));
@@ -106,6 +88,7 @@ oppia.factory('StateSolutionHelperService', [
               editorContextService.getActiveStateName()
             ).interaction.markSolutionAsValid();
           } else {
+            callback();
             explorationContextService.getState(
               editorContextService.getActiveStateName()
             ).interaction.markSolutionAsInvalid();

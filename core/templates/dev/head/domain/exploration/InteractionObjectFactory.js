@@ -37,8 +37,6 @@ oppia.factory('InteractionObjectFactory', [
       this.solutionIsValid = true;
     };
 
-    var solutionIsValid = true;
-
     Interaction.prototype.toBackendDict = function() {
       return {
         answer_groups: this.answerGroups.map(function(answerGroup) {
@@ -57,6 +55,18 @@ oppia.factory('InteractionObjectFactory', [
         id: this.id,
         solution: this.solution ? this.solution.toBackendDict() : null
       };
+    };
+
+    Interaction.prototype.isSolutionValid = function() {
+      return this.solutionIsValid;
+    };
+
+    Interaction.prototype.markSolutionAsValid = function() {
+      this.solutionIsValid = true;
+    };
+
+    Interaction.prototype.markSolutionAsInvalid = function() {
+      this.solutionIsValid = false;
     };
 
     Interaction.createFromBackendDict = function(interactionDict) {
@@ -101,18 +111,6 @@ oppia.factory('InteractionObjectFactory', [
 
     var generateSolutionFromBackend = function(solutionBackendDict) {
       return SolutionObjectFactory.createFromBackendDict(solutionBackendDict);
-    };
-
-    Interaction.prototype.isSolutionValid = function() {
-      return solutionIsValid;
-    };
-
-    Interaction.prototype.markSolutionAsValid = function() {
-      solutionIsValid = true;
-    };
-
-    Interaction.prototype.markSolutionAsInvalid = function() {
-      solutionIsValid = false;
     };
 
     return Interaction;

@@ -166,6 +166,8 @@ oppia.controller('StateHints', [
     };
 
     $scope.deleteHint = function(index, evt) {
+      // Prevent clicking on the delete button from also toggling the display
+      // state of the hint.
       evt.stopPropagation();
 
       alertsService.clearWarnings();
@@ -185,7 +187,8 @@ oppia.controller('StateHints', [
           }
         ]
       }).result.then(function() {
-        if (stateSolutionService.displayed && index === 0) {
+        if (stateSolutionService.savedMemento &&
+          stateHintsService.savedMemento.length === 1) {
           openDeleteLastHintModal();
         } else {
           stateHintsService.displayed.splice(index, 1);

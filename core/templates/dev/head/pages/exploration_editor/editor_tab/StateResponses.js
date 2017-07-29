@@ -46,10 +46,14 @@ oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
+  'stateSolutionService', 'SolutionHelperService',
+  'explorationContextService',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
-      explorationStatesService, graphDataService, OutcomeObjectFactory) {
+      explorationStatesService, graphDataService, OutcomeObjectFactory,
+      stateSolutionService, SolutionHelperService,
+      explorationContextService) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -73,6 +77,23 @@ oppia.factory('responsesService', [
         explorationStatesService.saveInteractionAnswerGroups(
           editorContextService.getActiveStateName(),
           angular.copy(newAnswerGroups));
+
+        if (
+          stateInteractionIdService.savedMemento &&
+          INTERACTION_SPECS[stateInteractionIdService.savedMemento]
+            .can_have_solution && stateSolutionService.savedMemento !== null) {
+          if (stateSolutionService.savedMemento.correctAnswer !== null) {
+            var currentStateName = editorContextService.getActiveStateName();
+            SolutionHelperService.verifySolution(
+              explorationContextService.getExplorationId(),
+              explorationStatesService.getState(currentStateName),
+              stateSolutionService.savedMemento.correctAnswer,
+              function () {
+                alertsService.addInfoMessage(
+                  'That solution does not lead to the next state!');
+              });
+          }
+        }
 
         graphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
@@ -331,7 +352,6 @@ oppia.controller('StateResponses', [
   'explorationContextService', 'trainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
-  'StateSolutionHelperService', 'stateSolutionService',
   'explorationStatesService',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
@@ -339,7 +359,6 @@ oppia.controller('StateResponses', [
       explorationContextService, trainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory,
-      StateSolutionHelperService, stateSolutionService,
       explorationStatesService) {
     $scope.editorContextService = editorContextService;
 
@@ -737,17 +756,6 @@ oppia.controller('StateResponses', [
           [result.tmpRule], result.tmpOutcome, false));
         responsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
-        if (
-          INTERACTION_SPECS[stateInteractionIdService.savedMemento]
-            .can_have_solution && stateSolutionService.displayed !== null) {
-          if (stateSolutionService.displayed.correctAnswer !== null) {
-            var currentStateName = editorContextService.getActiveStateName();
-            StateSolutionHelperService.verifySolution(
-              explorationContextService.getExplorationId(),
-              explorationStatesService.getState(currentStateName),
-              stateSolutionService.displayed.correctAnswer);
-          }
-        }
 
         // After saving it, check if the modal should be reopened right away.
         if (result.reopen) {
@@ -819,11 +827,6 @@ oppia.controller('StateResponses', [
       responsesService.updateActiveAnswerGroup({
         rules: updatedRules
       });
-      var currentStateName = editorContextService.getActiveStateName();
-      StateSolutionHelperService.verifySolution(
-        explorationContextService.getExplorationId(),
-        explorationStatesService.getState(currentStateName),
-        stateSolutionService.displayed.correctAnswer);
     };
 
     $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {

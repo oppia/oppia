@@ -1943,14 +1943,12 @@ oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
   'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER', 'StateSolutionHelperService',
-  'explorationData', 'angularNameService', 'AnswerClassificationService',
+  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER, StateSolutionHelperService,
-      explorationData, angularNameService, AnswerClassificationService) {
+      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -2151,14 +2149,11 @@ oppia.factory('explorationWarningsService', [
       });
 
       var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
-      angular.forEach(statesWithIncorrectSolution, function(
-        stateWithIncorrectSolution) {
-        if (stateWarnings.hasOwnProperty(stateWithIncorrectSolution)) {
-          stateWarnings[stateWithIncorrectSolution].push(
-            STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
+      angular.forEach(statesWithIncorrectSolution, function(state) {
+        if (stateWarnings.hasOwnProperty(state)) {
+          stateWarnings[state].push(STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
         } else {
-          stateWarnings[stateWithIncorrectSolution] = [
-            STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
+          stateWarnings[state] = [STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
         }
       });
 

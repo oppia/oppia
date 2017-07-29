@@ -61,7 +61,7 @@ states:
       fallbacks: []
       hints: []
       id: null
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -88,7 +88,7 @@ states:
           trigger_type: NthResubmission
       hints: []
       id: null
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -201,7 +201,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -223,7 +223,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   Second state:
     classifier_model_id: null
@@ -245,7 +245,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -692,7 +692,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
         # Add hint and delete hint
@@ -715,23 +716,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
+        # Solution should be set to None as default.
+        self.assertEquals(init_state.interaction.solution, None)
+
         init_state.add_hint('hint #1')
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+
         # Object type of answer must match that of correct_answer
         with self.assertRaises(AssertionError):
-            exploration.validate()
+            init_state.interaction.solution = (
+                exp_domain.Solution.from_dict(
+                    init_state.interaction.id, solution))
 
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
     def test_tag_validation(self):
@@ -1088,7 +1095,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                 'fallbacks': [],
                 'hints': [],
                 'id': None,
-                'solution': {},
+                'solution': None,
             },
             'param_changes': [],
         }
@@ -2103,7 +2110,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   END:
     classifier_model_id: null
@@ -2120,7 +2127,7 @@ states:
       fallbacks: []
       hints: []
       id: EndExploration
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -2142,7 +2149,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: 10
 tags: []
@@ -2192,7 +2199,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   END:
     classifier_model_id: null
@@ -2209,7 +2216,7 @@ states:
       fallbacks: []
       hints: []
       id: EndExploration
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -2231,7 +2238,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: 11
 tags: []
@@ -2281,7 +2288,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   END:
     classifier_model_id: null
@@ -2298,7 +2305,7 @@ states:
       fallbacks: []
       hints: []
       id: EndExploration
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -2320,7 +2327,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: 12
 tags: []
@@ -2450,7 +2457,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'fallbacks': [],
                     'hints': [],
                     'id': None,
-                    'solution': {},
+                    'solution': None,
                 },
                 'param_changes': [],
             }

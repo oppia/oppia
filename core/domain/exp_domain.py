@@ -1799,7 +1799,7 @@ class State(object):
         'confirmed_unclassified_answers': [],
         'fallbacks': [],
         'hints': [],
-        'solution': {},
+        'solution': None,
     }
 
     def __init__(self, content, param_changes, interaction,
@@ -2378,7 +2378,7 @@ class Exploration(object):
 
             solution = (
                 Solution.from_dict(idict['id'], idict['solution'])
-                if idict['solution'] else {})
+                if idict['solution'] else None)
 
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
@@ -3495,7 +3495,7 @@ class Exploration(object):
                         interaction['hints'].append(
                             Hint(fallback['outcome']['feedback'][0]).to_dict())
             if 'solution' not in interaction:
-                interaction['solution'] = {}
+                interaction['solution'] = None
         return states_dict
 
     @classmethod
@@ -3514,7 +3514,8 @@ class Exploration(object):
     @classmethod
     def _convert_states_v11_dict_to_v12_dict(cls, states_dict):
         """Converts from version 11 to 12. Version 12 refactors audio
-        translations from a list to a dict keyed by language code.
+        translations from a list to a dict keyed by language code. Also,
+        exploration domain objects with empty solutions are set to None.
         """
         for state_dict in states_dict.values():
             old_audio_translations = state_dict['content']['audio_translations']

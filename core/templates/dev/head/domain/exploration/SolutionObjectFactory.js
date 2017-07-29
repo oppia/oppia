@@ -55,8 +55,7 @@ oppia.factory('SolutionObjectFactory', [
       } else if (interactionId === 'MultipleChoiceInput') {
         correctAnswer = (
           oppiaHtmlEscaper.objToEscapedJson(
-            choices[this.correctAnswer]
-              .label));
+            choices[this.correctAnswer].label));
       } else if (interactionId === 'MathExpressionInput') {
         correctAnswer = this.correctAnswer.latex;
       } else if (interactionId === 'CodeRepl' ||
@@ -101,7 +100,7 @@ oppia.factory('SolutionObjectFactory', [
       }
     };
 
-    Solution.prototype.getInteractionHtml = function(objectType) {
+    Solution.prototype.getObjectEditorHtml = function(objectType) {
       var element = $('<object-editor>');
       element.attr('obj-type', objectType);
       element.attr('init-args', '{choices: ruleDescriptionChoices}');
