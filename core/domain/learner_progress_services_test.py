@@ -515,7 +515,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
     def test_get_activity_progress(self):
-        # Add an entity to each of the sections.
+        # Add an activity to each of the sections.
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)

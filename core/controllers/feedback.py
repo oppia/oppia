@@ -24,18 +24,20 @@ import feconf
 
 transaction_services = models.Registry.import_transaction_services()
 
+
 class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         self.values.update({
             'threads': [t.to_dict() for t in feedback_services.get_all_threads(
                 exploration_id, False)]})
         self.render_json(self.values)
 
-    @acl_decorators.can_view_exploration_feedback
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id):
         subject = self.payload.get('subject')
         if not subject:
@@ -61,6 +63,7 @@ class ThreadHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         messages = [m.to_dict() for m in feedback_services.get_messages(
@@ -74,7 +77,7 @@ class ThreadHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @acl_decorators.can_view_exploration_feedback
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         text = self.payload.get('text')
@@ -105,7 +108,7 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @base.require_moderator
+    @acl_decorators.can_access_moderator_page
     def get(self):
         urlsafe_start_cursor = self.request.get('cursor')
 
@@ -128,6 +131,7 @@ class FeedbackStatsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         feedback_thread_analytics = (
             feedback_services.get_thread_analytics(
@@ -198,7 +202,7 @@ class SuggestionListHandler(base.BaseHandler):
         else:
             return None
 
-    @acl_decorators.can_view_exploration_feedback
+    @acl_decorators.can_comment_on_feedback_thread
     def get(self, exploration_id):
         threads = None
         list_type = self.request.get('list_type')
@@ -228,7 +232,7 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     viewed feedback messages from emails that might be sent in future to this
     user."""
 
-    @acl_decorators.can_view_exploration_feedback
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id):
         thread_id = self.payload.get('thread_id')
         transaction_services.run_in_transaction(

@@ -584,11 +584,10 @@ param_changes: []
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
 
-
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
-        response = self.post_json('/createhandler/state_yaml', {
+        response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
             'state_dict': exploration.states['State A'].to_dict(),
             'width': 50,
         }, csrf_token=csrf_token)

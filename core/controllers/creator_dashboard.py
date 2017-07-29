@@ -305,7 +305,7 @@ class NewCollection(base.BaseHandler):
 class UploadExploration(base.BaseHandler):
     """Uploads a new exploration."""
 
-    @base.require_fully_signed_up
+    @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
         yaml_content = self.request.get('yaml_file')
@@ -320,11 +320,3 @@ class UploadExploration(base.BaseHandler):
         else:
             raise self.InvalidInputException(
                 'This server does not allow file uploads.')
-
-
-class CreatorDashboardRedirectPage(base.BaseHandler):
-    """An page that redirects to the main Dashboard page."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.redirect(feconf.CREATOR_DASHBOARD_URL)

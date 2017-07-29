@@ -426,6 +426,85 @@ body {
   padding-left: 11px;
 }
 
+.oppia-learner-dashboard-feedback-section {
+  margin-right: 23px;
+}
+
+.oppia-learner-dashboard-feedback-section .table {
+  background-color: white;
+  margin-bottom: 10px;
+  margin-left: 6px;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-thread-message-count {
+  color: #757575;
+  font-size: 100.25%;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-message-spacing {
+  left: 3px;
+  padding: 0;
+  text-align: center;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-message-header {
+  display: inline-block;
+  text-align: center;
+  width: 8%;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-thread-new-message {
+  margin-right: 10px;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-thread-new-message-send {
+  margin: 6px 0 0 14px;
+}
+
+@media (max-width: 768px) {
+  .oppia-learner-dashboard-feedback-section .feedback-thread-new-message {
+    margin-left: 14px;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-message-author-name {
+    margin-left: 10px;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-new-message-send {
+    margin: 6px 0 0 28px;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
+    margin-top: 9px;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-message-body {
+    margin-left: 43px;
+  }
+}
+
+.oppia-learner-dashboard-feedback-section .col-sm-11 {
+  padding: 0 20px 0 0;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
+  font-size: 1em;
+  height: 70px;
+  margin-left: 14px;
+  resize: vertical;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-thread-warning {
+  color:#0277BD;
+  margin-left: 4px;
+}
+
+.oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
+  margin-left: 26px;
+  margin-top: 4px;
+  min-width: 32px;
+}
+
 @media (max-width: 810px) {
   .oppia-learner-dashboard-title {
     font-size: 2.8em;
@@ -456,6 +535,17 @@ body {
 
   .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
     margin: 0px 2px 0 4px;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
+    font-size: 1em;
+    height: 70px;
+    margin-left: 14px;
+    resize: vertical;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
+    margin-left: 15px;
   }
 }
 

@@ -93,6 +93,8 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             response = self.testapp.get(url, expect_errors=True)
+            if response.status_int not in [200, 302, 401, 404]:
+                print url
             self.assertIn(response.status_int, [200, 302, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
@@ -320,7 +322,10 @@ class I18nDictsTest(test_utils.GenericTestBase):
         )).keys())
 
     def _extract_keys_from_html_file(self, filename):
-        regex_pattern = r'(I18N_[A-Z/_\d]*)'
+        # The \b is added at the start to ensure that keys ending with
+        # '_I18N_IDS' do not get matched. Instances of such keys can be found
+        # in learner_dashboard.html.
+        regex_pattern = r'(\bI18N_[A-Z/_\d]*)'
         return re.findall(regex_pattern, utils.get_file_contents(
             filename))
 
@@ -492,3 +497,58 @@ class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
             response = self.get_json('/fake', expect_errors=True)
             self.assertTrue(isinstance(response, dict))
             self.assertEqual(500, response['code'])
+
+
+class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
+    """Tests that all methods in handlers have authentication decorators
+    applied on them.
+    """
+
+    def test_every_method_has_decorator(self):
+        handlers_checked = []
+
+        for route in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to handle them.
+            if isinstance(route, tuple):
+                continue
+            else:
+                handler = route.handler
+
+            # Following handler are present in base.py where acl_decorators
+            # cannot be imported.
+            if (handler.__name__ == 'LogoutPage' or
+                    handler.__name__ == 'Error404Handler'):
+                continue
+
+            if handler.get != base.BaseHandler.get:
+                handler_is_decorated = hasattr(handler.get, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'GET', handler_is_decorated))
+
+            if handler.post != base.BaseHandler.post:
+                handler_is_decorated = hasattr(handler.post, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'POST', handler_is_decorated))
+
+            if handler.put != base.BaseHandler.put:
+                handler_is_decorated = hasattr(handler.put, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'PUT', handler_is_decorated))
+
+            if handler.delete != base.BaseHandler.delete:
+                handler_is_decorated = hasattr(handler.delete, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'DELETE', handler_is_decorated))
+
+        self.log_line('Verifying decorators for handlers .... ')
+        for (name, method, handler_is_decorated) in handlers_checked:
+            self.log_line('%s %s method: %s' % (
+                name, method, 'PASS' if handler_is_decorated else 'FAIL'))
+        self.log_line(
+            'Total number of handlers checked: %s' % len(handlers_checked))
+
+        self.assertGreater(len(handlers_checked), 0)
+
+        for (name, method, handler_is_decorated) in handlers_checked:
+            self.assertTrue(handler_is_decorated)
