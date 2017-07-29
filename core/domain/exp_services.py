@@ -857,6 +857,14 @@ def _create_exploration(
     # but the creation of an exploration object will fail.
     exploration.validate()
     rights_manager.create_new_exploration_rights(exploration.id, committer_id)
+
+    # Find out all states that need a classifier to be trained.
+    state_names_to_train = []
+    for state_name in exploration.states:
+        state = exploration.states[state_name]
+        if state.can_undergo_classification():
+            state_names_to_train.append(state_name)
+
     model = exp_models.ExplorationModel(
         id=exploration.id,
         category=exploration.category,
@@ -878,6 +886,10 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
+
+    if state_names_to_train:
+        classifier_services.handle_classifier_training_job_creation(
+            exploration, state_names_to_train)
     create_exploration_summary(exploration.id, committer_id)
 
 

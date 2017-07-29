@@ -99,9 +99,13 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
 
-        # Now, there should be no jobs in the data store.
+        # There is one job and one mapping in the data store now as a result of
+        # creating the exploration.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
-        self.assertEqual(all_jobs.count(), 0)
+        self.assertEqual(all_jobs.count(), 1)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 1)
 
         # Modify such that job creation is triggered.
         state.interaction.answer_groups.insert(
@@ -119,12 +123,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
-        # There should be one job and one mapping in the data store now.
+        # There should be two jobs and two mappings in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
-        self.assertEqual(all_jobs.count(), 1)
+        self.assertEqual(all_jobs.count(), 2)
         all_mappings = (
             classifier_models.TrainingJobExplorationMappingModel.get_all())
-        self.assertEqual(all_mappings.count(), 1)
+        self.assertEqual(all_mappings.count(), 2)
 
         # Make a change to the exploration without changing the answer groups
         # to trigger mapping update.
@@ -137,12 +141,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
-        # There should be one job and two mappings in the data store now.
+        # There should be two jobs and three mappings in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
-        self.assertEqual(all_jobs.count(), 1)
+        self.assertEqual(all_jobs.count(), 2)
         all_mappings = (
             classifier_models.TrainingJobExplorationMappingModel.get_all())
-        self.assertEqual(all_mappings.count(), 2)
+        self.assertEqual(all_mappings.count(), 3)
 
         # Check that renaming a state does not create an extra job.
         change_list = [{
@@ -158,13 +162,13 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
-        # There should still be only one job and three mappings in the data
+        # There should still be only two jobs and four mappings in the data
         # store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
-        self.assertEqual(all_jobs.count(), 1)
+        self.assertEqual(all_jobs.count(), 2)
         all_mappings = (
             classifier_models.TrainingJobExplorationMappingModel.get_all())
-        self.assertEqual(all_mappings.count(), 3)
+        self.assertEqual(all_mappings.count(), 4)
 
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""
@@ -387,7 +391,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'TextInput', exp_id, 1, state_name, [],
             feconf.TRAINING_JOB_STATUS_NEW)
         classifier_training_job = (
-            classifier_services.get_job(
+            classifier_services.get_classifier_training_job(
                 exp_id, 1, state_name))
         self.assertEqual(classifier_training_job.exp_id, exp_id)
         self.assertEqual(classifier_training_job.exp_version, 1)

@@ -159,7 +159,8 @@ def handle_classifier_training_job_creation(exploration, state_names):
 
 def handle_mappings_creation(exploration, state_names, change_list):
     """Creates new TrainingJobExplorationMappingModel instances for all the
-    state names passed into the function.
+    state names passed into the function. The mapping is created from the
+    new state to the ClassifierTrainingJob of the old state.
 
     Args:
         exploration: Exploration. The Exploration domain object.
@@ -167,12 +168,14 @@ def handle_mappings_creation(exploration, state_names, change_list):
         change_list: list(dict). A list of changes introduced in this commit.
     """
     exp_id = exploration.id
-    exp_version = exploration.version
-    for state_name in state_names:
-        old_state_name = state_name
-        classifier_training_job = get_job(exp_id, exp_version-1, old_state_name)
+    current_exp_version = exploration.version
+    old_exp_version = current_exp_version - 1
+    for current_state_name in state_names:
+        old_state_name = current_state_name
+        classifier_training_job = get_classifier_training_job(
+            exp_id, old_exp_version, old_state_name)
+        # Check for renamed states.
         if not classifier_training_job:
-            old_state_name = state_name
             renamed_cmds = []
             for change_dict in change_list:
                 if change_dict['cmd'] == 'rename_state':
@@ -182,12 +185,14 @@ def handle_mappings_creation(exploration, state_names, change_list):
                 for change_dict in renamed_cmds:
                     if change_dict['cmd'] == 'rename_state' and (
                             change_dict['new_state_name'] == old_state_name):
+                        # The old state name has been retrieved.
                         old_state_name = change_dict['old_state_name']
                         renamed_cmds.remove(change_dict)
                 count -= 1
-            classifier_training_job = get_job(exp_id, exp_version-1,
-                                              old_state_name)
-        create_job_exploration_mapping(exp_id, exp_version, state_name,
+            classifier_training_job = get_classifier_training_job(
+                exp_id, old_exp_version, old_state_name)
+        create_job_exploration_mapping(exp_id, current_exp_version,
+                                       current_state_name,
                                        classifier_training_job.job_id)
 
 
@@ -453,7 +458,7 @@ def delete_classifier_training_job(job_id):
         classifier_training_job_model.delete()
 
 
-def get_job(exp_id, exp_version, state_name):
+def get_classifier_training_job(exp_id, exp_version, state_name):
     """Gets the classifier training job object from the exploration attributes.
 
     Args:
