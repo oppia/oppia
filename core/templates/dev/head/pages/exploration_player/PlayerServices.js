@@ -36,7 +36,7 @@ oppia.factory('oppiaPlayerService', [
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
   'UrlInterpolationService', 'ReadOnlyExplorationBackendApiService',
-  'EditableExplorationBackendApiService',
+  'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
@@ -44,7 +44,7 @@ oppia.factory('oppiaPlayerService', [
       playerTranscriptService, ExplorationObjectFactory,
       expressionInterpolationService, StatsReportingService,
       UrlInterpolationService, ReadOnlyExplorationBackendApiService,
-      EditableExplorationBackendApiService) {
+      EditableExplorationBackendApiService, AudioTranslationManagerService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -194,8 +194,11 @@ oppia.factory('oppiaPlayerService', [
             _explorationId).then(function(data) {
               exploration = ExplorationObjectFactory.createFromBackendDict(
                 data);
+
               exploration.setInitialStateName(initStateName);
               initParams(manualParamChanges);
+              AudioTranslationManagerService.init(
+                exploration.getAllLanguageCodes());
               _loadInitialState(successCallback);
             });
         } else {
@@ -219,10 +222,13 @@ oppia.factory('oppiaPlayerService', [
               _explorationId, version, data.session_id,
               GLOBALS.collectionId);
 
+            AudioTranslationManagerService.init(
+              exploration.getAllAudioLanguageCodes());
+
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });
-        }
+        }        
       },
       getExplorationId: function() {
         return _explorationId;

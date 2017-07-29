@@ -317,6 +317,8 @@
     "I18N_PLAYER_FEEDBACK_TOOLTIP": "Feedback",
     "I18N_PLAYER_FORWARD": "Forward",
     "I18N_PLAYER_GO_TO_LIBRARY": "Go to library",
+    "I18N_PLAYER_AUDIO_LANGUAGE": "Language",
+    "I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Audio Translation Settings",
     "I18N_PLAYER_HINT": "Hint",
     "I18N_PLAYER_HINTS_EXHAUSTED": "Sorry, I'm out of hints!",
     "I18N_PLAYER_HINT_IS_AVAILABLE": "Click here for a hint!",

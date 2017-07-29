@@ -10,19 +10,11 @@
            focus-on="<[getContentFocusLabel($index)]>">
         <span angular-html-bind="activeCard.contentHtml">
         </span>
-        <span ng-if="contentAudioTranslationAvailable()" 
+
+        <span ng-if="isContentAudioTranslationAvailable()" 
               class="audio-controls">
-          <img class="audio-control-button"
-               ng-if="showExtraAudioControls"
-               ng-src="<[AUDIO_SETTINGS_BUTTON_IMAGE_URL]>"
-               ng-click="openAudioTranslationSettings()">
-          <img class="audio-control-button"
-               ng-if="showExtraAudioControls"
-               ng-src="<[REWIND_AUDIO_BUTTON_IMAGE_URL]>"
-               ng-click="rewindAudioFiveSec()">
-          <img class="audio-control-button"
-               ng-src="<[playPauseButtonImageUrl()]>"
-               ng-click="playPauseAudioTranslation()">
+          <audio-controls audio-translations="contentAudioTranslations">
+          </audio-controls>
         </span>
       </div>
     </div>
@@ -251,15 +243,6 @@
   .conversation-skin-inline-interaction .conversation-skin-user-avatar {
     left: -20px;
     top: 14px;
-  }
-
-  .audio-control-button {
-    width: 24px;
-    height: 24px;
-  }
-
-  .audio-control-button:hover {
-    cursor: pointer
   }
 
   .audio-controls {

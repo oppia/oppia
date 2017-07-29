@@ -14,19 +14,18 @@
 
 /**
  * @fileoverview Service to manage the current language being
- * used for audio translations as well as related modals.
+ * used for audio translations.
  */
 
 oppia.factory('AudioTranslationManagerService', [
-  '$modal', 'ExplorationPlayerStateService', 'AudioPlayerService',
+  '$modal', 'AudioPlayerService',
   function(
-      $modal, ExplorationPlayerStateService, AudioPlayerService) {
+      $modal, AudioPlayerService) {
     var _currentAudioLanguageCode = null;
     var _allLanguageCodesInExploration = null;
 
-    var _init = function() {
-      _allLanguageCodesInExploration =
-        ExplorationPlayerStateService.getAllAudioLanguageCodes();
+    var _init = function(allLanguageCodesInExploration) {
+      _allLanguageCodesInExploration = allLanguageCodesInExploration;
 
       // TODO(tjiang11): Define an order. Preferably, we'd want
       // to promote the user's preferred languages, and promote
@@ -50,21 +49,29 @@ oppia.factory('AudioTranslationManagerService', [
         resolve: {},
         controller: [
           '$scope', '$filter', '$modalInstance',
-          'AudioTranslationManagerService',
+          'AudioTranslationManagerService', 'LanguageUtilService',
           function(
               $scope, $filter, $modalInstance,
-              AudioTranslationManagerService) {
-            $scope.selectedLanguage =
-              $filter('languageDescription')(_currentAudioLanguageCode);
-            $scope.allLanguageCodes =
+              AudioTranslationManagerService, LanguageUtilService) {
+            var allLanguageCodes =
               AudioTranslationManagerService
                 .getAllLanguageCodesInExploration();
 
+            $scope.languagesInExploration = [];
+            for (var i = 0; i < allLanguageCodes.length; i++) {
+              var languageCode = allLanguageCodes[i];
+              var languageDescription =
+                LanguageUtilService.getAudioLanguageDescription(languageCode);
+              $scope.languagesInExploration.push({
+                value: languageCode,
+                displayed: languageDescription
+              });
+            }
+
+            $scope.selectedLanguage = _currentAudioLanguageCode;
             $scope.save = function() {
-              var selectedLanguageCode = 
-                $filter('languageCode')($scope.selectedLanguage);
               $modalInstance.close({
-                languageCode: selectedLanguageCode
+                languageCode: $scope.selectedLanguage
               });
             };
           }
@@ -79,8 +86,8 @@ oppia.factory('AudioTranslationManagerService', [
     };
 
     return {
-      init: function() {
-        _init();
+      init: function(allLanguageCodesInExploration) {
+        _init(allLanguageCodesInExploration);
       },
       getCurrentAudioLanguageCode: function() {
         return _currentAudioLanguageCode;
@@ -93,42 +100,3 @@ oppia.factory('AudioTranslationManagerService', [
       }
     };
   }]);
-
-oppia.filter('languageDescriptions', ['$filter', function($filter) {
-  return function(languageCodes) {
-    var languageDescriptions = [];
-    angular.forEach(languageCodes, function(languageCode) {
-      languageDescriptions.push(
-        $filter('languageDescription')(languageCode));
-    });
-    return languageDescriptions;
-  };
-}]);
-
-
-oppia.filter('languageDescription', function() {
-  var _getLanguageDescription = function(languageCode) {
-    for (var i = 0; i < constants.SUPPORTED_AUDIO_LANGUAGES.length; i++) {
-      if (constants.SUPPORTED_AUDIO_LANGUAGES[i].id === languageCode) {
-        return constants.SUPPORTED_AUDIO_LANGUAGES[i].text;
-      }
-    }
-  };
-  return function(languageCode) {
-    return _getLanguageDescription(languageCode);
-  };
-});
-
-oppia.filter('languageCode', function () {
-  var _getLanguageCode = function(languageDescription) {
-    for (var i = 0; i < constants.SUPPORTED_AUDIO_LANGUAGES.length; i++) {
-      if (constants.SUPPORTED_AUDIO_LANGUAGES[i].text ===
-          languageDescription) {
-        return constants.SUPPORTED_AUDIO_LANGUAGES[i].id;
-      }
-    }
-  };
-  return function(languageDescription) {
-    return _getLanguageCode(languageDescription);
-  };
-});

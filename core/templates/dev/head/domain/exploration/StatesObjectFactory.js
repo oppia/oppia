@@ -108,15 +108,17 @@ oppia.factory('StatesObjectFactory', [
     };
 
     States.prototype.getAllAudioLanguageCodes = function() {
-      var allAudioLanguageCodes = new Set();
+      var allAudioLanguageCodes = [];
       for (var stateName in this._states) {
         var audioTranslationsForState =
-          this._states[stateName].content.getBindableAudioTranslations()
+          this._states[stateName].content.getBindableAudioTranslations();
         for (var languageCode in audioTranslationsForState) {
-          allAudioLanguageCodes.add(languageCode);
+          if (allAudioLanguageCodes.indexOf(languageCode) == -1) {
+            allAudioLanguageCodes.push(languageCode);
+          }
         }
       }
-      return Array.from(allAudioLanguageCodes);
+      return allAudioLanguageCodes;
     };
 
     States.createFromBackendDict = function(statesBackendDict) {

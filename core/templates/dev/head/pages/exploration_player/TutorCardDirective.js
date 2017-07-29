@@ -85,6 +85,10 @@ oppia.directive('tutorCard', [
 
             $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints.length);
+
+            $scope.contentAudioTranslations =
+              oppiaPlayerService.getStateContentAudioTranslations(
+                $scope.activeCard.stateName);
           };
 
           $scope.arePreviousResponsesShown = false;
@@ -125,32 +129,16 @@ oppia.directive('tutorCard', [
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg'));
 
-          $scope.AUDIO_SETTINGS_BUTTON_IMAGE_URL = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/icons/settings.svg'));
-
-          var PLAY_AUDIO_BUTTON_IMAGE_URL = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/icons/speaker-not-playing.svg'));
-
-          var PAUSE_AUDIO_BUTTON_IMAGE_URL = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/icons/speaker-playing.svg'));
-
-          $scope.REWIND_AUDIO_BUTTON_IMAGE_URL = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/icons/rewind-five.svg'));
 
           $scope.profilePicture = UrlInterpolationService.getStaticImageUrl(
             '/avatar/user_blue_72px.png');
 
-          var cardIndexOfPlayingAudio;
 
           oppiaPlayerService.getUserProfileImage().then(function(result) {
             $scope.profilePicture = result;
           });
 
-          $scope.showExtraAudioControls = false;
+          $scope.extraAudioControlsAreShown = false;
 
           $scope.getContentFocusLabel = function(index) {
             return CONTENT_FOCUS_LABEL_PREFIX + index;
@@ -173,74 +161,7 @@ oppia.directive('tutorCard', [
             });
           };
 
-          $scope.playPauseAudioTranslation = function() {
-            // TODO(tjiang11): Change from on-demand loading to pre-loading.
-
-            if (cardIndexOfPlayingAudio === undefined) {
-              cardIndexOfPlayingAudio =
-                playerPositionService.getActiveCardIndex();
-
-              // TODO(tjiang11): On first play, ask learner to pick language
-              // and subsequently for confirmation to use bandwidth 
-              // to download audio files.
-            }
-
-            $scope.showExtraAudioControls = true;
-
-            if (!AudioPlayerService.isPlaying()) {
-              if (AudioPlayerService.trackLoaded() && isSameAudio()) {
-                AudioPlayerService.play();
-              } else {
-                loadAndPlayAudioTranslation();
-              }
-            } else {
-              AudioPlayerService.pause();
-              if (!isSameAudio()) {
-                loadAndPlayAudioTranslation();
-              }
-            }
-          };
-
-          var isSameAudio = function() {
-            return cardIndexOfPlayingAudio == 
-              playerPositionService.getActiveCardIndex();
-          };
-
-          var loadAndPlayAudioTranslation = function() {
-            cardIndexOfPlayingAudio =
-              playerPositionService.getActiveCardIndex();
-            var currentAudioLanguageCode =
-              AudioTranslationManagerService.getCurrentAudioLanguageCode();
-            var audioTranslation =
-              oppiaPlayerService.getStateContentAudioTranslation(
-                $scope.activeCard.stateName, currentAudioLanguageCode);
-
-            // TODO(tjiang11): If audio translation is not available
-            // in the current language, then inform the learner with
-            // a piece of text below the audio controls.
-            if (audioTranslation != null) {
-              AudioPlayerService.load(
-                  audioTranslation.filename).then(function() {
-                    AudioPlayerService.play();
-                  });
-            }
-          };
-
-          $scope.rewindAudioFiveSec = function() {
-            AudioPlayerService.rewind(5);
-          };
-
-          $scope.playPauseButtonImageUrl = function() {
-            return AudioPlayerService.isPlaying() && isSameAudio() ?
-              PAUSE_AUDIO_BUTTON_IMAGE_URL : PLAY_AUDIO_BUTTON_IMAGE_URL;
-          };
-
-          $scope.openAudioTranslationSettings = function() {
-            AudioTranslationManagerService
-              .showAudioTranslationSettingsModal();
-          };
-
-          $scope.contentAudioTranslationAvailable = function() {
+          $scope.isContentAudioTranslationAvailable = function() {
             return Object.keys(oppiaPlayerService
               .getStateContentAudioTranslations(
               $scope.activeCard.stateName)).length > 0;

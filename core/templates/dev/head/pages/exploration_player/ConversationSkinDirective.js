@@ -255,7 +255,7 @@ oppia.directive('conversationSkin', [
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'FatigueDetectionService', 'AudioTranslationManagerService',
+        'FatigueDetectionService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             messengerService, oppiaPlayerService, urlService, focusService,
@@ -266,7 +266,7 @@ oppia.directive('conversationSkin', [
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            FatigueDetectionService, AudioTranslationManagerService) {
+            FatigueDetectionService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -463,7 +463,6 @@ oppia.directive('conversationSkin', [
               $rootScope.loadingMessage = '';
               $scope.hasFullyLoaded = true;
 
-              AudioTranslationManagerService.init();
               // If the exploration is embedded, use the exploration language
               // as site language. If the exploration language is not supported
               // as site language, English is used as default.

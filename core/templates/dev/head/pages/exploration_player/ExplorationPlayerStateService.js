@@ -50,10 +50,5 @@ oppia.factory('ExplorationPlayerStateService', [function() {
     getLanguageCode: function() {
       return exploration.getLanguageCode();
     },
-
-    getAllAudioLanguageCodes: function() {
-      return exploration.getAllAudioLanguageCodes();
-    }
-    
   };
 }]);

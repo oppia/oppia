@@ -838,13 +838,6 @@ oppia.factory('explorationLanguageCodeService', [
         }
       }
     };
-    child.getLanguageDescription = function(languageCode) {
-      for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
-        if (constants.ALL_LANGUAGE_CODES[i].code === languageCode) {
-          return constants.ALL_LANGUAGE_CODES[i].description;
-        }
-      }
-    };
     child._isValid = function(value) {
       return constants.ALL_LANGUAGE_CODES.some(function(elt) {
         return elt.code === value;

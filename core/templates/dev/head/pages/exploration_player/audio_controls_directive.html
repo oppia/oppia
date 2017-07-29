@@ -1,0 +1,22 @@
+<img class="audio-control-button"
+     ng-if="extraAudioControlsAreShown"
+     ng-src="<[AUDIO_SETTINGS_BUTTON_IMAGE_URL]>"
+     ng-click="openAudioTranslationSettings()">
+<img class="audio-control-button"
+     ng-if="extraAudioControlsAreShown"
+     ng-src="<[REWIND_AUDIO_BUTTON_IMAGE_URL]>"
+     ng-click="rewindAudioFiveSec()">
+<img class="audio-control-button"
+     ng-src="<[getPlayPauseButtonImageUrl()]>"
+     ng-click="playPauseAudioTranslation()">
+
+<style>
+  .audio-control-button {
+    width: 24px;
+    height: 24px;
+  }
+
+  .audio-control-button:hover {
+    cursor: pointer
+  }
+</style>
