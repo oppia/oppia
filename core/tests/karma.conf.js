@@ -26,7 +26,7 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*.js',
-      'core/templates/dev/head/components/rating_display.html',
+      'core/templates/dev/head/**/*.html',
       'extensions/**/*.js',
       'extensions/interactions/**/*.html',
       'extensions/interactions/rule_templates.json',
@@ -70,7 +70,7 @@ module.exports = function(config) {
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*.html': ['ng-html2js'],
       'extensions/interactions/**/*.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures']
     },

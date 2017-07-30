@@ -585,7 +585,7 @@ oppia.factory('explorationRightsService', [
             data.rights.viewable_if_private);
           whenViewabilityChanged.resolve();
         });
-        return whenViewabilityChanged.promise;          
+        return whenViewabilityChanged.promise;
       },
       saveRoleChanges: function(newMemberUsername, newMemberRole) {
         var whenRolesSaved = $q.defer();
@@ -607,7 +607,7 @@ oppia.factory('explorationRightsService', [
             data.rights.viewable_if_private);
           whenRolesSaved.resolve();
         });
-        return whenRolesSaved.promise;  
+        return whenRolesSaved.promise;
       },
       makePublic: function(makePublic) {
         var whenPublishStatusChanged = $q.defer();
@@ -1323,6 +1323,16 @@ oppia.factory('statePropertyService', [
         this.displayed = angular.copy(this.savedMemento);
       }
     };
+  }
+]);
+
+// A data service that stores the current state content.
+// TODO(sll): Add validation.
+oppia.factory('stateContentService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveStateContent';
+    return child;
   }
 ]);
 

@@ -17,21 +17,13 @@
  */
 
 oppia.controller('StateEditor', [
-  '$scope', '$rootScope', 'editorContextService', 'changeListService',
-  'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
-  'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
-  'UrlInterpolationService', 'editorFirstTimeEventsService',
-  'ENABLE_FALLBACK_EDITOR',
+  '$scope', '$rootScope', 'editorContextService', 'explorationStatesService',
+  'INTERACTION_SPECS', 'explorationAdvancedFeaturesService',
+  'UrlInterpolationService', 'ENABLE_FALLBACK_EDITOR', 'stateContentService',
   function(
-      $scope, $rootScope, editorContextService, changeListService,
-      editabilityService, explorationStatesService, INTERACTION_SPECS,
-      explorationInitStateNameService, explorationAdvancedFeaturesService,
-      UrlInterpolationService, editorFirstTimeEventsService,
-      ENABLE_FALLBACK_EDITOR) {
-    $scope.STATE_CONTENT_SCHEMA = {
-      type: 'html'
-    };
-
+      $scope, $rootScope, editorContextService, explorationStatesService,
+      INTERACTION_SPECS, explorationAdvancedFeaturesService,
+      UrlInterpolationService, ENABLE_FALLBACK_EDITOR, stateContentService) {
     $scope.areParametersEnabled = (
       explorationAdvancedFeaturesService.areParametersEnabled);
     $scope.areFallbacksEnabled = (
@@ -41,24 +33,13 @@ oppia.controller('StateEditor', [
 
     $scope.isCurrentStateTerminal = false;
     $scope.isInteractionIdSet = false;
-    $scope.isInteractionShown = false;
+    $scope.interactionIsShown = false;
 
     $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/avatar/oppia_avatar_100px.svg');
 
-    $scope.isCurrentStateInitialState = function() {
-      return (
-        editorContextService.getActiveStateName() ===
-        explorationInitStateNameService.savedMemento);
-    };
-
     $scope.$on('refreshStateEditor', function() {
       $scope.initStateEditor();
-    });
-
-    $scope.$on('refreshStateContent', function() {
-      $scope.content = explorationStatesService.getStateContentMemento(
-        editorContextService.getActiveStateName());
     });
 
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
@@ -68,14 +49,12 @@ oppia.controller('StateEditor', [
           newInteractionId].is_terminal);
     });
 
-    $scope.contentEditorIsOpen = false;
-
     $scope.initStateEditor = function() {
       var stateName = editorContextService.getActiveStateName();
       var stateData = explorationStatesService.getState(stateName);
       if (stateName && stateData) {
-        $scope.content = explorationStatesService.getStateContentMemento(
-          stateName);
+        stateContentService.init(
+          editorContextService.getActiveStateName(), stateData.content);
 
         $rootScope.$broadcast('stateEditorInitialized', stateData);
         var interactionId = explorationStatesService.getInteractionIdMemento(
@@ -85,45 +64,20 @@ oppia.controller('StateEditor', [
           $scope.isInteractionIdSet &&
           INTERACTION_SPECS[interactionId].is_terminal);
 
-        if ($scope.content.getHtml() || stateData.interaction.id) {
-          $scope.isInteractionShown = true;
+        var content = explorationStatesService.getStateContentMemento(
+          stateName);
+        if (content.getHtml() || stateData.interaction.id) {
+          $scope.interactionIsShown = true;
         }
-
-        $scope.$on('externalSave', function() {
-          if ($scope.contentEditorIsOpen) {
-            $scope.saveTextContent();
-          }
-        });
 
         $rootScope.loadingMessage = '';
       }
     };
 
-    $scope.openStateContentEditor = function() {
-      if (editabilityService.isEditable()) {
-        editorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
-        $scope.contentEditorIsOpen = true;
-      }
-    };
-
-    $scope.saveTextContent = function() {
-      explorationStatesService.saveStateContent(
-        editorContextService.getActiveStateName(), $scope.content);
-      $scope.contentEditorIsOpen = false;
-    };
-
-    $scope.onSaveContentButtonClicked = function() {
-      editorFirstTimeEventsService.registerFirstSaveContentEvent();
-      $scope.saveTextContent();
-      // Show the interaction when the text content is saved, even if no content
-      // is entered.
-      $scope.isInteractionShown = true;
-    };
-
-    $scope.cancelEdit = function() {
-      $scope.content = explorationStatesService.getStateContentMemento(
-        editorContextService.getActiveStateName());
-      $scope.contentEditorIsOpen = false;
+    $scope.showInteraction = function() {
+      // Show the interaction when the text content is saved, even if no
+      // content is entered.
+      $scope.interactionIsShown = true;
     };
   }
 ]);
