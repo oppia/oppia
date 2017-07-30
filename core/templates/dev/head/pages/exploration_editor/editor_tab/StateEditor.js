@@ -31,8 +31,8 @@ oppia.controller('StateEditor', [
 
     $scope.fallbackEditorIsEnabled = ENABLE_FALLBACK_EDITOR;
 
-    $scope.isCurrentStateTerminal = false;
-    $scope.isInteractionIdSet = false;
+    $scope.currentStateIsTerminal = false;
+    $scope.interactionIdIsSet = false;
     $scope.interactionIsShown = false;
 
     $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
@@ -43,9 +43,9 @@ oppia.controller('StateEditor', [
     });
 
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
-      $scope.isInteractionIdSet = Boolean(newInteractionId);
-      $scope.isCurrentStateTerminal = (
-        $scope.isInteractionIdSet && INTERACTION_SPECS[
+      $scope.interactionIdIsSet = Boolean(newInteractionId);
+      $scope.currentStateIsTerminal = (
+        $scope.interactionIdIsSet && INTERACTION_SPECS[
           newInteractionId].is_terminal);
     });
 
@@ -59,9 +59,9 @@ oppia.controller('StateEditor', [
         $rootScope.$broadcast('stateEditorInitialized', stateData);
         var interactionId = explorationStatesService.getInteractionIdMemento(
           stateName);
-        $scope.isInteractionIdSet = Boolean(interactionId);
-        $scope.isCurrentStateTerminal = (
-          $scope.isInteractionIdSet &&
+        $scope.interactionIdIsSet = Boolean(interactionId);
+        $scope.currentStateIsTerminal = (
+          $scope.interactionIdIsSet &&
           INTERACTION_SPECS[interactionId].is_terminal);
 
         var content = explorationStatesService.getStateContentMemento(

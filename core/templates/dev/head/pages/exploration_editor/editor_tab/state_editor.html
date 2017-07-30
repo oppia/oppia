@@ -22,7 +22,7 @@
     {% include 'pages/exploration_editor/editor_tab/state_editor_interaction.html' %}
   </div>
 
-  <div ng-hide="!isInteractionIdSet || isCurrentStateTerminal">
+  <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
     {% include 'pages/exploration_editor/editor_tab/state_editor_responses.html' %}
     <div ng-if="areFallbacksEnabled() && fallbackEditorIsEnabled">
       {% include 'pages/exploration_editor/editor_tab/state_editor_fallbacks.html' %}
