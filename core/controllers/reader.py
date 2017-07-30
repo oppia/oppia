@@ -459,34 +459,6 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class RemoveExpFromIncompleteListHandler(base.BaseHandler):
-    """Handles operations related to removing an exploration from the partially
-    completed list of a user.
-    """
-
-    @acl_decorators.can_access_learner_dashboard
-    def post(self):
-        """Handles POST requests."""
-        exploration_id = self.payload.get('exploration_id')
-        learner_progress_services.remove_exp_from_incomplete_list(
-            self.user_id, exploration_id)
-        self.render_json(self.values)
-
-
-class RemoveCollectionFromIncompleteListHandler(base.BaseHandler):
-    """Handles operations related to removing a collection from the partially
-    completed list of a user.
-    """
-
-    @acl_decorators.can_access_learner_dashboard
-    def post(self):
-        """Handles POST requests."""
-        collection_id = self.payload.get('collection_id')
-        learner_progress_services.remove_collection_from_incomplete_list(
-            self.user_id, collection_id)
-        self.render_json(self.values)
-
-
 class RatingHandler(base.BaseHandler):
     """Records the rating of an exploration submitted by a user.
 
