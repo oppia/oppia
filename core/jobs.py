@@ -182,8 +182,6 @@ class BaseJobManager(object):
             job_id: str. The ID of the job to complete.
             output_list: list(object). The output produced by the job.
         """
-        _MAX_OUTPUT_LENGTH_CHARS = 900000
-
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
