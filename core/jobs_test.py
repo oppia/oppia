@@ -391,36 +391,36 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         expected = ['<TRUNCATED>']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list, test_only_max_output_len=0)
-        self.assertEquals(expected, sorted(actual))
+        self.assertEquals(expected, actual)
 
     def test_compress_output_list_with_exact_max_output_len(self):
         sample_output_list = ['abc']
         expected = ['abc']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list, test_only_max_output_len=3)
-        self.assertEquals(expected, sorted(actual))
+        self.assertEquals(expected, actual)
 
     def test_compress_output_list_with_empty_outputs(self):
         sample_output_list = []
         expected = []
         actual = jobs.BaseJobManager._compress_output_list(sample_output_list)  # pylint: disable=protected-access
-        self.assertEquals(expected, sorted(actual))
+        self.assertEquals(expected, actual)
 
     def test_compress_output_list_with_duplicate_outputs(self):
-        sample_output_list = ['bar', 'foo'] * 3
-        expected = ['(3x) bar', '(3x) foo']
+        sample_output_list = {'bar', 'foo'} * 3
+        expected = {'(3x) bar', '(3x) foo'}
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list,
             # Ensure truncation doesn't happen in this test.
             test_only_max_output_len=sum(len(s) for s in expected))
-        self.assertEquals(expected, sorted(actual))
+        self.assertEquals(expected, set(actual))
 
     def test_compress_output_list_with_truncated_duplicate_outputs(self):
         sample_output_list = ['supercalifragilisticexpialidocious'] * 3
         expected = ['(3x) super <TRUNCATED>']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list, test_only_max_output_len=10)
-        self.assertEquals(expected, sorted(actual))
+        self.assertEquals(expected, actual)
 
 
 SUM_MODEL_ID = 'all_data_id'
