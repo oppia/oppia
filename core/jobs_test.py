@@ -363,7 +363,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(DummyJobManager.get_error(job2_id))
 
     def test_compress_output_list_with_single_char_outputs(self):
-        input_list = [1, 2, 3, 4, 5]
+        sample_output_list = [1, 2, 3, 4, 5]
         expected_possibilities = [
             ['1', '2', '3', '<TRUNCATED>'], ['1', '2', '4', '<TRUNCATED>'],
             ['1', '2', '5', '<TRUNCATED>'], ['1', '3', '4', '<TRUNCATED>'],
@@ -372,54 +372,54 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             ['2', '4', '5', '<TRUNCATED>'], ['3', '4', '5', '<TRUNCATED>'],
         ]
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len=3)
+            sample_output_list, test_only_max_output_len=3)
         self.assertIn(sorted(actual), expected_possibilities)
 
     def test_compress_output_list_with_multi_char_outputs(self):
-        input_list = ['abcd', 'efgh', 'ijkl']
+        sample_output_list = ['abcd', 'efgh', 'ijkl']
         expected_possibilities = [
             ['abcd', 'efgh', 'ij <TRUNCATED>'],
             ['abcd', 'ef <TRUNCATED>', 'ijkl'],
             ['ab <TRUNCATED>', 'efgh', 'ijkl'],
         ]
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len=10)
+            sample_output_list, test_only_max_output_len=10)
         self.assertIn(sorted(actual), expected_possibilities)
 
     def test_compress_output_list_with_zero_max_output_len(self):
-        input_list = [1, 2, 3]
+        sample_output_list = [1, 2, 3]
         expected = ['<TRUNCATED>']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len=0)
+            sample_output_list, test_only_max_output_len=0)
         self.assertEquals(expected, sorted(actual))
 
     def test_compress_output_list_with_exact_max_output_len(self):
-        input_list = ['abc']
+        sample_output_list = ['abc']
         expected = ['abc']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len=3)
+            sample_output_list, test_only_max_output_len=3)
         self.assertEquals(expected, sorted(actual))
 
     def test_compress_output_list_with_empty_outputs(self):
-        input_list = []
+        sample_output_list = []
         expected = []
-        actual = jobs.BaseJobManager._compress_output_list(input_list)  # pylint: disable=protected-access
+        actual = jobs.BaseJobManager._compress_output_list(sample_output_list)  # pylint: disable=protected-access
         self.assertEquals(expected, sorted(actual))
 
     def test_compress_output_list_with_duplicate_outputs(self):
-        input_list = ['bar', 'foo'] * 3
+        sample_output_list = ['bar', 'foo'] * 3
         expected = ['(3x) bar', '(3x) foo']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list,
+            sample_output_list,
             # Ensure truncation doesn't happen in this test.
             test_only_max_output_len=sum(len(s) for s in expected))
         self.assertEquals(expected, sorted(actual))
 
     def test_compress_output_list_with_truncated_duplicate_outputs(self):
-        input_list = ['supercalifragilisticexpialidocious'] * 3
+        sample_output_list = ['supercalifragilisticexpialidocious'] * 3
         expected = ['(3x) super <TRUNCATED>']
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len=10)
+            sample_output_list, test_only_max_output_len=10)
         self.assertEquals(expected, sorted(actual))
 
 
