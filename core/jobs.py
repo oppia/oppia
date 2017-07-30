@@ -220,11 +220,9 @@ class BaseJobManager(object):
         ]
 
         # Truncate outputs to fit within given max length.
-        if test_only_max_output_len is None:
-            remaining_len = _MAX_OUTPUT_LEN
-        else:
-            remaining_len = test_only_max_output_len
-
+        remaining_len = (
+            test_only_max_output_len if test_only_max_output_len is not None
+            else _MAX_OUTPUT_LEN)
         for idx, output_str in enumerate(output_str_list):
             remaining_len -= len(output_str)
             if remaining_len < 0:
