@@ -544,7 +544,7 @@ def get_all_completed_exp_ids(user_id):
         return []
 
 
-def get_filtered_completed_exp_summaries(exploration_summaries,
+def _get_filtered_completed_exp_summaries(exploration_summaries,
                                          exploration_ids):
     """Returns a list of summaries of the completed exploration ids and the
     ids of explorations that are no longer present.
@@ -596,7 +596,7 @@ def get_all_completed_collection_ids(user_id):
         return []
 
 
-def get_filtered_completed_collection_summaries(user_id, collection_summaries,
+def _get_filtered_completed_collection_summaries(user_id, collection_summaries,
                                                 collection_ids):
     """Returns a list of summaries of the completed collection ids, the ids
     of collections that are no longer present and the summaries of the
@@ -676,7 +676,7 @@ def get_all_incomplete_exp_ids(user_id):
         return []
 
 
-def get_filtered_incomplete_exp_summaries(exploration_summaries,
+def _get_filtered_incomplete_exp_summaries(exploration_summaries,
                                           exploration_ids):
     """Returns a list of summaries of the incomplete exploration ids and the ids
     of explorations that are no longer present.
@@ -727,7 +727,7 @@ def get_all_incomplete_collection_ids(user_id):
         return []
 
 
-def get_filtered_incomplete_collection_summaries(collection_summaries,
+def _get_filtered_incomplete_collection_summaries(collection_summaries,
                                                  collection_ids):
     """Returns a list of summaries of the incomplete collection ids and the ids
     of collections that are no longer present.
@@ -756,7 +756,7 @@ def get_filtered_incomplete_collection_summaries(collection_summaries,
             nonexistent_incomplete_collection_ids)
 
 
-def get_filtered_exp_playlist_summaries(exploration_summaries,
+def _get_filtered_exp_playlist_summaries(exploration_summaries,
                                         exploration_ids):
     """Returns a list of summaries of the explorations in the learner playlist
     and the ids of explorations that are no longer present.
@@ -784,7 +784,7 @@ def get_filtered_exp_playlist_summaries(exploration_summaries,
     return filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids
 
 
-def get_filtered_collection_playlist_summaries(collection_summaries,
+def _get_filtered_collection_playlist_summaries(collection_summaries,
                                                collection_ids):
     """Returns a list of summaries of the collections in the learner playlist
     and the ids of collections that are no longer present.
@@ -951,17 +951,17 @@ def get_activity_progress(user_id):
          if model else None for model in collection_playlist_models])
 
     filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids = (
-        get_filtered_incomplete_exp_summaries(
+        _get_filtered_incomplete_exp_summaries(
             incomplete_exp_summaries, incomplete_exploration_ids))
 
     filtered_completed_exp_summaries, nonexistent_completed_exp_ids = (
-        get_filtered_completed_exp_summaries(
+        _get_filtered_completed_exp_summaries(
             completed_exp_summaries, completed_exploration_ids))
 
     (filtered_completed_collection_summaries,
      nonexistent_completed_collection_ids,
      completed_to_incomplete_collection_summaries) = (
-         get_filtered_completed_collection_summaries(
+         _get_filtered_completed_collection_summaries(
              user_id, completed_collection_summaries, completed_collection_ids))
 
     completed_to_incomplete_collection_titles = []
@@ -973,16 +973,16 @@ def get_activity_progress(user_id):
 
     (filtered_incomplete_collection_summaries,
      nonexistent_incomplete_collection_ids) = (
-         get_filtered_incomplete_collection_summaries(
+         _get_filtered_incomplete_collection_summaries(
              incomplete_collection_summaries, incomplete_collection_ids))
 
     filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids = (
-        get_filtered_exp_playlist_summaries(
+        _get_filtered_exp_playlist_summaries(
             exploration_playlist_summaries, exploration_playlist_ids))
 
     (filtered_collection_playlist_summaries,
      nonexistent_playlist_collection_ids) = (
-         get_filtered_collection_playlist_summaries(
+         _get_filtered_collection_playlist_summaries(
              collection_playlist_summaries, collection_playlist_ids))
 
     number_of_deleted_activities = {
