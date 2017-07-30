@@ -365,26 +365,26 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
     def test_compress_output_list_with_single_char_outputs(self):
         sample_output_list = [1, 2, 3, 4, 5]
         expected_possibilities = [
-            ['1', '2', '3', '<TRUNCATED>'], ['1', '2', '4', '<TRUNCATED>'],
-            ['1', '2', '5', '<TRUNCATED>'], ['1', '3', '4', '<TRUNCATED>'],
-            ['1', '3', '5', '<TRUNCATED>'], ['1', '4', '5', '<TRUNCATED>'],
-            ['2', '3', '4', '<TRUNCATED>'], ['2', '3', '5', '<TRUNCATED>'],
-            ['2', '4', '5', '<TRUNCATED>'], ['3', '4', '5', '<TRUNCATED>'],
+            {'1', '2', '3', '<TRUNCATED>'}, {'1', '2', '4', '<TRUNCATED>'},
+            {'1', '2', '5', '<TRUNCATED>'}, {'1', '3', '4', '<TRUNCATED>'},
+            {'1', '3', '5', '<TRUNCATED>'}, {'1', '4', '5', '<TRUNCATED>'},
+            {'2', '3', '4', '<TRUNCATED>'}, {'2', '3', '5', '<TRUNCATED>'},
+            {'2', '4', '5', '<TRUNCATED>'}, {'3', '4', '5', '<TRUNCATED>'},
         ]
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list, test_only_max_output_len=3)
-        self.assertIn(sorted(actual), expected_possibilities)
+        self.assertIn(set(actual), expected_possibilities)
 
     def test_compress_output_list_with_multi_char_outputs(self):
         sample_output_list = ['abcd', 'efgh', 'ijkl']
         expected_possibilities = [
-            ['abcd', 'efgh', 'ij <TRUNCATED>'],
-            ['abcd', 'ef <TRUNCATED>', 'ijkl'],
-            ['ab <TRUNCATED>', 'efgh', 'ijkl'],
+            {'abcd', 'efgh', 'ij <TRUNCATED>'},
+            {'abcd', 'ijkl', 'ef <TRUNCATED>'},
+            {'efgh', 'ijkl', 'ab <TRUNCATED>'},
         ]
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list, test_only_max_output_len=10)
-        self.assertIn(sorted(actual), expected_possibilities)
+        self.assertIn(set(actual), expected_possibilities)
 
     def test_compress_output_list_with_zero_max_output_len(self):
         sample_output_list = [1, 2, 3]
