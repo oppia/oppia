@@ -573,8 +573,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection_playlist_summaries[0].title, 'Welcome Oppia Collection')
 
-        # Delete an exploration.
+        # Delete an exploration in the completed section.
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
+        # Delete an exploration in the incomplete section.
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
+        # Delete an exploration in the playlist section.
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_3)
         # Add an exploration to a collection that has already been completed.
         collection_services.update_collection(
             self.owner_id, self.COL_ID_0, [{
@@ -590,8 +594,15 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # section.
         self.assertEqual(
             len(activity_progress[0].incomplete_exp_summaries), 0)
-        # Check that the dashboard records the exploration deleted.
+        # Check that the dashboard records the exploration deleted in the
+        # completed section.
+        self.assertEqual(activity_progress[1]['completed_explorations'], 1)
+        # Check that the dashboard records the exploration deleted in the
+        # incomplete section.
         self.assertEqual(activity_progress[1]['incomplete_explorations'], 1)
+        # Check that the dashboard records the exploration deleted in the
+        # playlist section.
+        self.assertEqual(activity_progress[1]['exploration_playlist'], 1)
 
         incomplete_collection_summaries = (
             activity_progress[0].incomplete_collection_summaries)
@@ -602,3 +613,29 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(incomplete_collection_summaries[1].title, 'Bridges')
         # Check that the dashboard has recorded the change in the collection.
         self.assertEqual(activity_progress[2], ['Bridges'])
+
+        # Now suppose the user has completed the collection. It should be added
+        # back to the completed section.
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_0)
+
+        # Delete a collection in the completed section.
+        collection_services.delete_collection(self.owner_id, self.COL_ID_0)
+        # Delete a collection in the incomplete section.
+        collection_services.delete_collection(self.owner_id, self.COL_ID_1)
+        # Delete a collection in the playlist section.
+        collection_services.delete_collection(self.owner_id, self.COL_ID_3)
+
+        # Get the progress of the user.
+        activity_progress = learner_progress_services.get_activity_progress(
+            self.user_id)
+
+        # Check that the dashboard records the collection deleted in the
+        # completed section.
+        self.assertEqual(activity_progress[1]['completed_collections'], 1)
+        # Check that the dashboard records the collection deleted in the
+        # incomplete section.
+        self.assertEqual(activity_progress[1]['incomplete_collections'], 1)
+        # Check that the dashboard records the collection deleted in the
+        # playlist section.
+        self.assertEqual(activity_progress[1]['collection_playlist'], 1)
