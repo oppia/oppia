@@ -407,7 +407,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertEquals(expected, actual)
 
     def test_compress_output_list_with_duplicate_outputs(self):
-        sample_output_list = {'bar', 'foo'} * 3
+        sample_output_list = ['bar', 'foo'] * 3
         expected = {'(3x) bar', '(3x) foo'}
         actual = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             sample_output_list,
