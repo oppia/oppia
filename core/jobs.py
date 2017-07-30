@@ -196,7 +196,8 @@ class BaseJobManager(object):
         cls._post_completed_hook(job_id)
 
     @classmethod
-    def _compress_output_list(cls, output_list, test_only_max_output_len=None):
+    def _compress_output_list(
+            cls, output_list, test_only_max_output_len_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
         Ensures that the payload (i.e., [str(output) for output in output_list])
@@ -204,16 +205,23 @@ class BaseJobManager(object):
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
-            test_only_max_output_len: int or None. Overrides the intended max
-                output len limit when not None.
+            test_only_max_output_len_chars: int or None. Overrides the intended
+                max output len limit when not None.
 
         Returns:
             list(str). The compressed stringified output values.
         """
-        _MAX_OUTPUT_LEN = 900000
+        _MAX_OUTPUT_LEN_CHARS = 900000
 
         # Consolidate the lines of output since repeating them isn't useful.
-        counter = collections.Counter(str(output) for output in output_list)
+        class _OrderedCounter(collections.Counter, collections.OrderedDict):
+            """Counter that remembers the order elements are first encountered.
+
+            We use this class so that our tests can rely on deterministic
+            ordering, instead of simply using `collections.Counter` which has
+            non-deterministic ordering.
+            """
+        counter = _OrderedCounter(str(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
             for (output_str, count) in counter.iteritems()
@@ -221,8 +229,8 @@ class BaseJobManager(object):
 
         # Truncate outputs to fit within given max length.
         remaining_len = (
-            test_only_max_output_len if test_only_max_output_len is not None
-            else _MAX_OUTPUT_LEN)
+            _MAX_OUTPUT_LEN_CHARS if (test_only_max_output_len_chars is None)
+            else test_only_max_output_len_chars)
         for idx, output_str in enumerate(output_str_list):
             remaining_len -= len(output_str)
             if remaining_len < 0:

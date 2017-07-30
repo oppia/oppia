@@ -16,6 +16,8 @@
 
 import ast
 import logging
+import traceback
+import StringIO
 
 from core import jobs
 from core.domain import config_domain
@@ -343,6 +345,13 @@ class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
+        if False:
+            buffer = StringIO.StringIO()
+            traceback.print_stack(file=buffer)
+            logging.info(
+                'My entity class have been requested! Traceback:\n%s' % (
+                    buffer.getvalue()))
+            buffer.close()
         return [user_models.UserSettingsModel]
 
     @staticmethod
