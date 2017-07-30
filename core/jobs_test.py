@@ -17,7 +17,6 @@
 """Tests for long running jobs and continuous computations."""
 
 import ast
-from itertools import combinations
 
 from core import jobs
 from core import jobs_registry
