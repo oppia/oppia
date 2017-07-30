@@ -29,7 +29,7 @@ oppia.factory('CollectionObjectFactory', [
       this._category = collectionBackendObject.category;
       this._version = collectionBackendObject.version;
       this._nodes = [];
-      // Maps skill IDs to skills.
+      // Maps skill IDs to skill objects.
       this._skills = {};
       this._nextSkillId = Number(collectionBackendObject.next_skill_id);
 

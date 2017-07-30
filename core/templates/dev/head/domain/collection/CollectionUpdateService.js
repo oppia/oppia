@@ -22,6 +22,8 @@
 // These should match the constants defined in core.domain.collection_domain.
 // TODO(bhenning): The values of these constants should be provided by the
 // backend.
+// NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
+// 'acquired_skills' are deprecated. Do not use them.
 oppia.constant('CMD_ADD_COLLECTION_NODE', 'add_collection_node');
 oppia.constant('CMD_DELETE_COLLECTION_NODE', 'delete_collection_node');
 oppia.constant('CMD_EDIT_COLLECTION_PROPERTY', 'edit_collection_property');
