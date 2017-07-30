@@ -194,15 +194,15 @@ describe('Collection object factory', function() {
         collectionNodeBackendObject));
 
       // Ensure mutability.
-      collectionNodeBefore.getPrerequisiteSkillList().addSkill('example');
+      collectionNodeBefore.addPrerequisiteSkillId('example');
       expect(collectionNodeBefore).not.toEqual(
         CollectionNodeObjectFactory.create(collectionNodeBackendObject));
 
       var collectionNodeAfter = _getCollectionNode('exp_id0');
       expect(collectionNodeAfter).not.toEqual(
         CollectionNodeObjectFactory.create(collectionNodeBackendObject));
-      expect(collectionNodeAfter.getPrerequisiteSkillList().containsSkill(
-        'example')).toBe(true);
+      expect(collectionNodeAfter.containsPrerequisiteSkillId('example')).toBe(
+        true);
     }
   );
 
@@ -242,7 +242,7 @@ describe('Collection object factory', function() {
       // Ensure contained collection nodes can be mutated and reflected in the
       // collection object.
       collectionNodes = _sampleCollection.getBindableCollectionNodes();
-      collectionNodes[1].getPrerequisiteSkillList().addSkill('example');
+      collectionNodes[1].addPrerequisiteSkillId('example');
       expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
         collectionNodes);
       expect(_getCollectionNode('exp_id1')).toEqual(collectionNodes[1]);
@@ -262,7 +262,7 @@ describe('Collection object factory', function() {
 
       // Collection nodes can be mutated and reflected in the collection object.
       collectionNodes = _sampleCollection.getBindableCollectionNodes();
-      collectionNodes[0].getPrerequisiteSkillList().addSkill('example');
+      collectionNodes[0].addPrerequisiteSkillId('example');
       expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
         collectionNodes);
       expect(_getCollectionNode('exp_id1')).toEqual(collectionNodes[1]);
@@ -281,7 +281,7 @@ describe('Collection object factory', function() {
       expect(startingNodes[0].getExplorationId()).toEqual('exp_id0');
       expect(startingNodes[1].getExplorationId()).toEqual('exp_id1');
 
-      startingNodes[0].getPrerequisiteSkillList().addSkill('example');
+      startingNodes[0].addPrerequisiteSkillId('example');
 
       startingNodes = _sampleCollection.getStartingCollectionNodes();
       expect(startingNodes.length).toEqual(1);
@@ -304,38 +304,6 @@ describe('Collection object factory', function() {
       'exp_id0', 'exp_id2'
     ]);
   });
-
-  it('should return a combined skill list of all collection node skills',
-    function() {
-      _addCollectionNode('exp_id0');
-      _addCollectionNode('exp_id1');
-      _addCollectionNode('exp_id2');
-
-      var collectionNode0 = _getCollectionNode('exp_id0');
-      var collectionNode1 = _getCollectionNode('exp_id1');
-      var collectionNode2 = _getCollectionNode('exp_id2');
-      collectionNode0.getPrerequisiteSkillList().addSkill('c_needed_for_0');
-      collectionNode0.getPrerequisiteSkillList().addSkill('a_needed_for_01');
-      collectionNode0.getAcquiredSkillList().addSkill('b_final_skill');
-      collectionNode1.getPrerequisiteSkillList().addSkill('a_needed_for_01');
-      collectionNode1.getAcquiredSkillList().addSkill('c_needed_for_0');
-      collectionNode2.getAcquiredSkillList().addSkill('a_needed_for_01');
-
-      // Subsequent calls should return different lists.
-      var skillList = _sampleCollection.getSkillList();
-      var otherSkillList = _sampleCollection.getSkillList();
-      expect(skillList).toEqual(otherSkillList);
-      expect(skillList).not.toBe(otherSkillList);
-
-      // The skills will not be provided in sorted order.
-      var expectedSkills = [
-        'a_needed_for_01', 'b_final_skill', 'c_needed_for_0'];
-      expect(skillList.getSkills()).not.toEqual(expectedSkills);
-
-      skillList.sortSkills();
-      expect(skillList.getSkills()).toEqual(expectedSkills);
-    }
-  );
 
   it('should contain a collection skill defined in the backend object',
     function() {
@@ -393,33 +361,33 @@ describe('Collection object factory', function() {
   });
 
   it('should be able to delete skills', function() {
-    // Add collection nodes
+    // Add collection nodes.
     _addCollectionNode('exp_id0');
     _addCollectionNode('exp_id1');
 
     var collectionNode0 = _getCollectionNode('exp_id0');
     var collectionNode1 = _getCollectionNode('exp_id1');
 
-    // Add skills
+    // Add skills.
     expect(_addCollectionSkill('skill01')).toBe(true);
     var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
     expect(_addCollectionSkill('skill02')).toBe(true);
     var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
     expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(true);
 
-    collectionNode0.getAcquiredSkillList().addSkill(skillId2);
-    collectionNode1.getPrerequisiteSkillList().addSkill(skillId2);
+    collectionNode0.addAcquiredSkillId(skillId2);
+    collectionNode1.addPrerequisiteSkillId(skillId2);
 
-    // Delete a skill
+    // Delete a skill.
     expect(_sampleCollection.deleteCollectionSkill(skillId2)).toBe(true);
     expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(false);
 
-    // Other skill still exists
+    // The other skill still exists.
     expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(false);
 
-    // Skill ID is deleted from prerequisite and acquired skill IDs
-    expect(collectionNode0.getAcquiredSkillList().getSkills()).toEqual([]);
-    expect(collectionNode1.getPrerequisiteSkillList().getSkills()).toEqual([]);
+    // Skill ID is deleted from prerequisite and acquired skill IDs.
+    expect(collectionNode0.getAcquiredSkillIds()).toEqual([]);
+    expect(collectionNode1.getPrerequisiteSkillIds()).toEqual([]);
   });
 
   it('should not re-use skill ids for deleted skills', function() {
@@ -433,8 +401,8 @@ describe('Collection object factory', function() {
     expect(_addCollectionSkill('skill02')).toBe(true);
     var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
 
-    collectionNode0.getAcquiredSkillList().addSkill(skillId2);
-    collectionNode1.getPrerequisiteSkillList().addSkill(skillId2);
+    collectionNode0.addAcquiredSkillId(skillId2);
+    collectionNode1.addPrerequisiteSkillId(skillId2);
 
     expect(_sampleCollection.deleteCollectionSkill(skillId2)).toBe(true);
 
