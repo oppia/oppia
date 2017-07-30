@@ -364,7 +364,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_compress_output_list_with_single_char_outputs(self):
         input_list = [1, 2, 3, 4, 5]
-        expected_outputs = [
+        expected_output_possibilities = [
             {'1', '2', '3', '<TRUNCATED>'}, {'1', '2', '4', '<TRUNCATED>'},
             {'1', '2', '5', '<TRUNCATED>'}, {'1', '3', '4', '<TRUNCATED>'},
             {'1', '3', '5', '<TRUNCATED>'}, {'1', '4', '5', '<TRUNCATED>'},
@@ -373,18 +373,18 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         ]
         actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len=3)
-        self.assertIn(set(actual_output), expected_outputs)
+        self.assertIn(set(actual_output), expected_output_possibilities)
 
     def test_compress_output_list_with_multi_char_outputs(self):
         input_list = ['abcd', 'efgh', 'ijkl']
-        expected_outputs = [
+        expected_output_possibilities = [
             {'abcd', 'efgh', 'ij <TRUNCATED>'},
             {'abcd', 'ijkl', 'ef <TRUNCATED>'},
             {'efgh', 'ijkl', 'ab <TRUNCATED>'},
         ]
         actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
             input_list, test_only_max_output_len=10)
-        self.assertIn(set(actual_output), expected_outputs)
+        self.assertIn(set(actual_output), expected_output_possibilities)
 
     def test_compress_output_list_with_zero_max_output_len(self):
         input_list = [1, 2, 3]
