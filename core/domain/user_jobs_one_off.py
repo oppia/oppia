@@ -16,8 +16,6 @@
 
 import ast
 import logging
-import traceback
-import StringIO
 
 from core import jobs
 from core.domain import config_domain
