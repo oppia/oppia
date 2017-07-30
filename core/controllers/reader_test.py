@@ -16,6 +16,7 @@
 
 import os
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -25,6 +26,9 @@ from core.domain import param_domain
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
+
+EXPLORATION_TYPE = constants.ACTIVITY_TYPE_EXPLORATION
+COLLECTION_TYPE = constants.ACTIVITY_TYPE_COLLECTION
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -667,10 +671,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """Test handler for removing explorations from the partially completed
         list.
         """
-
         self.login(self.USER_EMAIL)
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
 
         state_name = 'state_name'
         version = 1
@@ -684,26 +685,20 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-        payload = {
-            'exploration_id': self.EXP_ID_0
-        }
-
         # Remove one exploration.
-        self.post_json(
-            '%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
-            payload, csrf_token)
+        self.testapp.delete(str(
+            '%s/%s/%s' %
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL, EXPLORATION_TYPE,
+             self.EXP_ID_0)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_1])
 
-        payload = {
-            'exploration_id': self.EXP_ID_1
-        }
-
         # Remove another exploration.
-        self.post_json(
-            '%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
-            payload, csrf_token)
+        self.testapp.delete(str(
+            '%s/%s/%s' %
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL, EXPLORATION_TYPE,
+             self.EXP_ID_1)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
@@ -712,8 +707,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """Test handler for removing collections from incomplete list."""
 
         self.login(self.USER_EMAIL)
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
 
         # Add two collections to incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
@@ -724,26 +717,20 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-        payload = {
-            'collection_id': self.COL_ID_0
-        }
-
         # Remove one collection.
-        self.post_json(
-            '%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
-            payload, csrf_token)
+        self.testapp.delete(str(
+            '%s/%s/%s' %
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL, COLLECTION_TYPE,
+             self.COL_ID_0)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
 
-        payload = {
-            'collection_id': self.COL_ID_1
-        }
-
         # Remove another collection.
-        self.post_json(
-            '%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
-            payload, csrf_token)
+        self.testapp.delete(str(
+            '%s/%s/%s' %
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL, COLLECTION_TYPE,
+             self.COL_ID_1)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])

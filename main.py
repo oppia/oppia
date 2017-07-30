@@ -218,24 +218,13 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_dashboard.LearnerDashboardFeedbackThreadHandler),
 
     get_redirect_route(
-        r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
-        reader.RemoveExpFromIncompleteListHandler),
-    get_redirect_route(
-        r'%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
-        reader.RemoveCollectionFromIncompleteListHandler),
+        r'%s/<activity_type>/<activity_id>' %
+        feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+        reader.LearnerIncompleteActivityHandler),
 
     get_redirect_route(
-        r'%s' % feconf.LEARNER_PLAYLIST_DATA_URL,
+        r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
         learner_playlist.LearnerPlaylistHandler),
-
-    get_redirect_route(
-        r'%s/remove_exploration_from_learner_playlist' %
-        feconf.LEARNER_PLAYLIST_DATA_URL,
-        learner_playlist.RemoveExplorationFromPlaylistHandler),
-    get_redirect_route(
-        r'%s/remove_collection_from_learner_playlist' %
-        feconf.LEARNER_PLAYLIST_DATA_URL,
-        learner_playlist.RemoveCollectionFromPlaylistHandler),
 
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',

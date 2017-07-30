@@ -20,6 +20,9 @@ from core.domain import learner_progress_services
 from core.tests import test_utils
 import feconf
 
+EXPLORATION_TYPE = constants.ACTIVITY_TYPE_EXPLORATION
+COLLECTION_TYPE = constants.ACTIVITY_TYPE_COLLECTION
+
 
 class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
     OWNER_EMAIL = 'owner@example.com'
@@ -31,7 +34,6 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
     EXP_TITLE_2 = 'exp title 2'
     EXP_ID_3 = 'exp_id_3'
     EXP_TITLE_3 = 'exp title 3'
-
     COL_ID_1 = 'col_id_1'
     COL_TITLE_1 = 'col title 1'
     COL_ID_2 = 'col_id_2'
@@ -68,21 +70,19 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Add one exploration to the playlist.
-        payload = {
-            'exploration_id': self.EXP_ID_1,
-            'activity_type': constants.ACTIVITY_TYPE_EXPLORATIONS
-        }
-        self.post_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_PLAYLIST_DATA_URL, EXPLORATION_TYPE,
+                self.EXP_ID_1), {}, csrf_token)
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_1])
 
         # Add another exploration.
-        payload = {
-            'exploration_id': self.EXP_ID_2,
-            'activity_type': constants.ACTIVITY_TYPE_EXPLORATIONS
-        }
-        self.post_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_PLAYLIST_DATA_URL, EXPLORATION_TYPE,
+                self.EXP_ID_2), {}, csrf_token)
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_1, self.EXP_ID_2])
@@ -90,11 +90,12 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # User rearranges the explorations. 'exp title 2' is shifted to the
         # first position.
         payload = {
-            'exploration_id': self.EXP_ID_2,
-            'activity_type': constants.ACTIVITY_TYPE_EXPLORATIONS,
             'index': 0
         }
-        self.post_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_PLAYLIST_DATA_URL, EXPLORATION_TYPE,
+                self.EXP_ID_2), payload, csrf_token)
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_2, self.EXP_ID_1])
@@ -103,11 +104,10 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # should not be added. Here we test for the completed case.
         learner_progress_services.mark_exploration_as_completed(
             self.viewer_id, self.EXP_ID_3)
-        payload = {
-            'exploration_id': self.EXP_ID_3,
-            'activity_type': constants.ACTIVITY_TYPE_EXPLORATIONS
-        }
-        self.post_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_PLAYLIST_DATA_URL, EXPLORATION_TYPE,
+                self.EXP_ID_3), {}, csrf_token)
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_2, self.EXP_ID_1])
@@ -120,21 +120,18 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Add one collection to the playlist.
-        payload = {
-            'collection_id': self.COL_ID_1,
-            'activity_type': constants.ACTIVITY_TYPE_COLLECTIONS
-        }
-        self.post_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_PLAYLIST_DATA_URL, COLLECTION_TYPE,
+                self.COL_ID_1), {}, csrf_token)
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_1])
 
         # Add another exploration.
-        payload = {
-            'collection_id': self.COL_ID_2,
-            'activity_type': constants.ACTIVITY_TYPE_COLLECTIONS
-        }
-        self.post_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.post_json('%s/%s/%s' % (
+            feconf.LEARNER_PLAYLIST_DATA_URL, COLLECTION_TYPE,
+            self.COL_ID_2), {}, csrf_token)
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_1, self.COL_ID_2])
@@ -142,11 +139,12 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # User rearranges the explorations. 'exp title 2' is shifted to the
         # first position.
         payload = {
-            'collection_id': self.COL_ID_2,
-            'activity_type': constants.ACTIVITY_TYPE_COLLECTIONS,
             'index': 0
         }
-        self.post_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_PLAYLIST_DATA_URL, COLLECTION_TYPE,
+                self.COL_ID_2), payload, csrf_token)
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2, self.COL_ID_1])
@@ -155,11 +153,9 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # should not be added. Here we test for the completed case.
         learner_progress_services.mark_collection_as_completed(
             self.viewer_id, self.COL_ID_3)
-        payload = {
-            'collection_id': self.COL_ID_3,
-            'activity_type': constants.ACTIVITY_TYPE_COLLECTIONS
-        }
-        self.post_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.post_json('%s/%s/%s' % (
+            feconf.LEARNER_PLAYLIST_DATA_URL, COLLECTION_TYPE,
+            self.COL_ID_3), {}, csrf_token)
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2, self.COL_ID_1])
@@ -168,8 +164,6 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
 
     def test_remove_exploration_from_learner_playlist(self):
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.get(feconf.LEARNER_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
 
         # Add explorations to the learner playlist.
         learner_progress_services.add_exp_to_learner_playlist(
@@ -181,27 +175,26 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.EXP_ID_1, self.EXP_ID_2])
 
         # Remove an exploration.
-        payload = {
-            'exploration_id': self.EXP_ID_1,
-            'activity_type': constants.ACTIVITY_TYPE_EXPLORATIONS
-        }
-        self.delete_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.testapp.delete(str(
+            '%s/%s/%s' % (
+                feconf.LEARNER_PLAYLIST_DATA_URL, EXPLORATION_TYPE,
+                self.EXP_ID_1)))
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_2])
 
         # Removing the same exploration again has no effect.
-        self.delete_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.testapp.delete(str('%s/%s/%s' % (
+            feconf.LEARNER_PLAYLIST_DATA_URL, EXPLORATION_TYPE,
+            self.EXP_ID_1)))
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_2])
 
         # Remove the second exploration.
-        payload = {
-            'exploration_id': self.EXP_ID_2,
-            'activity_type': constants.ACTIVITY_TYPE_EXPLORATIONS
-        }
-        self.delete_json(feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.testapp.delete(str('%s/%s/%s' % (
+            feconf.LEARNER_PLAYLIST_DATA_URL, EXPLORATION_TYPE,
+            self.EXP_ID_2)))
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [])
@@ -210,8 +203,6 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
 
     def test_remove_collection_from_learner_playlist(self):
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.get(feconf.LEARNER_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
 
         # Add collections to the learner playlist.
         learner_progress_services.add_collection_to_learner_playlist(
@@ -223,31 +214,22 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.COL_ID_1, self.COL_ID_2])
 
         # Remove a collection.
-        payload = {
-            'collection_id': self.COL_ID_1
-        }
-        self.post_json(
-            '%s/remove_collection_from_learner_playlist' %
-            feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.testapp.delete(str('%s/%s/%s' % (
+            feconf.LEARNER_PLAYLIST_DATA_URL, COLLECTION_TYPE, self.COL_ID_1)))
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2])
 
         # Removing the same collection again has no effect.
-        self.post_json(
-            '%s/remove_collection_from_learner_playlist' %
-            feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.testapp.delete(str('%s/%s/%s' % (
+            feconf.LEARNER_PLAYLIST_DATA_URL, COLLECTION_TYPE, self.COL_ID_1)))
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2])
 
         # Remove the second collection.
-        payload = {
-            'collection_id': self.COL_ID_2
-        }
-        self.post_json(
-            '%s/remove_collection_from_learner_playlist' %
-            feconf.LEARNER_PLAYLIST_DATA_URL, payload, csrf_token)
+        self.testapp.delete(str('%s/%s/%s' % (
+            feconf.LEARNER_PLAYLIST_DATA_URL, COLLECTION_TYPE, self.COL_ID_2)))
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [])

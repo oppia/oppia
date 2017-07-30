@@ -20,6 +20,7 @@ import random
 
 import jinja2
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import classifier_services
@@ -439,6 +440,22 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
+        self.render_json(self.values)
+
+
+class LearnerIncompleteActivityHandler(base.BaseHandler):
+    """Handles operations related to the activities in the incomplete list of
+    the user.
+    """
+    @acl_decorators.can_access_learner_dashboard
+    def delete(self, activity_type, activity_id):
+        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+            learner_progress_services.remove_exp_from_incomplete_list(
+                self.user_id, activity_id)
+        elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+            learner_progress_services.remove_collection_from_incomplete_list(
+                self.user_id, activity_id)
+
         self.render_json(self.values)
 
 
