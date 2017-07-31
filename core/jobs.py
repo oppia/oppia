@@ -213,7 +213,6 @@ class BaseJobManager(object):
         """
         _MAX_OUTPUT_LEN_CHARS = 900000
 
-        # Consolidate the lines of output since repeating them isn't useful.
         class _OrderedCounter(collections.Counter, collections.OrderedDict):
             """Counter that remembers the order elements are first encountered.
 
@@ -221,6 +220,9 @@ class BaseJobManager(object):
             ordering, instead of simply using `collections.Counter` which has
             non-deterministic ordering.
             """
+            pass
+
+        # Consolidate the lines of output since repeating them isn't useful.
         counter = _OrderedCounter(str(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
