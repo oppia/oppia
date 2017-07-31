@@ -103,6 +103,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(classifier_obj.exp_id, self.exp_id)
         self.assertEqual(classifier_obj.state_name, 'Home')
         self.assertEqual(classifier_obj.algorithm_id, 'LDAStringClassifier')
+        self.assertEqual(classifier_obj.classifier_data, self.classifier_data)
 
     def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.

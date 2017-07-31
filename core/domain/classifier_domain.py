@@ -379,10 +379,10 @@ class ClassifierTrainingJob(object):
 class TrainingJobExplorationMapping(object):
     """Domain object for a job-exploration mapping model.
 
-    A job-Exploration mapping is a one-to-one relation between the
+    A job-exploration mapping is a one-to-one relation between the
     attributes in an exploration to the training job model for the classifier it
-    needs to utilise. The mapping is from <exp_id, exp_version, state_name> to
-    the job_id.
+    needs to use. The mapping is from <exp_id, exp_version, state_name> to the
+    job_id.
 
     Attributes:
         exp_id: str. ID of the exploration.
@@ -390,7 +390,7 @@ class TrainingJobExplorationMapping(object):
             classifier's training job was created.
         state_name: str. The name of the state to which the classifier
             belongs.
-        job_id. str. The unique Id of the training job in the
+        job_id. str. The unique ID of the training job in the
             job-exploration mapping.
     """
 
@@ -403,7 +403,7 @@ class TrainingJobExplorationMapping(object):
                 corresponding classifier's training job was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
-            job_id: str. The unique id of the training job.
+            job_id: str. The unique ID of the training job.
         """
         self._exp_id = exp_id
         self._exp_version = exp_version

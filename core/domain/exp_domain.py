@@ -210,6 +210,24 @@ def _validate_customization_args_and_values(
             pass
 
 
+def retrieve_old_state_name(state_name, renamed_cmds):
+    """Retrieves the old state name of the state.
+
+    Args:
+        state_name: str. The name of the state.
+        renamed_cmds: list(dict). The list of commands which involve a state
+            rename.
+
+    Returns:
+        str. The old state name, if a renames is done, state_name otherwise.
+    """
+    old_state_name = state_name
+    for change_dict in reversed(renamed_cmds):
+        if change_dict['new_state_name'] == old_state_name:
+            old_state_name = change_dict['old_state_name']
+    return old_state_name
+
+
 class ExplorationChange(object):
     """Domain object class for an exploration change.
 
@@ -2967,6 +2985,7 @@ class Exploration(object):
 
         del self.states[state_name]
 
+
     def get_trainable_states_dict(self, old_states, change_list):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
@@ -2986,27 +3005,21 @@ class Exploration(object):
             'state_names_with_unchanged_answer_groups': []
         }
         new_states = self.states
+
+        renamed_cmds = []
+        for change_dict in change_list:
+            if change_dict['cmd'] == CMD_RENAME_STATE:
+                renamed_cmds.append(change_dict)
+
         for state_name in new_states:
             new_state = new_states[state_name]
             if not new_state.can_undergo_classification():
                 continue
 
-            old_state_name = state_name
-            renamed_cmds = []
-            for change_dict in change_list:
-                if change_dict['cmd'] == 'rename_state':
-                    renamed_cmds.append(change_dict)
-            count = len(renamed_cmds)
-            while count:
-                for change_dict in renamed_cmds:
-                    if change_dict['cmd'] == 'rename_state' and (
-                            change_dict['new_state_name'] == old_state_name):
-                        old_state_name = change_dict['old_state_name']
-                        renamed_cmds.remove(change_dict)
-                count -= 1
+            old_state_name = retrieve_old_state_name(state_name, renamed_cmds)
 
-            # The case where a new state is added. When this happens, there wont
-            # be a corresponding state name in the older state dict.
+            # The case where a new state is added. When this happens, there
+            # won't be a corresponding state name in the older state dict.
             if old_state_name not in old_states:
                 trainable_states_dict[
                     'state_names_with_changed_answer_groups'].append(state_name)
@@ -3015,7 +3028,7 @@ class Exploration(object):
             old_training_data = old_state.get_training_data()
             new_training_data = new_state.get_training_data()
             if new_training_data == old_training_data and (
-                    new_state.interaction_id == old_state.interaction_id):
+                    new_state.interaction.id == old_state.interaction.id):
                 trainable_states_dict[
                     'state_names_with_unchanged_answer_groups'].append(
                         state_name)

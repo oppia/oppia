@@ -210,3 +210,39 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(mapping.exp_version, 1)
         self.assertEqual(mapping.state_name, state_name)
         self.assertEqual(mapping.job_id, job_id)
+
+    def test_create_multi_mappings(self):
+        mapping_dicts_list = []
+        mapping_dicts_list.append({
+            'exp_id': u'1',
+            'exp_version': 1,
+            'state_name': 'Home',
+            'job_id': 'job_id1'
+        })
+        mapping_dicts_list.append({
+            'exp_id': u'1',
+            'exp_version': 2,
+            'state_name': 'Home',
+            'job_id': 'job_id2'
+        })
+
+        mapping_ids = (
+            classifier_models.TrainingJobExplorationMappingModel.create_multi(
+                mapping_dicts_list))
+        self.assertEqual(len(mapping_ids), 2)
+
+        mapping1 = (
+            classifier_models.TrainingJobExplorationMappingModel.get(
+                mapping_ids[0]))
+        self.assertEqual(mapping1.exp_id, '1')
+        self.assertEqual(mapping1.exp_version, 1)
+        self.assertEqual(mapping1.job_id, 'job_id1')
+        self.assertEqual(mapping1.state_name, 'Home')
+
+        mapping2 = (
+            classifier_models.TrainingJobExplorationMappingModel.get(
+                mapping_ids[1]))
+        self.assertEqual(mapping2.exp_id, '1')
+        self.assertEqual(mapping2.exp_version, 2)
+        self.assertEqual(mapping2.job_id, 'job_id2')
+        self.assertEqual(mapping2.state_name, 'Home')
