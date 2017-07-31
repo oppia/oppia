@@ -346,7 +346,7 @@ def mark_training_job_complete(job_id):
         job_id: str. ID of the ClassifierTrainingJob.
     """
     _update_classifier_training_job_status(
-        job_id,feconf.TRAINING_JOB_STATUS_COMPLETE)
+        job_id, feconf.TRAINING_JOB_STATUS_COMPLETE)
 
 
 def mark_training_job_failed(job_id):
