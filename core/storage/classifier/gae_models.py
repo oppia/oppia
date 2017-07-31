@@ -182,13 +182,13 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def query_training_jobs(cls, cursor):
+    def query_training_jobs(cls, cursor=None):
         """Generates a unique id for the training job of the form
         {{exp_id}}.{{random_hash_of_16_chars}}
 
         Args:
             cursor: str. It represent the position of cursor in the query
-            result.
+            result. It is set to None by default.
         Returns:
             List of the ClassifierTrainingJobModels with status new or pending.
         """

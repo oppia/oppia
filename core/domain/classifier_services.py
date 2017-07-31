@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Services for classifier data models"""
+"""Services for classifier data models."""
+
 import datetime
 
 from core.domain import classifier_domain
@@ -328,8 +329,8 @@ def _update_classifier_training_job_status(job_id, status):
     initial_status = classifier_training_job_model.status
     if status not in feconf.ALLOWED_TRAINING_JOB_STATUS_CHANGES[initial_status]:
         raise Exception(
-            'The status change %s to %s is not valid.' % (initial_status,
-                                                          status))
+            'The status change %s to %s is not valid.' % (
+                initial_status, status))
 
     classifier_training_job = get_classifier_training_job_by_id(job_id)
     classifier_training_job.update_status(status)
@@ -344,8 +345,8 @@ def mark_training_job_complete(job_id):
     Args:
         job_id: str. ID of the ClassifierTrainingJob.
     """
-    _update_classifier_training_job_status(job_id,
-                                           feconf.TRAINING_JOB_STATUS_COMPLETE)
+    _update_classifier_training_job_status(
+        job_id,feconf.TRAINING_JOB_STATUS_COMPLETE)
 
 
 def mark_training_job_failed(job_id):
@@ -354,8 +355,8 @@ def mark_training_job_failed(job_id):
     Args:
         job_id: str. ID of the ClassifierTrainingJob.
     """
-    _update_classifier_training_job_status(job_id,
-                                           feconf.TRAINING_JOB_STATUS_FAILED)
+    _update_classifier_training_job_status(
+        job_id, feconf.TRAINING_JOB_STATUS_FAILED)
 
 
 def mark_training_job_pending(job_id):
@@ -364,8 +365,8 @@ def mark_training_job_pending(job_id):
     Args:
         job_id: str. ID of the ClassifierTrainingJob.
     """
-    _update_classifier_training_job_status(job_id,
-                                           feconf.TRAINING_JOB_STATUS_PENDING)
+    _update_classifier_training_job_status(
+        job_id, feconf.TRAINING_JOB_STATUS_PENDING)
 
 
 def update_failed_jobs(training_jobs):
@@ -385,6 +386,7 @@ def fetch_next_job():
         ClassifierTrainingJobModel. Domain object of the next training Job.
     """
     classifier_training_jobs = []
+    # Initially the cursor for query is set to None.
     cursor = None
     valid_jobs = []
     failed_jobs = []
@@ -399,10 +401,8 @@ def fetch_next_job():
                 if (datetime.datetime.utcnow() - (
                         training_job.last_updated) > (
                             datetime.timedelta(
-                                minutes=feconf.CLASSIFIER_JOB_TTL))):
+                                minutes=feconf.CLASSIFIER_JOB_TTL_MINS))):
                     failed_jobs.append(training_job)
-                else:
-                    valid_jobs.append(training_job)
             else:
                 valid_jobs.append(training_job)
         if not more:
