@@ -1452,10 +1452,10 @@ def check_can_access_activity(
     Args:
         user_id: str or None. Id of the given user.
         user_actions: list(str). List of actions given user can perform.
-        activity_rights: rights_object or None. Rights object of the given
-            activity.
         activity_type: str. Signifies whether activity is exploration or
             collection.
+        activity_rights: rights_object or None. Rights object of the given
+            activity.
 
     Returns:
         bool. Whether the given activity can be accessed.
@@ -1490,6 +1490,8 @@ def check_can_edit_activity(
     Args:
         user_id: str or None. Id of the given user.
         user_actions: list(str). List of actions the user can perform.
+        activity_type: str. Signifies whether activity is exploration or
+            collection.
         activity_rights: rights_object or None. Rights object of the given
             activity.
 
@@ -1633,7 +1635,7 @@ def check_can_publish_exploration(user_id, user_actions, exploration_rights):
     Args:
         user_id: str or None. Id of the user.
         user_actions: list(str). List of actions the user can perform.
-        exploration_id: rights_object or None. Rights Object of given
+        exploration_rights: rights_object or None. Rights Object of given
             exploration.
 
     Returns:
@@ -1661,7 +1663,7 @@ def check_can_publicize_exploration(user_actions, exploration_rights):
 
     Args:
         user_actions: list(str). List of actions the user can perform.
-        exploration_id: rights_object or None. Rights object of given
+        exploration_rights: rights_object or None. Rights object of given
             exploration.
 
     Returns:
@@ -1699,7 +1701,7 @@ def check_can_unpublish_exploration(user_actions, exploration_rights):
 
     Args:
         user_actions: list(str). List of actions the user can perform.
-        exploration_id: rights_object or None. Rights object of given
+        exploration_rights: rights_object or None. Rights object of given
             exploration.
 
     Returns:

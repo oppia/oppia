@@ -130,10 +130,9 @@ class ExplorationPageEmbed(base.BaseHandler):
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = (
-            rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
-                exploration_rights))
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+            exploration_rights)
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
@@ -177,10 +176,9 @@ class ExplorationPage(base.BaseHandler):
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = (
-            rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
-                exploration_rights))
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+            exploration_rights)
 
         try:
             # If the exploration does not exist, a 404 error is raised.
@@ -205,8 +203,6 @@ class ExplorationHandler(base.BaseHandler):
         """Populates the data on the individual exploration page."""
         version = self.request.get('v')
         version = int(version) if version else None
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
 
         try:
             exploration = exp_services.get_exploration_by_id(
@@ -214,6 +210,8 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
