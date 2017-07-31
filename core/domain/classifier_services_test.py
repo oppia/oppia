@@ -93,8 +93,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_creation_of_jobs_and_mappings(self):
         """Test the create_classifier_training_jobs method and
-        create_job_exploration_mappings method by triggering update_exploration()
-        method.
+        create_job_exploration_mappings method by triggering
+        update_exploration() method.
         """
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']

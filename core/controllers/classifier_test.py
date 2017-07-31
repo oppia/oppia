@@ -69,8 +69,8 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             classifier_services.get_classifier_training_job(
                 self.exp_id, self.exploration.version, 'Home'))
         self.job_id = classifier_training_job.job_id
-        # Use the mark_training_job_pending function below after this is merged
-        # with Giritheja's PR.
+        # TODO(pranavsid98): Replace lines 73-78 with mark_training_job_pending
+        # after Giritheja's PR gets merged.
         classifier_training_job_model = (
             classifier_models.ClassifierTrainingJobModel.get(
                 self.job_id, strict=False))
