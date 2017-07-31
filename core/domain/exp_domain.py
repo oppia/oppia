@@ -3515,7 +3515,7 @@ class Exploration(object):
     def _convert_states_v11_dict_to_v12_dict(cls, states_dict):
         """Converts from version 11 to 12. Version 12 refactors audio
         translations from a list to a dict keyed by language code. Also,
-        exploration domain objects with empty solutions are set to None.
+        empty solutions are set to None.
         """
         for state_dict in states_dict.values():
             old_audio_translations = state_dict['content']['audio_translations']

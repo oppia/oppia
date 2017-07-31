@@ -2110,7 +2110,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: null
+      solution: {}
     param_changes: []
   END:
     classifier_model_id: null
@@ -2127,7 +2127,7 @@ states:
       fallbacks: []
       hints: []
       id: EndExploration
-      solution: null
+      solution: {}
     param_changes: []
   New state:
     classifier_model_id: null
@@ -2149,7 +2149,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: null
+      solution: {}
     param_changes: []
 states_schema_version: 10
 tags: []
@@ -2199,7 +2199,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: null
+      solution: {}
     param_changes: []
   END:
     classifier_model_id: null
@@ -2216,7 +2216,7 @@ states:
       fallbacks: []
       hints: []
       id: EndExploration
-      solution: null
+      solution: {}
     param_changes: []
   New state:
     classifier_model_id: null
@@ -2238,7 +2238,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: null
+      solution: {}
     param_changes: []
 states_schema_version: 11
 tags: []

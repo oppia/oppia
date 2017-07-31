@@ -22,12 +22,12 @@ oppia.directive('solutionEditor', [
     return {
       restrict: 'E',
       scope: {
-        // Some interactions are created manually based on the
-        // ObjectType while other interactions are directly passed in
-        // interactionHtml. If an interaction is manually constructed the
-        // interactionHtml will be null.
+        // Some correct answer templates are created manually based on the
+        // ObjectType while others are directly passed in correctAnswerEditorHtml.
+        // If a correct answer template is manually constructed the
+        // correctAnswerEditorHtml will be null.
         getObjectType: '&objectType',
-        interactionHtml: '=',
+        correctAnswerEditorHtml: '=',
         getOnSaveFn: '&onSave'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -40,11 +40,11 @@ oppia.directive('solutionEditor', [
           $scope.editSolutionForm = {};
           $scope.stateSolutionService = stateSolutionService;
           $scope.solutionEditorIsOpen = false;
-          $scope.solutionCorrectAnswerHtml = '';
+          $scope.solutionCorrectAnswerEditorHtml = '';
 
-          $scope.getInteractionHtml = function() {
-            if (!$scope.interactionHtml) {
-              $scope.interactionHtml = (
+          $scope.init = function() {
+            if (!$scope.correctAnswerEditorHtml) {
+              $scope.correctAnswerEditorHtml = (
                 stateSolutionService.displayed.getObjectEditorHtml(
                   $scope.getObjectType()));
             }
@@ -62,7 +62,7 @@ oppia.directive('solutionEditor', [
           };
 
           $scope.submitAnswer = function(answer) {
-            // This function sets correctAnswer. interactionHtml calls this
+            // This function sets correctAnswer. correctAnswerEditorHtml calls this
             // function when an answer is input.
             stateSolutionService.displayed.setCorrectAnswer(answer);
           };
@@ -73,8 +73,6 @@ oppia.directive('solutionEditor', [
           };
 
           $scope.cancelThisSolutionEdit = function() {
-            stateSolutionService.displayed = (
-              angular.copy(stateSolutionService.savedMemento));
             $scope.solutionEditorIsOpen = false;
           };
 
@@ -85,7 +83,7 @@ oppia.directive('solutionEditor', [
             }
           });
 
-          $scope.getInteractionHtml();
+          $scope.init();
         }
       ]
     };

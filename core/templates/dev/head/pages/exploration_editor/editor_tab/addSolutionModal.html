@@ -10,7 +10,7 @@
               ng-model="tmpSolution.answerIsExclusive"
               ng-options="(item ? 'The only' : 'One') for item in [true, false]">
       </select> <strong>solution is...</strong>
-      <div ng-if="!interactionHtml">
+      <div ng-if="!correctAnswerEditorHtml">
         <object-editor class="protractor-test-interaction-html"
                        obj-type="<[objectType]>"
                        init-args="{choices: ruleDescriptionChoices}"
@@ -21,7 +21,7 @@
         </object-editor>
       </div>
       <div class="protractor-test-interaction-html"
-           angular-html-bind="interactionHtml">
+           angular-html-bind="correctAnswerEditorHtml">
       </div>
       <br>
       <div ng-show="data.correctAnswer">

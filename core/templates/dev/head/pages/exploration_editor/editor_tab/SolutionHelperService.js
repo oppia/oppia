@@ -16,7 +16,8 @@
  * @fileoverview Service for solution editor.
  */
 
-oppia.constant('SUPPORTED_INTERACTIONS', [
+// These interaction ids use the interactionHtml available in the player view.
+oppia.constant('SOLUTION_SUPPORTED_INTERACTIONS', [
   'MusicNotesInput',
   'GraphInput',
   'SetInput',
@@ -38,21 +39,18 @@ oppia.constant('INTERACTION_OBJECT_TYPES', {
 });
 
 oppia.factory('SolutionHelperService', [
-  'oppiaHtmlEscaper', 'stateInteractionIdService',
-  'explorationContextService', 'editorContextService', '$injector',
-  'explorationStatesService', 'angularNameService', 'stateSolutionService',
-  'AnswerClassificationService', 'alertsService',
-  'SUPPORTED_INTERACTIONS', 'INTERACTION_OBJECT_TYPES',
-  function(oppiaHtmlEscaper, stateInteractionIdService,
-    explorationStatesService, editorContextService, $injector,
-    explorationContextService, angularNameService, stateSolutionService,
-    AnswerClassificationService, alertsService,
-    SUPPORTED_INTERACTIONS, INTERACTION_OBJECT_TYPES) {
+  '$injector', 'stateInteractionIdService', 'explorationContextService',
+  'editorContextService', 'angularNameService', 'AnswerClassificationService',
+  'SOLUTION_SUPPORTED_INTERACTIONS', 'INTERACTION_OBJECT_TYPES',
+  function(
+    $injector, stateInteractionIdService, explorationContextService,
+    editorContextService, angularNameService, AnswerClassificationService,
+    SOLUTION_SUPPORTED_INTERACTIONS, INTERACTION_OBJECT_TYPES) {
     return {
-      isConstructedUsingObjectType: function (id) {
-        return (SUPPORTED_INTERACTIONS.indexOf(id) === -1);
+      isConstructedUsingObjectType: function(id) {
+        return (SOLUTION_SUPPORTED_INTERACTIONS.indexOf(id) === -1);
       },
-      getInteractionObjectType: function (id) {
+      getInteractionObjectType: function(id) {
         return INTERACTION_OBJECT_TYPES[id];
       },
       getCorrectAnswerObject: function(answer, objectType) {
@@ -74,7 +72,8 @@ oppia.factory('SolutionHelperService', [
           return answer;
         }
       },
-      verifySolution: function(explorationId, state, correctAnswer, callback) {
+      verifySolution: function(
+        explorationId, state, correctAnswer, errorCallback) {
         var interactionId = stateInteractionIdService.savedMemento;
         var rulesServiceName = (
           angularNameService.getNameOfInteractionRulesService(interactionId));
@@ -88,7 +87,7 @@ oppia.factory('SolutionHelperService', [
               editorContextService.getActiveStateName()
             ).interaction.markSolutionAsValid();
           } else {
-            callback();
+            errorCallback();
             explorationContextService.getState(
               editorContextService.getActiveStateName()
             ).interaction.markSolutionAsInvalid();

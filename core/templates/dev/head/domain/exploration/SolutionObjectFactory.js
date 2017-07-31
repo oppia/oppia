@@ -47,9 +47,9 @@ oppia.factory('SolutionObjectFactory', [
     };
 
     Solution.prototype.getSummary = function(interactionId, choices) {
-      var isExclusiveAnswer = (
+      var solutionType = (
         this.answerIsExclusive ? 'The only' : 'One');
-      var correctAnswer = '';
+      var correctAnswer = null;
       if (interactionId === 'GraphInput') {
         correctAnswer = '[Graph Object]';
       } else if (interactionId === 'MultipleChoiceInput') {
@@ -74,15 +74,15 @@ oppia.factory('SolutionObjectFactory', [
       var explanation = (
         $filter('convertToPlainText')(this.explanation));
       return (
-        '[' + isExclusiveAnswer + ' solution is ' + correctAnswer + '] ' +
+        '[' + solutionType + ' solution is ' + correctAnswer + '] ' +
         explanation);
     };
 
-    Solution.prototype.setCorrectAnswer = function (correctAnswer) {
+    Solution.prototype.setCorrectAnswer = function(correctAnswer) {
       this.correctAnswer = correctAnswer;
     };
 
-    Solution.prototype.getCorrectAnswerHtml = function (objectType) {
+    Solution.prototype.getCorrectAnswerHtml = function(objectType) {
       if (objectType === 'CodeString') {
         return this.correctAnswer.code;
       } else if (objectType === 'ImageWithRegions') {

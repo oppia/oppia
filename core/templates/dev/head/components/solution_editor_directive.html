@@ -7,8 +7,7 @@
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing"
              ng-if="isEditable" ng-click="openSolutionEditor()">
-          <i ng-if="isEditable"
-             class="material-icons oppia-editor-edit-icon pull-right"
+          <i class="material-icons oppia-editor-edit-icon pull-right"
              title="Edit Solution">&#xE254;
           </i>
         </div>
@@ -33,7 +32,7 @@
                 ng-options="(item ? 'The only' : 'One') for item in [true, false]">
         </select>
         <strong>solution is...</strong>
-        <span angular-html-bind="interactionHtml"></span>
+        <span angular-html-bind="correctAnswerEditorHtml"></span>
         <br>
         <strong>Explanation:</strong>
         <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"

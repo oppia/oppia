@@ -197,7 +197,7 @@ oppia.controller('StateHints', [
       });
     };
 
-    $scope.onComponentSave = function() {
+    $scope.onSaveInlineHint = function() {
       stateHintsService.saveDisplayedValue();
     };
   }

@@ -17,31 +17,26 @@
  */
 
 oppia.controller('StateSolution', [
-  '$scope', '$rootScope', '$modal', '$filter', '$injector',
-  'editorContextService', 'alertsService', 'INTERACTION_SPECS',
-  'stateSolutionService', 'explorationStatesService',
+  '$scope', '$rootScope', '$modal', 'editorContextService', 'alertsService',
+  'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
   'SolutionHelperService', 'oppiaExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
-  'SolutionObjectFactory', 'responsesService', 'AnswerClassificationService',
-  'explorationContextService', 'angularNameService',
+  'SolutionObjectFactory', 'responsesService', 'explorationContextService',
   function(
-    $scope, $rootScope, $modal, $filter, $injector,
-    editorContextService, alertsService, INTERACTION_SPECS,
-    stateSolutionService, explorationStatesService,
+    $scope, $rootScope, $modal, editorContextService, alertsService,
+    INTERACTION_SPECS, stateSolutionService, explorationStatesService,
     SolutionHelperService, oppiaExplorationHtmlFormatterService,
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
-    SolutionObjectFactory, responsesService, AnswerClassificationService,
-    explorationContextService, angularNameService) {
+    SolutionObjectFactory, responsesService, explorationContextService) {
     $scope.editorContextService = editorContextService;
     $scope.stateSolutionService = stateSolutionService;
     $scope.SolutionHelperService = SolutionHelperService;
     $scope.inlineSolutionEditorIsActive = false;
-    $scope.interactionHtml = '';
+    $scope.correctAnswerEditorHtml = '';
     $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
-      'currentInteractionHtmlForSolutionEditor');
+      'currentcorrectAnswerEditorHtmlForSolutionEditor');
 
     $scope.stateHintsService = stateHintsService;
-    $scope.stateSolutionService = stateSolutionService;
     $scope.correctAnswer = null;
 
     $scope.isSolutionValid = function() {
@@ -54,11 +49,12 @@ oppia.controller('StateSolution', [
     var interactionId = stateInteractionIdService.savedMemento;
 
     if (SolutionHelperService.isConstructedUsingObjectType(interactionId)) {
-      // In this case the interactionHtml is constructed in the Solution
-      // object using the objectType. So interactionHtml is set to null here.
-      $scope.interactionHtml = null;
+      // In this case the correctAnswerEditorHtml is constructed in the Solution
+      // object using the objectType. So correctAnswerEditorHtml is set to
+      // null here.
+      $scope.correctAnswerEditorHtml = null;
     } else {
-      $scope.interactionHtml = (
+      $scope.correctAnswerEditorHtml = (
         oppiaExplorationHtmlFormatterService.getInteractionHtml(
           stateInteractionIdService.savedMemento,
           explorationStatesService.getInteractionCustomizationArgsMemento(
@@ -80,7 +76,7 @@ oppia.controller('StateSolution', [
     });
 
     $scope.getSolutionSummary = function() {
-      var solution = stateSolutionService.displayed;
+      var solution = stateSolutionService.savedMemento;
       return solution.getSummary(
         stateInteractionIdService.savedMemento,
         responsesService.getAnswerChoices());
@@ -88,7 +84,8 @@ oppia.controller('StateSolution', [
 
     // This returns false if the current interaction ID is null.
     $scope.isCurrentInteractionLinear = function() {
-      return (stateInteractionIdService.savedMemento &&
+      return (
+        stateInteractionIdService.savedMemento &&
         INTERACTION_SPECS[stateInteractionIdService.savedMemento].is_linear);
     };
 
@@ -108,18 +105,18 @@ oppia.controller('StateSolution', [
           correctAnswer: function() {
             return $scope.correctAnswer;
           },
-          interactionHtml: function() {
-            return $scope.interactionHtml;
+          correctAnswerEditorHtml: function() {
+            return $scope.correctAnswerEditorHtml;
           }
         },
         controller: [
           '$scope', '$modalInstance', 'objectType', 'correctAnswer',
-          'interactionHtml',
+          'correctAnswerEditorHtml',
           function($scope, $modalInstance, objectType, correctAnswer,
-            interactionHtml) {
+            correctAnswerEditorHtml) {
             $scope.correctAnswer = correctAnswer;
             $scope.objectType = objectType;
-            $scope.interactionHtml = interactionHtml;
+            $scope.correctAnswerEditorHtml = correctAnswerEditorHtml;
             $scope.EXPLANATION_FORM_SCHEMA = {
               type: 'html',
               ui_config: {}
@@ -208,7 +205,7 @@ oppia.controller('StateSolution', [
       });
     };
 
-    $scope.onComponentSave = function() {
+    $scope.onSaveInlineSolution = function() {
       alertsService.clearWarnings();
       var currentStateName = editorContextService.getActiveStateName();
       var state = explorationStatesService.getState(currentStateName);

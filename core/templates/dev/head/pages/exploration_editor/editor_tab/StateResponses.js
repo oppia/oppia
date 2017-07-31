@@ -78,6 +78,8 @@ oppia.factory('responsesService', [
           editorContextService.getActiveStateName(),
           angular.copy(newAnswerGroups));
 
+        // To check if the solution is valid once a rule has been changed or
+        // added.
         if (
           stateInteractionIdService.savedMemento &&
           INTERACTION_SPECS[stateInteractionIdService.savedMemento]
@@ -352,14 +354,12 @@ oppia.controller('StateResponses', [
   'explorationContextService', 'trainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
-  'explorationStatesService',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory,
-      explorationStatesService) {
+      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
     $scope.editorContextService = editorContextService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
