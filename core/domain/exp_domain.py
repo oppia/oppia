@@ -3014,13 +3014,14 @@ class Exploration(object):
             old_state = old_states[old_state_name]
             old_training_data = old_state.get_training_data()
             new_training_data = new_state.get_training_data()
-            if new_training_data != old_training_data:
+            if new_training_data == old_training_data and (
+                    new_state.interaction_id == old_state.interaction_id):
                 trainable_states_dict[
-                    'state_names_with_changed_answer_groups'].append(
+                    'state_names_with_unchanged_answer_groups'].append(
                         state_name)
             else:
                 trainable_states_dict[
-                    'state_names_with_unchanged_answer_groups'].append(
+                    'state_names_with_changed_answer_groups'].append(
                         state_name)
 
         return trainable_states_dict
