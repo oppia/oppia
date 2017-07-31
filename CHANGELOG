@@ -2,6 +2,73 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+
+v2.5.2 (9 Jul 2017)
+-------------------
+Fallbacks/hints:
+* Fix #3537: Handles empty feedbacks for fallback outcomes (#3538)
+* Fix  #3532: Implement back-end for Hints and Solution feature (#3533)
+* Fix #3554: Migration of Fallbacks to Hints (#3555)
+* Fix #3571: Introduce first version of Hints UI for learners  (#3577)
+
+Learner Dashboard:
+* Fixed a part of the second milestone of the learner dashboard project. (#3482)
+* Fetch all entities for the learner dashboard in a single RPC call. (#3536)
+
+Permissions:
+* Milestone 1 of sitewide ACL refactor (PRs #3493, #3517, #3543)
+* Default role added to role field in user settings model. (#3587)
+
+Machine Learning:
+* Fix #3465: Updated and renamed to ClassifierDataModel (#3504)
+* Fix #3466: Add storage, domain classes and tests for TrainClassifierJobModel. (#3511)
+* Fix #3528 : Add helper functions for ClassifierTrainingJobModel (#3529)
+
+Explorations and Interactions:
+* Fix a bug in the LogicProof interaction where operators were not being included in the student language, causing operators like 'A(x)' to be rejected even if they occur in the question. (#3545)
+* Remove warning sign in interaction save button; make some warnings more user-friendly. (#3525)
+* Fix #3446: Numeric input validator (#3470)
+* Fix #3295 Add backend support for draft change list id (#3560)
+* Fix #3295 Integrate draft change list id with front-end (#3565)
+
+Answers:
+* Add a function for getting some sample answers for a given state. (#3530)
+* Implement data extraction query controller and form. (#3581)
+
+Collections:
+* Fix #3438: Alternative to indicate next lesson in collection (#3523)
+* Fix a couple of UI issues in the collection editor. (#3524)
+* Add "back to collection" link to reduce potential confusion for users (#3544)
+
+UI tweaks:
+* Add two new splash page variants; update which splash pages users see (#3589)
+* Fix part of #3505: Improve image upload interface (#3552)
+* Allow user to resize images before uploading them in filepath editor (#3574)
+* Fix responsiveness of feedback button in navbar. (#3527)
+* Fix part of last tile showing in library (#3539)
+* Fix bugs related to feedback button visibility. (#3540)
+
+Utilities and infrastructure:
+* Fix #3249: Create MR Job to calculate length of User bio (#3510)
+* Allow list type schema value to be empty (#3542)
+* Fix #3502: Extract components from HTML string (#3549)
+* Fix #3521 Moved constants to improve rendering performance  (#3570)
+* Add a test to prevent HTML errors in translations, and fix existing errors. (#3579)
+* Refactor content property to include audio translations. (#3590)
+* Fix issue with files being converted to wrong type; re-harden backend validation. (#3593)
+
+Dev tools:
+* Fix #3557: make http://localhost:8181 open in default browser (#3566)
+* Remove .jscsrc (#3561)
+
+Code health:
+* Fix #2394: docstring for rights_manager domain (#3500)
+* Remove hybrid get_or_create_user() function. (#3513)
+* Fix #2254: Move embedded scripts into controllers, use ng-click (#3534)
+* Fix #2394: added docstrings to core.domain.value_generators_domain (#3564)
+* Move embedding tests to a separate file to avoid contention. (#3594)
+
+
 v2.5.1 (11 Jun 2017)
 --------------------
 Editor:

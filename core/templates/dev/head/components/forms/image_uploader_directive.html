@@ -4,11 +4,29 @@
     <i class="material-icons">&#xE002;</i>
     <[errorMessage]>
   </span>
+  <span class="image-uploader-license-warning">
+    Before uploading images, please ensure that they are<br>
+    compatible with the <a href="/about#license" target="_blank">license terms</a> of the site.<br>
+    Please do not upload watermarked images.
+  </span>
   <label for="image-file-input" translate="I18N_DIRECTIVES_UPLOAD_A_FILE" class="image-uploader-upload-label-button"></label>
   <input type="file" id='image-file-input' class="image-uploader-file-input" ng-class="fileInputClassName">
 </div>
 
 <style>
+  .image-uploader-license-warning {
+    background-color: rgba(225, 250, 89, 0.41);
+    border: 1px solid rgba(200, 230, 59, 0.41);
+    border-radius: 6px;
+    bottom: 8px;
+    font-size: 12px;
+    font-style: italic;
+    left: 8px;
+    position: absolute;
+    text-align: left;
+    padding: 4px 6px;
+  }
+
   .image-uploader-drop-area {
     background: #eee;
     color: black;

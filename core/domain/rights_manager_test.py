@@ -465,6 +465,27 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_admin).can_change_private_viewability(
                 feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
+    def test_check_exploration_rights(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_id_a, self.EXP_ID, self.user_id_b,
+            rights_manager.ROLE_VIEWER)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_id_a, self.EXP_ID, self.user_id_c,
+            rights_manager.ROLE_EDITOR)
+
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
+        self.assertTrue(exp_rights.is_owner(self.user_id_a))
+        self.assertTrue(exp_rights.is_editor(self.user_id_c))
+        self.assertTrue(exp_rights.is_viewer(self.user_id_b))
+        self.assertFalse(exp_rights.is_viewer(self.user_id_a))
+        self.assertFalse(exp_rights.is_owner(self.user_id_b))
+        self.assertFalse(exp_rights.is_editor(self.user_id_b))
+
 
 class CollectionRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on collections work as expected."""

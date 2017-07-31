@@ -143,6 +143,55 @@ class ActivityRights(object):
                 'viewable_if_private': self.viewable_if_private,
             }
 
+    def is_owner(self, user_id):
+        """Checks whether given user is owner of activity.
+
+        Args:
+            user_id: str. Id of the user.
+
+        Returns:
+            bool. Whether user is in activity owners.
+        """
+        return bool(user_id in self.owner_ids)
+
+    def is_editor(self, user_id):
+        """Checks whether given user is editor of activity.
+
+        Args:
+            user_id: str. Id of the user.
+
+        Returns:
+            bool. Whether user is in activity editors.
+        """
+        return bool(user_id in self.editor_ids)
+
+    def is_viewer(self, user_id):
+        """Checks whether given user is viewer of activity.
+
+        Args:
+            user_id: str. Id of the user.
+
+        Returns:
+            bool. Whether user is in activity viewers of.
+        """
+        return bool(user_id in self.viewer_ids)
+
+    def is_published(self):
+        """Checks whether activity is published.
+
+        Args:
+            activity_rights: object. Activity rights object.
+
+        Returns:
+            bool. Whether activity is published.
+        """
+        if self.status == ACTIVITY_STATUS_PUBLIC:
+            return True
+        elif self.status == ACTIVITY_STATUS_PUBLICIZED:
+            return True
+        else:
+            return False
+
 
 def _get_activity_rights_from_model(activity_rights_model, activity_type):
     """Constructs an ActivityRights object from the given activity rights model.

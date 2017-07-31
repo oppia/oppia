@@ -15,6 +15,7 @@
 """Controllers for the admin view."""
 
 import logging
+import random
 
 import jinja2
 
@@ -22,14 +23,17 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import base
 from core.controllers import editor
+from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import rte_component_registry
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -38,20 +42,25 @@ import utils
 current_user_services = models.Registry.import_current_user_services()
 
 
-def require_super_admin(handler):
-    """Decorator that checks if the current user is a super admin."""
-    def test_super_admin(self, **kwargs):
-        """Checks if the user is logged in and is a super admin."""
-        if not self.user_id:
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
-            return
-        if not current_user_services.is_current_user_super_admin():
-            raise self.UnauthorizedUserException(
-                '%s is not a super admin of this application', self.user_id)
-        return handler(self, **kwargs)
-
-    return test_super_admin
+SSL_CHALLENGE_RESPONSES = config_domain.ConfigProperty(
+    'ssl_challenge_responses', {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'challenge',
+                'schema': {
+                    'type': 'unicode'
+                }
+            }, {
+                'name': 'response',
+                'schema': {
+                    'type': 'unicode'
+                }
+            }]
+        },
+    },
+    'Challenge-response pairs for SSL validation.', [])
 
 
 def assign_roles(changed_user_roles):
@@ -68,7 +77,7 @@ def assign_roles(changed_user_roles):
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
         demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
@@ -138,7 +147,7 @@ class AdminHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
 
@@ -147,7 +156,7 @@ class AdminHandler(base.BaseHandler):
                 config_domain.Registry.get_config_property_schemas()),
         })
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def post(self):
         """Handles POST requests."""
         try:
@@ -157,6 +166,23 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'reload_collection':
                 collection_id = self.payload.get('collection_id')
                 self._reload_collection(collection_id)
+            elif self.payload.get('action') == 'generate_dummy_explorations':
+                num_dummy_exps_to_generate = self.payload.get(
+                    'num_dummy_exps_to_generate')
+                num_dummy_exps_to_publish = self.payload.get(
+                    'num_dummy_exps_to_publish')
+                if not isinstance(num_dummy_exps_to_generate, int):
+                    raise self.InvalidInputException(
+                        '%s is not a number' % num_dummy_exps_to_generate)
+                elif not isinstance(num_dummy_exps_to_publish, int):
+                    raise self.InvalidInputException(
+                        '%s is not a number' % num_dummy_exps_to_publish)
+                elif num_dummy_exps_to_generate < num_dummy_exps_to_publish:
+                    raise self.InvalidInputException(
+                        'Generate count cannot be less than publish count')
+                else:
+                    self._generate_dummy_explorations(
+                        num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif self.payload.get('action') == 'clear_search_index':
                 exp_services.clear_search_index()
             elif self.payload.get('action') == 'save_config_properties':
@@ -260,13 +286,54 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot reload a collection in production.')
 
+    def _generate_dummy_explorations(
+            self, num_dummy_exps_to_generate, num_dummy_exps_to_publish):
+        """
+        Generates and publishes the given number of dummy explorations.
+
+        Args:
+            num_dummy_exps_to_generate: int. Count of dummy explorations to
+                be generated.
+            num_dummy_exps_to_publish: int. Count of explorations to
+                be published.
+
+        Raises:
+            Exception: Environment is not DEVMODE.
+        """
+
+        if feconf.DEV_MODE:
+            logging.info(
+                '[ADMIN] %s generated %s number of dummy explorations' %
+                (self.user_id, num_dummy_exps_to_generate))
+            possible_titles = ['Hulk Neuroscience', 'Quantum Starks',
+                               'Wonder Anatomy',
+                               'Elvish, language of "Lord of the Rings',
+                               'The Science of Superheroes']
+            exploration_ids_to_publish = []
+            for i in range(num_dummy_exps_to_generate):
+                title = random.choice(possible_titles)
+                category = random.choice(feconf.SEARCH_DROPDOWN_CATEGORIES)
+                new_exploration_id = exp_services.get_new_exploration_id()
+                exploration = exp_domain.Exploration.create_default_exploration(
+                    new_exploration_id, title=title, category=category,
+                    objective='Dummy Objective')
+                exp_services.save_new_exploration(self.user_id, exploration)
+                if i <= num_dummy_exps_to_publish - 1:
+                    exploration_ids_to_publish.append(new_exploration_id)
+                    rights_manager.publish_exploration(
+                        self.user_id, new_exploration_id)
+            exp_services.index_explorations_given_ids(
+                exploration_ids_to_publish)
+        else:
+            raise Exception('Cannot generate dummy explorations in production.')
+
 
 class AdminRoleHandler(base.BaseHandler):
     """Handler for roles tab of admin page. Used to view and update roles."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         view_method = self.request.get('method')
 
@@ -296,7 +363,7 @@ class AdminRoleHandler(base.BaseHandler):
         else:
             raise self.InvalidInputException('Invalid method to view roles.')
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def post(self):
         username = self.payload.get('username')
         role = self.payload.get('role')
@@ -316,7 +383,7 @@ class AdminJobOutput(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
         job_id = self.request.get('job_id')
@@ -328,10 +395,66 @@ class AdminJobOutput(base.BaseHandler):
 class AdminTopicsCsvDownloadHandler(base.BaseHandler):
     """Retrieves topic similarity data for download."""
 
-    @require_super_admin
+    @acl_decorators.can_access_admin_page
     def get(self):
         self.response.headers['Content-Type'] = 'text/csv'
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=topic_similarities.csv')
         self.response.write(
             recommendations_services.get_topic_similarities_as_csv())
+
+
+class DataExtractionQueryHandler(base.BaseHandler):
+    """Handler for data extraction query."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        exp_id = self.request.get('exp_id')
+        exp_version = self.request.get('exp_version')
+        state_name = self.request.get('state_name')
+        num_answers = int(self.request.get('num_answers'))
+
+        exploration = exp_services.get_exploration_by_id(
+            exp_id, strict=False, version=exp_version)
+
+        if exploration is None:
+            raise self.InvalidInputException(
+                'No exploration with ID \'%s\' exists.' % exp_id)
+
+        if state_name not in exploration.states:
+            raise self.InvalidInputException(
+                'Exploration \'%s\' does not have \'%s\' state.'
+                % (exp_id, state_name))
+
+        state_answers = stats_services.get_state_answers(
+            exp_id, exp_version, state_name)
+        extracted_answers = state_answers.get_submitted_answer_dict_list()
+
+        if num_answers > 0:
+            extracted_answers = extracted_answers[:num_answers]
+
+        response = {
+            'data': extracted_answers
+        }
+        self.render_json(response)
+
+
+class SslChallengeHandler(base.BaseHandler):
+    """Plaintext page for responding to LetsEncrypt SSL challenges."""
+
+    @acl_decorators.open_access
+    def get(self, challenge):
+        """Handles GET requests."""
+        challenge_responses = SSL_CHALLENGE_RESPONSES.value
+        response = None
+        for challenge_response_pair in challenge_responses:
+            if challenge_response_pair['challenge'] == challenge:
+                response = challenge_response_pair['response']
+
+        if response is None:
+            raise self.PageNotFoundException()
+
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write(response)

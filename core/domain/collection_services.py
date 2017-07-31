@@ -161,7 +161,14 @@ def get_collection_from_model(collection_model, run_conversion=True):
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in
             versioned_collection_contents['collection_contents']['nodes']
-        ],
+        ], {
+            skill_id: collection_domain.CollectionSkill.from_dict(
+                skill_id, skill_dict)
+            for skill_id, skill_dict in
+            versioned_collection_contents[
+                'collection_contents']['skills'].iteritems()
+        },
+        versioned_collection_contents['collection_contents']['next_skill_id'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
@@ -593,12 +600,12 @@ def apply_change_list(collection_id, change_list):
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
                 collection_node = collection.get_node(change.exploration_id)
                 if (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS): # pylint: disable=line-too-long
-                    collection_node.update_prerequisite_skills(
+                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS): # pylint: disable=line-too-long
+                    collection_node.update_prerequisite_skill_ids(
                         change.new_value)
                 elif (change.property_name ==
-                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS): # pylint: disable=line-too-long
-                    collection_node.update_acquired_skills(change.new_value)
+                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS): # pylint: disable=line-too-long
+                    collection_node.update_acquired_skill_ids(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if (change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):
@@ -623,6 +630,10 @@ def apply_change_list(collection_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
                 continue
+            elif change.cmd == collection_domain.CMD_ADD_COLLECTION_SKILL:
+                collection.add_skill(change.name)
+            elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_SKILL:
+                collection.delete_skill(change.skill_id)
         return collection
 
     except Exception as e:
@@ -727,7 +738,12 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.collection_contents = {
         'nodes': [
             collection_node.to_dict() for collection_node in collection.nodes
-        ]
+        ],
+        'skills': {
+            skill_id: skill.to_dict()
+            for skill_id, skill in collection.skills.iteritems()
+        },
+        'next_skill_id': collection.next_skill_id
     }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
@@ -765,8 +781,13 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
             'nodes': [
                 collection_node.to_dict()
                 for collection_node in collection.nodes
-            ]
-        }
+            ],
+            'skills': {
+                skill_id: skill.to_dict()
+                for skill_id, skill in collection.skills.iteritems()
+            },
+            'next_skill_id': collection.next_skill_id
+        },
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
@@ -895,6 +916,7 @@ def update_collection(
             'received none.')
 
     collection = apply_change_list(collection_id, change_list)
+
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
 

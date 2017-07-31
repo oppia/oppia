@@ -1,0 +1,59 @@
+<div class="conversation-skin-learner-answer-container">
+  <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
+  <div ng-if="!data.isHint">
+    <div ng-if="getShortAnswerHtml()" class="conversation-skin-learner-answer-content"
+         popover-placement="bottom" popover-template="'popover/answer'"
+         popover-trigger="click" style="cursor: pointer;">
+      <div class="conversation-skin-learner-answer" angular-html-bind="getShortAnswerHtml()">
+      </div>
+    </div>
+    <div class="conversation-skin-learner-answer-content" ng-if="!getShortAnswerHtml()">
+      <div class="conversation-skin-learner-answer" angular-html-bind="getAnswerHtml()">
+      </div>
+    </div>
+  </div>
+  <div ng-if="data.isHint">
+    <div class="conversation-skin-learner-answer-content">
+      <[data.learnerInput | translate]>
+    </div>
+  </div>
+</div>
+
+<div class="conversation-skin-oppia-feedback-container" ng-if="data.oppiaResponse !== ''">
+  <img class="conversation-skin-oppia-avatar img-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
+  <div class="conversation-skin-oppia-feedback-content">
+    <div ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()">
+      <div class="conversation-skin-feedback-dot-one"></div>
+      <div class="conversation-skin-feedback-dot-two"></div>
+      <div class="conversation-skin-feedback-dot-three"></div>
+    </div>
+    <div ng-if="data.oppiaResponse !== null"
+         angular-html-bind="data.oppiaResponse"
+         class="protractor-test-conversation-feedback conversation-skin-oppia-feedback">
+    </div>
+  </div>
+</div>
+
+<style>
+  .conversation-skin-learner-answer-container,
+  .conversation-skin-oppia-feedback-container {
+    position: relative;
+    padding: 0 20px;
+  }
+
+  .conversation-skin-learner-answer-container {
+    text-align: right;
+  }
+
+  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+    border: 2px solid #094142;
+    height: 100px;
+    right: -88px;
+    top: -33px;
+    width: 100px;
+  }
+</style>
+
+<script type="text/ng-template" id="popover/answer">
+  <div angular-html-bind="answer()"></div>
+</script>

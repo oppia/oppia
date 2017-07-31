@@ -33,6 +33,7 @@ from google.appengine.api import users
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
+from core.domain import role_services
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -57,64 +58,6 @@ BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
         },
     },
     'Code to insert just before the closing </head> tag in all pages.', '')
-
-
-def require_user(handler):
-    """Decorator that checks if a user is associated to the current session."""
-
-    def test_login(self, **kwargs):
-        """Checks if the user for the current session is logged in."""
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-        return handler(self, **kwargs)
-
-    return test_login
-
-
-def require_moderator(handler):
-    """Decorator that checks whether the current user is a moderator."""
-
-    def test_is_moderator(self, **kwargs):
-        """Check that the user is a moderator.
-
-        Raises:
-            UnauthorizedUserException: The user is not a moderator.
-        """
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if not rights_manager.Actor(self.user_id).is_moderator():
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        return handler(self, **kwargs)
-    return test_is_moderator
-
-
-def require_fully_signed_up(handler):
-    """Decorator that checks if the user is logged in and has completed the
-    signup process.
-    """
-
-    def test_registered_as_editor(self, **kwargs):
-        """Check that the user has registered as an editor.
-
-        Raises:
-            UnauthorizedUserException: The user has insufficient credentials.
-        """
-        if (not self.user_id
-                or self.username in config_domain.BANNED_USERNAMES.value
-                or not user_services.has_fully_registered(self.user_id)):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        return handler(self, **kwargs)
-
-    return test_registered_as_editor
 
 
 def _clear_login_cookies(response_headers):
@@ -151,6 +94,25 @@ class LogoutPage(webapp2.RequestHandler):
             self.redirect(users.create_logout_url(url_to_redirect_to))
         else:
             self.redirect(url_to_redirect_to)
+
+
+class UserFacingExceptions(object):
+    """This class contains all the exception class definitions used."""
+
+    class NotLoggedInException(Exception):
+        """Error class for users that are not logged in (error code 401)."""
+
+    class InvalidInputException(Exception):
+        """Error class for invalid input on the user side (error code 400)."""
+
+    class UnauthorizedUserException(Exception):
+        """Error class for unauthorized access."""
+
+    class PageNotFoundException(Exception):
+        """Error class for a page not found error (error code 404)."""
+
+    class InternalErrorException(Exception):
+        """Error class for an internal server side error (error code 500)."""
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -197,7 +159,6 @@ class BaseHandler(webapp2.RequestHandler):
                 email = current_user_services.get_user_email(self.user)
                 user_settings = user_services.create_new_user(
                     self.user_id, email)
-
             self.values['user_email'] = user_settings.email
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
@@ -222,6 +183,11 @@ class BaseHandler(webapp2.RequestHandler):
                             datetime.datetime.utcnow(),
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
+
+        self.role = (
+            feconf.ROLE_ID_GUEST
+            if self.user_id is None else user_settings.role)
+        self.actions = role_services.get_all_actions(self.role)
 
         rights_mgr_user = rights_manager.Actor(self.user_id)
         self.is_moderator = rights_mgr_user.is_moderator()
@@ -502,20 +468,11 @@ class BaseHandler(webapp2.RequestHandler):
         self.error(500)
         self._render_exception(500, {'error': unicode(exception)})
 
-    class UnauthorizedUserException(Exception):
-        """Error class for unauthorized access."""
-
-    class NotLoggedInException(Exception):
-        """Error class for users that are not logged in (error code 401)."""
-
-    class InvalidInputException(Exception):
-        """Error class for invalid input on the user side (error code 400)."""
-
-    class PageNotFoundException(Exception):
-        """Error class for a page not found error (error code 404)."""
-
-    class InternalErrorException(Exception):
-        """Error class for an internal server side error (error code 500)."""
+    InternalErrorException = UserFacingExceptions.InternalErrorException
+    InvalidInputException = UserFacingExceptions.InvalidInputException
+    NotLoggedInException = UserFacingExceptions.NotLoggedInException
+    PageNotFoundException = UserFacingExceptions.PageNotFoundException
+    UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
 
 
 class Error404Handler(BaseHandler):

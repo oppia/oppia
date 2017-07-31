@@ -131,9 +131,9 @@ class EditorTest(BaseEditorControllerTest):
 
         response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(rights_url, {
-            'is_public': True,
+        publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
+        self.put_json(publish_url, {
+            'make_public': True,
         }, csrf_token, expect_errors=True, expected_status_int=400)
 
         self.logout()
@@ -408,8 +408,8 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     SAMPLE_JSON_CONTENT = {
         'State A': ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: {}
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -430,8 +430,8 @@ param_changes: []
 """),
         'State B': ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: {}
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -452,8 +452,8 @@ param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: {}
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -476,8 +476,8 @@ param_changes: []
 
     SAMPLE_STATE_STRING = ("""classifier_model_id: null
 content:
-- type: text
-  value: ''
+  audio_translations: {}
+  html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -584,11 +584,10 @@ param_changes: []
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
 
-
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
-        response = self.post_json('/createhandler/state_yaml', {
+        response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
             'state_dict': exploration.states['State A'].to_dict(),
             'width': 50,
         }, csrf_token=csrf_token)
@@ -771,7 +770,10 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
-                'new_value': [{'type': 'text', 'value': 'ABC'}],
+                'new_value': {
+                    'html': 'ABC',
+                    'audio_translations': {},
+                },
             }], 'Change objective and init state content')
 
     def test_reverting_to_old_exploration(self):
@@ -802,7 +804,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
             init_state_name = reader_dict['exploration']['init_state_name']
             init_state_data = (
                 reader_dict['exploration']['states'][init_state_name])
-            init_content = init_state_data['content'][0]['value']
+            init_content = init_state_data['content']['html']
             self.assertIn('ABC', init_content)
             self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
@@ -821,7 +823,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         init_state_name = reader_dict['exploration']['init_state_name']
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
-        init_content = init_state_data['content'][0]['value']
+        init_content = init_state_data['content']['html']
         self.assertNotIn('ABC', init_content)
         self.assertIn('Hi, welcome to Oppia!', init_content)
 
@@ -833,7 +835,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         init_state_name = reader_dict['exploration']['init_state_name']
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
-        init_content = init_state_data['content'][0]['value']
+        init_content = init_state_data['content']['html']
         self.assertIn('ABC', init_content)
         self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
@@ -843,7 +845,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         init_state_name = reader_dict['exploration']['init_state_name']
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
-        init_content = init_state_data['content'][0]['value']
+        init_content = init_state_data['content']['html']
         self.assertIn('Hi, welcome to Oppia!', init_content)
         self.assertNotIn('ABC', init_content)
 
@@ -853,7 +855,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         init_state_name = reader_dict['exploration']['init_state_name']
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
-        init_content = init_state_data['content'][0]['value']
+        init_content = init_state_data['content']['html']
         self.assertIn('ABC', init_content)
         self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
@@ -889,8 +891,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         self.assert_can_edit(response.body)
 
         # Ban joe.
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, 'banned_usernames', ['joe'])
+        self.set_banned_users(['joe'])
 
         # Test that Joe is banned. (He can still access the library page.)
         response = self.testapp.get(

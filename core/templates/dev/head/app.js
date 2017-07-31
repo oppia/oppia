@@ -21,7 +21,7 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
+    'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
     'toastr'
@@ -44,11 +44,14 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_STRING_CLASSIFIER', false);
 // Feature still in development.
-oppia.constant('ENABLE_HINT_EDITOR', false);
+oppia.constant('ENABLE_HINT_EDITOR', true);
+oppia.constant('ENABLE_FALLBACK_EDITOR', false);
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
 });
+oppia.constant('ACTION_ACCEPT_SUGGESTION', 'accept');
+oppia.constant('ACTION_REJECT_SUGGESTION', 'reject');
 
 // The maximum number of nodes to show in a row of the state graph.
 oppia.constant('MAX_NODES_PER_ROW', 4);

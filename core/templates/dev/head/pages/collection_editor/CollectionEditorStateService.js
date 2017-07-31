@@ -25,28 +25,20 @@ oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 oppia.factory('CollectionEditorStateService', [
   '$rootScope', 'alertsService', 'CollectionObjectFactory',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
-  'SkillListObjectFactory', 'UndoRedoService',
-  'EditableCollectionBackendApiService', 'EVENT_COLLECTION_INITIALIZED',
-  'EVENT_COLLECTION_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+  'UndoRedoService', 'EditableCollectionBackendApiService',
+  'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
   function(
       $rootScope, alertsService, CollectionObjectFactory,
       CollectionRightsBackendApiService, CollectionRightsObjectFactory,
-      SkillListObjectFactory, UndoRedoService,
-      EditableCollectionBackendApiService, EVENT_COLLECTION_INITIALIZED,
-      EVENT_COLLECTION_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+      UndoRedoService, EditableCollectionBackendApiService,
+      EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
     var _collectionRights = (
       CollectionRightsObjectFactory.createEmptyCollectionRights());
-    var _collectionSkillList = SkillListObjectFactory.create([]);
     var _collectionIsInitialized = false;
     var _isLoadingCollection = false;
     var _isSavingCollection = false;
 
-    var _updateSkillList = function() {
-      _collectionSkillList.clearSkills();
-      _collectionSkillList.addSkillsFromSkillList(_collection.getSkillList());
-      _collectionSkillList.sortSkills();
-    };
     var _setCollection = function(collection) {
       _collection.copyFromCollection(collection);
       if (_collectionIsInitialized) {
@@ -55,7 +47,6 @@ oppia.factory('CollectionEditorStateService', [
         $rootScope.$broadcast(EVENT_COLLECTION_INITIALIZED);
         _collectionIsInitialized = true;
       }
-      _updateSkillList();
     };
     var _updateCollection = function(newBackendCollectionObject) {
       _setCollection(CollectionObjectFactory.create(
@@ -68,12 +59,6 @@ oppia.factory('CollectionEditorStateService', [
       _setCollectionRights(CollectionRightsObjectFactory.create(
         newBackendCollectionRightsObject));
     };
-
-    // TODO(bhenning): Do this more efficiently by passing the change object
-    // and whether it was a forward change from the UndoRedoService through the
-    // event pipeline, then checking whether the change actually affects the
-    // skill list before recomputing it.
-    $rootScope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _updateSkillList);
 
     return {
       /**
@@ -211,15 +196,6 @@ oppia.factory('CollectionEditorStateService', [
        */
       isSavingCollection: function() {
         return _isSavingCollection;
-      },
-
-      /**
-       * Returns a collective skill list of all skills within the collection.
-       * This object is defined exactly once, so it may be bound to. It will be
-       * updated automatically as the collection is loaded and changed.
-       */
-      getCollectionSkillList: function() {
-        return _collectionSkillList;
       }
     };
   }

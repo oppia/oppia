@@ -88,7 +88,7 @@ oppia.factory('parameterMetadataService', [
 
       // Next, the content is evaluated.
       expressionInterpolationService.getParamsFromString(
-          state.content[0].value).forEach(
+          state.content.getHtml()).forEach(
         function(paramName) {
           result.push({
             action: PARAM_ACTION_GET,

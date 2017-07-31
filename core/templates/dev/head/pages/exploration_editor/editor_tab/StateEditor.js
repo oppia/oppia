@@ -21,11 +21,13 @@ oppia.controller('StateEditor', [
   'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
   'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
   'UrlInterpolationService', 'editorFirstTimeEventsService',
+  'ENABLE_FALLBACK_EDITOR',
   function(
       $scope, $rootScope, editorContextService, changeListService,
       editabilityService, explorationStatesService, INTERACTION_SPECS,
       explorationInitStateNameService, explorationAdvancedFeaturesService,
-      UrlInterpolationService, editorFirstTimeEventsService) {
+      UrlInterpolationService, editorFirstTimeEventsService,
+      ENABLE_FALLBACK_EDITOR) {
     $scope.STATE_CONTENT_SCHEMA = {
       type: 'html'
     };
@@ -34,6 +36,8 @@ oppia.controller('StateEditor', [
       explorationAdvancedFeaturesService.areParametersEnabled);
     $scope.areFallbacksEnabled = (
       explorationAdvancedFeaturesService.areFallbacksEnabled);
+
+    $scope.fallbackEditorIsEnabled = ENABLE_FALLBACK_EDITOR;
 
     $scope.isCurrentStateTerminal = false;
     $scope.isInteractionIdSet = false;
@@ -81,7 +85,7 @@ oppia.controller('StateEditor', [
           $scope.isInteractionIdSet &&
           INTERACTION_SPECS[interactionId].is_terminal);
 
-        if ($scope.content[0].value || stateData.interaction.id) {
+        if ($scope.content.getHtml() || stateData.interaction.id) {
           $scope.isInteractionShown = true;
         }
 
@@ -173,7 +177,7 @@ oppia.factory('trainingModalService', [
                 // Retrieve the interaction ID.
                 var interactionId = stateInteractionIdService.savedMemento;
 
-                var rulesServiceName = 
+                var rulesServiceName =
                   angularNameService.getNameOfInteractionRulesService(
                     interactionId)
 

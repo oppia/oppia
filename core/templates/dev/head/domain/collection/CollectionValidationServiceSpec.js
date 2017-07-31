@@ -20,6 +20,7 @@ describe('Collection validation service', function() {
   var CollectionValidationService = null;
   var CollectionObjectFactory = null;
   var CollectionNodeObjectFactory = null;
+  var CollectionSkillObjectFactory = null;
 
   var EXISTS = true;
   var DOES_NOT_EXIST = false;
@@ -32,6 +33,8 @@ describe('Collection validation service', function() {
     CollectionValidationService = $injector.get('CollectionValidationService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    CollectionSkillObjectFactory = $injector.get(
+      'CollectionSkillObjectFactory');
 
     var sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -39,7 +42,9 @@ describe('Collection validation service', function() {
       objective: 'an objective',
       category: 'a category',
       version: '1',
-      nodes: []
+      nodes: [],
+      skills: {},
+      next_skill_id: 0
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
@@ -59,6 +64,12 @@ describe('Collection validation service', function() {
 
   var _getCollectionNode = function(explorationId) {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
+  };
+
+  var _addCollectionSkill = function(skillName) {
+    var skillId = _sampleCollection.getNewSkillId();
+    return _sampleCollection.addCollectionSkill(
+      CollectionSkillObjectFactory.createFromIdAndName(skillId, skillName));
   };
 
   var _findPrivateValidationIssues = function() {
@@ -87,7 +98,7 @@ describe('Collection validation service', function() {
 
   it('should expect at least one node with no prereq skills', function() {
     var node = _getCollectionNode('exp_id0');
-    node.getPrerequisiteSkillList().addSkill('test');
+    node.addPrerequisiteSkillId('test');
 
     var issues = _findPrivateValidationIssues();
     expect(issues.length).toEqual(2);
@@ -96,7 +107,21 @@ describe('Collection validation service', function() {
       'learner.');
 
     // However, removing the prerequisite skill makes the node accessible again.
-    node.getPrerequisiteSkillList().clearSkills();
+    node.clearPrerequisiteSkillIds();
+
+    issues = _findPrivateValidationIssues();
+    expect(issues).toEqual([]);
+  });
+
+  it('should detect non-unique skill names', function() {
+    expect(_addCollectionSkill('skill name')).toBe(true);
+    expect(_addCollectionSkill('skill name2')).toBe(true);
+    expect(_addCollectionSkill('skill name')).toBe(true);
+
+    var issues = _findPrivateValidationIssues();
+    expect(issues.length).toEqual(1);
+    expect(issues[0]).toEqual('Skill name \'skill name\' is not unique.');
+    expect(_sampleCollection.deleteCollectionSkill('skill0')).toBe(true);
 
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([]);
@@ -114,13 +139,13 @@ describe('Collection validation service', function() {
     var node3 = _getCollectionNode('exp_id3');
     var node4 = _getCollectionNode('exp_id4');
 
-    node0.getAcquiredSkillList().addSkill('skill0');
-    node1.getPrerequisiteSkillList().addSkill('skill0');
-    node2.getPrerequisiteSkillList().addSkill('skill0');
-    node1.getAcquiredSkillList().addSkill('skill1');
-    node2.getAcquiredSkillList().addSkill('skill1');
-    node3.getPrerequisiteSkillList().addSkill('skill1');
-    node4.getPrerequisiteSkillList().addSkill('skill1');
+    node0.addAcquiredSkillId('skill0');
+    node1.addPrerequisiteSkillId('skill0');
+    node2.addPrerequisiteSkillId('skill0');
+    node1.addAcquiredSkillId('skill1');
+    node2.addAcquiredSkillId('skill1');
+    node3.addPrerequisiteSkillId('skill1');
+    node4.addPrerequisiteSkillId('skill1');
 
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
@@ -135,15 +160,18 @@ describe('Collection validation service', function() {
     expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
     expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
 
+    _addCollectionSkill('skill0');
+    _addCollectionSkill('skill1');
+
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');
     var node2 = _getCollectionNode('exp_id2');
 
-    node0.getAcquiredSkillList().addSkill('skill0');
-    node1.getPrerequisiteSkillList().addSkill('skill0');
-    node1.getAcquiredSkillList().addSkill('skill0');
-    node1.getAcquiredSkillList().addSkill('skill1');
-    node2.getPrerequisiteSkillList().addSkill('skill1');
+    node0.addAcquiredSkillId('skill0');
+    node1.addPrerequisiteSkillId('skill0');
+    node1.addAcquiredSkillId('skill0');
+    node1.addAcquiredSkillId('skill1');
+    node2.addPrerequisiteSkillId('skill1');
 
     // 'skill0' is required and acquired for exp 1
     var issues = _findPrivateValidationIssues();
@@ -153,9 +181,9 @@ describe('Collection validation service', function() {
     ]);
 
     // The issue will be detected for other collection nodes, too.
-    node2.getPrerequisiteSkillList().addSkill('skill1');
-    node2.getAcquiredSkillList().addSkill('skill0');
-    node2.getAcquiredSkillList().addSkill('skill1');
+    node2.addPrerequisiteSkillId('skill1');
+    node2.addAcquiredSkillId('skill0');
+    node2.addAcquiredSkillId('skill1');
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
       'Exploration exp_id1 has skills which are both required for playing it ' +
@@ -165,7 +193,7 @@ describe('Collection validation service', function() {
     ]);
 
     // Multiple skills can overlap between the two lists.
-    node2.getPrerequisiteSkillList().addSkill('skill0');
+    node2.addPrerequisiteSkillId('skill0');
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
       'Exploration exp_id1 has skills which are both required for playing it ' +
@@ -174,8 +202,8 @@ describe('Collection validation service', function() {
       'and acquired after playing it: skill1, skill0'
     ]);
 
-    node1.getAcquiredSkillList().removeSkillByName('skill0');
-    node2.getAcquiredSkillList().clearSkills();
+    node1.removeAcquiredSkillId('skill0');
+    node2.clearAcquiredSkillIds();
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([]);
   });
@@ -188,9 +216,9 @@ describe('Collection validation service', function() {
     var node1 = _getCollectionNode('exp_id1');
     var node2 = _getCollectionNode('exp_id2');
 
-    node0.getAcquiredSkillList().addSkill('skill0');
-    node1.getPrerequisiteSkillList().addSkill('skill0');
-    node2.getPrerequisiteSkillList().addSkill('skill1');
+    node0.addAcquiredSkillId('skill0');
+    node1.addPrerequisiteSkillId('skill0');
+    node2.addPrerequisiteSkillId('skill1');
 
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
@@ -198,11 +226,11 @@ describe('Collection validation service', function() {
       'exploration(s): exp_id2'
     ]);
 
-    node1.getAcquiredSkillList().addSkill('skill1');
+    node1.addAcquiredSkillId('skill1');
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([]);
 
-    node0.getAcquiredSkillList().removeSkillByName('skill0');
+    node0.removeAcquiredSkillId('skill0');
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
       'The following exploration(s) are unreachable from the initial ' +
@@ -215,8 +243,8 @@ describe('Collection validation service', function() {
       'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBe(true);
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');
-    node0.getPrerequisiteSkillList().addSkill('skill0');
-    node1.getAcquiredSkillList().addSkill('skill0');
+    node0.addPrerequisiteSkillId('skill0');
+    node1.addAcquiredSkillId('skill0');
 
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
@@ -232,10 +260,10 @@ describe('Collection validation service', function() {
       var node0 = _getCollectionNode('exp_id0');
       var node1 = _getCollectionNode('exp_id1');
       var node2 = _getCollectionNode('exp_id2');
-      node0.getAcquiredSkillList().addSkill('skill0');
-      node1.getPrerequisiteSkillList().addSkill('skill0');
-      node1.getAcquiredSkillList().addSkill('skill1');
-      node2.getPrerequisiteSkillList().addSkill('skill1');
+      node0.addAcquiredSkillId('skill0');
+      node1.addPrerequisiteSkillId('skill0');
+      node1.addAcquiredSkillId('skill1');
+      node2.addPrerequisiteSkillId('skill1');
       var issues = _findPrivateValidationIssues();
       expect(issues).toEqual([]);
     }
@@ -246,15 +274,15 @@ describe('Collection validation service', function() {
       expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
       var node1 = _getCollectionNode('exp_id1');
       var node0 = _getCollectionNode('exp_id0');
-      node0.getAcquiredSkillList().addSkill('skill0');
-      node1.getPrerequisiteSkillList().addSkill('skill0');
+      node0.addAcquiredSkillId('skill0');
+      node1.addPrerequisiteSkillId('skill0');
 
       var issues = _findPublicValidationIssues();
       expect(issues).toEqual([
         'Private explorations cannot be added to a public collection: exp_id0'
       ]);
 
-      node1.getPrerequisiteSkillList().removeSkillByName('skill0');
+      node1.removePrerequisiteSkillId('skill0');
       expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
       issues = _findPublicValidationIssues();
       expect(issues).toEqual([]);
@@ -269,10 +297,10 @@ describe('Collection validation service', function() {
     var node1 = _getCollectionNode('exp_id1');
     var node2 = _getCollectionNode('exp_id2');
 
-    node0.getPrerequisiteSkillList().addSkill('skill0');
-    node0.getAcquiredSkillList().addSkill('skill1');
-    node1.getPrerequisiteSkillList().addSkill('skill1');
-    node2.getPrerequisiteSkillList().addSkill('skill1');
+    node0.addPrerequisiteSkillId('skill0');
+    node0.addAcquiredSkillId('skill1');
+    node1.addPrerequisiteSkillId('skill1');
+    node2.addPrerequisiteSkillId('skill1');
 
     var issues = _findPublicValidationIssues();
     expect(issues).toEqual([

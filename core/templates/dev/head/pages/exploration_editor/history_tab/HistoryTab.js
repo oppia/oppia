@@ -107,10 +107,6 @@ oppia.controller('HistoryTab', [
          * 'earlierVersion' and 'laterVersion' whose values are the metadata
          * of the compared versions, containing 'committerId', 'createdOn',
          * 'commitMessage', and 'versionNumber'.
-         *
-         * $scope.yamlStrs is an object with keys 'earlierVersion' and
-         * 'laterVersion', whose values are the YAML representations of the
-         * compared versions
          */
         $scope.compareVersions = {};
         $scope.compareVersionMetadata = {};

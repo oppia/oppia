@@ -33,8 +33,12 @@ class UserSettingsModel(base_models.BaseModel):
     """
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
-    # User role. Required for authorization.
-    role = ndb.StringProperty(required=True, indexed=True)
+    # User role. Required for authorization. User gets a default role of
+    # exploration editor.
+    # TODO (1995YogeshSharma): Remove the default value once the one-off
+    # migration (to give role to all users) is run.
+    role = ndb.StringProperty(
+        required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
     # Identifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.
@@ -52,6 +56,9 @@ class UserSettingsModel(base_models.BaseModel):
     last_created_an_exploration = ndb.DateTimeProperty(default=None)
     # User uploaded profile picture as a dataURI string. May be None.
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
+    # The preferred dashboard of the user.
+    default_dashboard = ndb.StringProperty(
+        default=constants.DASHBOARD_TYPE_LEARNER, indexed=False)
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
     # Subject interests specified by the user.
@@ -190,6 +197,18 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExpUserLastPlaythroughModel, cls).get(
             instance_id, strict=False)
+
+
+class LearnerPlaylistModel(base_models.BaseModel):
+    """Keeps track of all the explorations and collections in the playlist of
+    the user.
+
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of all the explorations in the playlist of the user.
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of all the collections in the playlist of the user.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 
 class UserContributionsModel(base_models.BaseModel):
