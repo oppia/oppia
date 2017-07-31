@@ -23,9 +23,9 @@ oppia.directive('solutionEditor', [
       restrict: 'E',
       scope: {
         // Some correct answer templates are created manually based on the
-        // ObjectType while others are directly passed in correctAnswerEditorHtml.
-        // If a correct answer template is manually constructed the
-        // correctAnswerEditorHtml will be null.
+        // ObjectType while others are directly passed in
+        // correctAnswerEditorHtml. If a correct answer template is manually
+        // constructed the correctAnswerEditorHtml will be null.
         getObjectType: '&objectType',
         correctAnswerEditorHtml: '=',
         getOnSaveFn: '&onSave'
@@ -62,8 +62,8 @@ oppia.directive('solutionEditor', [
           };
 
           $scope.submitAnswer = function(answer) {
-            // This function sets correctAnswer. correctAnswerEditorHtml calls this
-            // function when an answer is input.
+            // This function sets correctAnswer. correctAnswerEditorHtml calls
+            // this function when an answer is input.
             stateSolutionService.displayed.setCorrectAnswer(answer);
           };
 
