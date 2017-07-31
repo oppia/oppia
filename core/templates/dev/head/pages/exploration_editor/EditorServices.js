@@ -22,8 +22,10 @@ oppia.factory('explorationData', [
   'EditableExplorationBackendApiService',
   'localSaveService',
   'ReadOnlyExplorationBackendApiService','$q',
-  function($http, $log, alertsService, EditableExplorationBackendApiService,
-    localSaveService, ReadOnlyExplorationBackendApiService,$q) {
+  function($http, $log, alertsService,
+    EditableExplorationBackendApiService,
+    LocalSaveService,
+    ReadOnlyExplorationBackendApiService, $q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
@@ -51,8 +53,8 @@ oppia.factory('explorationData', [
       explorationId: explorationId,
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
         // First save locally to be retrieved later if save is unsuccessful.
-        localSaveService.saveExplorationDraft(explorationId, changeList,
-          draftChangeListId);
+        localSaveService.saveExplorationDraft(
+          explorationId, changeList, draftChangeListId);
         $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
@@ -590,7 +592,7 @@ oppia.factory('explorationRightsService', [
             data.rights.viewable_if_private);
           whenViewabilityChanged.resolve();
         });
-        return whenViewabilityChanged.promise;          
+        return whenViewabilityChanged.promise;
       },
       saveRoleChanges: function(newMemberUsername, newMemberRole) {
         var whenRolesSaved = $q.defer();
@@ -612,7 +614,7 @@ oppia.factory('explorationRightsService', [
             data.rights.viewable_if_private);
           whenRolesSaved.resolve();
         });
-        return whenRolesSaved.promise;  
+        return whenRolesSaved.promise;
       },
       makePublic: function(makePublic) {
         var whenPublishStatusChanged = $q.defer();

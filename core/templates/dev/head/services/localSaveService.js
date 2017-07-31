@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,10 +36,11 @@
    }());
    /**
    * Create the key to access the changeList in localStorage
-   * @param {String} key - The exploration id of the changeList to be accessed.
+   * @param {String} explorationId - The exploration id of the changeList
+   *   to be accessed.
    */
-   var _createLocalSaveKey = function(key) {
-     return 'draft_' + key;
+   var _createExplorationDraftKey = function(explorationId) {
+     return 'draft_' + explorationId;
    }
    return {
      /**
@@ -49,11 +50,11 @@
        return Boolean(storage);
      },
      /**
-     * Save the given changeList to localStorage along with it's
+     * Save the given changeList to localStorage along with its
      * draftChangeListId
      * @param {String} explorationId - The id of the exploration
      *   associated with the changeList to be saved.
-     * @param {Object} changeList - The exploration change list to be saved.
+     * @param {List} changeList - The exploration change list to be saved.
      * @param {Integer} draftChangeListId - The id of the draft to be saved.
      */
      saveExplorationDraft: function(explorationId, changeList,
@@ -62,7 +63,8 @@
        if (storage) {
          var saveObject = {
            draftChanges: changeList,
-           draftChangeListId: draftChangeListId};
+           draftChangeListId: draftChangeListId
+         };
          saveObject = JSON.stringify(saveObject);
          storage.setItem(localSaveKey, saveObject);
        }
@@ -76,6 +78,8 @@
      getExplorationDraft: function(explorationId) {
        if (storage) {
          return JSON.parse(storage.getItem(_createLocalSaveKey(explorationId)));
+       } else {
+         return null;
        }
      },
      /**
