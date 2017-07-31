@@ -32,6 +32,8 @@ class CollectionPage(base.BaseHandler):
     @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Handles GET requests."""
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
         try:
             collection = collection_services.get_collection_by_id(
                 collection_id)
@@ -39,9 +41,9 @@ class CollectionPage(base.BaseHandler):
             raise self.PageNotFoundException(e)
         self.values.update({
             'nav_mode': feconf.NAV_MODE_COLLECTION,
-            'can_edit': acl_decorators.check_can_edit_activity(
+            'can_edit': rights_manager.check_can_edit_activity(
                 self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
-                collection_id),
+                collection_rights),
             'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
             'collection_title': collection.title,
@@ -61,7 +63,8 @@ class CollectionDataHandler(base.BaseHandler):
     @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
-
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
         try:
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
@@ -71,9 +74,9 @@ class CollectionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(e)
 
         self.values.update({
-            'can_edit': acl_decorators.check_can_edit_activity(
+            'can_edit': rights_manager.check_can_edit_activity(
                 self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
-                collection_id),
+                collection_rights),
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),

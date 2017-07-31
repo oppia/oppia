@@ -746,7 +746,7 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_owner_cannot_delete_published_exploratin(self):
+    def test_owner_cannot_delete_published_exploration(self):
         self.login(self.OWNER_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.published_exp_id, expect_errors=True)
