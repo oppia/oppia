@@ -75,21 +75,21 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
 
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
-
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
+    # def test_string_classifier_classification(self):
+    #     """All these responses trigger the string classifier."""
+    #
+    #     with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'it\'s a permutation of 3 elements'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'There are 3 options for the first ball, and 2 for the '
+    #                 'remaining two. So 3*2=6.'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('abc acb bac bca cbb cba'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('dunno, just guessed'))
 
     def test_creation_of_jobs_and_mappings(self):
         """Test the create_classifier_training_jobs method and
@@ -197,6 +197,16 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_names_mapping = {
             'Home': 'Old home'
         }
+
+        # Test that mapping cant be created if job doesn't exist.
+        classifier_services.create_job_exploration_mappings(
+            exploration, state_names, state_names_mapping)
+        # There will be only one mapping (because of the creation of the
+        # exploration).
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 1)
+
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             'TextInput', self.exp_id, exploration.version-1, [], 'Old home',
@@ -394,8 +404,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier_training_jobs[0].state_name, state_name)
         self.assertEqual(classifier_training_jobs[0].job_id, job_id)
 
-        # Test that method returns when job does not exist.
+        # Test that method returns a list with None as elements when job does
+        # not exist.
         false_state_name = 'false_name'
         classifier_training_jobs = (
             classifier_services.get_classifier_training_jobs(
                 exp_id, 1, [false_state_name]))
+        self.assertEqual(classifier_training_jobs, [None])

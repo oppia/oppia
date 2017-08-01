@@ -1115,6 +1115,56 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                                                             change_list)
         self.assertEqual(actual_dict, expected_dict)
 
+        # Delete state.
+        exploration.delete_state('New state')
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': [],
+            'state_names_mapping': {
+                'Renamed state': 'Renamed state'
+            }
+        }
+        actual_dict = exploration.get_trainable_states_dict(old_states,
+                                                            change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Test addition and multiple renames.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        exploration.rename_state('New state', 'New state2')
+        exploration.rename_state('New state2', 'New state3')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'New state', 'Renamed state'],
+            'state_names_with_unchanged_answer_groups': [],
+            'state_names_mapping': {
+                'New state3': 'New state',
+                'Renamed state': 'Renamed state'
+            }
+        }
+        actual_dict = exploration.get_trainable_states_dict(old_states,
+                                                            change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
 
     def test_is_demo_property(self):
         """Test the is_demo property."""

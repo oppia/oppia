@@ -209,6 +209,8 @@ def create_job_exploration_mappings(exploration, state_names,
 
     job_exploration_mappings = []
     for index, classifier_training_job in enumerate(classifier_training_jobs):
+        if classifier_training_job is None:
+            continue
         new_state_name = state_names_mapping.keys()[
             state_names_mapping.values().index(state_names_to_retrieve[index])]
         job_exploration_mapping = (
