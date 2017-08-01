@@ -194,8 +194,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
-            feconf.TRAINING_JOB_STATUS_PENDING]))
-        query = query.order(cls.created_on, cls._key)
+            feconf.TRAINING_JOB_STATUS_PENDING])).order(
+                cls.created_on, cls._key)
+
         job_models, cursor, more = query.fetch_page(10, start_cursor=cursor)
         return job_models, cursor, more
 

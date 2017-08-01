@@ -373,7 +373,8 @@ def update_failed_jobs(training_jobs):
     """Updates status of job_models to failed.
 
     Args:
-        training_jobs: list. List of jobs to be updated as failed.
+        training_jobs: list(ClassifierTrainingJobModel). List of jobs to be
+            updated as failed.
     """
     for training_job in training_jobs:
         mark_training_job_failed(training_job.job_id)
@@ -383,7 +384,7 @@ def fetch_next_job():
     """Gets next job model in the job queue.
 
     Returns:
-        ClassifierTrainingJobModel. Domain object of the next training Job.
+        ClassifierTrainingJob. Domain object of the next training Job.
     """
     classifier_training_jobs = []
     # Initially the cursor for query is set to None.
