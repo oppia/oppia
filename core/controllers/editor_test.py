@@ -697,11 +697,13 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             # not to be checked here (same for admin and moderator).
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '%s tried to delete exploration %s' %
-                             (self.owner_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
+                              self.owner_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '%s deleted exploration %s' %
-                             (self.owner_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
+                              self.owner_id, exp_id))
             self.logout()
 
             # Checking for admin.
@@ -716,11 +718,11 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '(admin) %s tried to delete exploration %s' %
-                             (self.admin_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '(admin) %s deleted exploration %s' %
-                             (self.admin_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.logout()
 
             # Checking for moderator.
@@ -735,11 +737,13 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '(moderator) %s tried to delete exploration %s' %
-                             (self.moderator_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_MODERATOR,
+                              self.moderator_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '(moderator) %s deleted exploration %s' %
-                             (self.moderator_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_MODERATOR,
+                              self.moderator_id, exp_id))
             self.logout()
 
 
