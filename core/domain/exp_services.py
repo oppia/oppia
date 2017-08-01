@@ -793,15 +793,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
 
-    if feconf.ENABLE_STRING_CLASSIFIER:
-        old_states = get_exploration_from_model(exploration_model).states
-        trainable_states_dict = exploration.get_trainable_states_dict(
-            old_states, change_list)
-        state_names_with_changed_answer_groups = trainable_states_dict[
-            'state_names_with_changed_answer_groups']
-        state_names_with_unchanged_answer_groups = trainable_states_dict[
-            'state_names_with_unchanged_answer_groups']
-
+    old_states = get_exploration_from_model(exploration_model).states
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
@@ -827,13 +819,20 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration.version += 1
 
     if feconf.ENABLE_STRING_CLASSIFIER:
+        trainable_states_dict = exploration.get_trainable_states_dict(
+            old_states, change_list)
+        state_names_with_changed_answer_groups = trainable_states_dict[
+            'state_names_with_changed_answer_groups']
+        state_names_with_unchanged_answer_groups = trainable_states_dict[
+            'state_names_with_unchanged_answer_groups']
+        state_names_mapping = trainable_states_dict['state_names_mapping']
         if state_names_with_changed_answer_groups:
             classifier_services.create_classifier_training_jobs(
                 exploration, state_names_with_changed_answer_groups)
         if state_names_with_unchanged_answer_groups:
             classifier_services.create_job_exploration_mappings(
                 exploration, state_names_with_unchanged_answer_groups,
-                change_list)
+                state_names_mapping)
 
 
 def _create_exploration(
@@ -858,13 +857,6 @@ def _create_exploration(
     exploration.validate()
     rights_manager.create_new_exploration_rights(exploration.id, committer_id)
 
-    # Find out all states that need a classifier to be trained.
-    state_names_to_train = []
-    for state_name in exploration.states:
-        state = exploration.states[state_name]
-        if state.can_undergo_classification():
-            state_names_to_train.append(state_name)
-
     model = exp_models.ExplorationModel(
         id=exploration.id,
         category=exploration.category,
@@ -886,6 +878,13 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
+
+    # Find out all states that need a classifier to be trained.
+    state_names_to_train = []
+    for state_name in exploration.states:
+        state = exploration.states[state_name]
+        if state.can_undergo_classification():
+            state_names_to_train.append(state_name)
 
     if state_names_to_train:
         classifier_services.create_classifier_training_jobs(

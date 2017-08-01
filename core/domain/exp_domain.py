@@ -210,24 +210,6 @@ def _validate_customization_args_and_values(
             pass
 
 
-def retrieve_old_state_name(state_name, renamed_cmds):
-    """Retrieves the old state name of the state.
-
-    Args:
-        state_name: str. The name of the state.
-        renamed_cmds: list(dict). The list of commands which involve a state
-            rename.
-
-    Returns:
-        str. The old state name, if a renames is done, state_name otherwise.
-    """
-    old_state_name = state_name
-    for change_dict in reversed(renamed_cmds):
-        if change_dict['new_state_name'] == old_state_name:
-            old_state_name = change_dict['old_state_name']
-    return old_state_name
-
-
 class ExplorationChange(object):
     """Domain object class for an exploration change.
 
@@ -2996,8 +2978,9 @@ class Exploration(object):
                 commit.
 
         Returns:
-            dict. The trainable states dict. This dict has two keys representing
-                state names with changed and unchanged answer groups
+            dict. The trainable states dict. This dict has three keys
+                representing state names with changed answer groups, unchanged
+                answer groups and state_name-old_state_name mapping
                 respectively.
         """
         trainable_states_dict = {
@@ -3011,12 +2994,17 @@ class Exploration(object):
             if change_dict['cmd'] == CMD_RENAME_STATE:
                 renamed_cmds.append(change_dict)
 
+        state_names_mapping = {}
         for state_name in new_states:
             new_state = new_states[state_name]
             if not new_state.can_undergo_classification():
                 continue
 
-            old_state_name = retrieve_old_state_name(state_name, renamed_cmds)
+            old_state_name = state_name
+            for change_dict in reversed(renamed_cmds):
+                if change_dict['new_state_name'] == old_state_name:
+                    old_state_name = change_dict['old_state_name']
+            state_names_mapping[state_name] = old_state_name
 
             # The case where a new state is added. When this happens, there
             # won't be a corresponding state name in the older state dict.
@@ -3037,6 +3025,7 @@ class Exploration(object):
                     'state_names_with_changed_answer_groups'].append(
                         state_name)
 
+        trainable_states_dict['state_names_mapping'] = state_names_mapping
         return trainable_states_dict
 
     # Methods relating to gadgets.

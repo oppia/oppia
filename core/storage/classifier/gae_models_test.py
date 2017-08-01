@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core.domain import classifier_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -213,23 +214,17 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(mappings[0].job_id, job_id)
 
     def test_create_multi_mappings(self):
-        mapping_dicts_list = []
-        mapping_dicts_list.append({
-            'exp_id': u'1',
-            'exp_version': 1,
-            'state_name': 'Home',
-            'job_id': 'job_id1'
-        })
-        mapping_dicts_list.append({
-            'exp_id': u'1',
-            'exp_version': 2,
-            'state_name': 'Home',
-            'job_id': 'job_id2'
-        })
+        job_exploration_mappings = []
+        job_exploration_mappings.append(
+            classifier_domain.TrainingJobExplorationMapping(
+                u'1', 1, 'Home', 'job_id1'))
+        job_exploration_mappings.append(
+            classifier_domain.TrainingJobExplorationMapping(
+                u'1', 2, 'Home', 'job_id2'))
 
         mapping_ids = (
             classifier_models.TrainingJobExplorationMappingModel.create_multi(
-                mapping_dicts_list))
+                job_exploration_mappings))
         self.assertEqual(len(mapping_ids), 2)
 
         mapping1 = (

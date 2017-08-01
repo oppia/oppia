@@ -258,14 +258,14 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 the mapping models.
 
         Returns:
-            list(ClassifierExplorationMappingModel). The model instances for the
-                classifier exploration mapping.
+            list(ClassifierExplorationMappingModel|None). The model instances
+                for the classifier exploration mapping.
         """
-        mapping_instances = []
+        mapping_ids = []
         for state_name in state_names:
             mapping_id = cls._generate_id(exp_id, exp_version, state_name)
-            mapping_instance = cls.get(mapping_id, False)
-            mapping_instances.append(mapping_instance)
+            mapping_ids.append(mapping_id)
+        mapping_instances = cls.get_multi(mapping_ids)
         return mapping_instances
 
     @classmethod
@@ -300,27 +300,26 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         raise Exception('A model with the same ID already exists.')
 
     @classmethod
-    def create_multi(cls, mapping_dicts_list):
+    def create_multi(cls, job_exploration_mappings):
         """Creates multiple new  TrainingJobExplorationMappingModel entries.
 
         Args:
-            mapping_dicts_list: list(dict). The list of dicts where each dict
-                represents the attributes of one
-                TrainingJobExplorationMappingModel.
+            job_exploration_mappings: list(TrainingJobExplorationMapping). The
+                list of TrainingJobExplorationMapping Domain objects.
         """
-        list_mapping_models = []
-        list_mapping_ids = []
-        for mapping_dict in mapping_dicts_list:
-            instance_id = cls._generate_id(mapping_dict['exp_id'],
-                                           mapping_dict['exp_version'],
-                                           mapping_dict['state_name'])
+        mapping_models = []
+        mapping_ids = []
+        for job_exploration_mapping in job_exploration_mappings:
+            instance_id = cls._generate_id(job_exploration_mapping.exp_id,
+                                           job_exploration_mapping.exp_version,
+                                           job_exploration_mapping.state_name)
             mapping_instance = cls(
-                id=instance_id, exp_id=mapping_dict['exp_id'],
-                exp_version=mapping_dict['exp_version'],
-                state_name=mapping_dict['state_name'],
-                job_id=mapping_dict['job_id'])
+                id=instance_id, exp_id=job_exploration_mapping.exp_id,
+                exp_version=job_exploration_mapping.exp_version,
+                state_name=job_exploration_mapping.state_name,
+                job_id=job_exploration_mapping.job_id)
 
-            list_mapping_models.append(mapping_instance)
-            list_mapping_ids.append(instance_id)
-        cls.put_multi(list_mapping_models)
-        return list_mapping_ids
+            mapping_models.append(mapping_instance)
+            mapping_ids.append(instance_id)
+        cls.put_multi(mapping_models)
+        return mapping_ids

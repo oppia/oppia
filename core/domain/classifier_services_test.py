@@ -170,6 +170,57 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_models.TrainingJobExplorationMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 4)
 
+    def test_create_classifier_training_jobs(self):
+        """Test the create_classifier_training_jobs method."""
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        state_names = ['Home']
+        classifier_services.create_classifier_training_jobs(
+            exploration, state_names)
+
+        # There should be two jobs (the first job because of the creation of the
+        # exploration) in the data store now.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 2)
+        for index, job in enumerate(all_jobs):
+            if index == 1:
+                job_id = job.id
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.exp_id, self.exp_id)
+        self.assertEqual(classifier_training_job.state_name, 'Home')
+
+    def test_create_job_exploration_mappings(self):
+        """Test the create_job_exploration_mappings method."""
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        state_names = ['Home']
+        state_names_mapping = {
+            'Home': 'Old home'
+        }
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            'TextInput', self.exp_id, exploration.version-1, [], 'Old home',
+            feconf.TRAINING_JOB_STATUS_COMPLETE)
+        classifier_models.TrainingJobExplorationMappingModel.create(
+            self.exp_id, exploration.version-1, 'Old home', job_id)
+        classifier_services.create_job_exploration_mappings(
+            exploration, state_names, state_names_mapping)
+
+        # There should be two mappings (the first mapping because of the
+        # creation of the exploration) in the data store now.
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 2)
+        for index, mapping in enumerate(all_mappings):
+            if index == 1:
+                mapping_id = mapping.id
+
+        job_exploration_mapping = (
+            classifier_models.TrainingJobExplorationMappingModel.get(
+                mapping_id))
+        self.assertEqual(job_exploration_mapping.exp_id, self.exp_id)
+        self.assertEqual(job_exploration_mapping.state_name, 'Home')
+
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""
 
@@ -342,3 +393,9 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier_training_jobs[0].exp_version, 1)
         self.assertEqual(classifier_training_jobs[0].state_name, state_name)
         self.assertEqual(classifier_training_jobs[0].job_id, job_id)
+
+        # Test that method returns when job does not exist.
+        false_state_name = 'false_name'
+        classifier_training_jobs = (
+            classifier_services.get_classifier_training_jobs(
+                exp_id, 1, [false_state_name]))

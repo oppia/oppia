@@ -1059,7 +1059,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [],
-            'state_names_with_unchanged_answer_groups': ['Renamed state']
+            'state_names_with_unchanged_answer_groups': ['Renamed state'],
+            'state_names_mapping': {
+                'Renamed state': 'Home'
+            }
         }
         actual_dict = exploration.get_trainable_states_dict(old_states,
                                                             change_list)
@@ -1081,7 +1084,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         expected_dict = {
             'state_names_with_changed_answer_groups': ['Renamed state'],
-            'state_names_with_unchanged_answer_groups': []
+            'state_names_with_unchanged_answer_groups': [],
+            'state_names_mapping': {
+                'Renamed state': 'Renamed state'
+            }
         }
         actual_dict = exploration.get_trainable_states_dict(old_states,
                                                             change_list)
@@ -1099,7 +1105,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         expected_dict = {
             'state_names_with_changed_answer_groups': [
                 'New state', 'Renamed state'],
-            'state_names_with_unchanged_answer_groups': []
+            'state_names_with_unchanged_answer_groups': [],
+            'state_names_mapping': {
+                'New state': 'New state',
+                'Renamed state': 'Renamed state'
+            }
         }
         actual_dict = exploration.get_trainable_states_dict(old_states,
                                                             change_list)

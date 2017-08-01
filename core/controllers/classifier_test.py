@@ -71,8 +71,9 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(classifier_training_jobs), 1)
         classifier_training_job = classifier_training_jobs[0]
         self.job_id = classifier_training_job.job_id
-        # TODO(pranavsid98): Replace lines 73-78 with mark_training_job_pending
-        # after Giritheja's PR gets merged.
+
+        # TODO(pranavsid98): Replace the three commands below with
+        # mark_training_job_pending after Giritheja's PR gets merged.
         classifier_training_job_model = (
             classifier_models.ClassifierTrainingJobModel.get(
                 self.job_id, strict=False))
