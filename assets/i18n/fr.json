@@ -224,7 +224,7 @@
 	"I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "En cours",
 	"I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE": "Il semble que vous n'ayez pas encore essayé aucune de vos explorations.",
 	"I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_TWO": "Voyons comment commencer cet excitant voyage !",
-	"I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY": "Êtes-vous sûr de vouloir supprimer '<[entityTitle]>' de votre liste '<[sectionNameI18nId | traduction]>' ?",
+	"I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY": "Êtes-vous sûr de vouloir supprimer '<[entityTitle]>' de votre liste '<[sectionNameI18nId | translate]>' ?",
 	"I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER": "Supprimer de la liste '<[sectionNameI18nId | translate]>' ?",
 	"I18N_LEARNER_DASHBOARD_REMOVE_BUTTON": "Supprimer",
 	"I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE": "Revenir à la liste des messages",
