@@ -5,18 +5,13 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-if="editabilityService.isEditable()">
           <div role="form" class="form-horizontal">
-            <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
-              <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40" ng-trim="false">
-                <span class="help-block" style="font-size: smaller">
-                  <em>Please use at most 40 characters, so that this fits in the summary card.</em>
-                  <span ng-if="explorationTitleService.displayed.length > 0">
-                    <em>Characters used: <[(explorationTitleService.displayed.length)]>/40</em>
-                  </span>
-                </span>
-              </div>
-            </div>
+            <title-field
+              title="Title"
+              input-focus="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
+              form-style="{display:'table-cell', width:'16.66666667%'}"
+              p-style="{display:'table', width:'100%', 'margin-bottom':'2%'}"
+              save-exploration-title="saveExplorationTitle()">
+            </title-field>
             <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed || ((explorationObjectiveService.displayed.length < 15) || (explorationObjectiveService.displayed.length > 100))}">
               <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
               <div class="col-lg-10 col-md-10 col-sm-10">

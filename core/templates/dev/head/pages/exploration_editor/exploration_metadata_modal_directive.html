@@ -6,11 +6,10 @@
   <p>
     Just a few more things before you publish:
   </p>
-  <p ng-if="requireTitleToBeSpecified">
-    Add a title: what should your exploration be called?
-    <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
-           placeholder="Music in the 19th Century" maxlength="40">
-  </p>
+  <title-field
+    title="Add a title: what should your exploration be called?"
+    form-style="{'font-weight':'normal'}">
+  </title-field>
   <form name="objectiveForm">
     <p ng-if="requireObjectiveToBeSpecified"
        ng-class="{'has-error': (objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15}">
