@@ -205,12 +205,16 @@ def create_job_exploration_mappings(exploration, state_names, change_list):
         # Check for renamed states.
         old_state_name = exp_domain.retrieve_old_state_name(current_state_name,
                                                             renamed_cmds)
-        classifier_training_job = get_classifier_training_job(
-            exp_id, old_exp_version, old_state_name)
+        state_names.append(old_state_name)
+
+    classifier_training_jobs = get_classifier_training_jobs(
+        exp_id, old_exp_version, state_names)
+
+    for index, classifier_training_job in enumerate(classifier_training_jobs):
         mapping_dicts_list.append({
             'exp_id': exp_id,
             'exp_version': current_exp_version,
-            'state_name': current_state_name,
+            'state_name': state_names[index],
             'job_id': classifier_training_job.job_id})
 
     _create_multi_job_exploration_mappings(mapping_dicts_list)
@@ -412,32 +416,38 @@ def delete_classifier_training_job(job_id):
         classifier_training_job_model.delete()
 
 
-def get_classifier_training_job(exp_id, exp_version, state_name):
+def get_classifier_training_jobs(exp_id, exp_version, state_names):
     """Gets the classifier training job object from the exploration attributes.
 
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. The exploration version.
-        state_name: str. The name of the state to which the classifier
-            belongs.
+        state_names: list(str). The state names for which we retrieve the job.
 
     Returns:
-        ClassifierTrainingJob. Domain object for the Classifier training job
-            model.
+        list(ClassifierTrainingJob). Domain objects for the Classifier training
+            job model.
 
     Raises:
         Exception: Entity for class TrainingJobExplorationMapping with id not
             found.
         Exception: Entity for class ClassifierTrainingJob with id not found.
     """
-    training_job_exploration_mapping_model = (
-        classifier_models.TrainingJobExplorationMappingModel.get_model(
-            exp_id, exp_version, state_name))
-    if training_job_exploration_mapping_model is None:
+    training_job_exploration_mapping_models = (
+        classifier_models.TrainingJobExplorationMappingModel.get_models(
+            exp_id, exp_version, state_names))
+    if training_job_exploration_mapping_models is None:
         return None
-    job_id = training_job_exploration_mapping_model.job_id
-    classifier_training_job = get_classifier_training_job_by_id(job_id)
-    return classifier_training_job
+    job_ids = []
+    for mapping_model in training_job_exploration_mapping_models:
+        job_ids.append(mapping_model.job_id)
+    classifier_training_job_models = (
+        classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
+    classifier_training_jobs = []
+    for job_model in classifier_training_job_models:
+        classifier_training_jobs.append(get_classifier_training_job_from_model(
+            job_model))
+    return classifier_training_jobs
 
 
 def _create_multi_job_exploration_mappings(mapping_dicts_list):

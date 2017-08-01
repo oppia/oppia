@@ -202,14 +202,15 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         classifier_models.TrainingJobExplorationMappingModel.create(
             exp_id, exp_version, state_name, job_id)
 
-        mapping = (
-            classifier_models.TrainingJobExplorationMappingModel.get_model(
-                exp_id, exp_version, state_name))
+        mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_models(
+                exp_id, exp_version, [state_name]))
 
-        self.assertEqual(mapping.exp_id, exp_id)
-        self.assertEqual(mapping.exp_version, 1)
-        self.assertEqual(mapping.state_name, state_name)
-        self.assertEqual(mapping.job_id, job_id)
+        self.assertEqual(len(mappings), 1)
+        self.assertEqual(mappings[0].exp_id, exp_id)
+        self.assertEqual(mappings[0].exp_version, 1)
+        self.assertEqual(mappings[0].state_name, state_name)
+        self.assertEqual(mappings[0].job_id, job_id)
 
     def test_create_multi_mappings(self):
         mapping_dicts_list = []

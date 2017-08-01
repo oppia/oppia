@@ -246,24 +246,27 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         return utils.convert_to_str(new_id)
 
     @classmethod
-    def get_model(cls, exp_id, exp_version, state_name):
-        """Retrieves the Classifier Exploration Mapping model given Exploration
+    def get_models(cls, exp_id, exp_version, state_names):
+        """Retrieves the Classifier Exploration Mapping models given Exploration
         attributes.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. The exploration version at the time
                 this training job was created.
-            state_name: unicode. The name of the state to which the classifier
-                belongs.
+            state_names: list(unicode). The state names for which we retrieve
+                the mapping models.
 
         Returns:
-            ClassifierExplorationMappingModel. The model instance for the
+            list(ClassifierExplorationMappingModel). The model instances for the
                 classifier exploration mapping.
         """
-        mapping_id = cls._generate_id(exp_id, exp_version, state_name)
-        mapping_instance = cls.get(mapping_id, False)
-        return mapping_instance
+        mapping_instances = []
+        for state_name in state_names:
+            mapping_id = cls._generate_id(exp_id, exp_version, state_name)
+            mapping_instance = cls.get(mapping_id, False)
+            mapping_instances.append(mapping_instance)
+        return mapping_instances
 
     @classmethod
     def create(

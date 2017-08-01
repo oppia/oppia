@@ -322,9 +322,9 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 feconf.TRAINING_JOB_STATUS_COMPLETE))):
             classifier_services.mark_training_job_complete(job_id)
 
-    def test_retrieval_of_classifier_training_job_from_exploration_attributes(
+    def test_retrieval_of_classifier_training_jobs_from_exploration_attributes(
             self):
-        """Test the get_classifier_training_job method."""
+        """Test the get_classifier_training_jobs method."""
 
         exp_id = u'1'
         state_name = u'टेक्स्ट'
@@ -334,10 +334,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.TrainingJobExplorationMappingModel.create(
             exp_id, 1, state_name, job_id)
-        classifier_training_job = (
-            classifier_services.get_classifier_training_job(
-                exp_id, 1, state_name))
-        self.assertEqual(classifier_training_job.exp_id, exp_id)
-        self.assertEqual(classifier_training_job.exp_version, 1)
-        self.assertEqual(classifier_training_job.state_name, state_name)
-        self.assertEqual(classifier_training_job.job_id, job_id)
+        classifier_training_jobs = (
+            classifier_services.get_classifier_training_jobs(
+                exp_id, 1, [state_name]))
+        self.assertEqual(len(classifier_training_jobs), 1)
+        self.assertEqual(classifier_training_jobs[0].exp_id, exp_id)
+        self.assertEqual(classifier_training_jobs[0].exp_version, 1)
+        self.assertEqual(classifier_training_jobs[0].state_name, state_name)
+        self.assertEqual(classifier_training_jobs[0].job_id, job_id)

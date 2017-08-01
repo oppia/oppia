@@ -65,9 +65,11 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             '_c_lw': [],
             '_c_l': []
         }
-        classifier_training_job = (
-            classifier_services.get_classifier_training_job(
-                self.exp_id, self.exploration.version, 'Home'))
+        classifier_training_jobs = (
+            classifier_services.get_classifier_training_jobs(
+                self.exp_id, self.exploration.version, ['Home']))
+        self.assertEqual(len(classifier_training_jobs), 1)
+        classifier_training_job = classifier_training_jobs[0]
         self.job_id = classifier_training_job.job_id
         # TODO(pranavsid98): Replace lines 73-78 with mark_training_job_pending
         # after Giritheja's PR gets merged.
@@ -94,12 +96,13 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         # Normal end-to-end test.
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=False, expected_status_int=200)
-        classifier_training_job = (
-            classifier_services.get_classifier_training_job(
-                self.exp_id, self.exploration.version, 'Home'))
+        classifier_training_jobs = (
+            classifier_services.get_classifier_training_jobs(
+                self.exp_id, self.exploration.version, ['Home']))
+        self.assertEqual(len(classifier_training_jobs), 1)
         classifier_obj = classifier_services.get_classifier_by_id(
-            classifier_training_job.job_id)
-        self.assertEqual(classifier_obj.id, classifier_training_job.job_id)
+            classifier_training_jobs[0].job_id)
+        self.assertEqual(classifier_obj.id, classifier_training_jobs[0].job_id)
         self.assertEqual(classifier_obj.exp_id, self.exp_id)
         self.assertEqual(classifier_obj.state_name, 'Home')
         self.assertEqual(classifier_obj.algorithm_id, 'LDAStringClassifier')
