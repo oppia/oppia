@@ -18,7 +18,8 @@
  */
 
 oppia.factory('SubtitledHtmlObjectFactory', [
-  'AudioTranslationObjectFactory', function(AudioTranslationObjectFactory) {
+  'AudioTranslationObjectFactory', 'LanguageUtilService',
+  function(AudioTranslationObjectFactory, LanguageUtilService) {
     var SubtitledHtml = function(html, audioTranslations) {
       this._html = html;
       this._audioTranslations = audioTranslations;
@@ -46,8 +47,35 @@ oppia.factory('SubtitledHtmlObjectFactory', [
       }
     };
 
-    SubtitledHtml.prototype.isEmpty = function() {
+    SubtitledHtml.prototype.getAudioLanguageCodes = function() {
+      return Object.keys(this._audioTranslations);
+    };
+
+    SubtitledHtml.prototype.hasAudioTranslations = function() {
+      return this.getAudioLanguageCodes().length > 0;
+    };
+
+    SubtitledHtml.prototype.isFullyTranslated = function() {
+      var numLanguages = Object.keys(this._audioTranslations).length;
+      return (numLanguages === LanguageUtilService.getAudioLanguagesCount());
+    };
+
+    SubtitledHtml.prototype.addAudioTranslation = function(
+        languageCode, filename, fileSizeBytes) {
+      if (this._audioTranslations.hasOwnProperty(languageCode)) {
+        throw Error('Trying to add duplicate language code.');
+      }
+      this._audioTranslations[languageCode] = (
+        AudioTranslationObjectFactory.createNew(filename, fileSizeBytes));
+    };
+
+    SubtitledHtml.prototype.hasNoHtml = function() {
       return !this._html;
+    };
+
+    SubtitledHtml.prototype.isEmpty = function() {
+      return (
+        this.hasNoHtml() && Object.keys(this._audioTranslations).length === 0);
     };
 
     SubtitledHtml.prototype.toBackendDict = function() {

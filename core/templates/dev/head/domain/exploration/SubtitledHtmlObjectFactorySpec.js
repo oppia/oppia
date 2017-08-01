@@ -43,10 +43,10 @@ describe('SubtitledHtml object factory', function() {
       expect(subtitledHtml.getHtml()).toEqual('new html');
     }));
 
-    it('should test emptiness correctly', inject(function() {
-      expect(subtitledHtml.isEmpty()).toBe(false);
+    it('should correctly check existence of HTML', inject(function() {
+      expect(subtitledHtml.hasNoHtml()).toBe(false);
       subtitledHtml.setHtml('');
-      expect(subtitledHtml.isEmpty()).toBe(true);
+      expect(subtitledHtml.hasNoHtml()).toBe(true);
     }));
 
     it('should convert to backend dict correctly', inject(function() {

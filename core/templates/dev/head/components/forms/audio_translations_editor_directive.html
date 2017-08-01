@@ -1,0 +1,30 @@
+<div>
+  <span ng-if="subtitledHtml.hasAudioTranslations()">
+    <hr>
+    Audio Translations
+    <div ng-repeat="languageCode in subtitledHtml.getAudioTranslations()">
+      <[languageCode]>
+      <!-- FIXME: AUDIO PLAYER bound to subtitledHtml.getAudioTranslations()[language] -->
+
+      <button type="button" class="oppia-transition-200"
+              ng-click="openEditAudioTranslationModal(language)"
+              title="Edit audio translation"
+              ng-if="isEditable()">
+        <i class="material-icons md-18">&#xE254;</i>
+      </button>
+      <button type="button" class="oppia-transition-200"
+              ng-click="deleteAudioTranslation(language)"
+              title="Delete audio translation"
+              ng-if="isEditable()">
+        <i class="material-icons md-18">&#xE5CD;</i>
+      </button>
+    </div>
+  </span>
+
+  <span class="pull-right" ng-if="isEditable() && !subtitledHtml.isFullyTranslated()">
+    <span ng-click="openAddAudioTranslationModal()">
+      <i class="material-icons">&#xE050;</i>
+      Add audio translation...
+    </span>
+  </span>
+</div>

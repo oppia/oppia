@@ -41,9 +41,10 @@ oppia.directive('stateContentEditor', [
             $scope, stateContentService, editabilityService,
             editorFirstTimeEventsService, explorationInitStateNameService,
             editorContextService) {
-          $scope.STATE_CONTENT_SCHEMA = {
+          $scope.HTML_SCHEMA = {
             type: 'html'
           };
+
           $scope.stateContentService = stateContentService;
           $scope.contentEditorIsOpen = false;
           $scope.isEditable = editabilityService.isEditable;
@@ -81,6 +82,20 @@ oppia.directive('stateContentEditor', [
           $scope.cancelEdit = function() {
             stateContentService.restoreFromMemento();
             $scope.contentEditorIsOpen = false;
+          };
+
+          $scope.onAudioTranslationsStartEditAction = function() {
+            if ($scope.contentEditorIsOpen) {
+              saveContent();
+            }
+          };
+
+          $scope.onAudioTranslationsEdited = function() {
+            // The HTML should be unchanged, because any "start edit" action for
+            // the audio translations would have called
+            // $scope.onAudioTranslationsStartEditAction() and closed the open
+            // HTML editor.
+            stateContentService.saveDisplayedValue();
           };
         }
       ]

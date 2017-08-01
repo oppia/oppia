@@ -36,6 +36,10 @@ oppia.factory('AudioTranslationObjectFactory', [function() {
     };
   };
 
+  AudioTranslation.createNew = function(filename, fileSizeBytes) {
+    return new AudioTranslation(filename, fileSizeBytes, false);
+  };
+
   AudioTranslation.createFromBackendDict = function(translationBackendDict) {
     return new AudioTranslation(
       translationBackendDict.filename,
