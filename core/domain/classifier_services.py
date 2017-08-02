@@ -223,7 +223,7 @@ def create_job_exploration_mappings(exploration, state_names,
         if classifier_training_job is None:
             logging.error(
                 'The ClassifierTrainingJobModel for the %s state of Exploration'
-                ' with exp_id %s and exp_version %s does not cskrocexist.' % (
+                ' with exp_id %s and exp_version %s does not exist.' % (
                     state_names_to_retrieve[index], exp_id, old_exp_version))
             continue
         new_state_name = state_names[index]
