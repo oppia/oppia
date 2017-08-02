@@ -27,9 +27,6 @@ from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
 
-EXPLORATION_TYPE = constants.ACTIVITY_TYPE_EXPLORATION
-COLLECTION_TYPE = constants.ACTIVITY_TYPE_COLLECTION
-
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
@@ -688,7 +685,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove one exploration.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL, EXPLORATION_TYPE,
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+             constants.ACTIVITY_TYPE_EXPLORATION,
              self.EXP_ID_0)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
@@ -697,7 +695,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove another exploration.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL, EXPLORATION_TYPE,
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+             constants.ACTIVITY_TYPE_EXPLORATION,
              self.EXP_ID_1)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
@@ -720,7 +719,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove one collection.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL, COLLECTION_TYPE,
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+             constants.ACTIVITY_TYPE_COLLECTION,
              self.COL_ID_0)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
@@ -729,7 +729,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove another collection.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL, COLLECTION_TYPE,
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+             constants.ACTIVITY_TYPE_COLLECTION,
              self.COL_ID_1)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
