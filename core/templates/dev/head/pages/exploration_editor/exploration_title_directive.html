@@ -1,0 +1,10 @@
+<p ng-class="{'has-error': !explorationTitleService.displayed.length > 0}" ng-style="<[::pStyle]>">
+  <label ng-style="<[::formStyle]>" ><[::title]></label>
+  <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40" ng-trim="false">
+  <span class="help-block" style="font-size: smaller">
+    <em>Please use at most 40 characters, so that this fits in the summary card.</em>
+    <span ng-if="explorationTitleService.displayed.length > 0">
+      <em>Characters used: <[(explorationTitleService.displayed.length)]>/40</em>
+    </span>
+  </span>
+</p>
