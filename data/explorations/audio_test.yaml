@@ -36,6 +36,46 @@ states:
       id: EndExploration
       solution: {}
     param_changes: []
+  Second:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        hi-en:
+          filename: 'test_audio_3_hi_en.mp3'
+          file_size_bytes: 2
+          needs_update: false
+      html: <p>Try typing some code.</p>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Finish
+          feedback:
+          - <p>Nice!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: x
+          rule_type: CodeEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# Type your code here.'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Finish
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: CodeRepl
+      solution: {}
+    param_changes: []
   Introduction:
     classifier_model_id: null
     content:
@@ -56,7 +96,7 @@ states:
         buttonText:
           value: Continue
       default_outcome:
-        dest: Finish
+        dest: Second
         feedback: []
         param_changes: []
       fallbacks: []

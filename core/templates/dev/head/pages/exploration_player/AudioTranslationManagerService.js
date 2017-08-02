@@ -32,7 +32,7 @@ oppia.factory('AudioTranslationManagerService', [
       // the exploration's default language if available.
       _allLanguageCodesInExploration.sort();
 
-      if (_allLanguageCodesInExploration.length == 1) {
+      if (_allLanguageCodesInExploration.length === 1) {
         _currentAudioLanguageCode = _allLanguageCodesInExploration[0];
       }
 
@@ -58,15 +58,15 @@ oppia.factory('AudioTranslationManagerService', [
                 .getAllLanguageCodesInExploration();
 
             $scope.languagesInExploration = [];
-            for (var i = 0; i < allLanguageCodes.length; i++) {
-              var languageCode = allLanguageCodes[i];
+
+            allLanguageCodes.map(function(languageCode) {
               var languageDescription =
                 LanguageUtilService.getAudioLanguageDescription(languageCode);
               $scope.languagesInExploration.push({
                 value: languageCode,
                 displayed: languageDescription
               });
-            }
+            });
 
             $scope.selectedLanguage = _currentAudioLanguageCode;
             $scope.save = function() {

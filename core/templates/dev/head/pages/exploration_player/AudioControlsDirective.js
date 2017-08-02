@@ -22,7 +22,7 @@ oppia.directive('audioControls', [
     return {
       restrict: 'E',
       scope: {
-        audioTranslations: '='
+        getAudioTranslations: '&audioTranslations'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
@@ -31,7 +31,8 @@ oppia.directive('audioControls', [
         '$scope', 'AudioTranslationManagerService', 'AudioPlayerService',
         function(
             $scope, AudioTranslationManagerService, AudioPlayerService) {
-          var filenameOfLastStartedAudio;
+          var filenameOfLastStartedAudio = null;
+          var directiveId = Math.random().toString(36).substr(2, 10);
 
           $scope.AUDIO_SETTINGS_BUTTON_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
@@ -68,17 +69,16 @@ oppia.directive('audioControls', [
             } else {
               AudioPlayerService.pause();
               if (!isRequestForSameAudioAsLastTime()) {
+                // After pausing the currently playing audio,
+                // immediately start playing the newly requested audio.
                 loadAndPlayAudioTranslation();
               }
             }
           };
 
           var isRequestForSameAudioAsLastTime = function() {
-            var requestedAudioTranslation =
-              $scope.audioTranslations[
-                AudioTranslationManagerService.getCurrentAudioLanguageCode()];
-            return filenameOfLastStartedAudio ==
-              requestedAudioTranslation.filename;
+            return directiveId ===
+              AudioPlayerService.getCurrentAudioControlsDirectiveId();
           };
 
           var loadAndPlayAudioTranslation = function() {
@@ -89,12 +89,12 @@ oppia.directive('audioControls', [
             // in the current language, then inform the learner with
             // a piece of text below the audio controls.
             var audioTranslation =
-              $scope.audioTranslations[currentAudioLanguageCode];
+              $scope.getAudioTranslations()[currentAudioLanguageCode];
 
             if (audioTranslation) {
               filenameOfLastStartedAudio = audioTranslation.filename;
               AudioPlayerService.load(
-                audioTranslation.filename).then(function() {
+                audioTranslation.filename, directiveId).then(function() {
                   AudioPlayerService.play();
                 });
             }

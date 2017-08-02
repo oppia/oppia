@@ -8,14 +8,13 @@
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
       <div class="conversation-skin-tutor-card-top-content protractor-test-conversation-content"
            focus-on="<[getContentFocusLabel($index)]>">
-        <span angular-html-bind="activeCard.contentHtml">
-        </span>
-
-        <span ng-if="isContentAudioTranslationAvailable()" 
+        <div angular-html-bind="activeCard.contentHtml">
+        </div>
+        <div ng-if="isContentAudioTranslationAvailable()" 
               class="audio-controls">
           <audio-controls audio-translations="contentAudioTranslations">
           </audio-controls>
-        </span>
+        </div>
       </div>
     </div>
 

@@ -198,7 +198,7 @@ oppia.factory('oppiaPlayerService', [
               exploration.setInitialStateName(initStateName);
               initParams(manualParamChanges);
               AudioTranslationManagerService.init(
-                exploration.getAllLanguageCodes());
+                exploration.getAllAudioLanguageCodes());
               _loadInitialState(successCallback);
             });
         } else {
@@ -228,7 +228,7 @@ oppia.factory('oppiaPlayerService', [
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });
-        }        
+        }
       },
       getExplorationId: function() {
         return _explorationId;

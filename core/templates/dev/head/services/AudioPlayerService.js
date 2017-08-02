@@ -22,17 +22,21 @@ oppia.factory('AudioPlayerService', [
   function(
       $q, $timeout, ngAudio, AssetsBackendApiService,
       explorationContextService) {
+    // The ID of the directive that contains the currently playing
+    // audio. This is a unique generated string in each directive.
+    var _currentAudioControlsDirectiveId = null;
     var _currentTrackFilename = null;
     var _currentTrack = null;
 
-    var _load = function(filename, successCallback, errorCallback) {
+    var _load = function(filename, directiveId, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.loadAudio(
         explorationContextService.getExplorationId(), filename)
           .then(function(audioBlob) {
             var blobUrl = URL.createObjectURL(audioBlob);
             _currentTrack = ngAudio.load(blobUrl);
-            _currentTrackFilename = filename; 
+            _currentTrackFilename = filename;
+            _currentAudioControlsDirectiveId = directiveId; 
 
             // ngAudio doesn't seem to be provide any way of detecting 
             // when native audio object has finished loading. It seems 
@@ -44,6 +48,7 @@ oppia.factory('AudioPlayerService', [
               _currentTrack.audio.onended = function() {
                 _currentTrack = null;
                 _currentTrackFilename = null;
+                _currentAudioControlsDirectiveId = null;
               }
             }, 100);
 
@@ -69,6 +74,9 @@ oppia.factory('AudioPlayerService', [
     var _stop = function() {
       if (_currentTrack) {
         _currentTrack.stop();
+        _currentAudioControlsDirectiveId = null;
+        _currentTrackFilename = null;
+        _currentTrack = null;
       }
     };
 
@@ -82,9 +90,9 @@ oppia.factory('AudioPlayerService', [
     };
 
     return {
-      load: function(filename) {
+      load: function(filename, directiveId) {
         return $q(function(resolve, reject) {
-          _load(filename, resolve, reject);
+          _load(filename, directiveId, resolve, reject);
         });
       },
       play: function() {
@@ -108,6 +116,9 @@ oppia.factory('AudioPlayerService', [
       clear: function() {
         _currentTrack = null;
         _currentTrackFilename = null;
+      },
+      getCurrentAudioControlsDirectiveId: function() {
+        return _currentAudioControlsDirectiveId;
       }
     };
   }
