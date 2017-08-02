@@ -31,22 +31,23 @@ oppia.directive('audioControls', [
         '$scope', 'AudioTranslationManagerService', 'AudioPlayerService',
         function(
             $scope, AudioTranslationManagerService, AudioPlayerService) {
-          var filenameOfLastStartedAudio = null;
+          // This ID is passed in to AudioPlayerService as a means of
+          // distinguishing which audio directive is currently playing audio.
           var directiveId = Math.random().toString(36).substr(2, 10);
 
-          $scope.AUDIO_SETTINGS_BUTTON_IMAGE_URL = (
+          $scope.IMAGE_URL_AUDIO_SETTINGS_BUTTON = (
             UrlInterpolationService.getStaticImageUrl(
               '/icons/settings.svg'));
 
-          var PLAY_AUDIO_BUTTON_IMAGE_URL = (
+          var IMAGE_URL_PLAY_AUDIO_BUTTON = (
             UrlInterpolationService.getStaticImageUrl(
               '/icons/speaker-not-playing.svg'));
 
-          var PAUSE_AUDIO_BUTTON_IMAGE_URL = (
+          var IMAGE_URL_PAUSE_AUDIO_BUTTON = (
             UrlInterpolationService.getStaticImageUrl(
               '/icons/speaker-playing.svg'));
 
-          $scope.REWIND_AUDIO_BUTTON_IMAGE_URL = (
+          $scope.IMAGE_URL_REWIND_AUDIO_BUTTON = (
             UrlInterpolationService.getStaticImageUrl(
               '/icons/rewind-five.svg'));
 
@@ -92,7 +93,6 @@ oppia.directive('audioControls', [
               $scope.getAudioTranslations()[currentAudioLanguageCode];
 
             if (audioTranslation) {
-              filenameOfLastStartedAudio = audioTranslation.filename;
               AudioPlayerService.load(
                 audioTranslation.filename, directiveId).then(function() {
                   AudioPlayerService.play();
@@ -107,7 +107,7 @@ oppia.directive('audioControls', [
           $scope.getPlayPauseButtonImageUrl = function() {
             return AudioPlayerService.isPlaying() && 
               isRequestForSameAudioAsLastTime() ?
-              PAUSE_AUDIO_BUTTON_IMAGE_URL : PLAY_AUDIO_BUTTON_IMAGE_URL;
+              IMAGE_URL_PAUSE_AUDIO_BUTTON : IMAGE_URL_PLAY_AUDIO_BUTTON;
           };
 
           $scope.openAudioTranslationSettings = function() {

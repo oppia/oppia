@@ -416,9 +416,9 @@ GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
 # files.
 
 if DEV_MODE:
-    AUDIO_URL_PREFIX = '/assets/test/<exploration_id>/audio/<filename>'
+    AUDIO_URL_TEMPLATE = '/assets/test/<exploration_id>/audio/<filename>'
 else:
-    AUDIO_URL_PREFIX = (
+    AUDIO_URL_TEMPLATE = (
         'https://storage.googleapis.com/%s/<exploration_id>/'
         'assets/audio/<filename>' % GCS_RESOURCE_BUCKET_NAME)
 
