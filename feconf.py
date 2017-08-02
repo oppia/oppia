@@ -419,8 +419,8 @@ if DEV_MODE:
     AUDIO_URL_PREFIX = '/assets/test/<exploration_id>/audio/<filename>'
 else:
     AUDIO_URL_PREFIX = (
-    'https://storage.googleapis.com/%s/<exploration_id>/'
-    'assets/audio/<filename>' % GCS_RESOURCE_BUCKET_NAME)
+        'https://storage.googleapis.com/%s/<exploration_id>/'
+        'assets/audio/<filename>' % GCS_RESOURCE_BUCKET_NAME)
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {

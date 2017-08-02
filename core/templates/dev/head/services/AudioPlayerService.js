@@ -28,7 +28,8 @@ oppia.factory('AudioPlayerService', [
     var _currentTrackFilename = null;
     var _currentTrack = null;
 
-    var _load = function(filename, directiveId, successCallback, errorCallback) {
+    var _load = function(
+        filename, directiveId, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.loadAudio(
         explorationContextService.getExplorationId(), filename)
