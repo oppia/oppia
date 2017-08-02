@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.tests import test_utils
-import feconf
 
 
 class ActivityServicesTests(test_utils.GenericTestBase):
@@ -32,11 +32,11 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
     def _create_exploration_reference(self, exploration_id):
         return activity_domain.ActivityReference(
-            feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+            constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
     def _create_collection_reference(self, collection_id):
         return activity_domain.ActivityReference(
-            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
+            constants.ACTIVITY_TYPE_COLLECTION, collection_id)
 
     def _compare_lists(self, reference_list_1, reference_list_2):
         hashes_1 = [reference.get_hash() for reference in reference_list_1]

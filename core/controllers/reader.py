@@ -133,7 +133,7 @@ class ExplorationPageEmbed(base.BaseHandler):
             bool(self.username) and
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+                constants.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
@@ -179,7 +179,7 @@ class ExplorationPage(base.BaseHandler):
             bool(self.username) and
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+                constants.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
         try:
             # If the exploration does not exist, a 404 error is raised.
@@ -215,7 +215,7 @@ class ExplorationHandler(base.BaseHandler):
             'can_edit': (
                 self.user_id and
                 rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
+                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),

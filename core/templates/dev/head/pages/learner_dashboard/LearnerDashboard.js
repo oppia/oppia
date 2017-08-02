@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -370,7 +370,6 @@ oppia.controller('LearnerDashboard', [
             $scope.sectionNameI18nId = sectionNameI18nId;
             $scope.subsectionName = subsectionName;
             $scope.activityTitle = activity.title;
-            console.log($scope.sectionNameI18nId);
             $scope.remove = function() {
               /* eslint-disable max-len */
               if (subsectionName ===

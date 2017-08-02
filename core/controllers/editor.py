@@ -126,7 +126,7 @@ class ExplorationPage(EditorHandler):
             bool(self.user_id) and
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+                constants.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
         visualizations_html = visualization_registry.Registry.get_full_html()
 
@@ -159,26 +159,26 @@ class ExplorationPage(EditorHandler):
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_edit': can_edit,
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_publicize': rights_manager.Actor(
                 self.user_id).can_publicize(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_publish': rights_manager.Actor(
                 self.user_id).can_publish(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_release_ownership': rights_manager.Actor(
                 self.user_id).can_release_ownership(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_unpublicize': rights_manager.Actor(
                 self.user_id).can_unpublicize(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(

@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,12 +87,12 @@ def _get_last_playthrough_information(last_playthrough_model):
 
 
 def _save_completed_activities(activities_completed):
-    """Save an activities completed domain object as an
-    CompletedActivities model in the datastore.
+    """Save an activities completed domain object as a
+    CompletedActivitiesModel instance in the datastore.
 
     Args:
         activities_completed: CompletedActivities. The activities
-            completed object to be saved in the datastore.
+            completed domain object to be saved in the datastore.
     """
     completed_activities_model = user_models.CompletedActivitiesModel(
         id=activities_completed.id,
@@ -105,7 +105,7 @@ def _save_completed_activities(activities_completed):
 
 def _save_incomplete_activities(incomplete_activities):
     """Save an incomplete activities domain object as an
-    IncompleteActivities model in the datastore.
+    IncompleteActivitiesModel instance in the datastore.
 
     Args:
         incomplete_activities: IncompleteActivities. The incomplete
@@ -123,7 +123,7 @@ def _save_incomplete_activities(incomplete_activities):
 
 def _save_last_playthrough_information(last_playthrough_information):
     """Save an ExpUserLastPlaythrough domain object as an
-    ExpUserLastPlaythrough model in the datastore.
+    ExpUserLastPlaythroughModel instance in the datastore.
 
     Args:
         last_playthrough_information: ExpUserLastPlaythrough. The last
@@ -545,7 +545,7 @@ def get_all_completed_exp_ids(user_id):
 
 
 def _get_filtered_completed_exp_summaries(exploration_summaries,
-                                         exploration_ids):
+                                          exploration_ids):
     """Returns a list of summaries of the completed exploration ids and the
     ids of explorations that are no longer present.
 
@@ -597,7 +597,7 @@ def get_all_completed_collection_ids(user_id):
 
 
 def _get_filtered_completed_collection_summaries(user_id, collection_summaries,
-                                                collection_ids):
+                                                 collection_ids):
     """Returns a list of summaries of the completed collection ids, the ids
     of collections that are no longer present and the summaries of the
     collections being shifted to the incomplete section on account of new
@@ -677,7 +677,7 @@ def get_all_incomplete_exp_ids(user_id):
 
 
 def _get_filtered_incomplete_exp_summaries(exploration_summaries,
-                                          exploration_ids):
+                                           exploration_ids):
     """Returns a list of summaries of the incomplete exploration ids and the ids
     of explorations that are no longer present.
 
@@ -728,7 +728,7 @@ def get_all_incomplete_collection_ids(user_id):
 
 
 def _get_filtered_incomplete_collection_summaries(collection_summaries,
-                                                 collection_ids):
+                                                  collection_ids):
     """Returns a list of summaries of the incomplete collection ids and the ids
     of collections that are no longer present.
 
@@ -757,7 +757,7 @@ def _get_filtered_incomplete_collection_summaries(collection_summaries,
 
 
 def _get_filtered_exp_playlist_summaries(exploration_summaries,
-                                        exploration_ids):
+                                         exploration_ids):
     """Returns a list of summaries of the explorations in the learner playlist
     and the ids of explorations that are no longer present.
 
@@ -785,7 +785,7 @@ def _get_filtered_exp_playlist_summaries(exploration_summaries,
 
 
 def _get_filtered_collection_playlist_summaries(collection_summaries,
-                                               collection_ids):
+                                                collection_ids):
     """Returns a list of summaries of the collections in the learner playlist
     and the ids of collections that are no longer present.
 

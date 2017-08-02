@@ -19,6 +19,7 @@
 import ast
 import logging
 
+from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -139,7 +140,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
             commit_time_string in stringified_commit_times_msecs]
         first_published_msec = min(commit_times_msecs)
         rights_manager.update_activity_first_published_msec(
-            feconf.ACTIVITY_TYPE_EXPLORATION, exp_id,
+            constants.ACTIVITY_TYPE_EXPLORATION, exp_id,
             first_published_msec)
 
 

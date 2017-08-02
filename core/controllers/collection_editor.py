@@ -16,6 +16,7 @@
 
 """Controllers for the collections editor."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import collection_services
@@ -145,7 +146,7 @@ class CollectionRightsHandler(CollectionEditorHandler):
             'can_edit': True,
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
+                    constants.ACTIVITY_TYPE_COLLECTION, collection_id),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(
@@ -186,7 +187,7 @@ class CollectionRightsHandler(CollectionEditorHandler):
             'can_edit': True,
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
+                    constants.ACTIVITY_TYPE_COLLECTION, collection_id),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(

@@ -16,6 +16,7 @@
 
 """Decorators to provide authorization across the site."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import rights_manager
 from core.domain import role_services
@@ -40,23 +41,23 @@ def check_activity_accessible(
     Returns:
         bool. Whether the given activity can be accessed.
     """
-    if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         if activity_id in feconf.DISABLED_EXPLORATION_IDS:
             return False
 
     activity_rights = (
         rights_manager.get_exploration_rights(activity_id, strict=False)
-        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
+        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION
         else rights_manager.get_collection_rights(activity_id, strict=False))
 
     action_play_public = (
         role_services.ACTION_PLAY_ANY_PUBLIC_EXPLORATION
-        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
+        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION
         else role_services.ACTION_PLAY_ANY_PUBLIC_COLLECTION)
 
     action_play_private = (
         role_services.ACTION_PLAY_ANY_PRIVATE_EXPLORATION
-        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
+        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION
         else role_services.ACTION_PLAY_ANY_PRIVATE_COLLECTION)
 
     if activity_rights is None:
@@ -124,7 +125,7 @@ def can_play_exploration(handler):
 
     def test_can_play(self, exploration_id, **kwargs):
         if check_activity_accessible(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
                 exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -139,7 +140,7 @@ def can_play_collection(handler):
 
     def test_can_play(self, collection_id, **kwargs):
         if check_activity_accessible(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_COLLECTION,
                 collection_id):
             return handler(self, collection_id, **kwargs)
         else:
@@ -156,7 +157,7 @@ def can_download_exploration(handler):
 
     def test_can_download(self, exploration_id, **kwargs):
         if check_activity_accessible(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
                 exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -173,7 +174,7 @@ def can_view_exploration_stats(handler):
 
     def test_can_view_stats(self, exploration_id, **kwargs):
         if check_activity_accessible(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
                 exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -383,7 +384,7 @@ def can_comment_on_feedback_thread(handler):
 
         if check_activity_accessible(
                 self.user_id, self.actions,
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                constants.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(

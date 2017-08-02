@@ -31,6 +31,7 @@ import pprint
 import StringIO
 import zipfile
 
+from constants import constants
 from core.domain import activity_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
@@ -927,7 +928,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # Remove the exploration from the featured activity references, if
     # necessary.
     activity_services.remove_featured_activity(
-        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+        constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
 
 # Operations on exploration snapshots.

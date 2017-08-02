@@ -14,6 +14,7 @@
 
 """Controllers for the Oppia collection learner view."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import collection_services
@@ -47,7 +48,7 @@ class CollectionPage(base.BaseHandler):
                 self.username in whitelisted_usernames and
                 self.username not in config_domain.BANNED_USERNAMES.value and
                 rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
+                    constants.ACTIVITY_TYPE_COLLECTION, collection_id)
             ),
             'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
@@ -80,7 +81,7 @@ class CollectionDataHandler(base.BaseHandler):
         self.values.update({
             'can_edit': (
                 self.user_id and rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)),
+                    constants.ACTIVITY_TYPE_COLLECTION, collection_id)),
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),

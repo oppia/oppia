@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -515,7 +515,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
     def test_get_activity_progress(self):
-        # Add an activity to each of the sections.
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
