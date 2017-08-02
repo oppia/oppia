@@ -43,6 +43,8 @@ oppia.directive('audioTranslationsEditor', [
 
           $scope.getAudioLanguageFullUrl = function(filename) {
             // TODO(sll): Update this after Tony's PR comes in.
+            //
+            // !!!!!    DO NOT SUBMIT WITHOUT FIXING THIS   !!!!!
             var urlPrefix = '/audiohandler/';
             return (
               urlPrefix + explorationId + '/' +
@@ -146,8 +148,6 @@ oppia.directive('audioTranslationsEditor', [
                         dataType: 'text'
                       }).done(function(data) {
                         $scope.$apply();
-                        console.log(generatedFilename);
-                        console.log(uploadedFile.size);
                         $modalInstance.close({
                           languageCode: $scope.languageCode,
                           filename: generatedFilename,
