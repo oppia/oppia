@@ -16,7 +16,6 @@
 
 """Controllers for the collections editor."""
 
-from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import collection_services
@@ -141,12 +140,13 @@ class CollectionRightsHandler(CollectionEditorHandler):
     def get(self, collection_id):
         """Gets the editing rights for the given collection."""
         collection = collection_services.get_collection_by_id(collection_id)
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
 
         self.values.update({
             'can_edit': True,
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    constants.ACTIVITY_TYPE_COLLECTION, collection_id),
+            'can_unpublish': rights_manager.check_can_unpublish_collection(
+                self.actions, collection_rights),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(
@@ -161,6 +161,8 @@ class CollectionRightsHandler(CollectionEditorHandler):
         collection = collection_services.get_collection_by_id(collection_id)
         version = self.payload.get('version')
         _require_valid_version(version, collection.version)
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
 
         # TODO(bhenning): Implement other rights changes here.
         make_public = self.payload.get('is_public')
@@ -185,9 +187,8 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
         self.values.update({
             'can_edit': True,
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    constants.ACTIVITY_TYPE_COLLECTION, collection_id),
+            'can_unpublish': rights_manager.check_can_unpublish_collection(
+                self.actions, collection_rights),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(

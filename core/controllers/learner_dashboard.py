@@ -16,7 +16,6 @@
 
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
@@ -32,19 +31,12 @@ class LearnerDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
-        if self.username in config_domain.BANNED_USERNAMES.value:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-        elif user_services.has_fully_registered(self.user_id):
-            self.values.update({
-                'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
-            })
-            self.render_template(
-                'pages/learner_dashboard/learner_dashboard.html',
-                redirect_url_on_logout='/')
-        else:
-            self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', feconf.LEARNER_DASHBOARD_URL))
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
+        })
+        self.render_template(
+            'pages/learner_dashboard/learner_dashboard.html',
+            redirect_url_on_logout='/')
 
 
 class LearnerDashboardHandler(base.BaseHandler):
