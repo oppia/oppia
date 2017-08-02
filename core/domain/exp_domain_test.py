@@ -1146,9 +1146,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'state_names_with_changed_answer_groups': [],
             'state_names_with_unchanged_answer_groups': ['Renamed state']
         }
-        state_names_mapping = exploration.get_state_names_mapping(change_list)
-        actual_dict = exploration.get_trainable_states_dict(old_states,
-                                                            state_names_mapping)
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
         self.assertEqual(actual_dict, expected_dict)
 
         # Modify answer groups to trigger change in answer groups.
@@ -1169,9 +1170,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'state_names_with_changed_answer_groups': ['Renamed state'],
             'state_names_with_unchanged_answer_groups': []
         }
-        state_names_mapping = exploration.get_state_names_mapping(change_list)
-        actual_dict = exploration.get_trainable_states_dict(old_states,
-                                                            state_names_mapping)
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
         self.assertEqual(actual_dict, expected_dict)
 
         # Add new state to trigger change in answer groups.
@@ -1188,9 +1190,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'New state', 'Renamed state'],
             'state_names_with_unchanged_answer_groups': []
         }
-        state_names_mapping = exploration.get_state_names_mapping(change_list)
-        actual_dict = exploration.get_trainable_states_dict(old_states,
-                                                            state_names_mapping)
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
         self.assertEqual(actual_dict, expected_dict)
 
         # Delete state.
@@ -1204,9 +1207,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'state_names_with_changed_answer_groups': ['Renamed state'],
             'state_names_with_unchanged_answer_groups': []
         }
-        state_names_mapping = exploration.get_state_names_mapping(change_list)
-        actual_dict = exploration.get_trainable_states_dict(old_states,
-                                                            state_names_mapping)
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
         self.assertEqual(actual_dict, expected_dict)
 
         # Test addition and multiple renames.
@@ -1233,9 +1237,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'Renamed state', 'New state3'],
             'state_names_with_unchanged_answer_groups': []
         }
-        state_names_mapping = exploration.get_state_names_mapping(change_list)
-        actual_dict = exploration.get_trainable_states_dict(old_states,
-                                                            state_names_mapping)
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
         self.assertEqual(actual_dict, expected_dict)
 
 

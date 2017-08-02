@@ -75,21 +75,21 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
 
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
-
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
+    # def test_string_classifier_classification(self):
+    #     """All these responses trigger the string classifier."""
+    #
+    #     with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'it\'s a permutation of 3 elements'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called(
+    #                 'There are 3 options for the first ball, and 2 for the '
+    #                 'remaining two. So 3*2=6.'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('abc acb bac bca cbb cba'))
+    #         self.assertTrue(
+    #             self._is_string_classifier_called('dunno, just guessed'))
 
     def test_creation_of_jobs_and_mappings(self):
         """Test the create_classifier_training_jobs method and
@@ -194,7 +194,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the create_job_exploration_mappings method."""
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
-        state_names_mapping = {
+        new_to_old_state_names = {
             'Home': 'Old home'
         }
 
@@ -205,12 +205,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
             classifier_services.create_job_exploration_mappings(
-                exploration, state_names, state_names_mapping)
+                exploration, state_names, new_to_old_state_names)
 
         exploration.version += 1
         # Test that mapping cant be created if job doesn't exist.
         classifier_services.create_job_exploration_mappings(
-            exploration, state_names, state_names_mapping)
+            exploration, state_names, new_to_old_state_names)
         # There will be only one mapping (because of the creation of the
         # exploration).
         all_mappings = (
@@ -225,7 +225,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.exp_id, exploration.version-1, 'Old home', job_id)
         classifier_services.create_job_exploration_mappings(
-            exploration, state_names, state_names_mapping)
+            exploration, state_names, new_to_old_state_names)
 
         # There should be three mappings (the first mapping because of the
         # creation of the exploration) in the data store now.

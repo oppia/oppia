@@ -184,7 +184,7 @@ def create_classifier_training_jobs(exploration, state_names):
 
 
 def create_job_exploration_mappings(exploration, state_names,
-                                    state_names_mapping):
+                                    new_to_old_state_names):
     """Creates new TrainingJobExplorationMappingModel instances for all the
     state names passed into the function. The mapping is created from the
     new state to the ClassifierTrainingJob of the old state. If there's been
@@ -196,7 +196,7 @@ def create_job_exploration_mappings(exploration, state_names,
     Args:
         exploration: Exploration. The Exploration domain object.
         state_names: list(str). List of state names.
-        state_names_mapping: dict. Dict mapping new state names to their
+        new_to_old_state_names: dict. Dict mapping new state names to their
             corresponding state names in previous version.
 
     Raises:
@@ -213,7 +213,7 @@ def create_job_exploration_mappings(exploration, state_names,
 
     state_names_to_retrieve = []
     for current_state_name in state_names:
-        old_state_name = state_names_mapping[current_state_name]
+        old_state_name = new_to_old_state_names[current_state_name]
         state_names_to_retrieve.append(old_state_name)
     classifier_training_jobs = get_classifier_training_jobs(
         exp_id, old_exp_version, state_names_to_retrieve)

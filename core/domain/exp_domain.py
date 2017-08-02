@@ -2977,31 +2977,31 @@ class Exploration(object):
                 commit.
 
         Returns:
-            dict. The state_names_mapping dict.
+            dict. The new_to_old_state_names mapping dict.
         """
-        state_names_mapping = {}
+        old_to_new_state_names = {}
 
         for state_name in self.states:
-            state = self.states[state_name]
-            state_names_mapping[state_name] = state_name
+            old_to_new_state_names[state_name] = state_name
 
         for change_dict in reversed(change_list):
             if change_dict['cmd'] == CMD_RENAME_STATE:
-                state_names_mapping[change_dict['old_state_name']] = (
-                    state_names_mapping.pop(change_dict['new_state_name']))
+                old_to_new_state_names[change_dict['old_state_name']] = (
+                    old_to_new_state_names.pop(change_dict['new_state_name']))
 
-        state_names_mapping = {value: key for key, value in (
-            state_names_mapping.items())}
-        return state_names_mapping
+        new_to_old_state_names = {
+            value: key for key, value in old_to_new_state_names.items()
+        }
+        return new_to_old_state_names
 
 
-    def get_trainable_states_dict(self, old_states, state_names_mapping):
+    def get_trainable_states_dict(self, old_states, new_to_old_state_names):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
 
         Args:
             old_states: dict. Dictionary containing all State domain objects.
-            state_names_mapping: dict. A mapping from current state names to
+            new_to_old_state_names: dict. A mapping from current state names to
                 state names from previous version of the exploration.
 
         Returns:
@@ -3020,7 +3020,7 @@ class Exploration(object):
             if not new_state.can_undergo_classification():
                 continue
 
-            old_state_name = state_names_mapping[state_name]
+            old_state_name = new_to_old_state_names[state_name]
 
             # The case where a new state is added. When this happens, there
             # won't be a corresponding state name in the older state dict.
