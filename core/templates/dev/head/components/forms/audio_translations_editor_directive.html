@@ -1,30 +1,77 @@
 <div>
   <span ng-if="subtitledHtml.hasAudioTranslations()">
     <hr>
-    Audio Translations
-    <div ng-repeat="languageCode in subtitledHtml.getAudioTranslations()">
-      <[languageCode]>
-      <!-- FIXME: AUDIO PLAYER bound to subtitledHtml.getAudioTranslations()[language] -->
-
-      <button type="button" class="oppia-transition-200"
-              ng-click="openEditAudioTranslationModal(language)"
-              title="Edit audio translation"
-              ng-if="isEditable()">
-        <i class="material-icons md-18">&#xE254;</i>
-      </button>
-      <button type="button" class="oppia-transition-200"
-              ng-click="deleteAudioTranslation(language)"
-              title="Delete audio translation"
-              ng-if="isEditable()">
-        <i class="material-icons md-18">&#xE5CD;</i>
-      </button>
+    <h4 class="oppia-audio-translations-header">Audio Translations</h4>
+    <div ng-repeat="(languageCode, audioTranslation) in subtitledHtml.getBindableAudioTranslations()">
+      <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-2 oppia-audio-language-description">
+          <[getAudioLanguageDescription(languageCode)]>
+        </div>
+        <div class="col-lg-9 col-md-9 col-sm-9">
+          <audio controls preload="none" controlsList="nodownload">
+            <source ng-src="<[getAudioLanguageFullUrl(audioTranslation.filename)]>" type="audio/mpeg">
+          </audio>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1">
+          <button type="button"
+                  class="oppia-delete-audio-translation-button oppia-transition-200"
+                  ng-click="deleteAudioTranslation(languageCode)"
+                  title="Delete audio translation"
+                  ng-if="isEditable()">
+            <i class="material-icons md-18">&#xE5CD;</i>
+          </button>
+        </div>
+      </div>
     </div>
   </span>
 
-  <span class="pull-right" ng-if="isEditable() && !subtitledHtml.isFullyTranslated()">
-    <span ng-click="openAddAudioTranslationModal()">
-      <i class="material-icons">&#xE050;</i>
+  <span class="oppia-add-audio-translation-btn-container" ng-if="isEditable() && !subtitledHtml.isFullyTranslated()">
+    <button ng-click="openAddAudioTranslationModal()" class="oppia-add-audio-translation-btn">
+      <i class="material-icons md-18">&#xE050;</i>
       Add audio translation...
-    </span>
+    </button>
   </span>
 </div>
+
+<style>
+  audio-translations-editor .oppia-audio-translations-header {
+    font-size: 1em;
+    font-weight: bold;
+  }
+
+  audio-translations-editor .oppia-audio-language-description {
+    margin: 6px 0;
+  }
+
+  audio-translations-editor .oppia-delete-audio-translation-button {
+    background: none;
+    border: 0;
+    color: #000;
+    cursor: pointer;
+    margin: 6px 0;
+    opacity: 0.5;
+    position: absolute;
+    right: -6px;
+  }
+  audio-translations-editor .oppia-delete-audio-translation-button:hover {
+    opacity: 1;
+  }
+
+  audio-translations-editor .oppia-add-audio-translation-btn-container {
+    bottom: 6px;
+    color: #333;
+    position: absolute;
+    right: 24px;
+  }
+  audio-translations-editor .oppia-add-audio-translation-btn-container:hover,
+  audio-translations-editor .oppia-add-audio-translation-btn-container:focus {
+    color: #0844aa;
+  }
+
+  audio-translations-editor .oppia-add-audio-translation-btn {
+    background: none repeat scroll 0 0 transparent;
+    border: none;
+    font-size: 12px;
+    font-weight: normal;
+  }
+</style>

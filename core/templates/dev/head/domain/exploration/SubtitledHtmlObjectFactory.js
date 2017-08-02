@@ -69,6 +69,15 @@ oppia.factory('SubtitledHtmlObjectFactory', [
         AudioTranslationObjectFactory.createNew(filename, fileSizeBytes));
     };
 
+    SubtitledHtml.prototype.deleteAudioTranslation = function(languageCode) {
+      if (!this._audioTranslations.hasOwnProperty(languageCode)) {
+        throw Error(
+          'Trying to remove non-existing translation for language code ' +
+          languageCode);
+      }
+      delete this._audioTranslations[languageCode];
+    };
+
     SubtitledHtml.prototype.hasNoHtml = function() {
       return !this._html;
     };

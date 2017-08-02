@@ -29,14 +29,25 @@ oppia.directive('audioTranslationsEditor', [
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
         '$scope', '$modal', 'stateContentService', 'editabilityService',
-        'LanguageUtilService', 'alertsService',
+        'LanguageUtilService', 'alertsService', 'explorationContextService',
         function(
             $scope, $modal, stateContentService, editabilityService,
-            LanguageUtilService, alertsService) {
+            LanguageUtilService, alertsService, explorationContextService) {
           $scope.isEditable = editabilityService.isEditable;
-          console.log($scope.subtitledHtml);
           $scope.audioTranslations = (
             $scope.subtitledHtml.getBindableAudioTranslations());
+          var explorationId = explorationContextService.getExplorationId();
+
+          $scope.getAudioLanguageDescription = (
+            LanguageUtilService.getAudioLanguageDescription);
+
+          $scope.getAudioLanguageFullUrl = function(filename) {
+            // TODO(sll): Update this after Tony's PR comes in.
+            var urlPrefix = '/audiohandler/';
+            return (
+              urlPrefix + explorationId + '/' +
+              encodeURIComponent('audio/' + filename));
+          };
 
           $scope.openAddAudioTranslationModal = function() {
             var allowedAudioLanguageCodes = (
@@ -62,10 +73,12 @@ oppia.directive('audioTranslationsEditor', [
               },
               controller: [
                 '$scope', '$modalInstance', 'LanguageUtilService',
-                'allowedAudioLanguageCodes',
+                'allowedAudioLanguageCodes', 'alertsService',
+                'explorationContextService', 'IdGenerationService',
                 function(
                     $scope, $modalInstance, LanguageUtilService,
-                    allowedAudioLanguageCodes) {
+                    allowedAudioLanguageCodes, alertsService,
+                    explorationContextService, IdGenerationService) {
                   $scope.languageCodesAndDescriptions = (
                     allowedAudioLanguageCodes.map(function(languageCode) {
                       return {
@@ -77,23 +90,79 @@ oppia.directive('audioTranslationsEditor', [
                     }));
 
                   $scope.languageCode = allowedAudioLanguageCodes[0];
-                  $scope.filename = null;  // FIXME: set on audio upload
-                  $scope.fileSizeBytes = null;  // FIXME: set on audio upload
+                  var uploadedFile = null;
 
                   $scope.isAudioTranslationValid = function() {
                     return (
                       allowedAudioLanguageCodes.indexOf(
                         $scope.languageCode) !== -1 &&
-                      $scope.filename !== null &&
-                      $scope.fileSizeBytes !== null &&
-                      $scope.fileSizeBytes > 0);
+                      uploadedFile !== null &&
+                      uploadedFile.size !== null &&
+                      uploadedFile.size > 0);
+                  };
+
+                  $scope.onFileChanged = function(file) {
+                    uploadedFile = file;
+                  };
+
+                  $scope.onFileCleared = function() {
+                    uploadedFile = null;
+                  };
+
+                  var generateNewFilename = function() {
+                    return (
+                      'content-' + $scope.languageCode + '-' +
+                      IdGenerationService.generateNewId() + '.mp3');
                   };
 
                   $scope.save = function() {
                     if ($scope.isAudioTranslationValid()) {
-                      $modalInstance.close(
-                        $scope.languageCode, $scope.filename,
-                        $scope.fileSizeBytes);
+                      var generatedFilename = generateNewFilename();
+
+                      var form = new FormData();
+                      form.append('raw_audio_file', uploadedFile);
+                      form.append('payload', JSON.stringify({
+                        filename: generatedFilename
+                      }));
+                      form.append('csrf_token', GLOBALS.csrf_token);
+
+                      $.ajax({
+                        url: UrlInterpolationService.interpolateUrl(
+                          '/createhandler/audioupload/<exploration_id>',
+                          {
+                            exploration_id: (
+                              explorationContextService.getExplorationId())
+                          }
+                        ),
+                        data: form,
+                        processData: false,
+                        contentType: false,
+                        type: 'POST',
+                        dataFilter: function(data) {
+                          // Remove the XSSI prefix.
+                          var transformedData = data.substring(5);
+                          return JSON.parse(transformedData);
+                        },
+                        dataType: 'text'
+                      }).done(function(data) {
+                        $scope.$apply();
+                        console.log(generatedFilename);
+                        console.log(uploadedFile.size);
+                        $modalInstance.close({
+                          languageCode: $scope.languageCode,
+                          filename: generatedFilename,
+                          fileSizeBytes: uploadedFile.size
+                        });
+                      }).fail(function(data) {
+                        console.error(data);
+                        // Remove the XSSI prefix.
+                        var transformedData = data.responseText.substring(5);
+                        var parsedResponse = angular.fromJson(transformedData);
+                        alertsService.addWarning(
+                          parsedResponse.error ||
+                          'Error communicating with server.');
+                        $scope.$apply();
+                      });
                     }
                   };
 
@@ -103,20 +172,16 @@ oppia.directive('audioTranslationsEditor', [
                   };
                 }
               ]
-            }).result.then(function(languageCode, filename, fileSizeBytes) {
+            }).result.then(function(result) {
               $scope.subtitledHtml.addAudioTranslation(
-                languageCode, filename, fileSizeBytes);
+                result.languageCode, result.filename, result.fileSizeBytes);
               $scope.getOnChangeFn()();
             });
           };
 
-          $scope.openEditAudioTranslationModal = function() {
-            // FIXME
-          };
-
-          $scope.deleteAudioTranslation = function(language) {
+          $scope.deleteAudioTranslation = function(languageCode) {
             $scope.getOnStartEditFn()();
-            $scope.subtitledHtml.deleteAudioTranslation(language);
+            $scope.subtitledHtml.deleteAudioTranslation(languageCode);
             $scope.getOnChangeFn()();
           };
         }

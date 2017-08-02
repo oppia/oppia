@@ -117,14 +117,14 @@ md-input-group.md-default-theme label
 .material-icons.md-18 {
   font-size: 18px;
 }
-.material-icons.md-100 {
-  font-size: 100px;
+.material-icons.md-32 {
+  font-size: 32px;
 }
 .material-icons.md-40 {
   font-size: 40px;
 }
-.material-icons.md-32 {
-  font-size: 32px;
+.material-icons.md-100 {
+  font-size: 100px;
 }
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);

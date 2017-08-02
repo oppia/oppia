@@ -226,6 +226,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
         resources.ImageHandler),
     get_redirect_route(
+        r'/audiohandler/<exploration_id>/<encoded_filepath>',
+        resources.AudioHandler),
+    get_redirect_route(
         r'/object_editor_template/<obj_type>',
         resources.ObjectEditorTemplateHandler),
     get_redirect_route(
@@ -329,7 +332,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
-        editor.AudioFileHandler),
+        editor.AudioUploadHandler),
     get_redirect_route(
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
