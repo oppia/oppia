@@ -81,7 +81,8 @@ var GLOBALS = {
     id: 'en',
     text: 'English'
   }],
-  ASSET_DIR_PREFIX: ''
+  ASSET_DIR_PREFIX: '',
+  AUDIO_URL_PREFIX: '/assets/test/<exploration_id>/audio/<filename>'
 };
 
 /* hashes for UrlInterpolationService tests */
