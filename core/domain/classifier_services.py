@@ -177,7 +177,8 @@ def create_classifier_training_jobs(exploration, state_names):
         job_exploration_mapping.validate()
         job_exploration_mappings.append(job_exploration_mapping)
 
-    _create_multi_job_exploration_mappings(job_exploration_mappings)
+    classifier_models.TrainingJobExplorationMappingModel.create_multi(
+        job_exploration_mappings)
 
 
 def create_job_exploration_mappings(exploration, state_names,
@@ -188,17 +189,25 @@ def create_job_exploration_mappings(exploration, state_names,
     a change in the state name, we retrieve the old state name and create the
     mapping accordingly.
     This method is called only from exp_services._save_exploration() method and
-    is never called from classifier_services._create_exploration().
+    is never called from exp_services._create_exploration().
 
     Args:
         exploration: Exploration. The Exploration domain object.
         state_names: list(str). List of state names.
         state_names_mapping: dict. Dict mapping new state names to their
             corresponding state names in previous version.
+
+    Raises:
+        Exception. This method should not be called by exploration with version
+            number.
     """
     exp_id = exploration.id
     current_exp_version = exploration.version
     old_exp_version = current_exp_version - 1
+    if old_exp_version <= 0:
+        raise Exception(
+            'This method should not be called by exploration with version '
+            'number %s' % (current_exp_version))
 
     state_names_to_retrieve = []
     for current_state_name in state_names:
@@ -211,8 +220,7 @@ def create_job_exploration_mappings(exploration, state_names,
     for index, classifier_training_job in enumerate(classifier_training_jobs):
         if classifier_training_job is None:
             continue
-        new_state_name = state_names_mapping.keys()[
-            state_names_mapping.values().index(state_names_to_retrieve[index])]
+        new_state_name = state_names[index]
         job_exploration_mapping = (
             classifier_domain.TrainingJobExplorationMapping(
                 exp_id, current_exp_version, new_state_name,
@@ -220,7 +228,8 @@ def create_job_exploration_mappings(exploration, state_names,
         job_exploration_mapping.validate()
         job_exploration_mappings.append(job_exploration_mapping)
 
-    _create_multi_job_exploration_mappings(job_exploration_mappings)
+    classifier_models.TrainingJobExplorationMappingModel.create_multi(
+        job_exploration_mappings)
 
 
 def get_classifier_from_model(classifier_data_model):
@@ -434,8 +443,6 @@ def get_classifier_training_jobs(exp_id, exp_version, state_names):
     training_job_exploration_mapping_models = (
         classifier_models.TrainingJobExplorationMappingModel.get_models(
             exp_id, exp_version, state_names))
-    if training_job_exploration_mapping_models is None:
-        return None
     job_ids = []
     for mapping_model in training_job_exploration_mapping_models:
         if mapping_model is None:
@@ -454,17 +461,3 @@ def get_classifier_training_jobs(exp_id, exp_version, state_names):
         if mapping_model is None:
             classifier_training_jobs.insert(index, None)
     return classifier_training_jobs
-
-
-def _create_multi_job_exploration_mappings(job_exploration_mappings):
-    """Creates multiple TrainingJobExplorationMappingModel instances in data
-    store.
-    NOTE: The client is responsible for passing in valid mapping domain objects
-    into this method.
-
-    Args:
-        job_exploration_mappings: list(TrainingJobExplorationMapping). The list
-            of TrainingJobExplorationMapping Domain objects.
-    """
-    classifier_models.TrainingJobExplorationMappingModel.create_multi(
-        job_exploration_mappings)

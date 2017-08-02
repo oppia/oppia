@@ -2968,20 +2968,49 @@ class Exploration(object):
         del self.states[state_name]
 
 
-    def get_trainable_states_dict(self, old_states, change_list):
+    def get_state_names_mapping(self, change_list):
+        """Creates a mapping from the current state names of the exploration
+        to their corresponding state names of the older version.
+
+        Args:
+            change_list: list(dict). A list of changes introduced in this
+                commit.
+
+        Returns:
+            dict. The state_names_mapping dict.
+        """
+        state_names_mapping = {}
+        renamed_cmds = []
+        for change_dict in change_list:
+            if change_dict['cmd'] == CMD_RENAME_STATE:
+                renamed_cmds.append(change_dict)
+
+        for state_name in self.states:
+            state = self.states[state_name]
+            if not state.can_undergo_classification():
+                continue
+            old_state_name = state_name
+            for change_dict in reversed(renamed_cmds):
+                if change_dict['new_state_name'] == old_state_name:
+                    old_state_name = change_dict['old_state_name']
+            state_names_mapping[state_name] = old_state_name
+
+        return state_names_mapping
+
+
+    def get_trainable_states_dict(self, old_states, state_names_mapping):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
 
         Args:
             old_states: dict. Dictionary containing all State domain objects.
-            change_list: list(dict). A list of changes introduced in this
-                commit.
+            state_names_mapping: dict. A mapping from current state names to
+                state names from previous version of the exploration.
 
         Returns:
             dict. The trainable states dict. This dict has three keys
-                representing state names with changed answer groups, unchanged
-                answer groups and state_name-old_state_name mapping
-                respectively.
+                representing state names with changed answer groups and
+                unchanged answer groups respectively.
         """
         trainable_states_dict = {
             'state_names_with_changed_answer_groups': [],
@@ -2989,22 +3018,12 @@ class Exploration(object):
         }
         new_states = self.states
 
-        renamed_cmds = []
-        for change_dict in change_list:
-            if change_dict['cmd'] == CMD_RENAME_STATE:
-                renamed_cmds.append(change_dict)
-
-        state_names_mapping = {}
         for state_name in new_states:
             new_state = new_states[state_name]
             if not new_state.can_undergo_classification():
                 continue
 
-            old_state_name = state_name
-            for change_dict in reversed(renamed_cmds):
-                if change_dict['new_state_name'] == old_state_name:
-                    old_state_name = change_dict['old_state_name']
-            state_names_mapping[state_name] = old_state_name
+            old_state_name = state_names_mapping[state_name]
 
             # The case where a new state is added. When this happens, there
             # won't be a corresponding state name in the older state dict.
@@ -3025,7 +3044,6 @@ class Exploration(object):
                     'state_names_with_changed_answer_groups'].append(
                         state_name)
 
-        trainable_states_dict['state_names_mapping'] = state_names_mapping
         return trainable_states_dict
 
     # Methods relating to gadgets.

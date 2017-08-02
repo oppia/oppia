@@ -198,6 +198,16 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'Home': 'Old home'
         }
 
+        # Test that Exception is raised if this method is called with version
+        # number 1.
+        exploration.version = 1
+        with self.assertRaisesRegexp(
+            Exception, 'This method should not be called by exploration with '
+                       'version number %s' % (exploration.version)):
+            classifier_services.create_job_exploration_mappings(
+                exploration, state_names, state_names_mapping)
+
+        exploration.version += 1
         # Test that mapping cant be created if job doesn't exist.
         classifier_services.create_job_exploration_mappings(
             exploration, state_names, state_names_mapping)
@@ -207,6 +217,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_models.TrainingJobExplorationMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 1)
 
+        # Create job and mapping for previous version.
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             'TextInput', self.exp_id, exploration.version-1, [], 'Old home',
@@ -216,13 +227,13 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_services.create_job_exploration_mappings(
             exploration, state_names, state_names_mapping)
 
-        # There should be two mappings (the first mapping because of the
+        # There should be three mappings (the first mapping because of the
         # creation of the exploration) in the data store now.
         all_mappings = (
             classifier_models.TrainingJobExplorationMappingModel.get_all())
-        self.assertEqual(all_mappings.count(), 2)
+        self.assertEqual(all_mappings.count(), 3)
         for index, mapping in enumerate(all_mappings):
-            if index == 1:
+            if index == 2:
                 mapping_id = mapping.id
 
         job_exploration_mapping = (
