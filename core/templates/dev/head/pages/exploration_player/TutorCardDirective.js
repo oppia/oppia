@@ -157,9 +157,8 @@ oppia.directive('tutorCard', [
           };
 
           $scope.isContentAudioTranslationAvailable = function() {
-            return Object.keys(oppiaPlayerService
-              .getStateContentAudioTranslations(
-              $scope.activeCard.stateName)).length > 0;
+            return oppiaPlayerService
+              .isContentAudioTranslationAvailable($scope.activeCard.stateName);
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
