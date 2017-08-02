@@ -203,7 +203,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exploration.version = 1
         with self.assertRaisesRegexp(
             Exception, 'This method should not be called by exploration with '
-                       'version number %s' % (exploration.version)):
+                       'version number 1'):
             classifier_services.create_job_exploration_mappings(
                 exploration, state_names, state_names_mapping)
 

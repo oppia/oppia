@@ -2980,21 +2980,18 @@ class Exploration(object):
             dict. The state_names_mapping dict.
         """
         state_names_mapping = {}
-        renamed_cmds = []
-        for change_dict in change_list:
-            if change_dict['cmd'] == CMD_RENAME_STATE:
-                renamed_cmds.append(change_dict)
 
         for state_name in self.states:
             state = self.states[state_name]
-            if not state.can_undergo_classification():
-                continue
-            old_state_name = state_name
-            for change_dict in reversed(renamed_cmds):
-                if change_dict['new_state_name'] == old_state_name:
-                    old_state_name = change_dict['old_state_name']
-            state_names_mapping[state_name] = old_state_name
+            state_names_mapping[state_name] = state_name
 
+        for change_dict in reversed(change_list):
+            if change_dict['cmd'] == CMD_RENAME_STATE:
+                state_names_mapping[change_dict['old_state_name']] = (
+                    state_names_mapping.pop(change_dict['new_state_name']))
+
+        state_names_mapping = {value: key for key, value in (
+            state_names_mapping.items())}
         return state_names_mapping
 
 

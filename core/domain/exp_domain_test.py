@@ -1053,7 +1053,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         expected_dict = {
-            'Renamed state': 'Home'
+            'Renamed state': 'Home',
+            'End': 'End'
         }
         actual_dict = exploration.get_state_names_mapping(change_list)
         self.assertEqual(actual_dict, expected_dict)
@@ -1069,7 +1070,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         expected_dict = {
             'New state': 'New state',
-            'Renamed state': 'Renamed state'
+            'Renamed state': 'Renamed state',
+            'End': 'End'
         }
         actual_dict = exploration.get_state_names_mapping(change_list)
         self.assertEqual(actual_dict, expected_dict)
@@ -1082,7 +1084,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         expected_dict = {
-            'Renamed state': 'Renamed state'
+            'Renamed state': 'Renamed state',
+            'End': 'End'
         }
         actual_dict = exploration.get_state_names_mapping(change_list)
         self.assertEqual(actual_dict, expected_dict)
@@ -1108,7 +1111,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         expected_dict = {
             'New state3': 'New state',
-            'Renamed state': 'Renamed state'
+            'Renamed state': 'Renamed state',
+            'End': 'End'
         }
         actual_dict = exploration.get_state_names_mapping(change_list)
         self.assertEqual(actual_dict, expected_dict)

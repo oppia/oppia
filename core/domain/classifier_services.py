@@ -14,6 +14,8 @@
 
 """Services for classifier data models"""
 
+import logging
+
 from core.domain import classifier_domain
 from core.domain import classifier_registry
 from core.domain import exp_domain
@@ -199,7 +201,7 @@ def create_job_exploration_mappings(exploration, state_names,
 
     Raises:
         Exception. This method should not be called by exploration with version
-            number.
+            number 1.
     """
     exp_id = exploration.id
     current_exp_version = exploration.version
@@ -219,6 +221,10 @@ def create_job_exploration_mappings(exploration, state_names,
     job_exploration_mappings = []
     for index, classifier_training_job in enumerate(classifier_training_jobs):
         if classifier_training_job is None:
+            logging.error(
+                'The ClassifierTrainingJobModel for the %s state of Exploration'
+                ' with exp_id %s and exp_version %s does not cskrocexist.' % (
+                    state_names_to_retrieve[index], exp_id, old_exp_version))
             continue
         new_state_name = state_names[index]
         job_exploration_mapping = (
