@@ -19,6 +19,8 @@ var constants = {
     "Mathematics", "Medicine", "Music", "Philosophy", "Physics", "Poetry",
     "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
     "Statistics", "Trigonometry", "Welcome"],
+  "ACTIVITY_TYPE_EXPLORATION": "exploration",
+  "ACTIVITY_TYPE_COLLECTION": "collection",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,

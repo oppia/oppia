@@ -14,6 +14,7 @@
 
 """Controllers for the Oppia collection learner view."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import collection_services
@@ -42,7 +43,7 @@ class CollectionPage(base.BaseHandler):
         self.values.update({
             'nav_mode': feconf.NAV_MODE_COLLECTION,
             'can_edit': rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_COLLECTION,
                 collection_rights),
             'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
@@ -74,7 +75,7 @@ class CollectionDataHandler(base.BaseHandler):
             collection_id, strict=False)
         self.values.update({
             'can_edit': rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_COLLECTION,
                 collection_rights),
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
