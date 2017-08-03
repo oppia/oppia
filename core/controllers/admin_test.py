@@ -24,8 +24,6 @@ from core.tests import test_utils
 
 import feconf
 
-
-
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
@@ -108,7 +106,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertIn(new_config_value, response.body)
 
 
-
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """ Test the conditions for generation of dummy explorations."""
 
@@ -161,6 +158,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(len(generated_exps), 0)
         self.assertEqual(len(published_exps), 0)
+
 
 class AdminRoleHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the admin page."""

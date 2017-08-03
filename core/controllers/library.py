@@ -300,7 +300,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     exp_ids,
-                    editor_user_id=editor_user_id))
+                    editor_user_id=editor_user_id,
+                    editor_actions=self.actions))
         else:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(

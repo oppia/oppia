@@ -65,11 +65,7 @@ var createAndLoginUser = function(email, username) {
 var createModerator = function(email, username) {
   login(email, true);
   _completeSignup(username);
-  admin.editConfigProperty(
-    'Usernames of moderators', 'List', function(listEditor) {
-      listEditor.addItem('Unicode').setValue(username);
-    }
-  );
+  admin.updateRole(username, 'moderator');
   logout();
 };
 

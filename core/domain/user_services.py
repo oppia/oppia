@@ -359,7 +359,7 @@ def get_users_settings(user_ids):
             result.append(UserSettings(
                 feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
-                role=feconf.ROLE_ID_ADMIN,
+                role=feconf.ROLE_ID_EXPLORATION_EDITOR,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
@@ -502,7 +502,7 @@ def get_user_role_from_id(user_id):
     Returns:
         str. Role of the user with given id.
     """
-    user_settings = get_user_settings(user_id)
+    user_settings = get_user_settings(user_id, strict=False)
     if user_settings is None:
         return feconf.ROLE_ID_GUEST
     return user_settings.role

@@ -16,7 +16,6 @@
 
 """Domain objects for configuration properties."""
 
-from core.domain import user_services
 from core.platform import models
 
 import feconf
@@ -71,10 +70,14 @@ class ConfigProperty(object):
     these names:
     - about_page_youtube_video_id
     - admin_email_address
+    - admin_ids
+    - admin_usernames
     - allow_yaml_file_upload
+    - banned_usernames
     - banner_alt_text
     - before_end_body_tag_hook
     - carousel_slides_config
+    - collection_editor_whitelist
     - contact_email_address
     - contribute_gallery_page_announcement
     - disabled_explorations
@@ -82,7 +85,9 @@ class ConfigProperty(object):
     - editor_prerequisites_agreement
     - embedded_google_group_url
     - full_site_url
+    - moderator_ids
     - moderator_request_forum_url
+    - moderator_usernames
     - sharing_options
     - sharing_options_twitter_text
     - sidebar_menu_additional_links
@@ -91,6 +96,7 @@ class ConfigProperty(object):
     - splash_page_exploration_id
     - splash_page_exploration_version
     - splash_page_youtube_video_id
+    - whitelisted_email_senders
     """
 
     def refresh_default_value(self, default_value):
@@ -211,65 +217,6 @@ class Registry(object):
 
         return schemas_dict
 
-
-def update_admin_ids(committer_id, admin_usernames):
-    """Refresh the list of admin user_ids based on the usernames entered."""
-    admin_ids = []
-    for username in admin_usernames:
-        user_id = user_services.get_user_id_from_username(username)
-        if user_id is not None:
-            admin_ids.append(user_id)
-        else:
-            raise Exception('Bad admin username: %s' % username)
-
-    Registry.get_config_property('admin_ids').set_value(
-        committer_id, admin_ids)
-
-
-def update_moderator_ids(committer_id, moderator_usernames):
-    """Refresh the list of moderator user_ids based on the usernames
-    entered.
-    """
-    moderator_ids = []
-    for username in moderator_usernames:
-        user_id = user_services.get_user_id_from_username(username)
-        if user_id is not None:
-            moderator_ids.append(user_id)
-        else:
-            raise Exception('Bad moderator username: %s' % username)
-
-    Registry.get_config_property('moderator_ids').set_value(
-        committer_id, moderator_ids)
-
-
-ADMIN_IDS = ConfigProperty(
-    'admin_ids', SET_OF_STRINGS_SCHEMA, 'Admin ids', [],
-    is_directly_settable=False)
-MODERATOR_IDS = ConfigProperty(
-    'moderator_ids', SET_OF_STRINGS_SCHEMA, 'Moderator ids', [],
-    is_directly_settable=False)
-
-ADMIN_USERNAMES = ConfigProperty(
-    'admin_usernames', SET_OF_STRINGS_SCHEMA, 'Usernames of admins', [],
-    post_set_hook=update_admin_ids)
-MODERATOR_USERNAMES = ConfigProperty(
-    'moderator_usernames', SET_OF_STRINGS_SCHEMA, 'Usernames of moderators',
-    [], post_set_hook=update_moderator_ids)
-
-BANNED_USERNAMES = ConfigProperty(
-    'banned_usernames',
-    SET_OF_STRINGS_SCHEMA,
-    'Banned usernames (editing permissions for these users have been removed)',
-    [])
-
-WHITELISTED_COLLECTION_EDITOR_USERNAMES = ConfigProperty(
-    'collection_editor_whitelist', SET_OF_STRINGS_SCHEMA,
-    'Names of users allowed to use the collection editor',
-    [])
-
-WHITELISTED_EMAIL_SENDERS = ConfigProperty(
-    'whitelisted_email_senders', SET_OF_STRINGS_SCHEMA,
-    'Names of users allowed to send emails via the query interface.', [])
 
 PROMO_BAR_ENABLED = ConfigProperty(
     'promo_bar_enabled', BOOL_SCHEMA,

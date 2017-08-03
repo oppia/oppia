@@ -59,6 +59,25 @@ var editConfigProperty = function(
   );
 };
 
+var updateRole = function(name, newRole) {
+  general.waitForSystem();
+  browser.get(general.ADMIN_URL_SUFFIX);
+  element(by.css('.protractor-test-admin-roles-tab')).click();
+  //change values for update form and submit it.
+  element(by.css('.protractor-update-form-name')).sendKeys(name);
+  var roleOptions = element.all(
+    by.css('.protractor-update-form-role-dropdown')
+  );
+  for (var i = 0; i < role_options.length(); i++) {
+    if (role_options[i] == newRole) {
+      role_options[i].click();
+    }
+  }
+  element(by.css('.protractor-update-form-submit')).click()
+  browser.waitForAngular();
+  return true;
+}
+
 // The name should be as given in the admin page (including '.yaml' if
 // necessary).
 var reloadExploration = function(name) {

@@ -63,18 +63,6 @@ SSL_CHALLENGE_RESPONSES = config_domain.ConfigProperty(
     'Challenge-response pairs for SSL validation.', [])
 
 
-def assign_roles(changed_user_roles):
-    """Assigns roles to users based on given dict.
-
-    Args:
-        changed_user_roles: dict(str:str). Dict mapping usernames to roles.
-            These are the changes that have to be applied to roles.
-    """
-    for username, role in changed_user_roles.iteritems():
-        user_services.update_user_role(
-            user_services.get_user_id_from_username(username), role)
-
-
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
     @acl_decorators.can_access_admin_page
@@ -190,48 +178,14 @@ class AdminHandler(base.BaseHandler):
                     'new_config_property_values')
                 logging.info('[ADMIN] %s saved config property values: %s' %
                              (self.user_id, new_config_property_values))
-                config_properties = (
-                    config_domain.Registry.get_config_property_schemas())
                 for (name, value) in new_config_property_values.iteritems():
                     config_services.set_property(self.user_id, name, value)
-                # For maintaining sync between old and new role system when
-                # roles are changed from config tab.
-                # TODO (1995YogeshSharma): Remove this once new system takes
-                # over.
-                role_change_dict = role_services.get_role_changes(
-                    {
-                        name: value['value']
-                        for name, value in config_properties.iteritems()
-                    },
-                    new_config_property_values)
-                assign_roles(role_change_dict)
-
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
-                config_properties = (
-                    config_domain.Registry.get_config_property_schemas())
                 logging.info('[ADMIN] %s reverted config property: %s' %
                              (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
-                new_config_properties = (
-                    config_domain.Registry.get_config_property_schemas())
-
-                # For maintaining the sync between roles in old and new
-                # authorization system.
-                # TODO (1995YogeshSharma): Remove this block of code once
-                # the new system takes over.
-                role_change_dict = role_services.get_role_changes(
-                    {
-                        name: value['value']
-                        for name, value in config_properties.iteritems()
-                    },
-                    {
-                        name: value['value']
-                        for name, value in new_config_properties.iteritems()
-                    }
-                )
-                assign_roles(role_change_dict)
             elif self.payload.get('action') == 'start_new_job':
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):

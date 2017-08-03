@@ -23,7 +23,7 @@ oppia.constant(
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
 oppia.constant(
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
-oppia.constant('ADMIN_SHOW_UPDATE_ROLE', false);
+oppia.constant('ADMIN_SHOW_UPDATE_ROLE', true);
 
 oppia.controller('Admin', [
   '$scope', '$http', '$window', 'AdminRouterService',

@@ -46,8 +46,7 @@ def can_play_exploration(handler):
             exploration_id, strict=False)
 
         if rights_manager.check_can_access_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
-                exploration_rights):
+                self.user_id, self.actions, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -64,8 +63,7 @@ def can_play_collection(handler):
             collection_id, strict=False)
 
         if rights_manager.check_can_access_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
-                collection_rights):
+                self.user_id, self.actions, collection_rights):
             return handler(self, collection_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -86,8 +84,7 @@ def can_download_exploration(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         if rights_manager.check_can_access_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
-                exploration_rights):
+                self.user_id, self.actions, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -108,8 +105,7 @@ def can_view_exploration_stats(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         if rights_manager.check_can_access_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
-                exploration_rights):
+                self.user_id, self.actions, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -130,8 +126,7 @@ def can_edit_collection(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_edit_activity(
-                self.user_id, self.actions,
-                feconf.ACTIVITY_TYPE_COLLECTION, collection_rights):
+                self.user_id, self.actions, collection_rights):
             return handler(self, collection_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -310,8 +305,7 @@ def can_comment_on_feedback_thread(handler):
             exploration_id, strict=False)
 
         if rights_manager.check_can_access_activity(
-                self.user_id, self.actions,
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_rights):
+                self.user_id, self.action, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -378,8 +372,7 @@ def can_edit_exploration(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_edit_activity(
-                self.user_id, self.actions,
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_rights):
+                self.user_id, self.actions, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -399,7 +392,7 @@ def can_delete_exploration(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
-        if rights_manager.check_can_delete_exploration(
+        if rights_manager.check_can_delete_activity(
                 self.user_id, self.actions, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -437,7 +430,7 @@ def can_publish_exploration(handler):
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if rights_manager.check_can_publish_exploration(
+        if rights_manager.check_can_publish_activity(
                 self.user_id, self.actions, exploration_rights):
             return handler(self, exploration_id, *args, **kwargs)
 
@@ -493,7 +486,7 @@ def can_modify_exploration_roles(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
-        if rights_manager.check_can_modify_exploration_roles(
+        if rights_manager.check_can_modify_activity_roles(
                 self.user_id, self.actions, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:

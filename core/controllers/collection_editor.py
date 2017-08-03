@@ -93,7 +93,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
             # Try to retrieve collection
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user_id,
+                    collection_id, self.user_id, self.actions,
                     allow_invalid_explorations=True))
         except Exception as e:
             raise self.PageNotFoundException(e)
@@ -123,7 +123,8 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
-                collection_id, self.user_id, allow_invalid_explorations=True))
+                collection_id, self.user_id, self.actions,
+                allow_invalid_explorations=True))
 
         # Send the updated collection back to the frontend.
         self.values.update({
@@ -208,7 +209,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
 
         collection_node_metadata_list, new_search_cursor = (
             summary_services.get_exp_metadata_dicts_matching_query(
-                query_string, search_cursor, self.user_id))
+                query_string, search_cursor, self.user_id, self.actions))
 
         self.values.update({
             'collection_node_metadata_list': collection_node_metadata_list,

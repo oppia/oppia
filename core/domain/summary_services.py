@@ -88,14 +88,15 @@ def get_human_readable_contributors_summary(contributors_summary):
 
 
 def get_learner_collection_dict_by_id(
-        collection_id, user_id, strict=True, allow_invalid_explorations=False,
-        version=None):
+        collection_id, user_id, user_actions, strict=True,
+        allow_invalid_explorations=False, version=None):
     """Gets a dictionary representation of a collection given by the provided
     collection ID. This dict includes user-specific playthrough information.
 
     Args:
         collection_id: str. The id of the collection.
         user_id: str. The user_id of the learner.
+        user_actions: list(str). List of actions for the user.
         strict: bool. Whether to fail noisily if no collection with the given
             id exists in the datastore.
         allow_invalid_explorations: bool. Whether to also return explorations
@@ -119,7 +120,7 @@ def get_learner_collection_dict_by_id(
 
     exp_ids = collection.exploration_ids
     exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exp_ids, editor_user_id=user_id)
+        exp_ids, editor_user_id=user_id, editor_actions=user_actions)
     exp_summaries_dict_map = {
         exp_summary_dict['id']: exp_summary_dict
         for exp_summary_dict in exp_summary_dicts
@@ -195,7 +196,8 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
 
-def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
+def get_exp_metadata_dicts_matching_query(
+        query_string, search_cursor, user_id, user_actions):
     """Given a query string and a search cursor, returns a list of exploration
     metadata dicts that satisfy the search query.
 
@@ -208,6 +210,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
         user_id: str or None. The id of the user performing the query.
             If not None, private explorations that are editable by this user
             are also returned.
+        user_actions: list(str). List of actions given user can perform.
 
     Returns:
         exploration_list: list(dict). A list of metadata dicts for explorations
@@ -218,12 +221,14 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))
 
-    exploration_list = get_exploration_metadata_dicts(exp_ids, user_id)
+    exploration_list = get_exploration_metadata_dicts(
+        exp_ids, user_actions, user_id)
 
     return exploration_list, new_search_cursor
 
 
-def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
+def get_exploration_metadata_dicts(
+        exploration_ids, editor_user_actions, editor_user_id=None):
     """Given a list of exploration ids, optionally filters the list for
     explorations that are currently non-private and not deleted, and returns a
     list of dicts of the corresponding exploration summaries for collection
@@ -232,6 +237,8 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
     Args:
         exploration_ids: list(str). A list of exploration ids for which
             exploration metadata dicts are to be returned.
+        editor_user_actions: list(str). List of actions for the user performing
+            the query.
         editor_user_id: str or None. The id of the user performing the query.
             If not None, private explorations that are editable by this user
             are also returned.
@@ -250,13 +257,17 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
     for exploration_summary in exploration_summaries:
         if exploration_summary is None:
             continue
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_summary.id, strict=False)
+        if exploration_rights is None:
+            continue
+
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
             if editor_user_id is None:
                 continue
-            if not rights_manager.Actor(editor_user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION,
-                    exploration_summary.id):
+            if not rights_manager.check_can_edit_activity(
+                    editor_user_id, editor_user_actions, exploration_rights):
                 continue
 
         filtered_exploration_summaries.append(exploration_summary)
@@ -267,7 +278,7 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
 
 
 def get_displayable_exp_summary_dicts_matching_ids(
-        exploration_ids, editor_user_id=None):
+        exploration_ids, editor_user_id=None, editor_actions=None):
     """Gets a summary of explorations in human readable form from
     exploration ids.
 
@@ -282,6 +293,10 @@ def get_displayable_exp_summary_dicts_matching_ids(
     Args:
         exploration_ids: list(str). List of exploration ids.
         editor_user_id: str or None. If provided, the returned value is
+            filtered based on a user ID who has edit access to the
+            corresponding explorations. Otherwise, the returned list is not
+            filtered.
+        editor_actions: list(str) or None. If provided, the returned value is
             filtered based on a user ID who has edit access to the
             corresponding explorations. Otherwise, the returned list is not
             filtered.
@@ -312,13 +327,16 @@ def get_displayable_exp_summary_dicts_matching_ids(
     for exploration_summary in exploration_summaries:
         if exploration_summary is None:
             continue
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_summary.id)
+        if exploration_rights is None:
+            continue
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
             if editor_user_id is None:
                 continue
-            if not rights_manager.Actor(editor_user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION,
-                    exploration_summary.id):
+            if not rights_manager.check_can_edit_activity(
+                    editor_user_id, editor_actions, exploration_rights):
                 continue
 
         filtered_exploration_summaries.append(exploration_summary)

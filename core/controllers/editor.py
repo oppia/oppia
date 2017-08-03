@@ -155,17 +155,16 @@ class ExplorationPage(EditorHandler):
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
-            'can_delete': rights_manager.check_can_delete_exploration(
+            'can_delete': rights_manager.check_can_delete_activity(
                 self.user_id, self.actions, exploration_rights),
             'can_edit': rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
-                exploration_rights),
+                self.user_id, self.actions, exploration_rights),
             'can_modify_roles': (
-                rights_manager.check_can_modify_exploration_roles(
+                rights_manager.check_can_modify_activity_roles(
                     self.user_id, self.actions, exploration_rights)),
             'can_publicize': rights_manager.check_can_publicize_exploration(
                 self.actions, exploration_rights),
-            'can_publish': rights_manager.check_can_publish_exploration(
+            'can_publish': rights_manager.check_can_publish_activity(
                 self.user_id, self.actions, exploration_rights),
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(

@@ -1724,9 +1724,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
             self.RECIPIENT_B_EMAIL)
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
-        config_services.set_property(
-            self.sender_id, 'whitelisted_email_senders',
-            [self.SENDER_USERNAME])
+        self.set_admins([self.SENDER_USERNAME])
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_correct_email_is_sent(self):
