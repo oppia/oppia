@@ -15,20 +15,25 @@
 /**
  * @fileoverview Directive for the exploration title field in forms.
  */
-oppia.directive('titleField', [
+oppia.directive('explorationTitleEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope:{
-        title: '@',
-        inputFocus: '@',
+        // The text for the label Field.
+        labelName: '@',
+        // The value to be shown on focus.
+        onInputFieldFocus: '@',
+        // Additional CSS style to define the width and font-weight.
         formStyle: '@',
+        // Additional CSS style for P tags.
         pStyle:'@',
-        saveExplorationTitle: '&'
+        // The method to call on when the input field is blured.
+        onInputFieldBlur: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/' +
-        'exploration_title_directive.html'),
+        'exploration_title_editor.html'),
       controller: [
         '$scope','explorationTitleService',
         function($scope, explorationTitleService) {

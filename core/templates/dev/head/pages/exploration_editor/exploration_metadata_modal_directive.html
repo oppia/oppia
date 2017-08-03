@@ -6,10 +6,9 @@
   <p>
     Just a few more things before you publish:
   </p>
-  <title-field
-    title="Add a title: what should your exploration be called?"
-    form-style="{'font-weight':'normal'}">
-  </title-field>
+  <exploration-title-editor label-name="Add a title: what should your exploration be called?"
+                            form-style="{'font-weight':'normal'}">
+  </exploration-title-editor>
   <form name="objectiveForm">
     <p ng-if="requireObjectiveToBeSpecified"
        ng-class="{'has-error': (objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15}">
