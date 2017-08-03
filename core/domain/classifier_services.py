@@ -186,14 +186,18 @@ def handle_trainable_states(exploration, state_names):
 
 
 def handle_non_retrainable_states(exploration, state_names,
-                                    new_to_old_state_names):
+                                  new_to_old_state_names):
     """Creates new TrainingJobExplorationMappingModel instances for all the
     state names passed into the function. The mapping is created from the
-    new state to the ClassifierTrainingJob of the old state. If there's been
-    a change in the state name, we retrieve the old state name and create the
-    mapping accordingly.
+    state in the new version of Exploration to the ClassifierTrainingJob of the
+    state in the older version of the exploration. If there's been a change in
+    the state name, we retrieve the old state name and create the mapping
+    accordingly.
     This method is called only from exp_services._save_exploration() method and
     is never called from exp_services._create_exploration().
+    In this method, the current_state_name refers to the name of the state in
+    the current version of the Exploration whereas the old_state_name refers to
+    the name of the state in the previous version of the Exploration.
 
     Args:
         exploration: Exploration. The Exploration domain object.

@@ -2998,6 +2998,9 @@ class Exploration(object):
     def get_trainable_states_dict(self, old_states, new_to_old_state_names):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
+        In this method, the new_state_name refers to the name of the state in
+        the current version of the Exploration whereas the old_state_name refers
+        to the name of the state in the previous version of the Exploration.
 
         Args:
             old_states: dict. Dictionary containing all State domain objects.
@@ -3015,31 +3018,38 @@ class Exploration(object):
         }
         new_states = self.states
 
-        for state_name in new_states:
-            new_state = new_states[state_name]
+        for new_state_name in new_states:
+            new_state = new_states[new_state_name]
             if not new_state.can_undergo_classification():
                 continue
 
-            old_state_name = new_to_old_state_names[state_name]
+            old_state_name = new_to_old_state_names[new_state_name]
 
-            # The case where a new state is added. When this happens, there
-            # won't be a corresponding state name in the older state dict.
+            # The case where a new state is added. When this happens, the
+            # old_state_name will be equal to the new_state_name and it will not
+            # be present in the Exploration's older version.
             if old_state_name not in old_states:
                 trainable_states_dict[
-                    'state_names_with_changed_answer_groups'].append(state_name)
+                    'state_names_with_changed_answer_groups'].append(
+                        new_state_name)
                 continue
             old_state = old_states[old_state_name]
             old_training_data = old_state.get_training_data()
             new_training_data = new_state.get_training_data()
+
+            # Check if the training data and interaction_id of the state in the
+            # previous version of the Exploration and the state in the new
+            # version of the Exploration match. If any of them are not equal,
+            # we create a new job for the state in the current version.
             if new_training_data == old_training_data and (
                     new_state.interaction.id == old_state.interaction.id):
                 trainable_states_dict[
                     'state_names_with_unchanged_answer_groups'].append(
-                        state_name)
+                        new_state_name)
             else:
                 trainable_states_dict[
                     'state_names_with_changed_answer_groups'].append(
-                        state_name)
+                        new_state_name)
 
         return trainable_states_dict
 
