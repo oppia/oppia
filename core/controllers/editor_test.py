@@ -584,11 +584,10 @@ param_changes: []
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
 
-
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
-        response = self.post_json('/createhandler/state_yaml', {
+        response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
             'state_dict': exploration.states['State A'].to_dict(),
             'width': 50,
         }, csrf_token=csrf_token)
@@ -698,11 +697,13 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             # not to be checked here (same for admin and moderator).
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '%s tried to delete exploration %s' %
-                             (self.owner_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
+                              self.owner_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '%s deleted exploration %s' %
-                             (self.owner_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
+                              self.owner_id, exp_id))
             self.logout()
 
             # Checking for admin.
@@ -717,11 +718,11 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '(admin) %s tried to delete exploration %s' %
-                             (self.admin_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '(admin) %s deleted exploration %s' %
-                             (self.admin_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.logout()
 
             # Checking for moderator.
@@ -736,11 +737,13 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '(moderator) %s tried to delete exploration %s' %
-                             (self.moderator_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_MODERATOR,
+                              self.moderator_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '(moderator) %s deleted exploration %s' %
-                             (self.moderator_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_MODERATOR,
+                              self.moderator_id, exp_id))
             self.logout()
 
 

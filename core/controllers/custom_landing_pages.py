@@ -18,6 +18,7 @@
 
 import random
 from core.controllers import base
+from core.domain import acl_decorators
 
 
 class FractionLandingPage(base.BaseHandler):
@@ -25,6 +26,7 @@ class FractionLandingPage(base.BaseHandler):
     version out of the four versions of fractions landing page and display it.
     """
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         version_id = self.request.get('v')

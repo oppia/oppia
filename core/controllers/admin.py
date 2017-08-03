@@ -444,6 +444,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
 class SslChallengeHandler(base.BaseHandler):
     """Plaintext page for responding to LetsEncrypt SSL challenges."""
 
+    @acl_decorators.open_access
     def get(self, challenge):
         """Handles GET requests."""
         challenge_responses = SSL_CHALLENGE_RESPONSES.value

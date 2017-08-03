@@ -17,7 +17,6 @@
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.platform import models
@@ -38,17 +37,13 @@ class CollectionPage(base.BaseHandler):
                 collection_id)
         except Exception as e:
             raise self.PageNotFoundException(e)
-        whitelisted_usernames = (
-            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value)
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
         self.values.update({
             'nav_mode': feconf.NAV_MODE_COLLECTION,
-            'can_edit': (
-                bool(self.username) and
-                self.username in whitelisted_usernames and
-                self.username not in config_domain.BANNED_USERNAMES.value and
-                rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
-            ),
+            'can_edit': rights_manager.check_can_edit_activity(
+                self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
+                collection_rights),
             'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
             'collection_title': collection.title,
@@ -68,7 +63,6 @@ class CollectionDataHandler(base.BaseHandler):
     @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
-
         try:
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
@@ -76,11 +70,12 @@ class CollectionDataHandler(base.BaseHandler):
                     allow_invalid_explorations=False))
         except Exception as e:
             raise self.PageNotFoundException(e)
-
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
         self.values.update({
-            'can_edit': (
-                self.user_id and rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)),
+            'can_edit': rights_manager.check_can_edit_activity(
+                self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
+                collection_rights),
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
