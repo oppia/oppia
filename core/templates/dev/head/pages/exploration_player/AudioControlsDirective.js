@@ -35,17 +35,7 @@ oppia.directive('audioControls', [
           // distinguishing which audio directive is currently playing audio.
           var directiveId = Math.random().toString(36).substr(2, 10);
 
-          $scope.IMAGE_URL_AUDIO_SETTINGS_BUTTON = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/icons/settings.svg'));
-
-          var IMAGE_URL_PLAY_AUDIO_BUTTON = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/icons/speaker-not-playing.svg'));
-
-          var IMAGE_URL_PAUSE_AUDIO_BUTTON = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/icons/speaker-playing.svg'));
+          $scope.AudioPlayerService = AudioPlayerService;
 
           $scope.IMAGE_URL_REWIND_AUDIO_BUTTON = (
             UrlInterpolationService.getStaticImageUrl(
@@ -102,12 +92,6 @@ oppia.directive('audioControls', [
 
           $scope.rewindAudioFiveSec = function() {
             AudioPlayerService.rewind(5);
-          };
-
-          $scope.getPlayPauseButtonImageUrl = function() {
-            return AudioPlayerService.isPlaying() && 
-              isRequestForSameAudioAsLastTime() ?
-              IMAGE_URL_PAUSE_AUDIO_BUTTON : IMAGE_URL_PLAY_AUDIO_BUTTON;
           };
 
           $scope.openAudioTranslationSettings = function() {
