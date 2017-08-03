@@ -818,7 +818,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
-    if feconf.ENABLE_STRING_CLASSIFIER:
+    if feconf.ENABLE_ML_CLASSIFIERS:
         new_to_old_state_names = exploration.get_state_names_mapping(
             change_list)
         trainable_states_dict = exploration.get_trainable_states_dict(
@@ -880,16 +880,17 @@ def _create_exploration(
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
 
-    # Find out all states that need a classifier to be trained.
-    state_names_to_train = []
-    for state_name in exploration.states:
-        state = exploration.states[state_name]
-        if state.can_undergo_classification():
-            state_names_to_train.append(state_name)
+    if feconf.ENABLE_ML_CLASSIFIERS:
+        # Find out all states that need a classifier to be trained.
+        state_names_to_train = []
+        for state_name in exploration.states:
+            state = exploration.states[state_name]
+            if state.can_undergo_classification():
+                state_names_to_train.append(state_name)
 
-    if state_names_to_train:
-        classifier_services.create_classifier_training_jobs(
-            exploration, state_names_to_train)
+        if state_names_to_train:
+            classifier_services.create_classifier_training_jobs(
+                exploration, state_names_to_train)
 
     create_exploration_summary(exploration.id, committer_id)
 

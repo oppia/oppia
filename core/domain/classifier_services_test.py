@@ -45,9 +45,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-            assets_list)
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+                assets_list)
 
         self.exp_id = exploration_id
         self.exp_state = (
@@ -78,7 +79,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def test_string_classifier_classification(self):
         """All these responses trigger the string classifier."""
 
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             self.assertTrue(
                 self._is_string_classifier_called(
                     'it\'s a permutation of 3 elements'))
@@ -119,7 +120,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'property_name': 'answer_groups',
             'new_value': answer_groups
         }]
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -137,7 +138,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'property_name': 'title',
             'new_value': 'New title'
         }]
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -158,7 +159,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'old_state_name': 'Home2',
             'new_state_name': 'Home3'
         }]
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 

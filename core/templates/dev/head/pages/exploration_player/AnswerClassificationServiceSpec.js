@@ -27,7 +27,7 @@ describe('Answer classification service with string classifier disabled',
             is_string_classifier_trainable: false
           }
         });
-        $provide.constant('ENABLE_STRING_CLASSIFIER', false);
+        $provide.constant('ENABLE_ML_CLASSIFIERS', false);
       });
     });
 
@@ -241,7 +241,7 @@ describe('Answer classification service with string classifier enabled',
             is_string_classifier_trainable: false
           }
         });
-        $provide.constant('ENABLE_STRING_CLASSIFIER', true);
+        $provide.constant('ENABLE_ML_CLASSIFIERS', true);
       });
     });
 

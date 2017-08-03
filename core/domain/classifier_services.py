@@ -50,7 +50,7 @@ def classify(state, answer):
     When the default rule is matched, outcome is the default_outcome of the
     state's interaction.
     """
-    assert feconf.ENABLE_STRING_CLASSIFIER
+    assert feconf.ENABLE_ML_CLASSIFIERS
 
     interaction_instance = interaction_registry.Registry.get_interaction_by_id(
         state.interaction.id)

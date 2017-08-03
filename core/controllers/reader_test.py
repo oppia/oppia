@@ -116,7 +116,7 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         """Before the test, create an exploration_dict."""
         super(ClassifyHandlerTest, self).setUp()
         self.enable_string_classifier = self.swap(
-            feconf, 'ENABLE_STRING_CLASSIFIER', True)
+            feconf, 'ENABLE_ML_CLASSIFIER', True)
 
         # Reading YAML exploration into a dictionary.
         yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),

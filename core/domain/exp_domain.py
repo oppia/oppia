@@ -2990,7 +2990,7 @@ class Exploration(object):
                     old_to_new_state_names.pop(change_dict['new_state_name']))
 
         new_to_old_state_names = {
-            value: key for key, value in old_to_new_state_names.items()
+            value: key for key, value in old_to_new_state_names.iteritems()
         }
         return new_to_old_state_names
 

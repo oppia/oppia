@@ -42,9 +42,10 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             self.yaml_content = yaml_file.read()
 
         assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
-            assets_list)
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
+                assets_list)
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
 
         self.classifier_data = {
