@@ -129,9 +129,11 @@ def classify_string_classifier_rule(state, normalized_answer):
     return None
 
 
-def create_classifier_training_jobs(exploration, state_names):
+def handle_trainable_states(exploration, state_names):
     """Creates ClassifierTrainingJobModel instances for all the state names
-    passed into the function.
+    passed into the function. If this function is called with version number 1,
+    we are creating jobs for all trainable states in the exploration. Otherwise,
+    a new job is being created for the states where retraining is required.
 
     Args:
         exploration: Exploration. The Exploration domain object.
@@ -183,7 +185,7 @@ def create_classifier_training_jobs(exploration, state_names):
         job_exploration_mappings)
 
 
-def create_job_exploration_mappings(exploration, state_names,
+def handle_non_retrainable_states(exploration, state_names,
                                     new_to_old_state_names):
     """Creates new TrainingJobExplorationMappingModel instances for all the
     state names passed into the function. The mapping is created from the

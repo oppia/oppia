@@ -828,10 +828,10 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         state_names_with_unchanged_answer_groups = trainable_states_dict[
             'state_names_with_unchanged_answer_groups']
         if state_names_with_changed_answer_groups:
-            classifier_services.create_classifier_training_jobs(
+            classifier_services.handle_trainable_states(
                 exploration, state_names_with_changed_answer_groups)
         if state_names_with_unchanged_answer_groups:
-            classifier_services.create_job_exploration_mappings(
+            classifier_services.handle_non_retrainable_states(
                 exploration, state_names_with_unchanged_answer_groups,
                 new_to_old_state_names)
 
@@ -889,7 +889,7 @@ def _create_exploration(
                 state_names_to_train.append(state_name)
 
         if state_names_to_train:
-            classifier_services.create_classifier_training_jobs(
+            classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
 
     create_exploration_summary(exploration.id, committer_id)

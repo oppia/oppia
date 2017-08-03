@@ -93,8 +93,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 self._is_string_classifier_called('dunno, just guessed'))
 
     def test_creation_of_jobs_and_mappings(self):
-        """Test the create_classifier_training_jobs method and
-        create_job_exploration_mappings method by triggering
+        """Test the handle_trainable_states method and
+        handle_non_retrainable_states method by triggering
         update_exploration() method.
         """
         exploration = exp_services.get_exploration_by_id(self.exp_id)
@@ -171,11 +171,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_models.TrainingJobExplorationMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 4)
 
-    def test_create_classifier_training_jobs(self):
-        """Test the create_classifier_training_jobs method."""
+    def test_handle_trainable_states(self):
+        """Test the handle_trainable_states method."""
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
-        classifier_services.create_classifier_training_jobs(
+        classifier_services.handle_trainable_states(
             exploration, state_names)
 
         # There should be two jobs (the first job because of the creation of the
@@ -191,8 +191,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier_training_job.exp_id, self.exp_id)
         self.assertEqual(classifier_training_job.state_name, 'Home')
 
-    def test_create_job_exploration_mappings(self):
-        """Test the create_job_exploration_mappings method."""
+    def test_handle_non_retrainable_states(self):
+        """Test the handle_non_retrainable_states method."""
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
         new_to_old_state_names = {
@@ -205,12 +205,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
-            classifier_services.create_job_exploration_mappings(
+            classifier_services.handle_non_retrainable_states(
                 exploration, state_names, new_to_old_state_names)
 
         exploration.version += 1
         # Test that mapping cant be created if job doesn't exist.
-        classifier_services.create_job_exploration_mappings(
+        classifier_services.handle_non_retrainable_states(
             exploration, state_names, new_to_old_state_names)
         # There will be only one mapping (because of the creation of the
         # exploration).
@@ -225,7 +225,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_COMPLETE)
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.exp_id, exploration.version-1, 'Old home', job_id)
-        classifier_services.create_job_exploration_mappings(
+        classifier_services.handle_non_retrainable_states(
             exploration, state_names, new_to_old_state_names)
 
         # There should be three mappings (the first mapping because of the
