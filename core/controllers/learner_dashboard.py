@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,6 +66,13 @@ class LearnerDashboardHandler(base.BaseHandler):
             learner_progress_services.get_collection_summary_dicts(
                 learner_progress.incomplete_collection_summaries))
 
+        exploration_playlist_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts(
+                learner_progress.exploration_playlist_summaries))
+        collection_playlist_summary_dicts = (
+            learner_progress_services.get_collection_summary_dicts(
+                learner_progress.collection_playlist_summaries))
+
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
         if len(full_thread_ids) > 0:
@@ -98,6 +105,8 @@ class LearnerDashboardHandler(base.BaseHandler):
             'completed_collections_list': completed_collection_summary_dicts,
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
             'incomplete_collections_list': incomplete_collection_summary_dicts,
+            'exploration_playlist': exploration_playlist_summary_dicts,
+            'collection_playlist': collection_playlist_summary_dicts,
             'number_of_deleted_activities': number_of_deleted_activities,
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),

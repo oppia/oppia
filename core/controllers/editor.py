@@ -158,7 +158,7 @@ class ExplorationPage(EditorHandler):
             'can_delete': rights_manager.check_can_delete_exploration(
                 self.user_id, self.actions, exploration_rights),
             'can_edit': rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
                 exploration_rights),
             'can_modify_roles': (
                 rights_manager.check_can_modify_exploration_roles(

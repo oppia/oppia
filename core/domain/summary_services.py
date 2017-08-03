@@ -16,13 +16,13 @@
 
 """Commands that can be used to operate on activity summaries."""
 
+from constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_services
-import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
@@ -255,7 +255,7 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
             if editor_user_id is None:
                 continue
             if not rights_manager.Actor(editor_user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION,
+                    constants.ACTIVITY_TYPE_EXPLORATION,
                     exploration_summary.id):
                 continue
 
@@ -317,7 +317,7 @@ def get_displayable_exp_summary_dicts_matching_ids(
             if editor_user_id is None:
                 continue
             if not rights_manager.Actor(editor_user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION,
+                    constants.ACTIVITY_TYPE_EXPLORATION,
                     exploration_summary.id):
                 continue
 
@@ -374,7 +374,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
         summary_dict = {
             'id': exploration_summary.id,
             'title': exploration_summary.title,
-            'activity_type': feconf.ACTIVITY_TYPE_EXPLORATION,
+            'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
             'category': exploration_summary.category,
             'created_on_msec': utils.get_time_in_millisecs(
                 exploration_summary.exploration_model_created_on),
@@ -437,7 +437,7 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
                 'id': collection_summary.id,
                 'title': collection_summary.title,
                 'category': collection_summary.category,
-                'activity_type': feconf.ACTIVITY_TYPE_COLLECTION,
+                'activity_type': constants.ACTIVITY_TYPE_COLLECTION,
                 'objective': collection_summary.objective,
                 'language_code': collection_summary.language_code,
                 'tags': collection_summary.tags,
@@ -569,12 +569,12 @@ def require_activities_to_be_public(activity_references):
         activity_references)
 
     activity_summaries_by_type = [{
-        'type': feconf.ACTIVITY_TYPE_EXPLORATION,
+        'type': constants.ACTIVITY_TYPE_EXPLORATION,
         'ids': exploration_ids,
         'summaries': exp_services.get_exploration_summaries_matching_ids(
             exploration_ids),
     }, {
-        'type': feconf.ACTIVITY_TYPE_COLLECTION,
+        'type': constants.ACTIVITY_TYPE_COLLECTION,
         'ids': collection_ids,
         'summaries': collection_services.get_collection_summaries_matching_ids(
             collection_ids),
@@ -630,11 +630,11 @@ def get_featured_activity_summary_dicts(language_codes):
         collection_ids)
 
     summary_dicts_by_id = {
-        feconf.ACTIVITY_TYPE_EXPLORATION: {
+        constants.ACTIVITY_TYPE_EXPLORATION: {
             summary_dict['id']: summary_dict
             for summary_dict in exp_summary_dicts
         },
-        feconf.ACTIVITY_TYPE_COLLECTION: {
+        constants.ACTIVITY_TYPE_COLLECTION: {
             summary_dict['id']: summary_dict
             for summary_dict in col_summary_dicts
         },
