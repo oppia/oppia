@@ -63,8 +63,8 @@ oppia.factory('I18nFileHashLoader', [
 ]);
 
 oppia.controller('I18nFooter', [
-  '$http', '$rootScope', '$scope', '$translate', '$timeout',
-  function($http, $rootScope, $scope, $translate, $timeout) {
+  '$http', '$rootScope', '$scope', '$translate', '$timeout', '$cookies',
+  function($http, $rootScope, $scope, $translate, $timeout, $cookies) {
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
@@ -90,6 +90,11 @@ oppia.controller('I18nFooter', [
         $http.put(siteLanguageUrl, {
           site_language_code: $scope.currentLanguageCode
         });
+      } else {
+        // This is a workaround for the library page as the base url
+        // changes the default cookie path
+        $cookies.put('NG_TRANSLATE_LANG_KEY',
+          '"' + $scope.currentLanguageCode + '"', {path: '/'});
       }
     };
   }
