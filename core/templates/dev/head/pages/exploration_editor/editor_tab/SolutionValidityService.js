@@ -20,5 +20,5 @@ oppia.factory('SolutionValidityService', [
       getAllValidities: function() {
         return this.solutionValidities;
       }
-  }
-}]);
+    }
+  }]);
