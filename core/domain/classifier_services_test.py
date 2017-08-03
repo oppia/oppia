@@ -290,7 +290,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier_training_job.status,
                          feconf.TRAINING_JOB_STATUS_PENDING)
 
-        classifier_services.mark_training_job_failed(job_id)
+        classifier_services.mark_training_job_failed([job_id])
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -302,24 +302,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_FAILED,
                 feconf.TRAINING_JOB_STATUS_FAILED))):
-            classifier_services.mark_training_job_failed(job_id)
-
-    def test_update_failed_jobs(self):
-        """Test the update_failed_jobs method."""
-        exp_id = u'1'
-        state_name = 'Home'
-        interaction_id = 'TextInput'
-
-        job_id = classifier_services.create_classifier_training_job(
-            feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_PENDING)
-        job = classifier_services.get_classifier_training_job_by_id(job_id)
-        classifier_services.update_failed_jobs([job])
-        classifier_training_job = (
-            classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.status,
-                         feconf.TRAINING_JOB_STATUS_FAILED)
+            classifier_services.mark_training_job_failed([job_id])
 
     def test_fetch_next_job(self):
         """Test the fetch_next_jobs method."""
