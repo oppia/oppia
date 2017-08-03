@@ -18,17 +18,18 @@
  */
 
 oppia.factory('AudioTranslationObjectFactory', [function() {
-  var AudioTranslation = function(
-      languageCode, filename, fileSizeBytes, needsUpdate) {
-    this.languageCode = languageCode;
+  var AudioTranslation = function(filename, fileSizeBytes, needsUpdate) {
     this.filename = filename;
     this.fileSizeBytes = fileSizeBytes;
     this.needsUpdate = needsUpdate;
   };
 
+  AudioTranslation.prototype.markAsNeedingUpdate = function() {
+    this.needsUpdate = true;
+  };
+
   AudioTranslation.prototype.toBackendDict = function() {
     return {
-      language_code: this.languageCode,
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
       needs_update: this.needsUpdate
@@ -37,7 +38,6 @@ oppia.factory('AudioTranslationObjectFactory', [function() {
 
   AudioTranslation.createFromBackendDict = function(translationBackendDict) {
     return new AudioTranslation(
-      translationBackendDict.language_code,
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,
       translationBackendDict.needs_update);

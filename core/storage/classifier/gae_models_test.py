@@ -61,28 +61,29 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ClassifierTrainingJobModelUnitTests, self).setUp()
         classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'exp_id1', 1,
+            'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1')
+            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'exp_id2', 2,
+            'LDAStringClassifier', 'TextInput', 'exp_id2', 2,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1')
+            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'exp_id3', 3,
+            'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1')
+            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
 
     def test_create_and_get_new_training_job_runs_successfully(self):
         job_id = classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'exp_id1', 1,
+            'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2')
+            'state_name2', feconf.TRAINING_JOB_STATUS_NEW)
 
         training_job = (
             classifier_models.ClassifierTrainingJobModel.get(job_id))
 
         self.assertEqual(training_job.algorithm_id, 'LDAStringClassifier')
+        self.assertEqual(training_job.interaction_id, 'TextInput')
         self.assertEqual(training_job.exp_id, 'exp_id1')
         self.assertEqual(training_job.exp_version, 1)
         self.assertEqual(training_job.state_name, 'state_name2')
@@ -90,3 +91,63 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                          feconf.TRAINING_JOB_STATUS_NEW)
         self.assertEqual(training_job.training_data,
                          [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
+
+
+class ClassifierExplorationMappingModelUnitTests(test_utils.GenericTestBase):
+    """Tests for the ClassifierExplorationMappingModel class."""
+
+    def test_create_and_get_new_mapping_runs_successfully(self):
+        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+            'exp_id1', 2, 'state_name4', 'classifier_id4')
+
+        mapping = classifier_models.ClassifierExplorationMappingModel.get(
+            mapping_id)
+
+        self.assertEqual(mapping.exp_id, 'exp_id1')
+        self.assertEqual(mapping.exp_version, 2)
+        self.assertEqual(mapping.state_name, 'state_name4')
+        self.assertEqual(mapping.classifier_id, 'classifier_id4')
+
+        # Test that exception is raised when creating mapping with same id.
+        with self.assertRaisesRegexp(Exception, (
+            'A model with the same ID already exists.')):
+            mapping_id = (
+                classifier_models.ClassifierExplorationMappingModel.create(
+                    'exp_id1', 2, 'state_name4', 'classifier_id4'))
+
+        # Test that state names with unicode characters get saved correctly.
+        state_name1 = u'Klüft'
+        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+            'exp_id1', 2, state_name1, 'classifier_id4')
+
+        mapping = classifier_models.ClassifierExplorationMappingModel.get(
+            mapping_id)
+
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name1.encode(
+            'utf-8')))
+
+        state_name2 = u'टेक्स्ट'
+        mapping_id = classifier_models.ClassifierExplorationMappingModel.create(
+            'exp_id1', 2, state_name2, 'classifier_id4')
+
+        mapping = classifier_models.ClassifierExplorationMappingModel.get(
+            mapping_id)
+
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name2.encode(
+            'utf-8')))
+
+    def test_get_model_from_exploration_attributes(self):
+        exp_id = 'exp_id1'
+        exp_version = 1
+        state_name = 'state_name1'
+        classifier_id = 'classifier_id1'
+        classifier_models.ClassifierExplorationMappingModel.create(
+            exp_id, exp_version, state_name, classifier_id)
+
+        mapping = classifier_models.ClassifierExplorationMappingModel.get_model(
+            exp_id, exp_version, state_name)
+
+        self.assertEqual(mapping.exp_id, exp_id)
+        self.assertEqual(mapping.exp_version, 1)
+        self.assertEqual(mapping.state_name, state_name)
+        self.assertEqual(mapping.classifier_id, classifier_id)

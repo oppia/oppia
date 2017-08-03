@@ -18,6 +18,7 @@ import logging
 import urllib
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import fs_domain
 from core.domain import obj_services
 from core.domain import value_generators_domain
@@ -26,6 +27,7 @@ from core.domain import value_generators_domain
 class ObjectEditorTemplateHandler(base.BaseHandler):
     """Retrieves a template for an object editor."""
 
+    @acl_decorators.open_access
     def get(self, obj_type):
         """Handles GET requests."""
         try:
@@ -40,6 +42,7 @@ class ObjectEditorTemplateHandler(base.BaseHandler):
 class ValueGeneratorHandler(base.BaseHandler):
     """Retrieves the HTML template for a value generator editor."""
 
+    @acl_decorators.open_access
     def get(self, generator_id):
         """Handles GET requests."""
         try:
@@ -55,6 +58,7 @@ class ValueGeneratorHandler(base.BaseHandler):
 class ImageHandler(base.BaseHandler):
     """Handles image retrievals."""
 
+    @acl_decorators.open_access
     def get(self, exploration_id, encoded_filepath):
         """Returns an image.
 

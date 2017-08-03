@@ -580,7 +580,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -602,7 +602,7 @@ states:
   New state:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -647,7 +647,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -669,7 +669,7 @@ states:
   Renamed state:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -783,7 +783,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     contents."""
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -808,7 +808,7 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'New state': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -834,7 +834,7 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -1396,7 +1396,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<b>Test content</b>',
-                    'audio_translations': [],
+                    'audio_translations': {},
                 }),
             '')
 
@@ -2553,7 +2553,7 @@ states:
   END:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: Congratulations, you have finished!
     interaction:
       answer_groups: []
@@ -2570,7 +2570,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -2798,6 +2798,7 @@ title: Old Title
         # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
+
 class SuggestionActionUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion action functions in exp_services."""
     THREAD_ID1 = '1111'
@@ -2835,14 +2836,18 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
         self.signup(self.USER_EMAIL, self.USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID1, self.editor_id)
+        self.save_new_valid_exploration(self.EXP_ID2, self.editor_id)
+        self.initial_state_name = exploration.init_state_name
         with self.swap(feedback_models.FeedbackThreadModel,
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
-                self.EXP_ID1, self.user_id, 3, 'state_name', 'description',
-                {'type': 'text', 'value': ''})
+                self.EXP_ID1, self.user_id, 3, self.initial_state_name,
+                'description', 'new text')
             feedback_services.create_suggestion(
-                self.EXP_ID2, self.user_id, 3, 'state_name', 'description',
-                {'type': 'text', 'value': ''})
+                self.EXP_ID2, self.user_id, 3, self.initial_state_name,
+                'description', 'new text')
 
     def test_accept_suggestion_valid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid',
@@ -2851,7 +2856,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                            self._check_commit_message):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID1,
-                    self.COMMIT_MESSAGE)
+                    self.COMMIT_MESSAGE, False)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID1, self.THREAD_ID1))
@@ -2871,7 +2876,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                 ):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2,
-                    self.COMMIT_MESSAGE)
+                    self.COMMIT_MESSAGE, False)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID2, self.THREAD_ID1))
@@ -2882,20 +2887,20 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                                      'Commit message cannot be empty.'):
             exp_services.accept_suggestion(
                 self.editor_id, self.THREAD_ID1, self.EXP_ID2,
-                self.EMPTY_COMMIT_MESSAGE)
+                self.EMPTY_COMMIT_MESSAGE, False)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID2, self.THREAD_ID1))
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
-    def test_accept_suggestion_actioned_suggestion(self):
+    def test_accept_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
         with self.swap(exp_services, '_is_suggestion_handled',
                        self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2,
-                    self.COMMIT_MESSAGE)
+                    self.COMMIT_MESSAGE, False)
 
     def test_reject_suggestion(self):
         exp_services.reject_suggestion(
@@ -2906,7 +2911,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.status,
                          feedback_models.STATUS_CHOICES_IGNORED)
 
-    def test_reject_actioned_suggestion(self):
+    def test_reject_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
         with self.swap(exp_services, '_is_suggestion_handled',
                        self._return_true):

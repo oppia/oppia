@@ -33,7 +33,7 @@ describe('StateImprovementSuggestionService', function() {
       state: {
         content: {
           html: 'content',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -68,7 +68,7 @@ describe('StateImprovementSuggestionService', function() {
       initial: {
         content: {
           html: 'content',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -99,7 +99,7 @@ describe('StateImprovementSuggestionService', function() {
       end: {
         content: {
           html: 'content',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -134,7 +134,7 @@ describe('StateImprovementSuggestionService', function() {
       'State 1': {
         content: {
           html: 'content',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -165,7 +165,7 @@ describe('StateImprovementSuggestionService', function() {
       'State 2': {
         content: {
           html: 'content',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           id: 'RuleTest',
