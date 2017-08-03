@@ -924,7 +924,7 @@ class AudioFileHandler(EditorHandler):
         # object being recursively passed around in app engine.
         del audio
 
-        bucket_name = constants.GCS_RESOURCE_BUCKET_NAME
+        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
 
         # Upload to GCS bucket with filepath
         # "<bucket>/<exploration-id>/assets/audio/<filename>".

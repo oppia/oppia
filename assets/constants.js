@@ -270,7 +270,6 @@ var constants = {
   }, {
     "id": "hi-en",
     "text": "Hinglish"
-  }],
+  }]
 
-  "GCS_RESOURCE_BUCKET_NAME": "oppia.resources"
 };

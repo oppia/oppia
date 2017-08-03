@@ -409,6 +409,19 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
+# Google Cloud Storage bucket name.
+GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
+
+# Url prefix for destination of uploaded files and location of downloaded
+# files.
+
+if DEV_MODE:
+    AUDIO_URL_TEMPLATE = '/assets/test/<exploration_id>/audio/<filename>'
+else:
+    AUDIO_URL_TEMPLATE = (
+        'https://storage.googleapis.com/%s/<exploration_id>/'
+        'assets/audio/<filename>' % GCS_RESOURCE_BUCKET_NAME)
+
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
     'Collapsible': {
@@ -518,6 +531,7 @@ DEMO_EXPLORATIONS = {
     u'14': 'about_oppia.yaml',
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
+    u'17': 'audio_test.yaml',
 }
 
 DEMO_COLLECTIONS = {

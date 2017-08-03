@@ -36,7 +36,7 @@ oppia.factory('oppiaPlayerService', [
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
   'UrlInterpolationService', 'ReadOnlyExplorationBackendApiService',
-  'EditableExplorationBackendApiService',
+  'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
@@ -44,7 +44,7 @@ oppia.factory('oppiaPlayerService', [
       playerTranscriptService, ExplorationObjectFactory,
       expressionInterpolationService, StatsReportingService,
       UrlInterpolationService, ReadOnlyExplorationBackendApiService,
-      EditableExplorationBackendApiService) {
+      EditableExplorationBackendApiService, AudioTranslationManagerService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -194,8 +194,11 @@ oppia.factory('oppiaPlayerService', [
             _explorationId).then(function(data) {
               exploration = ExplorationObjectFactory.createFromBackendDict(
                 data);
+
               exploration.setInitialStateName(initStateName);
               initParams(manualParamChanges);
+              AudioTranslationManagerService.init(
+                exploration.getAllAudioLanguageCodes());
               _loadInitialState(successCallback);
             });
         } else {
@@ -219,6 +222,9 @@ oppia.factory('oppiaPlayerService', [
               _explorationId, version, data.session_id,
               GLOBALS.collectionId);
 
+            AudioTranslationManagerService.init(
+              exploration.getAllAudioLanguageCodes());
+
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });
@@ -238,6 +244,16 @@ oppia.factory('oppiaPlayerService', [
       },
       getStateContentHtml: function(stateName) {
         return exploration.getUninterpolatedContentHtml(stateName);
+      },
+      getStateContentAudioTranslations: function(stateName) {
+        return exploration.getAudioTranslations(stateName);
+      },
+      getStateContentAudioTranslation: function(stateName, languageCode) {
+        return exploration.getAudioTranslation(stateName, languageCode);
+      },
+      isContentAudioTranslationAvailable: function(stateName) {
+        return Object.keys(
+          exploration.getAudioTranslations(stateName)).length > 0;
       },
       getInteractionHtml: function(stateName, labelForFocusTarget) {
         var interactionId = exploration.getInteractionId(stateName);
