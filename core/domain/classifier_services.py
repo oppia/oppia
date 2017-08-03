@@ -312,7 +312,7 @@ def _update_classifier_training_job_status(job_ids, status):
     """Checks for the existence of the model and then updates it.
 
     Args:
-        job_id: list(str). list of ID of the ClassifierTrainingJob domain 
+        job_id: list(str). list of ID of the ClassifierTrainingJob domain
             objects.
         status: str. The status to which the job needs to be updated.
 
@@ -321,27 +321,31 @@ def _update_classifier_training_job_status(job_ids, status):
             of the ClassifierTrainingJob does not exist.
     """
     classifier_training_job_models = (
-    classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
+        classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
-    for classifier_training_job_model in classifier_training_job_models:
-        if not classifier_training_job_model:
+    for index in range(len(job_ids)):
+        if not classifier_training_job_models[index]:
             raise Exception(
-                'The ClassifierTrainingJobModel corresponding to the job_id of the'
-                'ClassifierTrainingJob does not exist.')
+                'The ClassifierTrainingJobModel corresponding to the job_id '
+                'of the ClassifierTrainingJob does not exist.')
 
-        initial_status = classifier_training_job_model.status
-        if status not in feconf.ALLOWED_TRAINING_JOB_STATUS_CHANGES[initial_status]:
+        initial_status = classifier_training_job_models[index].status
+        if status not in (
+            feconf.ALLOWED_TRAINING_JOB_STATUS_CHANGES[initial_status]):
             raise Exception(
                 'The status change %s to %s is not valid.' % (
                     initial_status, status))
 
-    for job_id in job_ids:
-        classifier_training_job = get_classifier_training_job_by_id(job_id)
+        classifier_training_job = get_classifier_training_job_by_id(
+                job_ids[index])
         classifier_training_job.update_status(status)
         classifier_training_job.validate()
 
-        classifier_training_job_model.status = status
-        classifier_training_job_model.put()
+        classifier_training_job_models[index].status = status
+
+    classifier_models.ClassifierTrainingJobModel.put_multi(
+        classifier_training_job_models)
+
 
 def mark_training_job_complete(job_id):
     """Updates the training job's status to complete.
