@@ -221,6 +221,17 @@ body {
   max-width: 1400px;
 }
 
+.oppia-add-to-learner-playlist-icon {
+  color: white;
+  float: right;
+  font-size: 19px;
+  left: -11px;
+  margin-left: -16px;
+  margin-top: 12px;
+  position: relative;
+  z-index: 10;
+}
+
 .oppia-dashboard-container .exp-private-text {
   color: #aaa;
   font-style: italic;

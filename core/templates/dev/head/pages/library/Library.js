@@ -113,6 +113,10 @@ oppia.controller('Library', [
       $scope.activeGroupIndex = null;
     };
 
+    $scope.addToLearnerPlaylist = function(activityType, activityId) {
+      ;
+    };
+
     // If the value below is changed, the following CSS values in oppia.css
     // must be changed:
     // - .oppia-exp-summary-tiles-container: max-width

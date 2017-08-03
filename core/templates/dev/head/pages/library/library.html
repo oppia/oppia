@@ -116,7 +116,15 @@
                    ng-swipe-right="scroll($index, true)"
                    ng-swipe-left="scroll($index, false)">
                 <div class="oppia-library-carousel-tiles">
-                  <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
+                  <div ng-repeat="tile in group.activity_summary_dicts"
+                       style="display: inline-block;"
+                       ng-mouseenter="showAddToPlayLaterIcon=true" ng-mouseleave="showAddToPlayLaterIcon=false">
+                    <i class="oppia-add-to-learner-playlist-icon fa fa-clock-o"
+                       ng-show="showAddToPlayLaterIcon"
+                       ng-click="addToLearnerPlaylist(tile.activity_type, tile.id)"
+                       aria-hidden="true"
+                       tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
+                       tooltip-placement="bottom"></i>
                     <collection-summary-tile ng-if="tile.activity_type == 'collection'"
                                              collection-id="tile.id"
                                              collection-title="tile.title"
@@ -137,7 +145,8 @@
                                               num-views="tile.num_views"
                                               thumbnail-icon-url="tile.thumbnail_icon_url"
                                               thumbnail-bg-color="tile.thumbnail_bg_color"
-                                              class="protractor-test-exp-summary-tile">
+                                              class="protractor-test-exp-summary-tile"
+                                              style="position: relative; z-index: -1;">
                     </exploration-summary-tile>
                   </div>
                 </div>
