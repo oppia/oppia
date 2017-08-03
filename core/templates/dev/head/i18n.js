@@ -92,8 +92,11 @@ oppia.controller('I18nFooter', [
         });
       } else {
         // This is a workaround for the library page as the base url
-        // changes the default cookie path
-        $cookies.put('NG_TRANSLATE_LANG_KEY',
+        // changes the default cookie path.
+        // This will always set the cookie value manually for all non-logged in
+        // users in case we change the base url on other pages of the site.
+        $cookies.put(
+          'NG_TRANSLATE_LANG_KEY',
           '"' + $scope.currentLanguageCode + '"', {path: '/'});
       }
     };
