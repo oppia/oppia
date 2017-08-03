@@ -21,9 +21,13 @@ oppia.constant('SOLUTION_SUPPORTED_INTERACTIONS', [
   'MusicNotesInput',
   'GraphInput',
   'SetInput',
+  'CodeRepl',
   'MathExpressionInput',
   'ItemSelectionInput',
-  'LogicProof'
+  'LogicProof',
+  'TextInput',
+  'NumericInput',
+  'PencilCodeEditor'
 ]);
 
 oppia.constant('INTERACTION_OBJECT_TYPES', {
@@ -53,27 +57,8 @@ oppia.factory('SolutionHelperService', [
       getInteractionObjectType: function(id) {
         return INTERACTION_OBJECT_TYPES[id];
       },
-      getCorrectAnswerObject: function(answer, objectType) {
-        // The codeRepl interaction is built manually using objectType but
-        // the creator view for this interaction will be different from that of
-        // the learner view as there will be no compilation/error checking
-        // option. The code is entered into an unicode editor and this gets
-        // stored as correctAnswer. But since validation of this solution
-        // requires extra parameters ('error', 'evaluation', 'output') these
-        // are added.
-        if (objectType === 'CodeString') {
-          return {
-            code: answer,
-            output: '',
-            evaluation: '',
-            error: ''
-          }
-        } else {
-          return answer;
-        }
-      },
       verifySolution: function(
-        explorationId, state, correctAnswer, errorCallback) {
+        explorationId, state, correctAnswer, errorCallback, successCallback) {
         var interactionId = stateInteractionIdService.savedMemento;
         var rulesServiceName = (
           angularNameService.getNameOfInteractionRulesService(interactionId));
@@ -83,14 +68,9 @@ oppia.factory('SolutionHelperService', [
         ).then(function(result) {
           if (
             editorContextService.getActiveStateName() !== result.outcome.dest) {
-            explorationContextService.getState(
-              editorContextService.getActiveStateName()
-            ).interaction.markSolutionAsValid();
+            successCallback();
           } else {
             errorCallback();
-            explorationContextService.getState(
-              editorContextService.getActiveStateName()
-            ).interaction.markSolutionAsInvalid();
           }
         });
       }

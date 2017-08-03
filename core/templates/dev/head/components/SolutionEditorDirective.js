@@ -42,14 +42,6 @@ oppia.directive('solutionEditor', [
           $scope.solutionEditorIsOpen = false;
           $scope.solutionCorrectAnswerEditorHtml = '';
 
-          $scope.init = function() {
-            if (!$scope.correctAnswerEditorHtml) {
-              $scope.correctAnswerEditorHtml = (
-                stateSolutionService.displayed.getObjectEditorHtml(
-                  $scope.getObjectType()));
-            }
-          };
-
           $scope.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
             ui_config: {}
@@ -82,8 +74,6 @@ oppia.directive('solutionEditor', [
               $scope.saveThisSolution();
             }
           });
-
-          $scope.init();
         }
       ]
     };

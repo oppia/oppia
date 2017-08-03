@@ -10,16 +10,6 @@
               ng-model="tmpSolution.answerIsExclusive"
               ng-options="(item ? 'The only' : 'One') for item in [true, false]">
       </select> <strong>solution is...</strong>
-      <div ng-if="!correctAnswerEditorHtml">
-        <object-editor class="protractor-test-interaction-html"
-                       obj-type="<[objectType]>"
-                       init-args="{choices: ruleDescriptionChoices}"
-                       is-editable="true"
-                       always-editable="true"
-                       value="data.correctAnswer"
-                       style="color: black;">
-        </object-editor>
-      </div>
       <div class="protractor-test-interaction-html"
            angular-html-bind="correctAnswerEditorHtml">
       </div>

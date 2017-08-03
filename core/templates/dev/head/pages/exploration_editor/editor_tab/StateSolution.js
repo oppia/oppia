@@ -40,9 +40,8 @@ oppia.controller('StateSolution', [
     $scope.correctAnswer = null;
 
     $scope.isSolutionValid = function() {
-      return explorationStatesService.getState(
-        editorContextService.getActiveStateName()
-      ).interaction.isSolutionValid();
+      return explorationStatesService.isSolutionValid(
+        editorContextService.getActiveStateName());
     };
 
     $scope.inlineSolutionEditorIsActive = false;
@@ -136,16 +135,10 @@ oppia.controller('StateSolution', [
 
 
             $scope.saveSolution = function() {
-              var answer = $scope.data.correctAnswer;
-
-              var answerObject = (
-                SolutionHelperService.getCorrectAnswerObject(
-                  answer,
-                  $scope.objectType));
               $modalInstance.close({
                 solution: SolutionObjectFactory.createNew(
                   $scope.tmpSolution.answerIsExclusive,
-                  answerObject,
+                  $scope.data.correctAnswer,
                   $scope.tmpSolution.explanation)
               });
             };
@@ -160,14 +153,21 @@ oppia.controller('StateSolution', [
         var correctAnswer = result.solution.correctAnswer;
         var currentStateName = editorContextService.getActiveStateName();
         var state = explorationStatesService.getState(currentStateName);
-
         SolutionHelperService.verifySolution(
           explorationContextService.getExplorationId(),
           state,
           correctAnswer,
           function () {
+            explorationStatesService.updateSolutionValidity(
+              currentStateName, false);
             alertsService.addInfoMessage(
               'That solution does not lead to the next state!');
+          },
+          function () {
+            explorationStatesService.updateSolutionValidity(
+              currentStateName, true);
+            alertsService.addInfoMessage(
+              'The solution is now valid!');
           });
 
         stateSolutionService.displayed = result.solution;
@@ -199,9 +199,8 @@ oppia.controller('StateSolution', [
       }).result.then(function() {
         stateSolutionService.displayed = null;
         stateSolutionService.saveDisplayedValue();
-        explorationStatesService.getState(
-          editorContextService.getActiveStateName()
-        ).interaction.markSolutionAsInvalid();
+        explorationStatesService.deleteSolutionValidity(
+          editorContextService.getActiveStateName());
       });
     };
 
@@ -216,8 +215,16 @@ oppia.controller('StateSolution', [
         state,
         answer,
         function () {
+          explorationStatesService.updateSolutionValidity(
+            currentStateName, false);
           alertsService.addInfoMessage(
             'That solution does not lead to the next state!');
+        },
+        function () {
+          explorationStatesService.updateSolutionValidity(
+            currentStateName, true);
+          alertsService.addInfoMessage(
+            'The solution is now valid!');
         });
 
       stateSolutionService.saveDisplayedValue();

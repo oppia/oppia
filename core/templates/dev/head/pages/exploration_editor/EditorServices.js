@@ -908,15 +908,17 @@ oppia.factory('explorationParamChangesService', [
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope',
+  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'explorationGadgetsService',
-  'StatesObjectFactory',
+  'StatesObjectFactory', 'SolutionValidityService', 'angularNameService',
+  'AnswerClassificationService', 'explorationContextService',
   function(
-      $log, $modal, $filter, $location, $rootScope,
+      $log, $modal, $filter, $location, $rootScope, $injector,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, explorationGadgetsService,
-      StatesObjectFactory) {
+      StatesObjectFactory, SolutionValidityService, angularNameService,
+      AnswerClassificationService, explorationContextService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -1062,6 +1064,45 @@ oppia.factory('explorationStatesService', [
         }
         return (
           validatorsService.isValidStateName(newStateName, showWarnings));
+      },
+      isSolutionValid: function(stateName) {
+        return SolutionValidityService.isSolutionValid(stateName);
+      },
+      updateSolutionValidity: function(stateName, solutionIsValid) {
+        SolutionValidityService.updateValidity(stateName, solutionIsValid);
+        var warningService = $injector.get('explorationWarningsService');
+        warningService.updateWarnings();
+      },
+      deleteSolutionValidity: function(stateName) {
+        SolutionValidityService.deleteSolutionValidity(stateName);
+        var warningService = $injector.get('explorationWarningsService');
+        warningService.updateWarnings();
+      },
+      initializeSolutionValidityService: function() {
+        SolutionValidityService.init();
+        _states.getStateNames().forEach(function(stateName) {
+          var solution = _states.getState(stateName).interaction.solution;
+          if (solution) {
+            AnswerClassificationService.getMatchingClassificationResult(
+              explorationContextService.getExplorationId(),
+              _states.getState(stateName),
+              solution.correctAnswer,
+              true,
+              $injector.get(angularNameService.getNameOfInteractionRulesService(
+                _states.getState(stateName).interaction.id))
+            ).then(function(result) {
+              if (
+                editorContextService.getActiveStateName() !== (
+                  result.outcome.dest)) {
+                SolutionValidityService.updateValidity(stateName, true);
+              } else {
+                SolutionValidityService.updateValidity(stateName, false);
+              }
+              var warningService = $injector.get('explorationWarningsService');
+              warningService.updateWarnings();
+            });
+          }
+        });
       },
       getStateContentMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'content');
@@ -1942,13 +1983,13 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
+  'parameterMetadataService', 'SolutionValidityService', 'INTERACTION_SPECS',
+  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
+      parameterMetadataService, SolutionValidityService, INTERACTION_SPECS,
+      WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1971,15 +2012,13 @@ oppia.factory('explorationWarningsService', [
       var statesWithIncorrectSolution = [];
 
       var states = explorationStatesService.getStates();
-
       states.getStateNames().forEach(function(stateName) {
-        var interaction = states.getState(stateName).interaction;
-        if (interaction.solution !== null) {
-          if (!interaction.isSolutionValid()) {
-            statesWithIncorrectSolution.push(stateName);
-          }
+        if (states.getState(stateName).interaction.solution &&
+            !explorationStatesService.isSolutionValid(stateName)) {
+          statesWithIncorrectSolution.push(stateName);
         }
       });
+      return statesWithIncorrectSolution;
     };
 
     // Returns a list of names of all nodes which are unreachable from the
