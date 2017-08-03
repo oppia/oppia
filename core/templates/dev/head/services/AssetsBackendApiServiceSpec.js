@@ -43,7 +43,7 @@ describe('Assets Backend API Service', function() {
     var bucketName = 'oppia.resources'
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      GLOBALS.AUDIO_URL_PREFIX, {
+      GLOBALS.AUDIO_URL_TEMPLATE, {
         exploration_id: '0',
         filename: 'myfile.mp3'
       });
