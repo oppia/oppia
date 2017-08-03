@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -347,29 +347,29 @@ oppia.controller('LearnerDashboard', [
       });
     };
 
-    $scope.openRemoveEntityModal = function(
-      sectionName, subsectionName, entity) {
+    $scope.openRemoveActivityModal = function(
+      sectionNameI18nId, subsectionName, activity) {
       $modal.open({
-        templateUrl: 'modals/removeEntity',
+        templateUrl: 'modals/removeActivity',
         backdrop: true,
         resolve: {
-          sectionName: function() {
-            return sectionName;
+          sectionNameI18nId: function() {
+            return sectionNameI18nId;
           },
           subsectionName: function() {
             return subsectionName;
           },
-          entity: function() {
-            return entity;
+          activity: function() {
+            return activity;
           }
         },
         controller: [
-          '$scope', '$modalInstance', '$http', 'sectionName', 'subsectionName',
-          function($scope, $modalInstance, $http, sectionName, subsectionName) {
-            $scope.sectionName = sectionName;
+          '$scope', '$modalInstance', '$http', 'sectionNameI18nId',
+          'subsectionName', function($scope, $modalInstance, $http,
+            sectionNameI18nId, subsectionName) {
+            $scope.sectionNameI18nId = sectionNameI18nId;
             $scope.subsectionName = subsectionName;
-            $scope.entityTitle = entity.title;
-
+            $scope.activityTitle = activity.title;
             $scope.remove = function() {
               /* eslint-disable max-len */
               if (subsectionName ===
@@ -377,12 +377,12 @@ oppia.controller('LearnerDashboard', [
               /* eslint-enable max-len */
                 $http.post(
                   '/learner_dashboard/remove_in_progress_exploration', {
-                    exploration_id: entity.id
+                    exploration_id: activity.id
                   });
               } else if (subsectionName ===
                          LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
                 $http.post('/learner_dashboard/remove_in_progress_collection', {
-                  collection_id: entity.id
+                  collection_id: activity.id
                 });
               }
               $modalInstance.close();
@@ -396,13 +396,13 @@ oppia.controller('LearnerDashboard', [
       }).result.then(function() {
         if (subsectionName ===
             LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-          var index = $scope.incompleteExplorationsList.indexOf(entity);
+          var index = $scope.incompleteExplorationsList.indexOf(activity);
           if (index !== -1) {
             $scope.incompleteExplorationsList.splice(index, 1);
           }
         } else if (subsectionName ===
                    LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-          var index = $scope.incompleteCollectionsList.indexOf(entity);
+          var index = $scope.incompleteCollectionsList.indexOf(activity);
           if (index !== -1) {
             $scope.incompleteCollectionsList.splice(index, 1);
           }

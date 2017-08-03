@@ -14,6 +14,7 @@
 
 """Tests for classes and methods relating to user rights."""
 
+from constants import constants
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -145,7 +146,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.user_id_a, self.EXP_ID, self.user_id_b,
             rights_manager.ROLE_EDITOR)
-
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(exp_rights.is_owner(self.user_id_a))

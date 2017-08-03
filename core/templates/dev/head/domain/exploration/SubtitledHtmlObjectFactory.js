@@ -40,6 +40,10 @@ oppia.factory('SubtitledHtmlObjectFactory', [
       return this._audioTranslations;
     };
 
+    SubtitledHtml.prototype.getAudioTranslation = function(languageCode) {
+      return this._audioTranslations[languageCode];
+    };
+
     SubtitledHtml.prototype.markAudioAsNeedingUpdate = function() {
       for (var languageCode in this._audioTranslations) {
         this._audioTranslations[languageCode].markAsNeedingUpdate();

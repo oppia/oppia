@@ -1,0 +1,28 @@
+<i class="fa fa-cog audio-control-button-icon"
+   ng-if="extraAudioControlsAreShown"
+   ng-click="openAudioTranslationSettings()"></i>
+<img class="audio-control-button-image"
+     style="margin-top: 4px"
+     ng-if="extraAudioControlsAreShown"
+     ng-src="<[IMAGE_URL_REWIND_AUDIO_BUTTON]>"
+     ng-click="rewindAudioFiveSec()">
+<i class="fa fa-volume-off audio-control-button-icon"
+   style="min-width: 24px"
+   ng-click="playPauseAudioTranslation()"
+   ng-class="{'fa-volume-off': !AudioPlayerService.isPlaying(), 'fa-volume-up': AudioPlayerService.isPlaying()}">
+
+<style>
+  .audio-control-button-icon {
+    font-size: 1.5em;
+    vertical-align: middle;
+  }
+
+  .audio-control-button-image {
+    width: 21px;
+    height: 21px;
+  }
+
+  .audio-control-button:hover {
+    cursor: pointer;
+  }
+</style>

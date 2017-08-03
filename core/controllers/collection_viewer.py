@@ -14,6 +14,7 @@
 
 """Controllers for the Oppia collection learner view."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import collection_services

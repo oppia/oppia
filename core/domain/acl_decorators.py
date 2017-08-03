@@ -16,6 +16,7 @@
 
 """Decorators to provide authorization across the site."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import rights_manager
 from core.domain import role_services
@@ -531,12 +532,10 @@ def can_access_learner_dashboard(handler):
 def require_user_id_else_redirect_to_homepage(handler):
     """Decorator that checks if a user_id is associated to the current
     session. If not, the user is redirected to the main page.
-
     Note that the user may not yet have registered.
     """
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in.
-
         If not, redirects the user to the home page.
         """
         if not self.user_id:

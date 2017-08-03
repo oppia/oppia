@@ -16,7 +16,7 @@
 
 """Domain object for a reference to an activity."""
 
-import feconf
+from constants import constants
 
 
 class ActivityReference(object):
@@ -52,7 +52,8 @@ class ActivityReference(object):
         Raises:
             Exception: The activity type is invalid.
         """
-        if self.type not in feconf.ALL_ACTIVITY_TYPES:
+        if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
+                self.type != constants.ACTIVITY_TYPE_COLLECTION):
             raise Exception('Invalid activity type: %s' % self.type)
 
     def to_dict(self):
