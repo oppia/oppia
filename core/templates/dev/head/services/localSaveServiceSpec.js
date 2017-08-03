@@ -16,11 +16,11 @@
  * @fileoverview unit tests for the local save services.
  */
 
- describe('localSaveService', function() {
+ describe('LocalStorageService', function() {
    beforeEach(module('oppia'));
 
    describe('behavior in editor', function() {
-     var localSaveService = null;
+     var localStorageService = null;
      var explorationIdOne = '100';
      var draftChangeListIdOne = 2;
      var changeList = []
@@ -36,25 +36,25 @@
      };
 
      beforeEach(inject(function($injector) {
-       localSaveService = $injector.get('localSaveService');
+       localStorageService = $injector.get('localStorageService');
      }));
 
      it('should correctly save the draft', function() {
-       localSaveService.saveExplorationDraft(explorationIdOne,
+       localStorageService.saveExplorationDraft(explorationIdOne,
          changeList, draftChangeListIdOne);
-       localSaveService.saveExplorationDraft(explorationIdTwo,
+       localStorageService.saveExplorationDraft(explorationIdTwo,
          changeList, draftChangeListIdTwo);
-       expect(localSaveService.getExplorationDraft(
+       expect(localStorageService.getExplorationDraft(
          explorationIdOne)).toEqual(saveOne);
-       expect(localSaveService.getExplorationDraft(
+       expect(localStorageService.getExplorationDraft(
          explorationIdTwo)).toEqual(saveTwo);
      });
 
      it('should correctly remove the draft', function() {
-       localSaveService.saveExplorationDraft(explorationIdTwo,
+       localStorageService.saveExplorationDraft(explorationIdTwo,
          changeList, draftChangeListIdTwo);
-       localSaveService.removeExplorationDraft(explorationIdTwo);
-       expect(localSaveService.getExplorationDraft(
+       localStorageService.removeExplorationDraft(explorationIdTwo);
+       expect(localStorageService.getExplorationDraft(
          explorationIdTwo)).toBeNull();
      });
    });

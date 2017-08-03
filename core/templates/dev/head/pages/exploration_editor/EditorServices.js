@@ -20,11 +20,11 @@
 oppia.factory('explorationData', [
   '$http', '$log', 'alertsService',
   'EditableExplorationBackendApiService',
-  'localSaveService',
+  'LocalStorageService',
   'ReadOnlyExplorationBackendApiService','$q',
   function($http, $log, alertsService,
     EditableExplorationBackendApiService,
-    LocalSaveService,
+    LocalStorageService,
     ReadOnlyExplorationBackendApiService, $q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
@@ -51,16 +51,20 @@ oppia.factory('explorationData', [
     // Put exploration variables here.
     var explorationData = {
       explorationId: explorationId,
+      // Note that the changeList is the full changeList since the last
+      // commited version.
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
         // First save locally to be retrieved later if save is unsuccessful.
-        localSaveService.saveExplorationDraft(
+        LocalStorageService.saveExplorationDraft(
           explorationId, changeList, draftChangeListId);
         $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
         }).then(function(response) {
           draftChangeListId = response.data.draft_change_list_id;
-          localSaveService.removeExplorationDraft(explorationId);
+          // We can safely remove the locally saved draft copy if it was saved
+          // to the backend.
+          LocalStorageService.removeExplorationDraft(explorationId);
           if (successCallback) {
             successCallback(response);
           }
@@ -72,7 +76,7 @@ oppia.factory('explorationData', [
       },
       discardDraft: function(successCallback, errorCallback) {
         $http.post(explorationDraftAutosaveUrl, {}).then(function() {
-          localSaveService.removeExplorationDraft(explorationId);
+          LocalStorageService.removeExplorationDraft(explorationId);
           if (successCallback) {
             successCallback();
           }
@@ -102,8 +106,14 @@ oppia.factory('explorationData', [
               $log.info('Retrieved exploration data.');
               $log.info(response);
               draftChangeListId = response.draft_change_list_id;
+              var localSaveDraft = LocalStorageService.getExplorationDraft(
+                explorationId);
+              if (localSaveDraft !== null &&
+                localSaveDraft.draftChangeListId === draftChangeListId) {
+                explorationData.data = localSaveDraft.changeList;
+                return localSaveDraft.changeList;
+              }
               explorationData.data = response;
-
               return response;
             })
           );

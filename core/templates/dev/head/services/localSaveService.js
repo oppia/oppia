@@ -20,7 +20,7 @@
  //
  // Note that the draft is only saved if localStorage exists and works
  // (i.e. has storage capacity).
- oppia.factory('localSaveService', function() {
+ oppia.factory('LocalStorageService', function() {
    // check that local storage exists and works as expected.
    // If it does storage stores the localStorage object,
    // else storage is undefined or false.
@@ -45,6 +45,7 @@
    return {
      /**
      * Check that localStorage is available to the client.
+     * @returns {boolean} true iff the client has access to localStorage.
      */
      isStorageAvailable: function() {
        return Boolean(storage);
@@ -74,6 +75,8 @@
      * exploration id.
      * @param {String} explorationId - The exploration id of the change list
      *   to be retrieved.
+     * @returns {Object} The local save draft object if it exists,
+     *   else null.
      */
      getExplorationDraft: function(explorationId) {
        if (storage) {
