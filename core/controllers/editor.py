@@ -911,9 +911,9 @@ class AudioUploadHandler(EditorHandler):
                                              'as a %s file' % extension)
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
-                'Audio must be under %s seconds in length. '
-                'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC,
-                                     audio.info.length))
+                'Audio files must be under %s seconds in length. The uploaded '
+                'file is %.2f seconds long.' % (
+                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
         if len(set(audio.mime).intersection(
                 set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
             raise self.InvalidInputException(

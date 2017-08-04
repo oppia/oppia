@@ -245,7 +245,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
-            upload_files=(('raw', 'unused_filename', raw_audio),)
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
 
@@ -270,7 +270,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expect_errors=True,
             expected_status_int=400,
-            upload_files=(('raw', 'unused_filename', raw_audio),)
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
@@ -294,7 +294,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expect_errors=True,
             expected_status_int=400,
-            upload_files=(('raw', 'unused_filename', ''),)
+            upload_files=(('raw_audio_file', 'unused_filename', ''),)
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
@@ -312,7 +312,8 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expect_errors=True,
             expected_status_int=400,
-            upload_files=(('raw', 'unused_filename', 'non_audio_data'),)
+            upload_files=(
+                ('raw_audio_file', 'unused_filename', 'non_audio_data'),)
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
@@ -336,7 +337,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expect_errors=True,
             expected_status_int=400,
-            upload_files=(('raw', 'unused_filename', raw_audio),)
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
@@ -362,11 +363,11 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expect_errors=True,
             expected_status_int=400,
-            upload_files=(('raw', 'unused_filename', raw_audio),)
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
-        self.assertIn('Audio must be under %s seconds in length'
+        self.assertIn('Audio files must be under %s seconds in length'
                       % feconf.MAX_AUDIO_FILE_LENGTH_SEC,
                       response_dict['error'])
 
@@ -392,7 +393,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expect_errors=True,
             expected_status_int=400,
-            upload_files=(('raw', 'unused_filename', raw_audio),)
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)

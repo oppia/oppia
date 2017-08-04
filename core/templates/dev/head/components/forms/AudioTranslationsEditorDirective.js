@@ -79,6 +79,9 @@ oppia.directive('audioTranslationsEditor', [
                     $scope, $modalInstance, LanguageUtilService,
                     allowedAudioLanguageCodes, alertsService,
                     explorationContextService, IdGenerationService) {
+                  var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
+                    'There was an error uploading the audio file.');
+
                   $scope.languageCodesAndDescriptions = (
                     allowedAudioLanguageCodes.map(function(languageCode) {
                       return {
@@ -90,7 +93,7 @@ oppia.directive('audioTranslationsEditor', [
                     }));
 
                   // Whether there was an error uploading the audio file.
-                  $scope.errorUploadingFile = false;
+                  $scope.errorMessage = null;
 
                   $scope.languageCode = allowedAudioLanguageCodes[0];
                   var uploadedFile = null;
@@ -104,13 +107,13 @@ oppia.directive('audioTranslationsEditor', [
                       uploadedFile.size > 0);
                   };
 
-                  $scope.onFileChanged = function(file) {
-                    $scope.errorUploadingFile = false;
+                  $scope.updateUploadedFile = function(file) {
+                    $scope.errorMessage = null;
                     uploadedFile = file;
                   };
 
-                  $scope.onFileCleared = function() {
-                    $scope.errorUploadingFile = false;
+                  $scope.clearUploadedFile = function() {
+                    $scope.errorMessage = null;
                     uploadedFile = null;
                   };
 
@@ -133,12 +136,10 @@ oppia.directive('audioTranslationsEditor', [
                           filename: generatedFilename,
                           fileSizeBytes: uploadedFile.size
                         });
-                      }, function() {
-                        console.error(data);
-                        // Remove the XSSI prefix.
-                        var transformedData = data.responseText.substring(5);
-                        var parsedResponse = angular.fromJson(transformedData);
-                        $scope.errorUploadingFile = true;
+                      }, function(errorResponse) {
+                        $scope.errorMessage = (
+                          errorResponse.error || ERROR_MESSAGE_BAD_FILE_UPLOAD);
+                        uploadedFile = null;
                       });
                     }
                   };
@@ -156,10 +157,43 @@ oppia.directive('audioTranslationsEditor', [
             });
           };
 
-          $scope.deleteAudioTranslation = function(languageCode) {
+          $scope.openDeleteAudioTranslationModal = function(languageCode) {
             $scope.getOnStartEditFn()();
-            $scope.subtitledHtml.deleteAudioTranslation(languageCode);
-            $scope.getOnChangeFn()();
+
+            $modal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/forms/' +
+                'delete_audio_translation_modal_directive.html'),
+              backdrop: true,
+              resolve: {
+                languageCode: function() {
+                  return languageCode;
+                }
+              },
+              controller: [
+                '$scope', '$modalInstance', 'LanguageUtilService',
+                'languageCode',
+                function(
+                    $scope, $modalInstance, LanguageUtilService,
+                    languageCode) {
+                  $scope.languageDescription = (
+                    LanguageUtilService.getAudioLanguageDescription(
+                      languageCode));
+
+                  $scope.reallyDelete = function() {
+                    $modalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                    alertsService.clearWarnings();
+                  };
+                }
+              ]
+            }).result.then(function(result) {
+              $scope.subtitledHtml.deleteAudioTranslation(languageCode);
+              $scope.getOnChangeFn()();
+            });
           };
         }
       ]

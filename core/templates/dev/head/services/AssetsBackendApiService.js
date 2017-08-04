@@ -66,9 +66,13 @@ oppia.factory('AssetsBackendApiService', [
         if (successCallback) {
           successCallback(response);
         }
-      }).fail(function(error) {
+      }).fail(function(data) {
+        // Remove the XSSI prefix.
+        var transformedData = data.responseText.substring(5);
+        var parsedResponse = angular.fromJson(transformedData);
+        console.error(parsedResponse);
         if (errorCallback) {
-          errorCallback(error.data);
+          errorCallback(parsedResponse);
         }
       });
     };

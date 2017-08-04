@@ -19,13 +19,13 @@
           <label for="audioTranslationFileField" class="col-lg-2 col-md-2 col-sm-2">Audio File</label>
           <div class="col-lg-10 col-md-10 col-sm-10">
             <audio-file-uploader id="audioTranslationFileField"
-                                 on-file-changed="onFileChanged"
-                                 on-file-cleared="onFileCleared">
+                                 on-file-changed="updateUploadedFile"
+                                 on-file-cleared="clearUploadedFile">
             </audio-file-uploader>
-            <div ng-if="errorUploadingFile"
-                 class="oppia-audio-file-uploader-field-error-message">
+            <div ng-if="errorMessage"
+                 class="oppia-audio-file-upload-field-error-message">
               <i class="material-icons">&#xE002;</i>
-              There was an error uploading the file.
+              <[errorMessage]>
             </div>
           </div>
         </div>
@@ -43,11 +43,10 @@
   .oppia-audio-file-upload-field-error-message {
     color: red;
     display: inline-block;
-    font-size: 16;
+    font-size: 14px;
     padding: 4px;
   }
   .oppia-audio-file-upload-field-error-message i {
-    font-size: 16px;
     margin-right: 4px;
   }
 </style>
