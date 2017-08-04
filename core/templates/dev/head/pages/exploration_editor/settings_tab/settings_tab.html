@@ -473,7 +473,7 @@
         {% endif %}
 
         <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
-          <button type="button" class="btn btn-danger"
+          <button type="button" class="btn btn-danger protractor-test-delete-exploration-button"
                   ng-click="deleteExploration()">
             Delete Exploration
             <span ng-if="currentUserIsAdmin">(as admin)</span>
@@ -597,7 +597,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
+    <button class="btn btn-danger protractor-test-really-delete-exploration-button" ng-click="reallyDelete()">Delete Exploration</button>
   </div>
 </script>
 

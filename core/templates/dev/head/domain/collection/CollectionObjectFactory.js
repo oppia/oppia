@@ -19,10 +19,7 @@
 
 oppia.factory('CollectionObjectFactory', [
   'CollectionNodeObjectFactory', 'CollectionSkillObjectFactory',
-  'SkillListObjectFactory',
-  function(
-      CollectionNodeObjectFactory, CollectionSkillObjectFactory,
-      SkillListObjectFactory) {
+  function(CollectionNodeObjectFactory, CollectionSkillObjectFactory) {
     var Collection = function(collectionBackendObject) {
       this._id = collectionBackendObject.id;
       this._title = collectionBackendObject.title;
@@ -32,6 +29,7 @@ oppia.factory('CollectionObjectFactory', [
       this._category = collectionBackendObject.category;
       this._version = collectionBackendObject.version;
       this._nodes = [];
+      // Maps skill IDs to skill objects.
       this._skills = {};
       this._nextSkillId = Number(collectionBackendObject.next_skill_id);
 
@@ -204,7 +202,7 @@ oppia.factory('CollectionObjectFactory', [
     // by the player.
     Collection.prototype.getStartingCollectionNodes = function() {
       return this._nodes.filter(function(collectionNode) {
-        return collectionNode.getPrerequisiteSkillList().isEmpty();
+        return collectionNode.getPrerequisiteSkillIds().length === 0;
       });
     };
 
@@ -212,22 +210,6 @@ oppia.factory('CollectionObjectFactory', [
     // Changes to the list itself will not be reflected in this collection.
     Collection.prototype.getExplorationIds = function() {
       return angular.copy(Object.keys(this._explorationIdToNodeIndexMap));
-    };
-
-    // Builds a unique skill list containing all prerequisite and acquired
-    // skills from all collections nodes within this domain object. Please note
-    // this operation returns a new skill list everytime this function is
-    // called.
-    // TODO(wxy): migrate this to use the skills dict instead.
-    Collection.prototype.getSkillList = function() {
-      var skillList = SkillListObjectFactory.create([]);
-      for (var i = 0; i < this._nodes.length; i++) {
-        var collectionNode = this._nodes[i];
-        skillList.addSkillsFromSkillList(
-          collectionNode.getPrerequisiteSkillList());
-        skillList.addSkillsFromSkillList(collectionNode.getAcquiredSkillList());
-      }
-      return skillList;
     };
 
     // Gets a new ID for a skill. This should be of the same form as in the
@@ -259,14 +241,8 @@ oppia.factory('CollectionObjectFactory', [
       if (this._skills.hasOwnProperty(skillId)) {
         delete this._skills[skillId];
         this._nodes.forEach(function(node) {
-          var prerequisiteSkillList = node.getPrerequisiteSkillList();
-          var acquiredSkillList = node.getAcquiredSkillList();
-          if (prerequisiteSkillList.containsSkill(skillId)) {
-            prerequisiteSkillList.removeSkillById(skillId);
-          }
-          if (acquiredSkillList.containsSkill(skillId)) {
-            acquiredSkillList.removeSkillById(skillId);
-          }
+          node.removePrerequisiteSkillId(skillId);
+          node.removeAcquiredSkillId(skillId);
         });
         return true;
       }

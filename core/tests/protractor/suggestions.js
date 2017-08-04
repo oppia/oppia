@@ -62,7 +62,7 @@ describe('Suggestions on Explorations', function() {
 
     // Exploration author reviews the suggestion and accepts it
     users.login('user1@ExplorationSuggestions.com');
-    browser.get(general.SERVER_URL_PREFIX);
+    browser.get(general.CREATOR_DASHBOARD_URL);
     creatorDashboard.navigateToExplorationEditor();
     editor.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);

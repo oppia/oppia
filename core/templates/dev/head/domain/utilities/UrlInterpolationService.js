@@ -107,8 +107,8 @@ oppia.factory('UrlInterpolationService', [
         var INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
 
         // Parameter values can only contain alphanumerical characters, spaces,
-        // hyphens, underscores, or periods.
-        var VALID_URL_PARAMETER_VALUE_REGEX = /^(\w| |_|-|[.])+$/;
+        // hyphens, underscores, periods or the equal to symbol.
+        var VALID_URL_PARAMETER_VALUE_REGEX = /^(\w| |_|-|[.]|=)+$/;
 
         if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
             urlTemplate.match(EMPTY_VARIABLE_REGEX)) {

@@ -19,42 +19,14 @@
 
 describe('State Editor controller', function() {
   describe('StateEditor', function() {
-    var scope, ctrl, ecs, cls, ess;
-    var $httpBackend;
-    var mockExplorationData;
+    var scope, ecs, ess, scs;
 
-    beforeEach(function() {
-      module('oppia');
-      // Set a global value for INTERACTION_SPECS that will be used by all the
-      // descendant dependencies.
-      module(function($provide) {
-        $provide.constant('INTERACTION_SPECS', {
-          TextInput: {
-            display_mode: 'inline',
-            is_terminal: false
-          }
-        });
-      });
-      mockExplorationData = {
-        explorationId: 0,
-        autosaveChangeList: function() {}
-      };
-      module(function($provide) {
-        $provide.value('explorationData', mockExplorationData);
-      });
-      spyOn(mockExplorationData, 'autosaveChangeList');
-    });
-
+    beforeEach(module('oppia'));
     beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
-      $httpBackend = $injector.get('$httpBackend');
       ecs = $injector.get('editorContextService');
-      cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
-      IS = $injector.get('INTERACTION_SPECS');
-      shof = $injector.get('SubtitledHtmlObjectFactory');
-
-      GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
+      scs = $injector.get('stateContentService');
 
       ess.init({
         'First State': {
@@ -144,83 +116,17 @@ describe('State Editor controller', function() {
         }
       });
 
-      scope.getContent = function(contentString) {
-        return shof.createFromBackendDict({
-          html: contentString,
-          audio_translations: {}
-        });
-      };
-
-      ctrl = $controller('StateEditor', {
+      $controller('StateEditor', {
         $scope: scope,
-        editorContextService: ecs,
-        changeListService: cls,
-        explorationStatesService: ess,
-        editabilityService: {
-          isEditable: function() {
-            return true;
-          }
-        },
-        INTERACTION_SPECS: IS
+        explorationStatesService: ess
       });
     }));
 
     it('should initialize the state name and related properties', function() {
       ecs.setActiveStateName('Third State');
       scope.initStateEditor();
-      expect(scope.contentEditorIsOpen).toBe(false);
-      expect(scope.content.getHtml()).toEqual('This is some content.');
+      expect(scs.savedMemento.getHtml()).toEqual('This is some content.');
     });
-
-    it('should correctly handle no-op edits', function() {
-      ecs.setActiveStateName('First State');
-      scope.initStateEditor();
-      expect(scope.contentEditorIsOpen).toBe(false);
-      expect(scope.content).toEqual(scope.getContent('First State Content'));
-      scope.openStateContentEditor();
-      expect(scope.contentEditorIsOpen).toBe(true);
-      scope.content = scope.getContent('First State Content');
-      scope.saveTextContent();
-
-      expect(scope.contentEditorIsOpen).toBe(false);
-      expect(cls.getChangeList()).toEqual([]);
-    });
-
-    it('should check that content edits are saved correctly',
-      function() {
-        ecs.setActiveStateName('Third State');
-        expect(cls.getChangeList()).toEqual([]);
-        scope.openStateContentEditor();
-        scope.content = scope.getContent('babababa');
-        scope.saveTextContent();
-        expect(cls.getChangeList().length).toBe(1);
-        expect(cls.getChangeList()[0].new_value.html).toEqual('babababa');
-        expect(cls.getChangeList()[0].old_value.html).toEqual(
-          'This is some content.');
-
-        scope.openStateContentEditor();
-        scope.content = scope.getContent(
-          'And now for something completely different.'
-        );
-        scope.saveTextContent();
-        expect(cls.getChangeList().length).toBe(2);
-        expect(cls.getChangeList()[1].new_value.html)
-          .toEqual('And now for something completely different.');
-        expect(cls.getChangeList()[1].old_value.html).toEqual('babababa');
-      }
-    );
-
-    it('should not save any changes to content when an edit is cancelled',
-      function() {
-        ecs.setActiveStateName('Third State');
-        scope.initStateEditor();
-        var contentBeforeEdit = angular.copy(scope.content);
-        scope.content = scope.getContent('Test Content');
-        scope.cancelEdit();
-        expect(scope.contentEditorIsOpen).toBe(false);
-        expect(scope.content).toEqual(contentBeforeEdit);
-      }
-    );
   });
 
   describe('TrainingDataService', function() {

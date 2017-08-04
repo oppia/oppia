@@ -60,64 +60,6 @@ BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
     'Code to insert just before the closing </head> tag in all pages.', '')
 
 
-def require_user(handler):
-    """Decorator that checks if a user is associated to the current session."""
-
-    def test_login(self, **kwargs):
-        """Checks if the user for the current session is logged in."""
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-        return handler(self, **kwargs)
-
-    return test_login
-
-
-def require_moderator(handler):
-    """Decorator that checks whether the current user is a moderator."""
-
-    def test_is_moderator(self, **kwargs):
-        """Check that the user is a moderator.
-
-        Raises:
-            UnauthorizedUserException: The user is not a moderator.
-        """
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if not rights_manager.Actor(self.user_id).is_moderator():
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        return handler(self, **kwargs)
-    return test_is_moderator
-
-
-def require_fully_signed_up(handler):
-    """Decorator that checks if the user is logged in and has completed the
-    signup process.
-    """
-
-    def test_registered_as_editor(self, **kwargs):
-        """Check that the user has registered as an editor.
-
-        Raises:
-            UnauthorizedUserException: The user has insufficient credentials.
-        """
-        if (not self.user_id
-                or self.username in config_domain.BANNED_USERNAMES.value
-                or not user_services.has_fully_registered(self.user_id)):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        return handler(self, **kwargs)
-
-    return test_registered_as_editor
-
-
 def _clear_login_cookies(response_headers):
     """Clears login cookies from the given response headers."""
 
@@ -247,14 +189,14 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.actions = role_services.get_all_actions(self.role)
 
-        rights_mgr_user = rights_manager.Actor(self.user_id)
-        self.is_moderator = rights_mgr_user.is_moderator()
-        self.is_admin = rights_mgr_user.is_admin()
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
-        self.values['is_moderator'] = self.is_moderator
-        self.values['is_admin'] = self.is_admin
+        self.values['is_moderator'] = bool(
+            self.role == feconf.ROLE_ID_MODERATOR or
+            self.role == feconf.ROLE_ID_ADMIN)
+        self.values['is_admin'] = bool(
+            self.role == feconf.ROLE_ID_ADMIN)
         self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):
@@ -369,6 +311,7 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
             'ACTIVITY_STATUS_PUBLICIZED': (
                 rights_manager.ACTIVITY_STATUS_PUBLICIZED),
+            'AUDIO_URL_TEMPLATE': feconf.AUDIO_URL_TEMPLATE,
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
@@ -379,10 +322,8 @@ class BaseHandler(webapp2.RequestHandler):
 
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
-            'can_create_collections': (
-                self.username and self.username in
-                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
-            ),
+            'can_create_collections': bool(
+                self.role == feconf.ROLE_ID_COLLECTION_EDITOR),
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),

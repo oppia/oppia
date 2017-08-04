@@ -466,47 +466,4 @@ describe('Collection editor state service', function() {
       expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
     }
   );
-
-  it('should initially return an empty skill list', function() {
-    var collectionSkillList = (
-      CollectionEditorStateService.getCollectionSkillList());
-    expect(collectionSkillList.getSkills()).toEqual([]);
-  });
-
-  it('should return an aggregate of the collection\'s skill lists', function() {
-    var prevCollectionSkillList = (
-      CollectionEditorStateService.getCollectionSkillList());
-    expect(prevCollectionSkillList.getSkills()).toEqual([]);
-
-    CollectionEditorStateService.loadCollection(5);
-    $rootScope.$apply();
-
-    var collectionSkillList = (
-      CollectionEditorStateService.getCollectionSkillList());
-    expect(collectionSkillList.getSkills()).toEqual(['skill0', 'skill1']);
-    expect(collectionSkillList).toBe(prevCollectionSkillList);
-  });
-
-  it('should update the collection\'s skill list with UndoRedoService changes',
-    function() {
-      CollectionEditorStateService.loadCollection(5);
-      $rootScope.$apply();
-
-      var prevCollectionSkillList = (
-        CollectionEditorStateService.getCollectionSkillList());
-      expect(prevCollectionSkillList.getSkills()).toEqual(['skill0', 'skill1']);
-
-      // Simply applying a change is adequate for updating the skill list.
-      var collection = CollectionEditorStateService.getCollection();
-      CollectionUpdateService.setAcquiredSkills(
-        collection, '0', ['skill1', 'skill3']);
-      $rootScope.$apply();
-
-      var collectionSkillList = (
-        CollectionEditorStateService.getCollectionSkillList());
-      expect(collectionSkillList.getSkills()).toEqual([
-        'skill0', 'skill1', 'skill3']);
-      expect(collectionSkillList).toBe(prevCollectionSkillList);
-    }
-  );
 });

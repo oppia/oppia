@@ -148,12 +148,14 @@
 
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-mascot">
         <a ng-repeat="node in collection.getCollectionNodes()" href="<[getExplorationUrl(node.getExplorationId())]>">
-          <svg width="100"
+          <svg class="protractor-test-collection-exploration"
+               width="100"
                height="125"
                xmlns="http://www.w3.org/2000/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
                version="1.1"
-               ng-attr-style="position: absolute; left: <[pathIconParameters[$index].left]>; top: <[pathIconParameters[$index].top]>;">
+               ng-attr-style="position: absolute; left: <[pathIconParameters[$index].left]>; top: <[pathIconParameters[$index].top]>;"
+               class="protractor-test-collection-node">
             <defs>
               <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
                 <circle cx="50"
@@ -220,7 +222,8 @@
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
         <div class="mobile-path-segment" ng-repeat="node in collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
           <a href="<[getExplorationUrl(node.getExplorationId())]>">
-            <svg width="100"
+            <svg class="protractor-test-collection-exploration"
+                 width="100"
                  height="150"
                  xmlns="http://www.w3.org/2000/svg"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -364,7 +367,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionSkillObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/collectionFooterDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>

@@ -68,6 +68,26 @@
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_DASHBOARD"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <div class="checkbox" style="padding-top: 0;">
+                <label>
+                  <input type="radio" ng-model="defaultDashboard" value="DASHBOARD_TYPE_CREATOR" ng-change="saveDefaultDashboard(defaultDashboard)">
+                  <span translate="I18N_TOPNAV_CREATOR_DASHBOARD"></span>
+                </label>
+              </div>
+              <div class="checkbox" style="padding-top: 0;">
+                <label>
+                  <input type="radio" ng-model="defaultDashboard" value="DASHBOARD_TYPE_LEARNER" ng-change="saveDefaultDashboard(defaultDashboard)">
+                  <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
+                </label>
+              </div>
+            </div>`
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div ng-if="hasPageLoaded && select2DropdownIsShown">

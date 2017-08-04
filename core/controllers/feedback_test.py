@@ -61,10 +61,11 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         }, self.csrf_token)
         self.logout()
 
-    def test_invalid_exploration_ids_return_empty_threadlist(self):
+    def test_invalid_exploration_ids_return_page_not_found(self):
         response_dict = self.get_json(
-            '%s/bad_exp_id' % feconf.FEEDBACK_THREADLIST_URL_PREFIX)
-        self.assertEqual(response_dict['threads'], [])
+            '%s/bad_exp_id' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
+            expect_errors=True)
+        self.assertEqual(response_dict['code'], 404)
 
     def test_invalid_thread_ids_return_empty_message_list(self):
         response_dict = self.get_json(
@@ -725,15 +726,12 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                 'true'))
         self.assertEqual(len(response_dict['threads']), 2)
 
-        # Pass invalid action in the URL.
-        with self.swap(rights_manager.Actor, 'can_edit',
-                       self._return_true):
-            response_dict = self.put_json(
-                '%s/%s/%s' % (
-                    feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
-                    rejected_suggestion_thread_id),
-                {'action': u'invalid'}, csrf_token, expect_errors=True,
-                expected_status_int=400)
+        response_dict = self.put_json(
+            '%s/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
+                rejected_suggestion_thread_id),
+            {'action': u'invalid'}, csrf_token, expect_errors=True,
+            expected_status_int=400)
         self.assertIn('Invalid action.', response_dict['error'])
 
         # Editor tries to accept rejected suggestion.

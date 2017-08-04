@@ -25,6 +25,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_jobs_continuous
@@ -176,8 +177,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        if (self.username in
-                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value):
+        if role_services.ACTION_CREATE_COLLECTION in self.actions:
             for collection_summary in subscribed_collection_summaries:
                 # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
                 # in summary_services, instead of replicating it like this.
@@ -305,7 +305,7 @@ class NewCollection(base.BaseHandler):
 class UploadExploration(base.BaseHandler):
     """Uploads a new exploration."""
 
-    @base.require_fully_signed_up
+    @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
         yaml_content = self.request.get('yaml_file')
@@ -320,11 +320,3 @@ class UploadExploration(base.BaseHandler):
         else:
             raise self.InvalidInputException(
                 'This server does not allow file uploads.')
-
-
-class CreatorDashboardRedirectPage(base.BaseHandler):
-    """An page that redirects to the main Dashboard page."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.redirect(feconf.CREATOR_DASHBOARD_URL)

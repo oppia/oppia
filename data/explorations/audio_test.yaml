@@ -1,0 +1,109 @@
+author_notes: ''
+blurb: ''
+category: Art
+init_state_name: Introduction
+language_code: en
+objective: Try out playing audio on Oppia
+param_changes: []
+param_specs: {}
+schema_version: 15
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  Finish:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        en:
+          filename: 'test_audio_2_en.mp3'
+          file_size_bytes: 2
+          needs_update: false
+        hi-en:
+          filename: 'test_audio_2_hi_en.mp3'
+          file_size_bytes: 3
+          needs_update: false
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: {}
+    param_changes: []
+  Second:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        hi-en:
+          filename: 'test_audio_3_hi_en.mp3'
+          file_size_bytes: 2
+          needs_update: false
+      html: <p>Try typing some code.</p>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Finish
+          feedback:
+          - <p>Nice!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: x
+          rule_type: CodeEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# Type your code here.'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Finish
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: CodeRepl
+      solution: {}
+    param_changes: []
+  Introduction:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        en:
+          filename: 'test_audio_1_en.mp3'
+          file_size_bytes: 1
+          needs_update: false
+        hi-en:
+          filename: 'test_audio_1_hi_en.mp3'
+          file_size_bytes: 4
+          needs_update: false
+      html: <p>Try clicking on the speaker! After listening, click continue.</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: Second
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: Continue
+      solution: {}
+    param_changes: []
+states_schema_version: 12
+tags: []
+title: Audio Test

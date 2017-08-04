@@ -128,20 +128,15 @@ oppia.controller('StateInteraction', [
       var stateName = editorContextService.getActiveStateName();
 
       // Check if the content is currently empty, as expected.
-      var previousContent = explorationStatesService.getStateContentMemento(
-        stateName);
+      var previousContent = stateContentService.savedMemento;
       if (!previousContent.isEmpty()) {
         return;
       }
 
       // Update the state's content.
-      explorationStatesService.saveStateContent(
-        stateName,
-        SubtitledHtmlObjectFactory.createDefault(DEFAULT_TERMINAL_STATE_CONTENT)
-      );
-
-      // Update the state content editor view.
-      $rootScope.$broadcast('refreshStateContent');
+      stateContentService.displayed = SubtitledHtmlObjectFactory.createDefault(
+        DEFAULT_TERMINAL_STATE_CONTENT);
+      stateContentService.saveDisplayedValue();
     };
 
     $scope.onCustomizationModalSavePostHook = function() {
@@ -171,10 +166,6 @@ oppia.controller('StateInteraction', [
 
       graphDataService.recompute();
       _updateInteractionPreviewAndAnswerChoices();
-
-      // Refresh some related elements so the updated state appears (if its
-      // content has been changed).
-      $rootScope.$broadcast('refreshStateEditor');
     };
 
     $scope.openInteractionCustomizerModal = function() {

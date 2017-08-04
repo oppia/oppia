@@ -77,6 +77,7 @@ DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
         'Check out this interactive lesson I created on Oppia - a free '
         'platform for teaching and learning!'))
 
+
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
     all_value_generators = (
@@ -98,60 +99,6 @@ def _require_valid_version(version_from_payload, exploration_version):
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'
             % (exploration_version, version_from_payload))
-
-
-def require_editor(handler):
-    """Decorator that checks if the user can edit the given exploration."""
-    def test_editor(self, exploration_id, escaped_state_name=None, **kwargs):
-        """Gets the user and exploration id if the user can edit it.
-
-        Args:
-            self: the handler instance
-            exploration_id: the exploration id
-            escaped_state_name: the URL-escaped state name, if it exists
-            **kwargs: any other arguments passed to the handler
-
-        Returns:
-            The relevant handler, if the user is authorized to edit this
-            exploration.
-
-        Raises:
-            self.PageNotFoundException: if no such exploration or state exists.
-            self.UnauthorizedUserException: if the user exists but does not
-                have the right credentials.
-        """
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if self.username in config_domain.BANNED_USERNAMES.value:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-        except:
-            raise self.PageNotFoundException
-
-        if not rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to edit this exploration.',
-                self.user_id)
-
-        if not escaped_state_name:
-            return handler(self, exploration_id, **kwargs)
-
-        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
-        if state_name not in exploration.states:
-            logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % exploration.states.keys())
-            raise self.PageNotFoundException
-
-        return handler(self, exploration_id, state_name, **kwargs)
-
-    return test_editor
 
 
 class EditorHandler(base.BaseHandler):
@@ -176,11 +123,8 @@ class ExplorationPage(EditorHandler):
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
 
-        can_edit = (
-            bool(self.user_id) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
 
         visualizations_html = visualization_registry.Registry.get_full_html()
 
@@ -211,28 +155,27 @@ class ExplorationPage(EditorHandler):
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
-            'can_delete': rights_manager.Actor(
-                self.user_id).can_delete(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_edit': can_edit,
-            'can_modify_roles': rights_manager.Actor(
-                self.user_id).can_modify_roles(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_publicize': rights_manager.Actor(
-                self.user_id).can_publicize(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_publish': rights_manager.Actor(
-                self.user_id).can_publish(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_release_ownership': rights_manager.Actor(
-                self.user_id).can_release_ownership(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_unpublicize': rights_manager.Actor(
-                self.user_id).can_unpublicize(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+            'can_delete': rights_manager.check_can_delete_exploration(
+                self.user_id, self.actions, exploration_rights),
+            'can_edit': rights_manager.check_can_edit_activity(
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
+                exploration_rights),
+            'can_modify_roles': (
+                rights_manager.check_can_modify_exploration_roles(
+                    self.user_id, self.actions, exploration_rights)),
+            'can_publicize': rights_manager.check_can_publicize_exploration(
+                self.actions, exploration_rights),
+            'can_publish': rights_manager.check_can_publish_exploration(
+                self.user_id, self.actions, exploration_rights),
+            'can_release_ownership': (
+                rights_manager.check_can_release_ownership(
+                    self.user_id, self.actions, exploration_rights)),
+            'can_unpublicize': (
+                rights_manager.check_can_unpublicize_exploration(
+                    self.actions, exploration_rights)),
+            'can_unpublish': (
+                rights_manager.check_can_unpublish_exploration(
+                    self.actions, exploration_rights)),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
@@ -354,19 +297,8 @@ class ExplorationHandler(EditorHandler):
     def delete(self, exploration_id):
         """Deletes the given exploration."""
 
-        role_description = ''
-        if self.is_admin:
-            role_description = 'admin'
-        elif self.is_moderator:
-            role_description = 'moderator'
-
-        log_debug_string = ''
-        if role_description == '':
-            log_debug_string = '%s tried to delete exploration %s' % (
-                self.user_id, exploration_id)
-        else:
-            log_debug_string = '(%s) %s tried to delete exploration %s' % (
-                role_description, self.user_id, exploration_id)
+        log_debug_string = '(%s) %s tried to delete exploration %s' % (
+            self.role, self.user_id, exploration_id)
         logging.debug(log_debug_string)
 
         is_exploration_cloned = rights_manager.is_exploration_cloned(
@@ -374,13 +306,8 @@ class ExplorationHandler(EditorHandler):
         exp_services.delete_exploration(
             self.user_id, exploration_id, force_deletion=is_exploration_cloned)
 
-        log_info_string = ''
-        if role_description == '':
-            log_info_string = '%s deleted exploration %s' % (
-                self.user_id, exploration_id)
-        else:
-            log_info_string = '(%s) %s deleted exploration %s' % (
-                role_description, self.user_id, exploration_id)
+        log_info_string = '(%s) %s deleted exploration %s' % (
+            self.role, self.user_id, exploration_id)
         logging.info(log_info_string)
 
 
@@ -510,7 +437,7 @@ class ExplorationStatusHandler(EditorHandler):
 class ExplorationModeratorRightsHandler(EditorHandler):
     """Handles management of exploration rights by moderators."""
 
-    @base.require_moderator
+    @acl_decorators.can_access_moderator_page
     def put(self, exploration_id):
         """Updates the publication status of the given exploration, and sends
         an email to all its owners.
@@ -572,6 +499,7 @@ class UserExplorationEmailsHandler(EditorHandler):
     exploration.
     """
 
+    @acl_decorators.can_edit_exploration
     def put(self, exploration_id):
         """Updates the email notification preferences for the given exploration.
 
@@ -612,6 +540,7 @@ class UntrainedAnswersHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
@@ -739,7 +668,8 @@ class StateYamlHandler(EditorHandler):
     layer.
     """
 
-    def post(self):
+    @acl_decorators.can_play_exploration
+    def post(self, unused_exploration_id):
         """Handles POST requests."""
         try:
             state_dict = self.payload.get('state_dict')
@@ -772,6 +702,7 @@ class ExplorationSnapshotsHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
 
@@ -936,7 +867,7 @@ class ImageUploadHandler(EditorHandler):
 class AudioFileHandler(EditorHandler):
     """Handles audio file uploads to Google Cloud Storage."""
 
-    @require_editor
+    @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
 
@@ -993,7 +924,7 @@ class AudioFileHandler(EditorHandler):
         # object being recursively passed around in app engine.
         del audio
 
-        bucket_name = constants.GCS_RESOURCE_BUCKET_NAME
+        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
 
         # Upload to GCS bucket with filepath
         # "<bucket>/<exploration-id>/assets/audio/<filename>".
@@ -1010,7 +941,8 @@ class AudioFileHandler(EditorHandler):
 class StartedTutorialEventHandler(EditorHandler):
     """Records that this user has started the state editor tutorial."""
 
-    def post(self):
+    @acl_decorators.can_play_exploration
+    def post(self, unused_exploration_id):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)
 
