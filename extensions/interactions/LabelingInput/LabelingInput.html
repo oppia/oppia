@@ -1,0 +1,121 @@
+<script src="{{cache_slug}}/extensions/interactions/LabelingInput/LabelingInput.js"></script>
+<script src="{{cache_slug}}/extensions/interactions/LabelingInput/validator.js"></script>
+
+<script type="text/ng-template" id="interaction/LabelingInput">
+  <style>
+    .image-click-container {
+      background: #fff;
+      padding: 8px;
+      position: relative;
+    }
+
+    .oppia-image-click-img {
+      cursor: pointer;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media screen and (max-width: 959px) {
+      .code-repl-container {
+        width: 100vw;
+      }
+      .oppia-image-click-img {
+        max-width: 100vw;
+      }
+      .image-click-container {
+        padding: 8px 0px;
+      }
+    }
+  </style>
+  <div ng-if="!imageUrl" translate="I18N_INTERACTIONS_IMAGE_CLICK_SELECT"></div>
+
+  <div class="image-click-container" ng-if="imageUrl">
+  <h2><[imageTitle]></h2>
+  <hr>
+  <h4>Word Bank</h4>
+    <div data-drop="true"
+        jqyoui-droppable="{animate:true}">
+      </div>
+      <div ng-repeat="word in regionsAndBonus"
+        style="
+          margin-bottom: 1rem;
+          display: inline-block;
+          clear: none;
+          line-height: 20px;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          margin-right: 1rem;
+          text-align: center;
+          white-space: normal;
+          z-index: 11;
+          vertical-align: center;
+        "
+        class="btn btn-<[getButtonColor(word)]>"
+        data-drag="true"
+        data-jqyoui-options="{revert: checkRevertBounce()}"
+        jqyoui-draggable="{animate:true, onStart:'getThisName(word)', 
+                                         onStop: 'dropHovered()'}"
+        ><[word]>
+      </div>
+    </div>
+</div>
+    <br>
+    <img ng-src="<[imageUrl]>"
+         class="oppia-image-click-img"
+         ng-mousemove="onMousemoveImage($event)">
+
+     <div ng-if="alwaysShowRegions">
+      <div ng-repeat="region in allRegions",
+          data-drop="true",
+          jqyoui-droppable="{animate:false, onDrop: 'checkTheValues(region.label)', onOver: 'isInRegion(region)', onOut: 'outOfRegion(region)'}",
+          data-jqyoui-options="{}",
+          style="
+            height: <[getRegionDimensions($index).height]>px;
+             width: <[getRegionDimensions($index).width]>px;
+             left: <[getRegionDimensions($index).left - 5]>px;
+             top: <[getRegionDimensions($index).top - 2]>px;
+             border-radius: 5px;
+             pointer-events: none;
+             position: absolute;
+             display: <[getInlineDisplay()]>;
+             background: rgba(<[getRValue(region)]>,<[getGValue(region)]>,
+              <[getBValue(region)]>,0.5);
+             z-index: 10;
+          ">
+    </div>
+  </div>
+
+  <div ng-if="drawLines">
+  <div ng-repeat="region in allRegions"
+  class="line"
+  style="
+    left: <[region.startX + getLeftDelta()]>px;
+    top: <[region.startY + getTopDelta()]>px;
+    width: <[getLineDistance(region.startX, 
+            region.region.area[0][0] * getImageWidth(), 
+            region.startY, 
+            region.region.area[0][1] * getImageHeight())]>px;
+    height: 2px;
+    position: absolute;
+    background: rgba(<[getRValue(region)]>,
+      <[getGValue(region)]>,<[getBValue(region)]>,0.5);
+    transform: rotate(<[convertArctan(region.startX, 
+                                      region.region.area[0][0] * getImageWidth(), 
+                                      region.startY, 
+                                      region.region.area[0][1] * getImageHeight())]>rad);
+    transform-origin: 0% 0%;
+  ">
+  </div>
+  </div>
+</div>
+</script>
+
+<script type="text/ng-template" id="response/LabelingInput">
+  <div>
+    <[clickRegionLabel]>
+  </div>
+</script>
+
+<script type="text/ng-template" id="shortResponse/LabelingInput">
+  <span><[clickRegionLabel]></span>
+</script>

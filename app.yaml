@@ -143,3 +143,22 @@ libraries:
 # running the server in the dev environment.
 env_variables:
   MINIFICATION: false
+
+skip_files:
+- ^(.*/)?\.zip$
+- ^(.*/)?\.md$
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?tests$
+- ^(.*/)?test$
+- ^test/(.*/)?
+- ^README\..*
+- \.gitignore
+- ^\.git/.*
+- \.*\.lint$
+- ^fabfile\.py
+- ^testrunner\.py

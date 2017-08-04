@@ -28,4 +28,5 @@ DEPENDENCIES_TO_ANGULAR_MODULES_DICT = {
     'midijs': [],
     'pencilcode': [],
     'skulpt': [],
+    'dragdrop': ['ngDragDrop']
 }

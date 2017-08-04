@@ -64,6 +64,18 @@
       "description": "is not correct due to {{c|LogicErrorCategory}}"
     }
   },
+  "LabelingInput": {
+    "GetsAllCorrect": {
+      "description": "gets all labels correct"
+    },
+    "HasMultipleMisses": {
+      "description": "misses {{x|NonnegativeInt}} or more labels"
+    },
+    "Misses": {
+      "description": "does not correctly place the label {{x|UnicodeString}}"
+    }
+
+  },
   "MathExpressionInput": {
     "IsMathematicallyEquivalentTo": {
       "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
