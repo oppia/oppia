@@ -71,19 +71,26 @@ class SplashPage(base.BaseHandler):
                 self.redirect(target_url)
                 return
 
-
-class AboutPage(base.BaseHandler):
-    """Page with information about Oppia."""
+class CreditsPage(base.BaseHandler):
+    """Page with credits for contributors."""
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_ABOUT,
+            'meta_description': feconf.CREDITS_PAGE_DESCRIPTION,
+            'nav_mode': feconf.NAV_MODE_CREDITS,
         })
-        self.render_template('pages/about/about.html')
+        self.render_template('pages/credits/credits.html')
 
+class FoundationRedirectPage(base.BaseHandler):
+    """A page that redirects to the separate Oppia Foundation site."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.FOUNDATION_SITE_URL)
+        return
 
 class GetStartedPage(base.BaseHandler):
     """Page with information about how to get started using Oppia."""
@@ -207,16 +214,6 @@ class PrivacyPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_template('pages/privacy/privacy.html')
-
-
-class AboutRedirectPage(base.BaseHandler):
-    """A page that redirects to the main About page."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.redirect('/about')
-
 
 class TeachRedirectPage(base.BaseHandler):
     """A page that redirects to the main Teach page."""

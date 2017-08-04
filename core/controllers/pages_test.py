@@ -25,5 +25,5 @@ class NoninteractivePagesTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
         response.mustcontain(
-            'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING',
+            'I18N_CREDITS_PAGE_HEADING',
             'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING')

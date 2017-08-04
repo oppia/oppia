@@ -621,6 +621,8 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
+FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
+
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_GET_STARTED = 'get_started'
 NAV_MODE_BLOG = 'blog'
@@ -628,6 +630,7 @@ NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_CREATOR_DASHBOARD = 'creator_dashboard'
+NAV_MODE_CREDITS = 'credits'
 NAV_MODE_DONATE = 'donate'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LEARNER_DASHBOARD = 'learner_dashboard'
@@ -773,6 +776,9 @@ CREATE_PAGE_DESCRIPTION = (
 CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
+CREDITS_PAGE_DESCRIPTION = (
+    'We would like to thank the following individuals who have contributed'
+    'to building Oppia.')
 DONATE_PAGE_DESCRIPTION = (
     'Donate to The Oppia Foundation.')
 FORUM_PAGE_DESCRIPTION = (
