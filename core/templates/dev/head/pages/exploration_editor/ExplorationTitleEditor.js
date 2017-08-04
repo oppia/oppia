@@ -29,7 +29,9 @@ oppia.directive('explorationTitleEditor', [
         // Additional CSS style for P tags.
         pStyle:'@',
         // The method to call on when the input field is blured.
-        onInputFieldBlur: '&'
+        onInputFieldBlur: '&',
+        // The value to determine the visibilty of the field.
+        fieldRequired:'@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/' +

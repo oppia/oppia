@@ -1,5 +1,7 @@
-<p ng-class="{'has-error': !explorationTitleService.displayed.length > 0}" ng-style="<[::pStyle]>">
-  <label ng-style="<[::formStyle]>"><[::labelName]></label>
+<p ng-show="<[::fieldRequired]>"
+   ng-class="{'has-error': !explorationTitleService.displayed.length > 0}"
+   ng-style="<[::pStyle]>">
+  <label for="explorationTitle" ng-style="<[::formStyle]>"><[::labelName]></label>
   <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" 
          ng-model="explorationTitleService.displayed" ng-blur="onInputFieldBlur()" 
          placeholder="Choose a title for your exploration." focus-on="<[::onInputFieldFocus]>" 

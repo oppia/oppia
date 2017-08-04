@@ -9,7 +9,8 @@
                                       on-input-field-focus="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
                                       form-style="{display:'table-cell', width:'16.66666667%'}"
                                       p-style="{display:'table', width:'100%', 'margin-bottom':'2%'}"
-                                      on-input-field-blur="saveExplorationTitle()">
+                                      on-input-field-blur="saveExplorationTitle()"
+                                      field-required="true">
             </exploration-title-editor>
             <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed || ((explorationObjectiveService.displayed.length < 15) || (explorationObjectiveService.displayed.length > 100))}">
               <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
