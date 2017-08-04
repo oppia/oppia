@@ -18,9 +18,9 @@
  */
 
 oppia.factory('AudioTranslationManagerService', [
-  '$modal', 'AudioPlayerService',
+  '$modal', 'AudioPlayerService', 'UrlInterpolationService',
   function(
-      $modal, AudioPlayerService) {
+      $modal, AudioPlayerService, UrlInterpolationService) {
     var _currentAudioLanguageCode = null;
     var _allLanguageCodesInExploration = null;
 
@@ -45,7 +45,9 @@ oppia.factory('AudioTranslationManagerService', [
 
     var _showAudioTranslationSettingsModal = function() {
       $modal.open({
-        templateUrl: 'modals/audioTranslationSettings',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_player/' +
+          'audio_translation_settings_modal_directive.html'),
         resolve: {},
         controller: [
           '$scope', '$filter', '$modalInstance',

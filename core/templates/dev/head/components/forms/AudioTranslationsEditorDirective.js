@@ -123,11 +123,11 @@ oppia.directive('audioTranslationsEditor', [
                   $scope.save = function() {
                     if ($scope.isAudioTranslationValid()) {
                       var generatedFilename = generateNewFilename();
-                      var explorationId = explorationContextService.getExplorationId();
+                      var explorationId = (
+                        explorationContextService.getExplorationId());
                       AssetsBackendApiService.saveAudio(
                         explorationId, generatedFilename, uploadedFile
                       ).then(function() {
-                        $scope.$apply();
                         $modalInstance.close({
                           languageCode: $scope.languageCode,
                           filename: generatedFilename,
@@ -139,7 +139,6 @@ oppia.directive('audioTranslationsEditor', [
                         var transformedData = data.responseText.substring(5);
                         var parsedResponse = angular.fromJson(transformedData);
                         $scope.errorUploadingFile = true;
-                        $scope.$apply();
                       });
                     }
                   };

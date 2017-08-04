@@ -153,6 +153,5 @@ skip_files:
 # Karma test files
 - ^(.*/)Spec.js$
 # Other folders to ignore
-- data/
 - tests/
 - scripts/
