@@ -22,9 +22,9 @@
 
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'oppiaHtmlEscaper', 'explorationContextService',
-  'imageClickInputRulesService',
+  'imageClickInputRulesService', 'playerTranscriptService',
   function($sce, oppiaHtmlEscaper, explorationContextService,
-           imageClickInputRulesService) {
+           imageClickInputRulesService, playerTranscriptService) {
     return {
       restrict: 'E',
       scope: {
@@ -92,6 +92,12 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               rulesService: imageClickInputRulesService
             });
           };
+          $scope.$on('playerStateChange', function(evt, newStateName) {
+            if (newStateName !=
+                playerTranscriptService.getLastStateName()) {
+              $scope.highlightRegionsOnHover = false;
+            }
+          });
         }
       ]
     };
@@ -107,7 +113,6 @@ oppia.directive('oppiaResponseImageClickInput', [function() {
       '$scope', '$attrs', 'oppiaHtmlEscaper',
       function($scope, $attrs, oppiaHtmlEscaper) {
         var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-
         $scope.clickRegionLabel = '(Clicks on ' + (
           _answer.clickedRegions.length > 0 ?
           '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
