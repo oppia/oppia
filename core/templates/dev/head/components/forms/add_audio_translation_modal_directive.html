@@ -22,6 +22,11 @@
                                  on-file-changed="onFileChanged"
                                  on-file-cleared="onFileCleared">
             </audio-file-uploader>
+            <div ng-if="errorUploadingFile"
+                 class="oppia-audio-file-uploader-field-error-message">
+              <i class="material-icons">&#xE002;</i>
+              There was an error uploading the file.
+            </div>
           </div>
         </div>
       </div>
@@ -33,3 +38,16 @@
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success" ng-click="save()" ng-disabled="!isAudioTranslationValid()">Save</button>
 </div>
+
+<style>
+  .oppia-audio-file-upload-field-error-message {
+    color: red;
+    display: inline-block;
+    font-size: 16;
+    padding: 4px;
+  }
+  .oppia-audio-file-upload-field-error-message i {
+    font-size: 16px;
+    margin-right: 4px;
+  }
+</style>

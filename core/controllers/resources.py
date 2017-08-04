@@ -92,16 +92,17 @@ class AudioHandler(base.BaseHandler):
     served from GCS).
     """
 
+    _AUDIO_PATH_PREFIX = 'audio'
+
     @acl_decorators.open_access
-    def get(self, exploration_id, encoded_filepath):
+    def get(self, exploration_id, filename):
         """Returns an audio file.
 
         Args:
             encoded_filepath: a string representing the audio filepath. This
               string is encoded in the frontend using encodeURIComponent().
         """
-        filepath = urllib.unquote(encoded_filepath)
-        file_format = filepath[(filepath.rfind('.') + 1):]
+        file_format = filename[(filename.rfind('.') + 1):]
         # If the following is not cast to str, an error occurs in the wsgi
         # library because unicode gets used.
         self.response.headers['Content-Type'] = str(
@@ -111,7 +112,7 @@ class AudioHandler(base.BaseHandler):
             fs_domain.ExplorationFileSystem(exploration_id))
 
         try:
-            raw = fs.get(filepath)
+            raw = fs.get('%s/%s' % (self._AUDIO_PATH_PREFIX, filename))
         except:
             raise self.PageNotFoundException
 

@@ -21,7 +21,6 @@ import os
 
 import cloudstorage
 
-from constants import constants
 from core.platform import models
 import feconf
 import utils
@@ -269,7 +268,7 @@ class GcsFileSystem(object):
         raise NotImplementedError
 
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
-        bucket_name = constants.GCS_RESOURCE_BUCKET_NAME
+        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
 
         # Upload to GCS bucket with filepath
         # "<bucket>/<exploration-id>/assets/<filepath>".
