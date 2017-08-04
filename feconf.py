@@ -777,7 +777,7 @@ CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
 CREDITS_PAGE_DESCRIPTION = (
-    'We would like to thank the following individuals who have contributed'
+    'We would like to thank the following individuals who have contributed '
     'to building Oppia.')
 DONATE_PAGE_DESCRIPTION = (
     'Donate to The Oppia Foundation.')
