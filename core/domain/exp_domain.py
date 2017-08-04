@@ -2999,8 +2999,8 @@ class Exploration(object):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
         In this method, the new_state_name refers to the name of the state in
-        the current version of the Exploration whereas the old_state_name refers
-        to the name of the state in the previous version of the Exploration.
+        the current version of the exploration whereas the old_state_name refers
+        to the name of the state in the previous version of the exploration.
 
         Args:
             old_states: dict. Dictionary containing all State domain objects.
@@ -3027,7 +3027,7 @@ class Exploration(object):
 
             # The case where a new state is added. When this happens, the
             # old_state_name will be equal to the new_state_name and it will not
-            # be present in the Exploration's older version.
+            # be present in the exploration's older version.
             if old_state_name not in old_states:
                 trainable_states_dict[
                     'state_names_with_changed_answer_groups'].append(
@@ -3038,8 +3038,8 @@ class Exploration(object):
             new_training_data = new_state.get_training_data()
 
             # Check if the training data and interaction_id of the state in the
-            # previous version of the Exploration and the state in the new
-            # version of the Exploration match. If any of them are not equal,
+            # previous version of the exploration and the state in the new
+            # version of the exploration match. If any of them are not equal,
             # we create a new job for the state in the current version.
             if new_training_data == old_training_data and (
                     new_state.interaction.id == old_state.interaction.id):
