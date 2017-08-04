@@ -37,6 +37,10 @@ oppia.factory('SubtitledHtmlObjectFactory', [
       this._html = newHtml;
     };
 
+    SubtitledHtml.prototype.hasNoHtml = function() {
+      return !this._html;
+    };
+
     SubtitledHtml.prototype.getBindableAudioTranslations = function() {
       return this._audioTranslations;
     };
@@ -87,15 +91,6 @@ oppia.factory('SubtitledHtmlObjectFactory', [
       this._audioTranslations[languageCode].toggleNeedsUpdateAttribute();
     };
 
-    SubtitledHtml.prototype.hasNoHtml = function() {
-      return !this._html;
-    };
-
-    SubtitledHtml.prototype.isEmpty = function() {
-      return (
-        this.hasNoHtml() && Object.keys(this._audioTranslations).length === 0);
-    };
-
     SubtitledHtml.prototype.toBackendDict = function() {
       var audioTranslationsBackendDict = {};
       for (var languageCode in this._audioTranslations) {
@@ -107,6 +102,11 @@ oppia.factory('SubtitledHtmlObjectFactory', [
         html: this._html,
         audio_translations: audioTranslationsBackendDict
       };
+    };
+
+    SubtitledHtml.prototype.isEmpty = function() {
+      return (
+        this.hasNoHtml() && Object.keys(this._audioTranslations).length === 0);
     };
 
     SubtitledHtml.createFromBackendDict = function(subtitledHtmlBackendDict) {
