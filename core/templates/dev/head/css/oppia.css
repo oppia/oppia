@@ -3394,12 +3394,12 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-contributors-more-circle {
   background: #888;
-  border-radius: 50%;
-  border-color: black;
+  border-radius: 10%;
+  color: #fff;
   height: 20px;
-  padding-top: 3px;
-  text-align: center;
-  width: 20px;
+  min-width: 20px;
+  width: auto;
+
 }
 
 .oppia-info-card-bottom-row {

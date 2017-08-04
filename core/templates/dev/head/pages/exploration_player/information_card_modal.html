@@ -44,7 +44,7 @@
           </li>
 
           <li ng-if="contributorNames.length > 2" class="oppia-contributors-more-circle"
-            tooltip-append-to-body="true" tooltip="<[contributorNames.slice(2).join(',')]>"
+            tooltip-append-to-body="true" tooltip="<[contributorNames.slice(2).join(', ')]>"
             tooltip-placement="top">+<[contributorNames.length - 2]>
           </li>
           <li ng-if="contributorNames.length === 0"
