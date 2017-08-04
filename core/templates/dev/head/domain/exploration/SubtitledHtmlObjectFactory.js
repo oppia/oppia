@@ -45,7 +45,7 @@ oppia.factory('SubtitledHtmlObjectFactory', [
       return this._audioTranslations[languageCode];
     };
 
-    SubtitledHtml.prototype.markAudioAsNeedingUpdate = function() {
+    SubtitledHtml.prototype.markAllAudioAsNeedingUpdate = function() {
       for (var languageCode in this._audioTranslations) {
         this._audioTranslations[languageCode].markAsNeedingUpdate();
       }
@@ -80,6 +80,11 @@ oppia.factory('SubtitledHtmlObjectFactory', [
           languageCode);
       }
       delete this._audioTranslations[languageCode];
+    };
+
+    SubtitledHtml.prototype.toggleNeedsUpdateAttribute = function(
+        languageCode) {
+      this._audioTranslations[languageCode].toggleNeedsUpdateAttribute();
     };
 
     SubtitledHtml.prototype.hasNoHtml = function() {

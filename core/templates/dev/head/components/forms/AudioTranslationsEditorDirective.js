@@ -22,7 +22,12 @@ oppia.directive('audioTranslationsEditor', [
       restrict: 'E',
       scope: {
         subtitledHtml: '=',
+        // A function that must be called at the outset of every attempt to
+        // edit, even if the action is not subsequently taken through to
+        // completion.
         getOnStartEditFn: '&onStartEdit',
+        // A function that must be called on completion of an action which
+        // changes the audio translation data in a persistent way.
         getOnChangeFn: '&onChange'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -46,6 +51,12 @@ oppia.directive('audioTranslationsEditor', [
           $scope.getAudioTranslationFullUrl = function(filename) {
             return AssetsBackendApiService.getAudioDownloadUrl(
               explorationId, filename);
+          };
+
+          $scope.toggleNeedsUpdateAttribute = function(languageCode) {
+            $scope.getOnStartEditFn()();
+            $scope.subtitledHtml.toggleNeedsUpdateAttribute(languageCode);
+            $scope.getOnChangeFn()();
           };
 
           $scope.openAddAudioTranslationModal = function() {

@@ -28,6 +28,10 @@ oppia.factory('AudioTranslationObjectFactory', [function() {
     this.needsUpdate = true;
   };
 
+  AudioTranslation.prototype.toggleNeedsUpdateAttribute = function() {
+    this.needsUpdate = !this.needsUpdate;
+  };
+
   AudioTranslation.prototype.toBackendDict = function() {
     return {
       filename: this.filename,
