@@ -33,6 +33,7 @@ import zipfile
 
 from constants import constants
 from core.domain import activity_services
+from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import feedback_services
@@ -793,6 +794,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
 
+    old_states = get_exploration_from_model(exploration_model).states
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
@@ -817,6 +819,23 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
+    if feconf.ENABLE_ML_CLASSIFIERS:
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        trainable_states_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        state_names_with_changed_answer_groups = trainable_states_dict[
+            'state_names_with_changed_answer_groups']
+        state_names_with_unchanged_answer_groups = trainable_states_dict[
+            'state_names_with_unchanged_answer_groups']
+        if state_names_with_changed_answer_groups:
+            classifier_services.handle_trainable_states(
+                exploration, state_names_with_changed_answer_groups)
+        if state_names_with_unchanged_answer_groups:
+            classifier_services.handle_non_retrainable_states(
+                exploration, state_names_with_unchanged_answer_groups,
+                new_to_old_state_names)
+
 
 def _create_exploration(
         committer_id, exploration, commit_message, commit_cmds):
@@ -839,6 +858,7 @@ def _create_exploration(
     # but the creation of an exploration object will fail.
     exploration.validate()
     rights_manager.create_new_exploration_rights(exploration.id, committer_id)
+
     model = exp_models.ExplorationModel(
         id=exploration.id,
         category=exploration.category,
@@ -860,6 +880,19 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
+
+    if feconf.ENABLE_ML_CLASSIFIERS:
+        # Find out all states that need a classifier to be trained.
+        state_names_to_train = []
+        for state_name in exploration.states:
+            state = exploration.states[state_name]
+            if state.can_undergo_classification():
+                state_names_to_train.append(state_name)
+
+        if state_names_to_train:
+            classifier_services.handle_trainable_states(
+                exploration, state_names_to_train)
+
     create_exploration_summary(exploration.id, committer_id)
 
 
