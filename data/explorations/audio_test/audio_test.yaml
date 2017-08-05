@@ -22,7 +22,7 @@ states:
         hi-en:
           filename: 'test_audio_2_hi_en.mp3'
           file_size_bytes: 3
-          needs_update: false
+          needs_update: true
       html: Congratulations, you have finished!
     interaction:
       answer_groups: []
@@ -43,7 +43,7 @@ states:
         hi-en:
           filename: 'test_audio_3_hi_en.mp3'
           file_size_bytes: 2
-          needs_update: false
+          needs_update: true
       html: <p>Try typing some code.</p>
     interaction:
       answer_groups:

@@ -1,17 +1,20 @@
-<i class="fa fa-cog audio-control-button-icon"
-   ng-if="extraAudioControlsAreShown"
-   ng-click="openAudioTranslationSettings()"></i>
-<img class="audio-control-button-image"
-     style="margin-top: 2px"
+<div class="audio-controls">
+  <i class="fa fa-cog audio-control-button-icon"
      ng-if="extraAudioControlsAreShown"
-     ng-src="<[IMAGE_URL_REWIND_AUDIO_BUTTON]>"
-     ng-click="rewindAudioFiveSec()">
-<i class="fa audio-control-button-icon"
-   style="min-width: 24px"
-   ng-click="playPauseAudioTranslation()"
-   ng-class="{'fa-volume-off': !AudioPlayerService.isPlaying(), 'fa-volume-up': AudioPlayerService.isPlaying(), 'audio-not-available': !isAudioAvailableInCurrentLanguage()}"
-   tooltip="<[!isAudioAvailableInCurrentLanguage() ? audioNotAvailableMessage : '']>"
-   tooltip-append-to-body="true">
+     ng-click="openAudioTranslationSettings()"></i>
+  <img class="audio-control-button-image"
+       style="margin-top: 2px"
+       ng-if="extraAudioControlsAreShown"
+       ng-src="<[IMAGE_URL_REWIND_AUDIO_BUTTON]>"
+       ng-click="rewindAudioFiveSec()">
+  <i class="fa audio-control-button-icon"
+     style="min-width: 24px; text-align: left;"
+     ng-click="playPauseAudioTranslation()"
+     ng-class="{'fa-volume-off': !AudioPlayerService.isPlaying(), 'fa-volume-up': AudioPlayerService.isPlaying(), 'audio-not-available': !isAudioAvailableInCurrentLanguage()}"
+     tooltip="<[!isAudioAvailableInCurrentLanguage() ? audioNotAvailableMessage : '']>"
+     tooltip-append-to-body="true"></i>
+</div>
+<span ng-if="extraAudioControlsAreShown && isAudioAvailableInCurrentLanguage() && isCurrentAudioTranslationNeedingUpdate()" class="audio-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
 
 <style>
   .audio-control-button-icon {
@@ -30,6 +33,18 @@
 
   .audio-not-available {
     color: gray;
+  }
+
+  .audio-controls {
+    float: right;
+    text-align: right;
+    width: 100%;
+  }
+
+  .audio-message {
+    float:right;
+    font-size: 12px;
+    font-style: italic;
   }
 
 </style>

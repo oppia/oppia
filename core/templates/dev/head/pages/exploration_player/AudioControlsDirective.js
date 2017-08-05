@@ -35,6 +35,12 @@ oppia.directive('audioControls', [
           // distinguishing which audio directive is currently playing audio.
           var directiveId = Math.random().toString(36).substr(2, 10);
 
+          var getCurrentAudioTranslation = function() {
+            var currentAudioLanguageCode =
+              AudioTranslationManagerService.getCurrentAudioLanguageCode();
+            return $scope.getAudioTranslations()[currentAudioLanguageCode];
+          };
+
           $scope.AudioPlayerService = AudioPlayerService;
 
           $scope.IMAGE_URL_REWIND_AUDIO_BUTTON = (
@@ -42,10 +48,11 @@ oppia.directive('audioControls', [
               '/icons/rewind-five.svg'));
 
           $scope.isAudioAvailableInCurrentLanguage = function() {
-            var currentAudioLanguageCode =
-              AudioTranslationManagerService.getCurrentAudioLanguageCode();
-            return Boolean(
-                $scope.getAudioTranslations()[currentAudioLanguageCode]);
+            return Boolean(getCurrentAudioTranslation());
+          };
+
+          $scope.isCurrentAudioTranslationNeedingUpdate = function() {
+            return getCurrentAudioTranslation().needsUpdate;
           };
 
           $scope.audioNotAvailableMessage = 'Not available in ' + 
@@ -84,15 +91,10 @@ oppia.directive('audioControls', [
           };
 
           var loadAndPlayAudioTranslation = function() {
-            var currentAudioLanguageCode =
-              AudioTranslationManagerService.getCurrentAudioLanguageCode();
-
             // TODO(tjiang11): If audio translation is not available
             // in the current language, then inform the learner with
             // a piece of text below the audio controls.
-            var audioTranslation =
-              $scope.getAudioTranslations()[currentAudioLanguageCode];
-
+            var audioTranslation = getCurrentAudioTranslation();
             if (audioTranslation) {
               AudioPlayerService.load(
                 audioTranslation.filename, directiveId).then(function() {
