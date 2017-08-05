@@ -169,7 +169,10 @@ def handle_trainable_states(exploration, state_names):
     job_ids = classifier_models.ClassifierTrainingJobModel.create_multi(
         job_dicts_list)
 
-    # Create mapping for each job.
+    # Create mapping for each job. For TrainingJobExplorationMapping, we can
+    # append Domain objects to send to the job_exploration_mappings dict because
+    # we know all the attributes required for creating the Domain object unlike
+    # ClassifierTrainingJob class where we don't know the job_id.
     job_exploration_mappings = []
     for job_id_index, job_id in enumerate(job_ids):
         job_exploration_mapping = (
