@@ -63,6 +63,15 @@ oppia.factory('SubtitledHtmlObjectFactory', [
       return this.getAudioLanguageCodes().length > 0;
     };
 
+    SubtitledHtml.prototype.hasUnflaggedAudioTranslations = function() {
+      for (var languageCode in this._audioTranslations) {
+        if (!this._audioTranslations[languageCode].needsUpdate) {
+          return true;
+        }
+      }
+      return false;
+    };
+
     SubtitledHtml.prototype.isFullyTranslated = function() {
       var numLanguages = Object.keys(this._audioTranslations).length;
       return (numLanguages === LanguageUtilService.getAudioLanguagesCount());
