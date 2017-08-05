@@ -447,7 +447,7 @@
 	"I18N_SPLASH_SUBTITLE": "The second title shown in Oppia's landing page, below the main image - It should not exceed two lines in length.",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Paragraph describing Oppia showed in the splash page next to an image.",
 	"I18N_SPLASH_TITLE": "The main title shown in Oppia's landing page - This is an English idiom, it can be changed for a local common saying with similar meaning. It should not exceed one line in length.",
-	"I18N_START_HERE": "Start Here!",
+	"I18N_START_HERE": "Click here to start!",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "The text that appears on the subscribe button, which allows users to subscribe to creators.\n{{Identical|Subscribe}}",
 	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_1": "Text on Oppia's Teach page outlining the Community Guidelines.",
 	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_2": "Text on Oppia's Teach page outlining the Community Guidelines.",
