@@ -495,6 +495,22 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_skill('skillname2')
         self.assertEqual(sorted(collection.skills.keys()), ['skill0', 'skill1'])
 
+    def test_update_skill(self):
+        """Test that update_skill correctly updates skills."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        self.assertEqual(collection.skills, {})
+
+        # Add skills
+        collection.add_skill('skillname1')
+        self.assertEqual(collection.skills.keys(), ['skill0'])
+        self.assertEqual(collection.skills['skill0'].name, 'skillname1')
+
+        # update skill
+        collection.update_skill('skill0', 'new skill name1')
+
+        self.assertEqual(collection.skills['skill0'].name, 'new skill name1')
+
     def test_adding_duplicate_skill_raises_error(self):
         """Test that adding a duplicate skill name raises an error."""
         collection = collection_domain.Collection.create_default_collection(

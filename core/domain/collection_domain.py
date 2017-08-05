@@ -1075,6 +1075,14 @@ class Collection(object):
         self.skills[skill_id] = CollectionSkill(skill_id, skill_name, [])
         self.next_skill_id += 1
 
+    def update_skill(self, skill_id, new_skill_name):
+        """Renames skill with specified id to the new skill name."""
+        if skill_id not in self.skills:
+            raise ValueError(
+                'Skill with ID "%s" does not exist.' % skill_id)
+
+        self.skills[skill_id].name = new_skill_name
+
     def delete_skill(self, skill_id):
         """Deletes skill with specified id."""
         if skill_id not in self.skills:
