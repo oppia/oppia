@@ -33,11 +33,11 @@ oppia.directive('audioTranslationsEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
-        '$scope', '$modal', 'stateContentService', 'editabilityService',
+        '$scope', '$modal', '$sce', 'stateContentService', 'editabilityService',
         'LanguageUtilService', 'alertsService', 'explorationContextService',
         'AssetsBackendApiService',
         function(
-            $scope, $modal, stateContentService, editabilityService,
+            $scope, $modal, $sce, stateContentService, editabilityService,
             LanguageUtilService, alertsService, explorationContextService,
             AssetsBackendApiService) {
           $scope.isEditable = editabilityService.isEditable;
@@ -49,8 +49,9 @@ oppia.directive('audioTranslationsEditor', [
             LanguageUtilService.getAudioLanguageDescription);
 
           $scope.getAudioTranslationFullUrl = function(filename) {
-            return AssetsBackendApiService.getAudioDownloadUrl(
-              explorationId, filename);
+            return $sce.trustAsResourceUrl(
+              AssetsBackendApiService.getAudioDownloadUrl(
+                explorationId, filename));
           };
 
           $scope.toggleNeedsUpdateAttribute = function(languageCode) {

@@ -81,6 +81,19 @@ describe('SubtitledHtml object factory', function() {
       expect(subtitledHtml.hasAudioTranslations()).toBe(false);
     }));
 
+    it('should check existence of unflagged audio translations',
+      inject(function() {
+        expect(subtitledHtml.hasUnflaggedAudioTranslations()).toBe(true);
+        subtitledHtml.getAudioTranslation('en').needsUpdate = true;
+        expect(subtitledHtml.hasUnflaggedAudioTranslations()).toBe(true);
+        subtitledHtml.getAudioTranslation('hi').needsUpdate = true;
+        expect(subtitledHtml.hasUnflaggedAudioTranslations()).toBe(false);
+
+        subtitledHtml.deleteAudioTranslation('en');
+        subtitledHtml.deleteAudioTranslation('hi');
+        expect(subtitledHtml.hasUnflaggedAudioTranslations()).toBe(false);
+      }));
+
     it('should check whether the text is fully translated', inject(function() {
       expect(subtitledHtml.isFullyTranslated()).toBe(true);
       subtitledHtml.deleteAudioTranslation('en');

@@ -102,7 +102,9 @@ oppia.directive('stateContentEditor', [
           $scope.onSaveContentButtonClicked = function() {
             editorFirstTimeEventsService.registerFirstSaveContentEvent();
             saveContent();
-            if (stateContentService.savedMemento.hasAudioTranslations()) {
+
+            var savedContent = stateContentService.savedMemento;
+            if (savedContent.hasUnflaggedAudioTranslations()) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             $scope.getOnSaveContentFn()();

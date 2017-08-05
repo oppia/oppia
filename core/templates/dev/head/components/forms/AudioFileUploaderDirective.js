@@ -28,6 +28,8 @@ oppia.directive('audioFileUploader', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/audio_file_uploader_directive.html'),
       link: function(scope, elt) {
+        var ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
+
         var validateUploadedFile = function(file) {
           if (!file) {
             return 'No audio file was uploaded.';
@@ -37,7 +39,7 @@ oppia.directive('audioFileUploader', [
             return 'This file is not recognized as an audio file.';
           }
 
-          if (!file.type.match('audio.mp3')) {
+          if (ALLOWED_AUDIO_FILE_TYPES.indexOf(file.type) === -1) {
             return 'Only the MP3 audio format is currently supported.';
           }
 
