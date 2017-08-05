@@ -40,7 +40,6 @@ oppia.directive('solutionEditor', [
       controller: [
         '$scope', 'stateSolutionService',
         function($scope, stateSolutionService) {
-
           $scope.stateSolutionService = stateSolutionService;
 
           $scope.EXPLANATION_FORM_SCHEMA = {
