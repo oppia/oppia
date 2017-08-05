@@ -51,7 +51,7 @@ oppia.directive('audioControls', [
             return Boolean(getCurrentAudioTranslation());
           };
 
-          $scope.isCurrentAudioTranslationNeedingUpdate = function() {
+          $scope.doesCurrentAudioTranslationNeedUpdate = function() {
             return getCurrentAudioTranslation().needsUpdate;
           };
 
@@ -91,9 +91,6 @@ oppia.directive('audioControls', [
           };
 
           var loadAndPlayAudioTranslation = function() {
-            // TODO(tjiang11): If audio translation is not available
-            // in the current language, then inform the learner with
-            // a piece of text below the audio controls.
             var audioTranslation = getCurrentAudioTranslation();
             if (audioTranslation) {
               AudioPlayerService.load(
