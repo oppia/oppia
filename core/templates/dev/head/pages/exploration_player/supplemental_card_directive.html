@@ -14,7 +14,10 @@
                ng-click="onClickContinueButton()"
                ng-if="helpCardHasContinueButton"
                style="margin-top: 12px;"
-               translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
+               aria-label="Continue">
+      <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
+      <i class="fa fa-arrow-right"
+         style="font-size: 19px; padding-top: 1.5px;"></i>
     </md-button>
   </div>
 
