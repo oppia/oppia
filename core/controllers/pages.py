@@ -71,6 +71,7 @@ class SplashPage(base.BaseHandler):
                 self.redirect(target_url)
                 return
 
+
 class CreditsPage(base.BaseHandler):
     """Page with credits for contributors."""
 
@@ -83,6 +84,7 @@ class CreditsPage(base.BaseHandler):
         })
         self.render_template('pages/credits/credits.html')
 
+
 class FoundationRedirectPage(base.BaseHandler):
     """A page that redirects to the separate Oppia Foundation site."""
 
@@ -91,6 +93,7 @@ class FoundationRedirectPage(base.BaseHandler):
         """Handles GET requests."""
         self.redirect(feconf.FOUNDATION_SITE_URL)
         return
+
 
 class GetStartedPage(base.BaseHandler):
     """Page with information about how to get started using Oppia."""
