@@ -2,14 +2,16 @@
    ng-if="extraAudioControlsAreShown"
    ng-click="openAudioTranslationSettings()"></i>
 <img class="audio-control-button-image"
-     style="margin-top: 4px"
+     style="margin-top: 2px"
      ng-if="extraAudioControlsAreShown"
      ng-src="<[IMAGE_URL_REWIND_AUDIO_BUTTON]>"
      ng-click="rewindAudioFiveSec()">
-<i class="fa fa-volume-off audio-control-button-icon"
+<i class="fa audio-control-button-icon"
    style="min-width: 24px"
    ng-click="playPauseAudioTranslation()"
-   ng-class="{'fa-volume-off': !AudioPlayerService.isPlaying(), 'fa-volume-up': AudioPlayerService.isPlaying()}">
+   ng-class="{'fa-volume-off': !AudioPlayerService.isPlaying(), 'fa-volume-up': AudioPlayerService.isPlaying(), 'audio-not-available': !isAudioAvailableInCurrentLanguage()}"
+   tooltip="<[!isAudioAvailableInCurrentLanguage() ? audioNotAvailableMessage : '']>"
+   tooltip-append-to-body="true">
 
 <style>
   .audio-control-button-icon {
@@ -25,4 +27,9 @@
   .audio-control-button:hover {
     cursor: pointer;
   }
+
+  .audio-not-available {
+    color: gray;
+  }
+
 </style>

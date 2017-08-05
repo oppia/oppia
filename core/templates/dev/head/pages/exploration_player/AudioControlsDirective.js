@@ -41,6 +41,17 @@ oppia.directive('audioControls', [
             UrlInterpolationService.getStaticImageUrl(
               '/icons/rewind-five.svg'));
 
+          $scope.isAudioAvailableInCurrentLanguage = function() {
+            var currentAudioLanguageCode =
+              AudioTranslationManagerService.getCurrentAudioLanguageCode();
+            return Boolean(
+                $scope.getAudioTranslations()[currentAudioLanguageCode]);
+          };
+
+          $scope.audioNotAvailableMessage = 'Not available in ' + 
+            AudioTranslationManagerService
+              .getCurrentAudioLanguageDescription();
+
           $scope.playPauseAudioTranslation = function() {
             // TODO(tjiang11): Change from on-demand loading to pre-loading.
 

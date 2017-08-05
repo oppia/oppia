@@ -18,9 +18,9 @@
  */
 
 oppia.factory('AudioTranslationManagerService', [
-  '$modal', 'AudioPlayerService', 'UrlInterpolationService',
+  '$modal', 'AudioPlayerService', 'UrlInterpolationService', 'LanguageUtilService',
   function(
-      $modal, AudioPlayerService, UrlInterpolationService) {
+      $modal, AudioPlayerService, UrlInterpolationService, LanguageUtilService) {
     var _currentAudioLanguageCode = null;
     var _allLanguageCodesInExploration = null;
 
@@ -93,6 +93,9 @@ oppia.factory('AudioTranslationManagerService', [
       },
       getCurrentAudioLanguageCode: function() {
         return _currentAudioLanguageCode;
+      },
+      getCurrentAudioLanguageDescription: function() {
+        return LanguageUtilService.getAudioLanguageDescription(_currentAudioLanguageCode);
       },
       getAllLanguageCodesInExploration: function() {
         return _allLanguageCodesInExploration;
