@@ -68,12 +68,6 @@ oppia.controller('StateSolution', [
         !$scope.inlineSolutionEditorIsActive);
     };
 
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
-      stateSolutionService.init(
-        editorContextService.getActiveStateName(),
-        stateData.interaction.solution);
-    });
-
     $scope.getSolutionSummary = function() {
       var solution = stateSolutionService.savedMemento;
       return solution.getSummary(

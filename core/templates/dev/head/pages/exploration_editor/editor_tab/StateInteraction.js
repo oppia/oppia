@@ -107,6 +107,10 @@ oppia.controller('StateInteraction', [
       stateCustomizationArgsService.init(
         $scope.stateName, stateData.interaction.customizationArgs);
 
+      stateSolutionService.init(
+        editorContextService.getActiveStateName(),
+        stateData.interaction.solution);
+
       $rootScope.$broadcast('initializeAnswerGroups', {
         interactionId: stateData.interaction.id,
         answerGroups: stateData.interaction.answerGroups,
