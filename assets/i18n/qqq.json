@@ -306,6 +306,8 @@
 	"I18N_MODAL_CANCEL_BUTTON": "Text that is displayed in a button of a modal. On clicking it the modal closes.\n{{Identical|Cancel}}",
 	"I18N_ONE_SUBSCRIBER_TEXT": "Text displayed under the subscribers tab in creator dashboard. If the creator has one subscriber, this text is displayed which informs him/her about the same.",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Text displayed in the audio translation settings modal, asking the learner to pick what language they want to listen to audio translations in.",
+	"I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT": "Text displayed under the audio controls to the learner when the audio translation for the current language is flagged as needing an update by the creator.",
+	"I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "Text displayed in a tooltip over the speaker icon to play audio when there is no audio available in the selected language.",
 	"I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Title displayed at the top of the audio translation settings modal in the learner view.",
 	"I18N_PLAYER_BACK": "Text read to users with screenreaders when they navigate through an exploration. - This labels the leftward-pointing arrow that is used to go backward by one card in the exploration.\n{{Identical|Back}}",
 	"I18N_PLAYER_BACK_TO_COLLECTION": "Text shown to users after they complete an exploration in a collection. - This labels the link that is used to return back to the home page of the collection the user is currently exploring",
