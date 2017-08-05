@@ -45,7 +45,8 @@ oppia.factory('AudioTranslationManagerService', [
       }
     };
 
-    var _showAudioTranslationSettingsModal = function() {
+    var _showAudioTranslationSettingsModal = function(
+        onLanguageChangedCallback) {
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_player/' +
@@ -85,6 +86,7 @@ oppia.factory('AudioTranslationManagerService', [
           _currentAudioLanguageCode = result.languageCode;
           AudioPlayerService.stop();
           AudioPlayerService.clear();
+          onLanguageChangedCallback(_currentAudioLanguageCode);
         }
       });
     };
@@ -103,8 +105,8 @@ oppia.factory('AudioTranslationManagerService', [
       getAllLanguageCodesInExploration: function() {
         return _allLanguageCodesInExploration;
       },
-      showAudioTranslationSettingsModal: function() {
-        return _showAudioTranslationSettingsModal();
+      showAudioTranslationSettingsModal: function(onLanguageChangedCallback) {
+        return _showAudioTranslationSettingsModal(onLanguageChangedCallback);
       }
     };
   }]);
