@@ -43,8 +43,8 @@ oppia.factory('AssetsBackendApiService', [
         explorationId, filename, rawAssetData, successCallback,
         errorCallback) {
       var form = new FormData();
-      
-      form.append('raw', rawAssetData);
+
+      form.append('raw_audio_file', rawAssetData);
       form.append('payload', JSON.stringify({
         filename: filename
       }));
@@ -56,14 +56,23 @@ oppia.factory('AssetsBackendApiService', [
         processData: false,
         contentType: false,
         type: 'POST',
-        dataType: 'text'
+        dataType: 'text',
+        dataFilter: function(data) {
+          // Remove the XSSI prefix.
+          var transformedData = data.substring(5);
+          return JSON.parse(transformedData);
+        },
       }).done(function(response) {
         if (successCallback) {
           successCallback(response);
         }
-      }).fail(function(error) {
+      }).fail(function(data) {
+        // Remove the XSSI prefix.
+        var transformedData = data.responseText.substring(5);
+        var parsedResponse = angular.fromJson(transformedData);
+        console.error(parsedResponse);
         if (errorCallback) {
-          errorCallback(error.data);
+          errorCallback(parsedResponse);
         }
       });
     };
@@ -103,6 +112,9 @@ oppia.factory('AssetsBackendApiService', [
       },
       isCached: function(filename) {
         return _isCached(filename);
+      },
+      getAudioDownloadUrl: function(explorationId, filename) {
+        return _getAudioDownloadUrl(explorationId, filename);
       }
     };
   }

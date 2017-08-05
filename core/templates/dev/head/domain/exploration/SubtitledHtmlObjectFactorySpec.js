@@ -17,20 +17,32 @@
  */
 
 describe('SubtitledHtml object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(module('oppia', function($provide) {
+    $provide.value('LanguageUtilService', {
+      getAudioLanguagesCount: function() {
+        return 2;
+      }
+    });
+  }));
 
   describe('SubtitledHtmlObjectFactory', function() {
-    var scope, shof, subtitledHtml;
+    var scope, shof, lus, subtitledHtml;
 
     beforeEach(inject(function($rootScope, $injector) {
       scope = $rootScope.$new();
       shof = $injector.get('SubtitledHtmlObjectFactory');
+
       subtitledHtml = shof.createFromBackendDict({
         html: '<p>some html</p>',
         audio_translations: {
           en: {
             filename: 'a.mp3',
             file_size_bytes: 20,
+            needs_update: false
+          },
+          hi: {
+            filename: 'b.mp3',
+            file_size_bytes: 30,
             needs_update: false
           }
         }
@@ -43,8 +55,81 @@ describe('SubtitledHtml object factory', function() {
       expect(subtitledHtml.getHtml()).toEqual('new html');
     }));
 
-    it('should test emptiness correctly', inject(function() {
+    it('should correctly check existence of HTML', inject(function() {
+      expect(subtitledHtml.hasNoHtml()).toBe(false);
+      subtitledHtml.setHtml('');
+      expect(subtitledHtml.hasNoHtml()).toBe(true);
+    }));
+
+    it('should mark all audio as needing update', inject(function() {
+      expect(subtitledHtml.getAudioTranslation('en').needsUpdate).toBe(false);
+      expect(subtitledHtml.getAudioTranslation('hi').needsUpdate).toBe(false);
+      subtitledHtml.markAllAudioAsNeedingUpdate();
+      expect(subtitledHtml.getAudioTranslation('en').needsUpdate).toBe(true);
+      expect(subtitledHtml.getAudioTranslation('hi').needsUpdate).toBe(true);
+    }));
+
+    it('should get all audio language codes', inject(function() {
+      expect(subtitledHtml.getAudioLanguageCodes()).toEqual(['en', 'hi']);
+    }));
+
+    it('should check existence of audio translations', inject(function() {
+      expect(subtitledHtml.hasAudioTranslations()).toBe(true);
+      subtitledHtml.deleteAudioTranslation('en');
+      expect(subtitledHtml.hasAudioTranslations()).toBe(true);
+      subtitledHtml.deleteAudioTranslation('hi');
+      expect(subtitledHtml.hasAudioTranslations()).toBe(false);
+    }));
+
+    it('should check whether the text is fully translated', inject(function() {
+      expect(subtitledHtml.isFullyTranslated()).toBe(true);
+      subtitledHtml.deleteAudioTranslation('en');
+      expect(subtitledHtml.isFullyTranslated()).toBe(false);
+      subtitledHtml.deleteAudioTranslation('hi');
+      expect(subtitledHtml.isFullyTranslated()).toBe(false);
+    }));
+
+    it('should add an audio translation', inject(function() {
+      expect(function() {
+        subtitledHtml.addAudioTranslation('en', 'c.mp3', 300);
+      }).toThrowError('Trying to add duplicate language code.');
+      subtitledHtml.deleteAudioTranslation('en');
+      expect(subtitledHtml.getAudioLanguageCodes()).toEqual(['hi']);
+      subtitledHtml.addAudioTranslation('en', 'c.mp3', 300);
+      expect(subtitledHtml.getAudioLanguageCodes()).toEqual(['hi', 'en']);
+    }));
+
+    it('should delete an audio translation', inject(function() {
+      expect(subtitledHtml.hasAudioTranslations()).toBe(true);
+      subtitledHtml.deleteAudioTranslation('en');
+      subtitledHtml.deleteAudioTranslation('hi');
+      expect(subtitledHtml.hasAudioTranslations()).toBe(false);
+      expect(function() {
+        subtitledHtml.deleteAudioTranslation('en');
+      }).toThrowError(
+        'Trying to remove non-existing translation for language code en');
+    }));
+
+    it('should toggle needs-update attribute', inject(function() {
+      expect(subtitledHtml.getAudioTranslation('en').needsUpdate).toBe(false);
+      subtitledHtml.toggleNeedsUpdateAttribute('en')
+      expect(subtitledHtml.getAudioTranslation('en').needsUpdate).toBe(true);
+    }));
+
+    it('should correctly check emptiness', inject(function() {
       expect(subtitledHtml.isEmpty()).toBe(false);
+
+      // If there are translations but no content, it is not empty.
+      subtitledHtml.setHtml('');
+      expect(subtitledHtml.isEmpty()).toBe(false);
+
+      // If there is content but no translations, it is not empty.
+      subtitledHtml.setHtml('hello');
+      subtitledHtml.deleteAudioTranslation('en');
+      subtitledHtml.deleteAudioTranslation('hi');
+      expect(subtitledHtml.isEmpty()).toBe(false);
+
+      // If both content and translations are empty, the whole thing is empty.
       subtitledHtml.setHtml('');
       expect(subtitledHtml.isEmpty()).toBe(true);
     }));
@@ -56,6 +141,11 @@ describe('SubtitledHtml object factory', function() {
           en: {
             filename: 'a.mp3',
             file_size_bytes: 20,
+            needs_update: false
+          },
+          hi: {
+            filename: 'b.mp3',
+            file_size_bytes: 30,
             needs_update: false
           }
         }

@@ -32,12 +32,47 @@ describe('AudioTranslation object factory', function() {
       });
     }));
 
+    it('should correctly mark audio as needing update', inject(function() {
+      audioTranslation.markAsNeedingUpdate();
+      expect(audioTranslation).toEqual(atof.createFromBackendDict({
+        filename: 'a.mp3',
+        file_size_bytes: 20,
+        needs_update: true
+      }));
+    }));
+
+    it('should toggle needs update attribute correctly', inject(function() {
+      audioTranslation.toggleNeedsUpdateAttribute();
+      expect(audioTranslation).toEqual(atof.createFromBackendDict({
+        filename: 'a.mp3',
+        file_size_bytes: 20,
+        needs_update: true
+      }));
+
+      audioTranslation.toggleNeedsUpdateAttribute();
+      expect(audioTranslation).toEqual(atof.createFromBackendDict({
+        filename: 'a.mp3',
+        file_size_bytes: 20,
+        needs_update: false
+      }));
+    }));
+
     it('should convert to backend dict correctly', inject(function() {
       expect(audioTranslation.toBackendDict()).toEqual({
         filename: 'a.mp3',
         file_size_bytes: 20,
         needs_update: false
       });
+    }));
+
+    it('should create a new audio translation', inject(function() {
+      expect(atof.createNew('filename.mp3', 10)).toEqual(
+        atof.createFromBackendDict({
+          filename: 'filename.mp3',
+          file_size_bytes: 10,
+          needs_update: false
+        })
+      );
     }));
   });
 });
