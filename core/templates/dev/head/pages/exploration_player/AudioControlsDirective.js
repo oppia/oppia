@@ -37,7 +37,7 @@ oppia.directive('audioControls', [
           // distinguishing which audio directive is currently playing audio.
           var directiveId = Math.random().toString(36).substr(2, 10);
 
-          $scope.currentAudioLanguageCode =
+          var currentAudioLanguageCode =
             AudioTranslationManagerService
               .getCurrentAudioLanguageCode();
 
@@ -46,8 +46,7 @@ oppia.directive('audioControls', [
               .getCurrentAudioLanguageDescription();
 
           var getCurrentAudioTranslation = function() {
-            return $scope.getAudioTranslations()[
-              $scope.currentAudioLanguageCode];
+            return $scope.getAudioTranslations()[currentAudioLanguageCode];
           };
 
           $scope.AudioPlayerService = AudioPlayerService;
@@ -112,7 +111,7 @@ oppia.directive('audioControls', [
           $scope.openAudioTranslationSettings = function() {
             AudioTranslationManagerService
               .showAudioTranslationSettingsModal(function(newLanguageCode) {
-                $scope.currentAudioLanguageCode = newLanguageCode;
+                currentAudioLanguageCode = newLanguageCode;
                 $scope.currentAudioLanguageDescription = 
                   LanguageUtilService.getAudioLanguageDescription(
                     newLanguageCode);
