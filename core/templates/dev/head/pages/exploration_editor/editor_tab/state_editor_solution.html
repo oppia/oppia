@@ -1,6 +1,5 @@
 <div ng-controller="StateSolution">
-  <div ng-if="!isCurrentInteractionLinear() &&
-              stateHintsService.displayed.length > 0">
+  <div ng-if="stateHintsService.displayed.length > 0">
     <div class="oppia-editor-header">
       <strong>Solution</strong>
     </div>
@@ -17,7 +16,7 @@
                  ng-click="toggleInlineSolutionEditorIsActive()"
                  tooltip="This solution does not lead to another state. Verify the responses specified or change the solution."
                  tooltip-placement="bottom">
-              <div class="oppia-rule-header-warning-style" >
+              <div class="oppia-rule-header-warning-style">
                 ⚠
               </div>
             </div>
@@ -37,7 +36,7 @@
 
             <div ng-if="inlineSolutionEditorIsActive">
               <div class="oppia-editor-card-section protractor-test-oppia-solution-body">
-                <solution-editor object-type="objectType"
+                <solution-editor interaction-id="stateInteractionIdService.savedMemento"
                                  correct-answer-editor-html="correctAnswerEditorHtml"
                                  on-save="onSaveInlineSolution">
                 </solution-editor>

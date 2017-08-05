@@ -1039,6 +1039,29 @@ oppia.factory('explorationStatesService', [
     return {
       init: function(statesBackendDict) {
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
+        // Initialize the solutionValidityService.
+        SolutionValidityService.init();
+        _states.getStateNames().forEach(function(stateName) {
+          var solution = _states.getState(stateName).interaction.solution;
+          if (solution) {
+            AnswerClassificationService.getMatchingClassificationResult(
+              explorationContextService.getExplorationId(),
+              _states.getState(stateName),
+              solution.correctAnswer,
+              true,
+              $injector.get(angularNameService.getNameOfInteractionRulesService(
+                _states.getState(stateName).interaction.id))
+            ).then(function(result) {
+              if (
+                editorContextService.getActiveStateName() !== (
+                  result.outcome.dest)) {
+                SolutionValidityService.updateValidity(stateName, true);
+              } else {
+                SolutionValidityService.updateValidity(stateName, false);
+              }
+            });
+          }
+        });
       },
       getStates: function() {
         return angular.copy(_states);
@@ -1070,39 +1093,9 @@ oppia.factory('explorationStatesService', [
       },
       updateSolutionValidity: function(stateName, solutionIsValid) {
         SolutionValidityService.updateValidity(stateName, solutionIsValid);
-        var warningService = $injector.get('explorationWarningsService');
-        warningService.updateWarnings();
       },
       deleteSolutionValidity: function(stateName) {
         SolutionValidityService.deleteSolutionValidity(stateName);
-        var warningService = $injector.get('explorationWarningsService');
-        warningService.updateWarnings();
-      },
-      initializeSolutionValidityService: function() {
-        SolutionValidityService.init();
-        _states.getStateNames().forEach(function(stateName) {
-          var solution = _states.getState(stateName).interaction.solution;
-          if (solution) {
-            AnswerClassificationService.getMatchingClassificationResult(
-              explorationContextService.getExplorationId(),
-              _states.getState(stateName),
-              solution.correctAnswer,
-              true,
-              $injector.get(angularNameService.getNameOfInteractionRulesService(
-                _states.getState(stateName).interaction.id))
-            ).then(function(result) {
-              if (
-                editorContextService.getActiveStateName() !== (
-                  result.outcome.dest)) {
-                SolutionValidityService.updateValidity(stateName, true);
-              } else {
-                SolutionValidityService.updateValidity(stateName, false);
-              }
-              var warningService = $injector.get('explorationWarningsService');
-              warningService.updateWarnings();
-            });
-          }
-        });
       },
       getStateContentMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'content');
@@ -1994,12 +1987,12 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'SolutionValidityService', 'INTERACTION_SPECS',
+  'parameterMetadataService', 'INTERACTION_SPECS',
   'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, SolutionValidityService, INTERACTION_SPECS,
+      parameterMetadataService, INTERACTION_SPECS,
       WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};

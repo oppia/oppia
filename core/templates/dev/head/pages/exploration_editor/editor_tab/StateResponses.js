@@ -46,13 +46,13 @@ oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
-  'stateSolutionService', 'SolutionHelperService', 'alertsService',
+  'stateSolutionService', 'SolutionVerificationService', 'alertsService',
   'explorationContextService',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
-      stateSolutionService, SolutionHelperService, alertsService,
+      stateSolutionService, SolutionVerificationService, alertsService,
       explorationContextService) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
@@ -86,22 +86,23 @@ oppia.factory('responsesService', [
             .can_have_solution && stateSolutionService.savedMemento !== null) {
           if (stateSolutionService.savedMemento.correctAnswer !== null) {
             var currentStateName = editorContextService.getActiveStateName();
-            SolutionHelperService.verifySolution(
+            SolutionVerificationService.verifySolution(
               explorationContextService.getExplorationId(),
               explorationStatesService.getState(currentStateName),
               stateSolutionService.savedMemento.correctAnswer,
               function() {
                 explorationStatesService.updateSolutionValidity(
-                  currentStateName, false);
-                alertsService.addInfoMessage(
-                  'That solution does not lead to the next state!');
-              },
-              function() {
-                explorationStatesService.updateSolutionValidity(
                   currentStateName, true);
                 alertsService.addInfoMessage(
                   'The solution is now valid!');
-              });
+              },
+              function() {
+                explorationStatesService.updateSolutionValidity(
+                  currentStateName, false);
+                alertsService.addInfoMessage(
+                  'That solution does not lead to the next state!');
+              }
+            );
           }
         }
 

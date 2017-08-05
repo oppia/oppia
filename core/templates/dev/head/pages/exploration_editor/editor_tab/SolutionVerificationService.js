@@ -13,52 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for solution editor.
+ * @fileoverview Service for solution verification.
  */
 
-// These interaction ids use the interactionHtml available in the player view.
-oppia.constant('SOLUTION_SUPPORTED_INTERACTIONS', [
-  'MusicNotesInput',
-  'GraphInput',
-  'SetInput',
-  'CodeRepl',
-  'MathExpressionInput',
-  'ItemSelectionInput',
-  'LogicProof',
-  'TextInput',
-  'NumericInput',
-  'PencilCodeEditor'
-]);
-
-oppia.constant('INTERACTION_OBJECT_TYPES', {
-  CodeRepl: 'CodeString',
-  GraphInput: 'Graph',
-  ImageClickInput: 'ImageWithRegions',
-  PencilCodeEditor: 'CodeString',
-  MathExpressionInput: 'UnicodeString',
-  MusicNotesInput: 'MusicPhrase',
-  NumericInput: 'Real',
-  TextInput: 'NormalizedString',
-  LogicProof: 'LogicQuestion'
-});
-
-oppia.factory('SolutionHelperService', [
+oppia.factory('SolutionVerificationService', [
   '$injector', 'stateInteractionIdService', 'explorationContextService',
   'editorContextService', 'angularNameService', 'AnswerClassificationService',
-  'SOLUTION_SUPPORTED_INTERACTIONS', 'INTERACTION_OBJECT_TYPES',
   function(
     $injector, stateInteractionIdService, explorationContextService,
-    editorContextService, angularNameService, AnswerClassificationService,
-    SOLUTION_SUPPORTED_INTERACTIONS, INTERACTION_OBJECT_TYPES) {
+    editorContextService, angularNameService, AnswerClassificationService) {
     return {
-      isConstructedUsingObjectType: function(id) {
-        return (SOLUTION_SUPPORTED_INTERACTIONS.indexOf(id) === -1);
-      },
-      getInteractionObjectType: function(id) {
-        return INTERACTION_OBJECT_TYPES[id];
-      },
       verifySolution: function(
-        explorationId, state, correctAnswer, errorCallback, successCallback) {
+        explorationId, state, correctAnswer, successCallback, errorCallback) {
         var interactionId = stateInteractionIdService.savedMemento;
         var rulesServiceName = (
           angularNameService.getNameOfInteractionRulesService(interactionId));

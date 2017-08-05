@@ -42,7 +42,7 @@ oppia.factory('SolutionObjectFactory', [
     };
 
     Solution.createNew = function(
-      answerIsExclusive, correctAnswer, explanation) {
+        answerIsExclusive, correctAnswer, explanation) {
       return new Solution(answerIsExclusive, correctAnswer, explanation);
     };
 
@@ -52,10 +52,6 @@ oppia.factory('SolutionObjectFactory', [
       var correctAnswer = null;
       if (interactionId === 'GraphInput') {
         correctAnswer = '[Graph Object]';
-      } else if (interactionId === 'MultipleChoiceInput') {
-        correctAnswer = (
-          oppiaHtmlEscaper.objToEscapedJson(
-            choices[this.correctAnswer].label));
       } else if (interactionId === 'MathExpressionInput') {
         correctAnswer = this.correctAnswer.latex;
       } else if (interactionId === 'CodeRepl' ||
@@ -63,8 +59,6 @@ oppia.factory('SolutionObjectFactory', [
         correctAnswer = this.correctAnswer.code;
       } else if (interactionId === 'MusicNotesInput') {
         correctAnswer = '[Music Notes Object]';
-      } else if (interactionId === 'ImageClickInput') {
-        correctAnswer = this.correctAnswer.clickedRegions;
       } else if (interactionId === 'LogicProof') {
         correctAnswer = this.correctAnswer.correct;
       } else {
@@ -82,43 +76,25 @@ oppia.factory('SolutionObjectFactory', [
       this.correctAnswer = correctAnswer;
     };
 
-    Solution.prototype.getCorrectAnswerHtml = function(objectType) {
-      if (objectType === 'CodeString') {
+    Solution.prototype.setExplanation = function(explanation) {
+      this.explanation = explanation;
+    };
+
+    Solution.prototype.getCorrectAnswerHtml = function(interactionId) {
+      if (interactionId === 'CodeRepl' ||
+        interactionId === 'PencilCodeEditor') {
         return this.correctAnswer.code;
-      } else if (objectType === 'ImageWithRegions') {
-        return this.correctAnswer.clickedRegions;
-      } else if (objectType === 'Graph') {
+      } else if (interactionId === 'GraphInput') {
         return '[Graph Object]';
-      } else if (objectType === 'UnicodeString') {
+      } else if (interactionId === 'MathExpressionInput') {
         return this.correctAnswer.latex;
-      } else if (objectType === 'LogicQuestion') {
+      } else if (interactionId === 'LogicProof') {
         return this.correctAnswer.correct;
-      } else if (objectType === 'MusicPhrase') {
+      } else if (interactionId === 'MusicNotesInput') {
         return '[Music Phrase Object]';
       } else {
         return this.correctAnswer;
       }
-    };
-
-    Solution.prototype.getObjectEditorHtml = function(objectType) {
-      var element = $('<object-editor>');
-      element.attr('obj-type', objectType);
-      element.attr('init-args', '{choices: ruleDescriptionChoices}');
-      element.attr('is-editable', 'true');
-      element.attr('always-editable', 'true');
-      element.attr('style', 'color: black;');
-
-      if (objectType === 'UnicodeString') {
-        element.attr('value',
-          'stateSolutionService.displayed.correctAnswer.latex');
-      } else if (objectType === 'CodeString') {
-        element.attr('value',
-          'stateSolutionService.displayed.correctAnswer.code');
-      } else {
-        element.attr('value',
-          'stateSolutionService.displayed.correctAnswer');
-      }
-      return element.get(0).outerHTML;
     };
 
     return Solution;

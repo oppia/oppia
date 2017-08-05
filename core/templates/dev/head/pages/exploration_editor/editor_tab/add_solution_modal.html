@@ -7,18 +7,20 @@
         class="form-inline">
     <div class="oppia-rule-details-header">
       <select class="protractor-test-answer-is-exclusive-select"
-              ng-model="tmpSolution.answerIsExclusive"
+              ng-model="data.answerIsExclusive"
               ng-options="(item ? 'The only' : 'One') for item in [true, false]">
       </select> <strong>solution is...</strong>
+      <br>
+      <br>
       <div class="protractor-test-interaction-html"
            angular-html-bind="correctAnswerEditorHtml">
       </div>
       <br>
       <div ng-show="data.correctAnswer">
         <strong>Explanation:</strong>
-        <schema-based-editor class="protractor-test-explanation-text-area"
+        <schema-based-editor class="protractor-test-explanation-textarea"
                              schema="EXPLANATION_FORM_SCHEMA"
-                             local-value="tmpSolution.explanation">
+                             local-value="data.explanation">
         </schema-based-editor>
       </div>
     </div>
@@ -30,7 +32,7 @@
   <button class="btn btn-success protractor-test-submit-solution-button"
           ng-click="saveSolution()"
           ng-disabled="!data.correctAnswer ||
-                       !tmpSolution.explanation">
+                       !data.explanation">
     Check and Save Solution
   </button>
 </div>

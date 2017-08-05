@@ -46,31 +46,6 @@ describe('Solution object factory', function() {
         'This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
-        clickPosition: [0, 0],
-        clickedRegions: ['Region1']
-      });
-      expect(solution.getSummary('ImageClickInput',
-        ['Region1', 'Region2'])).toEqual('[One solution is Region1] ' +
-        'This is the explanation to the answer.');
-
-      solution.setCorrectAnswer(0);
-      expect(solution.getSummary('MultipleChoiceInput', [
-        {
-          val: 0,
-          label: '<p>one</p>'
-        },
-        {
-          val: 1,
-          label: '<p>two</p>'
-        },
-        {
-          val: 2,
-          label: '<p>three</p>'
-        }
-      ])).toEqual('[One solution is &quot;&lt;p&gt;one&lt;/p&gt;&quot;] ' +
-        'This is the explanation to the answer.');
-
-      solution.setCorrectAnswer({
         ascii: 'one',
         latex: 'one'
       });

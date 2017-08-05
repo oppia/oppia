@@ -17,30 +17,31 @@
  */
 
 oppia.directive('solutionEditor', [
-  'UrlInterpolationService', 'stateSolutionService',
-  function(UrlInterpolationService, stateSolutionService) {
+  '$modal', 'UrlInterpolationService', 'stateSolutionService',
+  'editorContextService', 'explorationStatesService',
+  'explorationWarningsService', 'alertsService',
+  'SolutionObjectFactory', 'SolutionVerificationService',
+  'explorationContextService',
+
+  function($modal, UrlInterpolationService, stateSolutionService,
+           editorContextService, explorationStatesService,
+           explorationWarningsService, alertsService,
+           SolutionObjectFactory, SolutionVerificationService,
+           explorationContextService) {
     return {
       restrict: 'E',
       scope: {
-        // Some correct answer templates are created manually based on the
-        // ObjectType while others are directly passed in
-        // correctAnswerEditorHtml. If a correct answer template is manually
-        // constructed the correctAnswerEditorHtml will be null.
-        getObjectType: '&objectType',
+        getInteractionId: '&interactionId',
         correctAnswerEditorHtml: '=',
         getOnSaveFn: '&onSave'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_editor_directive.html'),
       controller: [
-        '$scope', 'editabilityService', 'stateSolutionService',
-        function($scope, editabilityService, stateSolutionService) {
-          $scope.isEditable = editabilityService.isEditable();
+        '$scope', 'stateSolutionService',
+        function($scope, stateSolutionService) {
 
-          $scope.editSolutionForm = {};
           $scope.stateSolutionService = stateSolutionService;
-          $scope.solutionEditorIsOpen = false;
-          $scope.solutionCorrectAnswerEditorHtml = '';
 
           $scope.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
@@ -48,32 +49,79 @@ oppia.directive('solutionEditor', [
           };
 
           $scope.openSolutionEditor = function() {
-            if ($scope.isEditable) {
-              $scope.solutionEditorIsOpen = true;
-            }
-          };
+            $modal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration_editor/editor_tab/add_solution_modal.html'),
+              backdrop: 'static',
+              resolve: {
+                correctAnswerEditorHtml: function() {
+                  return $scope.correctAnswerEditorHtml;
+                }
+              },
+              controller: [
+                '$scope', '$modalInstance', 'correctAnswerEditorHtml',
+                'stateSolutionService',
+                function($scope, $modalInstance, correctAnswerEditorHtml,
+                         stateSolutionService) {
+                  $scope.correctAnswer = null;
+                  $scope.correctAnswerEditorHtml = correctAnswerEditorHtml;
+                  $scope.EXPLANATION_FORM_SCHEMA = {
+                    type: 'html',
+                    ui_config: {}
+                  };
 
-          $scope.submitAnswer = function(answer) {
-            // This function sets correctAnswer. correctAnswerEditorHtml calls
-            // this function when an answer is input.
-            stateSolutionService.displayed.setCorrectAnswer(answer);
-          };
+                  $scope.data = {
+                    answerIsExclusive: (
+                      stateSolutionService.savedMemento.answerIsExclusive),
+                    correctAnswer: null,
+                    explanation: stateSolutionService.savedMemento.explanation
+                  };
 
-          $scope.saveThisSolution = function() {
-            $scope.solutionEditorIsOpen = false;
-            $scope.getOnSaveFn()();
-          };
+                  $scope.submitAnswer = function(answer) {
+                    $scope.data.correctAnswer = answer;
+                  };
 
-          $scope.cancelThisSolutionEdit = function() {
-            $scope.solutionEditorIsOpen = false;
-          };
+                  $scope.saveSolution = function() {
+                    $modalInstance.close({
+                      solution: SolutionObjectFactory.createNew(
+                        $scope.data.answerIsExclusive,
+                        $scope.data.correctAnswer,
+                        $scope.data.explanation)
+                    });
+                  };
 
-          $scope.$on('externalSave', function() {
-            if ($scope.solutionEditorIsOpen &&
-              $scope.editSolutionForm.$valid) {
-              $scope.saveThisSolution();
-            }
-          });
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                    alertsService.clearWarnings();
+                  };
+                }
+              ]
+            }).result.then(function(result) {
+              var correctAnswer = result.solution.correctAnswer;
+              var currentStateName = editorContextService.getActiveStateName();
+              var state = explorationStatesService.getState(currentStateName);
+              SolutionVerificationService.verifySolution(
+                explorationContextService.getExplorationId(),
+                state,
+                correctAnswer,
+                function () {
+                  explorationStatesService.updateSolutionValidity(
+                    currentStateName, true);
+                  explorationWarningsService.updateWarnings();
+                },
+                function () {
+                  explorationStatesService.updateSolutionValidity(
+                    currentStateName, false);
+                  explorationWarningsService.updateWarnings();
+                  alertsService.addInfoMessage(
+                    'That solution does not lead to the next state!');
+                }
+              );
+
+              stateSolutionService.displayed = result.solution;
+              stateSolutionService.saveDisplayedValue();
+            });
+          };
         }
       ]
     };
