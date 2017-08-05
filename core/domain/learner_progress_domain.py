@@ -16,6 +16,7 @@
 
 """Domain objects for learner progress."""
 
+
 class LearnerProgress(object):
     """Domain object for the progress of the learner."""
 
@@ -46,3 +47,35 @@ class LearnerProgress(object):
         self.completed_collection_summaries = completed_collection_summaries
         self.exploration_playlist_summaries = exploration_playlist
         self.collection_playlist_summaries = collection_playlist
+
+
+class ActivityIdsInLearnerDashboard(object):
+    """Domain object for ids of the activities completed, currently being
+    completed or in the playlist of the user."""
+
+    def __init__(
+            self, completed_exploration_ids, completed_collection_ids,
+            incomplete_exploration_ids, incomplete_collection_ids,
+            exploration_playlist_ids, collection_playlist_ids):
+        """Constructs a ActivityIdsInLearnerDashboard domain object.
+
+        Args:
+            completed_exploration_ids: list(str). The ids of the explorations
+                completed by the user.
+            completed_collection_ids: list(str). The ids of the collections
+                completed by the user.
+            incomplete_exploration_ids: list(str). The ids of the explorations
+                currently in progress.
+            incomplete_collection_ids: list(str). The ids of the collections
+                currently in progress.
+            exploration_playlist_ids: list(str). The ids of the explorations
+                in the playlist of the user.
+            collection_playlist_ids: list(str). The ids of the collections
+                in the playlist of the user.
+        """
+        self.completed_exploration_ids = completed_exploration_ids
+        self.completed_collection_ids = completed_collection_ids
+        self.incomplete_exploration_ids = incomplete_exploration_ids
+        self.incomplete_collection_ids = incomplete_collection_ids
+        self.exploration_playlist_ids = exploration_playlist_ids
+        self.collection_playlist_ids = collection_playlist_ids

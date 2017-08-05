@@ -46,6 +46,8 @@ oppia.controller('Library', [
     $scope.activeGroupIndex = null;
 
     $scope.pageMode = GLOBALS.PAGE_MODE;
+    var hoverOverActivity = false;
+    var activeActivityId = '';
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
 
     // Keeps track of the index of the left-most visible card of each group.
@@ -73,6 +75,8 @@ oppia.controller('Library', [
     } else {
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
+        $scope.learnerDashboardActivityIds = (
+          data.learner_dashboard_activity_ids);
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
@@ -113,8 +117,44 @@ oppia.controller('Library', [
       $scope.activeGroupIndex = null;
     };
 
+    $scope.setHoverOverActivity = function(activityId) {
+      activeActivityId = activityId;
+      hoverOverActivity = !hoverOverActivity;
+    };
+
+    $scope.showAddToLearnerPlaylistIcon = function(activityId) {
+      var incompleteExplorationIds = (
+        $scope.learnerDashboardActivityIds.incomplete_exploration_ids);
+      var incompleteCollectionIds = (
+        $scope.learnerDashboardActivityIds.incomplete_collection_ids);
+      var completedExplorationIds = (
+        $scope.learnerDashboardActivityIds.completed_exploration_ids);
+      var completedCollectionIds = (
+        $scope.learnerDashboardActivityIds.completed_collection_ids);
+      var explorationPlaylistIds = (
+        $scope.learnerDashboardActivityIds.exploration_playlist_ids);
+      var collectionPlaylistIds = (
+        $scope.learnerDashboardActivityIds.collection_playlist_ids);
+      
+      if (incompleteExplorationIds.indexOf(activityId) !== -1 ||
+          incompleteCollectionIds.indexOf(activityId) !== -1 ||
+          completedExplorationIds.indexOf(activityId) !== -1 ||
+          completedCollectionIds.indexOf(activityId) !== -1 ||
+          explorationPlaylistIds.indexOf(activityId) !== -1 ||
+          collectionPlaylistIds.indexOf(activityId) !== -1) {
+        return false;
+      } else {
+        return hoverOverActivity && (activeActivityId == activityId);
+      }
+    };
+
     $scope.addToLearnerPlaylist = function(activityType, activityId) {
-      ;
+      var addActivityToLearnerPlaylistUrl = (
+        UrlInterpolationService.interpolateUrl(
+          '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+            activityType: activityType, activityId: activityId
+          }));
+      $http.post(addActivityToLearnerPlaylistUrl, {});
     };
 
     // If the value below is changed, the following CSS values in oppia.css

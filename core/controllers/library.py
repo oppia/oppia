@@ -23,6 +23,7 @@ from core.domain import acl_decorators
 from core.controllers import base
 from core.domain import collection_services
 from core.domain import exp_services
+from core.domain import learner_progress_services
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
@@ -117,9 +118,38 @@ class LibraryIndexHandler(base.BaseHandler):
                 [constants.DEFAULT_LANGUAGE_CODE]))
 
         preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
+        learner_dashboard_activity_ids = {
+            'completed_exploration_ids': [],
+            'completed_collection_ids': [],
+            'incomplete_exploration_ids': [],
+            'incomplete_collection_ids': [],
+            'exploration_playlist_ids': [],
+            'collection_playlist_ids': []
+        }
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
+
+            # Get the progress of the learner - the ids of the explorations and
+            # collections completed by the user, the activities currently being
+            # completed and the ones present in the playlist of the user.
+            activity_ids = (
+                learner_progress_services.get_ids_of_activities_in_learner_dashboard( # pylint: disable=line-too-long
+                    self.user_id))
+
+            learner_dashboard_activity_ids = {
+                'completed_exploration_ids': (
+                    activity_ids.completed_exploration_ids),
+                'completed_collection_ids': (
+                    activity_ids.completed_collection_ids),
+                'incomplete_exploration_ids': (
+                    activity_ids.incomplete_exploration_ids),
+                'incomplete_collection_ids': (
+                    activity_ids.incomplete_collection_ids),
+                'exploration_playlist_ids': (
+                    activity_ids.exploration_playlist_ids),
+                'collection_playlist_ids': activity_ids.collection_playlist_ids
+            }
 
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -143,6 +173,8 @@ class LibraryIndexHandler(base.BaseHandler):
         self.values.update({
             'activity_summary_dicts_by_category': (
                 summary_dicts_by_category),
+            'learner_dashboard_activity_ids': (
+                learner_dashboard_activity_ids),
             'preferred_language_codes': preferred_language_codes,
         })
         self.render_json(self.values)

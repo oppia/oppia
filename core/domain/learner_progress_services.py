@@ -850,29 +850,17 @@ def get_collection_summary_dicts(collection_summaries):
     return summary_dicts
 
 
-def get_activity_progress(user_id):
-    """Returns the progress of the learners - the explorations and collections
-    completed by the user and those in progress.
+def get_ids_of_activities_in_learner_dashboard(user_id):
+    """Returns the ids of each of the activities that are present in the various
+    sections of the learner dashboard, namely the completed section, the
+    incomplete section and the playlist section.
 
     Args:
         user_id: str. The id of the learner.
 
     Returns:
-        LearnerProgress. The learner progress domain object corresponding to the
-            particular learner.
-        dict. The numbers of the activities that are no longer present. It
-            contains four keys:
-            - incomplete_explorations: int. The number of incomplete
-                explorations no longer present.
-            - incomplete_collections: int. The number of incomplete collections
-                no longer present.
-            - completed_explorations: int. The number of completed explorations
-                no longer present.
-            - completed_collections: int. The number of completed collections no
-                longer present.
-        list(str). The titles of the collections to which new explorations have
-            been added.
-
+        activity_ids. The domain object containing the ids of all activities
+            in the learner dashboard.
     """
     learner_progress_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
@@ -912,6 +900,53 @@ def get_activity_progress(user_id):
     else:
         exploration_playlist_ids = []
         collection_playlist_ids = []
+
+    activity_ids = learner_progress_domain.ActivityIdsInLearnerDashboard(
+        completed_exploration_ids, completed_collection_ids,
+        incomplete_exploration_ids, incomplete_collection_ids,
+        exploration_playlist_ids, collection_playlist_ids)
+
+    return activity_ids
+
+
+def get_activity_progress(user_id):
+    """Returns the progress of the learners - the explorations and collections
+    completed by the user and those in progress.
+
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        LearnerProgress. The learner progress domain object corresponding to the
+            particular learner.
+        dict. The numbers of the activities that are no longer present. It
+            contains four keys:
+            - incomplete_explorations: int. The number of incomplete
+                explorations no longer present.
+            - incomplete_collections: int. The number of incomplete collections
+                no longer present.
+            - completed_explorations: int. The number of completed explorations
+                no longer present.
+            - completed_collections: int. The number of completed collections no
+                longer present.
+        list(str). The titles of the collections to which new explorations have
+            been added.
+
+    """
+    activity_ids_in_learner_dashboard = (
+        get_ids_of_activities_in_learner_dashboard(user_id))
+    completed_exploration_ids = (
+        activity_ids_in_learner_dashboard.completed_exploration_ids)
+    completed_collection_ids = (
+        activity_ids_in_learner_dashboard.completed_collection_ids)
+    incomplete_exploration_ids = (
+        activity_ids_in_learner_dashboard.incomplete_exploration_ids)
+    incomplete_collection_ids = (
+        activity_ids_in_learner_dashboard.incomplete_collection_ids)
+    exploration_playlist_ids = (
+        activity_ids_in_learner_dashboard.exploration_playlist_ids)
+    collection_playlist_ids = (
+        activity_ids_in_learner_dashboard.collection_playlist_ids)
 
     activity_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(

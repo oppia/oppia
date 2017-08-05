@@ -466,7 +466,8 @@ oppia.controller('LearnerDashboard', [
               threadSummaryDicts[index]));
         }
         $scope.numberOfUnreadThreads = responseData.number_of_unread_threads;
-
+        $scope.explorationPLaylist = responseData.exploration_playlist;
+        console.log($scope.explorationPLaylist);
         $scope.activeSection = LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE;
         $scope.activeSubsection = (
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
