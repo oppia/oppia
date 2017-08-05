@@ -52,18 +52,24 @@ oppia.directive('solutionEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/add_solution_modal.html'),
               backdrop: 'static',
-              resolve: {
-                correctAnswerEditorHtml: function() {
-                  return $scope.correctAnswerEditorHtml;
-                }
-              },
               controller: [
-                '$scope', '$modalInstance', 'correctAnswerEditorHtml',
-                'stateSolutionService',
-                function($scope, $modalInstance, correctAnswerEditorHtml,
-                         stateSolutionService) {
+                '$scope', '$modalInstance', 'stateInteractionIdService',
+                'stateSolutionService', 'editorContextService',
+                'oppiaExplorationHtmlFormatterService',
+                'explorationStatesService',
+                function($scope, $modalInstance, stateInteractionIdService,
+                         stateSolutionService, editorContextService,
+                         oppiaExplorationHtmlFormatterService,
+                         explorationStatesService) {
+                  $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
+                    'currentCorrectAnswerEditorHtmlForSolutionEditor');
                   $scope.correctAnswer = null;
-                  $scope.correctAnswerEditorHtml = correctAnswerEditorHtml;
+                  $scope.correctAnswerEditorHtml = (
+                    oppiaExplorationHtmlFormatterService.getInteractionHtml(
+                      stateInteractionIdService.savedMemento,
+                      explorationStatesService.getInteractionCustomizationArgsMemento(
+                        editorContextService.getActiveStateName()),
+                      $scope.SOLUTION_EDITOR_FOCUS_LABEL));
                   $scope.EXPLANATION_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {}

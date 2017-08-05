@@ -38,7 +38,6 @@ oppia.controller('StateSolution', [
     $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
       'currentCorrectAnswerEditorHtmlForSolutionEditor');
     explorationWarningsService.updateWarnings();
-
     $scope.stateHintsService = stateHintsService;
     $scope.correctAnswer = null;
 
@@ -88,18 +87,18 @@ oppia.controller('StateSolution', [
         resolve: {
           correctAnswer: function() {
             return $scope.correctAnswer;
-          },
-          correctAnswerEditorHtml: function() {
-            return $scope.correctAnswerEditorHtml;
           }
         },
         controller: [
           '$scope', '$modalInstance', 'correctAnswer',
-          'correctAnswerEditorHtml',
-          function($scope, $modalInstance, correctAnswer,
-            correctAnswerEditorHtml) {
+          function($scope, $modalInstance, correctAnswer) {
             $scope.correctAnswer = correctAnswer;
-            $scope.correctAnswerEditorHtml = correctAnswerEditorHtml;
+            $scope.correctAnswerEditorHtml = (
+              oppiaExplorationHtmlFormatterService.getInteractionHtml(
+                stateInteractionIdService.savedMemento,
+                explorationStatesService.getInteractionCustomizationArgsMemento(
+                  editorContextService.getActiveStateName()),
+                $scope.SOLUTION_EDITOR_FOCUS_LABEL));
             $scope.EXPLANATION_FORM_SCHEMA = {
               type: 'html',
               ui_config: {}
