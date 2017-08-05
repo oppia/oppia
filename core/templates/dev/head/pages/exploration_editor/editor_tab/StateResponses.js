@@ -46,10 +46,14 @@ oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
+  'stateSolutionService', 'SolutionHelperService', 'alertsService',
+  'explorationContextService',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
-      explorationStatesService, graphDataService, OutcomeObjectFactory) {
+      explorationStatesService, graphDataService, OutcomeObjectFactory,
+      stateSolutionService, SolutionHelperService, alertsService,
+      explorationContextService) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -73,6 +77,33 @@ oppia.factory('responsesService', [
         explorationStatesService.saveInteractionAnswerGroups(
           editorContextService.getActiveStateName(),
           angular.copy(newAnswerGroups));
+
+        // To check if the solution is valid once a rule has been changed or
+        // added.
+        if (
+          stateInteractionIdService.savedMemento &&
+          INTERACTION_SPECS[stateInteractionIdService.savedMemento]
+            .can_have_solution && stateSolutionService.savedMemento !== null) {
+          if (stateSolutionService.savedMemento.correctAnswer !== null) {
+            var currentStateName = editorContextService.getActiveStateName();
+            SolutionHelperService.verifySolution(
+              explorationContextService.getExplorationId(),
+              explorationStatesService.getState(currentStateName),
+              stateSolutionService.savedMemento.correctAnswer,
+              function() {
+                explorationStatesService.updateSolutionValidity(
+                  currentStateName, false);
+                alertsService.addInfoMessage(
+                  'That solution does not lead to the next state!');
+              },
+              function() {
+                explorationStatesService.updateSolutionValidity(
+                  currentStateName, true);
+                alertsService.addInfoMessage(
+                  'The solution is now valid!');
+              });
+          }
+        }
 
         graphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);

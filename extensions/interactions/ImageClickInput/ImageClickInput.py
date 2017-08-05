@@ -28,6 +28,7 @@ class ImageClickInput(base.BaseInteraction):
     instructions = 'Click on the image'
     narrow_instructions = 'View image'
     needs_summary = False
+    can_have_solution = False
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',

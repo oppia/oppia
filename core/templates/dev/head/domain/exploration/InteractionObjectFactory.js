@@ -19,13 +19,13 @@
 
 oppia.factory('InteractionObjectFactory', [
   'AnswerGroupObjectFactory', 'FallbackObjectFactory',
-  'HintObjectFactory', 'OutcomeObjectFactory',
+  'HintObjectFactory', 'OutcomeObjectFactory', 'SolutionObjectFactory',
   function(
     AnswerGroupObjectFactory, FallbackObjectFactory,
-    HintObjectFactory, OutcomeObjectFactory) {
+    HintObjectFactory, OutcomeObjectFactory, SolutionObjectFactory) {
     var Interaction = function(
         answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
-        defaultOutcome, fallbacks, hints, id) {
+        defaultOutcome, fallbacks, hints, id, solution) {
       this.answerGroups = answerGroups;
       this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
       this.customizationArgs = customizationArgs;
@@ -33,6 +33,7 @@ oppia.factory('InteractionObjectFactory', [
       this.fallbacks = fallbacks;
       this.hints = hints;
       this.id = id;
+      this.solution = solution;
     };
 
     Interaction.prototype.toBackendDict = function() {
@@ -51,7 +52,7 @@ oppia.factory('InteractionObjectFactory', [
           return hint.toBackendDict();
         }),
         id: this.id,
-        solution: {}
+        solution: this.solution ? this.solution.toBackendDict() : null
       };
     };
 
@@ -70,7 +71,9 @@ oppia.factory('InteractionObjectFactory', [
         defaultOutcome,
         generateFallbacksFromBackend(interactionDict.fallbacks),
         generateHintsFromBackend(interactionDict.hints),
-        interactionDict.id);
+        interactionDict.id,
+        interactionDict.solution ? (
+          generateSolutionFromBackend(interactionDict.solution)) : null);
     };
 
     var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
@@ -91,6 +94,10 @@ oppia.factory('InteractionObjectFactory', [
       return hintBackendDicts.map(function(hintBackendDict) {
         return HintObjectFactory.createFromBackendDict(hintBackendDict);
       });
+    };
+
+    var generateSolutionFromBackend = function(solutionBackendDict) {
+      return SolutionObjectFactory.createFromBackendDict(solutionBackendDict);
     };
 
     return Interaction;

@@ -1177,7 +1177,7 @@ class InteractionInstance(object):
                 self.confirmed_unclassified_answers),
             'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
             'hints': [hint.to_dict() for hint in self.hints],
-            'solution': self.solution,
+            'solution': self.solution.to_dict() if self.solution else None,
         }
 
     @classmethod
@@ -1195,6 +1195,11 @@ class InteractionInstance(object):
         default_outcome_dict = (
             Outcome.from_dict(interaction_dict['default_outcome'])
             if interaction_dict['default_outcome'] is not None else None)
+        solution_dict = (
+            Solution.from_dict(
+                interaction_dict['id'], interaction_dict['solution'])
+            if interaction_dict['solution'] else None)
+
         return cls(
             interaction_dict['id'],
             interaction_dict['customization_args'],
@@ -1204,7 +1209,7 @@ class InteractionInstance(object):
             interaction_dict['confirmed_unclassified_answers'],
             [Fallback.from_dict(f) for f in interaction_dict['fallbacks']],
             [Hint.from_dict(h) for h in interaction_dict['hints']],
-            interaction_dict['solution'])
+            solution_dict)
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
@@ -1342,12 +1347,10 @@ class InteractionInstance(object):
         for hint in self.hints:
             hint.validate()
 
-        if self.hints:
-            if self.solution:
-                Solution.from_dict(
-                    self.id, self.solution).validate(self.id)
+        if self.solution:
+            self.solution.validate(self.id)
 
-        elif self.solution:
+        if self.solution and not self.hints:
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
@@ -1796,7 +1799,7 @@ class State(object):
         'confirmed_unclassified_answers': [],
         'fallbacks': [],
         'hints': [],
-        'solution': {},
+        'solution': None,
     }
 
     def __init__(self, content, param_changes, interaction,
@@ -2088,17 +2091,21 @@ class State(object):
         """Update the solution of interaction.
 
         Args:
-            solution_dict: dict. The dict representation of Solution object.
+            solution_dict: dict or None. The dict representation of
+                Solution object.
 
         Raises:
-            Exception: 'hint_list' is not a list.
+            Exception: 'solution_dict' is not a dict.
         """
-        if not isinstance(solution_dict, dict):
-            raise Exception(
-                'Expected solution to be a dict, received %s'
-                % solution_dict)
-        self.interaction.solution = Solution.from_dict(
-            self.interaction.id, solution_dict)
+        if solution_dict is not None:
+            if not isinstance(solution_dict, dict):
+                raise Exception(
+                    'Expected solution to be a dict, received %s'
+                    % solution_dict)
+            self.interaction.solution = Solution.from_dict(
+                self.interaction.id, solution_dict)
+        else:
+            self.interaction.solution = None
 
     def add_hint(self, hint_text):
         """Add a new hint to the list of hints.
@@ -2371,7 +2378,7 @@ class Exploration(object):
 
             solution = (
                 Solution.from_dict(idict['id'], idict['solution'])
-                if idict['solution'] else {})
+                if idict['solution'] else None)
 
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
@@ -3488,7 +3495,7 @@ class Exploration(object):
                         interaction['hints'].append(
                             Hint(fallback['outcome']['feedback'][0]).to_dict())
             if 'solution' not in interaction:
-                interaction['solution'] = {}
+                interaction['solution'] = None
         return states_dict
 
     @classmethod
@@ -3507,7 +3514,8 @@ class Exploration(object):
     @classmethod
     def _convert_states_v11_dict_to_v12_dict(cls, states_dict):
         """Converts from version 11 to 12. Version 12 refactors audio
-        translations from a list to a dict keyed by language code.
+        translations from a list to a dict keyed by language code. Also,
+        empty solutions are set to None.
         """
         for state_dict in states_dict.values():
             old_audio_translations = state_dict['content']['audio_translations']
@@ -3519,6 +3527,8 @@ class Exploration(object):
                 }
                 for old_translation in old_audio_translations
             }
+            if not state_dict['interaction']['solution']:
+                state_dict['interaction']['solution'] = None
         return states_dict
 
     @classmethod

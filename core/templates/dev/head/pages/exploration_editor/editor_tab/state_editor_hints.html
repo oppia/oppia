@@ -25,7 +25,7 @@
                 <img ng-if="editabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
               </span>
               <a ng-click="changeActiveHintIndex($index)"
-                 class="oppia-rule-tab"
+                 class="oppia-rule-tab protractor-test-hint-tab"
                  ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}">
                 <response-header index="$index"
                                  summary="getHintSummary(hint)"
@@ -36,10 +36,10 @@
               </a>
 
               <div ng-if="activeHintIndex === $index">
-                <div class="oppia-editor-card-section">
+                <div class="oppia-editor-card-section protractor-test-hint-body-<[$index]>">
                   <hint-editor hint="hint"
                                index="$index + 1"
-                               on-save="onComponentSave">
+                               on-save="onSaveInlineHint">
                   </hint-editor>
                 </div>
               </div>
@@ -51,7 +51,9 @@
 
     <md-card style="margin: 0; padding: 0;">
       <div ng-if="editabilityService.isEditableOutsideTutorialMode()">
-        <button type="button" class="btn btn-default btn-lg oppia-add-hint-button" ng-click="openAddHintModal()">
+        <button type="button"
+                class="btn btn-default btn-lg oppia-add-hint-button protractor-test-oppia-add-hint-button"
+                ng-click="openAddHintModal()">
           + Add Hint
         </button>
       </div>
@@ -69,15 +71,17 @@
           class="form-inline">
       <div class="oppia-rule-details-header">
         <strong>Hint #<[hintIndex]> is...</strong>
-        <schema-based-editor schema="HINT_FORM_SCHEMA" local-value="tmpHint">
+        <schema-based-editor class="protractor-test-hint-text"
+                             schema="HINT_FORM_SCHEMA"
+                             local-value="tmpHint">
         </schema-based-editor>
       </div>
     </form>
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success" ng-click="saveHint()" ng-disabled="!tmpHint">Save Hint</button>
+    <button class="btn btn-default protractor-test-cancel-hint" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success protractor-test-save-hint" ng-click="saveHint()" ng-disabled="!tmpHint">Save Hint</button>
   </div>
 </script>
 
@@ -94,7 +98,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-      <button class="btn btn-danger"
+      <button class="btn btn-danger protractor-test-confirm-delete-hint"
               ng-click="reallyDelete()">
         Delete Hint
       </button>
