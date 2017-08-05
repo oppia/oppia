@@ -416,7 +416,7 @@ GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
 # files.
 
 if DEV_MODE:
-    AUDIO_URL_TEMPLATE = '/assets/test/<exploration_id>/audio/<filename>'
+    AUDIO_URL_TEMPLATE = '/audiohandler/<exploration_id>/audio/<filename>'
 else:
     AUDIO_URL_TEMPLATE = (
         'https://storage.googleapis.com/%s/<exploration_id>/'
@@ -531,7 +531,7 @@ DEMO_EXPLORATIONS = {
     u'14': 'about_oppia.yaml',
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
-    u'17': 'audio_test.yaml',
+    u'17': 'audio_test',
 }
 
 DEMO_COLLECTIONS = {

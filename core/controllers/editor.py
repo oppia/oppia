@@ -21,7 +21,6 @@ import imghdr
 import logging
 import StringIO
 
-import cloudstorage
 import jinja2
 import mutagen
 
@@ -864,18 +863,24 @@ class ImageUploadHandler(EditorHandler):
         self.render_json({'filepath': filename})
 
 
-class AudioFileHandler(EditorHandler):
-    """Handles audio file uploads to Google Cloud Storage."""
+class AudioUploadHandler(EditorHandler):
+    """Handles audio file uploads (to Google Cloud Storage in production, and
+    to the local datastore in dev).
+    """
+
+    # The string to prefix to the filename (before tacking the whole thing on
+    # to the end of 'assets/').
+    _FILENAME_PREFIX = 'audio'
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
 
-        raw = self.request.get('raw')
+        raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
         allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 
-        if not raw:
+        if not raw_audio_file:
             raise self.InvalidInputException('No audio supplied')
         dot_index = filename.rfind('.')
         extension = filename[dot_index + 1:].lower()
@@ -890,7 +895,7 @@ class AudioFileHandler(EditorHandler):
                 'one of the following extensions: %s' % allowed_formats)
 
         tempbuffer = StringIO.StringIO()
-        tempbuffer.write(raw)
+        tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:
             audio = mutagen.File(tempbuffer)
@@ -906,9 +911,9 @@ class AudioFileHandler(EditorHandler):
                                              'as a %s file' % extension)
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
-                'Audio must be under %s seconds in length. '
-                'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC,
-                                     audio.info.length))
+                'Audio files must be under %s seconds in length. The uploaded '
+                'file is %.2f seconds long.' % (
+                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
         if len(set(audio.mime).intersection(
                 set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
             raise self.InvalidInputException(
@@ -924,16 +929,15 @@ class AudioFileHandler(EditorHandler):
         # object being recursively passed around in app engine.
         del audio
 
-        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
-
-        # Upload to GCS bucket with filepath
-        # "<bucket>/<exploration-id>/assets/audio/<filename>".
-        gcs_file_url = ('/%s/%s/assets/audio/%s'
-                        % (bucket_name, exploration_id, filename))
-        gcs_file = cloudstorage.open(
-            gcs_file_url, 'w', content_type=mimetype)
-        gcs_file.write(raw)
-        gcs_file.close()
+        # Audio files are stored to the datastore in the dev env, and to GCS
+        # in production.
+        file_system_class = (
+            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+            else fs_domain.GcsFileSystem)
+        fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+        fs.commit(
+            self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
+            raw_audio_file, mimetype=mimetype)
 
         self.render_json({'filename': filename})
 

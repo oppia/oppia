@@ -143,3 +143,15 @@ libraries:
 # running the server in the dev environment.
 env_variables:
   MINIFICATION: false
+
+
+skip_files:
+# .pyc and .pyo files
+- ^(.*/)?.*\.py[co]$
+# Unix hidden files whose names begin with a dot
+- ^(.*/)?\..*$
+# Karma test files
+- ^(.*/)Spec.js$
+# Other folders to ignore
+- tests/
+- scripts/
