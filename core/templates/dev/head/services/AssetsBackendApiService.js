@@ -23,9 +23,6 @@ oppia.factory('AssetsBackendApiService', [
       $http, $q, UrlInterpolationService) {
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
-    var GCS_AUDIO_DOWNLOAD_URL_TEMPLATE = 
-      'https://storage.googleapis.com/' + constants.GCS_RESOURCE_BUCKET_NAME +
-      '/<exploration_id>/assets/audio/<filename>';
 
     // Map from asset filename to asset blob.
     var assetsCache = {};
@@ -46,8 +43,8 @@ oppia.factory('AssetsBackendApiService', [
         explorationId, filename, rawAssetData, successCallback,
         errorCallback) {
       var form = new FormData();
-      
-      form.append('raw', rawAssetData);
+
+      form.append('raw_audio_file', rawAssetData);
       form.append('payload', JSON.stringify({
         filename: filename
       }));
@@ -59,21 +56,30 @@ oppia.factory('AssetsBackendApiService', [
         processData: false,
         contentType: false,
         type: 'POST',
-        dataType: 'text'
+        dataType: 'text',
+        dataFilter: function(data) {
+          // Remove the XSSI prefix.
+          var transformedData = data.substring(5);
+          return JSON.parse(transformedData);
+        },
       }).done(function(response) {
         if (successCallback) {
           successCallback(response);
         }
-      }).fail(function(error) {
+      }).fail(function(data) {
+        // Remove the XSSI prefix.
+        var transformedData = data.responseText.substring(5);
+        var parsedResponse = angular.fromJson(transformedData);
+        console.error(parsedResponse);
         if (errorCallback) {
-          errorCallback(error.data);
+          errorCallback(parsedResponse);
         }
       });
     };
 
     var _getAudioDownloadUrl = function(explorationId, filename) {
       return UrlInterpolationService.interpolateUrl(
-        GCS_AUDIO_DOWNLOAD_URL_TEMPLATE, {
+        GLOBALS.AUDIO_URL_TEMPLATE, {
           exploration_id: explorationId,
           filename: filename
         });
@@ -106,6 +112,9 @@ oppia.factory('AssetsBackendApiService', [
       },
       isCached: function(filename) {
         return _isCached(filename);
+      },
+      getAudioDownloadUrl: function(explorationId, filename) {
+        return _getAudioDownloadUrl(explorationId, filename);
       }
     };
   }

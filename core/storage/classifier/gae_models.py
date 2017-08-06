@@ -181,9 +181,37 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         training_job_instance.put()
         return instance_id
 
+    @classmethod
+    def create_multi(cls, job_dicts_list):
+        """Creates multiple new  ClassifierTrainingJobModel entries.
 
-class ClassifierExplorationMappingModel(base_models.BaseModel):
-    """Model for mapping exploration attributes to a ClassifierDataModel.
+        Args:
+            job_dicts_list: list(dict). The list of dicts where each dict
+                represents the attributes of one ClassifierTrainingJobModel.
+
+        Returns:
+            list(str). List of job IDs.
+        """
+        job_models = []
+        job_ids = []
+        for job_dict in job_dicts_list:
+            instance_id = cls._generate_id(job_dict['exp_id'])
+            training_job_instance = cls(
+                id=instance_id, algorithm_id=job_dict['algorithm_id'],
+                interaction_id=job_dict['interaction_id'],
+                exp_id=job_dict['exp_id'],
+                exp_version=job_dict['exp_version'],
+                state_name=job_dict['state_name'], status=job_dict['status'],
+                training_data=job_dict['training_data'])
+
+            job_models.append(training_job_instance)
+            job_ids.append(instance_id)
+        cls.put_multi(job_models)
+        return job_ids
+
+
+class TrainingJobExplorationMappingModel(base_models.BaseModel):
+    """Model for mapping exploration attributes to a ClassifierTrainingJob.
 
     The id of instances of this class has the form
     {{exp_id}}.{{exp_version}}.{{utf8_encoded_state_name}}
@@ -196,8 +224,8 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
-    # The ID of the classifier corresponding to the exploration attributes.
-    classifier_id = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the training job corresponding to the exploration attributes.
+    job_id = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
@@ -218,28 +246,31 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
         return utils.convert_to_str(new_id)
 
     @classmethod
-    def get_model(cls, exp_id, exp_version, state_name):
-        """Retrieves the Classifier Exploration Mapping model given Exploration
+    def get_models(cls, exp_id, exp_version, state_names):
+        """Retrieves the Classifier Exploration Mapping models given Exploration
         attributes.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. The exploration version at the time
                 this training job was created.
-            state_name: unicode. The name of the state to which the classifier
-                belongs.
+            state_names: list(unicode). The state names for which we retrieve
+                the mapping models.
 
         Returns:
-            ClassifierExplorationMappingModel. The model instance for the
-                classifier exploration mapping.
+            list(ClassifierExplorationMappingModel|None). The model instances
+                for the classifier exploration mapping.
         """
-        mapping_id = cls._generate_id(exp_id, exp_version, state_name)
-        mapping_instance = cls.get(mapping_id, False)
-        return mapping_instance
+        mapping_ids = []
+        for state_name in state_names:
+            mapping_id = cls._generate_id(exp_id, exp_version, state_name)
+            mapping_ids.append(mapping_id)
+        mapping_instances = cls.get_multi(mapping_ids)
+        return mapping_instances
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, classifier_id):
+            cls, exp_id, exp_version, state_name, job_id):
         """Creates a new ClassifierExplorationMappingModel entry.
 
         Args:
@@ -248,7 +279,7 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
                 this training job was created.
             state_name: unicode. The name of the state to which the classifier
                 belongs.
-            classifier_id: str. The ID of the classifier corresponding to this
+            job_id: str. The ID of the training job corresponding to this
                 combination of <exp_id, exp_version, state_name>.
 
         Returns:
@@ -262,8 +293,33 @@ class ClassifierExplorationMappingModel(base_models.BaseModel):
         if not cls.get_by_id(instance_id):
             mapping_instance = cls(
                 id=instance_id, exp_id=exp_id, exp_version=exp_version,
-                state_name=state_name, classifier_id=classifier_id)
+                state_name=state_name, job_id=job_id)
 
             mapping_instance.put()
             return instance_id
         raise Exception('A model with the same ID already exists.')
+
+    @classmethod
+    def create_multi(cls, job_exploration_mappings):
+        """Creates multiple new  TrainingJobExplorationMappingModel entries.
+
+        Args:
+            job_exploration_mappings: list(TrainingJobExplorationMapping). The
+                list of TrainingJobExplorationMapping Domain objects.
+        """
+        mapping_models = []
+        mapping_ids = []
+        for job_exploration_mapping in job_exploration_mappings:
+            instance_id = cls._generate_id(job_exploration_mapping.exp_id,
+                                           job_exploration_mapping.exp_version,
+                                           job_exploration_mapping.state_name)
+            mapping_instance = cls(
+                id=instance_id, exp_id=job_exploration_mapping.exp_id,
+                exp_version=job_exploration_mapping.exp_version,
+                state_name=job_exploration_mapping.state_name,
+                job_id=job_exploration_mapping.job_id)
+
+            mapping_models.append(mapping_instance)
+            mapping_ids.append(instance_id)
+        cls.put_multi(mapping_models)
+        return mapping_ids

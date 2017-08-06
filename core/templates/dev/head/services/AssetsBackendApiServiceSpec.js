@@ -20,15 +20,14 @@ describe('Assets Backend API Service', function() {
   var AssetsBackendApiService = null;
   var $httpBackend = null;
   var $rootScope = null;
-  var GCS_AUDIO_DOWNLOAD_URL_TEMPLATE = 
-    'https://storage.googleapis.com/' + constants.GCS_RESOURCE_BUCKET_NAME +
-    '/<exploration_id>/assets/audio/<filename>';
 
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
     AssetsBackendApiService = $injector.get(
       'AssetsBackendApiService');
+    UrlInterpolationService = $injector.get(
+      'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
   }));
@@ -42,9 +41,11 @@ describe('Assets Backend API Service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    var requestUrl = 'https://storage.googleapis.com/' + 
-      constants.GCS_RESOURCE_BUCKET_NAME + 
-      '/0/assets/audio/myfile.mp3';
+    var requestUrl = UrlInterpolationService.interpolateUrl(
+      GLOBALS.AUDIO_URL_TEMPLATE, {
+        exploration_id: '0',
+        filename: 'myfile.mp3'
+      });
 
     $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
     expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
@@ -63,9 +64,11 @@ describe('Assets Backend API Service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    var requestUrl = 'https://storage.googleapis.com/' + 
-      constants.GCS_RESOURCE_BUCKET_NAME + 
-      '/0/assets/audio/myfile.mp3';
+    var requestUrl = UrlInterpolationService.interpolateUrl(
+      GLOBALS.AUDIO_URL_TEMPLATE, {
+        exploration_id: '0',
+        filename: 'myfile.mp3'
+      });
 
     $httpBackend.expect('GET', requestUrl).respond(500, 'MutagenError');
     AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(

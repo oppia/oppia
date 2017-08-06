@@ -28,6 +28,7 @@ import datetime
 import logging
 import os
 
+from constants import constants
 from core.domain import activity_services
 from core.domain import collection_domain
 from core.domain import exp_services
@@ -849,7 +850,7 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
 
     # Remove the collection from the featured activity list, if necessary.
     activity_services.remove_featured_activity(
-        feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
+        constants.ACTIVITY_TYPE_COLLECTION, collection_id)
 
 
 def get_collection_snapshots_metadata(collection_id):

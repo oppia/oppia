@@ -189,14 +189,14 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.actions = role_services.get_all_actions(self.role)
 
-        rights_mgr_user = rights_manager.Actor(self.user_id)
-        self.is_moderator = rights_mgr_user.is_moderator()
-        self.is_admin = rights_mgr_user.is_admin()
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
-        self.values['is_moderator'] = self.is_moderator
-        self.values['is_admin'] = self.is_admin
+        self.values['is_moderator'] = bool(
+            self.role == feconf.ROLE_ID_MODERATOR or
+            self.role == feconf.ROLE_ID_ADMIN)
+        self.values['is_admin'] = bool(
+            self.role == feconf.ROLE_ID_ADMIN)
         self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):
@@ -311,6 +311,7 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
             'ACTIVITY_STATUS_PUBLICIZED': (
                 rights_manager.ACTIVITY_STATUS_PUBLICIZED),
+            'AUDIO_URL_TEMPLATE': feconf.AUDIO_URL_TEMPLATE,
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
@@ -321,10 +322,8 @@ class BaseHandler(webapp2.RequestHandler):
 
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
-            'can_create_collections': (
-                self.username and self.username in
-                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
-            ),
+            'can_create_collections': bool(
+                self.role == feconf.ROLE_ID_COLLECTION_EDITOR),
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
@@ -435,6 +434,11 @@ class BaseHandler(webapp2.RequestHandler):
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
+        if isinstance(exception, self.NotLoggedInException):
+            self.redirect(
+                current_user_services.create_login_url(self.request.uri))
+            return
+
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
         logging.error('Exception raised: %s', exception)
 
@@ -443,11 +447,6 @@ class BaseHandler(webapp2.RequestHandler):
             self.error(404)
             self._render_exception(404, {
                 'error': 'Could not find the page %s.' % self.request.uri})
-            return
-
-        if isinstance(exception, self.NotLoggedInException):
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
             return
 
         if isinstance(exception, self.UnauthorizedUserException):
