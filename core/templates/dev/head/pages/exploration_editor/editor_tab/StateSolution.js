@@ -91,7 +91,7 @@ oppia.controller('StateSolution', [
           '$scope', '$modalInstance', 'correctAnswer', 'stateSolutionService',
           function(
             $scope, $modalInstance, correctAnswer, stateSolutionService) {
-          $scope.stateSolutionService =stateSolutionService;
+            $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswer = correctAnswer;
             $scope.correctAnswerEditorHtml = (
               oppiaExplorationHtmlFormatterService.getInteractionHtml(
