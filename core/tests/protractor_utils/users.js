@@ -77,11 +77,7 @@ var createAdmin = function(email, username) {
 var createAndLoginAdminUser = function(email, username) {
   login(email, true);
   _completeSignup(username);
-  admin.editConfigProperty(
-    'Usernames of admins', 'List', function(listEditor) {
-      listEditor.addItem('Unicode').setValue(username);
-    }
-  );
+  admin.updateRole(username, 'admin');
 };
 
 exports.login = login;

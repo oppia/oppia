@@ -32,12 +32,7 @@ describe('Collections', function() {
     general.acceptAlert();
     browser.waitForAngular();
     admin.reloadAllExplorations();
-    admin.editConfigProperty(
-      'Names of users allowed to use the collection editor',
-      'List', function(listEditor) {
-        listEditor.addItem('Unicode').setValue(USERNAME);
-      }
-    );
+    admin.updateRole(USERNAME, 'collection editor');
     users.logout();
   });
 

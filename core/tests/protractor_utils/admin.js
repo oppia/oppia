@@ -63,16 +63,12 @@ var updateRole = function(name, newRole) {
   general.waitForSystem();
   browser.get(general.ADMIN_URL_SUFFIX);
   element(by.css('.protractor-test-admin-roles-tab')).click();
+  browser.waitForAngular();
   //change values for update form and submit it.
   element(by.css('.protractor-update-form-name')).sendKeys(name);
-  var roleOptions = element.all(
-    by.css('.protractor-update-form-role-dropdown')
-  );
-  for (var i = 0; i < role_options.length(); i++) {
-    if (role_options[i] == newRole) {
-      role_options[i].click();
-    }
-  }
+  var select = element(by.model('updateFormValues.newRole'));
+  var searchKey = '[label="' + newRole + '"]'
+  select.$(searchKey).click();
   element(by.css('.protractor-update-form-submit')).click()
   browser.waitForAngular();
   return true;
@@ -114,3 +110,4 @@ var reloadAllExplorations = function(name) {
 exports.editConfigProperty = editConfigProperty;
 exports.reloadExploration = reloadExploration;
 exports.reloadAllExplorations = reloadAllExplorations;
+exports.updateRole = updateRole;

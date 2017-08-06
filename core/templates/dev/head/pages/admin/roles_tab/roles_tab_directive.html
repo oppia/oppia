@@ -77,13 +77,13 @@
 
           <div class="form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Select Role</label>
-            <div class="col-md-8 col-lg-8 col-sm-8 protractor-update-form-role-dropdown">
-              <select ng-options="roleName as roleString for (roleName, roleString) in UPDATABLE_ROLES" ng-model="updateFormValues.newRole" class="form-control">
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <select ng-options="roleName as roleString for (roleName, roleString) in UPDATABLE_ROLES" ng-model="updateFormValues.newRole" class="form-control" id="protractor-update-form-role-dropdown">
               </select>
             </div>
           </div>
   
-          <button type="submit" class="btn btn-success" ng-disabled="!updateFormValues.newRole || !updateFormValues.username" value="update role">Update Role</button>
+          <button type="submit" class="btn btn-success protractor-update-form-submit" ng-disabled="!updateFormValues.newRole || !updateFormValues.username" value="update role">Update Role</button>
         </form>
       </md-card>
     </div>
