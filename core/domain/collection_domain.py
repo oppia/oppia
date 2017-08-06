@@ -1081,6 +1081,11 @@ class Collection(object):
             raise ValueError(
                 'Skill with ID "%s" does not exist.' % skill_id)
 
+        for skill in self.skills.values():
+            if skill.name == new_skill_name:
+                raise ValueError('Skill with name "%s" already exists.'
+                                 % new_skill_name)
+
         self.skills[skill_id].name = new_skill_name
 
     def delete_skill(self, skill_id):
