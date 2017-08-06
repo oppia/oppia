@@ -62,12 +62,12 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.user)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.ALBERT_ID = self.get_user_id_from_email(self.user_email)
+        self.user_id = self.get_user_id_from_email(self.user_email)
 
-        self.save_new_valid_exploration(self.EXP_ID_1, self.ALBERT_ID)
-        rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_1)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_id)
+        rights_manager.publish_exploration(self.user_id, self.EXP_ID_1)
 
-        self.save_new_valid_exploration(self.EXP_ID_2, self.ALBERT_ID)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
 
     def test_unpublished_activities_cannot_be_added_to_featured_list(self):
         self.login(self.MODERATOR_EMAIL)
