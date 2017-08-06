@@ -57,9 +57,14 @@ oppia.controller('StateHints', [
       var currentActiveIndex = $scope.activeHintIndex;
       if (currentActiveIndex !== null && (
           !stateHintsService.displayed[currentActiveIndex].hintText)) {
-        alertsService.addInfoMessage('Deleting empty hint.');
-        stateHintsService.displayed.splice(currentActiveIndex, 1);
-        stateHintsService.saveDisplayedValue();
+        if (stateHintsService.displayed.length === 1) {
+          openDeleteLastHintModal();
+          return;
+        } else {
+          alertsService.addInfoMessage('Deleting empty hint.');
+          stateHintsService.displayed.splice(currentActiveIndex, 1);
+          stateHintsService.saveDisplayedValue();
+        }
       }
       // If the current hint is being clicked on again, close it.
       if (newIndex === $scope.activeHintIndex) {

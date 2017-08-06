@@ -14,7 +14,7 @@
             <div class="oppia-rule-header-warning-placement"
                  ng-if="!isSolutionValid()"
                  ng-click="toggleInlineSolutionEditorIsActive()"
-                 tooltip="This solution does not lead to another state. Verify the responses specified or change the solution."
+                 tooltip="This solution does not lead to another card. Verify the responses specified or change the solution."
                  tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style">
                 ⚠
@@ -49,10 +49,11 @@
 
     <md-card style="margin: 0; padding: 0;">
       <div ng-if="editabilityService.isEditableOutsideTutorialMode()">
-        <button type="button"
+        <button ng-if="!stateSolutionService.savedMemento"
+                type="button"
                 class="btn btn-default btn-lg oppia-add-hint-button protractor-test-oppia-add-solution-button"
                 ng-click="openAddSolutionModal()">
-          + <[stateSolutionService.savedMemento ? 'Change Solution' : 'Add Solution']>
+          + Add Solution
         </button>
       </div>
     </md-card>

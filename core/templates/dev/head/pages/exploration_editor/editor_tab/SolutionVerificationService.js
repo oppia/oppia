@@ -19,9 +19,11 @@
 oppia.factory('SolutionVerificationService', [
   '$injector', 'stateInteractionIdService', 'explorationContextService',
   'editorContextService', 'angularNameService', 'AnswerClassificationService',
+  'explorationStatesService',
   function(
     $injector, stateInteractionIdService, explorationContextService,
-    editorContextService, angularNameService, AnswerClassificationService) {
+    editorContextService, angularNameService, AnswerClassificationService,
+    explorationStatesService) {
     return {
       verifySolution: function(
         explorationId, state, correctAnswer, successCallback, errorCallback) {
@@ -29,12 +31,17 @@ oppia.factory('SolutionVerificationService', [
         var rulesServiceName = (
           angularNameService.getNameOfInteractionRulesService(interactionId));
         var rulesService = $injector.get(rulesServiceName);
+        var validityBeforeVerification = (
+          explorationStatesService.isSolutionValid(
+            editorContextService.getActiveStateName()));
         AnswerClassificationService.getMatchingClassificationResult(
           explorationId, state, correctAnswer, true, rulesService
         ).then(function(result) {
           if (
             editorContextService.getActiveStateName() !== result.outcome.dest) {
-            successCallback();
+            if (!validityBeforeVerification) {
+              successCallback();
+            }
           } else {
             errorCallback();
           }

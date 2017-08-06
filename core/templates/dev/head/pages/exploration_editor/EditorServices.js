@@ -1980,7 +1980,7 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   UNABLE_TO_END_EXPLORATION: (
     'There\'s no way to complete the exploration starting from this card.'),
   INCORRECT_SOLUTION: (
-    'This solution does not lead to another state.')
+    'Current solution does not lead to another card.')
 });
 
 // Service for the list of exploration warnings.

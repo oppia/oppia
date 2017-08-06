@@ -30,9 +30,7 @@ oppia.controller('StateSolution', [
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
     SolutionObjectFactory, responsesService, explorationContextService,
     explorationWarningsService) {
-    $scope.editorContextService = editorContextService;
     $scope.stateSolutionService = stateSolutionService;
-    $scope.SolutionVerificationService = SolutionVerificationService;
     $scope.inlineSolutionEditorIsActive = false;
     $scope.correctAnswerEditorHtml = '';
     $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
@@ -147,7 +145,7 @@ oppia.controller('StateSolution', [
               currentStateName, false);
             explorationWarningsService.updateWarnings();
             alertsService.addInfoMessage(
-              'That solution does not lead to the next state!');
+              'Current solution does not lead to another card.');
           }
         );
 
@@ -205,7 +203,7 @@ oppia.controller('StateSolution', [
             currentStateName, false);
           explorationWarningsService.updateWarnings();
           alertsService.addInfoMessage(
-            'That solution does not lead to the next state!');
+            'Current solution does not lead to another card!');
         }
       );
 

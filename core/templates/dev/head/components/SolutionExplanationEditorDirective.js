@@ -16,7 +16,7 @@
  * @fileoverview Directive for the explanation editor.
  */
 
-oppia.directive('explanationEditor', [
+oppia.directive('solutionExplanationEditor', [
   'UrlInterpolationService', 'stateSolutionService',
   function(UrlInterpolationService, stateSolutionService) {
     return {

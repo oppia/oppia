@@ -47,13 +47,13 @@ oppia.factory('responsesService', [
   'answerGroupsCache', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'alertsService',
-  'explorationContextService',
+  'explorationContextService', 'explorationWarningsService',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, alertsService,
-      explorationContextService) {
+      explorationContextService, explorationWarningsService) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -93,14 +93,15 @@ oppia.factory('responsesService', [
               function() {
                 explorationStatesService.updateSolutionValidity(
                   currentStateName, true);
-                alertsService.addInfoMessage(
-                  'The solution is now valid!');
+                explorationWarningsService.updateWarnings();
+                alertsService.addInfoMessage('The solution is now valid!');
               },
               function() {
                 explorationStatesService.updateSolutionValidity(
                   currentStateName, false);
+                explorationWarningsService.updateWarnings();
                 alertsService.addInfoMessage(
-                  'That solution does not lead to the next state!');
+                  'The current solution is not valid for this rule.');
               }
             );
           }

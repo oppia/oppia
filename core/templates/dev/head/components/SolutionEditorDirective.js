@@ -22,7 +22,6 @@ oppia.directive('solutionEditor', [
   'explorationWarningsService', 'alertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
   'explorationContextService',
-
   function($modal, UrlInterpolationService, stateSolutionService,
            editorContextService, explorationStatesService,
            explorationWarningsService, alertsService,
@@ -89,12 +88,16 @@ oppia.directive('solutionEditor', [
                   };
 
                   $scope.saveSolution = function() {
-                    $modalInstance.close({
-                      solution: SolutionObjectFactory.createNew(
-                        $scope.data.answerIsExclusive,
-                        $scope.data.correctAnswer,
-                        $scope.data.explanation)
-                    });
+                    if (typeof($scope.data.answerIsExclusive) === 'boolean' &&
+                        $scope.data.correctAnswer !== null &&
+                        $scope.data.explanation !== '') {
+                      $modalInstance.close({
+                        solution: SolutionObjectFactory.createNew(
+                          $scope.data.answerIsExclusive,
+                          $scope.data.correctAnswer,
+                          $scope.data.explanation)
+                      });
+                    }
                   };
 
                   $scope.cancel = function() {
@@ -121,7 +124,7 @@ oppia.directive('solutionEditor', [
                     currentStateName, false);
                   explorationWarningsService.updateWarnings();
                   alertsService.addInfoMessage(
-                    'That solution does not lead to the next state!');
+                    'Current solution does not lead to another card.');
                 }
               );
 
