@@ -88,7 +88,7 @@ oppia.directive('solutionEditor', [
                   };
 
                   $scope.saveSolution = function() {
-                    if (typeof($scope.data.answerIsExclusive) === 'boolean' &&
+                    if (typeof $scope.data.answerIsExclusive === 'boolean' &&
                         $scope.data.correctAnswer !== null &&
                         $scope.data.explanation !== '') {
                       $modalInstance.close({
