@@ -68,7 +68,7 @@ oppia.factory('SolutionObjectFactory', [
       var explanation = (
         $filter('convertToPlainText')(this.explanation));
       return (
-        solutionType + ' solution is ' + correctAnswer + '. ' + explanation);
+        solutionType + ' solution is "' + correctAnswer + '". ' + explanation);
     };
 
     Solution.prototype.setCorrectAnswer = function(correctAnswer) {

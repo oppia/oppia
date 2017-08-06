@@ -31,17 +31,12 @@ oppia.factory('SolutionVerificationService', [
         var rulesServiceName = (
           angularNameService.getNameOfInteractionRulesService(interactionId));
         var rulesService = $injector.get(rulesServiceName);
-        var validityBeforeVerification = (
-          explorationStatesService.isSolutionValid(
-            editorContextService.getActiveStateName()));
         AnswerClassificationService.getMatchingClassificationResult(
           explorationId, state, correctAnswer, true, rulesService
         ).then(function(result) {
           if (
             editorContextService.getActiveStateName() !== result.outcome.dest) {
-            if (!validityBeforeVerification) {
-              successCallback();
-            }
+            successCallback();
           } else {
             errorCallback();
           }

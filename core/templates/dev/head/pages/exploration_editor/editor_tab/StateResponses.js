@@ -48,12 +48,16 @@ oppia.factory('responsesService', [
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'alertsService',
   'explorationContextService', 'explorationWarningsService',
+  'INFO_MESSAGE_SOLUTION_IS_VALID',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, alertsService,
-      explorationContextService, explorationWarningsService) {
+      explorationContextService, explorationWarningsService,
+      INFO_MESSAGE_SOLUTION_IS_VALID,
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -86,6 +90,9 @@ oppia.factory('responsesService', [
             .can_have_solution && stateSolutionService.savedMemento !== null) {
           if (stateSolutionService.savedMemento.correctAnswer !== null) {
             var currentStateName = editorContextService.getActiveStateName();
+            var validityOfPreviousState = (
+              explorationStatesService.isSolutionValid(
+                editorContextService.getActiveStateName()));
             SolutionVerificationService.verifySolution(
               explorationContextService.getExplorationId(),
               explorationStatesService.getState(currentStateName),
@@ -94,14 +101,16 @@ oppia.factory('responsesService', [
                 explorationStatesService.updateSolutionValidity(
                   currentStateName, true);
                 explorationWarningsService.updateWarnings();
-                alertsService.addInfoMessage('The solution is now valid!');
+                if (!validityOfPreviousState) {
+                  alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
+                }
               },
               function() {
                 explorationStatesService.updateSolutionValidity(
                   currentStateName, false);
                 explorationWarningsService.updateWarnings();
                 alertsService.addInfoMessage(
-                  'The current solution is not valid for this rule.');
+                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
               }
             );
           }

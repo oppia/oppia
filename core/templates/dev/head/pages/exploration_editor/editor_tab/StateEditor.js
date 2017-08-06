@@ -46,7 +46,7 @@ oppia.controller('StateEditor', [
       $scope.interactionIdIsSet = Boolean(newInteractionId);
       $scope.currentInteractionCanHaveSolution = Boolean(
         $scope.interactionIdIsSet &&
-        INTERACTION_SPECS[interactionId].can_have_solution);
+        INTERACTION_SPECS[newInteractionId].can_have_solution);
       $scope.currentStateIsTerminal = Boolean(
         $scope.interactionIdIsSet && INTERACTION_SPECS[
           newInteractionId].is_terminal);

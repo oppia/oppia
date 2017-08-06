@@ -46,6 +46,12 @@ oppia.constant('ENABLE_STRING_CLASSIFIER', false);
 // Feature still in development.
 oppia.constant('ENABLE_HINT_EDITOR', true);
 oppia.constant('ENABLE_FALLBACK_EDITOR', false);
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'The current solution does not lead to another card.');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+  'The solution is now valid!');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'The current solution is no longer valid.');
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'

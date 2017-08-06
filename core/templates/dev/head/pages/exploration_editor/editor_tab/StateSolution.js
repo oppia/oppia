@@ -22,14 +22,14 @@ oppia.controller('StateSolution', [
   'SolutionVerificationService', 'oppiaExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
   'SolutionObjectFactory', 'responsesService', 'explorationContextService',
-  'explorationWarningsService',
+  'explorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
     $scope, $rootScope, $modal, editorContextService, alertsService,
     INTERACTION_SPECS, stateSolutionService, explorationStatesService,
     SolutionVerificationService, oppiaExplorationHtmlFormatterService,
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
     SolutionObjectFactory, responsesService, explorationContextService,
-    explorationWarningsService) {
+    explorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
     $scope.stateSolutionService = stateSolutionService;
     $scope.inlineSolutionEditorIsActive = false;
     $scope.correctAnswerEditorHtml = '';
@@ -88,8 +88,10 @@ oppia.controller('StateSolution', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'correctAnswer',
-          function($scope, $modalInstance, correctAnswer) {
+          '$scope', '$modalInstance', 'correctAnswer', 'stateSolutionService',
+          function(
+            $scope, $modalInstance, correctAnswer, stateSolutionService) {
+          $scope.stateSolutionService =stateSolutionService;
             $scope.correctAnswer = correctAnswer;
             $scope.correctAnswerEditorHtml = (
               oppiaExplorationHtmlFormatterService.getInteractionHtml(
@@ -144,8 +146,7 @@ oppia.controller('StateSolution', [
             explorationStatesService.updateSolutionValidity(
               currentStateName, false);
             explorationWarningsService.updateWarnings();
-            alertsService.addInfoMessage(
-              'Current solution does not lead to another card.');
+            alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
           }
         );
 
@@ -203,7 +204,7 @@ oppia.controller('StateSolution', [
             currentStateName, false);
           explorationWarningsService.updateWarnings();
           alertsService.addInfoMessage(
-            'Current solution does not lead to another card!');
+            INFO_MESSAGE_SOLUTION_IS_INVALID);
         }
       );
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the explanation editor.
+ * @fileoverview Directive for the solution explanation editor.
  */
 
 oppia.directive('solutionExplanationEditor', [

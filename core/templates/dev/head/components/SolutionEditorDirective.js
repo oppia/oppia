@@ -21,12 +21,12 @@ oppia.directive('solutionEditor', [
   'editorContextService', 'explorationStatesService',
   'explorationWarningsService', 'alertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
-  'explorationContextService',
+  'explorationContextService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function($modal, UrlInterpolationService, stateSolutionService,
            editorContextService, explorationStatesService,
            explorationWarningsService, alertsService,
            SolutionObjectFactory, SolutionVerificationService,
-           explorationContextService) {
+           explorationContextService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
     return {
       restrict: 'E',
       scope: {
@@ -124,7 +124,7 @@ oppia.directive('solutionEditor', [
                     currentStateName, false);
                   explorationWarningsService.updateWarnings();
                   alertsService.addInfoMessage(
-                    'Current solution does not lead to another card.');
+                    INFO_MESSAGE_SOLUTION_IS_INVALID);
                 }
               );
 
