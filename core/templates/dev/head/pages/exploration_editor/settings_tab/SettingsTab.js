@@ -379,7 +379,7 @@ oppia.controller('SettingsTab', [
       // 'moderator action' path, and implement an option for different actions
       // saying whether emails should be sent for these, or not. At present,
       // we don't expect to send an email when an exploration is unpublicized.
-      explorationRightsService.makePublicized(false);
+      explorationRightsService.unpublicize();
     };
 
     $scope.isExplorationLockedForEditing = function() {
