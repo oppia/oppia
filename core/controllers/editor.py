@@ -366,7 +366,7 @@ class ExplorationStatusHandler(EditorHandler):
     """Handles publishing or publicizing of an exploration."""
 
     def _publish_exploration(self, exploration_id):
-        """Publish an exploration based.
+        """Publish an exploration.
 
         Args:
             exploration_id: str. Id of the exploration.
