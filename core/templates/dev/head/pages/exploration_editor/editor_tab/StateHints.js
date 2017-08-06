@@ -57,7 +57,8 @@ oppia.controller('StateHints', [
       var currentActiveIndex = $scope.activeHintIndex;
       if (currentActiveIndex !== null && (
           !stateHintsService.displayed[currentActiveIndex].hintText)) {
-        if (stateHintsService.displayed.length === 1) {
+        if (stateSolutionService.savedMemento &&
+          stateHintsService.displayed.length === 1) {
           openDeleteLastHintModal();
           return;
         } else {
