@@ -42,7 +42,7 @@ describe('Solution object factory', function() {
 
     it('should create summary correctly', function() {
       expect(solution.getSummary('TextInput')).toEqual(
-        'One solution is &quot;This is a correct answer!&quot;. ' +
+        'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
@@ -50,7 +50,7 @@ describe('Solution object factory', function() {
         latex: 'one'
       });
       expect(solution.getSummary('MathExpressionInput')).toEqual(
-        'One solution is one. This is the explanation to the answer.');
+        'One solution is "one". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
         code: 'a=10',
@@ -59,7 +59,7 @@ describe('Solution object factory', function() {
         output: ''
       });
       expect(solution.getSummary('CodeRepl')).toEqual(
-        'One solution is a=10. This is the explanation to the answer.');
+        'One solution is "a=10". This is the explanation to the answer.');
     })
   });
 });
