@@ -409,6 +409,19 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
+# Google Cloud Storage bucket name.
+GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
+
+# Url prefix for destination of uploaded files and location of downloaded
+# files.
+
+if DEV_MODE:
+    AUDIO_URL_TEMPLATE = '/audiohandler/<exploration_id>/audio/<filename>'
+else:
+    AUDIO_URL_TEMPLATE = (
+        'https://storage.googleapis.com/%s/<exploration_id>/'
+        'assets/audio/<filename>' % GCS_RESOURCE_BUCKET_NAME)
+
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
     'Collapsible': {
@@ -518,6 +531,7 @@ DEMO_EXPLORATIONS = {
     u'14': 'about_oppia.yaml',
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
+    u'17': 'audio_test',
 }
 
 DEMO_COLLECTIONS = {
@@ -578,6 +592,8 @@ FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
+LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
+LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -655,7 +671,7 @@ TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with base.js
-ENABLE_STRING_CLASSIFIER = False
+ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
@@ -679,11 +695,6 @@ USER_QUERY_STATUS_FAILED = 'failed'
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
-
-# Types of activities that can be created with Oppia.
-ACTIVITY_TYPE_EXPLORATION = 'exploration'
-ACTIVITY_TYPE_COLLECTION = 'collection'
-ALL_ACTIVITY_TYPES = [ACTIVITY_TYPE_EXPLORATION, ACTIVITY_TYPE_COLLECTION]
 
 # These categories are shown in the library navbar.
 SEARCH_DROPDOWN_CATEGORIES = sorted([

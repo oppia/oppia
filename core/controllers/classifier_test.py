@@ -20,8 +20,11 @@ import os
 from core.controllers import classifier
 from core.domain import classifier_services
 from core.domain import exp_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
+
+(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
 class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
@@ -39,16 +42,12 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             self.yaml_content = yaml_file.read()
 
         assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
-            assets_list)
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
+                assets_list)
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
 
-        state = self.exploration.states['Home']
-        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
-            state.interaction.id]['algorithm_id']
-        interaction_id = 'TextInput'
-        training_data = state.get_training_data()
         self.classifier_data = {
             '_alpha': 0.1,
             '_beta': 0.001,
@@ -67,9 +66,21 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             '_c_lw': [],
             '_c_l': []
         }
-        self.job_id = classifier_services.create_classifier_training_job(
-            algorithm_id, interaction_id, self.exp_id, self.exploration.version,
-            'Home', training_data, feconf.TRAINING_JOB_STATUS_PENDING)
+        classifier_training_jobs = (
+            classifier_services.get_classifier_training_jobs(
+                self.exp_id, self.exploration.version, ['Home']))
+        self.assertEqual(len(classifier_training_jobs), 1)
+        classifier_training_job = classifier_training_jobs[0]
+        self.job_id = classifier_training_job.job_id
+
+        # TODO(pranavsid98): Replace the three commands below with
+        # mark_training_job_pending after Giritheja's PR gets merged.
+        classifier_training_job_model = (
+            classifier_models.ClassifierTrainingJobModel.get(
+                self.job_id, strict=False))
+        classifier_training_job_model.status = (
+            feconf.TRAINING_JOB_STATUS_PENDING)
+        classifier_training_job_model.put()
 
         self.job_result_dict = {
             'job_id' : self.job_id,
@@ -87,10 +98,13 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         # Normal end-to-end test.
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=False, expected_status_int=200)
-        classifier_obj = (
-            classifier_services.get_classifier_from_exploration_attributes(
-                self.exp_id, self.exploration.version, 'Home'))
-        self.assertEqual(classifier_obj.id, self.job_id)
+        classifier_training_jobs = (
+            classifier_services.get_classifier_training_jobs(
+                self.exp_id, self.exploration.version, ['Home']))
+        self.assertEqual(len(classifier_training_jobs), 1)
+        classifier_obj = classifier_services.get_classifier_by_id(
+            classifier_training_jobs[0].job_id)
+        self.assertEqual(classifier_obj.id, classifier_training_jobs[0].job_id)
         self.assertEqual(classifier_obj.exp_id, self.exp_id)
         self.assertEqual(classifier_obj.state_name, 'Home')
         self.assertEqual(classifier_obj.algorithm_id, 'LDAStringClassifier')
