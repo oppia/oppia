@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,371 +14,1195 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs for queries personalized to individual users."""
+"""Tests for user-related one-off computations."""
 
 import ast
-import logging
+import datetime
+import re
 
-from core import jobs
-from core.domain import config_domain
+from core.domain import collection_domain
+from core.domain import collection_services
+from core.domain import config_services
 from core.domain import exp_services
+from core.domain import event_services
+from core.domain import feedback_services
+from core.domain import rating_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import subscription_services
+from core.domain import user_jobs_one_off
+from core.domain import user_jobs_continuous_test
 from core.domain import user_services
 from core.platform import models
+from core.tests import test_utils
+
 import feconf
-import utils
 
-(exp_models, collection_models, feedback_models, user_models) = (
-    models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.collection,
-        models.NAMES.feedback, models.NAMES.user]))
-
-
-class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for creating and populating UserContributionsModels for
-    all registered users that have contributed.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationSnapshotMetadataModel]
-
-    @staticmethod
-    def map(item):
-        yield (item.committer_id, {
-            'exploration_id': item.get_unversioned_instance_id(),
-            'version_string': item.get_version_string(),
-        })
-
-    @staticmethod
-    def reduce(key, version_and_exp_ids):
-
-        created_exploration_ids = set()
-        edited_exploration_ids = set()
-
-        edits = [ast.literal_eval(v) for v in version_and_exp_ids]
-
-        for edit in edits:
-            edited_exploration_ids.add(edit['exploration_id'])
-            if edit['version_string'] == '1':
-                created_exploration_ids.add(edit['exploration_id'])
-
-        if user_services.get_user_contributions(key, strict=False) is not None:
-            user_services.update_user_contributions(
-                key, list(created_exploration_ids), list(
-                    edited_exploration_ids))
-        else:
-            user_services.create_user_contributions(
-                key, list(created_exploration_ids), list(
-                    edited_exploration_ids))
+(user_models, feedback_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.feedback])
+taskqueue_services = models.Registry.import_taskqueue_services()
+search_services = models.Registry.import_search_services()
 
 
-class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for calculating the distribution of username lengths."""
+class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off dashboard subscriptions job."""
+    EXP_ID_1 = 'exp_id_1'
+    EXP_ID_2 = 'exp_id_2'
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_USERNAME = 'b'
+    USER_C_EMAIL = 'c@example.com'
+    USER_C_USERNAME = 'c'
+    USER_D_EMAIL = 'd@example.com'
+    USER_D_USERNAME = 'd'
 
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.UserContributionsOneOffJob.create_new()
+        user_jobs_one_off.UserContributionsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
 
-    @staticmethod
-    def map(item):
-        if item.username is not None:
-            yield (len(item.username), 1)
+    def setUp(self):
+        super(UserContributionsOneOffJobTests, self).setUp()
+        # User A has no created or edited explorations
+        # User B has one created exploration
+        # User C has one edited exploration
+        # User D has created an exploration and then edited it.
+        # (This is used to check that there are no duplicate
+        # entries in the contribution lists.)
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
+        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
 
-    @staticmethod
-    def reduce(key, stringified_username_counter):
-        username_counter = [
-            ast.literal_eval(v) for v in stringified_username_counter]
-        yield (key, len(username_counter))
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.user_b_id, end_state_name='End')
+
+        exp_services.update_exploration(self.user_c_id, self.EXP_ID_1, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }], 'Test edit')
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.user_d_id, end_state_name='End')
+
+        exp_services.update_exploration(self.user_d_id, self.EXP_ID_2, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }], 'Test edit')
+
+    def test_null_case(self):
+        """Tests the case where user has no created or edited explorations."""
+
+        self._run_one_off_job()
+        user_a_contributions_model = user_models.UserContributionsModel.get(
+            self.user_a_id, strict=False)
+        self.assertEqual(user_a_contributions_model.created_exploration_ids, [])
+        self.assertEqual(user_a_contributions_model.edited_exploration_ids, [])
+
+    def test_created_exp(self):
+        """Tests the case where user has created (and therefore edited)
+        an exploration."""
+
+        self._run_one_off_job()
+        user_b_contributions_model = user_models.UserContributionsModel.get(
+            self.user_b_id)
+        self.assertEqual(
+            user_b_contributions_model.created_exploration_ids, [self.EXP_ID_1])
+        self.assertEqual(
+            user_b_contributions_model.edited_exploration_ids, [self.EXP_ID_1])
+
+    def test_edited_exp(self):
+        """Tests the case where user has an edited exploration."""
+
+        self._run_one_off_job()
+        user_c_contributions_model = user_models.UserContributionsModel.get(
+            self.user_c_id)
+        self.assertEqual(
+            user_c_contributions_model.created_exploration_ids, [])
+        self.assertEqual(
+            user_c_contributions_model.edited_exploration_ids, [self.EXP_ID_1])
+
+    def test_for_duplicates(self):
+        """Tests the case where user has an edited exploration, and edits
+        it again making sure it is not duplicated."""
+
+        self._run_one_off_job()
+        user_d_contributions_model = user_models.UserContributionsModel.get(
+            self.user_d_id)
+        self.assertEqual(
+            user_d_contributions_model.edited_exploration_ids,
+            [self.EXP_ID_2])
+        self.assertEqual(
+            user_d_contributions_model.created_exploration_ids,
+            [self.EXP_ID_2])
 
 
-class LongUserBiosOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for calculating the length of user_bios."""
+class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off username length distribution job."""
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_EMAIL = 'ab@example.com'
+    USER_B_USERNAME = 'ab'
+    USER_C_EMAIL = 'bc@example.com'
+    USER_C_USERNAME = 'bc'
+    USER_D_EMAIL = 'bcd@example.com'
+    USER_D_USERNAME = 'bcd'
 
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UsernameLengthDistributionOneOffJob.create_new())
+        user_jobs_one_off.UsernameLengthDistributionOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
+                job_id))
 
-    @staticmethod
-    def map(item):
-        if item.user_bio is None:
-            user_bio_length = 0
-        else:
-            user_bio_length = len(item.user_bio)
+        output = {}
+        for stringified_distribution in stringified_output:
+            value = re.findall(r'\d+', stringified_distribution)
+            # output['username length'] = number of users
+            output[value[0]] = int(value[1])
 
-        yield (user_bio_length, item.username)
+        return output
 
-    @staticmethod
-    def reduce(userbio_length, stringified_usernames):
-        if int(userbio_length) > 500:
-            yield (userbio_length, stringified_usernames)
+    def test_null_case(self):
+        """Tests the case when there are no signed up users but there is one
+        default user having the username - 'tmpsuperadm1n'.
+        """
+        output = self._run_one_off_job()
+        # number of users = 1.
+        # length of usernames = 13 (tmpsuperadm1n).
+        self.assertEqual(output['13'], 1)
+
+    def test_single_user_case(self):
+        """Tests the case when there is only one signed up user and a default
+        user - 'tmpsuperadm1n'.
+        """
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        output = self._run_one_off_job()
+        # number of users = 2.
+        # length of usernames = 13 (tmpsuperadm1n), 1 (a).
+        self.assertEqual(output['13'], 1)
+        self.assertEqual(output['1'], 1)
+
+    def test_multiple_users_case(self):
+        """Tests the case when there are multiple signed up users and a
+        default user - 'tmpsuperadm1n'.
+        """
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        output = self._run_one_off_job()
+        # number of users = 3
+        # length of usernames = 13 (tmpsuperadm1n), 2 (ab), 1 (a).
+        self.assertEqual(output['13'], 1)
+        self.assertEqual(output['2'], 1)
+        self.assertEqual(output['1'], 1)
+
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
+        output = self._run_one_off_job()
+        # number of users = 5
+        # length of usernames = 13 (tmpsuperadm1n), 3 (bcd), 2 (ab, bc), 1 (a).
+        self.assertEqual(output['13'], 1)
+        self.assertEqual(output['3'], 1)
+        self.assertEqual(output['2'], 2)
+        self.assertEqual(output['1'], 1)
 
 
-class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for subscribing users to explorations, collections, and
-    feedback threads.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [
-            exp_models.ExplorationRightsModel,
-            collection_models.CollectionRightsModel,
-            feedback_models.FeedbackMessageModel,
+class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off long userbio length job."""
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_A_BIO = 'I am less than 500'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_USERNAME = 'b'
+    USER_B_BIO = 'Long Bio' * 100
+    USER_C_EMAIL = 'c@example.com'
+    USER_C_USERNAME = 'c'
+    USER_C_BIO = 'Same Bio' * 100
+    USER_D_EMAIL = 'd@example.com'
+    USER_D_USERNAME = 'd'
+    USER_D_BIO = 'Diff Bio' * 300
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.LongUserBiosOneOffJob.create_new())
+        user_jobs_one_off.LongUserBiosOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+
+        stringified_output = (
+            user_jobs_one_off.LongUserBiosOneOffJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item)
+                       for stringified_item in stringified_output]
+        output = [[int(eval_item[0]), eval_item[1]]
+                  for eval_item in eval_output]
+        return output
+
+    def test_no_userbio_returns_empty_list(self):
+        """Tests the case when userbio is None."""
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        result = self._run_one_off_job()
+        self.assertEqual(result, [])
+
+    def test_short_userbio_returns_empty_list(self):
+        """Tests the case where the userbio is less than 500 characters."""
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
+        user_services.update_user_bio(user_id_a, self.USER_A_BIO)
+        result = self._run_one_off_job()
+        self.assertEqual(result, [])
+
+    def test_long_userbio_length(self):
+        """Tests the case where the userbio is more than 500 characters."""
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
+        user_services.update_user_bio(user_id_b, self.USER_B_BIO)
+        result = self._run_one_off_job()
+        expected_result = [[800, ['b']]]
+        self.assertEqual(result, expected_result)
+
+    def test_same_userbio_length(self):
+        """Tests the case where two users have same userbio length."""
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
+        user_services.update_user_bio(user_id_b, self.USER_B_BIO)
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_services.update_user_bio(user_id_c, self.USER_C_BIO)
+        result = self._run_one_off_job()
+        result[0][1].sort()
+        expected_result = [[800, ['b', 'c']]]
+        self.assertEqual(result, expected_result)
+
+    def test_diff_userbio_length(self):
+        """Tests the case where two users have different userbio lengths."""
+        self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
+        user_id_d = self.get_user_id_from_email(self.USER_D_EMAIL)
+        user_services.update_user_bio(user_id_d, self.USER_D_BIO)
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_services.update_user_bio(user_id_c, self.USER_C_BIO)
+        result = self._run_one_off_job()
+        expected_result = [[2400, ['d']], [800, ['c']]]
+        self.assertEqual(result, expected_result)
+
+
+class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off dashboard subscriptions job."""
+    EXP_ID_1 = 'exp_id_1'
+    EXP_ID_2 = 'exp_id_2'
+    COLLECTION_ID_1 = 'col_id_1'
+    COLLECTION_ID_2 = 'col_id_2'
+    EXP_ID_FOR_COLLECTION_1 = 'id_of_exp_in_collection_1'
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_USERNAME = 'b'
+    USER_C_EMAIL = 'c@example.com'
+    USER_C_USERNAME = 'c'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.DashboardSubscriptionsOneOffJob.create_new()
+        user_jobs_one_off.DashboardSubscriptionsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+
+    def _null_fn(self, *args, **kwargs):
+        """A mock for functions of the form subscribe_to_*() to represent
+        behavior prior to the implementation of subscriptions.
+        """
+        pass
+
+    def setUp(self):
+        super(DashboardSubscriptionsOneOffJobTests, self).setUp()
+
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
+            # User A creates and saves a new valid exploration.
+            self.save_new_valid_exploration(
+                self.EXP_ID_1, self.user_a_id, end_state_name='End')
+
+    def test_null_case(self):
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id, strict=False)
+        self.assertEqual(user_b_subscriptions_model, None)
+
+        self._run_one_off_job()
+
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id, strict=False)
+        self.assertEqual(user_b_subscriptions_model, None)
+
+    def test_feedback_thread_subscription(self):
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id, strict=False)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id, strict=False)
+
+        self.assertEqual(user_b_subscriptions_model, None)
+        self.assertEqual(user_c_subscriptions_model, None)
+
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
+            # User B starts a feedback thread.
+            feedback_services.create_thread(
+                self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
+            # User C adds to that thread.
+            thread_id = feedback_services.get_all_threads(
+                self.EXP_ID_1, False)[0].get_thread_id()
+            feedback_services.create_message(
+                self.EXP_ID_1, thread_id, self.user_c_id, None, None,
+                'more text')
+
+        self._run_one_off_job()
+
+        # Both users are subscribed to the feedback thread.
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id)
+
+        self.assertEqual(user_b_subscriptions_model.activity_ids, [])
+        self.assertEqual(user_c_subscriptions_model.activity_ids, [])
+        full_thread_id = (
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID_1, thread_id))
+        self.assertEqual(
+            user_b_subscriptions_model.feedback_thread_ids, [full_thread_id])
+        self.assertEqual(
+            user_c_subscriptions_model.feedback_thread_ids, [full_thread_id])
+
+    def test_exploration_subscription(self):
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
+            # User A adds user B as an editor to the exploration.
+            rights_manager.assign_role_for_exploration(
+                self.user_a_id, self.EXP_ID_1, self.user_b_id,
+                rights_manager.ROLE_EDITOR)
+            # User A adds user C as a viewer of the exploration.
+            rights_manager.assign_role_for_exploration(
+                self.user_a_id, self.EXP_ID_1, self.user_c_id,
+                rights_manager.ROLE_VIEWER)
+
+        self._run_one_off_job()
+
+        # Users A and B are subscribed to the exploration. User C is not.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id, strict=False)
+
+        self.assertEqual(
+            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+        self.assertEqual(
+            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
+        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
+        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
+        self.assertEqual(user_c_subscriptions_model, None)
+
+    def test_two_explorations(self):
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
+            # User A creates and saves another valid exploration.
+            self.save_new_valid_exploration(self.EXP_ID_2, self.user_a_id)
+
+        self._run_one_off_job()
+
+        # User A is subscribed to two explorations.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+
+        self.assertEqual(
+            sorted(user_a_subscriptions_model.activity_ids),
+            sorted([self.EXP_ID_1, self.EXP_ID_2]))
+
+    def test_community_owned_exploration(self):
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
+            # User A adds user B as an editor to the exploration.
+            rights_manager.assign_role_for_exploration(
+                self.user_a_id, self.EXP_ID_1, self.user_b_id,
+                rights_manager.ROLE_EDITOR)
+            # The exploration becomes community-owned.
+            rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
+            rights_manager.release_ownership_of_exploration(
+                self.user_a_id, self.EXP_ID_1)
+            # User C edits the exploration.
+            exp_services.update_exploration(
+                self.user_c_id, self.EXP_ID_1, [], 'Update exploration')
+
+        self._run_one_off_job()
+
+        # User A and user B are subscribed to the exploration; user C is not.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id, strict=False)
+
+        self.assertEqual(
+            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+        self.assertEqual(
+            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
+        self.assertEqual(user_c_subscriptions_model, None)
+
+    def test_deleted_exploration(self):
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
+
+            # User A deletes the exploration.
+            exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+
+        self._run_one_off_job()
+
+        # User A is not subscribed to the exploration.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id, strict=False)
+        self.assertEqual(user_a_subscriptions_model, None)
+
+    def test_collection_subscription(self):
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_collection', self._null_fn
+            ):
+            # User A creates and saves a new valid collection.
+            self.save_new_valid_collection(
+                self.COLLECTION_ID_1, self.user_a_id,
+                exploration_id=self.EXP_ID_FOR_COLLECTION_1)
+
+            # User A adds user B as an editor to the collection.
+            rights_manager.assign_role_for_collection(
+                self.user_a_id, self.COLLECTION_ID_1, self.user_b_id,
+                rights_manager.ROLE_EDITOR)
+            # User A adds user C as a viewer of the collection.
+            rights_manager.assign_role_for_collection(
+                self.user_a_id, self.COLLECTION_ID_1, self.user_c_id,
+                rights_manager.ROLE_VIEWER)
+
+        self._run_one_off_job()
+
+        # Users A and B are subscribed to the collection. User C is not.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id, strict=False)
+
+        self.assertEqual(
+            user_a_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
+        # User A is also subscribed to the exploration within the collection
+        # because they created both.
+        self.assertEqual(
+            sorted(user_a_subscriptions_model.activity_ids), [
+                self.EXP_ID_1, self.EXP_ID_FOR_COLLECTION_1])
+        self.assertEqual(
+            user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
+        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
+        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
+        self.assertEqual(user_c_subscriptions_model, None)
+
+    def test_two_collections(self):
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_collection', self._null_fn
+            ):
+            # User A creates and saves a new valid collection.
+            self.save_new_valid_collection(
+                self.COLLECTION_ID_1, self.user_a_id,
+                exploration_id=self.EXP_ID_FOR_COLLECTION_1)
+
+            # User A creates and saves another valid collection.
+            self.save_new_valid_collection(
+                self.COLLECTION_ID_2, self.user_a_id,
+                exploration_id=self.EXP_ID_FOR_COLLECTION_1)
+
+        self._run_one_off_job()
+
+        # User A is subscribed to two collections.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+
+        self.assertEqual(
+            sorted(user_a_subscriptions_model.collection_ids),
+            sorted([self.COLLECTION_ID_1, self.COLLECTION_ID_2]))
+
+    def test_deleted_collection(self):
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_collection', self._null_fn
+            ):
+            # User A creates and saves a new collection.
+            self.save_new_default_collection(
+                self.COLLECTION_ID_1, self.user_a_id)
+
+            # User A deletes the collection.
+            collection_services.delete_collection(
+                self.user_a_id, self.COLLECTION_ID_1)
+
+            # User A deletes the exploration from earlier.
+            exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+
+        self._run_one_off_job()
+
+        # User A is not subscribed to the collection.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id, strict=False)
+        self.assertEqual(user_a_subscriptions_model, None)
+
+    def test_adding_exploration_to_collection(self):
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_collection', self._null_fn
+            ):
+            # User B creates and saves a new collection.
+            self.save_new_default_collection(
+                self.COLLECTION_ID_1, self.user_b_id)
+
+            # User B adds the exploration created by user A to the collection.
+            collection_services.update_collection(
+                self.user_b_id, self.COLLECTION_ID_1, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': self.EXP_ID_1
+                }], 'Add new exploration to collection.')
+
+        # Users A and B have no subscriptions (to either explorations or
+        # collections).
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id, strict=False)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id, strict=False)
+        self.assertEqual(user_a_subscriptions_model, None)
+        self.assertEqual(user_b_subscriptions_model, None)
+
+        self._run_one_off_job()
+
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+
+        # User B should be subscribed to the collection and user A to the
+        # exploration.
+        self.assertEqual(
+            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+        self.assertEqual(
+            user_a_subscriptions_model.collection_ids, [])
+        self.assertEqual(
+            user_b_subscriptions_model.activity_ids, [])
+        self.assertEqual(
+            user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
+
+
+class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off dashboard stats job."""
+
+    CURRENT_DATE_AS_STRING = user_services.get_current_date_as_string()
+    DATE_AFTER_ONE_WEEK = (
+        (datetime.datetime.utcnow() + datetime.timedelta(7)).strftime(
+            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT))
+
+    USER_SESSION_ID = 'session1'
+
+    EXP_ID_1 = 'exp_id_1'
+    EXP_ID_2 = 'exp_id_2'
+    EXP_VERSION = 1
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.DashboardStatsOneOffJob.create_new()
+        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+
+    def setUp(self):
+        super(DashboardStatsOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def _mock_get_current_date_as_string(self):
+        return self.CURRENT_DATE_AS_STRING
+
+    def _rate_exploration(self, user_id, exp_id, rating):
+        rating_services.assign_rating_to_exploration(user_id, exp_id, rating)
+
+    def _record_play(self, exp_id, state):
+        event_services.StartExplorationEventHandler.record(
+            exp_id, self.EXP_VERSION, state, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
+
+    def test_weekly_stats_if_continuous_stats_job_has_not_been_run(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id)
+        exp_id = exploration.id
+        init_state_name = exploration.init_state_name
+        self._record_play(exp_id, init_state_name)
+        self._rate_exploration('user1', exp_id, 5)
+
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        self.assertEqual(weekly_stats, None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
+
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        expected_results_list = [{
+            self._mock_get_current_date_as_string(): {
+                'num_ratings': 0,
+                'average_ratings': None,
+                'total_plays': 0
+            }
+        }]
+        self.assertEqual(weekly_stats, expected_results_list)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id),
+            expected_results_list[0])
+
+    def test_weekly_stats_if_no_explorations(self):
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         start_computation())
+        self.process_and_flush_pending_tasks()
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
+
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        self.assertEqual(weekly_stats, [{
+            self._mock_get_current_date_as_string(): {
+                'num_ratings': 0,
+                'average_ratings': None,
+                'total_plays': 0
+            }
+        }])
+
+    def test_weekly_stats_for_single_exploration(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id)
+        exp_id = exploration.id
+        init_state_name = exploration.init_state_name
+        self._record_play(exp_id, init_state_name)
+        self._rate_exploration('user1', exp_id, 5)
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         start_computation())
+        self.process_and_flush_pending_tasks()
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
+
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        self.assertEqual(weekly_stats, [{
+            self._mock_get_current_date_as_string(): {
+                'num_ratings': 1,
+                'average_ratings': 5.0,
+                'total_plays': 1
+            }
+        }])
+
+    def test_weekly_stats_for_multiple_explorations(self):
+        exploration_1 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id)
+        exp_id_1 = exploration_1.id
+        exploration_2 = self.save_new_valid_exploration(
+            self.EXP_ID_2, self.owner_id)
+        exp_id_2 = exploration_2.id
+        init_state_name_1 = exploration_1.init_state_name
+        self._record_play(exp_id_1, init_state_name_1)
+        self._rate_exploration('user1', exp_id_1, 5)
+        self._rate_exploration('user2', exp_id_2, 4)
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         start_computation())
+        self.process_and_flush_pending_tasks()
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
+
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        self.assertEqual(weekly_stats, [{
+            self._mock_get_current_date_as_string(): {
+                'num_ratings': 2,
+                'average_ratings': 4.5,
+                'total_plays': 1
+            }
+        }])
+
+    def test_stats_for_multiple_weeks(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id)
+        exp_id = exploration.id
+        init_state_name = exploration.init_state_name
+        self._rate_exploration('user1', exp_id, 4)
+        self._record_play(exp_id, init_state_name)
+        self._record_play(exp_id, init_state_name)
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         start_computation())
+        self.process_and_flush_pending_tasks()
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
+
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        self.assertEqual(weekly_stats, [{
+            self._mock_get_current_date_as_string(): {
+                'num_ratings': 1,
+                'average_ratings': 4.0,
+                'total_plays': 2
+            }
+        }])
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         stop_computation(self.owner_id))
+        self.process_and_flush_pending_tasks()
+
+        self._rate_exploration('user2', exp_id, 2)
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         start_computation())
+        self.process_and_flush_pending_tasks()
+
+        def _mock_get_date_after_one_week():
+            """Returns the date of the next week."""
+            return self.DATE_AFTER_ONE_WEEK
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       _mock_get_date_after_one_week):
+            self._run_one_off_job()
+
+        expected_results_list = [
+            {
+                self._mock_get_current_date_as_string(): {
+                    'num_ratings': 1,
+                    'average_ratings': 4.0,
+                    'total_plays': 2
+                }
+            },
+            {
+                _mock_get_date_after_one_week(): {
+                    'num_ratings': 2,
+                    'average_ratings': 3.0,
+                    'total_plays': 2
+                }
+            }
+        ]
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        self.assertEqual(weekly_stats, expected_results_list)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id),
+            expected_results_list[1])
+
+
+class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
+
+    EXP_ID = 'test_exp'
+
+    def setUp(self):
+        super(UserFirstContributionMsecOneOffJobTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+    def test_contribution_msec_updates_on_published_explorations(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.admin_id, end_state_name='End')
+        init_state_name = exploration.init_state_name
+
+        # Test that no contribution time is set.
+        job_id = (
+            user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
+
+        # Test all owners and editors of exploration after publication have
+        # updated times.
+        exp_services.publish_exploration_and_update_user_profiles(
+            self.admin_id, self.EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            self.admin_id, self.EXP_ID)
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, [{
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput'
+            }], 'commit')
+        job_id = (
+            user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.admin_id).first_contribution_msec)
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.editor_id).first_contribution_msec)
+
+    def test_contribution_msec_does_not_update_on_unpublished_explorations(
+            self):
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        exp_services.publish_exploration_and_update_user_profiles(
+            self.owner_id, self.EXP_ID)
+        # We now manually reset the user's first_contribution_msec to None.
+        # This is to test that the one off job skips over the unpublished
+        # exploration and does not reset the user's first_contribution_msec.
+        user_services._update_first_contribution_msec(  # pylint: disable=protected-access
+            self.owner_id, None)
+        rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
+
+        # Test that first contribution time is not set for unpublished
+        # explorations.
+        job_id = (
+            user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        self.assertIsNone(user_services.get_user_settings(
+            self.owner_id).first_contribution_msec)
+
+
+class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
+
+    FETCHED_GRAVATAR = 'fetched_gravatar'
+
+    def setUp(self):
+        super(UserProfilePictureOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_new_profile_picture_is_generated_if_it_does_not_exist(self):
+        user_services.update_profile_picture_data_url(self.owner_id, None)
+
+        # Before the job runs, the data URL is None.
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNone(user_settings.profile_picture_data_url)
+
+        job_id = (
+            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
+        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
+
+        def _mock_fetch_gravatar(unused_email):
+            return self.FETCHED_GRAVATAR
+
+        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+            self.process_and_flush_pending_tasks()
+
+        # After the job runs, the data URL has been updated.
+        new_user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(
+            new_user_settings.profile_picture_data_url, self.FETCHED_GRAVATAR)
+
+    def test_profile_picture_is_not_regenerated_if_it_already_exists(self):
+        user_services.update_profile_picture_data_url(
+            self.owner_id, 'manually_added_data_url')
+
+        # Before the job runs, the data URL is the manually-added one.
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(
+            user_settings.profile_picture_data_url, 'manually_added_data_url')
+
+        job_id = (
+            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
+        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
+
+        def _mock_fetch_gravatar(unused_email):
+            return self.FETCHED_GRAVATAR
+
+        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+            self.process_and_flush_pending_tasks()
+
+        # After the job runs, the data URL is still the manually-added one.
+        new_user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(
+            new_user_settings.profile_picture_data_url,
+            'manually_added_data_url')
+
+
+class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserLastExplorationActivityOneOffJobTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.exp_id = 'exp'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UserLastExplorationActivityOneOffJob.create_new())
+        user_jobs_one_off.UserLastExplorationActivityOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+
+    def test_that_last_created_time_is_updated(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, end_state_name='End')
+        self.logout()
+
+        user_settings = user_services.get_user_settings(self.owner_id)
+        user_settings.last_created_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
+
+        self._run_one_off_job()
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNotNone(owner_settings.last_created_an_exploration)
+        self.assertIsNotNone(owner_settings.last_edited_an_exploration)
+
+    def test_that_last_edited_time_is_updated(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, end_state_name='End')
+        self.logout()
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(self.editor_id, self.exp_id, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }], 'Test edit')
+        self.logout()
+
+        user_settings = user_services.get_user_settings(self.editor_id)
+        user_settings.last_edited_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+        self.assertIsNone(editor_settings.last_edited_an_exploration)
+
+        self._run_one_off_job()
+
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNotNone(editor_settings.last_edited_an_exploration)
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+
+    def test_that_last_edited_and_created_time_both_updated(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, end_state_name='End')
+        exp_services.update_exploration(self.owner_id, self.exp_id, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }], 'Test edit')
+        self.logout()
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(self.editor_id, self.exp_id, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'new objective'
+        }], 'Test edit new')
+        self.logout()
+
+        user_settings = user_services.get_user_settings(self.owner_id)
+        user_settings.last_created_an_exploration = None
+        user_settings.last_edited_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        user_settings = user_services.get_user_settings(self.editor_id)
+        user_settings.last_edited_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+        self.assertIsNone(editor_settings.last_edited_an_exploration)
+
+        self._run_one_off_job()
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNotNone(owner_settings.last_edited_an_exploration)
+        self.assertIsNotNone(owner_settings.last_created_an_exploration)
+        self.assertIsNotNone(editor_settings.last_edited_an_exploration)
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+
+    def test_that_last_edited_and_created_time_are_not_updated(self):
+        user_settings = user_services.get_user_settings(self.owner_id)
+        user_settings.last_created_an_exploration = None
+        user_settings.last_edited_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
+
+        self._run_one_off_job()
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
+
+
+class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
+    def test_create_user_with_different_roles_and_run_migration_job(self):
+        """Tests the working of roles migration job. A sample set of users
+        is created with varying roles. The migration job is run and resulted
+        change in roles is tested against expected values.
+        """
+        user_ids = [
+            'user_id1', 'user_id2', 'user_id3', 'user_id4',
+            'user_id5', 'user_id6', 'user_id7', 'user_id8'
+        ]
+        user_emails = [
+            'user1@example.com', 'user2@example.com', 'user3@example.com',
+            'user4@example.com', 'user5@example.com', 'user6@example.com',
+            'user7@example.com', 'user8@example.com'
+        ]
+        user_names = [
+            'user1', 'user2', 'user3', 'user4', 'user5', 'user6',
+            'user7', 'user8'
         ]
 
-    @staticmethod
-    def map(item):
-        if isinstance(item, feedback_models.FeedbackMessageModel):
-            if item.author_id:
-                yield (item.author_id, {
-                    'type': 'feedback',
-                    'id': item.thread_id
-                })
-        elif isinstance(item, exp_models.ExplorationRightsModel):
-            if item.deleted:
-                return
+        for uid, uemail, uname in zip(user_ids, user_emails, user_names):
+            user_services.create_new_user(uid, uemail)
+            user_services.set_username(uid, uname)
 
-            if not item.community_owned:
-                for owner_id in item.owner_ids:
-                    yield (owner_id, {
-                        'type': 'exploration',
-                        'id': item.id
-                    })
-                for editor_id in item.editor_ids:
-                    yield (editor_id, {
-                        'type': 'exploration',
-                        'id': item.id
-                    })
-            else:
-                # Go through the history.
-                current_version = item.version
-                for version in range(1, current_version + 1):
-                    model = exp_models.ExplorationRightsModel.get_version(
-                        item.id, version)
+        admin_usernames = ['user1', 'user2', 'user3']
+        moderator_usernames = ['user4', 'user5', 'user2']
+        banned_usernames = ['user6']
+        collection_editor_usernames = ['user7', 'user3']
 
-                    if not model.community_owned:
-                        for owner_id in model.owner_ids:
-                            yield (owner_id, {
-                                'type': 'exploration',
-                                'id': item.id
-                            })
-                        for editor_id in model.editor_ids:
-                            yield (editor_id, {
-                                'type': 'exploration',
-                                'id': item.id
-                            })
-        elif isinstance(item, collection_models.CollectionRightsModel):
-            # NOTE TO DEVELOPERS: Although the code handling subscribing to
-            # collections is very similar to the code above for explorations,
-            # it is not abstracted out due to the majority of the coding being
-            # yield statements. These must happen inside the generator method
-            # (which is this method) and, as a result, there is little common
-            # code between the two code blocks which can be effectively
-            # abstracted.
-            if item.deleted:
-                return
+        config_services.set_property(
+            'admin_id', 'admin_usernames', admin_usernames)
+        config_services.set_property(
+            'admin_id', 'moderator_usernames', moderator_usernames)
+        config_services.set_property(
+            'admin_id', 'banned_usernames', banned_usernames)
+        config_services.set_property(
+            'admin_id', 'collection_editor_whitelist',
+            collection_editor_usernames)
 
-            if not item.community_owned:
-                for owner_id in item.owner_ids:
-                    yield (owner_id, {
-                        'type': 'collection',
-                        'id': item.id
-                    })
-                for editor_id in item.editor_ids:
-                    yield (editor_id, {
-                        'type': 'collection',
-                        'id': item.id
-                    })
-            else:
-                # Go through the history.
-                current_version = item.version
-                for version in range(1, current_version + 1):
-                    model = (
-                        collection_models.CollectionRightsModel.get_version(
-                            item.id, version))
+        job_id = (
+            user_jobs_one_off.UserRolesMigrationOneOffJob.create_new())
+        user_jobs_one_off.UserRolesMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
-                    if not model.community_owned:
-                        for owner_id in model.owner_ids:
-                            yield (owner_id, {
-                                'type': 'collection',
-                                'id': item.id
-                            })
-                        for editor_id in model.editor_ids:
-                            yield (editor_id, {
-                                'type': 'collection',
-                                'id': item.id
-                            })
+        user_final_roles = {}
+        for username in user_names:
+            user_final_roles[username] = user_services.get_user_role_from_id(
+                user_services.get_user_id_from_username(username))
 
-    @staticmethod
-    def reduce(key, stringified_values):
-        values = [ast.literal_eval(v) for v in stringified_values]
-        for item in values:
-            if item['type'] == 'feedback':
-                subscription_services.subscribe_to_thread(key, item['id'])
-            elif item['type'] == 'exploration':
-                subscription_services.subscribe_to_exploration(key, item['id'])
-            elif item['type'] == 'collection':
-                subscription_services.subscribe_to_collection(key, item['id'])
-
-
-class DashboardStatsOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for populating weekly dashboard stats for all registered
-    users who have a non-None value of UserStatsModel.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        user_services.update_dashboard_stats_log(item.id)
-
-    @staticmethod
-    def reduce(item):
-        pass
-
-
-class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job that updates first contribution time in milliseconds for
-    current users. This job makes the assumption that once an exploration is
-    published, it remains published. This job is not completely precise in that
-    (1) we ignore explorations that have been published in the past but are now
-    unpublished, and (2) commits that were made during an interim unpublished
-    period are counted against the first publication date instead of the second
-    publication date.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationRightsSnapshotMetadataModel]
-
-    @staticmethod
-    def map(item):
-        exp_id = item.get_unversioned_instance_id()
-
-        exp_rights = rights_manager.get_exploration_rights(
-            exp_id, strict=False)
-        if exp_rights is None:
-            return
-
-        exp_first_published_msec = exp_rights.first_published_msec
-        # First contribution time in msec is only set from contributions to
-        # explorations that are currently published.
-        if not rights_manager.is_exploration_private(exp_id):
-            created_on_msec = utils.get_time_in_millisecs(item.created_on)
-            yield (
-                item.committer_id,
-                max(exp_first_published_msec, created_on_msec)
-            )
-
-    @staticmethod
-    def reduce(user_id, stringified_commit_times_msec):
-        commit_times_msec = [
-            ast.literal_eval(commit_time_string) for
-            commit_time_string in stringified_commit_times_msec]
-        first_contribution_msec = min(commit_times_msec)
-        user_services.update_first_contribution_msec_if_not_set(
-            user_id, first_contribution_msec)
-
-
-class UserProfilePictureOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job that updates profile pictures for users which do not
-    currently have them. Users who already have profile pictures are
-    unaffected.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted or item.profile_picture_data_url is not None:
-            return
-
-        user_services.generate_initial_profile_picture(item.id)
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        pass
-
-
-class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceJobManager):
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(user_model):
-        user_id = user_model.id
-        contributions = user_models.UserContributionsModel.get(user_id)
-
-        created_explorations = exp_services.get_multiple_explorations_by_id(
-            contributions.created_exploration_ids)
-        if created_explorations:
-            user_model.last_created_an_exploration = max(
-                [model.created_on for model in created_explorations.values()])
-
-        user_commits = (
-            exp_models.ExplorationCommitLogEntryModel.query(
-                exp_models.ExplorationCommitLogEntryModel.user_id == user_id).
-            order(-exp_models.ExplorationCommitLogEntryModel.created_on).
-            fetch(1))
-
-        if user_commits:
-            user_model.last_edited_an_exploration = user_commits[0].created_on
-
-        user_model.put()
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        pass
-
-
-class UserRolesMigrationOneOffJob(jobs.BaseMapReduceJobManager):
-    """A one time job to attach a new field (representing role of user) to the
-    UserSettingsModel. The job will load all existing users from the datastore,
-    look for the role to assign them and then store them back thus updating the
-    table schema and adding appropiate roles to users.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(user_model):
-        admin_usernames = config_domain.Registry.get_config_property(
-            'admin_usernames')
-        moderator_usernames = config_domain.Registry.get_config_property(
-            'moderator_usernames')
-        banned_usernames = config_domain.Registry.get_config_property(
-            'banned_usernames')
-        collection_editors = config_domain.Registry.get_config_property(
-            'collection_editor_whitelist')
-
-        user_roles = [feconf.ROLE_ID_EXPLORATION_EDITOR]
-        if user_model.username in admin_usernames.value:
-            user_roles.append(feconf.ROLE_ID_ADMIN)
-        if user_model.username in moderator_usernames.value:
-            user_roles.append(feconf.ROLE_ID_MODERATOR)
-        if user_model.username in banned_usernames.value:
-            user_roles.append(feconf.ROLE_ID_BANNED_USER)
-        if user_model.username in collection_editors.value:
-            user_roles.append(feconf.ROLE_ID_COLLECTION_EDITOR)
-        user_role = role_services.get_max_priority_role(user_roles)
-
-        try:
-            user_services.update_user_role(user_model.id, user_role)
-            yield ('success', 1)
-        except Exception as e:
-            logging.error('Exception raised: %s' % e)
-            yield (user_model.username, unicode(e))
-
-    @staticmethod
-    def reduce(key, value):
-        if key == 'success':
-            yield(key, len(value))
-        else:
-            yield(key, value)
+        self.assertEqual(
+            user_final_roles['user1'], feconf.ROLE_ID_ADMIN)
+        self.assertEqual(
+            user_final_roles['user2'], feconf.ROLE_ID_ADMIN)
+        self.assertEqual(
+            user_final_roles['user3'], feconf.ROLE_ID_ADMIN)
+        self.assertEqual(
+            user_final_roles['user4'], feconf.ROLE_ID_MODERATOR)
+        self.assertEqual(
+            user_final_roles['user5'], feconf.ROLE_ID_MODERATOR)
+        self.assertEqual(
+            user_final_roles['user6'], feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(
+            user_final_roles['user7'], feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_final_roles['user8'], feconf.ROLE_ID_EXPLORATION_EDITOR)
