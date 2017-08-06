@@ -14,7 +14,6 @@
 
 """Tests for classes and methods relating to user rights."""
 
-from constants import constants
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services

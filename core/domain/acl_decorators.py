@@ -16,7 +16,6 @@
 
 """Decorators to provide authorization across the site."""
 
-from constants import constants
 from core.controllers import base
 from core.domain import rights_manager
 from core.domain import role_services
@@ -306,7 +305,7 @@ def can_comment_on_feedback_thread(handler):
             exploration_id, strict=False)
 
         if rights_manager.check_can_access_activity(
-                self.user_id, self.action, exploration_rights):
+                self.user_id, self.actions, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -463,16 +462,12 @@ def can_manage_collection_publish_status(handler):
             raise self.UnauthorizedUserException(
                 'You do not have credentials to unpublish this collection.')
 
-        if collection_rights.is_private():
-            if role_services.ACTION_PUBLISH_ANY_COLLECTION in self.actions:
-                return handler(self, collection_id, **kwargs)
+        if rights_manager.check_can_publish_activity(
+                self.user_id, self.actions, collection_rights):
+            return handler(self, collection_id, **kwargs)
 
-            if role_services.ACTION_PUBLISH_OWNED_COLLECTION in self.actions:
-                if collection_rights.is_owner(self.user_id):
-                    return handler(self, collection_id, **kwargs)
-
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to publish this collection.')
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to publish this collection.')
     test_can_manage_collection_publish_status.__wrapped__ = True
 
     return test_can_manage_collection_publish_status

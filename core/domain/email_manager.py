@@ -37,19 +37,6 @@ def log_new_error(*args, **kwargs):
     logging.error(*args, **kwargs)
 
 
-def check_atleast_moderator(user_id):
-    user_role = user_services.get_user_role_from_id(user_id)
-    if (user_role == feconf.ROLE_ID_MODERATOR or
-            user_role == feconf.ROLE_ID_ADMIN):
-        return True
-    return False
-
-
-def check_admin(user_id):
-    user_role = user_services.get_user_role_from_id(user_id)
-    if user_role == feconf.ROLE_ID_ADMIN:
-        return True
-    return False
 
 
 EMAIL_HTML_BODY_SCHEMA = {
@@ -140,8 +127,10 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
 
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION: check_atleast_moderator,
-    feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: check_atleast_moderator,
+    feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION: (
+        user_services.check_atleast_moderator),
+    feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
+        user_services.check_atleast_moderator),
     feconf.EMAIL_INTENT_DAILY_BATCH: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
@@ -154,16 +143,17 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_MARKETING: check_admin,
-    feconf.EMAIL_INTENT_DELETE_EXPLORATION: check_atleast_moderator,
+    feconf.EMAIL_INTENT_MARKETING: user_services.check_admin,
+    feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
+        user_services.check_atleast_moderator),
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_MARKETING: check_admin,
-    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: check_admin,
-    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: check_admin,
-    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: check_admin,
-    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: check_admin,
-    feconf.BULK_EMAIL_INTENT_TEST: check_admin
+    feconf.BULK_EMAIL_INTENT_MARKETING: user_services.check_admin,
+    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.check_admin,
+    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.check_admin,
+    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: user_services.check_admin,
+    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: user_services.check_admin,
+    feconf.BULK_EMAIL_INTENT_TEST: user_services.check_admin
 }
 
 

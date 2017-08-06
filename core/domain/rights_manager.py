@@ -1021,7 +1021,7 @@ def _unpublish_activity(committer_id, activity_id, activity_type):
     committer_actions = role_services.get_all_actions(committer_role)
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         if not check_can_unpublish_exploration(
                 committer_actions, activity_rights):
             logging.error(
@@ -1029,7 +1029,7 @@ def _unpublish_activity(committer_id, activity_id, activity_type):
                 'permission.' % (committer_id, activity_type, activity_id))
             raise Exception('This %s cannot be unpublished.' % activity_type)
 
-    if activity_type == feconf.ACTIVITY_TYPE_COLLECTION:
+    if activity_type == constants.ACTIVITY_TYPE_COLLECTION:
         if not check_can_unpublish_collection(
                 committer_actions, activity_rights):
             logging.error(
@@ -1380,4 +1380,4 @@ def unpublicize_collection(committer_id, collection_id):
             _unpublicize_activity.
     """
     _unpublicize_activity(
-        committer_id, collection_id, feconf.ACTIVITY_TYPE_COLLECTION)
+        committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)

@@ -1429,3 +1429,18 @@ def update_dashboard_stats_log(user_id):
     }
     model.weekly_creator_stats_list.append(weekly_dashboard_stats)
     model.put()
+
+
+def check_atleast_moderator(user_id):
+    user_role = get_user_role_from_id(user_id)
+    if (user_role == feconf.ROLE_ID_MODERATOR or
+            user_role == feconf.ROLE_ID_ADMIN):
+        return True
+    return False
+
+
+def check_admin(user_id):
+    user_role = get_user_role_from_id(user_id)
+    if user_role == feconf.ROLE_ID_ADMIN:
+        return True
+    return False
