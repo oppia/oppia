@@ -54,12 +54,15 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
 
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
-    ALBERT_ID = 'albert'
+    user = 'albert'
+    user_email = 'albert@example.com'
 
     def setUp(self):
         super(FeaturedActivitiesHandlerTest, self).setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.user_email, self.user)
         self.set_moderators([self.MODERATOR_USERNAME])
+        self.ALBERT_ID = self.get_user_id_from_email(self.user_email)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.ALBERT_ID)
         rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_1)
