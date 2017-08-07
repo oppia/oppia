@@ -418,8 +418,9 @@ def _get_thread_from_model(thread_model):
     Returns:
         FeedbackThread. The corresponding FeedbackThread domain object.
     """
-    message_count = feedback_models.FeedbackMessageModel.get_message_count(
-        thread_model.exploration_id, thread_model.thread_id)
+    if not thread_model.message_count:
+        message_count = feedback_models.FeedbackMessageModel.get_message_count(
+            thread_model.exploration_id, thread_model.thread_id)
 
     return feedback_domain.FeedbackThread(
         thread_model.id, thread_model.exploration_id, thread_model.state_name,
@@ -502,7 +503,7 @@ def get_thread_summaries(user_id, full_thread_ids):
     thread_summaries = []
     number_of_unread_threads = 0
     for index, thread in enumerate(threads):
-        if not feedback_thread_user_models[index]:
+        if feedback_thread_user_models[index] is None:
             update_messages_read_by_the_user(
                 user_id, explorations[index], thread_ids[index], [])
         last_message_read = (
