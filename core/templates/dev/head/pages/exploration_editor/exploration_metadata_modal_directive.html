@@ -6,9 +6,9 @@
   <p>
     Just a few more things before you publish:
   </p>
-  <exploration-title-editor label-name="Add a title: what should your exploration be called?"
-                            form-style="{'font-weight':'normal'}"
-                            field-required="<[::requireTitleToBeSpecified]>">
+  <exploration-title-editor ng-if="requireTitleToBeSpecified"
+                            label-name="Add a title: what should your exploration be called?"
+                            form-style="{'font-weight':'normal'}">
   </exploration-title-editor>
   <form name="objectiveForm">
     <p ng-if="requireObjectiveToBeSpecified"

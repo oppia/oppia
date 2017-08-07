@@ -19,19 +19,17 @@ oppia.directive('explorationTitleEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope:{
-        // The text for the label Field.
+      scope: {
+        // The text for the label of the field.
         labelName: '@',
-        // The value to be shown on focus.
+        // Value to move focus on the element.
         onInputFieldFocus: '@',
         // Additional CSS style to define the width and font-weight.
         formStyle: '@',
         // Additional CSS style for P tags.
         pStyle:'@',
-        // The method to call on when the input field is blured.
-        onInputFieldBlur: '&',
-        // The value to determine the visibilty of the field.
-        fieldRequired:'@'
+        // The method to call when the input field is blured.
+        onInputFieldBlur: '&'      
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/' +
