@@ -305,6 +305,8 @@
 	"I18N_LIBRARY_VIEW_ALL": "सभी को देखें",
 	"I18N_MODAL_CANCEL_BUTTON": "रद्द करना",
 	"I18N_ONE_SUBSCRIBER_TEXT": "आपके पास 1 ग्राहक है।",
+	"I18N_PLAYER_AUDIO_LANGUAGE": "भाषा",
+	"I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "ध्वनि अनुवाद सेटिंग्स",
 	"I18N_PLAYER_BACK": "वापस",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "कार्ड #",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "समुदाय संपादन योग्य",

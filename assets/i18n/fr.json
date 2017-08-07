@@ -305,6 +305,8 @@
 	"I18N_LIBRARY_VIEW_ALL": "Afficher tout",
 	"I18N_MODAL_CANCEL_BUTTON": "Annuler",
 	"I18N_ONE_SUBSCRIBER_TEXT": "Vous avez 1 abonné.",
+	"I18N_PLAYER_AUDIO_LANGUAGE": "Langue",
+	"I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Paramètres de traduction audio",
 	"I18N_PLAYER_BACK": "Retour",
 	"I18N_PLAYER_BACK_TO_COLLECTION": "Retour à la collection",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Numéro de carte",
