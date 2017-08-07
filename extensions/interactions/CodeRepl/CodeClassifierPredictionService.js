@@ -36,7 +36,7 @@ oppia.factory('CodeClassifierPredictionService', [
 
     var getTokenizedProgram = function(program, tokenToId) {
       // Tokenize Python programs in dataset for winnowing.
-      var generatedTokens = PythonProgramTokenizer.generate_tokens(
+      var generatedTokens = PythonProgramTokenizer.generateTokens(
         program.split('\n'));
       tokenizedProgram = [];
 

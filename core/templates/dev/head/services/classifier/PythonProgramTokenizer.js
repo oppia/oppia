@@ -41,7 +41,7 @@ oppia.constant('PythonProgramTokenType', {
 });
 
 oppia.factory('PythonProgramTokenizer', [
-  'PythonProgramTokenType', function(PythonProgramTokenType) {
+  '$log', 'PythonProgramTokenType', function($log, PythonProgramTokenType) {
     var group = function() {
       return '(' + Array.prototype.join.call(arguments, '|') + ')';
     };
@@ -151,7 +151,7 @@ oppia.factory('PythonProgramTokenizer', [
     var tabsize = 8;
 
     return {
-      generate_tokens: function(program) {
+      generateTokens: function(program) {
         var tokenizedProgram = [];
         var lnum = parenlev = continued = 0;
         var namechars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
