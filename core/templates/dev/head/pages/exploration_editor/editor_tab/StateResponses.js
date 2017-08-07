@@ -77,7 +77,6 @@ oppia.factory('responsesService', [
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
         $rootScope.$broadcast('answerGroupChanged');
-
         explorationStatesService.saveInteractionAnswerGroups(
           editorContextService.getActiveStateName(),
           angular.copy(newAnswerGroups));
@@ -89,7 +88,7 @@ oppia.factory('responsesService', [
         currentInteractionId &&
         INTERACTION_SPECS[currentInteractionId].can_have_solution);
         var solutionExists = (
-        stateSolutionService.savedMemento !== null &&
+        stateSolutionService.savedMemento &&
         stateSolutionService.savedMemento.correctAnswer !== null);
 
         if (interactionCanHaveSolution && solutionExists) {

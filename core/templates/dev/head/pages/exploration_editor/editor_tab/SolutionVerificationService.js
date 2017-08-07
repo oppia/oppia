@@ -19,11 +19,9 @@
 oppia.factory('SolutionVerificationService', [
   '$injector', 'stateInteractionIdService', 'explorationContextService',
   'editorContextService', 'angularNameService', 'AnswerClassificationService',
-  'explorationStatesService',
   function(
     $injector, stateInteractionIdService, explorationContextService,
-    editorContextService, angularNameService, AnswerClassificationService,
-    explorationStatesService) {
+    editorContextService, angularNameService, AnswerClassificationService) {
     return {
       verifySolution: function(
         explorationId, state, correctAnswer, successCallback, errorCallback) {

@@ -3527,8 +3527,6 @@ class Exploration(object):
                 }
                 for old_translation in old_audio_translations
             }
-            if not state_dict['interaction']['solution']:
-                state_dict['interaction']['solution'] = None
         return states_dict
 
     @classmethod
@@ -3572,7 +3570,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 15
+    CURRENT_EXP_SCHEMA_VERSION = 16
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3901,6 +3899,18 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v15_dict_to_v16_dict(cls, exploration_dict):
+        """Converts a v15 exploration dict into a v16 exploration dict."""
+        exploration_dict['schema_version'] = 16
+
+        exploration_dict['states'] = cls._convert_states_v12_dict_to_v13_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 13
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4006,6 +4016,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v14_dict_to_v15_dict(
                 exploration_dict)
             exploration_schema_version = 15
+
+        if exploration_schema_version == 15:
+            exploration_dict = cls._convert_v15_dict_to_v16_dict(
+                exploration_dict)
+            exploration_schema_version = 16
 
         return (exploration_dict, initial_schema_version)
 
