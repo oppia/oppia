@@ -1491,6 +1491,7 @@ var HintEditor = function(hintNum) {
   };
 };
 
+// This only handles TextInput interaction.
 var addSolution = function(solution) {
   element(by.css('.protractor-test-oppia-add-solution-button')).click();
   browser.switchTo().activeElement().sendKeys(solution.explanation);

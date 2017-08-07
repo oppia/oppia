@@ -18,17 +18,12 @@
   </div>
 
   <div ng-if="isEditable && explanationEditorIsOpen">
-    <form role="form"
-          class="form-inline"
-          name="editSolutionForm"
-          ng-submit="saveThisExplanation()">
-      <div class="oppia-rule-details-header">
-        <strong>Explanation:</strong>
-        <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
-                             local-value="stateSolutionService.displayed.explanation">
-        </schema-based-editor>
-      </div>
-    </form>
+    <div class="oppia-rule-details-header">
+      <strong>Explanation:</strong>
+      <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
+                           local-value="stateSolutionService.displayed.explanation">
+      </schema-based-editor>
+    </div>
 
     <div class="oppia-rule-save-cancel-buttons">
       <div class="pull-right">

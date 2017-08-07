@@ -46,7 +46,7 @@ oppia.factory('SolutionObjectFactory', [
       return new Solution(answerIsExclusive, correctAnswer, explanation);
     };
 
-    Solution.prototype.getSummary = function(interactionId, choices) {
+    Solution.prototype.getSummary = function(interactionId, customizationArgs) {
       var solutionType = (
         this.answerIsExclusive ? 'The only' : 'One');
       var correctAnswer = null;
@@ -77,23 +77,6 @@ oppia.factory('SolutionObjectFactory', [
 
     Solution.prototype.setExplanation = function(explanation) {
       this.explanation = explanation;
-    };
-
-    Solution.prototype.getCorrectAnswerHtml = function(interactionId) {
-      if (interactionId === 'CodeRepl' ||
-        interactionId === 'PencilCodeEditor') {
-        return this.correctAnswer.code;
-      } else if (interactionId === 'GraphInput') {
-        return '[Graph Object]';
-      } else if (interactionId === 'MathExpressionInput') {
-        return this.correctAnswer.latex;
-      } else if (interactionId === 'LogicProof') {
-        return this.correctAnswer.correct;
-      } else if (interactionId === 'MusicNotesInput') {
-        return '[Music Phrase Object]';
-      } else {
-        return this.correctAnswer;
-      }
     };
 
     return Solution;

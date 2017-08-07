@@ -3532,6 +3532,16 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v12_dict_to_v13_dict(cls, states_dict):
+        """Converts from version 12 to 13. Version 13 sets empty
+        solutions to None.
+        """
+        for state_dict in states_dict.values():
+            if not state_dict['interaction']['solution']:
+                state_dict['interaction']['solution'] = None
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given

@@ -21,18 +21,21 @@ oppia.directive('solutionEditor', [
   'editorContextService', 'explorationStatesService',
   'explorationWarningsService', 'alertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
-  'explorationContextService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'explorationContextService', 'oppiaExplorationHtmlFormatterService',
+  'stateInteractionIdService', 'stateCustomizationArgsService',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function($modal, UrlInterpolationService, stateSolutionService,
            editorContextService, explorationStatesService,
            explorationWarningsService, alertsService,
            SolutionObjectFactory, SolutionVerificationService,
-           explorationContextService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
+           explorationContextService, oppiaExplorationHtmlFormatterService,
+           stateInteractionIdService, stateCustomizationArgsService,
+           INFO_MESSAGE_SOLUTION_IS_INVALID) {
     return {
       restrict: 'E',
       scope: {
         getInteractionId: '&interactionId',
-        correctAnswerEditorHtml: '=',
-        getOnSaveFn: '&onSave'
+        correctAnswerEditorHtml: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_editor_directive.html'),
@@ -46,10 +49,18 @@ oppia.directive('solutionEditor', [
             ui_config: {}
           };
 
+          $scope.getAnswerHtml = function () {
+            return oppiaExplorationHtmlFormatterService.getAnswerHtml(
+              stateSolutionService.savedMemento.correctAnswer,
+              stateInteractionIdService.savedMemento,
+              stateCustomizationArgsService.savedMemento);
+          };
+
           $scope.openSolutionEditor = function() {
             $modal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/add_solution_modal.html'),
+                '/pages/exploration_editor/editor_tab/' +
+                'add_or_update_solution_modal.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$modalInstance', 'stateInteractionIdService',

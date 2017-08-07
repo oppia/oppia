@@ -394,7 +394,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that interactions that can have solution cannot be linear.
             if interaction.can_have_solution:
-                self.assertEquals(interaction.is_linear, False)
+                self.assertFalse(interaction.is_linear)
 
             default_object_values = obj_services.get_default_object_values()
 

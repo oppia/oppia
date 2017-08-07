@@ -1052,13 +1052,11 @@ oppia.factory('explorationStatesService', [
               $injector.get(angularNameService.getNameOfInteractionRulesService(
                 _states.getState(stateName).interaction.id))
             ).then(function(result) {
-              if (
+              var solutionIsValid = (
                 editorContextService.getActiveStateName() !== (
-                  result.outcome.dest)) {
-                SolutionValidityService.updateValidity(stateName, true);
-              } else {
-                SolutionValidityService.updateValidity(stateName, false);
-              }
+                  result.outcome.dest));
+              SolutionValidityService.updateValidity(
+                stateName, solutionIsValid);
             });
           }
         });

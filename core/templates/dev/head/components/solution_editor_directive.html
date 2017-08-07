@@ -14,11 +14,10 @@
         <strong>
           <[stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
         </strong>
-        <span angular-html-bind="stateSolutionService.savedMemento.getCorrectAnswerHtml(getInteractionId())"></span>
+        <span angular-html-bind="getAnswerHtml()"></span>
       </div>
     </div>
   </div>
   <br>
-  <solution-explanation-editor explanation="stateSolutionService.displayed.explanation">
-  </solution-explanation-editor>
+  <solution-explanation-editor></solution-explanation-editor>
 </div>

@@ -37,8 +37,7 @@
             <div ng-if="inlineSolutionEditorIsActive">
               <div class="oppia-editor-card-section protractor-test-oppia-solution-body">
                 <solution-editor interaction-id="stateInteractionIdService.savedMemento"
-                                 correct-answer-editor-html="correctAnswerEditorHtml"
-                                 on-save="onSaveInlineSolution">
+                                 correct-answer-editor-html="correctAnswerEditorHtml">
                 </solution-editor>
               </div>
             </div>
@@ -52,7 +51,7 @@
         <button ng-if="!stateSolutionService.savedMemento"
                 type="button"
                 class="btn btn-default btn-lg oppia-add-hint-button protractor-test-oppia-add-solution-button"
-                ng-click="openAddSolutionModal()">
+                ng-click="openAddOrUpdateSolutionModal()">
           + Add Solution
         </button>
       </div>
