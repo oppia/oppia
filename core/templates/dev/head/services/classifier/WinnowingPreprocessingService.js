@@ -21,7 +21,7 @@
  * same task.
  */
 
-Oppia.factory('WinnowingPreprocessingService', [function() {
+oppia.factory('WinnowingPreprocessingService', [function() {
   var generateHashValue = function(tokens, tokenToId) {
     var hashVal = 0;
     var n = tokens.length - 1;

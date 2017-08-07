@@ -21,7 +21,7 @@
  * Oppia-ml.
  */
 
-Oppia.factory('CodeClassifierPredictionService', [
+oppia.factory('CodeClassifierPredictionService', [
   'WinnowingPreprocessingService', 'SVMPredictionService',
   'PythonProgramTokenizer', 'PythonProgramTokenType',
   'CountVectorizerService', function(

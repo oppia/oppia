@@ -26,7 +26,7 @@
  * https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L2481
  */
 
-Oppia.factory('SVMPredictionService', [function() {
+oppia.factory('SVMPredictionService', [function() {
   var kernel = function(kernelParams, supportVectors, input) {
     var kernel = kernelParams.kernel;
     var kvalues = [];

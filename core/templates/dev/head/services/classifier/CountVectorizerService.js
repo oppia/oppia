@@ -22,7 +22,7 @@
  * propagated here.
  */
 
-Oppia.factory('CountVectorizerService', [function() {
+oppia.factory('CountVectorizerService', [function() {
   return {
     vectorize: function(tokenizedProgram, vocabulary) {
       var vectorLength = Object.keys(vocabulary).length;

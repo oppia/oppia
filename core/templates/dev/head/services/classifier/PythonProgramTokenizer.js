@@ -27,7 +27,7 @@
  */
 
 
-Oppia.constant('PythonProgramTokenType', {
+oppia.constant('PythonProgramTokenType', {
   COMMENT: 'COMMENT',
   NL: 'NL',
   STRING: 'STRING',
@@ -40,8 +40,8 @@ Oppia.constant('PythonProgramTokenType', {
   ERRORTOKEN: 'ERRORTOKEN'
 });
 
-Oppia.factory('PythonProgramTokenizer', [
-  '$log', 'PythonProgramTokenType', function($log, PythonProgramTokenType) {
+oppia.factory('PythonProgramTokenizer', [
+  'PythonProgramTokenType', function(PythonProgramTokenType) {
     var group = function() {
       return '(' + Array.prototype.join.call(arguments, '|') + ')';
     };
