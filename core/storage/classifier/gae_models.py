@@ -161,7 +161,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
             exp_version: int. The exploration version at the time
                 this training job was created.
-            next_scheduled_check_time: DateTime. The time to check the job.
+            next_scheduled_check_time: Datetime. The scheduled time to check
+                the job.
             state_name: str. The name of the state to which the classifier
                 belongs.
             status: str. The status of the training job.

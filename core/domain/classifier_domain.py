@@ -182,7 +182,7 @@ class ClassifierTrainingJob(object):
             for which the classifier will be generated.
         exp_version: str. The version of the exploration when
             the training job was generated.
-        next_scheduled_check_time: DateTime. The time to check the job.
+        next_scheduled_check_time: Datetime. The scheduled time to check the job.
         state_name: str. The name of the state for which the classifier will be
             generated.
         status: str. The status of the training job request. This can be either
@@ -218,7 +218,7 @@ class ClassifierTrainingJob(object):
             for which classifier will be generated.
         exp_version: str. The version of the exploration when
             the training job was generated.
-        next_scheduled_check_time: DateTime. The time to check the job.
+        next_scheduled_check_time: Datetime. The scheduled time to check the job.
         state_name: str. The name of the state for which the classifier will be
             generated.
         status: str. The status of the training job request. This can be either
@@ -299,7 +299,7 @@ class ClassifierTrainingJob(object):
         domain object.
 
         Args:
-            next_scheduled_check_time: DateTime. The time to check the job.
+            next_scheduled_check_time: Datetime. The scheduled time to check the job.
         """
 
         self._next_scheduled_check_time = next_scheduled_check_time
