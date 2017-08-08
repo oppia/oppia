@@ -298,7 +298,7 @@ class ClassifierTrainingJob(object):
         self._status = status
 
     def update_next_scheduled_check_time(self, next_scheduled_check_time):
-        """Updates the next_scheduled_check_time attribute of the 
+        """Updates the next_scheduled_check_time attribute of the
         ClassifierTrainingJob domain object.
 
         Args:
@@ -346,7 +346,7 @@ class ClassifierTrainingJob(object):
 
         if not isinstance(self.next_scheduled_check_time, datetime.datetime):
             raise utils.ValidationError(
-                'Expected next_scheduled_check_time to be datetime,' + 
+                'Expected next_scheduled_check_time to be datetime,' +
                 ' received %s' % self.next_scheduled_check_time)
 
         if not isinstance(self.state_name, basestring):

@@ -183,8 +183,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         next_scheduled_check_time = datetime.datetime.utcnow()
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            interaction_id, exp_id, 1, next_scheduled_check_time, [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW)
+            interaction_id, exp_id, 1, next_scheduled_check_time, [],
+            state_name, feconf.TRAINING_JOB_STATUS_NEW)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.algorithm_id,
@@ -194,7 +194,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier_training_job.exp_id, exp_id)
         self.assertEqual(classifier_training_job.exp_version, 1)
         self.assertEqual(classifier_training_job.next_scheduled_check_time,
-                         next_scheduled_check_time)        
+                         next_scheduled_check_time)
         self.assertEqual(classifier_training_job.training_data, [])
         self.assertEqual(classifier_training_job.state_name, state_name)
         self.assertEqual(classifier_training_job.status,
