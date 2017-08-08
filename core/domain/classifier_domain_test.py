@@ -192,7 +192,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'exp_version': 1,
             'next_scheduled_check_time':
                 datetime.datetime.strptime(
-                    "2017-08-11 12:42:31","%Y-%m-%d %H:%M:%S"),
+                    "2017-08-11 12:42:31", "%Y-%m-%d %H:%M:%S"),
             'state_name': 'a state name',
             'status': 'NEW',
             'training_data': [
@@ -231,7 +231,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'exp_version': 1,
             'next_scheduled_check_time':
                 datetime.datetime.strptime(
-                    "2017-08-11 12:42:31","%Y-%m-%d %H:%M:%S"),
+                    "2017-08-11 12:42:31", "%Y-%m-%d %H:%M:%S"),
             'state_name': 'some state',
             'algorithm_id': 'LDAStringClassifier',
             'interaction_id': 'TextInput',
@@ -270,7 +270,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         # Verify validation error is raised when invalid state_name is provided.
         training_job_dict['next_scheduled_check_time'] = (
             datetime.datetime.strptime(
-                    "2017-08-11 12:42:31","%Y-%m-%d %H:%M:%S"))
+                "2017-08-11 12:42:31", "%Y-%m-%d %H:%M:%S"))
         training_job_dict['state_name'] = 'A string #'
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (

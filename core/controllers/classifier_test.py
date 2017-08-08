@@ -16,7 +16,6 @@
 classifiers."""
 
 import os
-import datetime
 import json
 
 from core.controllers import classifier

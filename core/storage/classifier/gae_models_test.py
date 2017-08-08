@@ -115,7 +115,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
             next_scheduled_check_time + datetime.timedelta(
-            minutes=feconf.CLASSIFIER_JOB_TTL_MINS),
+                minutes=feconf.CLASSIFIER_JOB_TTL_MINS),
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_PENDING)
         classifier_models.ClassifierTrainingJobModel.create(
@@ -134,7 +134,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(training_jobs[3].exp_id, 'exp_id1')
         self.assertEqual(training_jobs[3].exp_version, 1)
         self.assertEqual(training_jobs[3].next_scheduled_check_time,
-            next_scheduled_check_time)
+                         next_scheduled_check_time)
         self.assertEqual(training_jobs[3].state_name, 'state_name2')
         self.assertEqual(training_jobs[3].status,
                          feconf.TRAINING_JOB_STATUS_NEW)

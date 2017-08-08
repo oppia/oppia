@@ -182,7 +182,8 @@ class ClassifierTrainingJob(object):
             for which the classifier will be generated.
         exp_version: str. The version of the exploration when
             the training job was generated.
-        next_scheduled_check_time: Datetime. The scheduled time to check the job.
+        next_scheduled_check_time: Datetime. The scheduled time to check the
+            job.
         state_name: str. The name of the state for which the classifier will be
             generated.
         status: str. The status of the training job request. This can be either
@@ -205,7 +206,8 @@ class ClassifierTrainingJob(object):
     """
 
     def __init__(self, job_id, algorithm_id, interaction_id, exp_id,
-                 exp_version, next_scheduled_check_time, state_name, status, training_data):
+                 exp_version, next_scheduled_check_time, state_name, status,
+                 training_data):
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
@@ -218,7 +220,8 @@ class ClassifierTrainingJob(object):
             for which classifier will be generated.
         exp_version: str. The version of the exploration when
             the training job was generated.
-        next_scheduled_check_time: Datetime. The scheduled time to check the job.
+        next_scheduled_check_time: Datetime. The scheduled time to check the
+            job.
         state_name: str. The name of the state for which the classifier will be
             generated.
         status: str. The status of the training job request. This can be either
@@ -295,11 +298,12 @@ class ClassifierTrainingJob(object):
         self._status = status
 
     def update_next_scheduled_check_time(self, next_scheduled_check_time):
-        """Updates the next_scheduled_check_time attribute of the ClassifierTrainingJob
-        domain object.
+        """Updates the next_scheduled_check_time attribute of the 
+        ClassifierTrainingJob domain object.
 
         Args:
-            next_scheduled_check_time: Datetime. The scheduled time to check the job.
+            next_scheduled_check_time: Datetime. The scheduled time to check
+                the job.
         """
 
         self._next_scheduled_check_time = next_scheduled_check_time
@@ -342,8 +346,8 @@ class ClassifierTrainingJob(object):
 
         if not isinstance(self.next_scheduled_check_time, datetime.datetime):
             raise utils.ValidationError(
-                'Expected next_scheduled_check_time to be an datetime, received %s' %
-                self.next_scheduled_check_time)
+                'Expected next_scheduled_check_time to be datetime,' + 
+                ' received %s' % self.next_scheduled_check_time)
 
         if not isinstance(self.state_name, basestring):
             raise utils.ValidationError(

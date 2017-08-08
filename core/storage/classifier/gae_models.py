@@ -14,11 +14,12 @@
 
 """Models for storing the classification data models."""
 
+import datetime
+
 from core.platform import models
 
 import feconf
 import utils
-import datetime
 
 from google.appengine.ext import ndb
 
@@ -117,7 +118,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     training_data = ndb.JsonProperty(default=None)
     # The time when the job was picked up last time.
     # It incremented by TTL on being picked up by VM.
-    next_scheduled_check_time = ndb.DateTimeProperty(required=True, indexed=True)
+    next_scheduled_check_time = ndb.DateTimeProperty(required=True,
+                                                     indexed=True)
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -204,7 +206,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             feconf.TRAINING_JOB_STATUS_PENDING])).filter(
                 cls.next_scheduled_check_time <= (
                     datetime.datetime.utcnow())).order(
-                cls.next_scheduled_check_time, cls._key)
+                        cls.next_scheduled_check_time, cls._key)
 
         job_models, cursor, more = query.fetch_page(10, start_cursor=cursor)
         return job_models, cursor, more
