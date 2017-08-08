@@ -780,7 +780,8 @@ class GadgetsOneOffJobTest(test_utils.GenericTestBase):
 
         actual_values = [
             value.encode('ascii')
-            for value in exp_jobs_one_off.GadgetsOneOffJob.get_output(job_id)]
+            for value in exp_jobs_one_off.GadgetsOneOffJob.get_output(job_id)
+        ]
         expected_values = [
             str([u'1', [u'bottom']]),
         ]
