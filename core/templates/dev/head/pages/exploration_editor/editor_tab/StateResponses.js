@@ -85,11 +85,11 @@ oppia.factory('responsesService', [
         // added.
         var currentInteractionId = stateInteractionIdService.savedMemento;
         var interactionCanHaveSolution = (
-        currentInteractionId &&
-        INTERACTION_SPECS[currentInteractionId].can_have_solution);
+          currentInteractionId &&
+          INTERACTION_SPECS[currentInteractionId].can_have_solution);
         var solutionExists = (
-        stateSolutionService.savedMemento &&
-        stateSolutionService.savedMemento.correctAnswer !== null);
+          stateSolutionService.savedMemento &&
+          stateSolutionService.savedMemento.correctAnswer !== null);
 
         if (interactionCanHaveSolution && solutionExists) {
           var currentStateName = editorContextService.getActiveStateName();

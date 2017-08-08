@@ -46,7 +46,7 @@ oppia.factory('SolutionObjectFactory', [
       return new Solution(answerIsExclusive, correctAnswer, explanation);
     };
 
-    Solution.prototype.getSummary = function(interactionId, customizationArgs) {
+    Solution.prototype.getSummary = function(interactionId) {
       var solutionType = (
         this.answerIsExclusive ? 'The only' : 'One');
       var correctAnswer = null;

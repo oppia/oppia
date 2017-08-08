@@ -21,6 +21,7 @@ oppia.directive('solutionExplanationEditor', [
   function(UrlInterpolationService, stateSolutionService) {
     return {
       restrict: 'E',
+      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/explanation_editor_directive.html'),
       controller: [
