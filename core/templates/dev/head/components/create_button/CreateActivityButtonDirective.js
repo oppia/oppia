@@ -29,6 +29,9 @@ oppia.directive('createActivityButton', [
             CollectionCreationService, siteAnalyticsService, urlService) {
           $scope.creationInProgress = false;
 
+          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+          $scope.allowYamlFileUpload = GLOBALS.allowYamlFileUpload;
+
           $scope.showUploadExplorationModal = (
             ExplorationCreationService.showUploadExplorationModal);
 

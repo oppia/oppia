@@ -327,7 +327,8 @@ class BaseHandler(webapp2.RequestHandler):
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
-            'preferred_site_language_code': self.preferred_site_language_code
+            'preferred_site_language_code': self.preferred_site_language_code,
+            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
         })
         if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
