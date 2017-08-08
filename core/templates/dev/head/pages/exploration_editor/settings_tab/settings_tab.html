@@ -5,8 +5,8 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-if="editabilityService.isEditable()">
           <div role="form" class="form-horizontal">
-            <exploration-title-editor label-name="Title"
-                                      on-input-field-focus="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
+            <exploration-title-editor label-text="Title"
+                                      focus-label="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
                                       form-style="{display:'table-cell', width:'16.66666667%'}"
                                       p-style="{display:'table', width:'100%', 'margin-bottom':'2%'}"
                                       on-input-field-blur="saveExplorationTitle()">

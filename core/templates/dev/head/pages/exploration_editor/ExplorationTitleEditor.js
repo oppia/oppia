@@ -21,9 +21,9 @@ oppia.directive('explorationTitleEditor', [
       restrict: 'E',
       scope: {
         // The text for the label of the field.
-        labelName: '@',
+        labelText: '@',
         // Value to move focus on the element.
-        onInputFieldFocus: '@',
+        focusLabel: '@',
         // Additional CSS style to define the width and font-weight.
         formStyle: '@',
         // Additional CSS style for P tags.
