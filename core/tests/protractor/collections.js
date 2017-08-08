@@ -24,7 +24,8 @@ var collectionEditor = require('../protractor_utils/collectionEditor.js');
 describe('Collections', function() {
   beforeAll(function() {
     var USERNAME = 'aliceCollections';
-    users.createAndLoginAdminUser('alice@collections.com', USERNAME);
+    users.createUser('alice@collections.com', USERNAME);
+    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
     browser.get(general.ADMIN_URL_SUFFIX);
     element.all(by.css(
       '.protractor-test-reload-collection-button')).first().click();

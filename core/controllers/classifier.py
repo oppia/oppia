@@ -19,6 +19,7 @@ import hmac
 import json
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import config_domain
 
@@ -92,6 +93,7 @@ class TrainedClassifierHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    @acl_decorators.open_access
     def post(self):
         """Handles POST requests."""
         signature = self.payload.get('signature')

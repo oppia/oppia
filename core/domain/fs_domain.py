@@ -19,6 +19,8 @@
 import logging
 import os
 
+import cloudstorage
+
 from core.platform import models
 import feconf
 import utils
@@ -159,7 +161,7 @@ class ExplorationFileSystem(object):
         else:
             return None
 
-    def commit(self, user_id, filepath, raw_bytes):
+    def commit(self, user_id, filepath, raw_bytes, unused_mimetype):
         """Saves a raw bytestring as a file in the database."""
         self._save_file(user_id, filepath, raw_bytes)
 
@@ -236,8 +238,47 @@ class DiskBackedFileSystem(object):
             os.path.join(self._root, filepath), raw_bytes=True, mode=mode)
         return FileStreamWithMetadata(content, None, None)
 
-    def commit(self, user_id, filepath, raw_bytes):
+    def commit(self, user_id, filepath, raw_bytes, mimetype):
         raise NotImplementedError
+
+    def delete(self, user_id, filepath):
+        raise NotImplementedError
+
+    def listdir(self, dir_name):
+        raise NotImplementedError
+
+
+class GcsFileSystem(object):
+    """Wrapper for a file system based on GCS.
+
+    This implementation ignores versioning.
+    """
+
+    def __init__(self, exploration_id):
+        self._exploration_id = exploration_id
+
+    @property
+    def exploration_id(self):
+        return self._exploration_id
+
+    def isfile(self, filepath):
+        raise NotImplementedError
+
+    def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
+        raise NotImplementedError
+
+    def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
+        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
+
+        # Upload to GCS bucket with filepath
+        # "<bucket>/<exploration-id>/assets/<filepath>".
+        gcs_file_url = (
+            '/%s/%s/assets/%s' % (
+                bucket_name, self._exploration_id, filepath))
+        gcs_file = cloudstorage.open(
+            gcs_file_url, 'w', content_type=mimetype)
+        gcs_file.write(raw_bytes)
+        gcs_file.close()
 
     def delete(self, user_id, filepath):
         raise NotImplementedError
@@ -286,11 +327,11 @@ class AbstractFileSystem(object):
                 % (filepath, version if version else 'latest'))
         return file_stream.read()
 
-    def commit(self, user_id, filepath, raw_bytes):
+    def commit(self, user_id, filepath, raw_bytes, mimetype=None):
         """Replaces the contents of the file with the given bytestring."""
         raw_bytes = str(raw_bytes)
         self._check_filepath(filepath)
-        self._impl.commit(user_id, filepath, raw_bytes)
+        self._impl.commit(user_id, filepath, raw_bytes, mimetype)
 
     def delete(self, user_id, filepath):
         """Deletes a file and the metadata associated with it."""

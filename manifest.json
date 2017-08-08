@@ -102,6 +102,16 @@
           ]
         }
       },
+      "angularAudio": {
+        "version": "1.7.4",
+        "downloadFormat": "zip",
+        "url": "https://github.com/danielstern/ngAudio/archive/1.7.4.zip",
+        "rootDirPrefix": "ngAudio-",
+        "targetDirPrefix": "angular-audio-",
+        "bundle": {
+          "js": ["app/angular.audio.js"]
+        }
+      },
       "angularTest": {
         "version": "1.5.8",
         "downloadFormat": "files",

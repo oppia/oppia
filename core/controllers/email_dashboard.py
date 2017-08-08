@@ -15,7 +15,7 @@
 """Controller for user query related pages and handlers."""
 
 from core.controllers import base
-from core.domain import config_domain
+from core.domain import acl_decorators
 from core.domain import email_manager
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
@@ -28,27 +28,11 @@ import feconf
 
 current_user_services = models.Registry.import_current_user_services()
 
-def require_valid_sender(handler):
-    """Decorator that checks if the current user is a authorized sender."""
-    def test_user(self, **kwargs):
-        """Checks if the user is logged in and is authorized sender."""
-        if not self.user_id:
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
-            return
-        if self.username not in config_domain.WHITELISTED_EMAIL_SENDERS.value:
-            raise self.UnauthorizedUserException(
-                '%s is not an authorized user of this application',
-                self.user_id)
-        return handler(self, **kwargs)
-
-    return test_user
-
 
 class EmailDashboardPage(base.BaseHandler):
     """Page to submit query and show past queries."""
 
-    @require_valid_sender
+    @acl_decorators.can_manage_email_dashboard
     def get(self):
         """Handles GET requests."""
         self.render_template('pages/email_dashboard/email_dashboard.html')
@@ -57,7 +41,7 @@ class EmailDashboardPage(base.BaseHandler):
 class EmailDashboardDataHandler(base.BaseHandler):
     """Query data handler."""
 
-    @require_valid_sender
+    @acl_decorators.can_manage_email_dashboard
     def get(self):
         cursor = self.request.get('cursor')
         num_queries_to_fetch = self.request.get('num_queries_to_fetch')
@@ -94,7 +78,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
 
         self.render_json(data)
 
-    @require_valid_sender
+    @acl_decorators.can_manage_email_dashboard
     def post(self):
         """Post handler for query."""
         data = self.payload['data']
@@ -142,7 +126,8 @@ class EmailDashboardDataHandler(base.BaseHandler):
 
 class QueryStatusCheck(base.BaseHandler):
     """Handler for checking status of individual queries."""
-    @require_valid_sender
+
+    @acl_decorators.can_manage_email_dashboard
     def get(self):
         query_id = self.request.get('query_id')
         query_model = user_models.UserQueryModel.get(query_id)
@@ -164,7 +149,8 @@ class QueryStatusCheck(base.BaseHandler):
 
 class EmailDashboardResultPage(base.BaseHandler):
     """Handler for email dashboard result page."""
-    @require_valid_sender
+
+    @acl_decorators.can_manage_email_dashboard
     def get(self, query_id):
         query_model = user_models.UserQueryModel.get(query_id, strict=False)
         if (query_model is None or
@@ -181,7 +167,7 @@ class EmailDashboardResultPage(base.BaseHandler):
         self.render_template(
             'pages/email_dashboard/email_dashboard_result.html')
 
-    @require_valid_sender
+    @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
         query_model = user_models.UserQueryModel.get(query_id, strict=False)
         if (query_model is None or
@@ -204,6 +190,8 @@ class EmailDashboardResultPage(base.BaseHandler):
 
 class EmailDashboardCancelEmailHandler(base.BaseHandler):
     """Handler for not sending any emails using query result."""
+
+    @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
         query_model = user_models.UserQueryModel.get(query_id, strict=False)
         if (query_model is None or
@@ -224,7 +212,8 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
     This handler sends a test email to submitter of query before it is sent to
     qualfied users in bulk.
     """
-    @require_valid_sender
+
+    @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
         query_model = user_models.UserQueryModel.get(query_id, strict=False)
         if (query_model is None or

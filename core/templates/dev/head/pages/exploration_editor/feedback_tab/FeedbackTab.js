@@ -224,7 +224,7 @@ oppia.controller('FeedbackTab', [
                 stateName, stateDict);
               state.content.setHtml(suggestion.suggestion_html);
               if (result.audioUpdateRequired) {
-                state.content.markAudioAsNeedingUpdate();
+                state.content.markAllAudioAsNeedingUpdate();
               }
               explorationData.data.version += 1;
               explorationStatesService.setState(stateName, state);

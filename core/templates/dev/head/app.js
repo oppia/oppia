@@ -21,7 +21,7 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
+    'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
     'toastr'
@@ -42,7 +42,7 @@ oppia.constant('RULE_TYPE_CLASSIFIER', 'FuzzyMatches');
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-oppia.constant('ENABLE_STRING_CLASSIFIER', false);
+oppia.constant('ENABLE_ML_CLASSIFIERS', false);
 // Feature still in development.
 oppia.constant('ENABLE_HINT_EDITOR', true);
 oppia.constant('ENABLE_FALLBACK_EDITOR', false);

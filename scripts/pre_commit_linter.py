@@ -122,7 +122,7 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'scripts/pre_commit_linter.py', 'integrations/*',
     'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
-    '*.min.js', 'assets/scripts/*', 'core/tests/data/*')
+    '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
 if not os.getcwd().endswith('oppia'):
     print ''

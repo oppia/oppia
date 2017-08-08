@@ -79,11 +79,12 @@
                 <div ng-if="hasPageLoaded">
                   <select2-dropdown
                     item="$parent.explorationTagsService.displayed"
+                    choices="$parent.explorationTagsService.displayed"
                     allow-multiple-choices="true"
                     invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
                     new-choice-regex="<[::TAG_REGEX]>"
                     width="100%"
-                    placeholder="Skills, concepts, topics, ..."
+                    placeholder="Skills, concepts, topics..."
                     on-selection-change="saveExplorationTags()">
                   </select2-dropdown>
                 </div>
@@ -472,7 +473,7 @@
         {% endif %}
 
         <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
-          <button type="button" class="btn btn-danger"
+          <button type="button" class="btn btn-danger protractor-test-delete-exploration-button"
                   ng-click="deleteExploration()">
             Delete Exploration
             <span ng-if="currentUserIsAdmin">(as admin)</span>
@@ -596,7 +597,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
+    <button class="btn btn-danger protractor-test-really-delete-exploration-button" ng-click="reallyDelete()">Delete Exploration</button>
   </div>
 </script>
 

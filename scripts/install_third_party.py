@@ -25,7 +25,7 @@ import urllib
 import urllib2
 import zipfile
 
-import common
+import common # pylint: disable=relative-import
 
 #These two lines prevent a "IOError: [Errno socket error]
 #[Errno -2] Name or service not known" error
