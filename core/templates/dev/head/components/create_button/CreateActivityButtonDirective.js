@@ -29,6 +29,7 @@ oppia.directive('createActivityButton', [
             CollectionCreationService, siteAnalyticsService, urlService) {
           $scope.creationInProgress = false;
 
+
           $scope.showUploadExplorationModal = (
             ExplorationCreationService.showUploadExplorationModal);
 
@@ -70,6 +71,8 @@ oppia.directive('createActivityButton', [
                       CollectionCreationService.createNewCollection();
                       $modalInstance.close();
                     };
+
+                    $scope.can_create_collections = GLOBALS.can_create_collections;
 
                     $scope.cancel = function() {
                       $modalInstance.dismiss('cancel');
