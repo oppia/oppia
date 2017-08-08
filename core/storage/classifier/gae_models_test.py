@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
+
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -60,22 +62,28 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ClassifierTrainingJobModelUnitTests, self).setUp()
+        next_scheduled_check_time = datetime.datetime.utcnow()
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
+            next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id2', 2,
+            next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
+            next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
 
     def test_create_and_get_new_training_job_runs_successfully(self):
+        next_scheduled_check_time = datetime.datetime.utcnow()
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
+            next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_NEW)
 
@@ -93,16 +101,26 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                          [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
 
     def test_query_training_jobs(self):
+        next_scheduled_check_time = datetime.datetime.utcnow()
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
+            next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id2', 2,
+            next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_PENDING)
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
+            next_scheduled_check_time + datetime.timedelta(
+            minutes=feconf.CLASSIFIER_JOB_TTL_MINS),
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING)
+        classifier_models.ClassifierTrainingJobModel.create(
+            'LDAStringClassifier', 'TextInput', 'exp_id4', 4,
+            next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_FAILED)
 
@@ -115,6 +133,8 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(training_jobs[3].interaction_id, 'TextInput')
         self.assertEqual(training_jobs[3].exp_id, 'exp_id1')
         self.assertEqual(training_jobs[3].exp_version, 1)
+        self.assertEqual(training_jobs[3].next_scheduled_check_time,
+            next_scheduled_check_time)
         self.assertEqual(training_jobs[3].state_name, 'state_name2')
         self.assertEqual(training_jobs[3].status,
                          feconf.TRAINING_JOB_STATUS_NEW)

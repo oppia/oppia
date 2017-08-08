@@ -16,6 +16,7 @@
 
 """Tests for classifier domain objects."""
 
+import datetime
 
 from core.domain import classifier_domain
 from core.tests import test_utils
@@ -175,6 +176,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job_dict['interaction_id'],
             training_job_dict['exp_id'],
             training_job_dict['exp_version'],
+            training_job_dict['next_scheduled_check_time'],
             training_job_dict['state_name'],
             training_job_dict['status'],
             training_job_dict['training_data'])
@@ -188,6 +190,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'exp_id': 'exp_id1',
             'exp_version': 1,
+            'next_scheduled_check_time':
+                datetime.datetime.strptime(
+                    "2017-08-11 12:42:31","%Y-%m-%d %H:%M:%S"),
             'state_name': 'a state name',
             'status': 'NEW',
             'training_data': [
@@ -224,6 +229,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
             'exp_id': 'exp_id1',
             'exp_version': 1,
+            'next_scheduled_check_time':
+                datetime.datetime.strptime(
+                    "2017-08-11 12:42:31","%Y-%m-%d %H:%M:%S"),
             'state_name': 'some state',
             'algorithm_id': 'LDAStringClassifier',
             'interaction_id': 'TextInput',
@@ -250,8 +258,19 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected exp_version to be an int')):
             training_job.validate()
 
-        # Verify validation error is raised when invalid state_name is provided.
+        # Verify validation error is raised when string is provided for
+        # next_scheduled_check_time instead of datetime.
         training_job_dict['exp_version'] = 1
+        training_job_dict['next_scheduled_check_time'] = 'abc'
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected next_scheduled_check_time to be an datetime')):
+            training_job.validate()
+
+        # Verify validation error is raised when invalid state_name is provided.
+        training_job_dict['next_scheduled_check_time'] = (
+            datetime.datetime.strptime(
+                    "2017-08-11 12:42:31","%Y-%m-%d %H:%M:%S"))
         training_job_dict['state_name'] = 'A string #'
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (

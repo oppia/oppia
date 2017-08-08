@@ -15,6 +15,7 @@
 """Domain objects for classifier models"""
 
 import copy
+import datetime
 
 from core.domain import classifier_registry
 from core.platform import models
@@ -181,6 +182,7 @@ class ClassifierTrainingJob(object):
             for which the classifier will be generated.
         exp_version: str. The version of the exploration when
             the training job was generated.
+        next_scheduled_check_time: DateTime. The time to check the job.
         state_name: str. The name of the state for which the classifier will be
             generated.
         status: str. The status of the training job request. This can be either
@@ -203,7 +205,7 @@ class ClassifierTrainingJob(object):
     """
 
     def __init__(self, job_id, algorithm_id, interaction_id, exp_id,
-                 exp_version, state_name, status, training_data):
+                 exp_version, next_scheduled_check_time, state_name, status, training_data):
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
@@ -216,6 +218,7 @@ class ClassifierTrainingJob(object):
             for which classifier will be generated.
         exp_version: str. The version of the exploration when
             the training job was generated.
+        next_scheduled_check_time: DateTime. The time to check the job.
         state_name: str. The name of the state for which the classifier will be
             generated.
         status: str. The status of the training job request. This can be either
@@ -240,6 +243,7 @@ class ClassifierTrainingJob(object):
         self._interaction_id = interaction_id
         self._exp_id = exp_id
         self._exp_version = exp_version
+        self._next_scheduled_check_time = next_scheduled_check_time
         self._state_name = state_name
         self._status = status
         self._training_data = copy.deepcopy(training_data)
@@ -265,6 +269,10 @@ class ClassifierTrainingJob(object):
         return self._exp_version
 
     @property
+    def next_scheduled_check_time(self):
+        return self._next_scheduled_check_time
+
+    @property
     def state_name(self):
         return self._state_name
 
@@ -286,6 +294,16 @@ class ClassifierTrainingJob(object):
 
         self._status = status
 
+    def update_next_scheduled_check_time(self, next_scheduled_check_time):
+        """Updates the next_scheduled_check_time attribute of the ClassifierTrainingJob
+        domain object.
+
+        Args:
+            next_scheduled_check_time: DateTime. The time to check the job.
+        """
+
+        self._next_scheduled_check_time = next_scheduled_check_time
+
     def to_dict(self):
         """Constructs a dict representation of training job domain object.
 
@@ -299,6 +317,7 @@ class ClassifierTrainingJob(object):
             'interaction_id': self._interaction_id,
             'exp_id': self._exp_id,
             'exp_version': self._exp_version,
+            'next_scheduled_check_time': self._next_scheduled_check_time,
             'state_name': self._state_name,
             'status': self._status,
             'training_data': self._training_data
@@ -320,6 +339,11 @@ class ClassifierTrainingJob(object):
             raise utils.ValidationError(
                 'Expected exp_version to be an int, received %s' %
                 self.exp_version)
+
+        if not isinstance(self.next_scheduled_check_time, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected next_scheduled_check_time to be an datetime, received %s' %
+                self.next_scheduled_check_time)
 
         if not isinstance(self.state_name, basestring):
             raise utils.ValidationError(

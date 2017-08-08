@@ -253,6 +253,7 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job_model.interaction_id,
         classifier_training_job_model.exp_id,
         classifier_training_job_model.exp_version,
+        classifier_training_job_model.next_scheduled_check_time,
         classifier_training_job_model.state_name,
         classifier_training_job_model.status,
         classifier_training_job_model.training_data)
@@ -298,17 +299,18 @@ def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
     Returns:
         job_id: str. ID of the classifier training job.
     """
+    next_scheduled_check_time = datetime.datetime.utcnow()
     dummy_classifier_training_job = classifier_domain.ClassifierTrainingJob(
         'job_id_dummy', algorithm_id, interaction_id, exp_id, exp_version,
-        state_name, status, training_data)
+        next_scheduled_check_time, state_name, status, training_data)
     dummy_classifier_training_job.validate()
     job_id = classifier_models.ClassifierTrainingJobModel.create(
-        algorithm_id, interaction_id, exp_id, exp_version, training_data,
-        state_name, status)
+        algorithm_id, interaction_id, exp_id, exp_version,
+        next_scheduled_check_time, training_data, state_name, status)
     return job_id
 
 
-def _update_classifier_training_job_status(job_ids, status):
+def _update_classifier_training_jobs_status(job_ids, status):
     """Checks for the existence of the model and then updates it.
 
     Args:
@@ -323,8 +325,8 @@ def _update_classifier_training_job_status(job_ids, status):
     classifier_training_job_models = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
-    for index, job_id in job_ids:
-        if not classifier_training_job_models[index]:
+    for index, job_id in enumerate(job_ids):
+        if classifier_training_job_models[index] is None:
             raise Exception(
                 'The ClassifierTrainingJobModel corresponding to the job_id '
                 'of the ClassifierTrainingJob does not exist.')
@@ -353,17 +355,17 @@ def mark_training_job_complete(job_id):
     Args:
         job_id: str. ID of the ClassifierTrainingJob.
     """
-    _update_classifier_training_job_status(
+    _update_classifier_training_jobs_status(
         [job_id], feconf.TRAINING_JOB_STATUS_COMPLETE)
 
 
-def mark_training_job_failed(job_ids):
+def mark_training_jobs_failed(job_ids):
     """Updates the training job's status to failed.
 
     Args:
         job_ids: list(str). list of ID of the ClassifierTrainingJobs.
     """
-    _update_classifier_training_job_status(
+    _update_classifier_training_jobs_status(
         job_ids, feconf.TRAINING_JOB_STATUS_FAILED)
 
 
@@ -373,8 +375,28 @@ def mark_training_job_pending(job_id):
     Args:
         job_id: str. ID of the ClassifierTrainingJob.
     """
-    _update_classifier_training_job_status(
+    _update_classifier_training_jobs_status(
         [job_id], feconf.TRAINING_JOB_STATUS_PENDING)
+
+
+def _update_job_next_scheduled_check_time(job_id):
+    """Updates the next scheduled check time of job.
+
+    Args:
+        job_id: str. ID of the ClassifierTrainingJob.
+    """
+    classifier_training_job_model = (
+        classifier_models.ClassifierTrainingJobModel.get(job_id))
+
+    if not classifier_training_job_model:
+        raise Exception(
+            'The ClassifierTrainingJobModel corresponding to the job_id '
+            'of the ClassifierTrainingJob does not exist.')
+
+    classifier_training_job_model.next_scheduled_check_time = (
+        datetime.datetime.utcnow() + datetime.timedelta(
+            minutes=feconf.CLASSIFIER_JOB_TTL_MINS))
+    classifier_training_job_model.put()
 
 
 def fetch_next_job():
@@ -396,21 +418,18 @@ def fetch_next_job():
         for training_job in classifier_training_jobs:
             if(training_job.status == (
                     feconf.TRAINING_JOB_STATUS_PENDING)):
-                if (datetime.datetime.utcnow() - (
-                        training_job.last_updated) > (
-                            datetime.timedelta(
-                                minutes=feconf.CLASSIFIER_JOB_TTL_MINS))):
-                    failed_job_ids.append(training_job.job_id)
+                failed_job_ids.append(training_job.id)
             else:
                 valid_jobs.append(training_job)
         if not more:
             break
 
     if len(failed_job_ids) > 0:
-        mark_training_job_failed(failed_job_ids)
+        mark_training_jobs_failed(failed_job_ids)
 
     if len(valid_jobs) > 0:
         next_job = get_classifier_training_job_from_model(valid_jobs[0])
+        _update_job_next_scheduled_check_time(next_job.job_id)
     else:
         next_job = None
     return next_job

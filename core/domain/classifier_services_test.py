@@ -17,6 +17,7 @@
 """Tests for classifier services"""
 
 import os
+import datetime
 
 from core.domain import classifier_domain
 from core.domain import classifier_registry
@@ -179,9 +180,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exp_id = u'1'
         state_name = 'Home'
         interaction_id = 'TextInput'
+        next_scheduled_check_time = datetime.datetime.utcnow()
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            interaction_id, exp_id, 1, [], state_name,
+            interaction_id, exp_id, 1, next_scheduled_check_time,[], state_name,
             feconf.TRAINING_JOB_STATUS_NEW)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -191,6 +193,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier_training_job.interaction_id, interaction_id)
         self.assertEqual(classifier_training_job.exp_id, exp_id)
         self.assertEqual(classifier_training_job.exp_version, 1)
+        self.assertEqual(classifier_training_job.next_scheduled_check_time,
+            next_scheduled_check_time)        
         self.assertEqual(classifier_training_job.training_data, [])
         self.assertEqual(classifier_training_job.state_name, state_name)
         self.assertEqual(classifier_training_job.status,
@@ -202,10 +206,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exp_id = u'1'
         state_name = 'Home'
         interaction_id = 'TextInput'
+        next_scheduled_check_time = datetime.datetime.utcnow()
+
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            interaction_id, exp_id, 1, [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW)
+            interaction_id, exp_id, 1, next_scheduled_check_time, [],
+            state_name, feconf.TRAINING_JOB_STATUS_NEW)
         self.assertTrue(job_id)
         classifier_services.delete_classifier_training_job(job_id)
         with self.assertRaisesRegexp(Exception, (
@@ -274,7 +280,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 feconf.TRAINING_JOB_STATUS_PENDING))):
             classifier_services.mark_training_job_pending(job_id)
 
-    def test_mark_training_job_failed(self):
+    def test_mark_training_jobs_failed(self):
         """Test the mark_training_job_failed method."""
         exp_id = u'1'
         state_name = 'Home'
@@ -290,7 +296,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier_training_job.status,
                          feconf.TRAINING_JOB_STATUS_PENDING)
 
-        classifier_services.mark_training_job_failed([job_id])
+        classifier_services.mark_training_jobs_failed([job_id])
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -302,7 +308,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_FAILED,
                 feconf.TRAINING_JOB_STATUS_FAILED))):
-            classifier_services.mark_training_job_failed([job_id])
+            classifier_services.mark_training_jobs_failed([job_id])
 
     def test_fetch_next_job(self):
         """Test the fetch_next_jobs method."""

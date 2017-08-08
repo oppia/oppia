@@ -18,6 +18,7 @@ from core.platform import models
 
 import feconf
 import utils
+import datetime
 
 from google.appengine.ext import ndb
 
@@ -114,6 +115,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The list contains dicts where each dict represents a single training
     # data group.
     training_data = ndb.JsonProperty(default=None)
+    # The time when the job was picked up last time.
+    # It incremented by TTL on being picked up by VM.
+    next_scheduled_check_time = ndb.DateTimeProperty(required=True, indexed=True)
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -147,7 +151,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, algorithm_id, interaction_id, exp_id, exp_version,
-            training_data, state_name, status):
+            next_scheduled_check_time, training_data, state_name, status):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -157,6 +161,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
             exp_version: int. The exploration version at the time
                 this training job was created.
+            next_scheduled_check_time: DateTime. The time to check the job.
             state_name: str. The name of the state to which the classifier
                 belongs.
             status: str. The status of the training job.
@@ -175,7 +180,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             interaction_id=interaction_id,
             exp_id=exp_id,
             exp_version=exp_version,
-            state_name=state_name, status=status, training_data=training_data
+            next_scheduled_check_time=next_scheduled_check_time,
+            state_name=state_name, status=status,
+            training_data=training_data,
             )
 
         training_job_instance.put()
@@ -183,19 +190,20 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def query_training_jobs(cls, cursor=None):
-        """Generates a unique id for the training job of the form
-        {{exp_id}}.{{random_hash_of_16_chars}}
+        """Queries the next ClassifierTrainingModel to be picked up VM.
 
         Args:
-            cursor: str. It represent the position of cursor in the query
-            result. It is set to None by default.
+            cursor: str or None. The list of returned entities starts from this
+                datastore cursor.
         Returns:
             List of the ClassifierTrainingJobModels with status new or pending.
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
-            feconf.TRAINING_JOB_STATUS_PENDING])).order(
-                cls.created_on, cls._key)
+            feconf.TRAINING_JOB_STATUS_PENDING])).filter(
+                cls.next_scheduled_check_time <= (
+                    datetime.datetime.utcnow())).order(
+                cls.next_scheduled_check_time, cls._key)
 
         job_models, cursor, more = query.fetch_page(10, start_cursor=cursor)
         return job_models, cursor, more

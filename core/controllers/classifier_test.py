@@ -16,6 +16,8 @@
 classifiers."""
 
 import os
+import datetime
+import json
 
 from core.controllers import classifier
 from core.domain import classifier_services
@@ -156,15 +158,16 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.payload = {}
         self.payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
+        message_json = json.dumps({})
         self.payload['signature'] = classifier.generate_signature(
-            secret, self.payload['vm_id'])
+            secret, message_json)
 
     def test_next_job_handler(self):
         json_response = self.post_json('/ml/nextjobhandler',
                                        self.payload, expect_errors=False,
                                        expected_status_int=200)
         self.assertEqual(json_response, self.expected_response)
-        classifier_services.mark_training_job_failed(self.job_id)
+        classifier_services.mark_training_jobs_failed([self.job_id])
         json_response = self.post_json('/ml/nextjobhandler',
                                        self.payload, expect_errors=False,
                                        expected_status_int=200)
