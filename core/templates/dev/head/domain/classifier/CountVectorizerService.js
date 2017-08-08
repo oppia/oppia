@@ -24,18 +24,16 @@
 
 oppia.factory('CountVectorizerService', [function() {
   return {
-    vectorize: function(tokenizedProgram, vocabulary) {
-      var vectorLength = Object.keys(vocabulary).length;
-      var vector = new Array(vectorLength);
+    vectorize: function(tokens, vocabulary) {
+      var vectorLength = Math.max.apply(Math, Object.values(vocabulary)) + 1;
+      var vector = [];
+      for(var i = 0; i < vectorLength; i++) {
+        vector.push(0);
+      }
 
-      tokenizedProgram.forEach(function(token) {
+      tokens.forEach(function(token) {
         if (vocabulary.hasOwnProperty(token)) {
-          if (vector[vocabulary[token]] == undefined) {
-            vector[vocabulary[token]] = 1;
-          }
-          else {
-            vector[vocabulary[token]] += 1;
-          }
+          vector[vocabulary[token]] += 1;
         }
       });
 

@@ -94,7 +94,7 @@ oppia.factory('PythonProgramTokenizer', [
                      String.raw`[+\-*/%&|^=<>]=?`,
                      String.raw`~`);
 
-    var Bracket = String.raw`[][(){}]`;
+    var Bracket = '[(){}]';
     var Special = group(String.raw`\r?\n`, String.raw`[:;.,\`@]`);
     var Funny = group(Operator, Bracket, Special)
 

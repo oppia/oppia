@@ -27,25 +27,25 @@
  */
 
 oppia.factory('SVMPredictionService', [function() {
-  var kernel = function(kernelParams, supportVectors, input) {
-    var kernel = kernelParams.kernel;
-    var kvalues = [];
-
-    if (kernel == 'rbf') {
-      var gamma = kernel.gamma;
-      var vectorLength = input.length;
-      for(var i = 0; i < supportVectors.length; i++) {
-        var sum = 0;
-        for(var j = 0; j < input.length; j++) {
-          sum += Math.pow((supportVectors[i][j] - input[j]), 2);
-        }
-        kvalues.push(Math.exp(-gamma * sum));
-      }
-      return kvalues;
-    }
-  };
-
   return {
+    kernel: function(kernelParams, supportVectors, input) {
+      var kernel = kernelParams.kernel;
+      var kvalues = [];
+
+      if (kernel == 'rbf') {
+        var gamma = kernelParams.gamma;
+        var vectorLength = input.length;
+        for(var i = 0; i < supportVectors.length; i++) {
+          var sum = 0;
+          for(var j = 0; j < input.length; j++) {
+            sum += Math.pow((supportVectors[i][j] - input[j]), 2);
+          }
+          kvalues.push(Math.exp(-gamma * sum));
+        }
+        return kvalues;
+      }
+    },
+
     predict: function(classifierData, input) {
       var nSupport = classifierData.n_support;
       var supportVectors = classifierData.support_vectors;
@@ -62,7 +62,7 @@ oppia.factory('SVMPredictionService', [function() {
 
       // Find kernel values for supportVectors and given input. Assumes that
       // input has same dimension and data type as any of the supportVectors.
-      var kvalues = kernel(kernel_params, supportVectors, input);
+      var kvalues = this.kernel(kernelParams, supportVectors, input);
 
       var votes = [];
       for(var i = 0; i < classes.length; i++) {

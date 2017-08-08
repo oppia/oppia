@@ -29,14 +29,14 @@ oppia.factory('WinnowingPreprocessingService', [function() {
     
     tokens.forEach(function(token) {
       hashVal += tokenToId[token] * base;
-      base /= Object.keys(tokenToId);
+      base /= Object.keys(tokenToId).length;
     });
 
     return hashVal;
   };
 
   return {
-    getKGram_hashes: function(tokens, tokenToId, K) {
+    getKGramHashes: function(tokens, tokenToId, K) {
       // Generate all possible k-gram hashes from tokens.
       var kGramHashes = [];
       for (var i = 0; i < tokens.length - K + 1; i += 1) {
@@ -48,10 +48,10 @@ oppia.factory('WinnowingPreprocessingService', [function() {
 
     getFingerprintFromHashes: function(kGramHashes, T, K) {
       // Generate fingerprint of a document from its k-gram hashes.
-      var windowSize = T + K - 1;
+      var windowSize = T - K + 1;
       var fingerprintHashesIndex = new Set();
       for (var i = 0; i < kGramHashes.length - windowSize + 1; i += 1) {
-        var windowHashes = kGramHashes.slice(i, i + windowHashes);
+        var windowHashes = kGramHashes.slice(i, i + windowSize);
         var minHashValue = Math.min.apply(Math, windowHashes);
         var minHashIndex = i + windowHashes.indexOf(minHashValue);
         fingerprintHashesIndex.add(minHashIndex);

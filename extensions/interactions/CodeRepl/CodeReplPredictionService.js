@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * Code classifier prediction functions.
+ * CodeRepl interaction prediction functions.
  *
  * IMPORTANT NOTE: The prediction function uses the classifier data
- * of trained model for inference. These functions must be changed if
- * there are any changes in corresponding classifier training function on
- * Oppia-ml.
+ * of trained model (code classifier model) for inference. These functions
+ * must be changed if there are any changes in corresponding classifier training
+ * function on Oppia-ml.
  */
 
-oppia.factory('CodeClassifierPredictionService', [
+oppia.factory('CodeReplPredictionService', [
   'WinnowingPreprocessingService', 'SVMPredictionService',
   'PythonProgramTokenizer', 'PythonProgramTokenType',
   'CountVectorizerService', function(
