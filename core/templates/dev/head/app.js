@@ -1220,3 +1220,20 @@ oppia.factory('codeNormalizationService', [function() {
     }
   };
 }]);
+
+// Service for retrieving algorithm id of classifier for a given interaction id.
+oppia.factory('algorithmIdRetrievalService', [function() {
+  // Maintain the Interaction-Classifier mapping as defined in feconf.
+  var interactionClassifierMapping = {
+    'TextInput': {
+      'algorithmId': 'LDAStringClassifier',
+      'dataSchemaVersion': 1
+    }
+  };
+
+  return {
+    getAlgorithmId: function(interactionId) {
+      return interactionClassifierMapping[interactionId]['algorithmId'];
+    }
+  }
+}]);

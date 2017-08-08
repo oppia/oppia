@@ -26,11 +26,13 @@ oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
-  '$http', '$q', 'LearnerParamsService', 'alertsService', 'INTERACTION_SPECS',
-  'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
+  '$http', '$q', 'LearnerParamsService', 'alertsService',
+  'PredictionAlgorithmRegistryService', 'algorithmIdRetrievalService',
+  'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
-  function($http, $q, LearnerParamsService, alertsService, INTERACTION_SPECS,
-      ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
+  function($http, $q, LearnerParamsService, alertsService,
+      PredictionAlgorithmRegistryService, algorithmIdRetrievalService,
+      INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
@@ -150,6 +152,63 @@ oppia.factory('AnswerClassificationService', [
           deferred.resolve(result);
         }
         return deferred.promise;
+      }
+
+      /**
+       * Gets the matching answer group.
+       *
+       * @param {string} explorationId - The exploration ID.
+       * @param {object} oldState - The state where the user submitted the
+       *   answer.
+       * @param {*} answer - The answer that the user has submitted.
+       * @param {boolean} isInEditorMode - Whether the function is being called
+       *   in editor mode.
+       * @param {function} interactionRulesService - The service which contains
+       *   the explicit rules of that interaction.
+       *
+       * @return {object} An object representing the answer group with the
+       *     following properties:
+       * <ul>
+       *   <li> **outcome**: the outcome of the answer group
+       *   <li> **answerGroupIndex**: the index of the matched answer group
+       *   <li> **ruleIndex**: the index of the rule in the matched answer
+       *            group
+       * </ul>
+       */
+      getMatchingClassificationResultNew: function(
+          explorationId, oldState, answer, isInEditorMode,
+          interactionRulesService) {
+        var result = null;
+        var answerGroups = oldState.interaction.answerGroups;
+        var defaultOutcome = oldState.interaction.defaultOutcome;
+        if (interactionRulesService) {
+          result = classifyAnswer(
+            answer, answerGroups, defaultOutcome, interactionRulesService);
+        } else {
+          alertsService.addWarning(
+            'Something went wrong with the exploration: no ' +
+            'interactionRulesService was available.');
+          // @prasanna08 @seanlip. Not sure about this part.
+          return;
+        }
+
+        if (result.outcome === defaultOutcome &&
+            INTERACTION_SPECS[oldState.interaction.id]
+              .is_string_classifier_trainable &&
+            ENABLE_ML_CLASSIFIERS) {
+          var classifierData = oldState.classifierData;
+          var interactionId = oldState.interaction.id;
+          var algorithmId = algorithmIdRetrievalService.getAlgorithmId(
+            interactionId);
+          var predictionService = (
+            PredictionAlgorithmRegistryService.getPredictionService(
+              algorithmId));
+          var result = predictionService.predict(classifierData, answer);
+          return result;
+        } else {
+          // @prasanna08 @seanlip. Not sure about this part.
+          return;
+        }
       }
     };
   }

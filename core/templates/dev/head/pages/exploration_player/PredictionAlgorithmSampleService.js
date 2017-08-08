@@ -21,13 +21,15 @@
  oppia.factory('PredictionAlgorithmSampleService', [
    'DEFAULT_OUTCOME_CLASSIFICATION', function(DEFAULT_OUTCOME_CLASSIFICATION) {
 
-   var predict = function(classifierData, userResponse) {
-     return {
-       outcome: 'defaultOutcome',
-       answerGroupIndex: 0,
-       ruleIndex: 0,
-       classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
-     };
+   return {
+     predict: function(classifierData, userText) {
+       return {
+         outcome: 'defaultOutcome',
+         answerGroupIndex: 0,
+         ruleIndex: 0,
+         classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
+       };
+     }
    };
 
  }]);
