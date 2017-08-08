@@ -154,8 +154,8 @@ def handle_trainable_states(exploration, state_names):
         # Validate the job.
         dummy_classifier_training_job = classifier_domain.ClassifierTrainingJob(
             'job_id_dummy', algorithm_id, interaction_id, exp_id, exp_version,
-            next_scheduled_check_time, state_name, feconf.TRAINING_JOB_STATUS_NEW,
-            training_data)
+            next_scheduled_check_time, state_name,
+            feconf.TRAINING_JOB_STATUS_NEW, training_data)
         dummy_classifier_training_job.validate()
 
         job_dicts_list.append({
