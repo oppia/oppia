@@ -14,12 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-<<<<<<< HEAD
 import datetime
 
-=======
 from core.domain import classifier_domain
->>>>>>> upstream/develop
 from core.platform import models
 from core.tests import test_utils
 import feconf
