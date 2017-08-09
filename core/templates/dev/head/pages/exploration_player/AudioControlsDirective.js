@@ -18,7 +18,8 @@
  */
 
 oppia.directive('audioControls', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'AudioPreloaderService',
+  function(UrlInterpolationService, AudioPreloaderService) {
     return {
       restrict: 'E',
       scope: {
@@ -65,6 +66,11 @@ oppia.directive('audioControls', [
 
           $scope.playPauseAudioTranslation = function() {
             // TODO(tjiang11): Change from on-demand loading to pre-loading.
+            if (!AudioPreloaderService.hasPreloaded()) {
+              AudioPreloaderService.excludeFile(
+                getCurrentAudioTranslation().filename);
+              AudioPreloaderService.preload();
+            }
 
             // TODO(tjiang11): On first play, ask learner to pick language
             // and subsequently for confirmation to use bandwidth 

@@ -132,6 +132,10 @@ oppia.factory('ExplorationObjectFactory', [
         languageCode);
     };
 
+    Exploration.prototype.getAllAudioTranslations = function() {
+      return this.states.getAllAudioTranslations();
+    };
+
     Exploration.prototype.getLanguageCode = function() {
       return this.languageCode;
     };
