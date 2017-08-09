@@ -412,37 +412,6 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # Check if the number of unread messages is equal to 1.
         self.assertEqual(number_of_unread_threads, 1)
 
-
-    def test_get_thread_summaries_load_test(self):
-        # The speed of fetching the summaries of 100 threads having 5 messages
-        # should be less than 1.7 second. In reality, the time taken to fetch
-        # all the summaries is less than 0.2s. However since it seems to take
-        # longer on Travis, the constant has been set to 1.7s.
-        # Create 100 threads.
-        for _ in range(100):
-            feedback_services.create_thread(
-                self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'],
-                self.user_id, self.EXPECTED_THREAD_DICT['subject'],
-                'not used here')
-        threadlist = feedback_services.get_all_threads(
-            self.EXP_ID_1, False)
-
-        thread_ids = []
-        for thread in threadlist:
-            thread_ids.append(thread.id)
-            # Create 5 messages in each thread.
-            for _ in range(5):
-                feedback_services.create_message(
-                    self.EXP_ID_1, thread.get_thread_id(), self.user_id, None,
-                    None, 'editor message')
-
-        start = time.time()
-        # Fetch the summaries of all the threads.
-        feedback_services.get_thread_summaries(self.user_id, thread_ids)
-        elapsed_time = time.time() - start
-        print "Time for fetching all the thread summaries -", elapsed_time
-        self.assertLessEqual(elapsed_time, 1.7)
-
     def test_update_messages_read_by_the_user(self):
         feedback_services.create_thread(
             self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'],

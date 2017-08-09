@@ -55,6 +55,11 @@ _PARSER.add_argument(
     help='optional subdirectory path containing the test(s) to run',
     type=str)
 _PARSER.add_argument(
+    '--exclude_load_test',
+    help='optional subdirectory which contain the load tests for various' +
+         'processes',
+    type=bool)
+_PARSER.add_argument(
     '-v',
     '--verbose',
     help='optional; if specified, display the output of the tests being run',
@@ -198,7 +203,7 @@ def _execute_tasks(tasks, batch_size=24):
         log('----------------------------------------')
 
 
-def _get_all_test_targets(test_path=None):
+def _get_all_test_targets(test_path=None, exclude_load_test=False):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -216,6 +221,10 @@ def _get_all_test_targets(test_path=None):
                 os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             for f in files:
+                if f.endswith('load_test.py') and not exclude_load_test:
+                    result.append(_convert_to_test_target(
+                        os.path.join(subroot, f)))
+
                 if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
                     result.append(_convert_to_test_target(
@@ -230,6 +239,11 @@ def main():
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
                         'should be specified.')
+    if parsed_args.test_target and parsed_args.exclude_load_test:
+        if parsed_args.test_target.endswith('load_test'):
+            raise Exception('Arguments are not consistent with each other '
+                            'Setting exclude_load_test to be true will not '
+                            'allow you to run the test_target file.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:
@@ -238,8 +252,13 @@ def main():
     if parsed_args.test_target:
         all_test_targets = [parsed_args.test_target]
     else:
-        all_test_targets = _get_all_test_targets(
-            test_path=parsed_args.test_path)
+        if parsed_args.exclude_load_test is not None:
+            all_test_targets = _get_all_test_targets(
+                test_path=parsed_args.test_path,
+                exclude_load_test=parsed_args.exclude_load_test)
+        else:
+            all_test_targets = _get_all_test_targets(
+                test_path=parsed_args.test_path)
 
     # Prepare tasks.
     task_to_taskspec = {}
