@@ -73,9 +73,6 @@ oppia.directive('audioControls', [
               AudioPreloaderService.showBandwidthConfirmationModal(
                 startAudio);
             } else {   
-              // TODO(tjiang11): On first play, ask learner to pick language
-              // and subsequently for confirmation to use bandwidth 
-              // to download audio files.
               startAudio();
             }
           };
