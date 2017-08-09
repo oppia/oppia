@@ -16,14 +16,12 @@
  * @fileoverview Service to preload audio into AssetsBackendApiService's cache.
  */
 
-oppia.factory('AudioPreloaderService', 
-  ['$modal', 'explorationContextService', 'AssetsBackendApiService',
+oppia.factory('AudioPreloaderService', [
+  '$modal', 'explorationContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
   function($modal, explorationContextService, AssetsBackendApiService,
-    ExplorationPlayerStateService, UrlInterpolationService) {
-
+      ExplorationPlayerStateService, UrlInterpolationService) {
     var NUM_BYTES_IN_MB = 1000;
-
     var _hasPreloaded = false;
     var _excludedFilename = null;
 
@@ -49,7 +47,8 @@ oppia.factory('AudioPreloaderService',
           'audio_preload_bandwidth_confirmation_modal_directive.html'),
         resolve: {},
         backdrop: false,
-        controller: ['$scope', '$modalInstance',
+        controller: [
+          '$scope', '$modalInstance',
           'ExplorationPlayerStateService', 'AudioPreloaderService',
           function(
               $scope, $modalInstance,
@@ -59,14 +58,14 @@ oppia.factory('AudioPreloaderService',
                 ExplorationPlayerStateService.getExploration()
                   .getAllAudioTranslations());
 
-            $scope.continue = function() {
+            $scope.confirm = function() {
               $modalInstance.close();
             };
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
             };
-        }]
+          }]
       }).result.then(function() {
         confirmationCallback();
         _preload();
