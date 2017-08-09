@@ -69,10 +69,12 @@ class ProfileHandler(base.BaseHandler):
         if user_contributions:
             created_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    user_contributions.created_exploration_ids))
+                    user_contributions.created_exploration_ids,
+                    user_services.UserActionsInfo()))
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    user_contributions.edited_exploration_ids))
+                    user_contributions.edited_exploration_ids,
+                    user_services.UserActionsInfo()))
         profile_is_of_current_user = (self.username == username)
 
         self.values.update({

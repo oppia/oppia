@@ -156,25 +156,25 @@ class ExplorationPage(EditorHandler):
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.check_can_delete_activity(
-                self.user_id, self.actions, exploration_rights),
+                self.user, exploration_rights),
             'can_edit': rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, exploration_rights),
+                self.user, exploration_rights),
             'can_modify_roles': (
                 rights_manager.check_can_modify_activity_roles(
-                    self.user_id, self.actions, exploration_rights)),
+                    self.user, exploration_rights)),
             'can_publicize': rights_manager.check_can_publicize_exploration(
-                self.actions, exploration_rights),
+                self.user, exploration_rights),
             'can_publish': rights_manager.check_can_publish_activity(
-                self.user_id, self.actions, exploration_rights),
+                self.user, exploration_rights),
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(
-                    self.user_id, self.actions, exploration_rights)),
+                    self.user, exploration_rights)),
             'can_unpublicize': (
                 rights_manager.check_can_unpublicize_exploration(
-                    self.actions, exploration_rights)),
+                    self.user, exploration_rights)),
             'can_unpublish': (
-                rights_manager.check_can_unpublish_exploration(
-                    self.actions, exploration_rights)),
+                rights_manager.check_can_unpublish_activity(
+                    self.user, exploration_rights)),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(

@@ -42,7 +42,7 @@ class CollectionPage(base.BaseHandler):
         self.values.update({
             'nav_mode': feconf.NAV_MODE_COLLECTION,
             'can_edit': rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, collection_rights),
+                self.user, collection_rights),
             'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
             'collection_title': collection.title,
@@ -65,7 +65,7 @@ class CollectionDataHandler(base.BaseHandler):
         try:
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user_id, self.actions,
+                    collection_id, self.user,
                     allow_invalid_explorations=False))
         except Exception as e:
             raise self.PageNotFoundException(e)
@@ -73,7 +73,7 @@ class CollectionDataHandler(base.BaseHandler):
             collection_id, strict=False)
         self.values.update({
             'can_edit': rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, collection_rights),
+                self.user, collection_rights),
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),

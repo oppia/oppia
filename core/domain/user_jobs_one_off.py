@@ -15,17 +15,13 @@
 """Jobs for queries personalized to individual users."""
 
 import ast
-# import logging
 
 from core import jobs
-# from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-# from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-# import feconf
 import utils
 
 (exp_models, collection_models, feedback_models, user_models) = (

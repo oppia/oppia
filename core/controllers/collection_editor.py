@@ -93,7 +93,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
             # Try to retrieve collection
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user_id, self.actions,
+                    collection_id, self.user,
                     allow_invalid_explorations=True))
         except Exception as e:
             raise self.PageNotFoundException(e)
@@ -123,7 +123,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
-                collection_id, self.user_id, self.actions,
+                collection_id, self.user,
                 allow_invalid_explorations=True))
 
         # Send the updated collection back to the frontend.
@@ -146,8 +146,8 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
         self.values.update({
             'can_edit': True,
-            'can_unpublish': rights_manager.check_can_unpublish_collection(
-                self.actions, collection_rights),
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, collection_rights),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(
@@ -188,8 +188,8 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
         self.values.update({
             'can_edit': True,
-            'can_unpublish': rights_manager.check_can_unpublish_collection(
-                self.actions, collection_rights),
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, collection_rights),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(
@@ -209,7 +209,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
 
         collection_node_metadata_list, new_search_cursor = (
             summary_services.get_exp_metadata_dicts_matching_query(
-                query_string, search_cursor, self.user_id, self.actions))
+                query_string, search_cursor, self.user))
 
         self.values.update({
             'collection_node_metadata_list': collection_node_metadata_list,

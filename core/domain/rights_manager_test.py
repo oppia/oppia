@@ -18,7 +18,6 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -59,15 +58,20 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_admin)
         self.user_role_moderator = user_services.get_user_role_from_id(
             self.user_id_moderator)
-        self.actions_a = role_services.get_all_actions(self.user_role_a)
-        self.actions_b = role_services.get_all_actions(self.user_role_b)
-        self.actions_c = role_services.get_all_actions(self.user_role_c)
-        self.actions_d = role_services.get_all_actions(self.user_role_d)
-        self.actions_e = role_services.get_all_actions(self.user_role_e)
-        self.actions_admin = role_services.get_all_actions(
-            self.user_role_admin)
-        self.actions_moderator = role_services.get_all_actions(
-            self.user_role_moderator)
+        self.user_a = user_services.UserActionsInfo(
+            self.user_id_a, self.user_role_a)
+        self.user_b = user_services.UserActionsInfo(
+            self.user_id_b, self.user_role_b)
+        self.user_c = user_services.UserActionsInfo(
+            self.user_id_c, self.user_role_c)
+        self.user_d = user_services.UserActionsInfo(
+            self.user_id_d, self.user_role_d)
+        self.user_e = user_services.UserActionsInfo(
+            self.user_id_e, self.user_role_e)
+        self.user_admin = user_services.UserActionsInfo(
+            self.user_id_admin, self.user_role_admin)
+        self.user_moderator = user_services.UserActionsInfo(
+            self.user_id_moderator, self.user_role_moderator)
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -89,25 +93,25 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights('1')
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_admin, self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_admin, self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
-            self.user_id_admin, self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_moderator, self.actions_moderator, exp_rights))
+            self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_moderator, self.actions_moderator, exp_rights))
+            self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
-            self.user_id_moderator, self.actions_moderator, exp_rights))
+            self.user_moderator, exp_rights))
 
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
@@ -118,25 +122,25 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights('3')
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_admin, self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_admin, self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
-            self.user_id_admin, self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_moderator, self.actions_moderator, exp_rights))
+            self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_moderator, self.actions_moderator, exp_rights))
+            self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
-            self.user_id_moderator, self.actions_moderator, exp_rights))
+            self.user_moderator, exp_rights))
 
     def test_ownership_of_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -157,32 +161,32 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_admin, self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_admin, self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_admin, self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_moderator, self.actions_moderator, exp_rights))
+            self.user_moderator, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_moderator, self.actions_moderator, exp_rights))
+            self.user_moderator, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_moderator, self.actions_moderator, exp_rights))
+            self.user_moderator, exp_rights))
 
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
     def test_inviting_collaborator_to_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -190,11 +194,11 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
         rights_manager.assign_role_for_exploration(
             self.user_id_a, self.EXP_ID, self.user_id_b,
@@ -202,11 +206,11 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
     def test_inviting_playtester_to_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -214,11 +218,11 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
         rights_manager.assign_role_for_exploration(
             self.user_id_a, self.EXP_ID, self.user_id_b,
@@ -226,11 +230,11 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
     def test_setting_rights_of_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -275,23 +279,23 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
-        self.assertFalse(rights_manager.check_can_unpublish_exploration(
-            self.actions_a, exp_rights))
+            self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_unpublish_activity(
+            self.user_a, exp_rights))
 
         rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
     def test_can_only_delete_unpublished_explorations(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -300,19 +304,19 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_delete_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
 
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
 
         rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_delete_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
 
     def test_can_publicize_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -323,9 +327,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_publicize_exploration(
-            self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_publicize_exploration(
-            self.actions_admin, exp_rights))
+            self.user_admin, exp_rights))
 
     def test_changing_viewability_of_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -334,7 +338,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
         with self.assertRaisesRegexp(Exception, 'already the current value'):
             rights_manager.set_private_viewability_of_exploration(
@@ -347,17 +351,17 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_a, self.EXP_ID, True)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
         rights_manager.set_private_viewability_of_exploration(
             self.user_id_a, self.EXP_ID, False)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, exp_rights))
+            self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_rights))
+            self.user_b, exp_rights))
 
     def test_check_exploration_rights(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -416,15 +420,20 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_id_admin)
         self.user_role_moderator = user_services.get_user_role_from_id(
             self.user_id_moderator)
-        self.actions_a = role_services.get_all_actions(self.user_role_a)
-        self.actions_b = role_services.get_all_actions(self.user_role_b)
-        self.actions_c = role_services.get_all_actions(self.user_role_c)
-        self.actions_d = role_services.get_all_actions(self.user_role_d)
-        self.actions_e = role_services.get_all_actions(self.user_role_e)
-        self.actions_admin = role_services.get_all_actions(
-            self.user_role_admin)
-        self.actions_moderator = role_services.get_all_actions(
-            self.user_role_moderator)
+        self.user_a = user_services.UserActionsInfo(
+            self.user_id_a, self.user_role_a)
+        self.user_b = user_services.UserActionsInfo(
+            self.user_id_b, self.user_role_b)
+        self.user_c = user_services.UserActionsInfo(
+            self.user_id_c, self.user_role_c)
+        self.user_d = user_services.UserActionsInfo(
+            self.user_id_d, self.user_role_d)
+        self.user_e = user_services.UserActionsInfo(
+            self.user_id_e, self.user_role_e)
+        self.user_admin = user_services.UserActionsInfo(
+            self.user_id_admin, self.user_role_admin)
+        self.user_moderator = user_services.UserActionsInfo(
+            self.user_id_moderator, self.user_role_moderator)
 
     def test_get_collection_rights_for_nonexistent_collection(self):
         non_col_id = 'this_collection_does_not_exist_id'
@@ -446,19 +455,25 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         collection_rights = rights_manager.get_collection_rights('0')
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, collection_rights))
+            self.user_a, collection_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_a, self.actions_a, collection_rights))
+            self.user_a, collection_rights))
+        self.assertFalse(rights_manager.check_can_delete_activity(
+            self.user_a, collection_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_admin, self.actions_admin, collection_rights))
+            self.user_admin, collection_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_admin, self.actions_admin, collection_rights))
+            self.user_admin, collection_rights))
+        self.assertTrue(rights_manager.check_can_delete_activity(
+            self.user_admin, collection_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_moderator, self.actions_moderator, collection_rights))
+            self.user_moderator, collection_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_moderator, self.actions_moderator, collection_rights))
+            self.user_moderator, collection_rights))
+        self.assertTrue(rights_manager.check_can_delete_activity(
+            self.user_moderator, collection_rights))
 
     def test_ownership_of_collection(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
@@ -488,24 +503,32 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.COLLECTION_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, collection_rights))
+            self.user_a, collection_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_a, self.actions_a, collection_rights))
+            self.user_a, collection_rights))
+        self.assertTrue(rights_manager.check_can_delete_activity(
+            self.user_a, collection_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_admin, self.actions_admin, collection_rights))
+            self.user_admin, collection_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_admin, self.actions_admin, collection_rights))
+            self.user_admin, collection_rights))
+        self.assertFalse(rights_manager.check_can_delete_activity(
+            self.user_admin, collection_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_moderator, self.actions_moderator, collection_rights))
+            self.user_moderator, collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_moderator, self.actions_moderator, collection_rights))
+            self.user_moderator, collection_rights))
+        self.assertFalse(rights_manager.check_can_delete_activity(
+            self.user_moderator, collection_rights))
 
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
+        self.assertFalse(rights_manager.check_can_delete_activity(
+            self.user_b, collection_rights))
 
     def test_inviting_collaborator_to_collection(self):
         self.save_new_valid_collection(
@@ -516,16 +539,16 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         # Verify initial editor permissions for the collection.
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, collection_rights))
+            self.user_a, collection_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_a, self.actions_a, collection_rights))
+            self.user_a, collection_rights))
 
         # Verify initial editor permissions for the exploration within the
         # collection.
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
 
         # User A adds user B to the collection as an editor.
         rights_manager.assign_role_for_collection(
@@ -541,18 +564,20 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         # Ensure User B is now an editor of the collection.
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
+        self.assertFalse(rights_manager.check_can_delete_activity(
+            self.user_b, collection_rights))
 
         exp_for_collection_rights = rights_manager.get_exploration_rights(
             self.EXP_ID_FOR_COLLECTION)
         # Ensure User B is not an editor of the exploration within the
         # collection.
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_for_collection_rights))
+            self.user_b, exp_for_collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, exp_for_collection_rights))
+            self.user_b, exp_for_collection_rights))
 
     def test_inviting_playtester_to_collection(self):
         self.save_new_valid_collection(
@@ -565,16 +590,16 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         # Verify initial viewer permissions for the collection.
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
 
         # Verify initial viewer permissions for the exploration within the
         # collection.
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_for_collection_rights))
+            self.user_b, exp_for_collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, exp_for_collection_rights))
+            self.user_b, exp_for_collection_rights))
 
         # User A adds user B to the collection as a viewer.
         rights_manager.assign_role_for_collection(
@@ -587,16 +612,16 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         # Ensure User B is now a viewer of the collection.
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
 
         # Ensure User B cannot view the exploration just because he/she has
         # access to the collection containing it.
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, exp_for_collection_rights))
+            self.user_b, exp_for_collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
-            self.user_id_b, self.actions_b, exp_for_collection_rights))
+            self.user_b, exp_for_collection_rights))
 
     def test_setting_rights_of_collection(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
@@ -639,14 +664,16 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.COLLECTION_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
 
         rights_manager.publish_collection(self.user_id_a, self.COLLECTION_ID)
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
+        self.assertFalse(rights_manager.check_can_unpublish_activity(
+            self.user_a, collection_rights))
 
         rights_manager.unpublish_collection(
             self.user_id_admin, self.COLLECTION_ID)
@@ -654,9 +681,9 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.COLLECTION_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
-            self.user_id_a, self.actions_a, collection_rights))
+            self.user_a, collection_rights))
         self.assertFalse(rights_manager.check_can_access_activity(
-            self.user_id_b, self.actions_b, collection_rights))
+            self.user_b, collection_rights))
 
     def test_can_only_delete_unpublished_collections(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
@@ -664,14 +691,14 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.COLLECTION_ID)
 
         self.assertTrue(rights_manager.check_can_delete_activity(
-            self.user_id_a, self.actions_a, collection_rights))
+            self.user_a, collection_rights))
 
         rights_manager.publish_collection(self.user_id_a, self.COLLECTION_ID)
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
 
         self.assertFalse(rights_manager.check_can_delete_activity(
-            self.user_id_a, self.actions_a, collection_rights))
+            self.user_a, collection_rights))
 
         rights_manager.unpublish_collection(
             self.user_id_admin, self.COLLECTION_ID)
@@ -679,57 +706,30 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.COLLECTION_ID)
 
         self.assertTrue(rights_manager.check_can_delete_activity(
-            self.user_id_a, self.actions_a, collection_rights))
-
-
-class CheckCanUnpublishExplorationTest(test_utils.GenericTestBase):
-    """Tests for check_can_unpublish_exploration function."""
-    published_exp_id = 'exp_id_1'
-    private_exp_id = 'exp_id_2'
-
-    def setUp(self):
-        super(CheckCanUnpublishExplorationTest, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(
-            self.published_exp_id, self.owner_id)
-        self.save_new_valid_exploration(
-            self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
-
-    def test_admin_can_unpublish_published_exploration(self):
-        self.assertTrue(rights_manager.check_can_unpublish_exploration(
-            role_services.get_all_actions(feconf.ROLE_ID_ADMIN),
-            rights_manager.get_exploration_rights(self.published_exp_id)))
-
-    def test_owner_cannot_unpublish_published_exploration(self):
-        self.assertFalse(rights_manager.check_can_unpublish_exploration(
-            role_services.get_all_actions(feconf.ROLE_ID_EXPLORATION_EDITOR),
-            rights_manager.get_exploration_rights(self.published_exp_id)))
-
-    def test_admin_cannot_unpublish_private_exploration(self):
-        self.assertFalse(rights_manager.check_can_unpublish_exploration(
-            role_services.get_all_actions(feconf.ROLE_ID_ADMIN),
-            rights_manager.get_exploration_rights(self.private_exp_id)))
-
-    def test_moderator_can_unpublish_published_exploration(self):
-        self.assertTrue(rights_manager.check_can_unpublish_exploration(
-            role_services.get_all_actions(feconf.ROLE_ID_MODERATOR),
-            rights_manager.get_exploration_rights(self.published_exp_id)))
+            self.user_a, collection_rights))
 
 
 class CheckCanUnpublicizeExplorationTest(test_utils.GenericTestBase):
-    """Tests for check_can_unpublish_exploration function."""
+    """Tests for check_can_unpublicize_exploration function."""
     publicized_exp_id = 'exp_id_1'
 
     def setUp(self):
         super(CheckCanUnpublicizeExplorationTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(
+            self.admin_id, user_services.get_user_role_from_id(self.admin_id))
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, user_services.get_user_role_from_id(self.owner_id))
+        self.moderator = user_services.UserActionsInfo(
+            self.moderator_id,
+            user_services.get_user_role_from_id(self.moderator_id))
         self.save_new_valid_exploration(
             self.publicized_exp_id, self.owner_id)
         rights_manager.publish_exploration(
@@ -739,22 +739,22 @@ class CheckCanUnpublicizeExplorationTest(test_utils.GenericTestBase):
 
     def test_admin_can_unpublicize_publicized_exploration(self):
         self.assertTrue(rights_manager.check_can_unpublicize_exploration(
-            role_services.get_all_actions(feconf.ROLE_ID_ADMIN),
+            self.admin,
             rights_manager.get_exploration_rights(self.publicized_exp_id)))
 
     def test_owner_cannot_unpublicize_publicized_exploration(self):
         self.assertFalse(rights_manager.check_can_unpublicize_exploration(
-            role_services.get_all_actions(feconf.ROLE_ID_EXPLORATION_EDITOR),
+            self.owner,
             rights_manager.get_exploration_rights(self.publicized_exp_id)))
 
     def test_moderator_can_unpublicize_publicized_exploration(self):
         self.assertTrue(rights_manager.check_can_unpublicize_exploration(
-            role_services.get_all_actions(feconf.ROLE_ID_MODERATOR),
+            self.moderator,
             rights_manager.get_exploration_rights(self.publicized_exp_id)))
 
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
-    """Tests for check_can_unpublish_exploration function."""
+    """Tests for check_can_release_ownership function."""
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
@@ -765,6 +765,10 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(
+            self.admin_id, user_services.get_user_role_from_id(self.admin_id))
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, user_services.get_user_role_from_id(self.owner_id))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -774,43 +778,49 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
 
     def test_admin_can_release_ownership_of_published_exploration(self):
         self.assertTrue(rights_manager.check_can_release_ownership(
-            self.admin_id,
-            role_services.get_all_actions(feconf.ROLE_ID_ADMIN),
+            self.admin,
             rights_manager.get_exploration_rights(self.published_exp_id)))
 
     def test_owner_can_release_ownership_of_published_exploration(self):
         self.assertTrue(rights_manager.check_can_release_ownership(
-            self.owner_id,
-            role_services.get_all_actions(feconf.ROLE_ID_EXPLORATION_EDITOR),
+            self.owner,
             rights_manager.get_exploration_rights(self.published_exp_id)))
 
     def test_admin_cannot_release_ownership_of_private_exploration(self):
         self.assertFalse(rights_manager.check_can_release_ownership(
-            self.admin_id,
-            role_services.get_all_actions(feconf.ROLE_ID_ADMIN),
+            self.admin,
             rights_manager.get_exploration_rights(self.private_exp_id)))
 
     def test_owner_cannot_release_ownership_of_private_exploration(self):
         self.assertFalse(rights_manager.check_can_release_ownership(
-            self.owner_id,
-            role_services.get_all_actions(feconf.ROLE_ID_MODERATOR),
+            self.owner,
             rights_manager.get_exploration_rights(self.private_exp_id)))
 
 
-class CheckCanUnpublishCollectionTest(test_utils.GenericTestBase):
-    """Tests for check_can_unpublish_collection function."""
+class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
+    """Tests for check_can_unpublish_activity function."""
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
     private_col_id = 'col_id_1'
     published_col_id = 'col_id_2'
 
     def setUp(self):
-        super(CheckCanUnpublishCollectionTest, self).setUp()
+        super(CheckCanUnpublishActivityTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin = user_services.UserActionsInfo(
+            self.admin_id, user_services.get_user_role_from_id(self.admin_id))
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, user_services.get_user_role_from_id(self.owner_id))
+        self.moderator = user_services.UserActionsInfo(
+            self.moderator_id,
+            user_services.get_user_role_from_id(self.moderator_id))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -827,16 +837,36 @@ class CheckCanUnpublishCollectionTest(test_utils.GenericTestBase):
             self.owner_id, self.published_col_id)
 
     def test_admin_can_unpublish_published_collection(self):
-        self.assertTrue(rights_manager.check_can_unpublish_collection(
-            role_services.get_all_actions(feconf.ROLE_ID_ADMIN),
+        self.assertTrue(rights_manager.check_can_unpublish_activity(
+            self.admin,
             rights_manager.get_collection_rights(self.published_col_id)))
 
     def test_owner_cannot_unpublish_published_collection(self):
-        self.assertFalse(rights_manager.check_can_unpublish_collection(
-            role_services.get_all_actions(feconf.ROLE_ID_EXPLORATION_EDITOR),
+        self.assertFalse(rights_manager.check_can_unpublish_activity(
+            self.owner,
             rights_manager.get_collection_rights(self.published_col_id)))
 
-    def test_admin_cannot_unpublish_private_exploration(self):
-        self.assertFalse(rights_manager.check_can_unpublish_collection(
-            role_services.get_all_actions(feconf.ROLE_ID_ADMIN),
+    def test_admin_cannot_unpublish_private_collection(self):
+        self.assertFalse(rights_manager.check_can_unpublish_activity(
+            self.admin,
             rights_manager.get_collection_rights(self.private_col_id)))
+
+    def test_admin_can_unpublish_published_exploration(self):
+        self.assertTrue(rights_manager.check_can_unpublish_activity(
+            self.admin,
+            rights_manager.get_exploration_rights(self.published_exp_id)))
+
+    def test_owner_cannot_unpublish_published_exploration(self):
+        self.assertFalse(rights_manager.check_can_unpublish_activity(
+            self.owner,
+            rights_manager.get_exploration_rights(self.published_exp_id)))
+
+    def test_admin_cannot_unpublish_private_exploration(self):
+        self.assertFalse(rights_manager.check_can_unpublish_activity(
+            self.admin,
+            rights_manager.get_exploration_rights(self.private_exp_id)))
+
+    def test_moderator_can_unpublish_published_exploration(self):
+        self.assertTrue(rights_manager.check_can_unpublish_activity(
+            self.moderator,
+            rights_manager.get_exploration_rights(self.published_exp_id)))

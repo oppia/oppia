@@ -22,7 +22,6 @@ import re
 
 from core.domain import collection_domain
 from core.domain import collection_services
-# from core.domain import config_services
 from core.domain import exp_services
 from core.domain import event_services
 from core.domain import feedback_services

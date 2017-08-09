@@ -23,7 +23,6 @@ from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import rating_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import summary_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -83,6 +82,10 @@ class ExplorationDisplayableSummariesTest(
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        self.albert = user_services.UserActionsInfo(
+            self.albert_id,
+            user_services.get_user_role_from_id(self.albert_id))
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
@@ -179,7 +182,8 @@ class ExplorationDisplayableSummariesTest(
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
+                user_services.UserActionsInfo()))
         expected_summary = {
             'category': u'A category',
             'community_owned': False,
@@ -204,8 +208,7 @@ class ExplorationDisplayableSummariesTest(
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
-                self.albert_id, role_services.get_all_actions(
-                    feconf.ROLE_ID_EXPLORATION_EDITOR)))
+                self.albert))
 
         self.assertEqual(len(displayable_summaries), 2)
         self.assertEqual(displayable_summaries[0]['id'], self.EXP_ID_1)
@@ -220,8 +223,7 @@ class ExplorationDisplayableSummariesTest(
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
-                self.albert_id, role_services.get_all_actions(
-                    feconf.ROLE_ID_EXPLORATION_EDITOR)))
+                self.albert))
 
         self.assertEqual(len(displayable_summaries), 3)
         self.assertEqual(displayable_summaries[0]['status'], 'private')
@@ -429,13 +431,14 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, user_services.get_user_role_from_id(self.owner_id))
 
     def test_get_learner_dict_with_deleted_exp_fails_validation(self):
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id, role_services.get_all_actions(
-                feconf.ROLE_ID_COLLECTION_EDITOR))
+            self.COLLECTION_ID, self.owner)
 
         exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
@@ -444,9 +447,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
             summary_services.get_learner_collection_dict_by_id(
-                self.COLLECTION_ID, self.owner_id,
-                role_services.get_all_actions(
-                    feconf.ROLE_ID_COLLECTION_EDITOR))
+                self.COLLECTION_ID, self.owner)
 
     def test_get_learner_dict_when_referencing_inaccessible_explorations(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
@@ -464,16 +465,12 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
             summary_services.get_learner_collection_dict_by_id(
-                self.COLLECTION_ID, self.owner_id,
-                role_services.get_all_actions(
-                    feconf.ROLE_ID_COLLECTION_EDITOR))
+                self.COLLECTION_ID, self.owner)
 
         # After the exploration is published, the dict can now be created.
         rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id,
-            role_services.get_all_actions(
-                feconf.ROLE_ID_COLLECTION_EDITOR))
+            self.COLLECTION_ID, self.owner)
 
     def test_get_learner_dict_with_private_exp_fails_validation(self):
         self.save_new_valid_collection(
@@ -482,9 +479,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         # Since both the collection and exploration are private, the learner
         # dict can be created.
         summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id,
-            role_services.get_all_actions(
-                feconf.ROLE_ID_COLLECTION_EDITOR))
+            self.COLLECTION_ID, self.owner)
 
         # A public collection referencing a private exploration is bad, however.
         rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
@@ -493,17 +488,13 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             'Cannot reference a private exploration within a public '
             'collection, exploration ID: exploration_id'):
             summary_services.get_learner_collection_dict_by_id(
-                self.COLLECTION_ID, self.owner_id,
-                role_services.get_all_actions(
-                    feconf.ROLE_ID_COLLECTION_EDITOR))
+                self.COLLECTION_ID, self.owner)
 
         # After the exploration is published, the learner dict can be crated
         # again.
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id,
-            role_services.get_all_actions(
-                feconf.ROLE_ID_COLLECTION_EDITOR))
+            self.COLLECTION_ID, self.owner)
 
     def test_get_learner_dict_with_allowed_private_exps(self):
         self.save_new_valid_collection(
@@ -518,9 +509,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
 
         collection_dict = summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id,
-            role_services.get_all_actions(
-                feconf.ROLE_ID_COLLECTION_EDITOR),
+            self.COLLECTION_ID, self.owner,
             allow_invalid_explorations=True)
 
         # The author's private exploration will be contained in the public
@@ -915,6 +904,13 @@ class CollectionNodeMetadataDictsTest(
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
+        self.albert = user_services.UserActionsInfo(
+            self.albert_id,
+            user_services.get_user_role_from_id(self.albert_id))
+        self.bob = user_services.UserActionsInfo(
+            self.bob_id,
+            user_services.get_user_role_from_id(self.bob_id))
+
         self.save_new_valid_exploration(self.EXP_ID1, self.albert_id,
                                         title='Exploration 1 Albert title',
                                         objective='An objective 1')
@@ -946,9 +942,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_get_exploration_metadata_dicts(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3],
-            role_services.get_all_actions(feconf.ROLE_ID_EXPLORATION_EDITOR),
-            self.albert_id))
+            [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID1,
@@ -967,9 +961,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_private_exps_of_another_user_are_not_returned(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID5, self.EXP_ID4],
-            role_services.get_all_actions(feconf.ROLE_ID_EXPLORATION_EDITOR),
-            self.bob_id))
+            [self.EXP_ID5, self.EXP_ID4], self.bob))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID4,
@@ -980,9 +972,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_public_exps_of_another_user_are_returned(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4],
-            role_services.get_all_actions(feconf.ROLE_ID_EXPLORATION_EDITOR),
-            self.bob_id))
+            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID2,
@@ -1003,9 +993,7 @@ class CollectionNodeMetadataDictsTest(
         exp_services.delete_exploration(self.albert_id, self.EXP_ID2)
 
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4],
-            role_services.get_all_actions(feconf.ROLE_ID_EXPLORATION_EDITOR),
-            self.bob_id))
+            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID3,
@@ -1021,9 +1009,7 @@ class CollectionNodeMetadataDictsTest(
     def test_exp_metadata_dicts_matching_query(self):
         metadata_dicts, _ = (
             summary_services.get_exp_metadata_dicts_matching_query(
-                'Exploration 1', None, self.albert_id,
-                role_services.get_all_actions(
-                    feconf.ROLE_ID_EXPLORATION_EDITOR)))
+                'Exploration 1', None, self.albert))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID1,
@@ -1034,8 +1020,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_invalid_exp_ids(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID3, self.INVALID_EXP_ID], role_services.get_all_actions(
-                feconf.ROLE_ID_EXPLORATION_EDITOR), self.albert_id))
+            [self.EXP_ID3, self.INVALID_EXP_ID], self.albert))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID3,

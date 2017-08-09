@@ -546,122 +546,103 @@ def _get_activity_rights(activity_type, activity_id):
                 activity_type))
 
 
-def check_can_access_activity(user_id, user_actions, activity_rights):
+def check_can_access_activity(user, activity_rights):
     """Checks whether the user can access given activity.
 
     Args:
-        user_id: str or None. Id of the given user.
-        user_actions: list(str). List of actions given user can perform.
-        activity_rights: rights_object or None. Rights object of the given
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: AcitivityRights or None. Rights object for the given
             activity.
 
     Returns:
-        bool. Whether the given activity can be accessed.
+        bool. Whether the given activity can be accessed by the given user.
     """
     if activity_rights is None:
         return False
     elif activity_rights.is_published():
         return bool(
-            role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY in user_actions)
+            role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY in user.actions)
     elif activity_rights.is_private():
         return bool(
-            (role_services.ACTION_PLAY_ANY_PRIVATE_ACTIVITY in user_actions) or
-            activity_rights.is_viewer(user_id) or
-            activity_rights.is_owner(user_id) or
-            activity_rights.is_editor(user_id) or
+            (role_services.ACTION_PLAY_ANY_PRIVATE_ACTIVITY in user.actions) or
+            activity_rights.is_viewer(user.user_id) or
+            activity_rights.is_owner(user.user_id) or
+            activity_rights.is_editor(user.user_id) or
             activity_rights.viewable_if_private)
 
 
-def check_can_edit_activity(user_id, user_actions, activity_rights):
+def check_can_edit_activity(user, activity_rights):
     """Checks whether the user can edit given activity.
 
     Args:
-        user_id: str or None. Id of the given user.
-        user_actions: list(str). List of actions the user can perform.
-        activity_rights: rights_object or None. Rights object of the given
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
             activity.
 
     Returns:
         bool. Whether the given user can edit this activity.
     """
-    if role_services.ACTION_EDIT_OWNED_ACTIVITY in user_actions:
-        if (activity_rights.is_owner(user_id) or
-                activity_rights.is_editor(user_id)):
-            return True
-    else:
+    if activity_rights is None:
         return False
 
+    if role_services.ACTION_EDIT_OWNED_ACTIVITY not in user.actions:
+        return False
+
+    if (activity_rights.is_owner(user.user_id) or
+            activity_rights.is_editor(user.user_id)):
+        return True
+
     if (activity_rights.community_owned or
-            (role_services.ACTION_EDIT_ANY_ACTIVITY in user_actions)):
+            (role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions)):
         return True
 
     if (activity_rights.is_published() and
             (role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in
-             user_actions)):
+             user.actions)):
         return True
 
     return False
 
 
-def check_can_unpublish_collection(user_actions, collection_rights):
-    """Checks whether the user can unpublish given collection.
-
-    Args:
-        user_actions: list(str). List of actions the user can perform.
-        collection_rights: rights_object or None. Rights object of given
-            collection.
-
-    Returns:
-        bool. Whether the user can unpublish given collection.
-    """
-    if collection_rights is None:
-        return False
-
-    if (collection_rights.is_published() and
-            role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in user_actions):
-        return True
-
-    return False
-
-
-def check_can_delete_activity(user_id, user_actions, activity_rights):
+def check_can_delete_activity(user, activity_rights):
     """Checks whether the user can delete given activity.
 
     Args:
-        user_id: str or None. Id of the user.
-        user_actions: list(str). List of actions the user can perform.
-        activity_rights: rights_object or None. Rights object of given
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
             activity.
 
     Returns:
-        bool. Whether the user can delete given exploration.
+        bool. Whether the user can delete given activity.
     """
     if activity_rights is None:
         return False
-
     if (activity_rights.is_private() and
             (role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in (
-                user_actions)) and
-            activity_rights.is_owner(user_id)):
+                user.actions)) and
+            activity_rights.is_owner(user.user_id)):
         return True
     elif (activity_rights.is_published() and
-          role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY in (
-              user_actions)):
+          (role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY in (
+              user.actions))):
         return True
     return False
 
 
-def check_can_modify_activity_roles(user_id, user_actions, activity_rights):
+def check_can_modify_activity_roles(user, activity_rights):
     """Checks whether the user can modify roles for given activity.
 
     Args:
-        user_id: str or None. Id of the user.
-        user_actions: list(str). List of actions the user can perform.
-        activity_rights: rights_object or None. Rights Object of given
-            exploration.
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
+            activity.
 
     Returns:
-        bool. Whether the user can modify roles for given exploration.
+        bool. Whether the user can modify roles for given activity.
     """
     if activity_rights is None:
         return False
@@ -671,22 +652,22 @@ def check_can_modify_activity_roles(user_id, user_actions, activity_rights):
         return False
 
     if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY in
-            user_actions):
+            user.actions):
         return True
     if (role_services.ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY in
-            user_actions):
-        if activity_rights.is_owner(user_id):
+            user.actions):
+        if activity_rights.is_owner(user.user_id):
             return True
     return False
 
 
-def check_can_release_ownership(user_id, user_actions, activity_rights):
+def check_can_release_ownership(user, activity_rights):
     """Checks whether the user can release ownership for given activity.
 
     Args:
-        user_id: str or None. Id of the user.
-        user_actions: list(str). List of actions the user can perform.
-        activity_rights: rights_object or None. Rights Object of given
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
             activity.
 
     Returns:
@@ -699,20 +680,20 @@ def check_can_release_ownership(user_id, user_actions, activity_rights):
         return False
 
     return check_can_modify_activity_roles(
-        user_id, user_actions, activity_rights)
+        user, activity_rights)
 
 
-def check_can_publish_activity(user_id, user_actions, activity_rights):
+def check_can_publish_activity(user, activity_rights):
     """Checks whether the user can publish given activity.
 
     Args:
-        user_id: str or None. Id of the user.
-        user_actions: list(str). List of actions the user can perform.
-        activity_rights: rights_object or None. Rights Object of given
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
             activity.
 
     Returns:
-        bool. Whether the user can publish given exploration.
+        bool. Whether the user can publish given activity.
     """
     if activity_rights is None:
         return False
@@ -720,24 +701,25 @@ def check_can_publish_activity(user_id, user_actions, activity_rights):
     if activity_rights.cloned_from:
         return False
 
-    if role_services.ACTION_PUBLISH_ANY_ACTIVITY in user_actions:
+    if role_services.ACTION_PUBLISH_ANY_ACTIVITY in user.actions:
         return True
 
     if activity_rights.is_private():
-        if role_services.ACTION_PUBLISH_OWNED_ACTIVITY in user_actions:
-            if activity_rights.is_owner(user_id):
+        if role_services.ACTION_PUBLISH_OWNED_ACTIVITY in user.actions:
+            if activity_rights.is_owner(user.user_id):
                 return True
 
     return False
 
 
-def check_can_publicize_exploration(user_actions, exploration_rights):
+def check_can_publicize_exploration(user, exploration_rights):
     """Checks whether the user can publicize given exploration.
 
     Args:
-        user_actions: list(str). List of actions the user can perform.
-        exploration_rights: rights_object or None. Rights object of given
-            exploration.
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        exploration_rights: ActivityRights or None. Rights object for the given
+            activity.
 
     Returns:
         bool. Whether the user can publicize given exploration.
@@ -746,18 +728,19 @@ def check_can_publicize_exploration(user_actions, exploration_rights):
         return False
 
     if exploration_rights.status == ACTIVITY_STATUS_PUBLIC:
-        if role_services.ACTION_PUBLICIZE_EXPLORATION in user_actions:
+        if role_services.ACTION_PUBLICIZE_ANY_EXPLORATION in user.actions:
             return True
     return False
 
 
-def check_can_unpublicize_exploration(user_actions, exploration_rights):
+def check_can_unpublicize_exploration(user, exploration_rights):
     """Checks whether the user can unpublicize given exploration.
 
     Args:
-        user_actions: list(str). List of actions the user can perform.
-        exploration_rights: rights_object or None. Rights object of given
-            exploration.
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        exploration_rights: ActivityRights or None. Rights object for the given
+            activity.
 
     Returns:
         bool. Whether the user can unpublicize given exploration.
@@ -766,30 +749,31 @@ def check_can_unpublicize_exploration(user_actions, exploration_rights):
         return False
 
     if exploration_rights.status == ACTIVITY_STATUS_PUBLICIZED:
-        if role_services.ACTION_UNPUBLICIZE_EXPLORATION in user_actions:
+        if role_services.ACTION_UNPUBLICIZE_ANY_EXPLORATION in user.actions:
             return True
     return False
 
 
-def check_can_unpublish_exploration(user_actions, exploration_rights):
-    """Checks whether the user can unpublish given exploration.
+def check_can_unpublish_activity(user, activity_rights):
+    """Checks whether the user can unpublish given activity.
 
     Args:
-        user_actions: list(str). List of actions the user can perform.
-        exploration_rights: rights_object or None. Rights object of given
-            exploration.
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
+            activity.
 
     Returns:
-        bool. Whether the user can unpublish given exploration.
+        bool. Whether the user can unpublish given activity.
     """
-    if exploration_rights is None:
+    if activity_rights is None:
         return False
 
-    if exploration_rights.community_owned:
+    if activity_rights.community_owned:
         return False
 
-    if exploration_rights.status == ACTIVITY_STATUS_PUBLIC:
-        if role_services.ACTION_UNPUBLISH_PUBLIC_EXPLORATION in user_actions:
+    if activity_rights.is_published():
+        if role_services.ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY in user.actions:
             return True
     return False
 
@@ -822,11 +806,11 @@ def _assign_role(
         Exception. The role is invalid.
     """
     committer_role = user_services.get_user_role_from_id(committer_id)
-    committer_actions = role_services.get_all_actions(committer_role)
+    user = user_services.UserActionsInfo(committer_id, committer_role)
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_modify_activity_roles(
-            committer_id, committer_actions, activity_rights):
+            user, activity_rights):
         logging.error(
             'User %s tried to allow user %s to be a(n) %s of activity %s '
             'but was refused permission.' % (
@@ -910,11 +894,10 @@ def _release_ownership_of_activity(committer_id, activity_id, activity_type):
         Exception. The committer does not have release rights.
     """
     committer_role = user_services.get_user_role_from_id(committer_id)
-    committer_actions = role_services.get_all_actions(committer_role)
+    user = user_services.UserActionsInfo(committer_id, committer_role)
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_release_ownership(
-            committer_id, committer_actions, activity_rights):
+    if not check_can_release_ownership(user, activity_rights):
         logging.error(
             'User %s tried to release ownership of %s %s but was '
             'refused permission.' % (committer_id, activity_type, activity_id))
@@ -988,11 +971,10 @@ def _publish_activity(committer_id, activity_id, activity_type):
             activity.
     """
     committer_role = user_services.get_user_role_from_id(committer_id)
-    committer_actions = role_services.get_all_actions(committer_role)
+    user = user_services.UserActionsInfo(committer_id, committer_role)
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_publish_activity(
-            committer_id, committer_actions, activity_rights):
+    if not check_can_publish_activity(user, activity_rights):
         logging.error(
             'User %s tried to publish %s %s but was refused '
             'permission.' % (committer_id, activity_type, activity_id))
@@ -1018,24 +1000,15 @@ def _unpublish_activity(committer_id, activity_id, activity_type):
             activity.
     """
     committer_role = user_services.get_user_role_from_id(committer_id)
-    committer_actions = role_services.get_all_actions(committer_role)
+    user = user_services.UserActionsInfo(committer_id, committer_role)
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-        if not check_can_unpublish_exploration(
-                committer_actions, activity_rights):
-            logging.error(
-                'User %s tried to unpublish %s %s but was refused '
-                'permission.' % (committer_id, activity_type, activity_id))
-            raise Exception('This %s cannot be unpublished.' % activity_type)
-
-    if activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-        if not check_can_unpublish_collection(
-                committer_actions, activity_rights):
-            logging.error(
-                'User %s tried to unpublish %s %s but was refused '
-                'permission.' % (committer_id, activity_type, activity_id))
-            raise Exception('This %s cannot be unpublished.' % activity_type)
+    if not check_can_unpublish_activity(
+            user, activity_rights):
+        logging.error(
+            'User %s tried to unpublish %s %s but was refused '
+            'permission.' % (committer_id, activity_type, activity_id))
+        raise Exception('This %s cannot be unpublished.' % activity_type)
 
     _change_activity_status(
         committer_id, activity_id, activity_type, ACTIVITY_STATUS_PRIVATE,
@@ -1058,12 +1031,12 @@ def _publicize_activity(committer_id, activity_id, activity_type):
         Exception. The committer does not have rights to publicize the activity.
     """
     committer_role = user_services.get_user_role_from_id(committer_id)
-    committer_actions = role_services.get_all_actions(committer_role)
+    user = user_services.UserActionsInfo(committer_id, committer_role)
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     # Publicizing functionality is going to be deprecated. That's why check
     # implemented only for exploration and not for both.
-    if not check_can_publicize_exploration(committer_actions, activity_rights):
+    if not check_can_publicize_exploration(user, activity_rights):
         logging.error(
             'User %s tried to publicize %s %s but was refused '
             'permission.' % (committer_id, activity_type, activity_id))
@@ -1090,13 +1063,12 @@ def _unpublicize_activity(committer_id, activity_id, activity_type):
             activity.
     """
     committer_role = user_services.get_user_role_from_id(committer_id)
-    committer_actions = role_services.get_all_actions(committer_role)
+    user = user_services.UserActionsInfo(committer_id, committer_role)
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     # Unpublicize functionality is going to be deprecated. That's why check
     # implemented only for exploration and not both.
-    if not check_can_unpublicize_exploration(
-            committer_actions, activity_rights):
+    if not check_can_unpublicize_exploration(user, activity_rights):
         logging.error(
             'User %s tried to unpublicize exploration %s but was refused '
             'permission.' % (committer_id, activity_id))
@@ -1171,12 +1143,11 @@ def set_private_viewability_of_exploration(
         Exception. If the viewable_if_private property is already as desired.
     """
     committer_role = user_services.get_user_role_from_id(committer_id)
-    committer_actions = role_services.get_all_actions(committer_role)
+    user = user_services.UserActionsInfo(committer_id, committer_role)
     exploration_rights = get_exploration_rights(exploration_id)
 
     # The user who can publish activity can change its private viewability.
-    if not check_can_publish_activity(
-            committer_id, committer_actions, exploration_rights):
+    if not check_can_publish_activity(user, exploration_rights):
         logging.error(
             'User %s tried to change private viewability of exploration %s '
             'but was refused permission.' % (committer_id, exploration_id))

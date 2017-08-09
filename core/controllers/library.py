@@ -57,7 +57,7 @@ def get_matching_activity_dicts(query_string, search_cursor):
             collection_ids))
     activity_list += (
         summary_services.get_displayable_exp_summary_dicts_matching_ids(
-            exp_ids))
+            exp_ids, user_services.UserActionsInfo()))
 
     if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
         logging.error(
@@ -205,7 +205,8 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                 '0', 'yvqBFOQNDz5e', 'BvpDpLSmO2Iu', 'gC4_ggkWar-L']
             activity_list = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    splash_page_featured_exploration_ids))
+                    splash_page_featured_exploration_ids,
+                    user_services.UserActionsInfo()))
 
         else:
             return self.PageNotFoundException
@@ -299,13 +300,11 @@ class ExplorationSummariesHandler(base.BaseHandler):
         if include_private_exps:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    exp_ids,
-                    editor_user_id=editor_user_id,
-                    editor_actions=self.actions))
+                    exp_ids, self.user))
         else:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    exp_ids))
+                    exp_ids, user_services.UserActionsInfo()))
         self.values.update({
             'summaries': summaries
         })

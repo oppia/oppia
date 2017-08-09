@@ -64,12 +64,12 @@ var updateRole = function(name, newRole) {
   browser.get(general.ADMIN_URL_SUFFIX);
   element(by.css('.protractor-test-admin-roles-tab')).click();
   browser.waitForAngular();
-  //change values for update form and submit it.
+  // Change values for "update role" form, and submit it.
   element(by.css('.protractor-update-form-name')).sendKeys(name);
   var select = element(by.model('updateFormValues.newRole'));
-  var searchKey = '[label="' + newRole + '"]'
+  var searchKey = '[label="' + newRole + '"]';
   select.$(searchKey).click();
-  element(by.css('.protractor-update-form-submit')).click()
+  element(by.css('.protractor-update-form-submit')).click();
   browser.waitForAngular();
   return true;
 }

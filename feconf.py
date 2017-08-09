@@ -814,8 +814,6 @@ HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
 
 # Following are the constants for the role Ids.
-# To check the role updation from /admin#roles, set ADMIN_SHOW_UPDATE_ROLE
-# constant in Admin.js to true.
 ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'

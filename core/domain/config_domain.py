@@ -103,7 +103,7 @@ class ConfigProperty(object):
         pass
 
     def __init__(self, name, schema, description, default_value,
-                 post_set_hook=None, is_directly_settable=True):
+                 is_directly_settable=True):
         if Registry.get_config_property(name):
             raise Exception('Property with name %s already exists' % name)
 
@@ -112,7 +112,6 @@ class ConfigProperty(object):
         self._description = description
         self._default_value = schema_utils.normalize_against_schema(
             default_value, self._schema)
-        self._post_set_hook = post_set_hook
         self._is_directly_settable = is_directly_settable
 
         Registry.init_config_property(self.name, self)
@@ -175,9 +174,6 @@ class ConfigProperty(object):
         # Set value in memcache.
         memcache_services.set_multi({
             model_instance.id: model_instance.value})
-
-        if self._post_set_hook is not None:
-            self._post_set_hook(committer_id, value)
 
     def normalize(self, value):
         return schema_utils.normalize_against_schema(value, self._schema)

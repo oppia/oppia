@@ -51,7 +51,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
         user_contributions = user_models.UserContributionsModel.get(user_id)
 
         if (user_id == query_model.submitter_id or
-                user_services.check_atleast_moderator(user_id)):
+                user_services.is_at_least_moderator(user_id)):
             return
 
         if query_model.has_not_logged_in_for_n_days is not None:
