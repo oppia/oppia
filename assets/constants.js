@@ -273,9 +273,9 @@ var constants = {
   }],
 
   "INTERACTION_CLASSIFIER_MAPPING": {
-    'TextInput': {
-      'algorithmId': 'LDAStringClassifier',
-      'dataSchemaVersion': 1
+    "TextInput": {
+      "algorithmId": "LDAStringClassifier",
+      "dataSchemaVersion": 1
     }
   }
 

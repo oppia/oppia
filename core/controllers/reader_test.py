@@ -17,6 +17,7 @@
 import os
 
 from constants import constants
+from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -24,8 +25,13 @@ from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
 from core.domain import rights_manager
+from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
+
+(classifier_models,) = models.Registry.import_models(
+    [models.NAMES.classifier])
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -186,6 +192,68 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+
+class ExplorationHandlerTest(test_utils.GenericTestBase):
+    """Test the handler for initialising exploration with
+    state_classifier_mapping.
+    """
+
+    def test_creation_of_state_classifier_mapping(self):
+        super(ExplorationHandlerTest, self).setUp()
+        self.exp_id = '15'
+
+        self.login(self.VIEWER_EMAIL)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        # Load demo exploration.
+        exp_services.delete_demo(self.exp_id)
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.load_demo(self.exp_id)
+
+        # Retrieve job_id of created job (because of save_exp).
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 1)
+        for job in all_jobs:
+            job_id = job.id
+
+        # Create classifier.
+        classifier_data = {
+            '_alpha': 0.1,
+            '_beta': 0.001,
+            '_prediction_threshold': 0.5,
+            '_training_iterations': 25,
+            '_prediction_iterations': 5,
+            '_num_labels': 10,
+            '_num_docs': 12,
+            '_num_words': 20,
+            '_label_to_id': {'text': 1},
+            '_word_to_id': {'hello': 2},
+            '_w_dp': [],
+            '_b_dl': [],
+            '_l_dp': [],
+            '_c_dl': [],
+            '_c_lw': [],
+            '_c_l': []
+        }
+        classifier_services.create_classifier(job_id, classifier_data)
+
+        expected_state_classifier_mapping = {
+            'text': {
+                'algorithm_id': 'LDAStringClassifier',
+                'classifier_data': classifier_data
+            },
+            'final': None
+        }
+        # Call the handler.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.exp_id))
+        retrieved_state_classifier_mapping = exploration_dict[
+            'state_classifier_mapping']
+        print retrieved_state_classifier_mapping
+
+        self.assertEqual(expected_state_classifier_mapping,
+                         retrieved_state_classifier_mapping)
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):

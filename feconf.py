@@ -114,10 +114,10 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
 # The minimum number of training samples required for training a classifier.
-MIN_TOTAL_TRAINING_EXAMPLES = 50
+MIN_TOTAL_TRAINING_EXAMPLES = 5
 
 # The minimum number of assigned labels required for training a classifier.
-MIN_ASSIGNED_LABELS = 2
+MIN_ASSIGNED_LABELS = 1
 
 # Default label for classification algorithms.
 DEFAULT_CLASSIFIER_LABEL = '_default'
