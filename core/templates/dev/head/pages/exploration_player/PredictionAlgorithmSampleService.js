@@ -24,7 +24,7 @@
    return {
      predict: function(classifierData, userText) {
        return {
-         outcome: 'defaultOutcome',
+         outcome: 'Sample default outcome',
          answerGroupIndex: 0,
          ruleIndex: 0,
          classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION

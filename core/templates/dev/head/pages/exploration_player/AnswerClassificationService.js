@@ -152,7 +152,7 @@ oppia.factory('AnswerClassificationService', [
           deferred.resolve(result);
         }
         return deferred.promise;
-      }
+      },
 
       /**
        * Gets a promise to the matching answer group.
