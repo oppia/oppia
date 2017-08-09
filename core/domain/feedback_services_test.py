@@ -14,7 +14,6 @@
 
 """Tests for feedback-related services."""
 import json
-import time
 
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous_test

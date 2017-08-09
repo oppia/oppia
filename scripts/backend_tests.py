@@ -57,7 +57,7 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--exclude_load_tests',
     help='optional subdirectory which contain the load tests for various' +
-         'processes',
+    'processes',
     type=bool)
 _PARSER.add_argument(
     '-v',
