@@ -39,11 +39,6 @@ oppia.directive('collectionEditorNavbar', [
           $scope.collection = CollectionEditorStateService.getCollection();
           $scope.collectionRights = (
             CollectionEditorStateService.getCollectionRights());
-          $scope.SHOW_COLLECTION_NAVIGATION_TAB_STATS =
-            GLOBALS.SHOW_COLLECTION_NAVIGATION_TAB_STATS;
-          $scope.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY =
-            GLOBALS.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY;
-          $scope.username = GLOBALS.username;
 
           $scope.isLoadingCollection = (
             CollectionEditorStateService.isLoadingCollection);
