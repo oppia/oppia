@@ -17,10 +17,13 @@
  */
 
 oppia.factory('AudioPreloaderService', 
-  ['explorationContextService', 'AssetsBackendApiService',
-  'ExplorationPlayerStateService',
-  function(explorationContextService, AssetsBackendApiService,
-    ExplorationPlayerStateService) {
+  ['$modal', 'explorationContextService', 'AssetsBackendApiService',
+  'ExplorationPlayerStateService', 'UrlInterpolationService',
+  function($modal, explorationContextService, AssetsBackendApiService,
+    ExplorationPlayerStateService, UrlInterpolationService) {
+
+    var NUM_BYTES_IN_MB = 1000;
+
     var _hasPreloaded = false;
     var _excludedFilename = null;
 
@@ -39,6 +42,45 @@ oppia.factory('AudioPreloaderService',
       _hasPreloaded = true;
     };
 
+    var _showBandwidthConfirmationModal = function(confirmationCallback) {
+      $modal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_player/' +
+          'audio_preload_bandwidth_confirmation_modal_directive.html'),
+        resolve: {},
+        backdrop: false,
+        controller: ['$scope', '$modalInstance',
+          'ExplorationPlayerStateService', 'AudioPreloaderService',
+          function(
+              $scope, $modalInstance,
+              ExplorationPlayerStateService, AudioPreloaderService) {
+            $scope.totalFileSizeOfAllAudioTranslationsBytes =
+              _calculateTotalFileSize(
+                ExplorationPlayerStateService.getExploration()
+                  .getAllAudioTranslations());
+
+            $scope.continue = function() {
+              $modalInstance.close();
+            };
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+            };
+        }]
+      }).result.then(function() {
+        confirmationCallback();
+        _preload();
+      });
+    };
+
+    var _calculateTotalFileSize = function(audioTranslations) {
+      var totalFileSize = 0;
+      for (var languageCode in audioTranslations) {
+        totalFileSize += audioTranslations[languageCode].fileSizeBytes;
+      }
+      return totalFileSize / NUM_BYTES_IN_MB;
+    };
+
     return {
       init: function() {
         _init();
@@ -51,6 +93,9 @@ oppia.factory('AudioPreloaderService',
       },
       excludeFile: function(filename) {
         _excludedFilename = filename;
+      },
+      showBandwidthConfirmationModal: function(confirmationCallback) {
+        _showBandwidthConfirmationModal(confirmationCallback);
       }
     };
   }

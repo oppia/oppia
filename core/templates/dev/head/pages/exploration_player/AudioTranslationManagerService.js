@@ -106,7 +106,7 @@ oppia.factory('AudioTranslationManagerService', [
         return _allLanguageCodesInExploration;
       },
       showAudioTranslationSettingsModal: function(onLanguageChangedCallback) {
-        return _showAudioTranslationSettingsModal(onLanguageChangedCallback);
+        _showAudioTranslationSettingsModal(onLanguageChangedCallback);
       }
     };
   }]);

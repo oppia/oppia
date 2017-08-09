@@ -65,17 +65,22 @@ oppia.directive('audioControls', [
           };
 
           $scope.playPauseAudioTranslation = function() {
-            // TODO(tjiang11): Change from on-demand loading to pre-loading.
             if (!AudioPreloaderService.hasPreloaded()) {
-              AudioPreloaderService.excludeFile(
-                getCurrentAudioTranslation().filename);
-              AudioPreloaderService.preload();
+              if (getCurrentAudioTranslation()) {
+                AudioPreloaderService.excludeFile(
+                  getCurrentAudioTranslation().filename);
+              }
+              AudioPreloaderService.showBandwidthConfirmationModal(
+                startAudio);
+            } else {   
+              // TODO(tjiang11): On first play, ask learner to pick language
+              // and subsequently for confirmation to use bandwidth 
+              // to download audio files.
+              startAudio();
             }
+          };
 
-            // TODO(tjiang11): On first play, ask learner to pick language
-            // and subsequently for confirmation to use bandwidth 
-            // to download audio files.
-
+          var startAudio = function() {
             $scope.extraAudioControlsAreShown = true;
 
             if (!AudioPlayerService.isPlaying()) {
