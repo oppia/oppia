@@ -198,20 +198,17 @@ describe('States object factory', function() {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllAudioTranslations())
         .toEqual([
-          atof.createFromBackendDict(
-          {
+          atof.createFromBackendDict({
             filename: 'myfile1.mp3',
             file_size_bytes: 0.5,
             needs_update: false
           }), 
-          atof.createFromBackendDict(
-          {
+          atof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
             needs_update: false
           }), 
-          atof.createFromBackendDict(
-          {
+          atof.createFromBackendDict({
             filename: 'myfile2.mp3',
             file_size_bytes: 0.8,
             needs_update: false
