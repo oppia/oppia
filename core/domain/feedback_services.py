@@ -147,7 +147,12 @@ def create_message(
     msg.put()
 
     # Update the message count in the thread.
-    thread.message_count += 1
+    if thread.message_count is not None:
+        thread.message_count += 1
+    else:
+        thread.message_count = (
+            feedback_models.FeedbackMessageModel.get_message_count(
+                exploration_id, thread_id))
 
     # We do a put() even if the status and subject are not updated, so that the
     # last_updated time of the thread reflects the last time a message was
@@ -418,9 +423,11 @@ def _get_thread_from_model(thread_model):
     Returns:
         FeedbackThread. The corresponding FeedbackThread domain object.
     """
-    if not thread_model.message_count:
+    if thread_model.message_count is None:
         message_count = feedback_models.FeedbackMessageModel.get_message_count(
             thread_model.exploration_id, thread_model.thread_id)
+    else:
+        message_count = thread_model.message_count
 
     return feedback_domain.FeedbackThread(
         thread_model.id, thread_model.exploration_id, thread_model.state_name,
@@ -503,12 +510,14 @@ def get_thread_summaries(user_id, full_thread_ids):
     thread_summaries = []
     number_of_unread_threads = 0
     for index, thread in enumerate(threads):
-        if feedback_thread_user_models[index] is None:
-            update_messages_read_by_the_user(
-                user_id, explorations[index], thread_ids[index], [])
-        last_message_read = (
-            last_two_messages[index][0].message_id
-            in feedback_thread_user_models[index].message_ids_read_by_user)
+        feedback_thread_user_model_exists = (
+            feedback_thread_user_models[index] is not None)
+        if feedback_thread_user_model_exists:
+            last_message_read = (
+                last_two_messages[index][0].message_id
+                in feedback_thread_user_models[index].message_ids_read_by_user)
+        else:
+            last_message_read = False
         author_last_message = user_services.get_username(
             last_two_messages[index][0].author_id)
 
@@ -517,9 +526,12 @@ def get_thread_summaries(user_id, full_thread_ids):
 
         does_second_message_exist = (last_two_messages[index][1] is not None)
         if does_second_message_exist:
-            second_last_message_read = (
-                last_two_messages[index][1].message_id
-                in feedback_thread_user_models[index].message_ids_read_by_user)
+            if feedback_thread_user_model_exists:
+                second_last_message_read = (
+                    last_two_messages[index][1].message_id
+                    in feedback_thread_user_models[index].message_ids_read_by_user) # pylint: disable=line-too-long
+            else:
+                second_last_message_read = False
             author_second_last_message = user_services.get_username(
                 last_two_messages[index][1].author_id)
         if not last_message_read:
