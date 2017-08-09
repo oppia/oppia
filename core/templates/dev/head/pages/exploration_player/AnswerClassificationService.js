@@ -27,12 +27,12 @@ oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
   '$http', '$q', 'LearnerParamsService', 'alertsService',
-  'PredictionAlgorithmRegistryService', 'algorithmIdRetrievalService',
-  'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
+  'PredictionAlgorithmRegistryService', 'INTERACTION_SPECS',
+  'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
   function($http, $q, LearnerParamsService, alertsService,
-      PredictionAlgorithmRegistryService, algorithmIdRetrievalService,
-      INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
+      PredictionAlgorithmRegistryService, INTERACTION_SPECS,
+      ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
@@ -155,7 +155,7 @@ oppia.factory('AnswerClassificationService', [
       }
 
       /**
-       * Gets the matching answer group.
+       * Gets a promise to the matching answer group.
        *
        * @param {string} explorationId - The exploration ID.
        * @param {object} oldState - The state where the user submitted the
@@ -166,8 +166,8 @@ oppia.factory('AnswerClassificationService', [
        * @param {function} interactionRulesService - The service which contains
        *   the explicit rules of that interaction.
        *
-       * @return {object} An object representing the answer group with the
-       *     following properties:
+       * @return {promise} A promise for an object representing the answer group
+       *     with the following properties:
        * <ul>
        *   <li> **outcome**: the outcome of the answer group
        *   <li> **answerGroupIndex**: the index of the matched answer group
@@ -188,27 +188,27 @@ oppia.factory('AnswerClassificationService', [
           alertsService.addWarning(
             'Something went wrong with the exploration: no ' +
             'interactionRulesService was available.');
-          // @prasanna08 @seanlip. Not sure about this part.
-          return;
+          deferred.reject();
+          return deferred.promise;
         }
 
-        if (result.outcome === defaultOutcome &&
-            INTERACTION_SPECS[oldState.interaction.id]
-              .is_string_classifier_trainable &&
+        var ruleBasedOutcomeIsDefault = (result.outcome == defaultOutcome);
+        var interactionIsTrainable = INTERACTION_SPECS[
+          oldState.interaction.id].is_string_classifier_trainable;
+        if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
           var classifierData = oldState.classifierData;
           var interactionId = oldState.interaction.id;
-          var algorithmId = algorithmIdRetrievalService.getAlgorithmId(
-            interactionId);
+          var algorithmId = constants.INTERACTION_CLASSIFIER_MAPPING[
+            interactionId]['algorithmId'];
           var predictionService = (
             PredictionAlgorithmRegistryService.getPredictionService(
               algorithmId));
-          var result = predictionService.predict(classifierData, answer);
-          return result;
+          deferred.resolve(predictionService.predict(classifierData, answer));
         } else {
-          // @prasanna08 @seanlip. Not sure about this part.
-          return;
+          deferred.resolve(result);
         }
+        return deferred.promise;
       }
     };
   }
