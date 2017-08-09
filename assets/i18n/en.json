@@ -306,6 +306,8 @@
     "I18N_MODAL_CANCEL_BUTTON": "Cancel",
     "I18N_ONE_SUBSCRIBER_TEXT": "You have 1 subscriber.",
     "I18N_PLAYER_AUDIO_LANGUAGE": "Language",
+    "I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT": "Audio might not fully match text",
+    "I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "Not available in <[languageDescription]>",
     "I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Audio Translation Settings",
     "I18N_PLAYER_BACK": "Back",
     "I18N_PLAYER_BACK_TO_COLLECTION": "Back to collection",

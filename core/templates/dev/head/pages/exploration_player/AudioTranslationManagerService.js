@@ -18,9 +18,11 @@
  */
 
 oppia.factory('AudioTranslationManagerService', [
-  '$modal', 'AudioPlayerService',
+  '$modal', 'AudioPlayerService', 'UrlInterpolationService',
+  'LanguageUtilService',
   function(
-      $modal, AudioPlayerService) {
+      $modal, AudioPlayerService, UrlInterpolationService,
+      LanguageUtilService) {
     var _currentAudioLanguageCode = null;
     var _allLanguageCodesInExploration = null;
 
@@ -43,9 +45,12 @@ oppia.factory('AudioTranslationManagerService', [
       }
     };
 
-    var _showAudioTranslationSettingsModal = function() {
+    var _showAudioTranslationSettingsModal = function(
+        onLanguageChangedCallback) {
       $modal.open({
-        templateUrl: 'modals/audioTranslationSettings',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_player/' +
+          'audio_translation_settings_modal_directive.html'),
         resolve: {},
         controller: [
           '$scope', '$filter', '$modalInstance',
@@ -81,6 +86,7 @@ oppia.factory('AudioTranslationManagerService', [
           _currentAudioLanguageCode = result.languageCode;
           AudioPlayerService.stop();
           AudioPlayerService.clear();
+          onLanguageChangedCallback(_currentAudioLanguageCode);
         }
       });
     };
@@ -92,11 +98,15 @@ oppia.factory('AudioTranslationManagerService', [
       getCurrentAudioLanguageCode: function() {
         return _currentAudioLanguageCode;
       },
+      getCurrentAudioLanguageDescription: function() {
+        return LanguageUtilService.getAudioLanguageDescription(
+          _currentAudioLanguageCode);
+      },
       getAllLanguageCodesInExploration: function() {
         return _allLanguageCodesInExploration;
       },
-      showAudioTranslationSettingsModal: function() {
-        return _showAudioTranslationSettingsModal();
+      showAudioTranslationSettingsModal: function(onLanguageChangedCallback) {
+        return _showAudioTranslationSettingsModal(onLanguageChangedCallback);
       }
     };
   }]);

@@ -305,7 +305,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
         user_services.update_user_bio(user_id_c, self.USER_C_BIO)
         result = self._run_one_off_job()
-        expected_result = [[2400, ['d']], [800, ['c']]]
+        expected_result = [[800, ['c']], [2400, ['d']]]
         self.assertEqual(result, expected_result)
 
 

@@ -29,17 +29,39 @@ oppia.directive('audioControls', [
         'audio_controls_directive.html'),
       controller: [
         '$scope', 'AudioTranslationManagerService', 'AudioPlayerService',
+        'LanguageUtilService',
         function(
-            $scope, AudioTranslationManagerService, AudioPlayerService) {
+            $scope, AudioTranslationManagerService, AudioPlayerService,
+            LanguageUtilService) {
           // This ID is passed in to AudioPlayerService as a means of
           // distinguishing which audio directive is currently playing audio.
           var directiveId = Math.random().toString(36).substr(2, 10);
+
+          var currentAudioLanguageCode =
+            AudioTranslationManagerService
+              .getCurrentAudioLanguageCode();
+
+          $scope.currentAudioLanguageDescription =
+            AudioTranslationManagerService
+              .getCurrentAudioLanguageDescription();
+
+          var getCurrentAudioTranslation = function() {
+            return $scope.getAudioTranslations()[currentAudioLanguageCode];
+          };
 
           $scope.AudioPlayerService = AudioPlayerService;
 
           $scope.IMAGE_URL_REWIND_AUDIO_BUTTON = (
             UrlInterpolationService.getStaticImageUrl(
               '/icons/rewind-five.svg'));
+
+          $scope.isAudioAvailableInCurrentLanguage = function() {
+            return Boolean(getCurrentAudioTranslation());
+          };
+
+          $scope.doesCurrentAudioTranslationNeedUpdate = function() {
+            return getCurrentAudioTranslation().needsUpdate;
+          };
 
           $scope.playPauseAudioTranslation = function() {
             // TODO(tjiang11): Change from on-demand loading to pre-loading.
@@ -73,15 +95,7 @@ oppia.directive('audioControls', [
           };
 
           var loadAndPlayAudioTranslation = function() {
-            var currentAudioLanguageCode =
-              AudioTranslationManagerService.getCurrentAudioLanguageCode();
-
-            // TODO(tjiang11): If audio translation is not available
-            // in the current language, then inform the learner with
-            // a piece of text below the audio controls.
-            var audioTranslation =
-              $scope.getAudioTranslations()[currentAudioLanguageCode];
-
+            var audioTranslation = getCurrentAudioTranslation();
             if (audioTranslation) {
               AudioPlayerService.load(
                 audioTranslation.filename, directiveId).then(function() {
@@ -96,7 +110,12 @@ oppia.directive('audioControls', [
 
           $scope.openAudioTranslationSettings = function() {
             AudioTranslationManagerService
-              .showAudioTranslationSettingsModal();
+              .showAudioTranslationSettingsModal(function(newLanguageCode) {
+                currentAudioLanguageCode = newLanguageCode;
+                $scope.currentAudioLanguageDescription = 
+                  LanguageUtilService.getAudioLanguageDescription(
+                    newLanguageCode);
+              });
           };
         }]
     }

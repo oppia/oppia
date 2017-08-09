@@ -1,28 +1,50 @@
-<i class="fa fa-cog audio-control-button-icon"
-   ng-if="extraAudioControlsAreShown"
-   ng-click="openAudioTranslationSettings()"></i>
-<img class="audio-control-button-image"
-     style="margin-top: 4px"
+<div class="audio-controls">
+  <i class="fa fa-cog audio-controls-button-icon"
      ng-if="extraAudioControlsAreShown"
-     ng-src="<[IMAGE_URL_REWIND_AUDIO_BUTTON]>"
-     ng-click="rewindAudioFiveSec()">
-<i class="fa fa-volume-off audio-control-button-icon"
-   style="min-width: 24px"
-   ng-click="playPauseAudioTranslation()"
-   ng-class="{'fa-volume-off': !AudioPlayerService.isPlaying(), 'fa-volume-up': AudioPlayerService.isPlaying()}">
+     ng-click="openAudioTranslationSettings()"></i>
+  <img class="audio-controls-button-image"
+       style="margin-top: 2px"
+       ng-if="extraAudioControlsAreShown"
+       ng-src="<[IMAGE_URL_REWIND_AUDIO_BUTTON]>"
+       ng-click="rewindAudioFiveSec()">
+  <i class="fa audio-controls-button-icon"
+     style="min-width: 24px; text-align: left;"
+     ng-click="playPauseAudioTranslation()"
+     ng-class="{'fa-volume-off': !AudioPlayerService.isPlaying(), 'fa-volume-up': AudioPlayerService.isPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage()}"
+     tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:currentAudioLanguageDescription}) : '']>"
+     tooltip-append-to-body="true"></i>
+</div>
+<span ng-if="extraAudioControlsAreShown && isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
 
 <style>
-  .audio-control-button-icon {
+  .audio-controls-button-icon {
     font-size: 1.5em;
     vertical-align: middle;
   }
 
-  .audio-control-button-image {
+  .audio-controls-button-image {
     width: 21px;
     height: 21px;
   }
 
-  .audio-control-button:hover {
+  .audio-controls-button-icon:hover, .audio-controls-button-image:hover {
     cursor: pointer;
   }
+
+  .audio-controls-audio-not-available {
+    color: gray;
+  }
+
+  .audio-controls {
+    float: right;
+    text-align: right;
+    width: 100%;
+  }
+
+  .audio-controls-message {
+    float: right;
+    font-size: 12px;
+    font-style: italic;
+  }
+
 </style>

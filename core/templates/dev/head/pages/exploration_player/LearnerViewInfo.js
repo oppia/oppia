@@ -19,9 +19,9 @@
 
 oppia.controller('LearnerViewInfo', [
   '$scope', '$modal', '$http', '$log', 'explorationContextService',
-  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($scope, $modal, $http, $log, explorationContextService,
-    EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+    EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var explorationId = explorationContextService.getExplorationId();
     var expInfo = null;
 
@@ -46,7 +46,8 @@ oppia.controller('LearnerViewInfo', [
     var openInformationCardModal = function() {
       $modal.open({
         animation: true,
-        templateUrl: 'modal/informationCard',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_player/information_card_modal_directive.html'),
         windowClass: 'oppia-modal-information-card',
         resolve: {
           expInfo: function() {

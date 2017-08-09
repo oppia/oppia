@@ -116,8 +116,8 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         """Before the test, create an exploration_dict."""
         super(ClassifyHandlerTest, self).setUp()
-        self.enable_string_classifier = self.swap(
-            feconf, 'ENABLE_STRING_CLASSIFIER', True)
+        self.enable_ml_classifiers = self.swap(
+            feconf, 'ENABLE_ML_CLASSIFIERS', True)
 
         # Reading YAML exploration into a dictionary.
         yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
@@ -145,7 +145,7 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
     def test_classification_handler(self):
         """Test the classification handler for a right answer."""
 
-        with self.enable_string_classifier:
+        with self.enable_ml_classifiers:
             # Testing the handler for a correct answer.
             old_state_dict = self.exploration.states['Home'].to_dict()
             answer = 'Permutations'

@@ -42,7 +42,7 @@ oppia.constant('RULE_TYPE_CLASSIFIER', 'FuzzyMatches');
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-oppia.constant('ENABLE_STRING_CLASSIFIER', false);
+oppia.constant('ENABLE_ML_CLASSIFIERS', false);
 // Feature still in development.
 oppia.constant('ENABLE_HINT_EDITOR', true);
 oppia.constant('ENABLE_FALLBACK_EDITOR', false);

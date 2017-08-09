@@ -416,7 +416,7 @@ GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
 # files.
 
 if DEV_MODE:
-    AUDIO_URL_TEMPLATE = '/assets/test/<exploration_id>/audio/<filename>'
+    AUDIO_URL_TEMPLATE = '/audiohandler/<exploration_id>/audio/<filename>'
 else:
     AUDIO_URL_TEMPLATE = (
         'https://storage.googleapis.com/%s/<exploration_id>/'
@@ -531,7 +531,7 @@ DEMO_EXPLORATIONS = {
     u'14': 'about_oppia.yaml',
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
-    u'17': 'audio_test.yaml',
+    u'17': 'audio_test',
 }
 
 DEMO_COLLECTIONS = {
@@ -671,7 +671,7 @@ TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with base.js
-ENABLE_STRING_CLASSIFIER = False
+ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
