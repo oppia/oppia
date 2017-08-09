@@ -42,82 +42,83 @@ oppia.constant('PythonProgramTokenType', {
 
 oppia.factory('PythonProgramTokenizer', [
   '$log', 'PythonProgramTokenType', function($log, PythonProgramTokenType) {
-    var group = function() {
+    var groupOfRegEx = function() {
       return '(' + Array.prototype.join.call(arguments, '|') + ')';
     };
 
-    var maybe = function() {
-      return group(arguments) + '?';
+    var regExMayBePresent = function() {
+      return groupOfRegEx(arguments) + '?';
     };
 
-    var any = function() {
-      return group(arguments) + '*';
+    var repeatedRegEx = function() {
+      return groupOfRegEx(arguments) + '*';
     };
 
-    var Whitespace = String.raw`[ \f\t]*`;
-    var Comment = String.raw`#[^\r\n]*`;
-    var Ignore = Whitespace + any(String.raw`\\\r?\n` + Whitespace) + maybe(
-      Comment);
-    var Name = String.raw`[a-zA-Z_]\w*`;
+    var whitespace = String.raw`[ \f\t]*`;
+    var comment = String.raw`#[^\r\n]*`;
+    var ignore = whitespace + repeatedRegEx(
+      String.raw`\\\r?\n` + whitespace) + regExMayBePresent(comment);
+    var name = String.raw`[a-zA-Z_]\w*`;
 
-    var Hexnumber = String.raw`0[xX][\da-fA-F]+[lL]?`;
-    var Octnumber = String.raw`(0[oO][0-7]+)|(0[0-7]*)[lL]?`;
-    var Binnumber = String.raw`0[bB][01]+[lL]?`;
-    var Decnumber = String.raw`[1-9]\d*[lL]?`;
-    var Intnumber = group(Hexnumber, Binnumber, Octnumber, Decnumber)
-    var Exponent = String.raw`[eE][-+]?\d+`
-    var Pointfloat = group(String.raw`\d+\.\d*`, String.raw`\.\d+`) + maybe(
-      Exponent)
-    var Expfloat = String.raw`\d+` + Exponent;
-    var Floatnumber = group(Pointfloat, Expfloat)
-    var Imagnumber = group(String.raw`\d+[jJ]`, Floatnumber + String.raw`[jJ]`)
-    var num = group(Imagnumber, Floatnumber, Intnumber)
+    var hexnumber = String.raw`0[xX][\da-fA-F]+[lL]?`;
+    var octnumber = String.raw`(0[oO][0-7]+)|(0[0-7]*)[lL]?`;
+    var binnumber = String.raw`0[bB][01]+[lL]?`;
+    var decnumber = String.raw`[1-9]\d*[lL]?`;
+    var intnumber = groupOfRegEx(hexnumber, binnumber, octnumber, decnumber)
+    var exponent = String.raw`[eE][-+]?\d+`
+    var pointfloat = groupOfRegEx(
+      String.raw`\d+\.\d*`, String.raw`\.\d+`) + regExMayBePresent(exponent)
+    var expfloat = String.raw`\d+` + exponent;
+    var floatnumber = groupOfRegEx(pointfloat, expfloat)
+    var imagnumber = groupOfRegEx(
+      String.raw`\d+[jJ]`, floatnumber + String.raw`[jJ]`)
+    var num = groupOfRegEx(imagnumber, floatnumber, intnumber)
     // Tail end of ' string.
-    var Single = String.raw`[^'\\]*(?:\\.[^'\\]*)*'`;
+    var single = String.raw`[^'\\]*(?:\\.[^'\\]*)*'`;
     // Tail end of " string.
-    var Double = String.raw`[^"\\]*(?:\\.[^"\\]*)*"`;
+    var double = String.raw`[^"\\]*(?:\\.[^"\\]*)*"`;
     // Tail end of ''' string.
-    var Single3 = String.raw`[^'\\]*(?:(?:\\.|'(?!''))[^'\\]*)*'''`;
+    var single3 = String.raw`[^'\\]*(?:(?:\\.|'(?!''))[^'\\]*)*'''`;
     // Tail end of """ string.
-    var Double3 = String.raw`[^"\\]*(?:(?:\\.|"(?!""))[^"\\]*)*"""`;
-    var Triple = group("[uUbB]?[rR]?'''", '[uUbB]?[rR]?"""');
-    // Single-line ' or " string.
-    var str = group(String.raw`[uUbB]?[rR]?'[^\n'\\]*(?:\\.[^\n'\\]*)*'`,
+    var double3 = String.raw`[^"\\]*(?:(?:\\.|"(?!""))[^"\\]*)*"""`;
+    var triple = groupOfRegEx("[uUbB]?[rR]?'''", '[uUbB]?[rR]?"""');
+    // single-line ' or " string.
+    var str = groupOfRegEx(String.raw`[uUbB]?[rR]?'[^\n'\\]*(?:\\.[^\n'\\]*)*'`,
                    String.raw`[uUbB]?[rR]?"[^\n"\\]*(?:\\.[^\n"\\]*)*"`);
 
     // Because of leftmost-then-longest match semantics, be sure to put the
     // longest operators first (e.g., if = came before ==, == would get
     // recognized as two instances of =).
-    var Operator = group(String.raw`\*\*=?`, String.raw`>>=?`, String.raw`<<=?`,
-                     String.raw`<>`, String.raw`!=`,
-                     String.raw`//=?`,
-                     String.raw`[+\-*/%&|^=<>]=?`,
-                     String.raw`~`);
+    var operator = groupOfRegEx(
+      String.raw`\*\*=?`, String.raw`>>=?`, String.raw`<<=?`,
+      String.raw`<>`, String.raw`!=`, String.raw`//=?`,
+      String.raw`[+\-*/%&|^=<>]=?`, String.raw`~`);
 
-    var Bracket = '[(){}]';
-    var Special = group(String.raw`\r?\n`, String.raw`[:;.,\`@]`);
-    var Funny = group(Operator, Bracket, Special)
+    var bracket = '[(){}]';
+    var special = groupOfRegEx(String.raw`\r?\n`, String.raw`[:;.,\`@]`);
+    var funny = groupOfRegEx(operator, bracket, special)
 
-    var PlainToken = group(num, Funny, str, Name)
-    var Token = Ignore + PlainToken
+    var plaintoken = groupOfRegEx(num, funny, str, name)
+    var token = ignore + plaintoken
 
     // First (or only) line of ' or " string.
-    var ContStr = group(String.raw`[uUbB]?[rR]?'[^\n'\\]*(?:\\.[^\n'\\]*)*` +
-                    group("'", String.raw`\\\r?\n`),
-                    String.raw`[uUbB]?[rR]?"[^\n"\\]*(?:\\.[^\n"\\]*)*` +
-                    group('"', String.raw`\\\r?\n`))
-    var PseudoExtras = group(String.raw`\\\r?\n|\Z`, Comment, Triple)
-    var PseudoToken = Whitespace + group(
-      PseudoExtras, num, Funny, ContStr, Name)
+    var contStr = groupOfRegEx(
+      String.raw`[uUbB]?[rR]?'[^\n'\\]*(?:\\.[^\n'\\]*)*` +
+      groupOfRegEx("'", String.raw`\\\r?\n`),
+      String.raw`[uUbB]?[rR]?"[^\n"\\]*(?:\\.[^\n"\\]*)*` +
+      groupOfRegEx('"', String.raw`\\\r?\n`))
+    var pseudoextras = groupOfRegEx(String.raw`\\\r?\n|\Z`, comment, triple)
+    var pseudotoken = whitespace + groupOfRegEx(
+      pseudoextras, num, funny, contStr, name)
 
     // Regular Expression object.
-    var tokenprog = new RegExp(Token);
-    var pseudoprog = new RegExp(PseudoToken);
-    var single3prog = new RegExp(Single3);
-    var double3prog = new RegExp(Double3);
+    var tokenprog = new RegExp(token);
+    var pseudoprog = new RegExp(pseudotoken);
+    var single3prog = new RegExp(single3);
+    var double3prog = new RegExp(double3);
 
     var endprogs = {
-      "'": new RegExp(Single), '"': new RegExp(Double),
+      "'": new RegExp(single), '"': new RegExp(double),
       "'''": single3prog, '"""': double3prog,
       "r'''": single3prog, 'r"""': double3prog,
       "u'''": single3prog, 'u"""': double3prog,
@@ -188,8 +189,8 @@ oppia.factory('PythonProgramTokenizer', [
             }
 
             else if (
-              needcont && line.slice(-2) != '\\\n' ||
-              line.slice(-3) != '\\\r\n') {
+              needcont && line.slice(-2) !== '\\\n' ||
+              line.slice(-3) !== '\\\r\n') {
               tokenizedProgram.push(
                 [PythonProgramTokenType.ERRORTOKEN, contstr + line]);
               contstr = '';
@@ -205,7 +206,7 @@ oppia.factory('PythonProgramTokenizer', [
           }
 
           // new statement
-          else if (parenlev == 0 && !continued) {
+          else if (parenlev === 0 && !continued) {
             if (!line) {
               break;
             }
@@ -213,13 +214,13 @@ oppia.factory('PythonProgramTokenizer', [
             column = 0
             // measure leading whitespace.
             while (pos < max) {
-              if (line[pos] == ' ') {
+              if (line[pos] === ' ') {
                 column += 1;
               }
-              else if (line[pos] == '\t') {
+              else if (line[pos] === '\t') {
                 column = (column / tabsize + 1) * tabsize;
               }
-              else if (line[pos] == '\f') {
+              else if (line[pos] === '\f') {
                 column = 0;
               }
               else {
@@ -228,13 +229,13 @@ oppia.factory('PythonProgramTokenizer', [
               pos += 1;
             }
 
-            if (pos == max) {
+            if (pos === max) {
               break;
             }
 
             // skip comments or blank lines.
-            if (('#\r\n').indexOf(line[pos]) != -1) {
-              if (line[pos] == '#') {
+            if (('#\r\n').indexOf(line[pos]) !== -1) {
+              if (line[pos] === '#') {
                 commentToken = line.slice(pos).replace(String.raw`\r\n`, '');
                 nlPos = pos + commentToken.length;
                 tokenizedProgram.push(
@@ -244,7 +245,7 @@ oppia.factory('PythonProgramTokenizer', [
               }
               else {
                 tokenizedProgram.push([
-                  PythonProgramTokenType.line[pos] == '#' ? COMMENT : NL,
+                  PythonProgramTokenType.line[pos] === '#' ? COMMENT : NL,
                   line.slice(pos)]);
               }
               continue;
@@ -258,7 +259,7 @@ oppia.factory('PythonProgramTokenizer', [
             }
 
             while (column < indents[-1]) {
-              if (indents.indexOf(column) == -1) {
+              if (indents.indexOf(column) === -1) {
                 $log.error(
                   'unindent does not match any outer indentation level');
               }
@@ -278,11 +279,11 @@ oppia.factory('PythonProgramTokenizer', [
           while (pos < max) {
             pseudomatch = pseudoprog.exec(line.slice(pos));
             // scan for tokens
-            if (pseudomatch && pseudomatch.index == 0) {
+            if (pseudomatch && pseudomatch.index === 0) {
               var start = pos + pseudomatch[0].indexOf(pseudomatch[1]);
               var end = start + pseudomatch[1].length;
               pos = end;
-              if (start == end) {
+              if (start === end) {
                 continue;
               }
               var token = line.slice(start, end);
@@ -290,20 +291,20 @@ oppia.factory('PythonProgramTokenizer', [
 
               // ordinary number
               if (
-                numchars.indexOf(initial) != -1 ||
-                (initial == '.' && token != '.')) {
+                numchars.indexOf(initial) !== -1 ||
+                (initial === '.' && token !== '.')) {
                 tokenizedProgram.push([PythonProgramTokenType.NUMBER, token]);
               }
-              else if ('\r\n'.indexOf(initial) != -1) {
+              else if ('\r\n'.indexOf(initial) !== -1) {
                 tokenizedProgram.push([PythonProgramTokenType.NL, token]);
               }
-              else if (initial == '#') {
+              else if (initial === '#') {
                 if (!token.endswith('\n')) {
                   tokenizedProgram.push(
                     [PythonProgramTokenType.COMMENT, token]);
                 }
               }
-              else if (tripleQuoted.indexOf(token) != -1) {
+              else if (tripleQuoted.indexOf(token) !== -1) {
                 endprog = endprogs[token];
                 endmatch = endprog.exec(line.slice(pos));
                 // all on one line
@@ -322,10 +323,10 @@ oppia.factory('PythonProgramTokenizer', [
               }
               // continued string
               else if (
-                  singleQuoted.indexOf(initial) != -1 ||
-                  singleQuoted.indexOf(token.slice(0, 2)) != -1 ||
-                  singleQuoted.indexOf(token.slice(0, 3)) != -1) {
-                if (token.slice(-1) == '\n') {
+                  singleQuoted.indexOf(initial) !== -1 ||
+                  singleQuoted.indexOf(token.slice(0, 2)) !== -1 ||
+                  singleQuoted.indexOf(token.slice(0, 3)) !== -1) {
+                if (token.slice(-1) === '\n') {
                   endprog = (
                     endprogs[initial] || endprogs[token[1]] ||
                     endprogs[token[2]]);
@@ -340,18 +341,18 @@ oppia.factory('PythonProgramTokenizer', [
                 }
               }
               // ordinary name
-              else if (namechars.indexOf(initial) != -1) {
+              else if (namechars.indexOf(initial) !== -1) {
                 tokenizedProgram.push([PythonProgramTokenType.NAME, token]);
               }
               // continued stmt
-              else if (initial == '\\') {
+              else if (initial === '\\') {
                 continued = 1;
               }
               else {
-                if ('([{'.indexOf(initial) != -1) {
+                if ('([{'.indexOf(initial) !== -1) {
                   parenlev += 1;
                 }
-                else if (')]}'.indexOf(initial) != -1) {
+                else if (')]}'.indexOf(initial) !== -1) {
                   parenlev -= 1;
                 }
                 tokenizedProgram.push([PythonProgramTokenType.OP, token]);

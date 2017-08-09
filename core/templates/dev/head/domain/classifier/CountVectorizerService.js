@@ -13,11 +13,12 @@
 // limitations under the License.
 
 /**
- * Vecotrize function for CountVectorizer feature extractor of sklearn.
+ * Vecotrizer function which mirrors the CountVectorizer feature
+ * extractor of sklearn.
  *
- * IMPORTANT NOTE: The vectorize function is uses the vocabulary that was
- * extracted during classifier's training. During training scikit's
- * CountVectorize class is used for this purpose. If there are any changes
+ * IMPORTANT NOTE: The Vectorizer function uses the vocabulary that was
+ * extracted during training. During training scikit's
+ * CountVectorizer class is used for this purpose. If there are any changes
  * in scikit's CountVectorize class then corresponding changes must be
  * propagated here.
  */
