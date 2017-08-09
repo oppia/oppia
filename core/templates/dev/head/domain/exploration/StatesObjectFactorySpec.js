@@ -27,6 +27,7 @@ describe('States object factory', function() {
 
       GLOBALS.NEW_STATE_TEMPLATE = {
         classifier_model_id: null,
+        classifier_details: null,
         content: {
           html: '',
           audio_translations: {}
@@ -95,6 +96,7 @@ describe('States object factory', function() {
       expect(newStates.getState('new state')).toEqual(
         sof.createFromBackendDict('new state', {
           classifier_model_id: null,
+          classifier_details: null,
           content: {
             html: '',
             audio_translations: {}

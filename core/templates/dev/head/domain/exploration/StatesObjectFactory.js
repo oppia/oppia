@@ -134,6 +134,7 @@ oppia.factory('StatesObjectFactory', [
       var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
       var newState = StateObjectFactory.createFromBackendDict(newStateName, {
         classifier_model_id: newStateTemplate.classifier_model_id,
+        classifier_details: newStateTemplate.classifier_details,
         content: newStateTemplate.content,
         interaction: newStateTemplate.interaction,
         param_changes: newStateTemplate.param_changes

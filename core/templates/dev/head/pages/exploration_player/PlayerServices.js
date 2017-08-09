@@ -213,6 +213,11 @@ oppia.factory('oppiaPlayerService', [
                 _explorationId));
           }
           loadedExploration.then(function(data) {
+            // Update exploration's states field.
+            for (var stateName in data.exploration.states) {
+              data.exploration.states[stateName][classifier_details] = (
+                data.state_classifier_mapping[stateName]);
+            }
             exploration = ExplorationObjectFactory.createFromBackendDict(
               data.exploration);
             version = data.version;

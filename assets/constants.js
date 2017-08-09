@@ -270,13 +270,6 @@ var constants = {
   }, {
     "id": "hi-en",
     "text": "Hinglish"
-  }],
-
-  "INTERACTION_CLASSIFIER_MAPPING": {
-    "TextInput": {
-      "algorithmId": "LDAStringClassifier",
-      "dataSchemaVersion": 1
-    }
-  }
+  }]
 
 };

@@ -197,10 +197,8 @@ oppia.factory('AnswerClassificationService', [
           oldState.interaction.id].is_string_classifier_trainable;
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
-          var classifierData = oldState.classifierData;
-          var interactionId = oldState.interaction.id;
-          var algorithmId = constants.INTERACTION_CLASSIFIER_MAPPING[
-            interactionId]['algorithmId'];
+          var classifierData = oldState.classifierDetails['classifierData'];
+          var algorithmId = oldState.classifierDetails['algorithmId'];
           var predictionService = (
             PredictionAlgorithmRegistryService.getPredictionService(
               algorithmId));
