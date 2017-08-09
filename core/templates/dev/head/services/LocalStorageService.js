@@ -60,7 +60,7 @@
      */
      saveExplorationDraft: function(explorationId, changeList,
        draftChangeListId) {
-       var localSaveKey = _createLocalSaveKey(explorationId);
+       var localSaveKey = _createExplorationDraftKey(explorationId);
        if (storage) {
          var saveObject = {
            draftChanges: changeList,
@@ -80,7 +80,8 @@
      */
      getExplorationDraft: function(explorationId) {
        if (storage) {
-         return JSON.parse(storage.getItem(_createLocalSaveKey(explorationId)));
+         return JSON.parse(storage.getItem(_createExplorationDraftKey(
+           explorationId)));
        } else {
          return null;
        }
@@ -93,7 +94,7 @@
      */
      removeExplorationDraft: function(explorationId) {
        if (storage) {
-         storage.removeItem(_createLocalSaveKey(explorationId));
+         storage.removeItem(_createExplorationDraftKey(explorationId));
        }
      }
    };

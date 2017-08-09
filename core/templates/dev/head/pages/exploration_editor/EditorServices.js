@@ -18,11 +18,13 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService',
+  '$http', '$log',
+  'alertsService',
   'EditableExplorationBackendApiService',
   'LocalStorageService',
   'ReadOnlyExplorationBackendApiService','$q',
-  function($http, $log, alertsService,
+  function($http, $log,
+    alertsService,
     EditableExplorationBackendApiService,
     LocalStorageService,
     ReadOnlyExplorationBackendApiService, $q) {
@@ -106,14 +108,19 @@ oppia.factory('explorationData', [
               $log.info('Retrieved exploration data.');
               $log.info(response);
               draftChangeListId = response.draft_change_list_id;
-              var localSaveDraft = LocalStorageService.getExplorationDraft(
-                explorationId);
-              if (localSaveDraft !== null &&
-                localSaveDraft.draftChangeListId === draftChangeListId) {
-                explorationData.data = localSaveDraft.changeList;
-                return localSaveDraft.changeList;
-              }
               explorationData.data = response;
+              var draftChanges = LocalStorageService.getExplorationDraft(
+                explorationId);
+              if (draftChanges &&
+                draftChanges.draftChangeListId === draftChangeListId) {
+                  var changeList = draftChanges.draftChanges;
+                  explorationData.autosaveChangeList(changeList, function() {
+                    // a reload is needed so that the changelist just saved is
+                    // loaded as opposed to the exploration returned by this
+                    // response
+                    window.location.reload();
+                  });
+              }
               return response;
             })
           );
