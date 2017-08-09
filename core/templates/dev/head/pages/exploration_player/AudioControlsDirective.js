@@ -46,7 +46,7 @@ oppia.directive('audioControls', [
             AudioTranslationManagerService
               .getCurrentAudioLanguageDescription();
 
-          var getCurrentAudioTranslation = function() {
+          var getAudioTranslationInCurrentLanguage = function() {
             return $scope.getAudioTranslations()[currentAudioLanguageCode];
           };
 
@@ -57,18 +57,18 @@ oppia.directive('audioControls', [
               '/icons/rewind-five.svg'));
 
           $scope.isAudioAvailableInCurrentLanguage = function() {
-            return Boolean(getCurrentAudioTranslation());
+            return Boolean(getAudioTranslationInCurrentLanguage());
           };
 
           $scope.doesCurrentAudioTranslationNeedUpdate = function() {
-            return getCurrentAudioTranslation().needsUpdate;
+            return getAudioTranslationInCurrentLanguage().needsUpdate;
           };
 
           $scope.playPauseAudioTranslation = function() {
             if (!AudioPreloaderService.hasPreloaded()) {
-              if (getCurrentAudioTranslation()) {
+              if (getAudioTranslationInCurrentLanguage()) {
                 AudioPreloaderService.excludeFile(
-                  getCurrentAudioTranslation().filename);
+                  getAudioTranslationInCurrentLanguage().filename);
               }
               AudioPreloaderService.showBandwidthConfirmationModal(
                 startAudio);
@@ -103,7 +103,7 @@ oppia.directive('audioControls', [
           };
 
           var loadAndPlayAudioTranslation = function() {
-            var audioTranslation = getCurrentAudioTranslation();
+            var audioTranslation = getAudioTranslationInCurrentLanguage();
             if (audioTranslation) {
               AudioPlayerService.load(
                 audioTranslation.filename, directiveId).then(function() {

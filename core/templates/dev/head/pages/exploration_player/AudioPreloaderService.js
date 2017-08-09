@@ -21,11 +21,16 @@ oppia.factory('AudioPreloaderService', [
   'ExplorationPlayerStateService', 'UrlInterpolationService',
   function($modal, explorationContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService) {
-    var NUM_BYTES_IN_MB = 1000;
+    // Whether all audio files have been preloaded in the exploration.
     var _hasPreloaded = false;
+
+    // This is a file to exclude while preloading all audio translations 
+    // for an exploration. This is used to disregard the current audio file
+    // which the user is loading to save some bandwidth, as it will be
+    // loaded anyway.
     var _excludedFilename = null;
 
-    var _preload = function() {
+    var _preloadAllAudioFiles = function() {
       var allAudioTranslations =
         ExplorationPlayerStateService
           .getExploration().getAllAudioTranslations();
@@ -53,10 +58,9 @@ oppia.factory('AudioPreloaderService', [
           function(
               $scope, $modalInstance,
               ExplorationPlayerStateService, AudioPreloaderService) {
-            $scope.totalFileSizeOfAllAudioTranslationsBytes =
-              _calculateTotalFileSize(
-                ExplorationPlayerStateService.getExploration()
-                  .getAllAudioTranslations());
+            $scope.totalFileSizeOfAllAudioTranslationsMB =
+              ExplorationPlayerStateService.getExploration()
+                .getAllAudioTranslationsFileSizeMB().toPrecision(3);
 
             $scope.confirm = function() {
               $modalInstance.close();
@@ -68,16 +72,8 @@ oppia.factory('AudioPreloaderService', [
           }]
       }).result.then(function() {
         confirmationCallback();
-        _preload();
+        _preloadAllAudioFiles();
       });
-    };
-
-    var _calculateTotalFileSize = function(audioTranslations) {
-      var totalFileSize = 0;
-      for (var languageCode in audioTranslations) {
-        totalFileSize += audioTranslations[languageCode].fileSizeBytes;
-      }
-      return totalFileSize / NUM_BYTES_IN_MB;
     };
 
     return {
@@ -86,9 +82,6 @@ oppia.factory('AudioPreloaderService', [
       },
       hasPreloaded: function() {
         return _hasPreloaded;
-      },
-      preload: function() {
-        _preload();
       },
       excludeFile: function(filename) {
         _excludedFilename = filename;

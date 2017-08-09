@@ -20,11 +20,12 @@ describe('Exploration object factory', function() {
   beforeEach(module('oppia'));
 
   describe('ExplorationObjectFactory', function() {
-    var scope, eof, explorationDict, exploration;
+    var scope, eof, atof, explorationDict, exploration;
     beforeEach(inject(function($rootScope, $injector) {
       scope = $rootScope.$new();
       eof = $injector.get('ExplorationObjectFactory');
       sof = $injector.get('StateObjectFactory');
+      atof = $injector.get('AudioTranslationObjectFactory');
 
       var statesDict = {
         'first state': {
@@ -33,12 +34,12 @@ describe('Exploration object factory', function() {
             audio_translations: {
               en: {
                 filename: 'myfile1.mp3',
-                file_size_bytes: 0.5,
+                file_size_bytes: 210000,
                 needs_update: false
               },
               'hi-en': {
                 filename: 'myfile3.mp3',
-                file_size_bytes: 0.8,
+                file_size_bytes: 430000,
                 needs_update: false
               }
             }
@@ -66,7 +67,7 @@ describe('Exploration object factory', function() {
             audio_translations: {
               'hi-en': {
                 filename: 'myfile2.mp3',
-                file_size_bytes: 0.8,
+                file_size_bytes: 120000,
                 needs_update: false
               }
             }
@@ -118,6 +119,34 @@ describe('Exploration object factory', function() {
     it('should correctly get the content html', function() {
       expect(exploration.getUninterpolatedContentHtml('first state'))
         .toEqual('content');
+    });
+
+    it('should correctly get audio translations from an exploration', 
+    function() {
+      expect(exploration.getAllAudioTranslations()).toEqual([
+        atof.createFromBackendDict(
+        {
+          filename: 'myfile1.mp3',
+          file_size_bytes: 210000,
+          needs_update: false
+        }),
+        atof.createFromBackendDict(
+        {
+          filename: 'myfile3.mp3',
+          file_size_bytes: 430000,
+          needs_update: false
+        }),
+        atof.createFromBackendDict({
+          filename: 'myfile2.mp3',
+          file_size_bytes: 120000,
+          needs_update: false
+        })
+      ]);
+    });
+
+    it('should get the correct file size in MB of all audio translations', function() {
+      var NUM_BYTES_IN_MB = 1 << 20;
+      expect(exploration.getAllAudioTranslationsFileSizeMB()).toEqual(760000 / NUM_BYTES_IN_MB);
     });
   });
 });

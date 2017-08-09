@@ -20,10 +20,11 @@ describe('States object factory', function() {
   beforeEach(module('oppia'));
 
   describe('StatesObjectFactory', function() {
-    var scope, sof, statesDict;
+    var scope, sof, statesDict, statesWithAudioDict, atof;
     beforeEach(inject(function($injector) {
       ssof = $injector.get('StatesObjectFactory');
       sof = $injector.get('StateObjectFactory');
+      atof = $injector.get('AudioTranslationObjectFactory');
 
       GLOBALS.NEW_STATE_TEMPLATE = {
         classifier_model_id: null,
@@ -87,44 +88,8 @@ describe('States object factory', function() {
           param_changes: []
         }
       };
-    }));
 
-    it('should create a new state given a state name', function() {
-      var newStates = ssof.createFromBackendDict(statesDict);
-      newStates.addState('new state');
-      expect(newStates.getState('new state')).toEqual(
-        sof.createFromBackendDict('new state', {
-          classifier_model_id: null,
-          content: {
-            html: '',
-            audio_translations: {}
-          },
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: 'Type your answer here.'
-              }
-            },
-            default_outcome: {
-              dest: 'new state',
-              feedback: [],
-              param_changes: []
-            },
-            fallbacks: [],
-            hints: [],
-            id: 'TextInput'
-          },
-          param_changes: []
-        }));
-    });
-
-    it('should correctly get all audio language codes in states', function() {
-      var statesWithAudioDict = {
+      statesWithAudioDict = {
         'first state': {
           content: {
             html: 'content',
@@ -187,10 +152,71 @@ describe('States object factory', function() {
           param_changes: []
         }
       }
+    }));
 
+    it('should create a new state given a state name', function() {
+      var newStates = ssof.createFromBackendDict(statesDict);
+      newStates.addState('new state');
+      expect(newStates.getState('new state')).toEqual(
+        sof.createFromBackendDict('new state', {
+          classifier_model_id: null,
+          content: {
+            html: '',
+            audio_translations: {}
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: 'Type your answer here.'
+              }
+            },
+            default_outcome: {
+              dest: 'new state',
+              feedback: [],
+              param_changes: []
+            },
+            fallbacks: [],
+            hints: [],
+            id: 'TextInput'
+          },
+          param_changes: []
+        }));
+    });
+
+    it('should correctly get all audio language codes in states', function() {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllAudioLanguageCodes())
         .toEqual(['en', 'hi-en']);
+    });
+
+    it('should correctly get all audio translations in states', function() {
+      var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
+      expect(statesWithAudio.getAllAudioTranslations())
+        .toEqual([
+          atof.createFromBackendDict(
+          {
+            filename: 'myfile1.mp3',
+            file_size_bytes: 0.5,
+            needs_update: false
+          }), 
+          atof.createFromBackendDict(
+          {
+            filename: 'myfile3.mp3',
+            file_size_bytes: 0.8,
+            needs_update: false
+          }), 
+          atof.createFromBackendDict(
+          {
+            filename: 'myfile2.mp3',
+            file_size_bytes: 0.8,
+            needs_update: false
+          })
+        ]);
     });
   });
 });
