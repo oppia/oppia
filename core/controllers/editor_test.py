@@ -114,6 +114,7 @@ class EditorTest(BaseEditorControllerTest):
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
         new_state_dict = exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME].to_dict()
+        new_state_dict['classifier_details'] = None
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
 
     def test_that_default_exploration_cannot_be_published(self):
