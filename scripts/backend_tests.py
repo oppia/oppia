@@ -39,6 +39,7 @@ LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+_LOAD_TESTS_DIR = 'core/tests/load_tests'
 
 
 _PARSER = argparse.ArgumentParser()
@@ -48,7 +49,7 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--test_target',
-    help='optional dotted module name of the test(s) to run',
+    help='optional dotted module name of\ the test(s) to run',
     type=str)
 _PARSER.add_argument(
     '--test_path',
@@ -56,8 +57,7 @@ _PARSER.add_argument(
     type=str)
 _PARSER.add_argument(
     '--exclude_load_tests',
-    help='optional subdirectory which contain the load tests for various' +
-    'processes',
+    help='optional; if specified, exclude load tests from being run',
     type=bool)
 _PARSER.add_argument(
     '-v',
@@ -203,7 +203,7 @@ def _execute_tasks(tasks, batch_size=24):
         log('----------------------------------------')
 
 
-def _get_all_test_targets(test_path=None, exclude_load_tests=False):
+def _get_all_test_targets(test_path=None, include_load_tests=False):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -221,7 +221,7 @@ def _get_all_test_targets(test_path=None, exclude_load_tests=False):
                 os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             for f in files:
-                if f.endswith('load_test.py') and not exclude_load_tests:
+                if include_load_tests and f.endswith('feedback_thread_summaries_test.py'):
                     result.append(_convert_to_test_target(
                         os.path.join(subroot, f)))
 
@@ -252,13 +252,10 @@ def main():
     if parsed_args.test_target:
         all_test_targets = [parsed_args.test_target]
     else:
-        if parsed_args.exclude_load_tests is not None:
-            all_test_targets = _get_all_test_targets(
-                test_path=parsed_args.test_path,
-                exclude_load_tests=parsed_args.exclude_load_tests)
-        else:
-            all_test_targets = _get_all_test_targets(
-                test_path=parsed_args.test_path)
+        include_load_tests = (parsed_args.exclude_load_tests is None)
+        all_test_targets = _get_all_test_targets(
+            test_path=parsed_args.test_path,
+            include_load_tests=include_load_tests)
 
     # Prepare tasks.
     task_to_taskspec = {}
