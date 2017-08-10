@@ -87,7 +87,9 @@ oppia.factory('AudioTranslationManagerService', [
           _currentAudioLanguageCode = result.languageCode;
           AudioPlayerService.stop();
           AudioPlayerService.clear();
-          onLanguageChangedCallback(_currentAudioLanguageCode);
+          if (onLanguageChangedCallback) {
+            onLanguageChangedCallback(_currentAudioLanguageCode);
+          }
         }
       });
     };

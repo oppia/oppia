@@ -98,10 +98,16 @@ oppia.factory('AudioPreloaderService', [
           }]
       }).result.then(function(result) {
         if (result.shouldOpenSettingsModal) {
+          // If the user selected to choose a different language, open
+          // the settings modal (later can isolate to a language-only
+          // modal), and on the callback re-open the bandwidth confirmation
+          // modal if the file for the new language hasn't been loaded.
           AudioTranslationManagerService
             .showAudioTranslationSettingsModal(function(newLanguageCode) {
-              if (!AssetsBackendApiService.isCached(
-                audioTranslationsForContent[newLanguageCode].filename)) {
+              var newAudioTranslation =
+                audioTranslationsForContent[newLanguageCode];
+              if (newAudioTranslation && !AssetsBackendApiService.isCached(
+                newAudioTranslation.filename)) {
                 _showBandwidthConfirmationModal(
                   audioTranslationsForContent, newLanguageCode,
                   confirmationCallback)

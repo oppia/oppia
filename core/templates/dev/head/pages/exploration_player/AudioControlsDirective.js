@@ -43,9 +43,10 @@ oppia.directive('audioControls', [
             return AudioTranslationManagerService.getCurrentAudioLanguageCode();
           };
 
-          $scope.currentAudioLanguageDescription =
-            AudioTranslationManagerService
+          $scope.currentAudioLanguageDescription = function() {
+            return AudioTranslationManagerService
               .getCurrentAudioLanguageDescription();
+          };
 
           var getAudioTranslationInCurrentLanguage = function() {
             return $scope.getAudioTranslations()[
@@ -69,9 +70,15 @@ oppia.directive('audioControls', [
           $scope.onSpeakerIconClicked = function() {
             var audioTranslation = getAudioTranslationInCurrentLanguage();
             if (audioTranslation) {
+              // If this language hasn't been preloaded for the exploration,
+              // and this audio translation hasn't been loaded, then ask to
+              // preload all audio translations for the current language.
               if (!AudioPreloaderService.hasPreloadedLanguage(
                     getCurrentAudioLanguageCode()) &&
                     !isCached(audioTranslation)) {
+                // Exclude the current audio translation from preloading to
+                // avoid a simultaneous double request for it, as it will
+                // be loaded in playPauseAudioTranslation() anyway.
                 AudioPreloaderService.excludeFile(
                   audioTranslation.filename);
                 AudioPreloaderService.showBandwidthConfirmationModal(
@@ -81,6 +88,8 @@ oppia.directive('audioControls', [
                 playPauseAudioTranslation(getCurrentAudioLanguageCode());
               }
             } else {
+              // If the audio translation isn't available in the current
+              // language, then open the settings modal.
               $scope.openAudioTranslationSettings();
             }
           };
@@ -129,12 +138,7 @@ oppia.directive('audioControls', [
           };
 
           $scope.openAudioTranslationSettings = function() {
-            AudioTranslationManagerService
-              .showAudioTranslationSettingsModal(function(newLanguageCode) {
-                $scope.currentAudioLanguageDescription = 
-                  LanguageUtilService.getAudioLanguageDescription(
-                    newLanguageCode);
-              });
+            AudioTranslationManagerService.showAudioTranslationSettingsModal();
           };
         }]
     }

@@ -11,7 +11,7 @@
      style="min-width: 24px; text-align: left;"
      ng-click="onSpeakerIconClicked()"
      ng-class="{'fa-volume-off': !AudioPlayerService.isPlaying(), 'fa-volume-up': AudioPlayerService.isPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage()}"
-     tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:currentAudioLanguageDescription}) : '']>"
+     tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:currentAudioLanguageDescription()}) : '']>"
      tooltip-append-to-body="true"></i>
 </div>
 <span ng-if="extraAudioControlsAreShown && isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
