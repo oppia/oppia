@@ -21,6 +21,10 @@ oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   function(
       $http, $q, UrlInterpolationService) {
+    // List of filenames that have had been requested for but have
+    // yet to return a response.
+    var _filesCurrentlyBeingRequested = [];
+
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
 
@@ -28,6 +32,7 @@ oppia.factory('AssetsBackendApiService', [
     var assetsCache = {};
     var _fetchAudio = function(
         explorationId, filename, successCallback, errorCallback) {
+      _filesCurrentlyBeingRequested.push(filename);
       $http({
         method: 'GET',
         responseType: 'blob',
@@ -36,7 +41,19 @@ oppia.factory('AssetsBackendApiService', [
         var audioBlob = new Blob([data]);
         assetsCache[filename] = audioBlob;
         successCallback(audioBlob);
-      }).error(errorCallback);
+      }).error(function() {
+        errorCallback();
+      }).finally(function() {
+        _removeFromFilesCurrentlyBeingRequested(filename);
+      });
+    };
+
+    var _removeFromFilesCurrentlyBeingRequested = function(filename) {
+      if (_isCurrentlyBeingRequested(filename)) {
+        var fileToRemoveIndex =
+          _filesCurrentlyBeingRequested.indexOf(filename);
+        _filesCurrentlyBeingRequested.splice(fileToRemoveIndex, 1);
+      }
     };
 
     var _saveAudio = function(
@@ -91,6 +108,10 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
+    var _isCurrentlyBeingRequested = function(filename) {
+      return _filesCurrentlyBeingRequested.indexOf(filename) !== -1;
+    };
+
     var _isCached = function(filename) {
       return assetsCache.hasOwnProperty(filename);
     };
@@ -99,8 +120,10 @@ oppia.factory('AssetsBackendApiService', [
       loadAudio: function(explorationId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
+            console.log("from cache " + filename);
             resolve(assetsCache[filename]);
-          } else {
+          } else if (!_isCurrentlyBeingRequested(filename)) {
+            console.log("requesting " + filename);
             _fetchAudio(explorationId, filename, resolve, reject);
           }
         });

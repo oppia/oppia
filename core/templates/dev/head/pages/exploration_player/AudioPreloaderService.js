@@ -26,23 +26,15 @@ oppia.factory('AudioPreloaderService', [
     // List of languages that have been preloaded in the exploration.
     var _preloadedLanguages = [];
 
-    // This is a file to exclude while preloading all audio translations 
-    // for an exploration. This is used to disregard the current audio file
-    // which the user is loading to save some bandwidth, as it will be
-    // loaded anyway.
-    var _excludedFilename = null;
-
     var _preloadAllAudioFiles = function(languageCode) {
       var allAudioTranslations =
         ExplorationPlayerStateService
           .getExploration().getAllAudioTranslations(languageCode);
 
       allAudioTranslations.map(function(audioTranslation) {
-        if (audioTranslation.filename !== _excludedFilename) {
-          AssetsBackendApiService.loadAudio(
-            explorationContextService.getExplorationId(),
-            audioTranslation.filename);
-        }
+        AssetsBackendApiService.loadAudio(
+          explorationContextService.getExplorationId(),
+          audioTranslation.filename);
       });
 
       _preloadedLanguages.push(languageCode);
@@ -127,9 +119,6 @@ oppia.factory('AudioPreloaderService', [
       },
       hasPreloadedLanguage: function(languageCode) {
         return _preloadedLanguages.indexOf(languageCode) !== -1;
-      },
-      excludeFile: function(filename) {
-        _excludedFilename = filename;
       },
       showBandwidthConfirmationModal: function(
           audioTranslationsForContent, languageCode,

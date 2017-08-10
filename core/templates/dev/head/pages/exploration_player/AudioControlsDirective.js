@@ -76,11 +76,6 @@ oppia.directive('audioControls', [
               if (!AudioPreloaderService.hasPreloadedLanguage(
                     getCurrentAudioLanguageCode()) &&
                     !isCached(audioTranslation)) {
-                // Exclude the current audio translation from preloading to
-                // avoid a simultaneous double request for it, as it will
-                // be loaded in playPauseAudioTranslation() anyway.
-                AudioPreloaderService.excludeFile(
-                  audioTranslation.filename);
                 AudioPreloaderService.showBandwidthConfirmationModal(
                   $scope.getAudioTranslations(), getCurrentAudioLanguageCode(),
                   playPauseAudioTranslation);
