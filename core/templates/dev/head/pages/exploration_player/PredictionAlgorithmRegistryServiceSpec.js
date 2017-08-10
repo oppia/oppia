@@ -16,23 +16,47 @@
  * @fileoverview Unit tests for the prediction algorithm registry service.
  */
 
- describe('Prediction algorithm registry service', function() {
-     beforeEach(module('oppia'));
+describe('Prediction algorithm registry service', function() {
+  beforeEach(module('oppia'));
 
-     describe('Test prediction algorithm registry functions', function() {
-       var registryService, predictionService;
-       beforeEach(inject(function($injector) {
-         registryService = $injector.get('PredictionAlgorithmRegistryService');
-         predictionService = $injector.get('PredictionAlgorithmSampleService');
-       }));
+  describe('Test prediction algorithm registry functions', function() {
+    beforeEach(function() {
+      module(function($provide) {
+        $provide.value('PredictionAlgorithmSampleService', {
+          predict: function(classifierData, userText) {
+            return {
+              outcome: 'Sample default outcome',
+              answerGroupIndex: 0,
+              ruleIndex: 0,
+              classificationCategorization: 'default_outcome'
+            };
+          }
+        });
+      });
+    });
 
-       it('should return correct prediction algorithm service.', function() {
-         var algorithmId = 'LDAStringClassifier';
-         var expectedPredictionService = predictionService;
-         var generatedPredictionService = registryService.getPredictionService(
-           algorithmId);
+    var registryService;
+    beforeEach(inject(function($injector) {
+      registryService = $injector.get('PredictionAlgorithmRegistryService');
+    }));
 
-          expect(generatedPredictionService).toEqual(expectedPredictionService);
-       });
-     });
-   });
+    it('should return correct prediction algorithm service.', function() {
+      var algorithmId = 'LDAStringClassifier';
+      var expectedPredictionService = {
+        predict: function(classifierData, userText) {
+          return {
+            outcome: 'Sample default outcome',
+            answerGroupIndex: 0,
+            ruleIndex: 0,
+            classificationCategorization: 'default_outcome'
+          };
+        }
+      };
+      var generatedPredictionService = registryService.getPredictionService(
+        algorithmId);
+
+      expect(generatedPredictionService.toString()).toEqual(
+        expectedPredictionService.toString());
+    });
+  });
+});
