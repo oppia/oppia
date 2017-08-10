@@ -352,10 +352,10 @@ describe('Answer classification service with string classifier enabled',
     it('should query the prediction service if no answer group matches and ' +
        'interaction is trainable', function() {
       var expectedClassificationResult = {
-        outcome: 'outcome 1',
+        outcome: oof.createNew('default', [], []),
         answerGroupIndex: 0,
         ruleIndex: 0,
-        classificationCategorization: EXPLICIT_CLASSIFICATION
+        classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
       };
       acs.getMatchingClassificationResult(
         explorationId, stateName, state, 0, false, rules)
