@@ -50,6 +50,8 @@ oppia.directive('editorNavigation', [
             }
           });
 
+          $scope.username = GLOBALS.username;
+
           $scope.showUserHelpModal = function() {
             var explorationId = explorationContextService.getExplorationId();
             siteAnalyticsService.registerClickHelpButtonEvent(explorationId);

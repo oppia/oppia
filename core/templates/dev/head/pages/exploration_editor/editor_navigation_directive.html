@@ -49,14 +49,12 @@
       </ul>
     </li>
 
-    {% if username %}
-      <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
-        <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
-           class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
-          <i class="material-icons">&#xE037;</i>
-        </a>
-      </li>
-    {% endif %}
+    <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}" ng-if="username">
+      <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
+         class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
+        <i class="material-icons">&#xE037;</i>
+      </a>
+    </li>
 
     <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'settings'}">
       <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
@@ -65,14 +63,12 @@
       </a>
     </li>
 
-    {% if username %}
-      <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'stats'}">
-        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
-           class="oppia-editor-navbar-tab-anchor">
-          <i class="material-icons">&#xE24B;</i>
-        </a>
-      </li>
-    {% endif %}
+    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'stats'}" ng-if="username">
+      <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
+         class="oppia-editor-navbar-tab-anchor">
+        <i class="material-icons">&#xE24B;</i>
+      </a>
+    </li>
 
     <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'history'}">
       <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
@@ -93,9 +89,8 @@
         </span>
       </div>
     </li>
-
-    {% if username %}
-    <div class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">
+    
+    <div class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak" ng-if="username">
       <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
           popover-placement="bottom" popover-trigger="none"
           popover="To get help in the future, click here!">
@@ -105,7 +100,6 @@
         </a>
       </li>
     </div>
-    {% endif %}
   </ul>
   <style type="text/css">
     .oppia-help-dropdown .popover{
