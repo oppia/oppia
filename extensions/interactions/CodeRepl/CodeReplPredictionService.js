@@ -34,131 +34,154 @@ oppia.factory('CodeReplPredictionService', [
     // because they appear rarely in a program) will be replaced.
     var TOKEN_NAME_UNK = 'UNK';
 
-    var getTokenizedProgram = function(program, tokenToId) {
-      // Tokenize Python programs in dataset for winnowing.
-      var generatedTokens = PythonProgramTokenizer.generateTokens(
-        program.split('\n'));
-      tokenizedProgram = [];
-
-      for (var i = 0; i < generatedTokens.length; i++) {
-        var token = generatedTokens[i];
-        var tokenId = token[0];
-        var tokenName = token[1];
-
-        if (
-          tokenId == PythonProgramTokenType.NL ||
-          tokenId == PythonProgramTokenType.COMMENT ||
-          tokenName.trim() == '') {
-          continue;
-        }
-        else if (tokenId == NAME && keyword_list.indexOf(tokenName) == -1) {
-          tokenizedProgram.push(TOKEN_NAME_VAR);
-        }
-        else {
-          if (tokenToId.hasOwnProperty(tokenName)) {
-            tokenizedProgram.push(tokenName);
-          }
-          else {
-            tokenizedProgram.push(TOKEN_NAME_UNK)
-          }
-        }
-      }
-
-      return tokenizedProgram;
-    };
-
-    var calcJaccardIndex = function(multisetA, multisetB) {
-      // Calculate jaccard index between two multisets.
-      multisetA.sort();
-      multisetB.sort();
-
-      var smallSet = (
-        (multisetA.length < multisetB.length) ?
-        multisetA.slice() : multisetB.slice());
-      var unionSet = (
-        (multisetA.length > multisetB.length) ?
-        multisetA.slice() : multisetB.slice());
-      var index = 0;
-      var extraElements = [];
-
-      smallSet.forEach(function(elem) {
-        while (index < unionSet.length && elem > unionSet[index]) {
-          index += 1;
-        }
-        if (index >= unionSet.length || elem < unionSet[index]) {
-          extraElements.push(elem);
-        }
-        else if (elem == unionSet[index]) {
-          index += 1;
-        }
-      });
-
-      unionSet = unionSet.concat(extraElements);
-
-      index = 0;
-      var intersectionSet = [];
-      multisetA.forEach(function(elem) {
-        while (index < multisetB.length && elem > multisetB[index]) {
-          index += 1;
-        }
-        if (index < multisetB.length && elem == multisetB[index]) {
-          intersectionSet.push(elem);
-          index += 1;
-        }
-      });
-
-      var coeff = intersectionSet.length / unionSet.length;
-      return coeff;
-    };
-
-    var getProgramSimilarity = function(fingerprintA, fingerprintB) {
-      // Calculate similarity between two programs' fingerprints.
-      var multisetA = [];
-      var multisetB = [];
-
-      fingerprintA.forEach(function(hash) {
-        multisetA.push(hash[0]);
-      });
-
-      fingerprintB.forEach(function(hash) {
-        multisetB.push(hash[0]);
-      });
-
-      return calcJaccardIndex(multisetA, multisetB);
-    };
-
-    var findNearestNeighborsIndexes = function(knnData, program) {
-      // Find index of nearest neighbor programs to given program.
-      var K = knnData.K;
-      var T = knnData.T;
-      var fingerprintData = knnData.fingerprint_data;
-      var tokenToId = knnData.token_to_id;
-      var top = knnData.top;
-
-      var tokenizedProgram = getTokenizedProgram(program, tokenToId);
-      var programHashes = WinnowingPreprocessingService.getKGramHashes(
-        tokenizedProgram, tokenToId, K);
-      var programFingerprint = (
-        WinnowingPreprocessingService.getFingerprintFromHashes(
-          programHashes, T, K));
-
-      similarityList = [];
-      Object.keys(fingerprintData).forEach(function(index) {
-        var fingerprintA = fingerprintData.index.fingerprint;
-        var similarity = getProgramSimilarity(
-          fingerprintA, programFingerprint);
-        similarityList.push([index, similarity]);
-      });
-
-      similarityList.sort(function(x, y) {
-        return x[1] < y[1];
-      });
-
-      var nearestNeighborsIndexes = similarityList.slice(0, top);
-      return nearestNeighborsIndexes;
-    };
+    // List of python keywords.
+    var KWLIST = [
+      'and', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del',
+      'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global',
+      'if', 'import', 'in', 'is', 'lambda', 'not', 'or', 'pass', 'print',
+      'raise', 'return', 'try', 'while', 'with', 'yield'];
 
     return {
+      getTokenizedProgram: function(programTokens, tokenToId) {
+        // Tokenize Python programs in dataset for winnowing.
+        tokenizedProgram = [];
+
+        for (var i = 0; i < programTokens.length; i++) {
+          var token = programTokens[i];
+          var tokenId = token[0];
+          var tokenName = token[1];
+
+          if (
+            tokenId == PythonProgramTokenType.NL ||
+            tokenId == PythonProgramTokenType.COMMENT ||
+            tokenName.trim() == '') {
+            continue;
+          }
+          else if (
+            tokenId == PythonProgramTokenType.NAME &&
+            KWLIST.indexOf(tokenName) == -1) {
+            tokenizedProgram.push(TOKEN_NAME_VAR);
+          }
+          else {
+            if (tokenToId.hasOwnProperty(tokenName)) {
+              tokenizedProgram.push(tokenName);
+            }
+            else {
+              tokenizedProgram.push(TOKEN_NAME_UNK)
+            }
+          }
+        }
+
+        return tokenizedProgram;
+      },
+
+      calcJaccardIndex: function(multisetA, multisetB) {
+        // Calculate jaccard index between two multisets.
+        multisetA.sort();
+        multisetB.sort();
+
+        var smallSet = (
+          (multisetA.length <= multisetB.length) ?
+          multisetA.slice() : multisetB.slice());
+        var unionSet = (
+          (multisetA.length > multisetB.length) ?
+          multisetA.slice() : multisetB.slice());
+        var index = 0;
+        var extraElements = [];
+
+        smallSet.forEach(function(elem) {
+          while (index < unionSet.length && elem > unionSet[index]) {
+            index += 1;
+          }
+          if (index >= unionSet.length || elem < unionSet[index]) {
+            extraElements.push(elem);
+          }
+          else if (elem === unionSet[index]) {
+            index += 1;
+          }
+        });
+
+        unionSet = unionSet.concat(extraElements);
+
+        index = 0;
+        var intersectionSet = [];
+        multisetA.forEach(function(elem) {
+          while (index < multisetB.length && elem > multisetB[index]) {
+            index += 1;
+          }
+          if (index < multisetB.length && elem === multisetB[index]) {
+            intersectionSet.push(elem);
+            index += 1;
+          }
+        });
+
+        var coeff = intersectionSet.length / unionSet.length;
+        return coeff;
+      },
+
+      getProgramSimilarity: function(fingerprintA, fingerprintB) {
+        // Calculate similarity between two programs' fingerprints.
+        var multisetA = [];
+        var multisetB = [];
+
+        fingerprintA.forEach(function(hash) {
+          multisetA.push(hash[0]);
+        });
+
+        fingerprintB.forEach(function(hash) {
+          multisetB.push(hash[0]);
+        });
+
+        return this.calcJaccardIndex(multisetA, multisetB);
+      },
+
+      findNearestNeighborsIndexes: function(knnData, program) {
+        // Find index of nearest neighbor programs to given program.
+        var K = knnData.K;
+        var T = knnData.T;
+        var fingerprintData = knnData.fingerprint_data;
+        var tokenToId = knnData.token_to_id;
+        var top = knnData.top;
+
+        // Find program tokens using python program tokenizer.
+        var pythonProgramTokens = PythonProgramTokenizer.generateTokens(
+          program.split('\n'));
+
+        // Normalize program tokens for winnowing preprocessing. This removes
+        // unnecessary tokens and normalizes variable and method name tokens.
+
+        var tokenizedProgram = this.getTokenizedProgram(
+          pythonProgramTokens, tokenToId);
+        // Find k-gram hashes from normalized program tokens.
+
+        var programHashes = WinnowingPreprocessingService.getKGramHashes(
+          tokenizedProgram, tokenToId, K);
+        // Find fingerprint from k-gram hashes of program.
+
+        var programFingerprint = (
+          WinnowingPreprocessingService.getFingerprintFromHashes(
+            programHashes, T, K));
+
+        // Calculte similarity of the input program with every program in
+        // classifier data for k nearest neighbor classification.
+        similarityList = [];
+        Object.keys(fingerprintData).forEach(function(index) {
+          var fingerprintA = fingerprintData.index.fingerprint;
+          var similarity = this.getProgramSimilarity(
+            fingerprintA, programFingerprint);
+          similarityList.push([index, similarity]);
+        });
+
+        // Sort the programs according to their similairy with the
+        // input program.
+        similarityList.sort(function(x, y) {
+          return x[1] < y[1];
+        });
+
+        var nearestNeighborsIndexes = similarityList.slice(0, top);
+        return nearestNeighborsIndexes;
+      },
+
       predict: function(classifierData, program) {
         var knnData = classifierData.KNN;
         var svmData = classifierData.SVM;
@@ -168,7 +191,7 @@ oppia.factory('CodeReplPredictionService', [
         var top = knnData.top;
         var occurrence = knnData.occurrence;
 
-        var nearestNeighborsIndexes = findNearestNeighborsIndexes(
+        var nearestNeighborsIndexes = this.findNearestNeighborsIndexes(
           knnData, program);
         var nearesNeighborsClasses = [];
         
@@ -206,7 +229,7 @@ oppia.factory('CodeReplPredictionService', [
         }
 
         // If KNN fails to predict then use SVM to predict the output class.
-        var tokenizedProgram = getTokenizedProgram(program);
+        var tokenizedProgram = this.getTokenizedProgram(program);
         var programVector = CountVectorizerService.vectorize(
           tokenizedProgram, cvVocabulary);
 
