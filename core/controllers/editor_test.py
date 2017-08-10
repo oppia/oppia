@@ -425,7 +425,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """),
         'State B': ("""classifier_model_id: null
@@ -447,7 +447,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
@@ -469,7 +469,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -493,7 +493,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """)
 
