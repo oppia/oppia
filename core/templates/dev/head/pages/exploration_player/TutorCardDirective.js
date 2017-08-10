@@ -96,8 +96,8 @@ oppia.directive('tutorCard', [
             $scope.solutionExists = Boolean(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).solution);
 
-	          $scope.contentAudioTranslations = (
-	            oppiaPlayerService.getStateContentAudioTranslations(
+            $scope.contentAudioTranslations = (
+              oppiaPlayerService.getStateContentAudioTranslations(
                 $scope.activeCard.stateName));
 
             AudioPlayerService.stop();
