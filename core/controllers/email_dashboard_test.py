@@ -40,7 +40,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(
             self.USER_A_EMAIL)
-        self.set_email_senders([self.SUBMITTER_USERNAME])
+        self.set_admins([self.SUBMITTER_USERNAME])
 
     def test_that_handler_works_correctly(self):
         self.login(self.SUBMITTER_EMAIL)
@@ -152,7 +152,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         self.signup(self.NEW_SUBMITTER_EMAIL, self.NEW_SUBMITTER_USERNAME)
         self.new_submitter_id = self.get_user_id_from_email(
             self.NEW_SUBMITTER_EMAIL)
-        self.set_email_senders(
+        self.set_admins(
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
 
     def test_that_correct_emails_are_sent_to_all_users(self):

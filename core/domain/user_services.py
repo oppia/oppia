@@ -541,6 +541,19 @@ def get_usernames_by_role(role):
     return [user.username for user in user_settings]
 
 
+def get_user_ids_by_role(role):
+    """Get user ids of all the users with given role Id.
+
+    Args:
+        role: str. The role Id of users requested.
+
+    Returns:
+        list(str). List of user ids of users with given role Id.
+    """
+    user_settings = user_models.UserSettingsModel.get_by_role(role)
+    return [user.id for user in user_settings]
+
+
 def _save_user_settings(user_settings):
     """Commits a user settings object to the datastore.
 

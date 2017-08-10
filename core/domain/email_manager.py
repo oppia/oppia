@@ -830,11 +830,8 @@ def send_flag_exploration_email(
         exploration_title, report_text, exploration_id,
         EMAIL_FOOTER.value)
 
-    recipient_names = user_services.get_usernames_by_role(
+    recipient_list = user_services.get_user_ids_by_role(
         feconf.ROLE_ID_MODERATOR)
-    recipient_list = []
-    for name in recipient_names:
-        recipient_list.append(user_services.get_user_id_from_username(name))
     for recipient_id in recipient_list:
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,

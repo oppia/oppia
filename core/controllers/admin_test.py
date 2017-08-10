@@ -171,9 +171,9 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
     def test_view_and_update_role(self):
         user_email = 'user1@example.com'
-        user_name = 'user1'
+        username = 'user1'
 
-        self.signup(user_email, user_name)
+        self.signup(user_email, username)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         # Check normal user has expected role. Viewing by username.
@@ -188,7 +188,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            {'role': feconf.ROLE_ID_MODERATOR, 'username': user_name},
+            {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
             csrf_token=csrf_token, expect_errors=False,
             expected_status_int=200)
         self.assertEqual(response_dict, {})

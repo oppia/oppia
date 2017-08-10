@@ -459,7 +459,7 @@ def can_manage_collection_publish_status(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if collection_rights.is_published():
-            if (role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in
+            if (role_services.ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY in
                     self.user.actions):
                 return handler(self, collection_id, **kwargs)
             raise self.UnauthorizedUserException(

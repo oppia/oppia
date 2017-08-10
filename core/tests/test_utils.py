@@ -339,11 +339,11 @@ class TestBase(unittest.TestCase):
 
         self._restore_stashed_user_env()
 
-    def set_user_role(self, user_name, user_role):
+    def set_user_role(self, username, user_role):
         """Sets the given role for this user.
 
         Args:
-            user_name: str. Username of the given user.
+            username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
         self._stash_current_user_env()
@@ -352,7 +352,7 @@ class TestBase(unittest.TestCase):
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminrolehandler', {
-            'username': user_name,
+            'username': username,
             'role': user_role
         }, csrf_token)
         self.logout()
@@ -394,15 +394,6 @@ class TestBase(unittest.TestCase):
         """
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
-
-    def set_email_senders(self, email_sender_usernames):
-        """Sets role of given users as ADMIN.
-
-        Args:
-            email_sender_usernames: list(str). List of usernames.
-        """
-        for name in email_sender_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_ADMIN)
 
     def get_current_logged_in_user_id(self):
         return os.environ['USER_ID']

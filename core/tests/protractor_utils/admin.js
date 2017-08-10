@@ -66,11 +66,10 @@ var updateRole = function(name, newRole) {
   browser.waitForAngular();
   // Change values for "update role" form, and submit it.
   element(by.css('.protractor-update-form-name')).sendKeys(name);
-  var select = element(by.model('updateFormValues.newRole'));
-  var searchKey = '[label="' + newRole + '"]';
-  select.$(searchKey).click();
+  element(by.css('.protractor-update-form-role-select')).
+    element(by.cssContainingText('option', newRole)).click();
   element(by.css('.protractor-update-form-submit')).click();
-  browser.waitForAngular();
+  general.waitForSystem();
   return true;
 }
 

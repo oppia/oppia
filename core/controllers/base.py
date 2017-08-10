@@ -142,9 +142,11 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.current_user = current_user_services.get_current_user()
-        self.user_id = current_user_services.get_user_id(
-            self.current_user) if self.current_user else None
+        self.user_id = (
+            current_user_services.get_user_id(
+                current_user_services.get_current_user())
+            if current_user_services.get_current_user()
+            else None)
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
@@ -156,7 +158,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id, strict=False)
             if user_settings is None:
                 email = current_user_services.get_user_email(
-                    self.current_user)
+                    current_user_services.get_current_user())
                 user_settings = user_services.create_new_user(
                     self.user_id, email)
             self.values['user_email'] = user_settings.email

@@ -319,12 +319,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_usernames_by_role(self):
         user_ids = ['test1', 'test2', 'test3', 'test4']
-        user_names = ['name1', 'name2', 'name3', 'name4']
+        usernames = ['name1', 'name2', 'name3', 'name4']
         user_emails = [
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, user_names):
+        for uid, email, name in zip(user_ids, user_emails, usernames):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 
@@ -342,13 +342,38 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.ROLE_ID_BANNED_USER)),
             set(['name3', 'name4']))
 
+    def test_get_user_ids_by_role(self):
+        user_ids = ['test1', 'test2', 'test3', 'test4']
+        usernames = ['name1', 'name2', 'name3', 'name4']
+        user_emails = [
+            'test1@email.com', 'test2@email.com',
+            'test3@email.com', 'test4@email.com']
+
+        for uid, email, name in zip(user_ids, user_emails, usernames):
+            user_services.create_new_user(uid, email)
+            user_services.set_username(uid, name)
+
+        user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[2], feconf.ROLE_ID_BANNED_USER)
+        user_services.update_user_role(user_ids[3], feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            set(user_services.get_user_ids_by_role(feconf.ROLE_ID_MODERATOR)),
+            set(['test1', 'test2']))
+
+        self.assertEqual(
+            set(user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_BANNED_USER)),
+            set(['test3', 'test4']))
+
     def test_update_user_role(self):
         user_id = 'test_id'
-        user_name = 'testname'
+        username = 'testname'
         user_email = 'test@email.com'
 
         user_services.create_new_user(user_id, user_email)
-        user_services.set_username(user_id, user_name)
+        user_services.set_username(user_id, username)
 
         self.assertEqual(user_services.get_user_role_from_id(user_id),
                          feconf.ROLE_ID_EXPLORATION_EDITOR)
