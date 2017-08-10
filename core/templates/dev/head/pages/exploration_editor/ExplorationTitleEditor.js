@@ -26,8 +26,6 @@ oppia.directive('explorationTitleEditor', [
         focusLabel: '@',
         // Additional CSS style to define the width and font-weight.
         formStyle: '@',
-        // Additional CSS style for P tags.
-        pStyle:'@',
         // The method to call when the input field is blured.
         onInputFieldBlur: '&'      
       },
