@@ -115,7 +115,6 @@ class TrainedClassifierHandler(base.BaseHandler):
                 feconf.TRAINING_JOB_STATUS_FAILED):
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
-
         try:
             classifier_services.store_classifier_data(job_id, classifier_data)
         except Exception as e:
