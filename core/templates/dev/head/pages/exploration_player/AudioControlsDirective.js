@@ -115,7 +115,7 @@ oppia.directive('audioControls', [
                 // immediately start playing the newly requested audio.
                 loadAndPlayAudioTranslation();
               }
-            }        
+            }
           };
 
           var isRequestForSameAudioAsLastTime = function() {

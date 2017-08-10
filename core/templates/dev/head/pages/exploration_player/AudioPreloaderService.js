@@ -23,8 +23,7 @@ oppia.factory('AudioPreloaderService', [
   function($modal, explorationContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService,
       AudioTranslationManagerService) {
-    // Mapping from language code to boolean indicating if it has 
-    // been preloaded.
+    // List of languages that have been preloaded in the exploration.
     var _preloadedLanguages = [];
 
     // This is a file to exclude while preloading all audio translations 
@@ -98,7 +97,7 @@ oppia.factory('AudioPreloaderService', [
           }]
       }).result.then(function(result) {
         if (result.shouldOpenSettingsModal) {
-          // If the user selected to choose a different language, open
+          // If the user elected to choose a different language, open
           // the settings modal (later can isolate to a language-only
           // modal), and on the callback re-open the bandwidth confirmation
           // modal if the file for the new language hasn't been loaded.
