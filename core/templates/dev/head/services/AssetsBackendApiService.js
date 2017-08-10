@@ -43,7 +43,7 @@ oppia.factory('AssetsBackendApiService', [
         successCallback(audioBlob);
       }).error(function() {
         errorCallback();
-      }).finally(function() {
+      })['finally'](function() {
         _removeFromFilesCurrentlyBeingRequested(filename);
       });
     };
@@ -120,10 +120,8 @@ oppia.factory('AssetsBackendApiService', [
       loadAudio: function(explorationId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
-            console.log("from cache " + filename);
             resolve(assetsCache[filename]);
           } else if (!_isCurrentlyBeingRequested(filename)) {
-            console.log("requesting " + filename);
             _fetchAudio(explorationId, filename, resolve, reject);
           }
         });
