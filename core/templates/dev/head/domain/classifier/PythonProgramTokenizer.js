@@ -54,48 +54,47 @@ oppia.factory('PythonProgramTokenizer', [
       return groupOfRegEx(arguments) + '*';
     };
 
-    var whitespace = String.raw`[ \f\t]*`;
-    var comment = String.raw`#[^\r\n]*`;
+    var whitespace = '[ \\f\\t]*';
+    var comment = '#[^\\r\\n]*';
     var ignore = whitespace + repeatedRegEx(
-      String.raw`\\\r?\n` + whitespace) + regExMayBePresent(comment);
-    var name = String.raw`[a-zA-Z_]\w*`;
+      '\\\\\\r?\\n' + whitespace) + regExMayBePresent(comment);
+    var name = '[a-zA-Z_]\\w*';
 
-    var hexnumber = String.raw`0[xX][\da-fA-F]+[lL]?`;
-    var octnumber = String.raw`(0[oO][0-7]+)|(0[0-7]*)[lL]?`;
-    var binnumber = String.raw`0[bB][01]+[lL]?`;
-    var decnumber = String.raw`[1-9]\d*[lL]?`;
-    var intnumber = groupOfRegEx(hexnumber, binnumber, octnumber, decnumber)
-    var exponent = String.raw`[eE][-+]?\d+`
+    var hexnumber = '0[xX][\\da-fA-F]+[lL]?';
+    var octnumber = '(0[oO][0-7]+)|(0[0-7]*)[lL]?';
+    var binnumber = '0[bB][01]+[lL]?';
+    var decnumber = '[1-9]\\d*[lL]?';
+    var intnumber = groupOfRegEx(hexnumber, binnumber, octnumber, decnumber);
+    var exponent = '[eE][-+]?\\d+';
     var pointfloat = groupOfRegEx(
-      String.raw`\d+\.\d*`, String.raw`\.\d+`) + regExMayBePresent(exponent)
-    var expfloat = String.raw`\d+` + exponent;
-    var floatnumber = groupOfRegEx(pointfloat, expfloat)
+      '\\d+\\.\\d*', '\\\\d+\\\\.\\\\d*') + regExMayBePresent(exponent)
+    var expfloat = '\\d+' + exponent;
+    var floatnumber = groupOfRegEx(pointfloat, expfloat);
     var imagnumber = groupOfRegEx(
-      String.raw`\d+[jJ]`, floatnumber + String.raw`[jJ]`)
+      '\\d+[jJ]', floatnumber + '[jJ]');
     var num = groupOfRegEx(imagnumber, floatnumber, intnumber)
     // Tail end of ' string.
-    var single = String.raw`[^'\\]*(?:\\.[^'\\]*)*'`;
+    var single = '[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'';
     // Tail end of " string.
-    var double = String.raw`[^"\\]*(?:\\.[^"\\]*)*"`;
+    var double = '[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
     // Tail end of ''' string.
-    var single3 = String.raw`[^'\\]*(?:(?:\\.|'(?!''))[^'\\]*)*'''`;
+    var single3 = "[^'\\\\]*(?:(?:\\\\.|'(?!''))[^'\\\\]*)*'''";
     // Tail end of """ string.
-    var double3 = String.raw`[^"\\]*(?:(?:\\.|"(?!""))[^"\\]*)*"""`;
+    var double3 = '[^"\\\\]*(?:(?:\\\\.|"(?!""))[^"\\\\]*)*"""';
     var triple = groupOfRegEx("[uUbB]?[rR]?'''", '[uUbB]?[rR]?"""');
     // single-line ' or " string.
-    var str = groupOfRegEx(String.raw`[uUbB]?[rR]?'[^\n'\\]*(?:\\.[^\n'\\]*)*'`,
-                   String.raw`[uUbB]?[rR]?"[^\n"\\]*(?:\\.[^\n"\\]*)*"`);
+    var str = groupOfRegEx(
+      "[uUbB]?[rR]?'[^\\n'\\\\]*(?:\\\\.[^\\n'\\\\]*)*'",
+      '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*"');
 
     // Because of leftmost-then-longest match semantics, be sure to put the
     // longest operators first (e.g., if = came before ==, == would get
     // recognized as two instances of =).
     var operator = groupOfRegEx(
-      String.raw`\*\*=?`, String.raw`>>=?`, String.raw`<<=?`,
-      String.raw`<>`, String.raw`!=`, String.raw`//=?`,
-      String.raw`[+\-*/%&|^=<>]=?`, String.raw`~`);
+      '\\*\\*=?', '>>=?', '<<=?', '<>', '!=', '//=?', '[+\\-*/%&|^=<>]=?', '~');
 
     var bracket = '[(){}]';
-    var special = groupOfRegEx(String.raw`\r?\n`, String.raw`[:;.,\`@]`);
+    var special = groupOfRegEx('\\r?\\n', '[:;.,\\`@]');
     var funny = groupOfRegEx(operator, bracket, special)
 
     var plaintoken = groupOfRegEx(num, funny, str, name)
@@ -103,11 +102,11 @@ oppia.factory('PythonProgramTokenizer', [
 
     // First (or only) line of ' or " string.
     var contStr = groupOfRegEx(
-      String.raw`[uUbB]?[rR]?'[^\n'\\]*(?:\\.[^\n'\\]*)*` +
-      groupOfRegEx("'", String.raw`\\\r?\n`),
-      String.raw`[uUbB]?[rR]?"[^\n"\\]*(?:\\.[^\n"\\]*)*` +
-      groupOfRegEx('"', String.raw`\\\r?\n`))
-    var pseudoextras = groupOfRegEx(String.raw`\\\r?\n|\Z`, comment, triple)
+      "[uUbB]?[rR]?'[^\\n'\\\\]*(?:\\\\.[^\\n'\\\\]*)*'" +
+      groupOfRegEx("'", '\\\\\\r?\\n'),
+      '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*' +
+      groupOfRegEx('"', '\\\\\\r?\\n'))
+    var pseudoextras = groupOfRegEx('\\\\\\r?\\n|\\Z', comment, triple)
     var pseudotoken = whitespace + groupOfRegEx(
       pseudoextras, num, funny, contStr, name)
 
@@ -236,7 +235,7 @@ oppia.factory('PythonProgramTokenizer', [
             // skip comments or blank lines.
             if (('#\r\n').indexOf(line[pos]) !== -1) {
               if (line[pos] === '#') {
-                commentToken = line.slice(pos).replace(String.raw`\r\n`, '');
+                commentToken = line.slice(pos).replace('\\r\\n', '');
                 nlPos = pos + commentToken.length;
                 tokenizedProgram.push(
                   [PythonProgramTokenType.COMMENT, commentToken]);

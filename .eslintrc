@@ -5,9 +5,6 @@
   "plugins": [
     "html"
   ],
-  "parserOptions": {
-    "ecmaVersion": 6
-  },
   "rules": {
     "no-empty": [
       "error",
@@ -113,7 +110,6 @@
       "error",
       "single",
       {
-        "allowTemplateLiterals": true,
         "avoidEscape": true
       }
     ]
