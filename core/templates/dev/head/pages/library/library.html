@@ -27,6 +27,7 @@
     GLOBALS.SEARCH_DROPDOWN_CATEGORIES = JSON.parse(
       '{{SEARCH_DROPDOWN_CATEGORIES|js_string}}');
     GLOBALS.PAGE_MODE = JSON.parse('{{page_mode|js_string}}');
+    GLOBALS.hasFullyRegistered = JSON.parse('{{has_fully_registered|js_string}}');
   </script>
 
   <style>
@@ -219,7 +220,7 @@
 {% block footer_js %}
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/searchService.js"></script>
-  
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>

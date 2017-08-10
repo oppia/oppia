@@ -26,6 +26,7 @@ oppia.directive('searchResults', [
         function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.someResultsExist = true;
+          $scope.hasFullyRegistered = GLOBALS.hasFullyRegistered;
 
           // Called when the first batch of search results is retrieved from the
           // server.
