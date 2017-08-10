@@ -19,10 +19,13 @@
 oppia.factory('AudioPreloaderService', [
   '$modal', 'explorationContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
+  'AudioTranslationManagerService',
   function($modal, explorationContextService, AssetsBackendApiService,
-      ExplorationPlayerStateService, UrlInterpolationService) {
-    // Whether all audio files have been preloaded in the exploration.
-    var _hasPreloaded = false;
+      ExplorationPlayerStateService, UrlInterpolationService,
+      AudioTranslationManagerService) {
+    // Mapping from language code to boolean indicating if it has 
+    // been preloaded.
+    var _preloadedLanguages = [];
 
     // This is a file to exclude while preloading all audio translations 
     // for an exploration. This is used to disregard the current audio file
@@ -30,49 +33,86 @@ oppia.factory('AudioPreloaderService', [
     // loaded anyway.
     var _excludedFilename = null;
 
-    var _preloadAllAudioFiles = function() {
+    var _preloadAllAudioFiles = function(languageCode) {
       var allAudioTranslations =
         ExplorationPlayerStateService
-          .getExploration().getAllAudioTranslations();
-      for (var languageCode in allAudioTranslations) {
-        var audioTranslation = allAudioTranslations[languageCode];
+          .getExploration().getAllAudioTranslations(languageCode);
+
+      allAudioTranslations.map(function(audioTranslation) {
         if (audioTranslation.filename !== _excludedFilename) {
           AssetsBackendApiService.loadAudio(
             explorationContextService.getExplorationId(),
             audioTranslation.filename);
         }
-      }
-      _hasPreloaded = true;
+      });
+
+      _preloadedLanguages.push(languageCode);
     };
 
-    var _showBandwidthConfirmationModal = function(confirmationCallback) {
+    var _showBandwidthConfirmationModal = function(
+        audioTranslationsForContent, languageCode,
+        confirmationCallback) {
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_player/' +
           'audio_preload_bandwidth_confirmation_modal_directive.html'),
         resolve: {},
-        backdrop: false,
+        backdrop: true,
         controller: [
           '$scope', '$modalInstance',
           'ExplorationPlayerStateService', 'AudioPreloaderService',
+          'LanguageUtilService',
           function(
               $scope, $modalInstance,
-              ExplorationPlayerStateService, AudioPreloaderService) {
+              ExplorationPlayerStateService, AudioPreloaderService,
+              LanguageUtilService) {
+            $scope.fileSizeOfCurrentAudioTranslationMB =
+              audioTranslationsForContent[languageCode]
+                .getFileSizeMB().toPrecision(3);
             $scope.totalFileSizeOfAllAudioTranslationsMB =
               ExplorationPlayerStateService.getExploration()
-                .getAllAudioTranslationsFileSizeMB().toPrecision(3);
+                .getAllAudioTranslationsFileSizeMB(languageCode)
+                .toPrecision(3);
+            $scope.currentLanguageDescription =
+              LanguageUtilService.getAudioLanguageDescription(languageCode);
+            $scope.shouldDownloadAllAudioInExploration = false;
 
             $scope.confirm = function() {
-              $modalInstance.close();
+              $modalInstance.close({
+                shouldDownloadAllAudioInExploration: 
+                  $scope.shouldDownloadAllAudioInExploration,
+                shouldOpenSettingsModal: false
+              });
             };
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
             };
+
+            $scope.chooseDifferentLanguage = function() {
+              $modalInstance.close({
+                shouldDownloadAllAudioInExploration: false,
+                shouldOpenSettingsModal: true
+              });
+            };
           }]
-      }).result.then(function() {
-        confirmationCallback();
-        _preloadAllAudioFiles();
+      }).result.then(function(result) {
+        if (result.shouldOpenSettingsModal) {
+          AudioTranslationManagerService
+            .showAudioTranslationSettingsModal(function(newLanguageCode) {
+              if (!AssetsBackendApiService.isCached(
+                audioTranslationsForContent[newLanguageCode].filename)) {
+                _showBandwidthConfirmationModal(
+                  audioTranslationsForContent, newLanguageCode,
+                  confirmationCallback)
+              }
+            });
+        } else {
+          confirmationCallback(languageCode);
+          if (result.shouldDownloadAllAudioInExploration) {
+            _preloadAllAudioFiles(languageCode);
+          }
+        }
       });
     };
 
@@ -80,14 +120,18 @@ oppia.factory('AudioPreloaderService', [
       init: function() {
         _init();
       },
-      hasPreloaded: function() {
-        return _hasPreloaded;
+      hasPreloadedLanguage: function(languageCode) {
+        return _preloadedLanguages.indexOf(languageCode) !== -1;
       },
       excludeFile: function(filename) {
         _excludedFilename = filename;
       },
-      showBandwidthConfirmationModal: function(confirmationCallback) {
-        _showBandwidthConfirmationModal(confirmationCallback);
+      showBandwidthConfirmationModal: function(
+          audioTranslationsForContent, languageCode,
+          confirmationCallback) {
+        _showBandwidthConfirmationModal(
+          audioTranslationsForContent, languageCode,
+          confirmationCallback);
       }
     };
   }

@@ -132,19 +132,21 @@ oppia.factory('ExplorationObjectFactory', [
         languageCode);
     };
 
-    Exploration.prototype.getAllAudioTranslations = function() {
-      return this.states.getAllAudioTranslations();
+    Exploration.prototype.getAllAudioTranslations = function(languageCode) {
+      return this.states.getAllAudioTranslations(languageCode);
     };
 
-    Exploration.prototype.getAllAudioTranslationsFileSizeMB = function() {
-      var NUM_BYTES_IN_MB = 1 << 20;
-      var totalFileSizeBytes = 0;
-      var allAudioTranslations = this.states.getAllAudioTranslations();
-      for (var languageCode in allAudioTranslations) {
-        totalFileSizeBytes += allAudioTranslations[languageCode].fileSizeBytes;
-      }
-      return totalFileSizeBytes / NUM_BYTES_IN_MB;
-    };
+    Exploration.prototype.getAllAudioTranslationsFileSizeMB =
+      function(languageCode) {
+        var NUM_BYTES_IN_MB = 1 << 20;
+        var totalFileSizeBytes = 0;
+        var allAudioTranslations =
+          this.states.getAllAudioTranslations(languageCode);
+        allAudioTranslations.map(function(audioTranslation) {
+          totalFileSizeBytes += audioTranslation.fileSizeBytes;
+        });
+        return totalFileSizeBytes / NUM_BYTES_IN_MB;
+      };
 
     Exploration.prototype.getLanguageCode = function() {
       return this.languageCode;

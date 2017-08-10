@@ -123,12 +123,7 @@ describe('Exploration object factory', function() {
 
     it('should correctly get audio translations from an exploration', 
     function() {
-      expect(exploration.getAllAudioTranslations()).toEqual([
-        atof.createFromBackendDict({
-          filename: 'myfile1.mp3',
-          file_size_bytes: 210000,
-          needs_update: false
-        }),
+      expect(exploration.getAllAudioTranslations('hi-en')).toEqual([
         atof.createFromBackendDict({
           filename: 'myfile3.mp3',
           file_size_bytes: 430000,
@@ -140,13 +135,22 @@ describe('Exploration object factory', function() {
           needs_update: false
         })
       ]);
+      expect(exploration.getAllAudioTranslations('en')).toEqual([
+        atof.createFromBackendDict({
+          filename: 'myfile1.mp3',
+          file_size_bytes: 210000,
+          needs_update: false
+        })
+      ]);
     });
 
     it('should get the correct file size in MB of all audio translations',
     function() {
       var NUM_BYTES_IN_MB = 1 << 20;
-      expect(exploration.getAllAudioTranslationsFileSizeMB()).toEqual(
-        760000 / NUM_BYTES_IN_MB);
+      expect(exploration.getAllAudioTranslationsFileSizeMB('hi-en')).toEqual(
+        550000 / NUM_BYTES_IN_MB);
+      expect(exploration.getAllAudioTranslationsFileSizeMB('en')).toEqual(
+        210000 / NUM_BYTES_IN_MB);
     });
   });
 });

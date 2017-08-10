@@ -30,24 +30,26 @@ oppia.directive('audioControls', [
         'audio_controls_directive.html'),
       controller: [
         '$scope', 'AudioTranslationManagerService', 'AudioPlayerService',
-        'LanguageUtilService',
+        'LanguageUtilService', 'AssetsBackendApiService',
         function(
             $scope, AudioTranslationManagerService, AudioPlayerService,
-            LanguageUtilService) {
+            LanguageUtilService, AssetsBackendApiService) {
           // This ID is passed in to AudioPlayerService as a means of
           // distinguishing which audio directive is currently playing audio.
           var directiveId = Math.random().toString(36).substr(2, 10);
 
-          var currentAudioLanguageCode =
-            AudioTranslationManagerService
-              .getCurrentAudioLanguageCode();
+
+          var getCurrentAudioLanguageCode = function() {
+            return AudioTranslationManagerService.getCurrentAudioLanguageCode();
+          };
 
           $scope.currentAudioLanguageDescription =
             AudioTranslationManagerService
               .getCurrentAudioLanguageDescription();
 
           var getAudioTranslationInCurrentLanguage = function() {
-            return $scope.getAudioTranslations()[currentAudioLanguageCode];
+            return $scope.getAudioTranslations()[
+              AudioTranslationManagerService.getCurrentAudioLanguageCode()];
           };
 
           $scope.AudioPlayerService = AudioPlayerService;
@@ -64,20 +66,30 @@ oppia.directive('audioControls', [
             return getAudioTranslationInCurrentLanguage().needsUpdate;
           };
 
-          $scope.playPauseAudioTranslation = function() {
-            if (!AudioPreloaderService.hasPreloaded()) {
-              if (getAudioTranslationInCurrentLanguage()) {
+          $scope.onSpeakerIconClicked = function() {
+            var audioTranslation = getAudioTranslationInCurrentLanguage();
+            if (audioTranslation) {
+              if (!AudioPreloaderService.hasPreloadedLanguage(
+                    getCurrentAudioLanguageCode()) &&
+                    !isCached(audioTranslation)) {
                 AudioPreloaderService.excludeFile(
-                  getAudioTranslationInCurrentLanguage().filename);
+                  audioTranslation.filename);
+                AudioPreloaderService.showBandwidthConfirmationModal(
+                  $scope.getAudioTranslations(), getCurrentAudioLanguageCode(),
+                  playPauseAudioTranslation);
+              } else {
+                playPauseAudioTranslation(getCurrentAudioLanguageCode());
               }
-              AudioPreloaderService.showBandwidthConfirmationModal(
-                startAudio);
-            } else {   
-              startAudio();
+            } else {
+              $scope.openAudioTranslationSettings();
             }
           };
 
-          var startAudio = function() {
+          var isCached = function(audioTranslation) {
+            return AssetsBackendApiService.isCached(audioTranslation.filename);
+          };
+
+          var playPauseAudioTranslation = function(languageCode) {
             $scope.extraAudioControlsAreShown = true;
 
             if (!AudioPlayerService.isPlaying()) {
@@ -94,7 +106,7 @@ oppia.directive('audioControls', [
                 // immediately start playing the newly requested audio.
                 loadAndPlayAudioTranslation();
               }
-            }
+            }        
           };
 
           var isRequestForSameAudioAsLastTime = function() {
@@ -119,7 +131,6 @@ oppia.directive('audioControls', [
           $scope.openAudioTranslationSettings = function() {
             AudioTranslationManagerService
               .showAudioTranslationSettingsModal(function(newLanguageCode) {
-                currentAudioLanguageCode = newLanguageCode;
                 $scope.currentAudioLanguageDescription = 
                   LanguageUtilService.getAudioLanguageDescription(
                     newLanguageCode);

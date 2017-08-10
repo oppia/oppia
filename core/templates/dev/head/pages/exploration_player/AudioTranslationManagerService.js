@@ -52,6 +52,7 @@ oppia.factory('AudioTranslationManagerService', [
           '/pages/exploration_player/' +
           'audio_translation_settings_modal_directive.html'),
         resolve: {},
+        backdrop: true,
         controller: [
           '$scope', '$filter', '$modalInstance',
           'AudioTranslationManagerService', 'LanguageUtilService',
