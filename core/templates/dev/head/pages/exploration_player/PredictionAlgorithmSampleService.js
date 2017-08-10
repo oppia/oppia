@@ -21,10 +21,7 @@
    return {
      predict: function(classifierData, userText) {
        return {
-         outcome: 'Sample default outcome',
-         answerGroupIndex: 0,
-         ruleIndex: 0,
-         classificationCategorization: 'explicit'
+         answerGroupIndex: 0
        };
      }
    };

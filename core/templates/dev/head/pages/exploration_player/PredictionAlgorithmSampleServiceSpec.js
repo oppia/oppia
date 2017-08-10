@@ -17,7 +17,7 @@
  */
 
  describe('Prediction algorithm sample service', function() {
-   beforeEach(module(oppia));
+   beforeEach(module('oppia'));
 
    describe('Test prediction algorithm functions', function() {
      var predictionService;
@@ -25,14 +25,11 @@
        predictionService = $injector.get('PredictionAlgorithmSampleService');
      }));
 
-     it('should return correct predicted values.', function() {
+     it('should return correct structure of predicted values.', function() {
        var classifierData = {};
        var userText = "";
        var expectedResult = {
-         outcome: 'Sample default outcome',
-         answerGroupIndex: 0,
-         ruleIndex: 0,
-         classificationCategorization: 'explicit'
+         answerGroupIndex: 0
        };
        var generatedResult = predictionService.predict(
          classifierData, userText);

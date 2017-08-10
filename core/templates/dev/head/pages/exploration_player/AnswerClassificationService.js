@@ -129,7 +129,7 @@ oppia.factory('AnswerClassificationService', [
 
         var ruleBasedOutcomeIsDefault = (result.outcome == defaultOutcome);
         var interactionIsTrainable = INTERACTION_SPECS[
-          oldState.interaction.id].is_string_classifier_trainable;
+          oldState.interaction.id].is_interaction_trainable;
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
           var classifierData = StateClassifierMappingService.getClassifierData(
@@ -139,7 +139,14 @@ oppia.factory('AnswerClassificationService', [
           var predictionService = (
             PredictionAlgorithmRegistryService.getPredictionService(
               algorithmId));
-          deferred.resolve(predictionService.predict(classifierData, answer));
+          var predictedAnswerGroupIndex = predictionService.predict(
+            classifierData, answer).answerGroupIndex;
+          deferred.resolve({
+            outcome: result.outcome,
+            ruleIndex: result.ruleIndex,
+            answerGroupIndex: predictedAnswerGroupIndex,
+            classificationCategorization: result.classificationCategorization
+          });
         } else {
           deferred.resolve(result);
         }

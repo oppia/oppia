@@ -20,43 +20,20 @@ describe('Prediction algorithm registry service', function() {
   beforeEach(module('oppia'));
 
   describe('Test prediction algorithm registry functions', function() {
-    beforeEach(function() {
-      module(function($provide) {
-        $provide.value('PredictionAlgorithmSampleService', {
-          predict: function(classifierData, userText) {
-            return {
-              outcome: 'Sample default outcome',
-              answerGroupIndex: 0,
-              ruleIndex: 0,
-              classificationCategorization: 'explicit'
-            };
-          }
-        });
-      });
-    });
 
-    var registryService;
+    var registryService, predictionService;
     beforeEach(inject(function($injector) {
+      predictionService = $injector.get('PredictionAlgorithmSampleService');
       registryService = $injector.get('PredictionAlgorithmRegistryService');
     }));
 
     it('should return correct prediction algorithm service.', function() {
       var algorithmId = 'LDAStringClassifier';
-      var expectedPredictionService = {
-        predict: function(classifierData, userText) {
-          return {
-            outcome: 'Sample default outcome',
-            answerGroupIndex: 0,
-            ruleIndex: 0,
-            classificationCategorization: 'explicit'
-          };
-        }
-      };
       var generatedPredictionService = registryService.getPredictionService(
         algorithmId);
 
       expect(generatedPredictionService.toString()).toEqual(
-        expectedPredictionService.toString());
+        predictionService.toString());
     });
   });
 });

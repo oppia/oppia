@@ -24,7 +24,7 @@ describe('Answer classification service with string classifier disabled',
       module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           RuleTest: {
-            is_string_classifier_trainable: false
+            is_interaction_trainable: false
           }
         });
         $provide.constant('ENABLE_ML_CLASSIFIERS', false);
@@ -238,10 +238,10 @@ describe('Answer classification service with string classifier enabled',
       module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           TrainableInteraction: {
-            is_string_classifier_trainable: true
+            is_interaction_trainable: true
           },
           UntrainableInteraction: {
-            is_string_classifier_trainable: false
+            is_interaction_trainable: false
           }
         });
         $provide.constant('ENABLE_ML_CLASSIFIERS', true);
@@ -352,7 +352,7 @@ describe('Answer classification service with string classifier enabled',
     it('should query the prediction service if no answer group matches and ' +
        'interaction is trainable', function() {
       var expectedClassificationResult = {
-        outcome: 'Sample default outcome',
+        outcome: 'outcome 1',
         answerGroupIndex: 0,
         ruleIndex: 0,
         classificationCategorization: EXPLICIT_CLASSIFICATION

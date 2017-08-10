@@ -250,7 +250,6 @@ class ExplorationHandlerTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.exp_id))
         retrieved_state_classifier_mapping = exploration_dict[
             'state_classifier_mapping']
-        print retrieved_state_classifier_mapping
 
         self.assertEqual(expected_state_classifier_mapping,
                          retrieved_state_classifier_mapping)
