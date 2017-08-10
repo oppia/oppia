@@ -344,7 +344,7 @@ def store_classifier_data(job_id, classifier_data):
 
     Args:
         job_id: str. ID of the ClassifierTrainingJob domain object.
-        classifier_data: str. The classification model which needs to be stored
+        classifier_data: dict. The classification model which needs to be stored
             in the job.
 
     Raises:
@@ -358,7 +358,7 @@ def store_classifier_data(job_id, classifier_data):
             'The ClassifierTrainingJobModel corresponding to the job_id of the'
             'ClassifierTrainingJob does not exist.')
 
-    classifier_training_job = get_classifier_training_job_by_id(job_id)
+    classifier_training_job = get_classifier_training_job_from_model(job_id)
     classifier_training_job.update_classifier_data(classifier_data)
     classifier_training_job.validate()
 
