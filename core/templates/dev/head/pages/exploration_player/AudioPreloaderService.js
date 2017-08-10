@@ -24,7 +24,7 @@ oppia.factory('AudioPreloaderService', [
       ExplorationPlayerStateService, UrlInterpolationService,
       AudioTranslationManagerService) {
     // List of languages that have been preloaded in the exploration.
-    var _preloadedLanguages = [];
+    var _preloadedLanguageCodes = [];
 
     var _preloadAllAudioFiles = function(languageCode) {
       var allAudioTranslations =
@@ -37,7 +37,7 @@ oppia.factory('AudioPreloaderService', [
           audioTranslation.filename);
       });
 
-      _preloadedLanguages.push(languageCode);
+      _preloadedLanguageCodes.push(languageCode);
     };
 
     var _showBandwidthConfirmationModal = function(
@@ -118,7 +118,7 @@ oppia.factory('AudioPreloaderService', [
         _init();
       },
       hasPreloadedLanguage: function(languageCode) {
-        return _preloadedLanguages.indexOf(languageCode) !== -1;
+        return _preloadedLanguageCodes.indexOf(languageCode) !== -1;
       },
       showBandwidthConfirmationModal: function(
           audioTranslationsForContent, languageCode,
