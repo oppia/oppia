@@ -137,7 +137,7 @@ class NextJobHandler(base.BaseHandler):
         """Handles POST requests. """
         signature = self.payload.get('signature')
         vm_id = self.payload.get('vm_id')
-        message = json.dumps({})
+        message = self.payload.get('message')
 
         if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
             raise self.UnauthorizedUserException

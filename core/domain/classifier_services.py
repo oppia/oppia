@@ -163,6 +163,7 @@ def handle_trainable_states(exploration, state_names):
             'interaction_id': interaction_id,
             'exp_id': exp_id,
             'exp_version': exp_version,
+            'next_scheduled_check_time': next_scheduled_check_time,
             'state_name': state_name,
             'training_data': training_data,
             'status': feconf.TRAINING_JOB_STATUS_NEW
@@ -409,7 +410,8 @@ def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
         state_name: str. The name of the state to which the classifier
             belongs.
         training_data: dict. The data used in training phase.
-        status: str. The status of the training job (NEW by default).
+        status: str. The status of the training job (
+            feconf.TRAINING_JOB_STATUS_NEW by default).
 
     Returns:
         job_id: str. ID of the classifier training job.
@@ -446,15 +448,8 @@ def _update_classifier_training_jobs_status(job_ids, status):
                 'The ClassifierTrainingJobModel corresponding to the job_id '
                 'of the ClassifierTrainingJob does not exist.')
 
-        initial_status = classifier_training_job_models[index].status
-        if status not in (
-                feconf.ALLOWED_TRAINING_JOB_STATUS_CHANGES[initial_status]):
-            raise Exception(
-                'The status change %s to %s is not valid.' % (
-                    initial_status, status))
-
-        classifier_training_job = get_classifier_training_job_by_id(
-            job_id)
+        classifier_training_job = get_classifier_training_job_from_model(
+            classifier_training_job_models[index])
         classifier_training_job.update_status(status)
         classifier_training_job.validate()
 
@@ -494,8 +489,8 @@ def mark_training_job_pending(job_id):
         [job_id], feconf.TRAINING_JOB_STATUS_PENDING)
 
 
-def _update_job_next_scheduled_check_time(job_id):
-    """Updates the next scheduled check time of job.
+def _update_scheduled_check_time_for_new_training_job(job_id):
+    """Updates the next scheduled check time of job with status NEW.
 
     Args:
         job_id: str. ID of the ClassifierTrainingJob.
@@ -524,27 +519,29 @@ def fetch_next_job():
     # Initially the cursor for query is set to None.
     cursor = None
     valid_jobs = []
-    failed_job_ids = []
+    timed_out_job_ids = []
 
     while len(valid_jobs) == 0:
         classifier_training_jobs, cursor, more = (
-            classifier_models.ClassifierTrainingJobModel.query_training_jobs(
-                cursor))
+            classifier_models.ClassifierTrainingJobModel.
+            query_new_and_pending_training_jobs(cursor))
         for training_job in classifier_training_jobs:
-            if(training_job.status == (
+            if (training_job.status == (
                     feconf.TRAINING_JOB_STATUS_PENDING)):
-                failed_job_ids.append(training_job.id)
+                if (training_job.next_scheduled_check_time <= (
+                        datetime.datetime.utcnow())):
+                    timed_out_job_ids.append(training_job.id)
             else:
                 valid_jobs.append(training_job)
         if not more:
             break
 
-    if len(failed_job_ids) > 0:
-        mark_training_jobs_failed(failed_job_ids)
+    if timed_out_job_ids:
+        mark_training_jobs_failed(timed_out_job_ids)
 
-    if len(valid_jobs) > 0:
+    if valid_jobs:
         next_job = get_classifier_training_job_from_model(valid_jobs[0])
-        _update_job_next_scheduled_check_time(next_job.job_id)
+        _update_scheduled_check_time_for_new_training_job(next_job.job_id)
     else:
         next_job = None
     return next_job

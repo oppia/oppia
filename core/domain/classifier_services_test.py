@@ -16,8 +16,8 @@
 
 """Tests for classifier services"""
 
-import os
 import datetime
+import os
 
 from core.domain import classifier_registry
 from core.domain import classifier_services
@@ -195,6 +195,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def test_handle_non_retrainable_states(self):
         """Test the handle_non_retrainable_states method."""
         exploration = exp_services.get_exploration_by_id(self.exp_id)
+        next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
         new_to_old_state_names = {
             'Home': 'Old home'
@@ -222,7 +223,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # Create job and mapping for previous version.
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            'TextInput', self.exp_id, exploration.version-1, [], 'Old home',
+            'TextInput', self.exp_id, exploration.version-1,
+            next_scheduled_check_time, [], 'Old home',
             feconf.TRAINING_JOB_STATUS_COMPLETE)
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.exp_id, exploration.version-1, 'Old home', job_id)
@@ -288,6 +290,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the create_classifier method."""
 
         exp_id = u'1'
+        next_scheduled_check_time = datetime.datetime.utcnow()
         state_name = 'Home'
         interaction_id = 'TextInput'
         classifier_data = {
@@ -310,7 +313,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         }
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp_id, 1, [], state_name,
+                'algorithm_id'], interaction_id, exp_id, 1,
+            next_scheduled_check_time, [], state_name,
             feconf.TRAINING_JOB_STATUS_NEW)
         classifier_id = (
             classifier_services.create_classifier(job_id, classifier_data))
@@ -374,13 +378,14 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def test_mark_training_job_complete(self):
         """Test the mark_training_job_complete method."""
         exp_id = u'1'
+        next_scheduled_check_time = datetime.datetime.utcnow()
         state_name = 'Home'
         interaction_id = 'TextInput'
 
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            interaction_id, exp_id, 1, [], state_name,
-            feconf.TRAINING_JOB_STATUS_PENDING)
+            interaction_id, exp_id, 1, next_scheduled_check_time, [],
+            state_name, feconf.TRAINING_JOB_STATUS_PENDING)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -476,6 +481,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
                 'algorithm_id'], interaction_id, exp2_id, 1, state_name,
             [], feconf.TRAINING_JOB_STATUS_PENDING)
+        # This will get the job_id of the exploration created in setup.
+        classifier_services.fetch_next_job()
         next_job = classifier_services.fetch_next_job()
         self.assertEqual(job1_id, next_job.job_id)
 
@@ -484,10 +491,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the get_classifier_training_jobs method."""
 
         exp_id = u'1'
+        next_scheduled_check_time = datetime.datetime.utcnow()
         state_name = u'टेक्स्ट'
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            'TextInput', exp_id, 1, [], state_name,
+            'TextInput', exp_id, 1, next_scheduled_check_time, [], state_name,
             feconf.TRAINING_JOB_STATUS_NEW)
         classifier_models.TrainingJobExplorationMappingModel.create(
             exp_id, 1, state_name, job_id)

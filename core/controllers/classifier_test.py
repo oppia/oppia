@@ -15,8 +15,8 @@
 """Tests for the controllers that communicate with VM for training
 classifiers."""
 
-import os
 import json
+import os
 
 from core.controllers import classifier
 from core.domain import classifier_services
@@ -163,17 +163,17 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
             1, 'Home', self.training_data,
             feconf.TRAINING_JOB_STATUS_NEW)
         self.expected_response = {
-            u'job_id' : unicode(self.job_id, "utf-8"),
+            u'job_id' : unicode(self.job_id, 'utf-8'),
             u'training_data' : self.training_data,
-            u'algorithm_id' : unicode(self.algorithm_id, "utf-8")
+            u'algorithm_id' : unicode(self.algorithm_id, 'utf-8')
         }
 
         self.payload = {}
         self.payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        message_json = json.dumps({})
+        self.payload['message'] = json.dumps({})
         self.payload['signature'] = classifier.generate_signature(
-            secret, message_json)
+            secret, self.payload['message'])
 
     def test_next_job_handler(self):
         json_response = self.post_json('/ml/nextjobhandler',

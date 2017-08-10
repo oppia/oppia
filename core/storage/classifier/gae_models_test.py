@@ -61,25 +61,6 @@ class ClassifierDataModelUnitTests(test_utils.GenericTestBase):
 class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     """Test the ClassifierTrainingJobModel class."""
 
-    def setUp(self):
-        super(ClassifierTrainingJobModelUnitTests, self).setUp()
-        next_scheduled_check_time = datetime.datetime.utcnow()
-        classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'TextInput', 'exp_id2', 2,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name1', feconf.TRAINING_JOB_STATUS_NEW)
-
     def test_create_and_get_new_training_job_runs_successfully(self):
         next_scheduled_check_time = datetime.datetime.utcnow()
         job_id = classifier_models.ClassifierTrainingJobModel.create(
@@ -101,7 +82,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(training_job.training_data,
                          [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
 
-    def test_query_training_jobs(self):
+    def test_query_new_and_pending_training_jobs(self):
         next_scheduled_check_time = datetime.datetime.utcnow()
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
@@ -126,31 +107,33 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             'state_name2', feconf.TRAINING_JOB_STATUS_FAILED)
 
         training_jobs, cursor, more = (
-            classifier_models.ClassifierTrainingJobModel.query_training_jobs(
-                None))
+            classifier_models.ClassifierTrainingJobModel.
+            query_new_and_pending_training_jobs(None))
 
-        self.assertEqual(len(training_jobs), 5)
-        self.assertEqual(training_jobs[3].algorithm_id, 'LDAStringClassifier')
-        self.assertEqual(training_jobs[3].interaction_id, 'TextInput')
-        self.assertEqual(training_jobs[3].exp_id, 'exp_id1')
-        self.assertEqual(training_jobs[3].exp_version, 1)
-        self.assertEqual(training_jobs[3].next_scheduled_check_time,
+        self.assertEqual(len(training_jobs), 2)
+        self.assertEqual(training_jobs[0].algorithm_id, 'LDAStringClassifier')
+        self.assertEqual(training_jobs[0].interaction_id, 'TextInput')
+        self.assertEqual(training_jobs[0].exp_id, 'exp_id1')
+        self.assertEqual(training_jobs[0].exp_version, 1)
+        self.assertEqual(training_jobs[0].next_scheduled_check_time,
                          next_scheduled_check_time)
-        self.assertEqual(training_jobs[3].state_name, 'state_name2')
-        self.assertEqual(training_jobs[3].status,
+        self.assertEqual(training_jobs[0].state_name, 'state_name2')
+        self.assertEqual(training_jobs[0].status,
                          feconf.TRAINING_JOB_STATUS_NEW)
-        self.assertEqual(training_jobs[3].training_data,
+        self.assertEqual(training_jobs[0].training_data,
                          [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
-        self.assertEqual(training_jobs[4].status,
+        self.assertEqual(training_jobs[1].status,
                          feconf.TRAINING_JOB_STATUS_PENDING)
         self.assertEqual(more, False)
         self.assertEqual(cursor is not None, True)
 
     def test_create_multi_jobs(self):
+        next_scheduled_check_time = datetime.datetime.utcnow()
         job_dicts_list = []
         job_dicts_list.append({
             'exp_id': u'1',
             'exp_version': 1,
+            'next_scheduled_check_time': next_scheduled_check_time,
             'state_name': 'Home',
             'interaction_id': 'TextInput',
             'algorithm_id': feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
@@ -161,6 +144,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         job_dicts_list.append({
             'exp_id': u'1',
             'exp_version': 2,
+            'next_scheduled_check_time': next_scheduled_check_time,
             'state_name': 'Home',
             'interaction_id': 'TextInput',
             'algorithm_id': feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
