@@ -124,18 +124,17 @@ oppia.factory('explorationSaveService', [
           onStartSaveCallback();
         }
 
-        explorationRightsService.saveChangeToBackend({
-          is_public: true
-        }).then(function() {
-          if (onSaveDoneCallback) {
-            onSaveDoneCallback();
-          }
+        explorationRightsService.publish().then(
+          function() {
+            if (onSaveDoneCallback) {
+              onSaveDoneCallback();
+            }
 
-          showCongratulatorySharingModal();
-          siteAnalyticsService.registerPublishExplorationEvent(
-            explorationData.explorationId);
-          whenModalClosed.resolve();
-        });
+            showCongratulatorySharingModal();
+            siteAnalyticsService.registerPublishExplorationEvent(
+              explorationData.explorationId);
+            whenModalClosed.resolve();
+          });
       });
 
       return whenModalClosed.promise;
@@ -501,7 +500,8 @@ oppia.factory('explorationSaveService', [
             windowClass: 'oppia-save-exploration-modal',
             controller: [
               '$scope', '$modalInstance', 'isExplorationPrivate',
-              function($scope, $modalInstance, isExplorationPrivate) {
+              function(
+                $scope, $modalInstance, isExplorationPrivate) {
                 $scope.showDiff = false;
                 $scope.onClickToggleDiffButton = function() {
                   $scope.showDiff = !$scope.showDiff;

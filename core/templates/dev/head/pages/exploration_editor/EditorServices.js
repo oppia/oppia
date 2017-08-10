@@ -546,14 +546,16 @@ oppia.factory('explorationRightsService', [
       viewableIfPrivate: function() {
         return this._viewableIfPrivate;
       },
-      saveChangeToBackend: function(requestParams) {
-        var whenRightsSaved = $q.defer();
+      makeCommunityOwned: function() {
+        var whenCommunityOwnedSet = $q.defer();
         var that = this;
 
-        requestParams.version = explorationData.data.version;
-        var explorationRightsUrl = (
+        var requestUrl = (
           '/createhandler/rights/' + explorationData.explorationId);
-        $http.put(explorationRightsUrl, requestParams).then(function(response) {
+        $http.put(requestUrl, {
+          version: explorationData.data.version,
+          make_community_owned: true
+        }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
           that.init(
@@ -561,9 +563,92 @@ oppia.factory('explorationRightsService', [
             data.rights.viewer_names, data.rights.status,
             data.rights.cloned_from, data.rights.community_owned,
             data.rights.viewable_if_private);
-          whenRightsSaved.resolve();
+          whenCommunityOwnedSet.resolve();
         });
-        return whenRightsSaved.promise;
+        return whenCommunityOwnedSet.promise;
+      },
+      setViewability: function(viewableIfPrivate) {
+        var whenViewabilityChanged = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+            '/createhandler/rights/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          version: explorationData.data.version,
+          viewable_if_private: viewableIfPrivate
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenViewabilityChanged.resolve();
+        });
+        return whenViewabilityChanged.promise;
+      },
+      saveRoleChanges: function(newMemberUsername, newMemberRole) {
+        var whenRolesSaved = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+            '/createhandler/rights/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          version: explorationData.data.version,
+          new_member_role: newMemberRole,
+          new_member_username: newMemberUsername
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenRolesSaved.resolve();
+        });
+        return whenRolesSaved.promise;
+      },
+      publish: function() {
+        var whenPublishStatusChanged = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+          '/createhandler/status/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          make_public: true
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenPublishStatusChanged.resolve();
+        });
+        return whenPublishStatusChanged.promise;
+      },
+      unpublicize: function() {
+        var whenPublicizedStatusChanged = $q.defer();
+        var that = this;
+
+        var requestUrl = (
+          '/createhandler/status/' + explorationData.explorationId);
+        $http.put(requestUrl, {
+          make_unpublicized: true
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenPublicizedStatusChanged.resolve();
+        });
+        return whenPublicizedStatusChanged.promise;
       },
       saveModeratorChangeToBackend: function(action, emailBody) {
         var that = this;
@@ -823,15 +908,17 @@ oppia.factory('explorationParamChangesService', [
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope',
+  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'explorationGadgetsService',
-  'StatesObjectFactory',
+  'StatesObjectFactory', 'SolutionValidityService', 'angularNameService',
+  'AnswerClassificationService', 'explorationContextService',
   function(
-      $log, $modal, $filter, $location, $rootScope,
+      $log, $modal, $filter, $location, $rootScope, $injector,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, explorationGadgetsService,
-      StatesObjectFactory) {
+      StatesObjectFactory, SolutionValidityService, angularNameService,
+      AnswerClassificationService, explorationContextService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -952,6 +1039,27 @@ oppia.factory('explorationStatesService', [
     return {
       init: function(statesBackendDict) {
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
+        // Initialize the solutionValidityService.
+        SolutionValidityService.init();
+        _states.getStateNames().forEach(function(stateName) {
+          var solution = _states.getState(stateName).interaction.solution;
+          if (solution) {
+            AnswerClassificationService.getMatchingClassificationResult(
+              explorationContextService.getExplorationId(),
+              _states.getState(stateName),
+              solution.correctAnswer,
+              true,
+              $injector.get(angularNameService.getNameOfInteractionRulesService(
+                _states.getState(stateName).interaction.id))
+            ).then(function(result) {
+              var solutionIsValid = (
+                editorContextService.getActiveStateName() !== (
+                  result.outcome.dest));
+              SolutionValidityService.updateValidity(
+                stateName, solutionIsValid);
+            });
+          }
+        });
       },
       getStates: function() {
         return angular.copy(_states);
@@ -977,6 +1085,15 @@ oppia.factory('explorationStatesService', [
         }
         return (
           validatorsService.isValidStateName(newStateName, showWarnings));
+      },
+      isSolutionValid: function(stateName) {
+        return SolutionValidityService.isSolutionValid(stateName);
+      },
+      updateSolutionValidity: function(stateName, solutionIsValid) {
+        SolutionValidityService.updateValidity(stateName, solutionIsValid);
+      },
+      deleteSolutionValidity: function(stateName) {
+        SolutionValidityService.deleteSolutionValidity(stateName);
       },
       getStateContentMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'content');
@@ -1253,6 +1370,16 @@ oppia.factory('statePropertyService', [
         this.displayed = angular.copy(this.savedMemento);
       }
     };
+  }
+]);
+
+// A data service that stores the current state content.
+// TODO(sll): Add validation.
+oppia.factory('stateContentService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveStateContent';
+    return child;
   }
 ]);
 
@@ -1819,9 +1946,10 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
         if (_currentlyInFirstVisit) {
           $rootScope.$broadcast('enterEditorForTheFirstTime');
           editorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_TUTORIAL_EVENT_URL).error(function() {
-            console.error('Warning: could not record tutorial start event.');
-          });
+          $http.post(STARTED_TUTORIAL_EVENT_URL + '/' + expId).error(
+            function() {
+              console.error('Warning: could not record tutorial start event.');
+            });
         }
       },
       markTutorialFinished: function() {
@@ -1848,20 +1976,22 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   ADD_INTERACTION: 'Please add an interaction to this card.',
   STATE_UNREACHABLE: 'This card is unreachable.',
   UNABLE_TO_END_EXPLORATION: (
-    'There\'s no way to complete the exploration starting from this card.')
+    'There\'s no way to complete the exploration starting from this card.'),
+  INCORRECT_SOLUTION: (
+    'The current solution does not lead to another card.')
 });
 
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
+  'parameterMetadataService', 'INTERACTION_SPECS',
+  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
+      parameterMetadataService, INTERACTION_SPECS,
+      WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1878,6 +2008,19 @@ oppia.factory('explorationWarningsService', [
       });
 
       return statesWithoutInteractionIds;
+    };
+
+    var _getStatesWithIncorrectSolution = function() {
+      var statesWithIncorrectSolution = [];
+
+      var states = explorationStatesService.getStates();
+      states.getStateNames().forEach(function(stateName) {
+        if (states.getState(stateName).interaction.solution &&
+            !explorationStatesService.isSolutionValid(stateName)) {
+          statesWithIncorrectSolution.push(stateName);
+        }
+      });
+      return statesWithIncorrectSolution;
     };
 
     // Returns a list of names of all nodes which are unreachable from the
@@ -2043,6 +2186,15 @@ oppia.factory('explorationWarningsService', [
         } else {
           stateWarnings[stateWithoutInteractionIds] = [
             STATE_ERROR_MESSAGES.ADD_INTERACTION];
+        }
+      });
+
+      var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
+      angular.forEach(statesWithIncorrectSolution, function(state) {
+        if (stateWarnings.hasOwnProperty(state)) {
+          stateWarnings[state].push(STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
+        } else {
+          stateWarnings[state] = [STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
         }
       });
 

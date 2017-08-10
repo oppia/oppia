@@ -18,6 +18,7 @@ import logging
 import urllib
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import fs_domain
 from core.domain import obj_services
 from core.domain import value_generators_domain
@@ -26,6 +27,7 @@ from core.domain import value_generators_domain
 class ObjectEditorTemplateHandler(base.BaseHandler):
     """Retrieves a template for an object editor."""
 
+    @acl_decorators.open_access
     def get(self, obj_type):
         """Handles GET requests."""
         try:
@@ -40,6 +42,7 @@ class ObjectEditorTemplateHandler(base.BaseHandler):
 class ValueGeneratorHandler(base.BaseHandler):
     """Retrieves the HTML template for a value generator editor."""
 
+    @acl_decorators.open_access
     def get(self, generator_id):
         """Handles GET requests."""
         try:
@@ -55,6 +58,7 @@ class ValueGeneratorHandler(base.BaseHandler):
 class ImageHandler(base.BaseHandler):
     """Handles image retrievals."""
 
+    @acl_decorators.open_access
     def get(self, exploration_id, encoded_filepath):
         """Returns an image.
 
@@ -81,3 +85,38 @@ class ImageHandler(base.BaseHandler):
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
+
+
+class AudioHandler(base.BaseHandler):
+    """Handles audio retrievals (only in dev -- in production, audio files are
+    served from GCS).
+    """
+
+    _AUDIO_PATH_PREFIX = 'audio'
+
+    @acl_decorators.open_access
+    def get(self, exploration_id, filename):
+        """Returns an audio file.
+
+        Args:
+            encoded_filepath: a string representing the audio filepath. This
+              string is encoded in the frontend using encodeURIComponent().
+        """
+        file_format = filename[(filename.rfind('.') + 1):]
+        # If the following is not cast to str, an error occurs in the wsgi
+        # library because unicode gets used.
+        self.response.headers['Content-Type'] = str(
+            'audio/%s' % file_format)
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration_id))
+
+        try:
+            raw = fs.get('%s/%s' % (self._AUDIO_PATH_PREFIX, filename))
+        except:
+            raise self.PageNotFoundException
+
+        self.response.cache_control.no_cache = None
+        self.response.cache_control.public = True
+        self.response.cache_control.max_age = 600
+        self.response.write(raw)

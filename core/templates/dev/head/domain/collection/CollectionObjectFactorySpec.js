@@ -19,6 +19,7 @@
 describe('Collection object factory', function() {
   var CollectionObjectFactory = null;
   var CollectionNodeObjectFactory = null;
+  var CollectionSkillObjectFactory = null;
   var _sampleCollection = null;
 
   beforeEach(module('oppia'));
@@ -26,6 +27,8 @@ describe('Collection object factory', function() {
   beforeEach(inject(function($injector) {
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    CollectionSkillObjectFactory = $injector.get(
+      'CollectionSkillObjectFactory');
 
     var sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -33,7 +36,9 @@ describe('Collection object factory', function() {
       objective: 'an objective',
       category: 'a category',
       version: '1',
-      nodes: []
+      nodes: [],
+      skills: {},
+      next_skill_id: 0
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
@@ -42,8 +47,8 @@ describe('Collection object factory', function() {
   var _addCollectionNode = function(explorationId) {
     var collectionNodeBackendObject = {
       exploration_id: explorationId,
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     };
     return _sampleCollection.addCollectionNode(
@@ -52,6 +57,12 @@ describe('Collection object factory', function() {
 
   var _getCollectionNode = function(explorationId) {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
+  };
+
+  var _addCollectionSkill = function(skillName) {
+    var skillId = _sampleCollection.getNewSkillId();
+    return _sampleCollection.addCollectionSkill(
+      CollectionSkillObjectFactory.createFromIdAndName(skillId, skillName));
   };
 
   it('should be able to create an empty collection object', function() {
@@ -64,14 +75,16 @@ describe('Collection object factory', function() {
     expect(collection.getTags()).toBeUndefined();
     expect(collection.getVersion()).toBeUndefined();
     expect(collection.getCollectionNodes()).toEqual([]);
+    expect(collection.getNextSkillId()).toEqual(0);
+    expect(collection.getCollectionSkills()).toEqual({});
   });
 
   it('should contain a collection node defined in the backend object',
     function() {
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration: {}
       };
       var collection = CollectionObjectFactory.create({
@@ -92,8 +105,8 @@ describe('Collection object factory', function() {
 
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration: {}
       };
       var collectionNode = CollectionNodeObjectFactory.create(
@@ -115,8 +128,8 @@ describe('Collection object factory', function() {
   it('should not add duplicate explorations', function() {
     var collectionNodeBackendObject = {
       exploration_id: 'exp_id0',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     };
     var collectionNode = CollectionNodeObjectFactory.create(
@@ -135,14 +148,14 @@ describe('Collection object factory', function() {
 
     var collectionNodeBackendObject1 = {
       exploration_id: 'exp_id0',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     };
     var collectionNodeBackendObject2 = {
       exploration_id: 'exp_id1',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     };
     var collectionNode1 = CollectionNodeObjectFactory.create(
@@ -169,8 +182,8 @@ describe('Collection object factory', function() {
       expect(_getCollectionNode('exp_id0')).toBeUndefined();
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration: {}
       };
       _sampleCollection.addCollectionNode(
@@ -181,15 +194,15 @@ describe('Collection object factory', function() {
         collectionNodeBackendObject));
 
       // Ensure mutability.
-      collectionNodeBefore.getPrerequisiteSkillList().addSkill('example');
+      collectionNodeBefore.addPrerequisiteSkillId('example');
       expect(collectionNodeBefore).not.toEqual(
         CollectionNodeObjectFactory.create(collectionNodeBackendObject));
 
       var collectionNodeAfter = _getCollectionNode('exp_id0');
       expect(collectionNodeAfter).not.toEqual(
         CollectionNodeObjectFactory.create(collectionNodeBackendObject));
-      expect(collectionNodeAfter.getPrerequisiteSkillList().containsSkill(
-        'example')).toBe(true);
+      expect(collectionNodeAfter.containsPrerequisiteSkillId('example')).toBe(
+        true);
     }
   );
 
@@ -229,7 +242,7 @@ describe('Collection object factory', function() {
       // Ensure contained collection nodes can be mutated and reflected in the
       // collection object.
       collectionNodes = _sampleCollection.getBindableCollectionNodes();
-      collectionNodes[1].getPrerequisiteSkillList().addSkill('example');
+      collectionNodes[1].addPrerequisiteSkillId('example');
       expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
         collectionNodes);
       expect(_getCollectionNode('exp_id1')).toEqual(collectionNodes[1]);
@@ -249,7 +262,7 @@ describe('Collection object factory', function() {
 
       // Collection nodes can be mutated and reflected in the collection object.
       collectionNodes = _sampleCollection.getBindableCollectionNodes();
-      collectionNodes[0].getPrerequisiteSkillList().addSkill('example');
+      collectionNodes[0].addPrerequisiteSkillId('example');
       expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
         collectionNodes);
       expect(_getCollectionNode('exp_id1')).toEqual(collectionNodes[1]);
@@ -268,7 +281,7 @@ describe('Collection object factory', function() {
       expect(startingNodes[0].getExplorationId()).toEqual('exp_id0');
       expect(startingNodes[1].getExplorationId()).toEqual('exp_id1');
 
-      startingNodes[0].getPrerequisiteSkillList().addSkill('example');
+      startingNodes[0].addPrerequisiteSkillId('example');
 
       startingNodes = _sampleCollection.getStartingCollectionNodes();
       expect(startingNodes.length).toEqual(1);
@@ -292,37 +305,146 @@ describe('Collection object factory', function() {
     ]);
   });
 
-  it('should return a combined skill list of all collection node skills',
+  it('should contain a collection skill defined in the backend object',
     function() {
-      _addCollectionNode('exp_id0');
-      _addCollectionNode('exp_id1');
-      _addCollectionNode('exp_id2');
-
-      var collectionNode0 = _getCollectionNode('exp_id0');
-      var collectionNode1 = _getCollectionNode('exp_id1');
-      var collectionNode2 = _getCollectionNode('exp_id2');
-      collectionNode0.getPrerequisiteSkillList().addSkill('c_needed_for_0');
-      collectionNode0.getPrerequisiteSkillList().addSkill('a_needed_for_01');
-      collectionNode0.getAcquiredSkillList().addSkill('b_final_skill');
-      collectionNode1.getPrerequisiteSkillList().addSkill('a_needed_for_01');
-      collectionNode1.getAcquiredSkillList().addSkill('c_needed_for_0');
-      collectionNode2.getAcquiredSkillList().addSkill('a_needed_for_01');
-
-      // Subsequent calls should return different lists.
-      var skillList = _sampleCollection.getSkillList();
-      var otherSkillList = _sampleCollection.getSkillList();
-      expect(skillList).toEqual(otherSkillList);
-      expect(skillList).not.toBe(otherSkillList);
-
-      // The skills will not be provided in sorted order.
-      var expectedSkills = [
-        'a_needed_for_01', 'b_final_skill', 'c_needed_for_0'];
-      expect(skillList.getSkills()).not.toEqual(expectedSkills);
-
-      skillList.sortSkills();
-      expect(skillList.getSkills()).toEqual(expectedSkills);
+      var collectionSkillBackendObject = {
+        name: 'skill01',
+        question_ids: []
+      };
+      var collection = CollectionObjectFactory.create({
+        id: 'collection_id',
+        nodes: [],
+        skills: {
+          skill0: collectionSkillBackendObject
+        },
+        next_skill_id: 1
+      });
+      expect(collection.containsCollectionSkill('skill0')).toBe(true);
+      expect(collection.containsCollectionSkill('fake skill')).toBe(false);
+      expect(collection.getCollectionSkills()).toEqual({
+        skill0: CollectionSkillObjectFactory.create(
+          'skill0', collectionSkillBackendObject)
+      });
     }
   );
+
+  it('should get the next usable skill id correctly',
+    function() {
+      expect(_sampleCollection.getNewSkillId()).toEqual('skill0');
+      expect(_sampleCollection.getNewSkillId()).toEqual('skill1');
+    });
+
+  it('should be able to add an existing skill object to the collection',
+    function() {
+      var collectionSkillBackendObject = {
+        name: 'skill01',
+        question_ids: []
+      };
+      _sampleCollection.setNextSkillId(1);
+      expect(_sampleCollection.addCollectionSkill(
+        CollectionSkillObjectFactory.create(
+          'skill0', collectionSkillBackendObject))).toBe(true);
+      expect(_sampleCollection.containsCollectionSkill('skill0')).toBe(true);
+    }
+  );
+
+  it('should be able to add new skills by skill name', function() {
+    expect(_addCollectionSkill('new skill')).toBe(true);
+    var newSkillId = _sampleCollection.getSkillIdFromName('new skill');
+    expect(newSkillId).toEqual('skill0');
+    expect(_sampleCollection.containsCollectionSkill(newSkillId)).toBe(true);
+
+    expect(_addCollectionSkill('new skill 2')).toBe(true);
+    var newSkillId2 = _sampleCollection.getSkillIdFromName('new skill 2');
+    expect(newSkillId2).toEqual('skill1');
+    expect(_sampleCollection.containsCollectionSkill(newSkillId2)).toBe(true);
+  });
+
+  it('should be able to delete skills', function() {
+    // Add collection nodes.
+    _addCollectionNode('exp_id0');
+    _addCollectionNode('exp_id1');
+
+    var collectionNode0 = _getCollectionNode('exp_id0');
+    var collectionNode1 = _getCollectionNode('exp_id1');
+
+    // Add skills.
+    expect(_addCollectionSkill('skill01')).toBe(true);
+    var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
+    expect(_addCollectionSkill('skill02')).toBe(true);
+    var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
+    expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(true);
+
+    collectionNode0.addAcquiredSkillId(skillId2);
+    collectionNode1.addPrerequisiteSkillId(skillId2);
+
+    // Delete a skill.
+    expect(_sampleCollection.deleteCollectionSkill(skillId2)).toBe(true);
+    expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(false);
+
+    // The other skill still exists.
+    expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(false);
+
+    // Skill ID is deleted from prerequisite and acquired skill IDs.
+    expect(collectionNode0.getAcquiredSkillIds()).toEqual([]);
+    expect(collectionNode1.getPrerequisiteSkillIds()).toEqual([]);
+  });
+
+  it('should not re-use skill ids for deleted skills', function() {
+    _addCollectionNode('exp_id0');
+    _addCollectionNode('exp_id1');
+    var collectionNode0 = _getCollectionNode('exp_id0');
+    var collectionNode1 = _getCollectionNode('exp_id1');
+
+    expect(_addCollectionSkill('skill01')).toBe(true);
+    var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
+    expect(_addCollectionSkill('skill02')).toBe(true);
+    var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
+
+    collectionNode0.addAcquiredSkillId(skillId2);
+    collectionNode1.addPrerequisiteSkillId(skillId2);
+
+    expect(_sampleCollection.deleteCollectionSkill(skillId2)).toBe(true);
+
+    // Skill ID is not reused
+    expect(_addCollectionSkill('skill03')).toBe(true);
+    var skillId3 = _sampleCollection.getSkillIdFromName('skill03');
+    expect(skillId3).toEqual('skill2');
+  });
+
+  it('should be able to get all skills', function() {
+    // Add skills.
+    expect(_addCollectionSkill('skill01')).toBe(true);
+    var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
+    expect(_addCollectionSkill('skill02')).toBe(true);
+    var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
+    expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(true);
+
+    // Check get all skills.
+    var expectedSkills = {};
+    expectedSkills[skillId1] = CollectionSkillObjectFactory.createFromIdAndName(
+        skillId1, 'skill01');
+    expectedSkills[skillId2] = CollectionSkillObjectFactory.createFromIdAndName(
+        skillId2, 'skill02');
+    expect(_sampleCollection.getCollectionSkills()).toEqual(expectedSkills);
+  });
+
+  it('should be able to clear skills', function() {
+    expect(_addCollectionSkill('skill01')).toBe(true);
+    var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
+    expect(_addCollectionSkill('skill02')).toBe(true);
+    var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
+
+    // Clear skills.
+    _sampleCollection.clearCollectionSkills();
+    expect(_sampleCollection.getCollectionSkills()).toEqual({});
+
+    // Check that IDs reset.
+    expect(_addCollectionSkill('new skill')).toBe(true);
+    var newSkillId = _sampleCollection.getSkillIdFromName('new skill');
+    expect(newSkillId).toEqual('skill0');
+    expect(_sampleCollection.containsCollectionSkill(newSkillId)).toBe(true);
+  });
 
   it('should be able to copy from another collection', function() {
     var secondCollection = CollectionObjectFactory.create({
@@ -332,14 +454,19 @@ describe('Collection object factory', function() {
       category: 'Another category',
       language_code: 'en',
       version: '15',
-      nodes: []
+      nodes: [],
+      skills: {},
+      next_skill_id: 0
     });
     secondCollection.addCollectionNode(CollectionNodeObjectFactory.create({
       exploration_id: 'exp_id5',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     }));
+    secondCollection.setNextSkillId(1);
+    secondCollection.addCollectionSkill(
+      CollectionSkillObjectFactory.createFromIdAndName('skill0', 'skill'));
 
     _addCollectionNode('exp_id0');
     _addCollectionNode('exp_id1');

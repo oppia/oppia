@@ -1,20 +1,27 @@
 <div ng-controller="StateSolution">
-  <div ng-if="!isCurrentInteractionLinear() &&
-              stateHintsService.displayed.length > 0 &&
-              objectType !== 'LogicQuestion'">
+  <div ng-if="stateHintsService.displayed.length > 0">
     <div class="oppia-editor-header">
       <strong>Solution</strong>
     </div>
     <md-card class="oppia-editor-card-with-avatar">
       <div class="oppia-editor-card-body">
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
-            ng-if="solutionIsSpecified &&
+            ng-if="stateSolutionService.savedMemento &&
                    stateSolutionService.savedMemento.explanation">
-          <li ng-class="!isActive"
+          <li ng-class="!inlineSolutionEditorIsActive"
               class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
               style="margin-top: 0;">
-            <a ng-click="toggleIsActive()"
-               class="oppia-rule-tab">
+            <div class="oppia-rule-header-warning-placement"
+                 ng-if="!isSolutionValid()"
+                 ng-click="toggleInlineSolutionEditorIsActive()"
+                 tooltip="This solution does not lead to another card. Verify the responses specified or change the solution."
+                 tooltip-placement="bottom">
+              <div class="oppia-rule-header-warning-style">
+                ⚠
+              </div>
+            </div>
+            <a ng-click="toggleInlineSolutionEditorIsActive()"
+               class="oppia-rule-tab protractor-test-oppia-solution-tab">
               <div class="oppia-response-header-block">
                 <div class="oppia-response-header">
                   <span angular-html-bind="getSolutionSummary()"></span>
@@ -27,13 +34,10 @@
               </div>
             </a>
 
-            <div ng-if="isActive">
-              <div class="oppia-editor-card-section">
-                <solution-editor solution="stateSolutionService.savedMemento"
-                                 object-type="objectType"
-                                 interaction-html="interactionHtml"
-                                 rule-description-choices="ruleDescriptionChoices"
-                                 on-save="onComponentSave">
+            <div ng-if="inlineSolutionEditorIsActive">
+              <div class="oppia-editor-card-section protractor-test-oppia-solution-body">
+                <solution-editor interaction-id="stateInteractionIdService.savedMemento"
+                                 correct-answer-editor-html="correctAnswerEditorHtml">
                 </solution-editor>
               </div>
             </div>
@@ -44,87 +48,13 @@
 
     <md-card style="margin: 0; padding: 0;">
       <div ng-if="editabilityService.isEditableOutsideTutorialMode()">
-        <button type="button"
-                class="btn btn-default btn-lg oppia-add-hint-button"
-                ng-click="openAddSolutionModal()">
+        <button ng-if="!stateSolutionService.savedMemento"
+                type="button"
+                class="btn btn-default btn-lg oppia-add-hint-button protractor-test-oppia-add-solution-button"
+                ng-click="openAddOrUpdateSolutionModal()">
           + Add Solution
         </button>
       </div>
     </md-card>
   </div>
 </div>
-
-<script type="text/ng-template" id="modals/addSolution">
-  <div class="modal-header">
-    <h3>Add Solution</h3>
-  </div>
-
-  <div class="modal-body">
-    <form name="addSolutionForm.answer"
-          class="form-inline">
-      <div class="oppia-rule-details-header">
-        <select ng-model="answerIsExclusive">
-          <option ng-if="!answerIsExclusive" value="">-- Please select an option --</option>
-          <option value="false">One</option>
-          <option value="true">Only</option>
-        </select> <strong>Solution is...</strong>
-        <div ng-if="!interactionHtml">
-          <object-editor ng-if="objectType === 'UnicodeString'"
-                         obj-type="<[objectType]>"
-                         init-args="{choices: ruleDescriptionChoices}"
-                         is-editable="true"
-                         always-editable="true"
-                         value="tmpSolution.correctAnswer"
-                         style="color: black;">
-          </object-editor>
-          <object-editor ng-if="objectType === 'CodeString' ||
-                                objectType === 'NormalizedString' ||
-                                objectType === 'Real'"
-                         obj-type="<[objectType]>"
-                         init-args="{choices: ruleDescriptionChoices}"
-                         is-editable="true"
-                         always-editable="true"
-                         value="tmpSolution.correctAnswer"
-                         style="color: black;">
-          </object-editor>
-        </div>
-        <div angular-html-bind="interactionHtml"></div>
-        <br>
-        <strong>Explanation is...</strong>
-        <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
-                             local-value="tmpSolution.explanation">
-        </schema-based-editor>
-      </div>
-    </form>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success"
-            ng-click="saveSolution()"
-            ng-disabled="!tmpSolution.explanation &&
-                         !tmpSolution.correctAnswer">
-      Check and Save Solution
-    </button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/deleteSolution">
-  <div class="modal-header">
-    <h3>Delete Solution</h3>
-  </div>
-
-  <div class="modal-body">
-    <p>
-      Are you sure you want to delete this solution?
-    </p>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-danger"
-            ng-click="reallyDelete()">
-      Delete Solution
-    </button>
-  </div>
-</script>

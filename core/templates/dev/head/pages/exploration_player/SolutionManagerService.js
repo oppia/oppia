@@ -17,8 +17,7 @@
  */
 
 oppia.factory('SolutionManagerService', [
-  '$timeout',
-  function($timeout) {
+  function() {
     var solution = null;
     var solutionIsExhausted = false;
     var _getCurrentSolution = function() {

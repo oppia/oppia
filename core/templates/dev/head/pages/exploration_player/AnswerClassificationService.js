@@ -27,10 +27,10 @@ oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
   '$http', '$q', 'LearnerParamsService', 'alertsService', 'INTERACTION_SPECS',
-  'ENABLE_STRING_CLASSIFIER', 'EXPLICIT_CLASSIFICATION',
+  'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
   function($http, $q, LearnerParamsService, alertsService, INTERACTION_SPECS,
-      ENABLE_STRING_CLASSIFIER, EXPLICIT_CLASSIFICATION,
+      ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
@@ -128,7 +128,7 @@ oppia.factory('AnswerClassificationService', [
         if (result.outcome === defaultOutcome &&
             INTERACTION_SPECS[oldState.interaction.id]
               .is_string_classifier_trainable &&
-            ENABLE_STRING_CLASSIFIER) {
+            ENABLE_ML_CLASSIFIERS) {
           var classifyUrl = '/explorehandler/classify/' + explorationId;
           var params = (
             isInEditorMode ? {} : LearnerParamsService.getAllParams());

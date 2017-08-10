@@ -580,7 +580,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -597,12 +597,12 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -619,7 +619,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -647,7 +647,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -664,12 +664,12 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   Renamed state:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -686,7 +686,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -783,7 +783,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     contents."""
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -800,7 +800,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -808,7 +808,7 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'New state': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -825,7 +825,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """)
     }
@@ -834,7 +834,7 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -851,7 +851,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """)
     }
@@ -1396,7 +1396,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<b>Test content</b>',
-                    'audio_translations': [],
+                    'audio_translations': {},
                 }),
             '')
 
@@ -2553,7 +2553,7 @@ states:
   END:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: Congratulations, you have finished!
     interaction:
       answer_groups: []
@@ -2565,12 +2565,12 @@ states:
       fallbacks: []
       hints: []
       id: EndExploration
-      solution: {}
+      solution: null
     param_changes: []
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -2585,7 +2585,7 @@ states:
       fallbacks: []
       hints: []
       id: Continue
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []

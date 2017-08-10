@@ -51,18 +51,26 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
-INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
-GADGETS_DIR = os.path.join('extensions', 'gadgets')
-RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
+
+EXTENSIONS_DIR_PREFIX = (
+    'backend_prod_files' if (IS_MINIFIED or not DEV_MODE) else '')
+INTERACTIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+GADGETS_DIR = os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'gadgets')
+RTE_EXTENSIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
-# Choose production template if minification flag is used or
+# Choose production templates folder if minification flag is used or
 # if in production mode
-TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
-FRONTEND_TEMPLATES_DIR = os.path.join(
-    'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
-DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
+if IS_MINIFIED or not DEV_MODE:
+    FRONTEND_TEMPLATES_DIR = (
+        os.path.join('backend_prod_files', 'templates', 'head'))
+else:
+    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+DEPENDENCIES_TEMPLATES_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
@@ -101,6 +109,10 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
+# The maximum number of activities allowed in the playlist of the learner. This
+# limit applies to both the explorations playlist and the collections playlist.
+MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
+
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
 
@@ -138,13 +150,13 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 11
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 3
+CURRENT_COLLECTION_SCHEMA_VERSION = 4
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -397,6 +409,19 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
+# Google Cloud Storage bucket name.
+GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
+
+# Url prefix for destination of uploaded files and location of downloaded
+# files.
+
+if DEV_MODE:
+    AUDIO_URL_TEMPLATE = '/audiohandler/<exploration_id>/audio/<filename>'
+else:
+    AUDIO_URL_TEMPLATE = (
+        'https://storage.googleapis.com/%s/<exploration_id>/'
+        'assets/audio/<filename>' % GCS_RESOURCE_BUCKET_NAME)
+
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
     'Collapsible': {
@@ -506,6 +531,7 @@ DEMO_EXPLORATIONS = {
     u'14': 'about_oppia.yaml',
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
+    u'17': 'audio_test',
 }
 
 DEMO_COLLECTIONS = {
@@ -548,12 +574,12 @@ COLLECTION_URL_PREFIX = '/collection'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
-DASHBOARD_EXPLORATION_STATS_PREFIX = '/creatordashboardhandler/explorationstats'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
+EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
 EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
@@ -566,6 +592,8 @@ FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
+LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
+LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -643,7 +671,7 @@ TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with base.js
-ENABLE_STRING_CLASSIFIER = False
+ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
@@ -667,11 +695,6 @@ USER_QUERY_STATUS_FAILED = 'failed'
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
-
-# Types of activities that can be created with Oppia.
-ACTIVITY_TYPE_EXPLORATION = 'exploration'
-ACTIVITY_TYPE_COLLECTION = 'collection'
-ALL_ACTIVITY_TYPES = [ACTIVITY_TYPE_EXPLORATION, ACTIVITY_TYPE_COLLECTION]
 
 # These categories are shown in the library navbar.
 SEARCH_DROPDOWN_CATEGORIES = sorted([
@@ -808,5 +831,3 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
 VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'
-
-GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'

@@ -21,11 +21,13 @@ oppia.controller('StateHints', [
   'ENABLE_HINT_EDITOR', 'alertsService', 'INTERACTION_SPECS',
   'stateHintsService', 'explorationStatesService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory', 'oppiaPlayerService',
+  'stateSolutionService',
   function(
     $scope, $rootScope, $modal, $filter, editorContextService,
     ENABLE_HINT_EDITOR, alertsService, INTERACTION_SPECS,
     stateHintsService, explorationStatesService, stateInteractionIdService,
-    UrlInterpolationService, HintObjectFactory, oppiaPlayerService) {
+    UrlInterpolationService, HintObjectFactory, oppiaPlayerService,
+    stateSolutionService) {
     $scope.editorContextService = editorContextService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
@@ -55,9 +57,15 @@ oppia.controller('StateHints', [
       var currentActiveIndex = $scope.activeHintIndex;
       if (currentActiveIndex !== null && (
           !stateHintsService.displayed[currentActiveIndex].hintText)) {
-        alertsService.addInfoMessage('Deleting empty hint.');
-        stateHintsService.displayed.splice(currentActiveIndex, 1);
-        stateHintsService.saveDisplayedValue();
+        if (stateSolutionService.savedMemento &&
+          stateHintsService.displayed.length === 1) {
+          openDeleteLastHintModal();
+          return;
+        } else {
+          alertsService.addInfoMessage('Deleting empty hint.');
+          stateHintsService.displayed.splice(currentActiveIndex, 1);
+          stateHintsService.saveDisplayedValue();
+        }
       }
       // If the current hint is being clicked on again, close it.
       if (newIndex === $scope.activeHintIndex) {
@@ -135,9 +143,37 @@ oppia.controller('StateHints', [
       }
     };
 
+    var openDeleteLastHintModal = function() {
+      alertsService.clearWarnings();
+
+      $modal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/delete_last_hint_modal.html'),
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance',
+          function($scope, $modalInstance) {
+            $scope.deleteBothSolutionAndHint = function() {
+              $modalInstance.close();
+            };
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              alertsService.clearWarnings();
+            };
+          }
+        ]
+      }).result.then(function() {
+        stateSolutionService.displayed = null;
+        stateSolutionService.saveDisplayedValue();
+        stateHintsService.displayed = [];
+        stateHintsService.saveDisplayedValue();
+      });
+    };
+
     $scope.deleteHint = function(index, evt) {
       // Prevent clicking on the delete button from also toggling the display
-      // state of the answer group.
+      // state of the hint.
       evt.stopPropagation();
 
       alertsService.clearWarnings();
@@ -157,12 +193,17 @@ oppia.controller('StateHints', [
           }
         ]
       }).result.then(function() {
-        stateHintsService.displayed.splice(index, 1);
-        stateHintsService.saveDisplayedValue();
+        if (stateSolutionService.savedMemento &&
+          stateHintsService.savedMemento.length === 1) {
+          openDeleteLastHintModal();
+        } else {
+          stateHintsService.displayed.splice(index, 1);
+          stateHintsService.saveDisplayedValue();
+        }
       });
     };
 
-    $scope.onComponentSave = function() {
+    $scope.onSaveInlineHint = function() {
       stateHintsService.saveDisplayedValue();
     };
   }

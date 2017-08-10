@@ -13,194 +13,106 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers, services and filters for solution.
+ * @fileoverview Controller for solution.
  */
 
 oppia.controller('StateSolution', [
-  '$scope', '$rootScope', '$modal', '$filter', '$injector',
-  'editorContextService', 'alertsService', 'INTERACTION_SPECS',
-  'stateSolutionService', 'explorationStatesService',
-  'oppiaExplorationHtmlFormatterService', 'stateInteractionIdService',
-  'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
-  'responsesService', 'AnswerClassificationService',
-  'explorationContextService', 'angularNameService', 'oppiaHtmlEscaper',
+  '$scope', '$rootScope', '$modal', 'editorContextService', 'alertsService',
+  'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
+  'SolutionVerificationService', 'oppiaExplorationHtmlFormatterService',
+  'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
+  'SolutionObjectFactory', 'explorationContextService',
+  'explorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
-    $scope, $rootScope, $modal, $filter, $injector,
-    editorContextService, alertsService, INTERACTION_SPECS,
-    stateSolutionService, explorationStatesService,
-    oppiaExplorationHtmlFormatterService, stateInteractionIdService,
-    stateHintsService, UrlInterpolationService, SolutionObjectFactory,
-    responsesService, AnswerClassificationService,
-    explorationContextService, angularNameService, oppiaHtmlEscaper) {
-    $scope.editorContextService = editorContextService;
-    $scope.stateSolutionService = stateSolutionService;
-    $scope.isActive = false;
-    $scope.answerIsExclusive = false;
-    $scope.answerCheckPassed = false;
-    $scope.INTERACTION_SPECS = INTERACTION_SPECS;
-    $rootScope.interactionHtml = '';
-
+    $scope, $rootScope, $modal, editorContextService, alertsService,
+    INTERACTION_SPECS, stateSolutionService, explorationStatesService,
+    SolutionVerificationService, oppiaExplorationHtmlFormatterService,
+    stateInteractionIdService, stateHintsService, UrlInterpolationService,
+    SolutionObjectFactory, explorationContextService,
+    explorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
+    $scope.correctAnswer = null;
+    $scope.correctAnswerEditorHtml = '';
+    $scope.inlineSolutionEditorIsActive = false;
+    $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
+      'currentCorrectAnswerEditorHtmlForSolutionEditor');
     $scope.stateHintsService = stateHintsService;
+    $scope.stateInteractionIdService = stateInteractionIdService;
     $scope.stateSolutionService = stateSolutionService;
-    $rootScope.correctAnswer = null;
 
-    $scope.supportedInteractions = [
-      'InteractiveMap',
-      'MusicNotesInput',
-      'GraphInput',
-      'SetInput',
-      'MathExpressionInput',
-      'MultipleChoiceInput',
-      'ImageClickInput',
-      'ItemSelectionInput'
-    ];
 
-    $scope.unsupportedInteractionObjectTypes = {
-      CodeRepl: 'CodeString',
-      PencilCodeEditor: 'CodeString',
-      NumericInput: 'Real',
-      TextInput: 'NormalizedString',
-      LogicProof: 'LogicQuestion'
+    explorationWarningsService.updateWarnings();
+
+    $scope.isSolutionValid = function() {
+      return explorationStatesService.isSolutionValid(
+        editorContextService.getActiveStateName());
     };
 
-    $rootScope.submitAnswer = function (answer, rules) {
-      $rootScope.correctAnswer = answer;
+    $scope.correctAnswerEditorHtml = (
+      oppiaExplorationHtmlFormatterService.getInteractionHtml(
+        stateInteractionIdService.savedMemento,
+        explorationStatesService.getInteractionCustomizationArgsMemento(
+          editorContextService.getActiveStateName()),
+        $scope.SOLUTION_EDITOR_FOCUS_LABEL));
+
+    $scope.toggleInlineSolutionEditorIsActive = function() {
+      $scope.inlineSolutionEditorIsActive = (
+        !$scope.inlineSolutionEditorIsActive);
     };
-
-    $scope.toggleIsActive = function() {
-      $scope.isActive = !$scope.isActive;
-    };
-
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
-      stateSolutionService.init(
-        editorContextService.getActiveStateName(),
-        stateData.interaction.solution);
-      $rootScope.interactionHtml = (
-        oppiaExplorationHtmlFormatterService.getInteractionHtml(
-          stateInteractionIdService.savedMemento,
-          explorationStatesService.getInteractionCustomizationArgsMemento(
-            editorContextService.getActiveStateName()),
-          'currentInteractionHtml'));
-
-      $scope.solutionIsSpecified = (
-        JSON.stringify(stateSolutionService.savedMemento) ? true : false);
-      $scope.isActive = false;
-      var interactionId = stateInteractionIdService.savedMemento;
-
-      $scope.INTERACTION_SPECS = INTERACTION_SPECS[interactionId];
-
-      if ($scope.supportedInteractions.indexOf(interactionId) === -1) {
-        $rootScope.interactionHtml = null;
-        $rootScope.objectType = (
-          $scope.unsupportedInteractionObjectTypes[interactionId]);
-      } else {
-        $rootScope.objectType = null;
-      }
-    });
 
     $scope.getSolutionSummary = function() {
-      var solution = stateSolutionService.displayed;
-      var isExclusiveAnswer = (
-        solution.answerIsExclusive ? 'Only' : 'One');
-      var correctAnswer = '';
-      var interactionId = stateInteractionIdService.savedMemento;
-      if (interactionId === 'GraphInput') {
-        correctAnswer = '[Graph Object]';
-      } else if (interactionId === 'MultipleChoiceInput') {
-        correctAnswer = (
-          oppiaHtmlEscaper.objToEscapedJson(
-            responsesService.getAnswerChoices()[solution.correctAnswer].label));
-      } else if (interactionId === 'MathExpressionInput') {
-        correctAnswer = solution.correctAnswer.latex;
-      } else if (interactionId === 'CodeRepl' ||
-                 interactionId === 'PencilCodeEditor') {
-        correctAnswer = solution.correctAnswer.code;
-      } else if (interactionId === 'MusicNotesInput') {
-        correctAnswer = '[Music Notes Object]';
-      } else if (interactionId === 'ImageClickInput') {
-        correctAnswer = solution.correctAnswer.clickedRegions;
-      } else {
-        correctAnswer = (
-          oppiaHtmlEscaper.objToEscapedJson(solution.correctAnswer));
-      }
-
-      var explanation = (
-        $filter('convertToPlainText')(solution.explanation));
-      return (
-        '[' + isExclusiveAnswer + ' solution is ' + correctAnswer + '] ' +
-        explanation);
+      var solution = stateSolutionService.savedMemento;
+      return solution.getSummary(stateInteractionIdService.savedMemento);
     };
 
     // This returns false if the current interaction ID is null.
     $scope.isCurrentInteractionLinear = function() {
-      var interactionId = stateInteractionIdService.savedMemento;
-      return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+      return (
+        stateInteractionIdService.savedMemento &&
+        INTERACTION_SPECS[stateInteractionIdService.savedMemento].is_linear);
     };
 
-    $scope.openAddSolutionModal = function() {
+    $scope.openAddOrUpdateSolutionModal = function() {
       alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
-      $scope.isActive = false;
+      $scope.inlineSolutionEditorIsActive = false;
 
       $modal.open({
-        templateUrl: 'modals/addSolution',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'add_or_update_solution_modal.html'),
         backdrop: 'static',
         controller: [
-          '$scope', '$rootScope', '$modalInstance', 'editorContextService',
-          function($scope, $rootScope, $modalInstance, editorContextService) {
+          '$scope', '$modalInstance', 'stateSolutionService',
+          function(
+            $scope, $modalInstance, stateSolutionService) {
+            $scope.stateSolutionService = stateSolutionService;
+            $scope.correctAnswerEditorHtml = (
+              oppiaExplorationHtmlFormatterService.getInteractionHtml(
+                stateInteractionIdService.savedMemento,
+                explorationStatesService.getInteractionCustomizationArgsMemento(
+                  editorContextService.getActiveStateName()),
+                $scope.SOLUTION_EDITOR_FOCUS_LABEL));
             $scope.EXPLANATION_FORM_SCHEMA = {
               type: 'html',
               ui_config: {}
             };
 
-            var interactionId = stateInteractionIdService.savedMemento;
-            $scope.INTERACTION_SPECS = INTERACTION_SPECS;
+            $scope.data = {
+              answerIsExclusive: false,
+              correctAnswer: null,
+              explanation: ''
+            };
 
-            $scope.tmpSolution = {};
-            $scope.tmpSolution.answerIsExclusive = $scope.answerIsExclusive;
-            $scope.tmpSolution.correctAnswer = '';
-            $scope.tmpSolution.explanation = '';
-
-            $scope.addSolutionForm = {};
-
-            if ($rootScope.objectType === 'CodeString') {
-              stateSolutionService.displayed = {
-                correctAnswer: {
-                  code: '',
-                  output: '',
-                  evaluation: '',
-                  error: ''
-                }
-              };
-            }
+            $scope.submitAnswer = function(answer) {
+              $scope.data.correctAnswer = answer;
+            };
 
             $scope.saveSolution = function() {
-              // Close the modal and save it afterwards.
-              $scope.tmpSolution.answerIsExclusive = (
-                $scope.answerIsExclusive === 'true');
-              var answer = ($rootScope.correctAnswer !== null) ? (
-                $rootScope.correctAnswer) : $scope.tmpSolution.correctAnswer;
-              if ($rootScope.objectType === 'CodeString') {
-                answer = {
-                  code: $scope.tmpSolution.correctAnswer,
-                  output: '',
-                  evaluation: '',
-                  error: ''
-                };
-              }
-              if ($rootScope.objectType === 'UnicodeString') {
-                answer = {
-                  ascii: '',
-                  latex: $scope.tmpSolution.correctAnswer
-                };
-              }
-
               $modalInstance.close({
-                solution: angular.copy(
-                  SolutionObjectFactory.createNew(
-                    $scope.tmpSolution.answerIsExclusive,
-                    answer,
-                    $scope.tmpSolution.explanation))
+                solution: SolutionObjectFactory.createNew(
+                  $scope.data.answerIsExclusive,
+                  $scope.data.correctAnswer,
+                  $scope.data.explanation)
               });
             };
 
@@ -211,52 +123,42 @@ oppia.controller('StateSolution', [
           }
         ]
       }).result.then(function(result) {
-        var explorationId =
-          explorationContextService.getExplorationId();
-        var currentStateName =
-          editorContextService.getActiveStateName();
-        var state = explorationStatesService.getState(currentStateName);
-        var interactionId = stateInteractionIdService.savedMemento;
-        var rulesServiceName = (
-          angularNameService.getNameOfInteractionRulesService(interactionId));
-        // Inject RulesService dynamically.
-        var rulesService = $injector.get(rulesServiceName);
         var correctAnswer = result.solution.correctAnswer;
-        try {
-          AnswerClassificationService.getMatchingClassificationResult(
-            explorationId, state, correctAnswer, true, rulesService)
-            .then(function (result) {
-              if (editorContextService.getActiveStateName() !== (
-              result.outcome.dest)) {
-                stateSolutionService.saveDisplayedValue();
-                $scope.solutionIsSpecified = (
-                  JSON.stringify(
-                    stateSolutionService.savedMemento) ? true : false);
-              } else {
-                alertsService.addInfoMessage('That solution was incorrect!');
-                $scope.openAddSolutionModal();
-              }
-            });
-        }
-        catch (e) {
-          alertsService.addInfoMessage('That solution was invalid!');
-          $scope.openAddSolutionModal();
-        }
+        var currentStateName = editorContextService.getActiveStateName();
+        var state = explorationStatesService.getState(currentStateName);
+        SolutionVerificationService.verifySolution(
+          explorationContextService.getExplorationId(),
+          state,
+          correctAnswer,
+          function () {
+            explorationStatesService.updateSolutionValidity(
+              currentStateName, true);
+            explorationWarningsService.updateWarnings();
+          },
+          function () {
+            explorationStatesService.updateSolutionValidity(
+              currentStateName, false);
+            explorationWarningsService.updateWarnings();
+            alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+          }
+        );
+
         stateSolutionService.displayed = result.solution;
+        stateSolutionService.saveDisplayedValue();
       });
     };
 
     $scope.deleteSolution = function(evt) {
-      // Prevent clicking on the delete button from also toggling the display
-      // state of the answer group.
       evt.stopPropagation();
 
       alertsService.clearWarnings();
       $modal.open({
-        templateUrl: 'modals/deleteSolution',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/delete_solution_modal.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$modalInstance',
+          function($scope, $modalInstance) {
             $scope.reallyDelete = function() {
               $modalInstance.close();
             };
@@ -270,53 +172,9 @@ oppia.controller('StateSolution', [
       }).result.then(function() {
         stateSolutionService.displayed = null;
         stateSolutionService.saveDisplayedValue();
-        $scope.solutionIsSpecified = false;
+        explorationStatesService.deleteSolutionValidity(
+          editorContextService.getActiveStateName());
       });
-    };
-
-    $scope.onComponentSave = function() {
-      alertsService.clearWarnings();
-      var explorationId =
-        explorationContextService.getExplorationId();
-      var currentStateName =
-        editorContextService.getActiveStateName();
-      var state = explorationStatesService.getState(currentStateName);
-      var interactionId = stateInteractionIdService.savedMemento;
-      var rulesServiceName =
-        angularNameService.getNameOfInteractionRulesService(
-          interactionId);
-      // Inject RulesService dynamically.
-      var rulesService = $injector.get(rulesServiceName);
-      var answer = stateSolutionService.savedMemento.correctAnswer;
-
-      try {
-        AnswerClassificationService.getMatchingClassificationResult(
-          explorationId, state, answer, true, rulesService).then(
-            function (result) {
-              if (editorContextService.getActiveStateName() !== (
-              result.outcome.dest)) {
-                stateSolutionService.savedMemento.correctAnswer = answer;
-                stateSolutionService.displayed = (
-                  stateSolutionService.savedMemento);
-                stateSolutionService.saveDisplayedValue();
-                $scope.solutionIsSpecified = (
-                  JSON.stringify(
-                    stateSolutionService.displayed) ? true : false);
-              } else {
-                alertsService.addInfoMessage('That solution was incorrect!');
-                stateSolutionService.saveDisplayedValue();
-                $scope.solutionIsSpecified = (
-                  JSON.stringify(
-                    stateSolutionService.displayed) ? true : false);
-              }
-            });
-      }
-      catch (e) {
-        alertsService.addInfoMessage('That solution was invalid!');
-        stateSolutionService.saveDisplayedValue();
-        $scope.solutionIsSpecified = (
-          JSON.stringify(stateSolutionService.displayed) ? true : false);
-      }
     };
   }
 ]);

@@ -17,31 +17,67 @@
  * domain objects.
  */
 
-oppia.factory('SolutionObjectFactory', function() {
-  var Solution = function(answerIsExclusive, correctAnswer, explanation) {
-    this.answerIsExclusive = answerIsExclusive;
-    this.correctAnswer = correctAnswer;
-    this.explanation = explanation;
-  };
-
-  Solution.prototype.toBackendDict = function() {
-    return {
-      answer_is_exclusive: this.answerIsExclusive,
-      correct_answer: this.correctAnswer,
-      explanation: this.explanation
+oppia.factory('SolutionObjectFactory', [
+  '$filter', 'oppiaHtmlEscaper',
+  function($filter, oppiaHtmlEscaper) {
+    var Solution = function(answerIsExclusive, correctAnswer, explanation) {
+      this.answerIsExclusive = answerIsExclusive;
+      this.correctAnswer = correctAnswer;
+      this.explanation = explanation;
     };
-  };
 
-  Solution.createFromBackendDict = function(solutionBackendDict) {
-    return new Solution(
-      solutionBackendDict.answer_is_exclusive,
-      solutionBackendDict.correct_answer,
-      solutionBackendDict.explanation);
-  };
+    Solution.prototype.toBackendDict = function() {
+      return {
+        answer_is_exclusive: this.answerIsExclusive,
+        correct_answer: this.correctAnswer,
+        explanation: this.explanation
+      };
+    };
 
-  Solution.createNew = function(answerIsExclusive, correctAnswer, explanation) {
-    return new Solution(answerIsExclusive, correctAnswer, explanation);
-  };
+    Solution.createFromBackendDict = function(solutionBackendDict) {
+      return new Solution(
+        solutionBackendDict.answer_is_exclusive,
+        solutionBackendDict.correct_answer,
+        solutionBackendDict.explanation);
+    };
 
-  return Solution;
-});
+    Solution.createNew = function(
+        answerIsExclusive, correctAnswer, explanation) {
+      return new Solution(answerIsExclusive, correctAnswer, explanation);
+    };
+
+    Solution.prototype.getSummary = function(interactionId) {
+      var solutionType = (
+        this.answerIsExclusive ? 'The only' : 'One');
+      var correctAnswer = null;
+      if (interactionId === 'GraphInput') {
+        correctAnswer = '[Graph Object]';
+      } else if (interactionId === 'MathExpressionInput') {
+        correctAnswer = this.correctAnswer.latex;
+      } else if (interactionId === 'CodeRepl' ||
+        interactionId === 'PencilCodeEditor') {
+        correctAnswer = this.correctAnswer.code;
+      } else if (interactionId === 'MusicNotesInput') {
+        correctAnswer = '[Music Notes Object]';
+      } else if (interactionId === 'LogicProof') {
+        correctAnswer = this.correctAnswer.correct;
+      } else {
+        correctAnswer = (
+          oppiaHtmlEscaper.objToEscapedJson(this.correctAnswer));
+      }
+      var explanation = (
+        $filter('convertToPlainText')(this.explanation));
+      return (
+        solutionType + ' solution is "' + correctAnswer + '". ' + explanation);
+    };
+
+    Solution.prototype.setCorrectAnswer = function(correctAnswer) {
+      this.correctAnswer = correctAnswer;
+    };
+
+    Solution.prototype.setExplanation = function(explanation) {
+      this.explanation = explanation;
+    };
+
+    return Solution;
+  }]);

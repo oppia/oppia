@@ -33,10 +33,13 @@ from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import trigger_registry
+from core.platform import models
 import feconf
 import jinja_utils
 import schema_utils
 import utils
+
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -401,7 +404,6 @@ class AudioTranslation(object):
             dict. A dict, mapping all fields of AudioTranslation instance.
         """
         return {
-            'language_code': self.language_code,
             'filename': self.filename,
             'file_size_bytes': self.file_size_bytes,
             'needs_update': self.needs_update,
@@ -419,25 +421,20 @@ class AudioTranslation(object):
             AudioTranslation. The corresponding AudioTranslation domain object.
         """
         return cls(
-            audio_translation_dict['language_code'],
             audio_translation_dict['filename'],
             audio_translation_dict['file_size_bytes'],
             audio_translation_dict['needs_update'])
 
-    def __init__(self, language_code, filename, file_size_bytes, needs_update):
+    def __init__(self, filename, file_size_bytes, needs_update):
         """Initializes a AudioTranslation domain object.
 
         Args:
-            language_code: str. The language code of the audio.
             filename: str. The corresponding audio file path.
             file_size_bytes: int. The file size, in bytes. Used to display
                 potential bandwidth usage to the learner before they download
                 the file.
             needs_update: bool. Whether audio is marked for needing review.
         """
-        # str. A language code, such as ‘en’ or ‘hi’. A hybrid language will be
-        # represented for example as ‘hi-en’ for Hinglish.
-        self.language_code = language_code
         # str. The corresponding audio file path, e.g.
         # "content-en-2-h7sjp8s.mp3".
         self.filename = filename
@@ -454,16 +451,6 @@ class AudioTranslation(object):
             ValidationError: One or more attributes of the AudioTranslation are
             invalid.
         """
-        if not isinstance(self.language_code, basestring):
-            raise utils.ValidationError(
-                'Expected language code to be a string, received: %s' %
-                self.language_code)
-        allowed_audio_language_codes = [
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
-        if self.language_code not in allowed_audio_language_codes:
-            raise utils.ValidationError(
-                'Unrecognized language code: %s' % self.language_code)
-
         if not isinstance(self.filename, basestring):
             raise utils.ValidationError(
                 'Expected audio filename to be a string, received %s' %
@@ -496,6 +483,21 @@ class AudioTranslation(object):
 class SubtitledHtml(object):
     """Value object representing subtitled HTML."""
 
+    def __init__(self, html, audio_translations):
+        """Initializes a SubtitledHtml domain object.
+
+        Args:
+            html: str. A piece of user submitted HTML. This is cleaned in such
+                a way as to contain a restricted set of HTML tags.
+            audio_translations: dict(str: AudioTranslation). Dict mapping
+                language codes (such as "en" or "hi") to AudioTranslation
+                domain objects. Hybrid languages will be represented using
+                composite language codes, such as "hi-en" for Hinglish.
+        """
+        self.html = html_cleaner.clean(html)
+        self.audio_translations = audio_translations
+        self.validate()
+
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.
 
@@ -504,9 +506,11 @@ class SubtitledHtml(object):
         """
         return {
             'html': self.html,
-            'audio_translations': [
-                audio_translation.to_dict()
-                for audio_translation in self.audio_translations]
+            'audio_translations': {
+                language_code: audio_translation.to_dict()
+                for language_code, audio_translation
+                in self.audio_translations.iteritems()
+            }
         }
 
     @classmethod
@@ -520,23 +524,11 @@ class SubtitledHtml(object):
         Returns:
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
-        return cls(subtitled_html_dict['html'], [
-            AudioTranslation.from_dict(audio_translation_dict)
-            for audio_translation_dict in
-            subtitled_html_dict['audio_translations']])
-
-    def __init__(self, html, audio_translations):
-        """Initializes a SubtitledHtml domain object.
-
-        Args:
-            html: str. A piece of user submitted HTML. This is cleaned in such
-                a way as to contain a restricted set of HTML tags.
-            audio_translations: list(AudioTranslation). List of
-                AudioTranslation domain object.
-        """
-        self.html = html_cleaner.clean(html)
-        self.audio_translations = audio_translations
-        self.validate()
+        return cls(subtitled_html_dict['html'], {
+            language_code: AudioTranslation.from_dict(audio_translation_dict)
+            for language_code, audio_translation_dict in
+            subtitled_html_dict['audio_translations'].iteritems()
+        })
 
     def validate(self):
         """Validates properties of the SubtitledHtml.
@@ -551,12 +543,24 @@ class SubtitledHtml(object):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
-        if not isinstance(self.audio_translations, list):
+        if not isinstance(self.audio_translations, dict):
             raise utils.ValidationError(
-                'Expected audio_translations to be a list, received %s'
+                'Expected audio_translations to be a dict, received %s'
                 % self.audio_translations)
-        for audio_translation in self.audio_translations:
-            audio_translation.validate()
+
+        allowed_audio_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
+        for language_code, translation in self.audio_translations.iteritems():
+            if not isinstance(language_code, basestring):
+                raise utils.ValidationError(
+                    'Expected language code to be a string, received: %s' %
+                    language_code)
+
+            if language_code not in allowed_audio_language_codes:
+                raise utils.ValidationError(
+                    'Unrecognized language code: %s' % language_code)
+
+            translation.validate()
 
     def to_html(self, params):
         """Exports this SubtitledHTML object to an HTML string. The HTML is
@@ -1346,11 +1350,10 @@ class InteractionInstance(object):
         for hint in self.hints:
             hint.validate()
 
-        if self.hints:
-            if self.solution:
-                self.solution.validate(self.id)
+        if self.solution:
+            self.solution.validate(self.id)
 
-        elif self.solution:
+        if self.solution and not self.hints:
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
@@ -1799,7 +1802,7 @@ class State(object):
         'confirmed_unclassified_answers': [],
         'fallbacks': [],
         'hints': [],
-        'solution': {},
+        'solution': None,
     }
 
     def __init__(self, content, param_changes, interaction,
@@ -2069,7 +2072,6 @@ class State(object):
                         Hint(fallback.outcome.feedback[0]).to_dict())
         self.update_interaction_hints(hint_list)
 
-
     def update_interaction_hints(self, hints_list):
         """Update the list of hints.
 
@@ -2179,7 +2181,7 @@ class State(object):
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
-            SubtitledHtml(content_html, []),
+            SubtitledHtml(content_html, {}),
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name))
@@ -2339,12 +2341,11 @@ class Exploration(object):
             state = exploration.states[state_name]
 
             state.content = SubtitledHtml(
-                html_cleaner.clean(sdict['content']['html']),
-                [
-                    AudioTranslation.from_dict(audio_translation)
-                    for audio_translation in
-                    sdict['content']['audio_translations']
-                ])
+                html_cleaner.clean(sdict['content']['html']), {
+                    language_code: AudioTranslation.from_dict(translation)
+                    for language_code, translation in
+                    sdict['content']['audio_translations'].iteritems()
+                })
 
             state.param_changes = [param_domain.ParamChange(
                 pc['name'], pc['generator_id'], pc['customization_args']
@@ -2380,7 +2381,7 @@ class Exploration(object):
 
             solution = (
                 Solution.from_dict(idict['id'], idict['solution'])
-                if idict['solution'] else {})
+                if idict['solution'] else None)
 
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
@@ -2972,6 +2973,92 @@ class Exploration(object):
 
         del self.states[state_name]
 
+
+    def get_state_names_mapping(self, change_list):
+        """Creates a mapping from the current state names of the exploration
+        to their corresponding state names of the older version.
+
+        Args:
+            change_list: list(dict). A list of changes introduced in this
+                commit.
+
+        Returns:
+            dict. The new_to_old_state_names mapping dict.
+        """
+        old_to_new_state_names = {}
+
+        for state_name in self.states:
+            old_to_new_state_names[state_name] = state_name
+
+        for change_dict in reversed(change_list):
+            if change_dict['cmd'] == CMD_RENAME_STATE:
+                old_to_new_state_names[change_dict['old_state_name']] = (
+                    old_to_new_state_names.pop(change_dict['new_state_name']))
+
+        new_to_old_state_names = {
+            value: key for key, value in old_to_new_state_names.iteritems()
+        }
+        return new_to_old_state_names
+
+
+    def get_trainable_states_dict(self, old_states, new_to_old_state_names):
+        """Retrieves the state names of all trainable states in an exploration
+        segregated into state names with changed and unchanged answer groups.
+        In this method, the new_state_name refers to the name of the state in
+        the current version of the exploration whereas the old_state_name refers
+        to the name of the state in the previous version of the exploration.
+
+        Args:
+            old_states: dict. Dictionary containing all State domain objects.
+            new_to_old_state_names: dict. A mapping from current state names to
+                state names from previous version of the exploration.
+
+        Returns:
+            dict. The trainable states dict. This dict has three keys
+                representing state names with changed answer groups and
+                unchanged answer groups respectively.
+        """
+        trainable_states_dict = {
+            'state_names_with_changed_answer_groups': [],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_states = self.states
+
+        for new_state_name in new_states:
+            new_state = new_states[new_state_name]
+            if not new_state.can_undergo_classification():
+                continue
+
+            old_state_name = new_to_old_state_names[new_state_name]
+
+            # The case where a new state is added. When this happens, the
+            # old_state_name will be equal to the new_state_name and it will not
+            # be present in the exploration's older version.
+            if old_state_name not in old_states:
+                trainable_states_dict[
+                    'state_names_with_changed_answer_groups'].append(
+                        new_state_name)
+                continue
+            old_state = old_states[old_state_name]
+            old_training_data = old_state.get_training_data()
+            new_training_data = new_state.get_training_data()
+
+            # Check if the training data and interaction_id of the state in the
+            # previous version of the exploration and the state in the new
+            # version of the exploration match. If any of them are not equal,
+            # we create a new job for the state in the current version.
+            if new_training_data == old_training_data and (
+                    new_state.interaction.id == old_state.interaction.id):
+                trainable_states_dict[
+                    'state_names_with_unchanged_answer_groups'].append(
+                        new_state_name)
+            else:
+                trainable_states_dict[
+                    'state_names_with_changed_answer_groups'].append(
+                        new_state_name)
+
+        return trainable_states_dict
+
     # Methods relating to gadgets.
     def add_gadget(self, gadget_dict, panel):
         """Adds a gadget to the associated panel.
@@ -3497,7 +3584,7 @@ class Exploration(object):
                         interaction['hints'].append(
                             Hint(fallback['outcome']['feedback'][0]).to_dict())
             if 'solution' not in interaction:
-                interaction['solution'] = {}
+                interaction['solution'] = None
         return states_dict
 
     @classmethod
@@ -3511,6 +3598,34 @@ class Exploration(object):
                 'html': content_html,
                 'audio_translations': []
             }
+        return states_dict
+
+    @classmethod
+    def _convert_states_v11_dict_to_v12_dict(cls, states_dict):
+        """Converts from version 11 to 12. Version 12 refactors audio
+        translations from a list to a dict keyed by language code. Also,
+        empty solutions are set to None.
+        """
+        for state_dict in states_dict.values():
+            old_audio_translations = state_dict['content']['audio_translations']
+            state_dict['content']['audio_translations'] = {
+                old_translation['language_code']: {
+                    'filename': old_translation['filename'],
+                    'file_size_bytes': old_translation['file_size_bytes'],
+                    'needs_update': old_translation['needs_update'],
+                }
+                for old_translation in old_audio_translations
+            }
+        return states_dict
+
+    @classmethod
+    def _convert_states_v12_dict_to_v13_dict(cls, states_dict):
+        """Converts from version 12 to 13. Version 13 sets empty
+        solutions to None.
+        """
+        for state_dict in states_dict.values():
+            if not state_dict['interaction']['solution']:
+                state_dict['interaction']['solution'] = None
         return states_dict
 
     @classmethod
@@ -3544,7 +3659,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 14
+    CURRENT_EXP_SCHEMA_VERSION = 16
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3860,6 +3975,31 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v14_dict_to_v15_dict(cls, exploration_dict):
+        """Converts a v14 exploration dict into a v15 exploration dict."""
+
+        exploration_dict['schema_version'] = 15
+
+        exploration_dict['states'] = cls._convert_states_v11_dict_to_v12_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 12
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v15_dict_to_v16_dict(cls, exploration_dict):
+        """Converts a v15 exploration dict into a v16 exploration dict."""
+        exploration_dict['schema_version'] = 16
+
+        exploration_dict['states'] = cls._convert_states_v12_dict_to_v13_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 13
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3960,6 +4100,16 @@ class Exploration(object):
             exploration_dict = cls._convert_v13_dict_to_v14_dict(
                 exploration_dict)
             exploration_schema_version = 14
+
+        if exploration_schema_version == 14:
+            exploration_dict = cls._convert_v14_dict_to_v15_dict(
+                exploration_dict)
+            exploration_schema_version = 15
+
+        if exploration_schema_version == 15:
+            exploration_dict = cls._convert_v15_dict_to_v16_dict(
+                exploration_dict)
+            exploration_schema_version = 16
 
         return (exploration_dict, initial_schema_version)
 

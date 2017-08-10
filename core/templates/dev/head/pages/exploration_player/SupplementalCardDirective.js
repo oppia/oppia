@@ -98,30 +98,20 @@ oppia.directive('supplementalCard', [
             playerTranscriptService.addNewInput(
               'Please show me the answer.', true);
             var solution = SolutionManagerService.consumeSolution();
-            var answer = '';
             var interactionId = stateInteractionIdService.savedMemento;
-            if (interactionId === 'GraphInput' ||
-                interactionId === 'MusicNotesInput' ||
-                interactionId === 'InteractiveMap') {
-              answer = (
-                oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-                  solution.correctAnswer,
-                  interactionId,
-                  explorationStatesService
+            var answer = (
+              oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+                solution.correctAnswer,
+                interactionId,
+                explorationStatesService
                   .getInteractionCustomizationArgsMemento(
                     $scope.activeCard.stateName)));
-            } else if (interactionId === 'CodeRepl' ||
-              interactionId === 'PencilCodeEditor') {
-              answer = solution.correctAnswer.code;
-            } else if (interactionId === 'ImageClickInput') {
-              answer = solution.correctAnswer.clickedRegions;
-            }
-
             var answerIsExclusive = solution.answerIsExclusive ? 'Only' : 'One';
             var response = (
               answerIsExclusive + ' answer is:<br>' + answer +
               '<br><br>Explanation:<br>' + solution.explanation);
             playerTranscriptService.addNewResponse(response);
+            $scope.helpCardHtml = response;
           };
 
           $scope.isHintAvailable = function() {

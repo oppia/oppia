@@ -20,26 +20,34 @@
  */
 
 oppia.factory('CollectionLinearizerService', [
-  'CollectionUpdateService', 'SkillListObjectFactory',
-  function(CollectionUpdateService, SkillListObjectFactory) {
+  'CollectionUpdateService',
+  function(CollectionUpdateService) {
     var _getNextExplorationIds = function(collection, completedExpIds) {
-      var acquiredSkillList = completedExpIds.reduce(
-        function(skillList, explorationId) {
+      var userAcquiredSkillIds = completedExpIds.reduce(
+        function(skillIdsList, explorationId) {
           var collectionNode = collection.getCollectionNodeByExplorationId(
             explorationId);
-          skillList.addSkillsFromSkillList(
-            collectionNode.getAcquiredSkillList());
-          return skillList;
-        }, SkillListObjectFactory.create([]));
+          collectionNode.getAcquiredSkillIds().forEach(function(skillId) {
+            if (skillIdsList.indexOf(skillId) === -1) {
+              skillIdsList.push(skillId);
+            }
+          });
+          return skillIdsList;
+        }, []);
 
       // Pick all collection nodes whose prerequisite skills are satisified by
       // the currently acquired skills and which have not yet been completed.
       return collection.getExplorationIds().filter(function(explorationId) {
+        if (completedExpIds.indexOf(explorationId) !== -1) {
+          return false;
+        }
+
         var collectionNode = collection.getCollectionNodeByExplorationId(
           explorationId);
-        return completedExpIds.indexOf(explorationId) === -1 &&
-          acquiredSkillList.isSupersetOfSkillList(
-            collectionNode.getPrerequisiteSkillList());
+        return collectionNode.getPrerequisiteSkillIds().every(
+          function(skillId) {
+            return userAcquiredSkillIds.indexOf(skillId) !== -1;
+          });
       });
     };
 
@@ -66,9 +74,9 @@ oppia.factory('CollectionLinearizerService', [
       // must require the acquired skills of the current node.
       var curCollectionNode = collection.getCollectionNodeByExplorationId(
         curExplorationId);
-      var curAcquiredSkillList = curCollectionNode.getAcquiredSkillList();
-      CollectionUpdateService.setPrerequisiteSkills(
-        collection, newExplorationId, curAcquiredSkillList.getSkills());
+      var curAcquiredSkillIds = curCollectionNode.getAcquiredSkillIds();
+      CollectionUpdateService.setPrerequisiteSkillIds(
+        collection, newExplorationId, curAcquiredSkillIds);
     };
 
     var findNodeIndex = function(linearNodeList, explorationId) {
@@ -109,14 +117,14 @@ oppia.factory('CollectionLinearizerService', [
 
       // Case 2 involves two shifts. Take for instance: a->b
       // First, b needs to have the same prerequisites as a: a, b
-      var leftPrereqSkills = leftNode.getPrerequisiteSkillList().getSkills();
-      CollectionUpdateService.setPrerequisiteSkills(
-        collection, node.getExplorationId(), leftPrereqSkills);
+      var leftPrereqSkillIds = leftNode.getPrerequisiteSkillIds();
+      CollectionUpdateService.setPrerequisiteSkillIds(
+        collection, node.getExplorationId(), leftPrereqSkillIds);
 
       // Second, a needs to prerequire b's acquired skills: b->a
-      var centerAcquiredSkills = node.getAcquiredSkillList().getSkills();
-      CollectionUpdateService.setPrerequisiteSkills(
-        collection, leftNode.getExplorationId(), centerAcquiredSkills);
+      var centerAcquiredSkillIds = node.getAcquiredSkillIds();
+      CollectionUpdateService.setPrerequisiteSkillIds(
+        collection, leftNode.getExplorationId(), centerAcquiredSkillIds);
 
       if (rightNode) {
         // Case 3 has a third shift beyond case two. With example: a->b->c
@@ -125,9 +133,9 @@ oppia.factory('CollectionLinearizerService', [
         //          \
         //           -a
         // Step 3 involves updating c to prerequire a's acquired skills: b->a->c
-        var leftAcquiredSkills = leftNode.getAcquiredSkillList().getSkills();
-        CollectionUpdateService.setPrerequisiteSkills(
-          collection, rightNode.getExplorationId(), leftAcquiredSkills);
+        var leftAcquiredSkillIds = leftNode.getAcquiredSkillIds();
+        CollectionUpdateService.setPrerequisiteSkillIds(
+          collection, rightNode.getExplorationId(), leftAcquiredSkillIds);
       }
     };
     var swapRight = function(collection, linearNodeList, nodeIndex) {
@@ -184,8 +192,11 @@ oppia.factory('CollectionLinearizerService', [
         var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
         CollectionUpdateService.addCollectionNode(
           collection, explorationId, summaryBackendObject);
-        CollectionUpdateService.setAcquiredSkills(
-          collection, explorationId, [summaryBackendObject.title]);
+        var skillName = summaryBackendObject.title;
+        CollectionUpdateService.addCollectionSkill(collection, skillName);
+        var skillId = collection.getSkillIdFromName(skillName);
+        CollectionUpdateService.setAcquiredSkillIds(
+          collection, explorationId, [skillId]);
 
         if (linearNodeList.length > 0) {
           var lastNode = linearNodeList[linearNodeList.length - 1];
@@ -205,25 +216,40 @@ oppia.factory('CollectionLinearizerService', [
           return false;
         }
 
+        var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
+        var nodeIndex = findNodeIndex(linearNodeList, explorationId);
+        var collectionNode = linearNodeList[nodeIndex];
+        var acquiredSkillIds = collectionNode.getAcquiredSkillIds();
+        if (acquiredSkillIds.length !== 1) {
+          throw Error(
+            'Expected collection node to have exactly one acquired skill, ' +
+            'found: ' + acquiredSkillIds.length);
+        }
+        var acquiredSkillId = collectionNode.getAcquiredSkillIds()[0];
+
         // Relinking is only needed if more than just the specified node is in
         // the collection.
         if (collection.getCollectionNodeCount() > 1) {
-          var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
-          var nodeIndex = findNodeIndex(linearNodeList, explorationId);
-
           // Ensure any present left/right nodes are appropriately linked after
           // the node is removed.
           var leftNode = getNodeLeftOf(linearNodeList, nodeIndex);
           var rightNode = getNodeRightOf(linearNodeList, nodeIndex);
-          var newPrerequisiteSkills = [];
+          var newPrerequisiteSkillIds = [];
           if (leftNode) {
-            newPrerequisiteSkills = leftNode.getAcquiredSkillList().getSkills();
+            newPrerequisiteSkillIds = leftNode.getAcquiredSkillIds();
           }
           if (rightNode) {
-            CollectionUpdateService.setPrerequisiteSkills(
-              collection, rightNode.getExplorationId(), newPrerequisiteSkills);
+            CollectionUpdateService.setPrerequisiteSkillIds(
+              collection, rightNode.getExplorationId(),
+              newPrerequisiteSkillIds);
           }
         }
+
+        // Delete the skill
+        CollectionUpdateService.deleteCollectionSkill(
+          collection, acquiredSkillId);
+
+        // Delete the node
         CollectionUpdateService.deleteCollectionNode(collection, explorationId);
         return true;
       },
@@ -250,4 +276,5 @@ oppia.factory('CollectionLinearizerService', [
         return shiftNode(collection, explorationId, swapRight);
       }
     };
-  }]);
+  }
+]);

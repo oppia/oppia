@@ -131,9 +131,9 @@ class EditorTest(BaseEditorControllerTest):
 
         response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(rights_url, {
-            'is_public': True,
+        publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
+        self.put_json(publish_url, {
+            'make_public': True,
         }, csrf_token, expect_errors=True, expected_status_int=400)
 
         self.logout()
@@ -408,7 +408,7 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     SAMPLE_JSON_CONTENT = {
         'State A': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -425,12 +425,12 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """),
         'State B': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -447,12 +447,12 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -469,14 +469,14 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
     SAMPLE_STATE_STRING = ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -493,7 +493,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """)
 
@@ -584,11 +584,10 @@ param_changes: []
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
 
-
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
-        response = self.post_json('/createhandler/state_yaml', {
+        response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
             'state_dict': exploration.states['State A'].to_dict(),
             'width': 50,
         }, csrf_token=csrf_token)
@@ -698,11 +697,13 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             # not to be checked here (same for admin and moderator).
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '%s tried to delete exploration %s' %
-                             (self.owner_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
+                              self.owner_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '%s deleted exploration %s' %
-                             (self.owner_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
+                              self.owner_id, exp_id))
             self.logout()
 
             # Checking for admin.
@@ -717,11 +718,11 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '(admin) %s tried to delete exploration %s' %
-                             (self.admin_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '(admin) %s deleted exploration %s' %
-                             (self.admin_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.logout()
 
             # Checking for moderator.
@@ -736,11 +737,13 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '(moderator) %s tried to delete exploration %s' %
-                             (self.moderator_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_MODERATOR,
+                              self.moderator_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '(moderator) %s deleted exploration %s' %
-                             (self.moderator_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_MODERATOR,
+                              self.moderator_id, exp_id))
             self.logout()
 
 
@@ -773,7 +776,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                 'state_name': exploration.init_state_name,
                 'new_value': {
                     'html': 'ABC',
-                    'audio_translations': [],
+                    'audio_translations': {},
                 },
             }], 'Change objective and init state content')
 
@@ -892,8 +895,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         self.assert_can_edit(response.body)
 
         # Ban joe.
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, 'banned_usernames', ['joe'])
+        self.set_banned_users(['joe'])
 
         # Test that Joe is banned. (He can still access the library page.)
         response = self.testapp.get(

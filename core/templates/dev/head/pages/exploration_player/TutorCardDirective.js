@@ -52,7 +52,8 @@ oppia.directive('tutorCard', [
         '$scope', '$timeout', 'oppiaPlayerService', 'HintManagerService',
         'playerPositionService', 'playerTranscriptService',
         'ExplorationPlayerStateService', 'windowDimensionsService',
-        'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
+        'urlService', 'AudioPlayerService',
+        'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'HINT_REQUEST_STRING_I18N_IDS', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
         'SolutionManagerService', 'stateInteractionIdService',
@@ -61,7 +62,8 @@ oppia.directive('tutorCard', [
           $scope, $timeout, oppiaPlayerService, HintManagerService,
           playerPositionService, playerTranscriptService,
           ExplorationPlayerStateService, windowDimensionsService,
-          urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
+          urlService, AudioPlayerService,
+          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
           CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
           HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC,
           SolutionManagerService, stateInteractionIdService,
@@ -93,6 +95,12 @@ oppia.directive('tutorCard', [
 
             $scope.solutionExists = Boolean(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).solution);
+
+	    $scope.contentAudioTranslations =
+              oppiaPlayerService.getStateContentAudioTranslations(
+                $scope.activeCard.stateName);
+
+            AudioPlayerService.stop();
           };
 
           $scope.arePreviousResponsesShown = false;
@@ -155,6 +163,7 @@ oppia.directive('tutorCard', [
           $scope.OPPIA_AVATAR_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg'));
+
           $scope.profilePicture = UrlInterpolationService.getStaticImageUrl(
             '/avatar/user_blue_72px.png');
 
@@ -181,6 +190,11 @@ oppia.directive('tutorCard', [
               answer: answer,
               rulesService: interactionRulesService
             });
+          };
+
+          $scope.isContentAudioTranslationAvailable = function() {
+            return oppiaPlayerService
+              .isContentAudioTranslationAvailable($scope.activeCard.stateName);
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {

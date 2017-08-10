@@ -376,12 +376,13 @@ class ClassifierTrainingJob(object):
                     grouped_answers['answers'])
 
 
-class ClassifierExplorationMapping(object):
-    """Domain object for a classifier-exploration mapping model.
+class TrainingJobExplorationMapping(object):
+    """Domain object for a job-exploration mapping model.
 
-    A Classifier-Exploration mapping is a one-to-one relation between the
-    attributes in an exploration to the classifier model it needs to utilise.
-    The mapping is from <exp_id, exp_version, state_name> to the classifier_id.
+    A job-exploration mapping is a one-to-one relation between the
+    attributes in an exploration to the training job model for the classifier it
+    needs to use. The mapping is from <exp_id, exp_version, state_name> to the
+    job_id.
 
     Attributes:
         exp_id: str. ID of the exploration.
@@ -389,12 +390,12 @@ class ClassifierExplorationMapping(object):
             classifier's training job was created.
         state_name: str. The name of the state to which the classifier
             belongs.
-        classifier_id. str. The unique Id of the classifier in the
-            classifier-exploration mapping.
+        job_id. str. The unique ID of the training job in the
+            job-exploration mapping.
     """
 
-    def __init__(self, exp_id, exp_version, state_name, classifier_id):
-        """Constructs a ClassifierExplorationMapping domain object.
+    def __init__(self, exp_id, exp_version, state_name, job_id):
+        """Constructs a TrainingJobExplorationMapping domain object.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -402,12 +403,12 @@ class ClassifierExplorationMapping(object):
                 corresponding classifier's training job was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
-            classifier_id: str. The unique id of the classifier.
+            job_id: str. The unique ID of the training job.
         """
         self._exp_id = exp_id
         self._exp_version = exp_version
         self._state_name = state_name
-        self._classifier_id = classifier_id
+        self._job_id = job_id
 
     @property
     def exp_id(self):
@@ -422,22 +423,23 @@ class ClassifierExplorationMapping(object):
         return self._state_name
 
     @property
-    def classifier_id(self):
-        return self._classifier_id
+    def job_id(self):
+        return self._job_id
 
     def to_dict(self):
-        """Constructs a dict representation of ClassifierExplorationMapping
+        """Constructs a dict representation of TrainingJobExplorationMapping
         domain object.
 
         Returns:
-            A dict representation of ClassifierExplorationMapping domain object.
+            A dict representation of TrainingJobExplorationMapping domain
+                object.
         """
 
         return {
             'exp_id': self._exp_id,
             'exp_version': self._exp_version,
             'state_name': self.state_name,
-            'classifier_id': self._classifier_id
+            'job_id': self._job_id
         }
 
     def validate(self):
@@ -457,7 +459,7 @@ class ClassifierExplorationMapping(object):
                 'Expected state_name to be a string, received %s' % (
                     self.state_name))
 
-        if not isinstance(self.classifier_id, basestring):
+        if not isinstance(self.job_id, basestring):
             raise utils.ValidationError(
-                'Expected classifier_id to be a string, received %s' % (
-                    self.classifier_id))
+                'Expected job_id to be a string, received %s' % (
+                    self.job_id))

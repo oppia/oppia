@@ -17,65 +17,132 @@
  */
 
 oppia.directive('solutionEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  '$modal', 'UrlInterpolationService', 'stateSolutionService',
+  'editorContextService', 'explorationStatesService',
+  'explorationWarningsService', 'alertsService',
+  'SolutionObjectFactory', 'SolutionVerificationService',
+  'explorationContextService', 'oppiaExplorationHtmlFormatterService',
+  'stateInteractionIdService', 'stateCustomizationArgsService',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  function($modal, UrlInterpolationService, stateSolutionService,
+           editorContextService, explorationStatesService,
+           explorationWarningsService, alertsService,
+           SolutionObjectFactory, SolutionVerificationService,
+           explorationContextService, oppiaExplorationHtmlFormatterService,
+           stateInteractionIdService, stateCustomizationArgsService,
+           INFO_MESSAGE_SOLUTION_IS_INVALID) {
     return {
       restrict: 'E',
       scope: {
-        solution: '=',
-        objectType: '=',
-        interactionHtml: '=',
-        ruleDescriptionChoices: '=',
-        getOnSaveFn: '&onSave'
+        getInteractionId: '&interactionId',
+        correctAnswerEditorHtml: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' + 'solution_editor_directive.html'),
+        '/components/solution_editor_directive.html'),
       controller: [
-        '$scope', 'editabilityService', function($scope, editabilityService) {
-          $scope.isEditable = editabilityService.isEditable();
-
-          $scope.editSolutionForm = {};
-          $scope.solutionEditorIsOpen = false;
-
-          $scope.solutionMemento = null;
+        '$scope', 'stateSolutionService',
+        function($scope, stateSolutionService) {
+          $scope.stateSolutionService = stateSolutionService;
 
           $scope.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
             ui_config: {}
           };
 
+          $scope.getAnswerHtml = function () {
+            return oppiaExplorationHtmlFormatterService.getAnswerHtml(
+              stateSolutionService.savedMemento.correctAnswer,
+              stateInteractionIdService.savedMemento,
+              stateCustomizationArgsService.savedMemento);
+          };
+
           $scope.openSolutionEditor = function() {
-            if ($scope.isEditable) {
-              $scope.solutionMemento = angular.copy($scope.solution);
-              $scope.solutionEditorIsOpen = true;
-              $scope.solution.answerIsExclusive = (
-                $scope.solution.answerIsExclusive.toString());
-            }
-          };
+            $modal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration_editor/editor_tab/' +
+                'add_or_update_solution_modal.html'),
+              backdrop: 'static',
+              controller: [
+                '$scope', '$modalInstance', 'stateInteractionIdService',
+                'stateSolutionService', 'editorContextService',
+                'oppiaExplorationHtmlFormatterService',
+                'explorationStatesService',
+                function($scope, $modalInstance, stateInteractionIdService,
+                         stateSolutionService, editorContextService,
+                         oppiaExplorationHtmlFormatterService,
+                         explorationStatesService) {
+                  $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
+                    'currentCorrectAnswerEditorHtmlForSolutionEditor');
+                  $scope.correctAnswer = null;
+                  $scope.correctAnswerEditorHtml = (
+                    oppiaExplorationHtmlFormatterService.getInteractionHtml(
+                      stateInteractionIdService.savedMemento,
+                      /* eslint-disable max-len */
+                      explorationStatesService.getInteractionCustomizationArgsMemento(
+                        editorContextService.getActiveStateName()),
+                      /* eslint-enable max-len */
+                      $scope.SOLUTION_EDITOR_FOCUS_LABEL));
+                  $scope.EXPLANATION_FORM_SCHEMA = {
+                    type: 'html',
+                    ui_config: {}
+                  };
 
-          $scope.submitAnswer = function(answer, rules) {
-            $scope.solution.correctAnswer = answer;
-          };
+                  $scope.data = {
+                    answerIsExclusive: (
+                      stateSolutionService.savedMemento.answerIsExclusive),
+                    correctAnswer: null,
+                    explanation: stateSolutionService.savedMemento.explanation
+                  };
 
-          $scope.saveThisSolution = function() {
-            $scope.solutionEditorIsOpen = false;
-            $scope.solutionMemento = null;
-            $scope.solution.answerIsExclusive = (
-              $scope.solution.answerIsExclusive === 'true');
-            $scope.getOnSaveFn()();
-          };
+                  $scope.submitAnswer = function(answer) {
+                    $scope.data.correctAnswer = answer;
+                  };
 
-          $scope.cancelThisSolutionEdit = function() {
-            $scope.solution = angular.copy($scope.solutionMemento);
-            $scope.solutionMemento = null;
-            $scope.solutionEditorIsOpen = false;
-          };
+                  $scope.saveSolution = function() {
+                    if (typeof $scope.data.answerIsExclusive === 'boolean' &&
+                        $scope.data.correctAnswer !== null &&
+                        $scope.data.explanation !== '') {
+                      $modalInstance.close({
+                        solution: SolutionObjectFactory.createNew(
+                          $scope.data.answerIsExclusive,
+                          $scope.data.correctAnswer,
+                          $scope.data.explanation)
+                      });
+                    }
+                  };
 
-          $scope.$on('externalSave', function() {
-            if ($scope.solutionEditorIsOpen &&
-              $scope.editSolutionForm.$valid) {
-              $scope.saveThisSolution();
-            }
-          });
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                    alertsService.clearWarnings();
+                  };
+                }
+              ]
+            }).result.then(function(result) {
+              var correctAnswer = result.solution.correctAnswer;
+              var currentStateName = editorContextService.getActiveStateName();
+              var state = explorationStatesService.getState(currentStateName);
+              SolutionVerificationService.verifySolution(
+                explorationContextService.getExplorationId(),
+                state,
+                correctAnswer,
+                function () {
+                  explorationStatesService.updateSolutionValidity(
+                    currentStateName, true);
+                  explorationWarningsService.updateWarnings();
+                },
+                function () {
+                  explorationStatesService.updateSolutionValidity(
+                    currentStateName, false);
+                  explorationWarningsService.updateWarnings();
+                  alertsService.addInfoMessage(
+                    INFO_MESSAGE_SOLUTION_IS_INVALID);
+                }
+              );
+
+              stateSolutionService.displayed = result.solution;
+              stateSolutionService.saveDisplayedValue();
+            });
+          };
         }
       ]
     };

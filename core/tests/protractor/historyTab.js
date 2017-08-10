@@ -62,7 +62,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '  audio_translations: []',
+        text: '  audio_translations: {}',
         highlighted: false
       },
       4: {
@@ -150,7 +150,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       25: {
-        text: '  solution: {}',
+        text: '  solution: null',
         highlighted: false
       },
       26: {
@@ -173,7 +173,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '  audio_translations: []',
+        text: '  audio_translations: {}',
         highlighted: false
       },
       4: {
@@ -227,7 +227,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       16: {
-        text: '  solution: {}',
+        text: '  solution: null',
         highlighted: false
       },
       17: {
@@ -243,7 +243,7 @@ describe('Exploration history', function() {
     var STATE_2_STRING =
       'classifier_model_id: null\n' +
       'content:\n' +
-      '  audio_translations: []\n' +
+      '  audio_translations: {}\n' +
       '  html: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
@@ -258,7 +258,7 @@ describe('Exploration history', function() {
       '  fallbacks: []\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
-      '  solution: {}\n' +
+      '  solution: null\n' +
       'param_changes: []\n' +
       ' ';
 

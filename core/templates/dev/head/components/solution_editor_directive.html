@@ -1,108 +1,23 @@
 <div style="height: 100%;">
   <div ng-if="!solutionEditorIsOpen"
        style="height: 100%;"
-       ng-attr-title="<[isEditable ? 'Edit solution' : '']>">
+       ng-attr-title="Edit solution">
     <div class="oppia-readonly-rule-tile"
-         ng-class="{'oppia-editable-section': isEditable}">
+         ng-class="{'oppia-editable-section': true}">
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing"
-             ng-if="isEditable" ng-click="openSolutionEditor()">
-          <i ng-if="isEditable"
-             class="material-icons oppia-editor-edit-icon pull-right"
+             ng-click="openSolutionEditor()">
+          <i class="material-icons oppia-editor-edit-icon pull-right"
              title="Edit Solution">&#xE254;
           </i>
         </div>
         <strong>
-          <[solution.answerIsExclusive ? 'Only' : 'One']> Solution is...
+          <[stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
         </strong>
-        <span ng-if="objectType !== 'CodeString' &&
-                     objectType !== 'Graph' &&
-                     objectType !== 'RegionSelect' &&
-                     objectType !== 'UnicodeString'">
-          <[solution.correctAnswer]>
-        </span>
-        <span ng-if="objectType === 'CodeString'">
-          <[solution.correctAnswer.code]>
-        </span>
-        <span ng-if="objectType === 'Graph'">
-          [Graph Object]
-        </span>
-        <span ng-if="objectType === 'RegionSelect'">
-          <[solution.correctAnswer.clickedRegions[0]]>
-        </span>
-        <span ng-if="objectType === 'UnicodeString'">
-          <[solution.correctAnswer.latex]>
-        </span>
-        <br>
-        <strong>Explanation is...</strong>
-        <span angular-html-bind="solution.explanation"></span>
+        <span angular-html-bind="getAnswerHtml()"></span>
       </div>
     </div>
   </div>
-
-  <div ng-if="isEditable && solutionEditorIsOpen">
-    <form role="form"
-          class="form-inline"
-          name="editSolutionForm"
-          ng-submit="saveThisSolution()">
-      <div class="oppia-rule-details-header">
-        <select ng-model="solution.answerIsExclusive">
-          <option value="false">One</option>
-          <option value="true">Only</option>
-        </select> <strong>Solution is...</strong>
-        <div ng-if="!interactionHtml">
-          <object-editor ng-if="objectType === 'UnicodeString'"
-                         obj-type="<[objectType]>"
-                         init-args="{choices: ruleDescriptionChoices}"
-                         is-editable="true"
-                         always-editable="true"
-                         value="solution.correctAnswer.latex"
-                         style="color: black;">
-          </object-editor>
-          <object-editor ng-if="objectType === 'CodeString'"
-                         obj-type="<[objectType]>"
-                         init-args="{choices: ruleDescriptionChoices}"
-                         is-editable="true"
-                         always-editable="true"
-                         value="solution.correctAnswer.code"
-                         style="color: black;">
-          </object-editor>
-          <object-editor ng-if="objectType === 'CodeString' ||
-                              objectType === 'NormalizedString' ||
-                              objectType === 'Real'"
-                         obj-type="<[objectType]>"
-                         init-args="{choices: ruleDescriptionChoices}"
-                         is-editable="true"
-                         always-editable="true"
-                         value="solution.correctAnswer"
-                         style="color: black;">
-          </object-editor>
-        </div>
-        <span angular-html-bind="interactionHtml"></span>
-        <br>
-        <strong>Explanation is...</strong>
-        <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
-                             local-value="solution.explanation">
-        </schema-based-editor>
-      </div>
-    </form>
-
-    <div class="oppia-rule-save-cancel-buttons">
-      <div class="pull-right">
-        <button type="button"
-                class="btn btn-default"
-                ng-click="cancelThisSolutionEdit()">
-          Cancel
-        </button>
-        <button type="button"
-                class="btn btn-success"
-                ng-disabled="!solution.correctAnswer && !solution.explanation"
-                ng-click="saveThisSolution()">
-          Save
-        </button>
-      </div>
-
-      <div style="clear: both;"></div>
-    </div>
-  </div>
+  <br>
+  <solution-explanation-editor></solution-explanation-editor>
 </div>
