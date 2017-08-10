@@ -32,6 +32,8 @@ var expectInteractionDetailsToMatch = function(elem) {
 var submitAnswer = function(elem, answer) {
   elem.element(by.tagName('oppia-interactive-numeric-input')).
     element(by.tagName('input')).sendKeys(answer + '\n');
+  elem.element(by.tagName('oppia-interactive-numeric-input')).
+    element(by.tagName('button')).click();
 };
 
 var answerObjectType = 'Real';
