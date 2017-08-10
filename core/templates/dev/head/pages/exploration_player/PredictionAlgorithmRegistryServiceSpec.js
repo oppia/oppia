@@ -28,7 +28,7 @@ describe('Prediction algorithm registry service', function() {
               outcome: 'Sample default outcome',
               answerGroupIndex: 0,
               ruleIndex: 0,
-              classificationCategorization: 'default_outcome'
+              classificationCategorization: 'explicit'
             };
           }
         });
@@ -48,7 +48,7 @@ describe('Prediction algorithm registry service', function() {
             outcome: 'Sample default outcome',
             answerGroupIndex: 0,
             ruleIndex: 0,
-            classificationCategorization: 'default_outcome'
+            classificationCategorization: 'explicit'
           };
         }
       };

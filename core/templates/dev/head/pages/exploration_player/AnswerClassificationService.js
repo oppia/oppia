@@ -27,12 +27,12 @@ oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
   '$http', '$q', 'LearnerParamsService', 'alertsService',
-  'PredictionAlgorithmRegistryService', 'INTERACTION_SPECS',
-  'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
+  'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
+  'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
   function($http, $q, LearnerParamsService, alertsService,
-      PredictionAlgorithmRegistryService, INTERACTION_SPECS,
-      ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
+      PredictionAlgorithmRegistryService, StateClassifierMappingService,
+      INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
@@ -110,74 +110,9 @@ oppia.factory('AnswerClassificationService', [
        * </ul>
        */
       getMatchingClassificationResult: function(
-          explorationId, oldState, answer, isInEditorMode,
+          explorationId, stateName, oldState, answer, isInEditorMode,
           interactionRulesService) {
         var deferred = $q.defer();
-        var result = null;
-        var answerGroups = oldState.interaction.answerGroups;
-        var defaultOutcome = oldState.interaction.defaultOutcome;
-        if (interactionRulesService) {
-          result = classifyAnswer(
-            answer, answerGroups, defaultOutcome, interactionRulesService);
-        } else {
-          alertsService.addWarning(
-            'Something went wrong with the exploration: no ' +
-            'interactionRulesService was available.');
-          deferred.reject();
-          return deferred.promise;
-        }
-
-        if (result.outcome === defaultOutcome &&
-            INTERACTION_SPECS[oldState.interaction.id]
-              .is_string_classifier_trainable &&
-            ENABLE_ML_CLASSIFIERS) {
-          var classifyUrl = '/explorehandler/classify/' + explorationId;
-          var params = (
-            isInEditorMode ? {} : LearnerParamsService.getAllParams());
-
-          $http.post(classifyUrl, {
-            old_state: oldState.toBackendDict(),
-            params: params,
-            answer: answer
-          }).then(function(response) {
-            var result = response.data;
-            deferred.resolve({
-              outcome: result.outcome,
-              ruleIndex: result.rule_spec_index,
-              answerGroupIndex: result.answer_group_index,
-              classificationCategorization: result.classification_categorization
-            });
-          });
-        } else {
-          deferred.resolve(result);
-        }
-        return deferred.promise;
-      },
-
-      /**
-       * Gets a promise to the matching answer group.
-       *
-       * @param {string} explorationId - The exploration ID.
-       * @param {object} oldState - The state where the user submitted the
-       *   answer.
-       * @param {*} answer - The answer that the user has submitted.
-       * @param {boolean} isInEditorMode - Whether the function is being called
-       *   in editor mode.
-       * @param {function} interactionRulesService - The service which contains
-       *   the explicit rules of that interaction.
-       *
-       * @return {promise} A promise for an object representing the answer group
-       *     with the following properties:
-       * <ul>
-       *   <li> **outcome**: the outcome of the answer group
-       *   <li> **answerGroupIndex**: the index of the matched answer group
-       *   <li> **ruleIndex**: the index of the rule in the matched answer
-       *            group
-       * </ul>
-       */
-      getMatchingClassificationResultNew: function(
-          explorationId, oldState, answer, isInEditorMode,
-          interactionRulesService) {
         var result = null;
         var answerGroups = oldState.interaction.answerGroups;
         var defaultOutcome = oldState.interaction.defaultOutcome;
@@ -197,8 +132,10 @@ oppia.factory('AnswerClassificationService', [
           oldState.interaction.id].is_string_classifier_trainable;
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
-          var classifierData = oldState.classifierDetails['classifierData'];
-          var algorithmId = oldState.classifierDetails['algorithmId'];
+          var classifierData = StateClassifierMappingService.getClassifierData(
+            stateName);
+          var algorithmId = StateClassifierMappingService.getAlgorithmId(
+            stateName);
           var predictionService = (
             PredictionAlgorithmRegistryService.getPredictionService(
               algorithmId));

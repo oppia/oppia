@@ -32,7 +32,7 @@
          outcome: 'Sample default outcome',
          answerGroupIndex: 0,
          ruleIndex: 0,
-         classificationCategorization: 'default_outcome'
+         classificationCategorization: 'explicit'
        };
        var generatedResult = predictionService.predict(
          classifierData, userText);

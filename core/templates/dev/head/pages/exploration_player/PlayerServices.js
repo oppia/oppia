@@ -34,16 +34,18 @@ oppia.factory('oppiaPlayerService', [
   'alertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
-  'expressionInterpolationService', 'StatsReportingService',
-  'UrlInterpolationService', 'ReadOnlyExplorationBackendApiService',
+  'expressionInterpolationService', 'StateClassifierMappingService',
+  'StatsReportingService', 'UrlInterpolationService',
+  'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
-      expressionInterpolationService, StatsReportingService,
-      UrlInterpolationService, ReadOnlyExplorationBackendApiService,
+      expressionInterpolationService, StateClassifierMappingService,
+      StatsReportingService, UrlInterpolationService,
+      ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
@@ -213,15 +215,13 @@ oppia.factory('oppiaPlayerService', [
                 _explorationId));
           }
           loadedExploration.then(function(data) {
-            // Update exploration's states field.
-            for (var stateName in data.exploration.states) {
-              data.exploration.states[stateName]['classifier_details'] = (
-                data.state_classifier_mapping[stateName]);
-            }
+
             exploration = ExplorationObjectFactory.createFromBackendDict(
               data.exploration);
             version = data.version;
             initParams([]);
+
+            StateClassifierMappingService.init(data.state_classifier_mapping);
 
             StatsReportingService.initSession(
               _explorationId, version, data.session_id,
@@ -299,11 +299,12 @@ oppia.factory('oppiaPlayerService', [
         }
 
         answerIsBeingProcessed = true;
-        var oldState = exploration.getState(
-          playerTranscriptService.getLastStateName());
+        var stateName = playerTranscriptService.getLastStateName();
+        var oldState = exploration.getState(stateName);
         AnswerClassificationService.getMatchingClassificationResult(
-          _explorationId, oldState, answer, false, interactionRulesService
-        ).then(function(classificationResult) {
+          _explorationId, stateName, oldState, answer, false,
+          interactionRulesService)
+          .then(function(classificationResult) {
           if (!_editorPreviewMode) {
             StatsReportingService.recordAnswerSubmitted(
               playerTranscriptService.getLastStateName(),

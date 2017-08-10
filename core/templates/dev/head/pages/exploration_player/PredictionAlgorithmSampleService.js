@@ -16,10 +16,7 @@
  * @fileoverview Prediction Algorithm sample for testing framework.
  */
 
- oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
-
- oppia.factory('PredictionAlgorithmSampleService', [
-   'DEFAULT_OUTCOME_CLASSIFICATION', function(DEFAULT_OUTCOME_CLASSIFICATION) {
+ oppia.factory('PredictionAlgorithmSampleService', [function() {
 
    return {
      predict: function(classifierData, userText) {
@@ -27,7 +24,7 @@
          outcome: 'Sample default outcome',
          answerGroupIndex: 0,
          ruleIndex: 0,
-         classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
+         classificationCategorization: 'explicit'
        };
      }
    };
