@@ -414,10 +414,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # Check if the number of unread messages match.
         self.assertEqual(number_of_unread_threads, 0)
         for index, thread in enumerate(threads):
-            print "Hello", index
             thread_summary = {
                 'status': thread.status,
                 'original_author_id': thread.original_author_id,
+                'last_updated': thread_summaries[index]['last_updated'],
                 'last_message_text': 'not used here',
                 'total_message_count': 1,
                 'last_message_read': True,

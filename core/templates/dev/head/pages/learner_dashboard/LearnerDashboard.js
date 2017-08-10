@@ -375,15 +375,26 @@ oppia.controller('LearnerDashboard', [
               if (subsectionName ===
                   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
               /* eslint-enable max-len */
-                $http.post(
-                  '/learner_dashboard/remove_in_progress_exploration', {
-                    exploration_id: activity.id
+                var removeExpUrl = UrlInterpolationService.interpolateUrl(
+                  '/learnerincompleteactivityhandler/<activityType>' +
+                  '/<activityId>', {
+                    activityType: constants.ACTIVITY_TYPE_EXPLORATION,
+                    activityId: activity.id
                   });
+                /* eslint-disable */
+                $http.delete(removeExpUrl);
+                /* eslint-enable */
               } else if (subsectionName ===
                          LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-                $http.post('/learner_dashboard/remove_in_progress_collection', {
-                  collection_id: activity.id
-                });
+                var removeColletionUrl = UrlInterpolationService.interpolateUrl(
+                  '/learnerincompleteactivityhandler/<activityType>' +
+                  '/<activityId>', {
+                    activityType: constants.ACTIVITY_TYPE_COLLECTION,
+                    activityId: activity.id
+                  });
+                /* eslint-disable */
+                $http.delete(removeColletionUrl);
+                /* eslint-enable */
               }
               $modalInstance.close();
             };
