@@ -43,7 +43,7 @@ oppia.directive('audioControls', [
             return AudioTranslationManagerService.getCurrentAudioLanguageCode();
           };
 
-          $scope.currentAudioLanguageDescription = function() {
+          $scope.getCurrentAudioLanguageDescription = function() {
             return AudioTranslationManagerService
               .getCurrentAudioLanguageDescription();
           };
