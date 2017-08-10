@@ -442,7 +442,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
     classifier_training_job_models = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
-    for index, job_id in enumerate(job_ids):
+    for index in range(len(job_ids)):
         if classifier_training_job_models[index] is None:
             raise Exception(
                 'The ClassifierTrainingJobModel corresponding to the job_id '
