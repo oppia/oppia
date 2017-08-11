@@ -49,7 +49,7 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--test_target',
-    help='optional dotted module name of\ the test(s) to run',
+    help='optional dotted module name of the test(s) to run',
     type=str)
 _PARSER.add_argument(
     '--test_path',
@@ -58,7 +58,7 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--exclude_load_tests',
     help='optional; if specified, exclude load tests from being run',
-    type=bool)
+    action='store_true')
 _PARSER.add_argument(
     '-v',
     '--verbose',
@@ -220,11 +220,13 @@ def _get_all_test_targets(test_path=None, include_load_tests=False):
             result.append(_convert_to_test_target(
                 os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
-            for f in files:
-                if include_load_tests and f.endswith('feedback_thread_summaries_test.py'):
-                    result.append(_convert_to_test_target(
-                        os.path.join(subroot, f)))
+            if subroot.endswith(_LOAD_TESTS_DIR) and include_load_tests:
+                for f in files:
+                    if f.endswith('_test.py'):
+                        result.append(_convert_to_test_target(
+                            os.path.join(subroot, f)))
 
+            for f in files:
                 if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
                     result.append(_convert_to_test_target(
@@ -239,11 +241,6 @@ def main():
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
                         'should be specified.')
-    if parsed_args.test_target and parsed_args.exclude_load_tests:
-        if parsed_args.test_target.endswith('load_test'):
-            raise Exception('Arguments are not consistent with each other '
-                            'Setting exclude_load_tests to be true will not '
-                            'allow you to run the test_target file.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:
@@ -252,7 +249,7 @@ def main():
     if parsed_args.test_target:
         all_test_targets = [parsed_args.test_target]
     else:
-        include_load_tests = (parsed_args.exclude_load_tests is None)
+        include_load_tests = not parsed_args.exclude_load_tests
         all_test_targets = _get_all_test_targets(
             test_path=parsed_args.test_path,
             include_load_tests=include_load_tests)
