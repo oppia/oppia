@@ -256,6 +256,9 @@ oppia.factory('oppiaPlayerService', [
       getStateContentAudioTranslation: function(stateName, languageCode) {
         return exploration.getAudioTranslation(stateName, languageCode);
       },
+      getAllAudioTranslations: function() {
+        return exploration.getAllAudioTranslations();
+      },
       isContentAudioTranslationAvailable: function(stateName) {
         return Object.keys(
           exploration.getAudioTranslations(stateName)).length > 0;
