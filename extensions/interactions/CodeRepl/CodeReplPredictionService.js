@@ -35,7 +35,7 @@ oppia.factory('CodeReplPredictionService', [
     var TOKEN_NAME_UNK = 'UNK';
 
     // List of python keywords.
-    var KWLIST = [
+    var KW_LIST = [
       'and', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del',
       'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global',
       'if', 'import', 'in', 'is', 'lambda', 'not', 'or', 'pass', 'print',
@@ -59,7 +59,7 @@ oppia.factory('CodeReplPredictionService', [
           }
           else if (
             tokenId == PythonProgramTokenType.NAME &&
-            KWLIST.indexOf(tokenName) == -1) {
+            KW_LIST.indexOf(tokenName) == -1) {
             tokenizedProgram.push(TOKEN_NAME_VAR);
           }
           else {
@@ -217,14 +217,15 @@ oppia.factory('CodeReplPredictionService', [
         });
 
         // Find the winning class.
-        classCount = Object.entries(classCount).sort(function(x, y) {
-          return x[1] < y[1];
-        });
+        var classCountArray = []
+        Object.keys(classCount).forEach(function(k) {
+          classCountArray.push([k, classCount[k]]);
+        })
 
-        var predictedClass = classCount[0][0];
-        var predictedClassOccurrence = classCount[0][1];
+        var predictedClass = classCountArray[0][0];
+        var predictedClassOccurrence = classCountArray[0][1];
         if (predictedClassOccurrence >= occurrence &&
-            predictedClassOccurrence != classCount[1][1]) {
+            predictedClassOccurrence != classCountArray[1][1]) {
           return predictedClass;
         }
 

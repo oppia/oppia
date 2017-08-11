@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Vecotrizer function which mirrors the CountVectorizer feature
+ * Vectorizer function which mirrors the CountVectorizer feature
  * extractor of sklearn.
  *
  * IMPORTANT NOTE: The Vectorizer function uses the vocabulary that was
@@ -26,7 +26,7 @@
 oppia.factory('CountVectorizerService', [function() {
   return {
     vectorize: function(tokens, vocabulary) {
-      var vectorLength = Math.max.apply(Math, Object.values(vocabulary)) + 1;
+      var vectorLength = Object.keys(vocabulary).length;
       var vector = [];
       for(var i = 0; i < vectorLength; i++) {
         vector.push(0);

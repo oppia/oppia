@@ -104,7 +104,7 @@ oppia.factory('SVMPredictionService', [function() {
       var maxVoteIdx = 0;
       for(var i = 0; i < votes.length; i++) {
         if (votes[i] > votes[maxVoteIdx]) {
-          maxVoteIdx = votes[i];
+          maxVoteIdx = i;
         }
       }
 
