@@ -82,6 +82,7 @@ var GLOBALS = {
     text: 'English'
   }],
   ASSET_DIR_PREFIX: '',
+  AUDIO_URL_TEMPLATE: '/assets/test/<exploration_id>/audio/<filename>',
   // This prefix is needed to correctly interpolate directive template URLs in
   // Karma tests. It is referenced by UrlInterpolationService.
   TEMPLATE_DIR_PREFIX: 'core/templates/dev/head'

@@ -16,6 +16,7 @@
 
 """Decorators to provide authorization across the site."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import rights_manager
 from core.domain import role_services
@@ -46,7 +47,7 @@ def can_play_exploration(handler):
             exploration_id, strict=False)
 
         if rights_manager.check_can_access_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
                 exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -64,7 +65,7 @@ def can_play_collection(handler):
             collection_id, strict=False)
 
         if rights_manager.check_can_access_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_COLLECTION,
                 collection_rights):
             return handler(self, collection_id, **kwargs)
         else:
@@ -86,7 +87,7 @@ def can_download_exploration(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         if rights_manager.check_can_access_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
                 exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -108,7 +109,7 @@ def can_view_exploration_stats(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         if rights_manager.check_can_access_activity(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
+                self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
                 exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -131,7 +132,7 @@ def can_edit_collection(handler):
 
         if rights_manager.check_can_edit_activity(
                 self.user_id, self.actions,
-                feconf.ACTIVITY_TYPE_COLLECTION, collection_rights):
+                constants.ACTIVITY_TYPE_COLLECTION, collection_rights):
             return handler(self, collection_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -311,7 +312,7 @@ def can_comment_on_feedback_thread(handler):
 
         if rights_manager.check_can_access_activity(
                 self.user_id, self.actions,
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_rights):
+                constants.ACTIVITY_TYPE_EXPLORATION, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -379,7 +380,7 @@ def can_edit_exploration(handler):
 
         if rights_manager.check_can_edit_activity(
                 self.user_id, self.actions,
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_rights):
+                constants.ACTIVITY_TYPE_EXPLORATION, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -538,12 +539,10 @@ def can_access_learner_dashboard(handler):
 def require_user_id_else_redirect_to_homepage(handler):
     """Decorator that checks if a user_id is associated to the current
     session. If not, the user is redirected to the main page.
-
     Note that the user may not yet have registered.
     """
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in.
-
         If not, redirects the user to the home page.
         """
         if not self.user_id:

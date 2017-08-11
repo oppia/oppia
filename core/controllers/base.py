@@ -311,6 +311,7 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
             'ACTIVITY_STATUS_PUBLICIZED': (
                 rights_manager.ACTIVITY_STATUS_PUBLICIZED),
+            'AUDIO_URL_TEMPLATE': feconf.AUDIO_URL_TEMPLATE,
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
@@ -433,6 +434,11 @@ class BaseHandler(webapp2.RequestHandler):
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
+        if isinstance(exception, self.NotLoggedInException):
+            self.redirect(
+                current_user_services.create_login_url(self.request.uri))
+            return
+
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
         logging.error('Exception raised: %s', exception)
 
@@ -441,11 +447,6 @@ class BaseHandler(webapp2.RequestHandler):
             self.error(404)
             self._render_exception(404, {
                 'error': 'Could not find the page %s.' % self.request.uri})
-            return
-
-        if isinstance(exception, self.NotLoggedInException):
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
             return
 
         if isinstance(exception, self.UnauthorizedUserException):

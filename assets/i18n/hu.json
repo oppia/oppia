@@ -50,7 +50,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED": "Utoljára frissítve",
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Értékelés",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Megoldatlan válaszok",
-	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Húzd ide a képet",
+	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Húzd ide egy képet",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Letiltott felfedezés",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Sajnáljuk, de a választott felfedezés jelenleg le van tiltva. Kérjük, próbáld újra később.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Letiltott felfedezés – Oppia",
