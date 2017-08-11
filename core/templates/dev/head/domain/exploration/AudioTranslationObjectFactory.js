@@ -28,12 +28,25 @@ oppia.factory('AudioTranslationObjectFactory', [function() {
     this.needsUpdate = true;
   };
 
+  AudioTranslation.prototype.toggleNeedsUpdateAttribute = function() {
+    this.needsUpdate = !this.needsUpdate;
+  };
+
+  AudioTranslation.prototype.getFileSizeMB = function() {
+    var NUM_BYTES_IN_MB = 1 << 20;
+    return this.fileSizeBytes / NUM_BYTES_IN_MB;
+  };
+
   AudioTranslation.prototype.toBackendDict = function() {
     return {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
       needs_update: this.needsUpdate
     };
+  };
+
+  AudioTranslation.createNew = function(filename, fileSizeBytes) {
+    return new AudioTranslation(filename, fileSizeBytes, false);
   };
 
   AudioTranslation.createFromBackendDict = function(translationBackendDict) {

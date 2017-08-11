@@ -71,6 +71,10 @@ oppia.directive('createActivityButton', [
                       $modalInstance.close();
                     };
 
+                    $scope.canCreateCollections = (
+                      GLOBALS.can_create_collections
+                    );
+
                     $scope.cancel = function() {
                       $modalInstance.dismiss('cancel');
                     };

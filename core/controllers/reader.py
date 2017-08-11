@@ -20,6 +20,7 @@ import random
 
 import jinja2
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import classifier_services
@@ -124,15 +125,15 @@ class ExplorationPageEmbed(base.BaseHandler):
         """Handles GET requests."""
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = (
-            bool(self.username) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
+            exploration_rights)
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
@@ -163,6 +164,8 @@ class ExplorationPage(base.BaseHandler):
         """Handles GET requests."""
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
 
         if self.request.get('iframed'):
             redirect_url = '/embed/exploration/%s' % exploration_id
@@ -174,11 +177,9 @@ class ExplorationPage(base.BaseHandler):
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = (
-            bool(self.username) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
+            exploration_rights)
 
         try:
             # If the exploration does not exist, a 404 error is raised.
@@ -210,11 +211,13 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
         self.values.update({
             'can_edit': (
-                self.user_id and
-                rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
+                rights_manager.check_can_edit_activity(
+                    self.user_id, self.actions,
+                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_rights)),
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
@@ -442,31 +445,19 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class RemoveExpFromIncompleteListHandler(base.BaseHandler):
-    """Handles operations related to removing an exploration from the partially
-    completed list of a user.
+class LearnerIncompleteActivityHandler(base.BaseHandler):
+    """Handles operations related to the activities in the incomplete list of
+    the user.
     """
-
     @acl_decorators.can_access_learner_dashboard
-    def post(self):
-        """Handles POST requests."""
-        exploration_id = self.payload.get('exploration_id')
-        learner_progress_services.remove_exp_from_incomplete_list(
-            self.user_id, exploration_id)
-        self.render_json(self.values)
+    def delete(self, activity_type, activity_id):
+        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+            learner_progress_services.remove_exp_from_incomplete_list(
+                self.user_id, activity_id)
+        elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+            learner_progress_services.remove_collection_from_incomplete_list(
+                self.user_id, activity_id)
 
-
-class RemoveCollectionFromIncompleteListHandler(base.BaseHandler):
-    """Handles operations related to removing a collection from the partially
-    completed list of a user.
-    """
-
-    @acl_decorators.can_access_learner_dashboard
-    def post(self):
-        """Handles POST requests."""
-        collection_id = self.payload.get('collection_id')
-        learner_progress_services.remove_collection_from_incomplete_list(
-            self.user_id, collection_id)
         self.render_json(self.values)
 
 

@@ -21,16 +21,18 @@ oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   function(
       $http, $q, UrlInterpolationService) {
+    // List of filenames that have had been requested for but have
+    // yet to return a response.
+    var _filesCurrentlyBeingRequested = [];
+
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
-    var GCS_AUDIO_DOWNLOAD_URL_TEMPLATE = 
-      'https://storage.googleapis.com/' + constants.GCS_RESOURCE_BUCKET_NAME +
-      '/<exploration_id>/assets/audio/<filename>';
 
     // Map from asset filename to asset blob.
     var assetsCache = {};
     var _fetchAudio = function(
         explorationId, filename, successCallback, errorCallback) {
+      _filesCurrentlyBeingRequested.push(filename);
       $http({
         method: 'GET',
         responseType: 'blob',
@@ -39,15 +41,27 @@ oppia.factory('AssetsBackendApiService', [
         var audioBlob = new Blob([data]);
         assetsCache[filename] = audioBlob;
         successCallback(audioBlob);
-      }).error(errorCallback);
+      }).error(function() {
+        errorCallback();
+      })['finally'](function() {
+        _removeFromFilesCurrentlyBeingRequested(filename);
+      });
+    };
+
+    var _removeFromFilesCurrentlyBeingRequested = function(filename) {
+      if (_isCurrentlyBeingRequested(filename)) {
+        var fileToRemoveIndex =
+          _filesCurrentlyBeingRequested.indexOf(filename);
+        _filesCurrentlyBeingRequested.splice(fileToRemoveIndex, 1);
+      }
     };
 
     var _saveAudio = function(
         explorationId, filename, rawAssetData, successCallback,
         errorCallback) {
       var form = new FormData();
-      
-      form.append('raw', rawAssetData);
+
+      form.append('raw_audio_file', rawAssetData);
       form.append('payload', JSON.stringify({
         filename: filename
       }));
@@ -59,21 +73,30 @@ oppia.factory('AssetsBackendApiService', [
         processData: false,
         contentType: false,
         type: 'POST',
-        dataType: 'text'
+        dataType: 'text',
+        dataFilter: function(data) {
+          // Remove the XSSI prefix.
+          var transformedData = data.substring(5);
+          return JSON.parse(transformedData);
+        },
       }).done(function(response) {
         if (successCallback) {
           successCallback(response);
         }
-      }).fail(function(error) {
+      }).fail(function(data) {
+        // Remove the XSSI prefix.
+        var transformedData = data.responseText.substring(5);
+        var parsedResponse = angular.fromJson(transformedData);
+        console.error(parsedResponse);
         if (errorCallback) {
-          errorCallback(error.data);
+          errorCallback(parsedResponse);
         }
       });
     };
 
     var _getAudioDownloadUrl = function(explorationId, filename) {
       return UrlInterpolationService.interpolateUrl(
-        GCS_AUDIO_DOWNLOAD_URL_TEMPLATE, {
+        GLOBALS.AUDIO_URL_TEMPLATE, {
           exploration_id: explorationId,
           filename: filename
         });
@@ -85,6 +108,10 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
+    var _isCurrentlyBeingRequested = function(filename) {
+      return _filesCurrentlyBeingRequested.indexOf(filename) !== -1;
+    };
+
     var _isCached = function(filename) {
       return assetsCache.hasOwnProperty(filename);
     };
@@ -94,7 +121,7 @@ oppia.factory('AssetsBackendApiService', [
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
             resolve(assetsCache[filename]);
-          } else {
+          } else if (!_isCurrentlyBeingRequested(filename)) {
             _fetchAudio(explorationId, filename, resolve, reject);
           }
         });
@@ -106,6 +133,9 @@ oppia.factory('AssetsBackendApiService', [
       },
       isCached: function(filename) {
         return _isCached(filename);
+      },
+      getAudioDownloadUrl: function(explorationId, filename) {
+        return _getAudioDownloadUrl(explorationId, filename);
       }
     };
   }

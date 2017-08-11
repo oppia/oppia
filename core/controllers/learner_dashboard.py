@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
@@ -32,19 +31,12 @@ class LearnerDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
-        if self.username in config_domain.BANNED_USERNAMES.value:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-        elif user_services.has_fully_registered(self.user_id):
-            self.values.update({
-                'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
-            })
-            self.render_template(
-                'pages/learner_dashboard/learner_dashboard.html',
-                redirect_url_on_logout='/')
-        else:
-            self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', feconf.LEARNER_DASHBOARD_URL))
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
+        })
+        self.render_template(
+            'pages/learner_dashboard/learner_dashboard.html',
+            redirect_url_on_logout='/')
 
 
 class LearnerDashboardHandler(base.BaseHandler):
@@ -73,6 +65,13 @@ class LearnerDashboardHandler(base.BaseHandler):
         incomplete_collection_summary_dicts = (
             learner_progress_services.get_collection_summary_dicts(
                 learner_progress.incomplete_collection_summaries))
+
+        exploration_playlist_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts(
+                learner_progress.exploration_playlist_summaries))
+        collection_playlist_summary_dicts = (
+            learner_progress_services.get_collection_summary_dicts(
+                learner_progress.collection_playlist_summaries))
 
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
@@ -106,6 +105,8 @@ class LearnerDashboardHandler(base.BaseHandler):
             'completed_collections_list': completed_collection_summary_dicts,
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
             'incomplete_collections_list': incomplete_collection_summary_dicts,
+            'exploration_playlist': exploration_playlist_summary_dicts,
+            'collection_playlist': collection_playlist_summary_dicts,
             'number_of_deleted_activities': number_of_deleted_activities,
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
