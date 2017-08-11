@@ -53,13 +53,13 @@ class EmailRightsTest(test_utils.GenericTestBase):
         expected_validation_results = {
             feconf.EMAIL_INTENT_SIGNUP: (True, False, False, False),
             feconf.EMAIL_INTENT_DAILY_BATCH: (True, False, False, False),
-            feconf.EMAIL_INTENT_MARKETING: (False, True, False, False),
+            feconf.EMAIL_INTENT_MARKETING: (True, True, False, False),
             feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION: (
-                False, True, True, False),
+                True, True, True, False),
             feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-                False, True, True, False),
+                True, True, True, False),
             feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-                False, True, True, False),
+                True, True, True, False),
         }
 
         # pylint: disable=protected-access

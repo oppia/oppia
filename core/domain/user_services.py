@@ -379,7 +379,7 @@ def get_users_settings(user_ids):
             result.append(UserSettings(
                 feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
-                role=feconf.ROLE_ID_EXPLORATION_EDITOR,
+                role=feconf.ROLE_ID_ADMIN,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
