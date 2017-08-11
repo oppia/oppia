@@ -18,7 +18,8 @@
  */
 
 oppia.directive('audioControls', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'AudioPreloaderService',
+  function(UrlInterpolationService, AudioPreloaderService) {
     return {
       restrict: 'E',
       scope: {
@@ -29,24 +30,27 @@ oppia.directive('audioControls', [
         'audio_controls_directive.html'),
       controller: [
         '$scope', 'AudioTranslationManagerService', 'AudioPlayerService',
-        'LanguageUtilService',
+        'LanguageUtilService', 'AssetsBackendApiService',
         function(
             $scope, AudioTranslationManagerService, AudioPlayerService,
-            LanguageUtilService) {
+            LanguageUtilService, AssetsBackendApiService) {
           // This ID is passed in to AudioPlayerService as a means of
           // distinguishing which audio directive is currently playing audio.
           var directiveId = Math.random().toString(36).substr(2, 10);
 
-          var currentAudioLanguageCode =
-            AudioTranslationManagerService
-              .getCurrentAudioLanguageCode();
 
-          $scope.currentAudioLanguageDescription =
-            AudioTranslationManagerService
+          var getCurrentAudioLanguageCode = function() {
+            return AudioTranslationManagerService.getCurrentAudioLanguageCode();
+          };
+
+          $scope.getCurrentAudioLanguageDescription = function() {
+            return AudioTranslationManagerService
               .getCurrentAudioLanguageDescription();
+          };
 
-          var getCurrentAudioTranslation = function() {
-            return $scope.getAudioTranslations()[currentAudioLanguageCode];
+          var getAudioTranslationInCurrentLanguage = function() {
+            return $scope.getAudioTranslations()[
+              AudioTranslationManagerService.getCurrentAudioLanguageCode()];
           };
 
           $scope.AudioPlayerService = AudioPlayerService;
@@ -56,20 +60,40 @@ oppia.directive('audioControls', [
               '/icons/rewind-five.svg'));
 
           $scope.isAudioAvailableInCurrentLanguage = function() {
-            return Boolean(getCurrentAudioTranslation());
+            return Boolean(getAudioTranslationInCurrentLanguage());
           };
 
           $scope.doesCurrentAudioTranslationNeedUpdate = function() {
-            return getCurrentAudioTranslation().needsUpdate;
+            return getAudioTranslationInCurrentLanguage().needsUpdate;
           };
 
-          $scope.playPauseAudioTranslation = function() {
-            // TODO(tjiang11): Change from on-demand loading to pre-loading.
+          $scope.onSpeakerIconClicked = function() {
+            var audioTranslation = getAudioTranslationInCurrentLanguage();
+            if (audioTranslation) {
+              // If this language hasn't been preloaded for the exploration,
+              // and this audio translation hasn't been loaded, then ask to
+              // preload all audio translations for the current language.
+              if (!AudioPreloaderService.hasPreloadedLanguage(
+                    getCurrentAudioLanguageCode()) &&
+                    !isCached(audioTranslation)) {
+                AudioPreloaderService.showBandwidthConfirmationModal(
+                  $scope.getAudioTranslations(), getCurrentAudioLanguageCode(),
+                  playPauseAudioTranslation);
+              } else {
+                playPauseAudioTranslation(getCurrentAudioLanguageCode());
+              }
+            } else {
+              // If the audio translation isn't available in the current
+              // language, then open the settings modal.
+              $scope.openAudioTranslationSettings();
+            }
+          };
 
-            // TODO(tjiang11): On first play, ask learner to pick language
-            // and subsequently for confirmation to use bandwidth 
-            // to download audio files.
+          var isCached = function(audioTranslation) {
+            return AssetsBackendApiService.isCached(audioTranslation.filename);
+          };
 
+          var playPauseAudioTranslation = function(languageCode) {
             $scope.extraAudioControlsAreShown = true;
 
             if (!AudioPlayerService.isPlaying()) {
@@ -95,7 +119,7 @@ oppia.directive('audioControls', [
           };
 
           var loadAndPlayAudioTranslation = function() {
-            var audioTranslation = getCurrentAudioTranslation();
+            var audioTranslation = getAudioTranslationInCurrentLanguage();
             if (audioTranslation) {
               AudioPlayerService.load(
                 audioTranslation.filename, directiveId).then(function() {
@@ -109,13 +133,7 @@ oppia.directive('audioControls', [
           };
 
           $scope.openAudioTranslationSettings = function() {
-            AudioTranslationManagerService
-              .showAudioTranslationSettingsModal(function(newLanguageCode) {
-                currentAudioLanguageCode = newLanguageCode;
-                $scope.currentAudioLanguageDescription = 
-                  LanguageUtilService.getAudioLanguageDescription(
-                    newLanguageCode);
-              });
+            AudioTranslationManagerService.showAudioTranslationSettingsModal();
           };
         }]
     }

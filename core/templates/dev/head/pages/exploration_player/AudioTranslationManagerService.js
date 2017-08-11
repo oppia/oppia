@@ -52,6 +52,7 @@ oppia.factory('AudioTranslationManagerService', [
           '/pages/exploration_player/' +
           'audio_translation_settings_modal_directive.html'),
         resolve: {},
+        backdrop: true,
         controller: [
           '$scope', '$filter', '$modalInstance',
           'AudioTranslationManagerService', 'LanguageUtilService',
@@ -86,7 +87,9 @@ oppia.factory('AudioTranslationManagerService', [
           _currentAudioLanguageCode = result.languageCode;
           AudioPlayerService.stop();
           AudioPlayerService.clear();
-          onLanguageChangedCallback(_currentAudioLanguageCode);
+          if (onLanguageChangedCallback) {
+            onLanguageChangedCallback(_currentAudioLanguageCode);
+          }
         }
       });
     };
@@ -106,7 +109,7 @@ oppia.factory('AudioTranslationManagerService', [
         return _allLanguageCodesInExploration;
       },
       showAudioTranslationSettingsModal: function(onLanguageChangedCallback) {
-        return _showAudioTranslationSettingsModal(onLanguageChangedCallback);
+        _showAudioTranslationSettingsModal(onLanguageChangedCallback);
       }
     };
   }]);

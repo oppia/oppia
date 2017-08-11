@@ -31,64 +31,6 @@ ALGORITHM_CHOICES = [classifier_details['algorithm_id'] for (
     classifier_details) in feconf.INTERACTION_CLASSIFIER_MAPPING.values()]
 
 
-class ClassifierDataModel(base_models.BaseModel):
-    """Storage model for classifier used for answer classification.
-
-    The id of instances of this class is the job_request_id of the corresponding
-    ClassifierTrainingJobModel and has the form
-    {{exp_id}}.{{random_hash_of_16_chars}}
-    """
-    # The exploration_id of the exploration to whose state the model belongs.
-    exp_id = ndb.StringProperty(required=True, indexed=True)
-    # The exploration version at the time this classifier model was created.
-    exp_version_when_created = ndb.IntegerProperty(required=True, indexed=True)
-    # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True, indexed=True)
-    # The ID of the algorithm used to create the model.
-    algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES)
-    # The actual model used for classification. Immutable, unless a schema
-    # upgrade takes place.
-    classifier_data = ndb.JsonProperty(required=True)
-    # The schema version for the data that is being classified.
-    data_schema_version = ndb.IntegerProperty(required=True)
-
-    @classmethod
-    def create(
-            cls, classifier_id, exp_id, exp_version_when_created, state_name,
-            algorithm_id, classifier_data, data_schema_version):
-        """Creates a new ClassifierDataModel entry.
-
-        Args:
-            classifier_id: str. ID of the job used for training the classifier.
-            exp_id: str. ID of the exploration.
-            exp_version_when_created: int. The version of the exploration when
-                this classification model was created.
-            state_name: str. The name of the state to which the classifier
-                belongs.
-            algorithm_id: str. ID of the algorithm used to generate the model.
-            classifier_data: dict. The model used for classification.
-            data_schema_version: int. Schema version of the
-                data used by the classifier.
-
-        Returns:
-            ID of the new ClassifierDataModel entry.
-
-        Raises:
-            Exception: A model with the same ID already exists.
-        """
-
-        instance_id = classifier_id
-        classifier_data_model_instance = cls(
-            id=instance_id, exp_id=exp_id,
-            exp_version_when_created=exp_version_when_created,
-            state_name=state_name, algorithm_id=algorithm_id,
-            classifier_data=classifier_data,
-            data_schema_version=data_schema_version)
-
-        classifier_data_model_instance.put()
-        return instance_id
-
-
 class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
 
@@ -120,6 +62,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # It is incremented by TTL when a job with status NEW is picked up by VM.
     next_scheduled_check_time = ndb.DateTimeProperty(required=True,
                                                      indexed=True)
+    # The classifier data which will be populated when storing the results of
+    # the job.
+    classifier_data = ndb.JsonProperty(default=None)
+    # The schema version for the data that is being classified.
+    data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -153,7 +100,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, algorithm_id, interaction_id, exp_id, exp_version,
-            next_scheduled_check_time, training_data, state_name, status):
+            next_scheduled_check_time, training_data, state_name, status,
+            classifier_data, data_schema_version):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -169,6 +117,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 belongs.
             status: str. The status of the training job.
             training_data: dict. The data used in training phase.
+            classifier_data: dict|None. The data stored as result of training.
+            data_schema_version: int. The schema version for the data.
 
         Returns:
             ID of the new ClassifierModel entry.
@@ -185,7 +135,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             exp_version=exp_version,
             next_scheduled_check_time=next_scheduled_check_time,
             state_name=state_name, status=status,
-            training_data=training_data)
+            training_data=training_data,
+            classifier_data=classifier_data,
+            data_schema_version=data_schema_version
+            )
 
         training_job_instance.put()
         return instance_id
@@ -233,7 +186,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 exp_version=job_dict['exp_version'],
                 next_scheduled_check_time=job_dict['next_scheduled_check_time'],
                 state_name=job_dict['state_name'], status=job_dict['status'],
-                training_data=job_dict['training_data'])
+                training_data=job_dict['training_data'],
+                classifier_data=job_dict['classifier_data'],
+                data_schema_version=job_dict['data_schema_version'])
 
             job_models.append(training_job_instance)
             job_ids.append(instance_id)
