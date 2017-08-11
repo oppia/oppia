@@ -85,6 +85,17 @@ oppia.factory('routerService', [
       }
     });
 
+    // Select2 dropdowns does not automatically get populated
+    // when the tab is loaded, so we have to force it to refresh.
+    // Similar issue happened in Preferences.js and the same bug
+    // fix was made.
+    var _forceSelect2Refresh = function() {
+      $rootScope.select2DropdownIsShown = false;
+      $timeout(function() {
+        $rootScope.select2DropdownIsShown = true;
+      }, 100);
+    };
+
     var _doNavigationWithState = function(path, pathType) {
       var pathBase = '/' + pathType + '/';
       var putativeStateName = path.substring(pathBase.length);
@@ -195,6 +206,7 @@ oppia.factory('routerService', [
       navigateToSettingsTab: function() {
         _savePendingChanges();
         $location.path('/settings');
+        _forceSelect2Refresh();
       },
       navigateToHistoryTab: function() {
         _savePendingChanges();
