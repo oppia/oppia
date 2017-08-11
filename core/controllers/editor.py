@@ -24,6 +24,8 @@ import StringIO
 import jinja2
 import mutagen
 
+from mutagen.mp3 import MP3
+
 from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
@@ -883,7 +885,10 @@ class AudioUploadHandler(EditorHandler):
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:
-            audio = mutagen.File(tempbuffer)
+            if extension == 'mp3':
+                audio = MP3(tempbuffer)
+            else:
+                audio = mutagen.File(tempbuffer)
         except mutagen.MutagenError:
             # Mutagen occasionally has problems with certain files
             # for unknown reasons.
