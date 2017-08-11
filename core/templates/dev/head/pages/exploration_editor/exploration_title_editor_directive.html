@@ -1,5 +1,4 @@
-<p ng-class="{'has-error': !explorationTitleService.displayed.length > 0}"
-   class="settings-p">
+<p ng-class="{'has-error': !explorationTitleService.displayed.length > 0}">
   <label for="explorationTitle" ng-style="<[::formStyle]>"><[::labelText]></label>
   <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" 
          ng-model="explorationTitleService.displayed" ng-blur="onInputFieldBlur()" 
@@ -14,10 +13,10 @@
 </p>
 <style>
 @media (min-width: 768px) {
-.settings-p{
-display: table;
-width: 100%;
-margin-bottom: 2%;
-}
+  exploration-title-editor p{
+    display: table;
+    width: 100%;
+    margin-bottom: 2%;
+  }
 }
 </style>
