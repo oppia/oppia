@@ -1723,15 +1723,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
-    def test_get_search_rank(self):
-        self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
-
-        base_search_rank = 20
-
-        self.assertEqual(
-            collection_services._get_search_rank(self.COLLECTION_ID),
-            base_search_rank)
-
 
 class CollectionSummaryTests(CollectionServicesUnitTests):
     """Test collection summaries."""

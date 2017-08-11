@@ -70,15 +70,6 @@ var createAndPublishExploration = function(
   publishExploration();
 };
 
-// Run from the editor, requires user to be a moderator / admin.
-var markExplorationAsFeatured = function() {
-  editor.runFromSettingsTab(function() {
-    element(by.css('.protractor-test-mark-exploration-featured')).click();
-    general.waitForSystem();
-    element(by.css('.protractor-test-feature-exploration-button')).click();
-  });
-};
-
 // Role management (state editor settings tab)
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
@@ -134,7 +125,6 @@ exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
-exports.markExplorationAsFeatured = markExplorationAsFeatured;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;

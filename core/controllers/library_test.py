@@ -160,7 +160,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'Objective B',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_list'][0])
+        }, response_dict['activity_list'][1])
         self.assertDictContainsSubset({
             'id': 'A',
             'category': 'Category A',
@@ -168,7 +168,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'Objective A',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_list'][1])
+        }, response_dict['activity_list'][0])
 
         # Delete exploration A
         exp_services.delete_exploration(self.admin_id, 'A')

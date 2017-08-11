@@ -2195,17 +2195,17 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 30)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_ID, 5)
         self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 40)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 10)
 
         rating_services.assign_rating_to_exploration(
             self.user_id_admin, self.EXP_ID, 2)
         self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 38)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 8)
 
     def test_search_ranks_cannot_be_negative(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
