@@ -136,17 +136,21 @@ oppia.factory('AnswerClassificationService', [
             stateName);
           var algorithmId = StateClassifierMappingService.getAlgorithmId(
             stateName);
-          var predictionService = (
-            PredictionAlgorithmRegistryService.getPredictionService(
-              algorithmId));
-          var predictedAnswerGroupIndex = predictionService.predict(
-            classifierData, answer).answerGroupIndex;
-          deferred.resolve({
-            outcome: result.outcome,
-            ruleIndex: result.ruleIndex,
-            answerGroupIndex: predictedAnswerGroupIndex,
-            classificationCategorization: result.classificationCategorization
-          });
+          if (classifierData && algorithmId) {
+            var predictionService = (
+              PredictionAlgorithmRegistryService.getPredictionService(
+                algorithmId));
+            var predictedAnswerGroupIndex = predictionService.predict(
+              classifierData, answer).answerGroupIndex;
+            deferred.resolve({
+              outcome: result.outcome,
+              ruleIndex: result.ruleIndex,
+              answerGroupIndex: predictedAnswerGroupIndex,
+              classificationCategorization: result.classificationCategorization
+            });
+          } else {
+            deferred.resolve(result);
+          }
         } else {
           deferred.resolve(result);
         }

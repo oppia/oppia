@@ -25,12 +25,19 @@
      },
 
      getClassifierData: function(stateName) {
-       return stateClassifierMapping[stateName]['classifier_data'];
+       if (stateClassifierMapping[stateName]) {
+         return stateClassifierMapping[stateName].classifier_data;
+       } else {
+         return null;
+       }
      },
 
      getAlgorithmId: function(stateName) {
-       return stateClassifierMapping[stateName]['algorithm_id'];
+       if (stateClassifierMapping[stateName]) {
+         return stateClassifierMapping[stateName].algorithm_id;
+       } else {
+         return null;
+       }
      }
    };
-
  }]);
