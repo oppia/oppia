@@ -223,13 +223,12 @@ class ExplorationHandler(base.BaseHandler):
             if classifier_training_jobs[index] == None:
                 state_classifier_mapping[state_name] = None
             else:
-                # Not making this a multi-get since we are deprecating
-                # ClassifierDataModel in subsequent PRs.
-                classifier = classifier_services.get_classifier_by_id(
-                    classifier_training_jobs[index].job_id)
+                classifier_data = classifier_training_jobs[
+                    index].classifier_data
+                algorithm_id = classifier_training_jobs[index].algorithm_id
                 state_classifier_mapping[state_name] = {
-                    'algorithm_id': classifier.algorithm_id,
-                    'classifier_data': classifier.classifier_data
+                    'algorithm_id': algorithm_id,
+                    'classifier_data': classifier_data
                 }
 
         self.values.update({

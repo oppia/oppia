@@ -209,7 +209,9 @@ class ExplorationHandlerTest(test_utils.GenericTestBase):
         # Load demo exploration.
         exp_services.delete_demo(self.exp_id)
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.load_demo(self.exp_id)
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    exp_services.load_demo(self.exp_id)
 
         # Retrieve job_id of created job (because of save_exp).
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
@@ -217,31 +219,12 @@ class ExplorationHandlerTest(test_utils.GenericTestBase):
         for job in all_jobs:
             job_id = job.id
 
-        # Create classifier.
-        classifier_data = {
-            '_alpha': 0.1,
-            '_beta': 0.001,
-            '_prediction_threshold': 0.5,
-            '_training_iterations': 25,
-            '_prediction_iterations': 5,
-            '_num_labels': 10,
-            '_num_docs': 12,
-            '_num_words': 20,
-            '_label_to_id': {'text': 1},
-            '_word_to_id': {'hello': 2},
-            '_w_dp': [],
-            '_b_dl': [],
-            '_l_dp': [],
-            '_c_dl': [],
-            '_c_lw': [],
-            '_c_l': []
-        }
-        classifier_services.create_classifier(job_id, classifier_data)
+        classifier_services.store_classifier_data(job_id, {})
 
         expected_state_classifier_mapping = {
             'text': {
                 'algorithm_id': 'LDAStringClassifier',
-                'classifier_data': classifier_data
+                'classifier_data': {}
             },
             'final': None
         }
