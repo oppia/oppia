@@ -89,7 +89,7 @@ oppia.factory('explorationData', [
         });
       },
       // Returns a promise that supplies the data for the current exploration.
-      getData: function() {
+      getData: function(errorCallback) {
         if (explorationData.data) {
           $log.info('Found exploration data in cache.');
 
@@ -120,7 +120,10 @@ oppia.factory('explorationData', [
                     // response
                     window.location.reload();
                   });
-              }
+              } else if (draftChanges &&
+                draftChanges.draftChangeListId !== draftChangeListId) {
+                  errorCallback(explorationId, draftChanges.draftChanges);
+                }
               return response;
             })
           );
@@ -2489,11 +2492,13 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$log', '$modal', '$timeout', '$window', 'lostChangesService',
-  'explorationData', 'UrlInterpolationService',
+  '$log', '$modal', '$timeout', '$window',
+  'explorationData', 'LocalStorageService', 'lostChangesService',
+   'UrlInterpolationService',
   function(
-      $log, $modal, $timeout, $window, lostChangesService,
-      explorationData, UrlInterpolationService) {
+      $log, $modal, $timeout, $window, 
+      explorationData, LocalStorageService, lostChangesService,
+      UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
       $timeout(function() {
@@ -2554,6 +2559,38 @@ oppia.factory('autosaveInfoModalsService', [
             }
           }],
           windowClass: 'oppia-autosave-version-mismatch-modal'
+        }).result.then(function() {
+          _isModalOpen = false;
+        }, function() {
+          _isModalOpen = false;
+        });
+
+        _isModalOpen = true;
+      },
+      showLostChangesModal: function(lostChanges, explorationId) {
+        $modal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'lost_changes_modal.html'),
+          // Prevent modal from closing when the user clicks outside it.
+          backdrop: 'static',
+          controller: ['$scope', '$modalInstance', function(
+            $scope, $modalInstance) {
+            // When the user clicks on discard changes button, signal backend
+            // to discard the draft and reload the page thereafter.
+            $scope.close = function() {
+              LocalStorageService.removeExplorationDraft(explorationId);
+              $modalInstance.dismiss('cancel');
+            };
+
+            $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
+            if ($scope.hasLostChanges) {
+              $scope.lostChangesHtml = (
+                lostChangesService.makeHumanReadable(lostChanges).html());
+              $log.error('Lost changes: ' + JSON.stringify(lostChanges));
+            }
+          }],
+          windowClass: 'oppia-lost-changes-modal'
         }).result.then(function() {
           _isModalOpen = false;
         }, function() {
