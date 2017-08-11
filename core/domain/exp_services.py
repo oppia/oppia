@@ -61,8 +61,6 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # search query.
 MAX_ITERATIONS = 10
 
-# Constants used for search ranking.
-_STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
@@ -1545,26 +1543,6 @@ def get_next_page_of_all_non_private_commits(
     ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-def _exp_rights_to_search_dict(rights):
-    # Allow searches like "is:featured".
-    """Returns a search dict with information about the exploration rights. This
-    allows searches like "is:featured".
-
-    Args:
-        rights: ActivityRights. Domain object for the rights/publication status
-            of the exploration.
-
-    Returns:
-        dict. If the status of the given exploration is publicized then it
-        returns a dict with a key "is", and the value "featured". Otherwise, it
-        returns an empty dict.
-    """
-    doc = {}
-    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
-        doc['is'] = 'featured'
-    return doc
-
-
 def _should_index(exp):
     """Returns whether the given exploration should be indexed for future
     search queries.
@@ -1656,11 +1634,7 @@ def get_search_rank_from_exp_summary(exp_summary):
     # TODO(sll): Improve this calculation.
     rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
 
-    rank = _DEFAULT_RANK + (
-        _STATUS_PUBLICIZED_BONUS
-        if exp_summary.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
-        else 0)
-
+    rank = _DEFAULT_RANK
     if exp_summary.ratings:
         for rating_value in exp_summary.ratings:
             rank += (
@@ -1695,7 +1669,6 @@ def _exp_to_search_dict(exp):
         dict. The representation of the given exploration, in a form that can
         be used by the search index.
     """
-    rights = rights_manager.get_exploration_rights(exp.id)
     doc = {
         'id': exp.id,
         'language_code': exp.language_code,
@@ -1707,7 +1680,6 @@ def _exp_to_search_dict(exp):
         'author_notes': exp.author_notes,
         'rank': get_search_rank(exp.id),
     }
-    doc.update(_exp_rights_to_search_dict(rights))
     return doc
 
 
@@ -1759,7 +1731,7 @@ def update_exploration_status_in_search(exp_id):
         delete_documents_from_search_index([exp_id])
     else:
         patch_exploration_search_document(
-            rights.id, _exp_rights_to_search_dict(rights))
+            rights.id, {})
 
 
 def delete_documents_from_search_index(exploration_ids):

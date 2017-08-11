@@ -73,9 +73,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-        # Publicize the demo exploration.
         self.set_admins([self.ADMIN_USERNAME])
-        rights_manager.publicize_exploration(self.admin_id, '0')
 
         # Run migration job to create exploration summaries.
         # This is not necessary, but serves as additional check that
@@ -109,7 +107,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'title': 'A new title!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
     def test_library_handler_for_created_explorations(self):
@@ -146,7 +144,6 @@ class LibraryPageTest(test_utils.GenericTestBase):
         exp_services._save_exploration(  # pylint: disable=protected-access
             self.admin_id, exploration, 'Exploration B', [])
         rights_manager.publish_exploration(self.admin_id, 'B')
-        rights_manager.publicize_exploration(self.admin_id, 'B')
 
         # Publish exploration A
         rights_manager.publish_exploration(self.admin_id, 'A')
@@ -162,7 +159,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
         self.assertDictContainsSubset({
             'id': 'A',
@@ -185,7 +182,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
 

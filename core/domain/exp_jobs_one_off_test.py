@@ -55,53 +55,17 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
         'title': 'Title 5'
     }]
 
-    def test_all_exps_publicized(self):
-        """Test exploration summary batch job if all explorations are
-        publicized.
-        """
-        self._run_batch_job_once_and_verify_output(
-            self.EXP_SPECS,
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED)
-
     def test_all_exps_public(self):
-        """Test summary batch job if all explorations are public
-        but not publicized."""
+        """Test summary batch job if all explorations are public."""
         self._run_batch_job_once_and_verify_output(
             self.EXP_SPECS,
             default_status=rights_manager.ACTIVITY_STATUS_PUBLIC)
-
-    def test_exps_some_publicized(self):
-        """Test summary batch job if some explorations are publicized."""
-
-        exp_specs = [{
-            'category': 'Category A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-            'title': 'Title 1'
-        }, {
-            'category': 'Category B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 2'
-        }, {
-            'category': 'Category C',
-            'status': rights_manager.ACTIVITY_STATUS_PRIVATE,
-            'title': 'Title 3'
-        }, {
-            'category': 'Category A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 4'
-        }, {
-            'category': 'Category C',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 5'
-        }]
-
-        self._run_batch_job_once_and_verify_output(exp_specs)
 
     def _run_batch_job_once_and_verify_output(
             self, exp_specs,
             default_title='A title',
             default_category='A category',
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED):
+            default_status=rights_manager.ACTIVITY_STATUS_PUBLIC):
         """Run batch job for creating exploration summaries once and verify its
         output. exp_specs is a list of dicts with exploration specifications.
         Allowed keys are category, status, title. If a key is not specified,
@@ -149,14 +113,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     category=spec['category'])
                 exploration = exp_services.get_exploration_by_id(exp_id)
 
-                # Publish or publicize exploration.
+                # Publish exploration.
                 if spec['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
                     rights_manager.publish_exploration(admin_id, exp_id)
-                elif (
-                        spec['status'] ==
-                        rights_manager.ACTIVITY_STATUS_PUBLICIZED):
-                    rights_manager.publish_exploration(admin_id, exp_id)
-                    rights_manager.publicize_exploration(admin_id, exp_id)
 
                 # Do not include user_id here, so all explorations are not
                 # editable for now (will be updated depending on user_id

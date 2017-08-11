@@ -2062,39 +2062,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-    def test_update_publicized_exploration_status_in_search(self):
-
-        def mock_get_doc(doc_id, index):
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(doc_id, self.EXP_ID)
-            return {}
-
-        def mock_add_docs(docs, index):
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(docs, [{'is': 'featured'}])
-
-        def mock_get_rights(unused_exp_id):
-            return rights_manager.ActivityRights(
-                self.EXP_ID,
-                [self.owner_id], [self.editor_id], [self.viewer_id],
-                status=rights_manager.ACTIVITY_STATUS_PUBLICIZED)
-
-        get_doc_counter = test_utils.CallCounter(mock_get_doc)
-        add_docs_counter = test_utils.CallCounter(mock_add_docs)
-
-        get_doc_swap = self.swap(
-            search_services, 'get_document_from_index', get_doc_counter)
-        add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter)
-        get_rights_swap = self.swap(
-            rights_manager, 'get_exploration_rights', mock_get_rights)
-
-        with get_doc_swap, add_docs_swap, get_rights_swap:
-            exp_services.update_exploration_status_in_search(self.EXP_ID)
-
-        self.assertEqual(get_doc_counter.times_called, 1)
-        self.assertEqual(add_docs_counter.times_called, 1)
-
     def test_update_private_exploration_status_in_search(self):
 
         def mock_delete_docs(ids, index):
@@ -2227,7 +2194,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             exp_services.get_search_rank(self.EXP_ID), base_search_rank)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
         self.assertEqual(
             exp_services.get_search_rank(self.EXP_ID), base_search_rank + 30)
 
