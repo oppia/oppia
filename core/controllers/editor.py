@@ -23,8 +23,7 @@ import StringIO
 
 import jinja2
 import mutagen
-
-from mutagen.mp3 import MP3
+from mutagen import mp3
 
 from constants import constants
 from core.controllers import base
@@ -886,7 +885,7 @@ class AudioUploadHandler(EditorHandler):
         tempbuffer.seek(0)
         try:
             if extension == 'mp3':
-                audio = MP3(tempbuffer)
+                audio = mp3.MP3(tempbuffer)
             else:
                 audio = mutagen.File(tempbuffer)
         except mutagen.MutagenError:
