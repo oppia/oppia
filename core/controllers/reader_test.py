@@ -28,7 +28,6 @@ from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import utils
 
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
@@ -201,17 +200,17 @@ class ExplorationHandlerTest(test_utils.GenericTestBase):
 
     def test_creation_of_state_classifier_mapping(self):
         super(ExplorationHandlerTest, self).setUp()
-        self.exp_id = '15'
+        exploration_id = '15'
 
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         # Load demo exploration.
-        exp_services.delete_demo(self.exp_id)
+        exp_services.delete_demo(exploration_id)
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.load_demo(self.exp_id)
+                    exp_services.load_demo(exploration_id)
 
         # Retrieve job_id of created job (because of save_exp).
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
@@ -230,7 +229,7 @@ class ExplorationHandlerTest(test_utils.GenericTestBase):
         }
         # Call the handler.
         exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.exp_id))
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id))
         retrieved_state_classifier_mapping = exploration_dict[
             'state_classifier_mapping']
 
