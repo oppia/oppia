@@ -16,7 +16,6 @@
 
 from core.domain import collection_services
 from core.domain import collection_domain
-from core.domain import config_domain
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
@@ -62,9 +61,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
     def test_access_collection_editor_page(self):
         """Test access to editor pages for the sample collection."""
         whitelisted_usernames = [self.EDITOR_USERNAME]
-        self.set_config_property(
-            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
-            whitelisted_usernames)
+        self.set_collection_editors(whitelisted_usernames)
 
         # Check that it is possible to access a page with specific version
         # number.
@@ -94,9 +91,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
     def test_editable_collection_handler_get(self):
         whitelisted_usernames = [self.EDITOR_USERNAME]
-        self.set_config_property(
-            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
-            whitelisted_usernames)
+        self.set_collection_editors(whitelisted_usernames)
 
         # Check that non-editors cannot access the editor data handler.
         # This is due to them not being whitelisted.
@@ -118,9 +113,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
     def test_editable_collection_handler_put_cannot_access(self):
         """Check that non-editors cannot access editable put handler"""
         whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
-        self.set_config_property(
-            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
-            whitelisted_usernames)
+        self.set_collection_editors(whitelisted_usernames)
 
         # Assign viewer role to collection.
         rights_manager.create_new_collection_rights(
@@ -151,9 +144,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
     def test_editable_collection_handler_put_can_access(self):
         """Check that editors can access put handler"""
         whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
-        self.set_config_property(
-            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
-            whitelisted_usernames)
+        self.set_collection_editors(whitelisted_usernames)
 
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
@@ -207,9 +198,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
     def test_get_collection_rights(self):
         whitelisted_usernames = [self.OWNER_USERNAME]
-        self.set_config_property(
-            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
-            whitelisted_usernames)
+        self.set_collection_editors(whitelisted_usernames)
 
         self.login(self.OWNER_EMAIL)
 

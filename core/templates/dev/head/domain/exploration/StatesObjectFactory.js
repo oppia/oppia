@@ -107,6 +107,32 @@ oppia.factory('StatesObjectFactory', [
       return finalStateNames;
     };
 
+    States.prototype.getAllAudioLanguageCodes = function() {
+      var allAudioLanguageCodes = [];
+      for (var stateName in this._states) {
+        var audioTranslationsForState =
+          this._states[stateName].content.getBindableAudioTranslations();
+        for (var languageCode in audioTranslationsForState) {
+          if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
+            allAudioLanguageCodes.push(languageCode);
+          }
+        }
+      }
+      return allAudioLanguageCodes;
+    };
+
+    States.prototype.getAllAudioTranslations = function(languageCode) {
+      var allAudioTranslations = [];
+      for (var stateName in this._states) {
+        var audioTranslationsForState =
+          this._states[stateName].content.getBindableAudioTranslations();
+        if (audioTranslationsForState.hasOwnProperty(languageCode)) {
+          allAudioTranslations.push(audioTranslationsForState[languageCode]);
+        }
+      }
+      return allAudioTranslations;
+    };
+
     States.createFromBackendDict = function(statesBackendDict) {
       var stateObjectsDict = {};
       for (var stateName in statesBackendDict) {

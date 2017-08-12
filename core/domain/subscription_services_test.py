@@ -128,6 +128,21 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             subscription_services.get_exploration_ids_subscribed_to(USER_ID),
             [EXP_ID, EXP_ID_2])
 
+    def test_get_all_threads_subscribed_to(self):
+        self.assertEqual(
+            subscription_services.get_all_threads_subscribed_to(
+                USER_ID), [])
+
+        subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID)
+        self.assertEqual(
+            subscription_services.get_all_threads_subscribed_to(USER_ID),
+            [FEEDBACK_THREAD_ID])
+
+        subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID_2)
+        self.assertEqual(
+            subscription_services.get_all_threads_subscribed_to(USER_ID),
+            [FEEDBACK_THREAD_ID, FEEDBACK_THREAD_ID_2])
+
     def test_thread_and_exp_subscriptions_are_tracked_individually(self):
         self.assertEqual(self._get_thread_ids_subscribed_to(USER_ID), [])
 

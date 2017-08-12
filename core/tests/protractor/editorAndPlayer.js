@@ -111,16 +111,16 @@ describe('Full exploration editor', function() {
       // Check behaviour of the back button
       editor.setObjective('do some stuff here');
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
-        '#/gui/second');
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+        explorationId + '#/gui/second');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
-        '#/settings');
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+        explorationId + '#/settings');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
-        '#/gui/second');
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+        explorationId + '#/gui/second');
 
       // Check display of content & interaction in the editor
       editor.setContent(function(richTextEditor) {
@@ -204,7 +204,7 @@ describe('Full exploration editor', function() {
 
       // Save.
       editor.setTitle('Testing multiple rules');
-      editor.setCategory('Answer Groups');
+      editor.setCategory('Algebra');
       editor.setObjective('To assess happiness.');
       editor.openAndClosePreviewSummaryTile();
       editor.saveChanges();

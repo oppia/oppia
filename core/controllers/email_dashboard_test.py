@@ -14,7 +14,6 @@
 
 """Tests for email dashboard handler."""
 
-from core.domain import config_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -32,6 +31,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     SUBMITTER_USERNAME = 'submit'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
+
     def setUp(self):
         super(EmailDashboardDataHandlerTests, self).setUp()
         self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
@@ -40,9 +40,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(
             self.USER_A_EMAIL)
-        config_services.set_property(
-            self.submitter_id, 'whitelisted_email_senders',
-            [self.SUBMITTER_USERNAME])
+        self.set_email_senders([self.SUBMITTER_USERNAME])
 
     def test_that_handler_works_correctly(self):
         self.login(self.SUBMITTER_EMAIL)
@@ -154,8 +152,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         self.signup(self.NEW_SUBMITTER_EMAIL, self.NEW_SUBMITTER_USERNAME)
         self.new_submitter_id = self.get_user_id_from_email(
             self.NEW_SUBMITTER_EMAIL)
-        config_services.set_property(
-            self.submitter_id, 'whitelisted_email_senders',
+        self.set_email_senders(
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
 
     def test_that_correct_emails_are_sent_to_all_users(self):

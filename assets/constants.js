@@ -19,10 +19,13 @@ var constants = {
     "Mathematics", "Medicine", "Music", "Philosophy", "Physics", "Poetry",
     "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
     "Statistics", "Trigonometry", "Welcome"],
+  "ACTIVITY_TYPE_EXPLORATION": "exploration",
+  "ACTIVITY_TYPE_COLLECTION": "collection",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
-
+  "DASHBOARD_TYPE_CREATOR": "creator",
+  "DASHBOARD_TYPE_LEARNER": "learner",
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
@@ -222,7 +225,7 @@ var constants = {
     "text": "Deutsch"
   }, {
     "id": "fr",
-    "text": "français"
+    "text": "Français"
   }, {
     "id": "nl",
     "text": "Nederlands"
@@ -231,7 +234,7 @@ var constants = {
     "text": "Español"
   }, {
     "id": "hu",
-    "text": "magyar"
+    "text": "Magyar"
   }, {
     "id": "pt",
     "text": "Português"
@@ -268,4 +271,5 @@ var constants = {
     "id": "hi-en",
     "text": "Hinglish"
   }]
+
 };
