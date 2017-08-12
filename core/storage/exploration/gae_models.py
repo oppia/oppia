@@ -450,7 +450,7 @@ class ExpSummaryModel(base_models.BaseModel):
                 public in descending order of scaled_average_rating.
         """
         return ExpSummaryModel.query().filter(
-            ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC)
+            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(
@@ -510,7 +510,7 @@ class ExpSummaryModel(base_models.BaseModel):
                 being first in the list.
         """
         return ExpSummaryModel.query().filter(
-            ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC)
+            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(

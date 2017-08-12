@@ -279,8 +279,8 @@ def get_item_similarity(
     indicates the compared_exp is a better recommendation as an exploration to
     start after completing reference_exp.
 
-    Comparison of similarity is based on the similarity of exploration topics,
-    whether the explorations have the same language or author. It
+    Comparison of similarity is based on the similarity of exploration topics
+    and whether the explorations have the same language or author. It
     returns 0.0 if compared_exp is private."""
 
     similarity_score = 0

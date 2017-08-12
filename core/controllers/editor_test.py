@@ -1157,6 +1157,72 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
 
+    def test_error_cases_for_email_sending(self):
+        with self.swap(
+            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            ), self.swap(
+                feconf, 'CAN_SEND_EMAILS', False):
+            # Log in as a moderator.
+            self.login(self.MODERATOR_EMAIL)
+
+            # Go to the exploration editor page.
+            response = self.testapp.get('/create/%s' % self.EXP_ID)
+            self.assertEqual(response.status_int, 200)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            # Submit an invalid action. This should cause an error.
+            response_dict = self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                    'action': 'random_action',
+                    'email_body': None,
+                    'version': 1,
+                }, csrf_token, expect_errors=True, expected_status_int=400)
+            self.assertEqual(
+                response_dict['error'], 'Invalid moderator action.')
+
+            # Try to unpublish the exploration without an email body. This
+            # should cause an error.
+            response_dict = self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
+                    'email_body': None,
+                    'version': 1,
+                }, csrf_token, expect_errors=True, expected_status_int=400)
+            self.assertIn(
+                'Moderator actions should include an email',
+                response_dict['error'])
+
+            response_dict = self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
+                    'email_body': '',
+                    'version': 1,
+                }, csrf_token, expect_errors=True, expected_status_int=400)
+            self.assertIn(
+                'Moderator actions should include an email',
+                response_dict['error'])
+
+            # Try to unpublish the exploration even if the relevant feconf
+            # flags are not set. This should cause a system error.
+            valid_payload = {
+                'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
+                'email_body': 'Your exploration is featured!',
+                'version': 1,
+            }
+            self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID,
+                valid_payload, csrf_token, expect_errors=True,
+                expected_status_int=500)
+
+            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+                # Now the email gets sent with no error.
+                self.put_json(
+                    '/createhandler/moderatorrights/%s' % self.EXP_ID,
+                    valid_payload, csrf_token)
+
+            # Log out.
+            self.logout()
+
     def test_email_is_sent_correctly_when_unpublishing(self):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True

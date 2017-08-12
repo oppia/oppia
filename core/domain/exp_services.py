@@ -1730,8 +1730,7 @@ def update_exploration_status_in_search(exp_id):
     if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([exp_id])
     else:
-        patch_exploration_search_document(
-            rights.id, {})
+        patch_exploration_search_document(rights.id, {})
 
 
 def delete_documents_from_search_index(exploration_ids):

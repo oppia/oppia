@@ -1324,8 +1324,7 @@ def update_collection_status_in_search(collection_id):
     if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([collection_id])
     else:
-        patch_collection_search_document(
-            rights.id, {})
+        patch_collection_search_document(rights.id, {})
 
 
 def delete_documents_from_search_index(collection_ids):
@@ -1348,8 +1347,9 @@ def search_collections(query, limit, sort=None, cursor=None):
             of space separated values. Each value should start with a '+' or a
             '-' character indicating whether to sort in ascending or descending
             order respectively. This character should be followed by a field
-            name to sort on. When this is None, results are based on Default
-            rank.
+            name to sort on. When this is None, results are returned based on
+            their ranking (which is currently set to the same default value
+            for all collections).
         limit: int. the maximum number of results to return.
         cursor: str. A cursor, used to get the next page of results.
             If there are more documents that match the query than 'limit', this

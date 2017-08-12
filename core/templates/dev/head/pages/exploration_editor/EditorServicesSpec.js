@@ -519,6 +519,24 @@ describe('Exploration rights service', function() {
       expect(ers._viewableIfPrivate).toBe(true);
     });
 
+    it('reports the correct cloning status', function() {
+      ers.init(['abc'], [], [], 'public', '1234', true);
+      expect(ers.isCloned()).toBe(true);
+      expect(ers.clonedFrom()).toEqual('1234');
+ 
+      ers.init(['abc'], [], [], 'public', null, true);
+      expect(ers.isCloned()).toBe(false);
+      expect(ers.clonedFrom()).toBeNull();
+    });
+ 
+    it('reports the correct community-owned status', function() {
+      ers.init(['abc'], [], [], 'public', '1234', false);
+      expect(ers.isCommunityOwned()).toBe(false);
+ 
+      ers.init(['abc'], [], [], 'public', '1234', true);
+      expect(ers.isCommunityOwned()).toBe(true);
+    });
+
     it('reports the correct derived statuses', function() {
       ers.init(['abc'], [], [], 'private', 'e1234', true);
       expect(ers.isPrivate()).toBe(true);
