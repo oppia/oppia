@@ -39,7 +39,7 @@ LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
-_LOAD_TESTS_DIR = 'core/tests/load_tests'
+_LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
 
 _PARSER = argparse.ArgumentParser()
@@ -203,7 +203,7 @@ def _execute_tasks(tasks, batch_size=24):
         log('----------------------------------------')
 
 
-def _get_all_test_targets(test_path=None, include_load_tests=False):
+def _get_all_test_targets(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -220,7 +220,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=False):
             result.append(_convert_to_test_target(
                 os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
-            if subroot.endswith(_LOAD_TESTS_DIR) and include_load_tests:
+            if _LOAD_TESTS_DIR in subroot and include_load_tests:
                 for f in files:
                     if f.endswith('_test.py'):
                         result.append(_convert_to_test_target(
