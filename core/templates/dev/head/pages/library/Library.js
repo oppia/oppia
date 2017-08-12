@@ -27,11 +27,11 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('Library', [
-  '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
-  'urlService', 'ALL_CATEGORIES', 'searchService', 'windowDimensionsService',
-  'UrlInterpolationService', 'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX',
-  function(
-      $scope, $http, $rootScope, $window, $timeout, i18nIdService,
+  '$scope', '$http', '$modal', '$rootScope', '$window', '$timeout',
+  'i18nIdService', 'urlService', 'ALL_CATEGORIES', 'searchService',
+  'windowDimensionsService', 'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
+  'LIBRARY_TILE_WIDTH_PX', function(
+      $scope, $http, $modal, $rootScope, $window, $timeout, i18nIdService,
       urlService, ALL_CATEGORIES, searchService, windowDimensionsService,
       UrlInterpolationService, LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
@@ -152,9 +152,78 @@ oppia.controller('Library', [
       var addActivityToLearnerPlaylistUrl = (
         UrlInterpolationService.interpolateUrl(
           '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-            activityType: activityType, activityId: activityId
+            activityType: activityType,
+            activityId: activityId
           }));
       $http.post(addActivityToLearnerPlaylistUrl, {});
+
+      if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
+        $scope.learnerDashboardActivityIds.exploration_playlist_ids.push(
+          activityId);
+      } else {
+        $scope.learnerDashboardActivityIds.collection_playlist_ids.push(
+          activityId);
+      }
+    };
+
+    $scope.removeFromLearnerPlaylist = function(
+      activityId, activityType, activityTitle) {
+      $modal.open({
+        templateUrl: 'modals/removeActivity',
+        backdrop: true,
+        resolve: {
+          activityId: function() {
+            return activityId;
+          },
+          activityType: function() {
+            return activityType;
+          },
+          activityTitle: function() {
+            return activityTitle;
+          }
+        },
+        controller: [
+          '$scope', '$modalInstance', '$http', 'UrlInterpolationService',
+          function($scope, $modalInstance, $http, UrlInterpolationService) {
+            $scope.sectionNameI18nId = (
+              'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
+            $scope.activityTitle = activityTitle;
+            var removeFromLearnerPlaylistUrl = (
+              UrlInterpolationService.interpolateUrl(
+                '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                  activityType: activityType,
+                  activityId: activityId
+                }));
+
+            $scope.remove = function() {
+              $http['delete'](removeFromLearnerPlaylistUrl);
+              $modalInstance.close();
+            };
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+            };
+          }
+        ]
+      }).result.then(function() {
+        if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
+          var index = (
+            $scope.learnerDashboardActivityIds.exploration_playlist_ids.indexOf(
+              activityId));
+          if (index !== -1) {
+            $scope.learnerDashboardActivityIds.exploration_playlist_ids.splice(
+              index, 1);
+          }
+        } else {
+          var index = (
+            $scope.learnerDashboardActivityIds.collection_playlist_ids.indexOf(
+              activityId));
+          if (index !== -1) {
+            $scope.learnerDashboardActivityIds.collection_playlist_ids.splice(
+              index, 1);
+          }
+        }
+      });
     };
 
     // If the value below is changed, the following CSS values in oppia.css

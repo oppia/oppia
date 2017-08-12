@@ -409,7 +409,7 @@ oppia.controller('LearnerDashboard', [
           }
         }
       });
-    }
+    };
 
     $rootScope.loadingMessage = 'Loading';
     LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(

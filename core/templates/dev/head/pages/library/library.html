@@ -127,6 +127,7 @@
                        tooltip-placement="left"></i>
                     <i class="oppia-learner-dashboard-icon fa fa-clock-o"
                        ng-if="learnerDashboardActivityIds.exploration_playlist_ids.indexOf(tile.id) !== -1"
+                       ng-click="removeFromLearnerPlaylist(tile.id, tile.activity_type, tile.title)"
                        aria-hidden="true"
                        tooltip="<['I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate]>"
                        tooltip-placement="left"></i>
@@ -227,6 +228,23 @@
       </div>
     </div>
   </div>
+
+  <script type="text/ng-template" id="modals/removeActivity">
+    <div class="modal-header">
+      <h3 translate="I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER" translate-values="{sectionNameI18nId: sectionNameI18nId}"></h3>
+    </div>
+
+    <div class="modal-body">
+      <p translate="I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY" translate-values="{entityTitle: activityTitle, sectionNameI18nId: sectionNameI18nId}"></p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
+      <button class="btn btn-danger protractor-test-confirm-delete-interaction"
+              ng-click="remove()" translate="I18N_LEARNER_DASHBOARD_REMOVE_BUTTON">
+      </button>
+    </div>
+  </script>
 
   {% include 'pages/library/search_results_directive.html' %}
 
