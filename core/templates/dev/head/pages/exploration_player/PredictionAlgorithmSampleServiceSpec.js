@@ -27,14 +27,14 @@
 
      it('should return correct structure of predicted values.', function() {
        var classifierData = {};
-       var userText = "";
+       var userText = '';
        var expectedResult = {
          answerGroupIndex: 0
        };
        var generatedResult = predictionService.predict(
          classifierData, userText);
 
-        expect(generatedResult).toEqual(expectedResult);
+       expect(generatedResult).toEqual(expectedResult);
      });
    });
  });

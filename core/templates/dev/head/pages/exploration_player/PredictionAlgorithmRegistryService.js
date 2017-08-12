@@ -19,11 +19,10 @@
  oppia.factory('PredictionAlgorithmRegistryService', [
    'PredictionAlgorithmSampleService',
    function(PredictionAlgorithmSampleService) {
-
      // This mapping needs to be updated whenever a new prediction service needs
      // to be added for classification.
      var algorithmIdPredictionServiceMapping = {
-       'LDAStringClassifier': PredictionAlgorithmSampleService
+       LDAStringClassifier: PredictionAlgorithmSampleService
      };
 
      return {
@@ -31,5 +30,4 @@
          return algorithmIdPredictionServiceMapping[algorithmId];
        }
      };
-
    }]);

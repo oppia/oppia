@@ -17,7 +17,6 @@
  */
 
  oppia.factory('PredictionAlgorithmSampleService', [function() {
-
    return {
      predict: function(classifierData, userText) {
        return {
@@ -25,5 +24,4 @@
        };
      }
    };
-
  }]);

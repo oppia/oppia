@@ -20,7 +20,6 @@ describe('Prediction algorithm registry service', function() {
   beforeEach(module('oppia'));
 
   describe('Test prediction algorithm registry functions', function() {
-
     var registryService, predictionService;
     beforeEach(inject(function($injector) {
       predictionService = $injector.get('PredictionAlgorithmSampleService');

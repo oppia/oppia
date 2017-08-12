@@ -323,8 +323,8 @@ describe('Answer classification service with string classifier enabled',
 
       stateClassifierMapping = {
         stateName: {
-          'algorithm_id': 'LDAStringClassifier',
-          'classifier_data': {}
+          algorithm_id: 'LDAStringClassifier',
+          classifier_data: {}
         }
       };
       scms.init(stateClassifierMapping);
