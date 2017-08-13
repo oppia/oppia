@@ -160,12 +160,12 @@ class ExplorationPage(EditorHandler):
                 self.user, exploration_rights),
             'can_modify_roles': (
                 rights_manager.check_can_modify_exploration_roles(
-                    self.user_id, self.actions, exploration_rights)),
+                    self.user, exploration_rights)),
             'can_publish': rights_manager.check_can_publish_exploration(
-                self.user_id, self.actions, exploration_rights),
+                self.user, exploration_rights),
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(
-                    self.user_id, self.actions, exploration_rights)),
+                    self.user, exploration_rights)),
             'can_unpublish': (
                 rights_manager.check_can_unpublish_activity(
                     self.user, exploration_rights)),
