@@ -177,7 +177,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             job_id = (
                 exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
             exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(
-            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+                job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
             self.process_and_flush_pending_tasks()
 
             # Get and check job output.

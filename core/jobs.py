@@ -1278,8 +1278,7 @@ class BaseContinuousComputationManager(object):
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
         job_manager.enqueue(
-                job_id,
-                queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS)
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS)
 
     @classmethod
     def _register_end_of_batch_job_and_return_status(cls):
