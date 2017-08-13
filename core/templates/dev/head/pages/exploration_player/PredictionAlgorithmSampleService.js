@@ -18,7 +18,7 @@
 
  oppia.factory('PredictionAlgorithmSampleService', [function() {
    return {
-     predict: function(classifierData, userText) {
+     predict: function(classifierData, answer) {
        return {
          answerGroupIndex: 0
        };

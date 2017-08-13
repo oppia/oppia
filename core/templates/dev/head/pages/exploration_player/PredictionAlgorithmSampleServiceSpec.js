@@ -27,12 +27,12 @@
 
      it('should return correct structure of predicted values.', function() {
        var classifierData = {};
-       var userText = '';
+       var answer = '';
        var expectedResult = {
          answerGroupIndex: 0
        };
        var generatedResult = predictionService.predict(
-         classifierData, userText);
+         classifierData, answer);
 
        expect(generatedResult).toEqual(expectedResult);
      });

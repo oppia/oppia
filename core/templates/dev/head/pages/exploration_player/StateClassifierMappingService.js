@@ -25,7 +25,7 @@
      },
 
      getClassifierData: function(stateName) {
-       if (stateClassifierMapping[stateName]) {
+       if (stateClassifierMapping.hasOwnProperty(stateName)) {
          return stateClassifierMapping[stateName].classifier_data;
        } else {
          return null;
@@ -33,7 +33,7 @@
      },
 
      getAlgorithmId: function(stateName) {
-       if (stateClassifierMapping[stateName]) {
+       if (stateClassifierMapping.hasOwnProperty(stateName)) {
          return stateClassifierMapping[stateName].algorithm_id;
        } else {
          return null;

@@ -351,9 +351,11 @@ describe('Answer classification service with string classifier enabled',
 
     it('should query the prediction service if no answer group matches and ' +
        'interaction is trainable', function() {
+      // The prediction result is the same as default until there is a mapping
+      // in PredictionAlgorithmRegistryService.
       var expectedClassificationResult = {
         outcome: oof.createNew('default', [], []),
-        answerGroupIndex: 0,
+        answerGroupIndex: 2,
         ruleIndex: 0,
         classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
       };

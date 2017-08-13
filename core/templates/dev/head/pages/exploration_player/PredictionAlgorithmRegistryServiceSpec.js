@@ -28,6 +28,9 @@ describe('Prediction algorithm registry service', function() {
 
     it('should return correct prediction algorithm service.', function() {
       var algorithmId = 'LDAStringClassifier';
+      registryService.setMapping({
+        LDAStringClassifier: predictionService
+      });
       var generatedPredictionService = registryService.getPredictionService(
         algorithmId);
 

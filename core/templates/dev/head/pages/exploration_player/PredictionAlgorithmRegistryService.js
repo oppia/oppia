@@ -21,13 +21,19 @@
    function(PredictionAlgorithmSampleService) {
      // This mapping needs to be updated whenever a new prediction service needs
      // to be added for classification.
-     var algorithmIdPredictionServiceMapping = {
-       LDAStringClassifier: PredictionAlgorithmSampleService
-     };
+     var algorithmIdPredictionServiceMapping = {};
 
      return {
        getPredictionService: function(algorithmId) {
-         return algorithmIdPredictionServiceMapping[algorithmId];
+         if (algorithmIdPredictionServiceMapping.hasOwnProperty(algorithmId)) {
+           return algorithmIdPredictionServiceMapping[algorithmId];
+         } else {
+           return null;
+         }
+       },
+       setMapping: function(newAlgorithmIdPredictionServiceMapping) {
+         algorithmIdPredictionServiceMapping = (
+           newAlgorithmIdPredictionServiceMapping);
        }
      };
    }]);

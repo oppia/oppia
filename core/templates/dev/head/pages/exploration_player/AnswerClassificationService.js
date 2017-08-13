@@ -127,7 +127,7 @@ oppia.factory('AnswerClassificationService', [
           return deferred.promise;
         }
 
-        var ruleBasedOutcomeIsDefault = (result.outcome == defaultOutcome);
+        var ruleBasedOutcomeIsDefault = (result.outcome === defaultOutcome);
         var interactionIsTrainable = INTERACTION_SPECS[
           oldState.interaction.id].is_interaction_trainable;
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
@@ -140,8 +140,13 @@ oppia.factory('AnswerClassificationService', [
             var predictionService = (
               PredictionAlgorithmRegistryService.getPredictionService(
                 algorithmId));
-            var predictedAnswerGroupIndex = predictionService.predict(
-              classifierData, answer).answerGroupIndex;
+            var predictedAnswerGroupIndex;
+            if (predictionService) {
+              predictedAnswerGroupIndex = predictionService.predict(
+                classifierData, answer).answerGroupIndex;
+            } else {
+              predictedAnswerGroupIndex = result.answerGroupIndex;
+            }
             deferred.resolve({
               outcome: result.outcome,
               ruleIndex: result.ruleIndex,
