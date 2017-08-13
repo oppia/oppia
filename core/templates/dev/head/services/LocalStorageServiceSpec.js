@@ -20,7 +20,7 @@
    beforeEach(module('oppia'));
 
    describe('behavior in editor', function() {
-     var localStorageService = null;
+     var LocalStorageService = null;
      var explorationIdOne = '100';
      var draftChangeListIdOne = 2;
      var changeList = []
@@ -36,25 +36,25 @@
      };
 
      beforeEach(inject(function($injector) {
-       localStorageService = $injector.get('localStorageService');
+       LocalStorageService = $injector.get('LocalStorageService');
      }));
 
      it('should correctly save the draft', function() {
-       localStorageService.saveExplorationDraft(explorationIdOne,
+       LocalStorageService.saveExplorationDraft(explorationIdOne,
          changeList, draftChangeListIdOne);
-       localStorageService.saveExplorationDraft(explorationIdTwo,
+       LocalStorageService.saveExplorationDraft(explorationIdTwo,
          changeList, draftChangeListIdTwo);
-       expect(localStorageService.getExplorationDraft(
+       expect(LocalStorageService.getExplorationDraft(
          explorationIdOne)).toEqual(saveOne);
-       expect(localStorageService.getExplorationDraft(
+       expect(LocalStorageService.getExplorationDraft(
          explorationIdTwo)).toEqual(saveTwo);
      });
 
      it('should correctly remove the draft', function() {
-       localStorageService.saveExplorationDraft(explorationIdTwo,
+       LocalStorageService.saveExplorationDraft(explorationIdTwo,
          changeList, draftChangeListIdTwo);
-       localStorageService.removeExplorationDraft(explorationIdTwo);
-       expect(localStorageService.getExplorationDraft(
+       LocalStorageService.removeExplorationDraft(explorationIdTwo);
+       expect(LocalStorageService.getExplorationDraft(
          explorationIdTwo)).toBeNull();
      });
    });
