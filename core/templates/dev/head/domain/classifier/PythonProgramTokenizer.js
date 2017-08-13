@@ -76,7 +76,7 @@ oppia.factory('PythonProgramTokenizer', [
     // Tail end of ' string.
     var single = '[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'';
     // Tail end of " string.
-    var double = '[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
+    var doubleQuote = '[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
     // Tail end of ''' string.
     var single3 = "[^'\\\\]*(?:(?:\\\\.|'(?!''))[^'\\\\]*)*'''";
     // Tail end of """ string.
@@ -117,7 +117,7 @@ oppia.factory('PythonProgramTokenizer', [
     var double3prog = new RegExp(double3);
 
     var endprogs = {
-      "'": new RegExp(single), '"': new RegExp(double),
+      "'": new RegExp(single), '"': new RegExp(doubleQuote),
       "'''": single3prog, '"""': double3prog,
       "r'''": single3prog, 'r"""': double3prog,
       "u'''": single3prog, 'u"""': double3prog,
