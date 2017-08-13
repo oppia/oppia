@@ -51,9 +51,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS',
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
-            self.job_class.enqueue(
-                self.job_class.create_new(),
-                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+            self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
@@ -76,9 +74,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS',
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
-            self.job_class.enqueue(
-                self.job_class.create_new(),
-                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+            self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
@@ -93,9 +89,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
 
             rights_manager.unpublish_exploration(self.admin_id, 'exp_id_4')
 
-            self.job_class.enqueue(
-                self.job_class.create_new(),
-                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+            self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),

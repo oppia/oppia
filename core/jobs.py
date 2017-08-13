@@ -828,6 +828,30 @@ class BaseMapReduceJobManager(BaseJobManager):
         return job_queued_msec >= created_on_msec
 
 
+class BaseMapReduceOneOffJobManager(BaseJobManager):
+
+    @classmethod
+    def enqueue(
+            cls, job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            additional_job_params=None):
+        """Marks a job as queued and adds it to a queue for processing.
+
+        Overriden to use taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS as the
+        default queue.
+
+        Args:
+            job_id: str. The ID of the job to enqueue.
+            queue_name: str. The queue name the job should be run in. See
+                core/platform/taskqueue/gae_taskqueue_services for supported
+                values.
+            additional_job_params: dict(str : *) or None. Additional parameters
+                for the job.
+        """
+        super(BaseMapReduceOneOffJobManager, cls).enqueue(
+            job_id, queue_name=queue_name,
+            additional_job_params=additional_job_params)
+
+
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
     _ENTITY_KINDS_PARAM = MAPPER_PARAM_KEY_ENTITY_KINDS
     _READER_LIST_PARAM = 'readers'

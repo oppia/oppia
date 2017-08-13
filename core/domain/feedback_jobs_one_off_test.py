@@ -63,8 +63,7 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob.create_new() # pylint: disable=line-too-long
-        feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob.enqueue(
-            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+        feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),

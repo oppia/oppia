@@ -158,8 +158,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # Start migration job on all explorations, including this one.
             job_id = (
                 exp_jobs_one_off.ExplorationMigrationJobManager.create_new())
-            exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(
-                job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+            exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
             # Confirm that the exploration is at version 2.

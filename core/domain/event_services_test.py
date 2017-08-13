@@ -64,7 +64,7 @@ class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.count_jobs_in_taskqueue(
             queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 1)
         self.assertEqual(self.count_jobs_in_taskqueue(
-            queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+            queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 0)
 
         self.process_and_flush_pending_tasks()
 

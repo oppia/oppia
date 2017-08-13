@@ -34,7 +34,7 @@ import utils
 _COMMIT_TYPE_REVERT = 'revert'
 
 
-class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
+class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that calculates summaries of explorations. For every
     ExplorationModel entity, create a ExpSummaryModel entity containing
     information described in ExpSummariesAggregator.
@@ -62,7 +62,7 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
         pass
 
 
-class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
+class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that finds the user ids of the contributors
     (defined as any human who has made a 'positive' -- i.e.
     non-revert-- commit) for each exploration.
@@ -88,7 +88,8 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
         exp_summary_model.put()
 
 
-class ExplorationContributorsSummaryOneOffJob(jobs.BaseMapReduceJobManager):
+class ExplorationContributorsSummaryOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """One-off job that computes the number of commits
     done by contributors for each Exploration
     """
@@ -111,7 +112,7 @@ class ExplorationContributorsSummaryOneOffJob(jobs.BaseMapReduceJobManager):
         pass
 
 
-class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
+class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that finds first published time in milliseconds for all
     explorations.
     """
@@ -143,7 +144,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
             first_published_msec)
 
 
-class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
+class IndexAllExplorationsJobManager(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that indexes all explorations and computes their ranks."""
 
     @classmethod
@@ -160,7 +161,7 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
         pass
 
 
-class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
+class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks that all explorations have appropriate validation
     statuses.
     """
@@ -190,7 +191,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
+class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
     versions. This job will load all existing explorations from the data store
     and immediately store them back into the data store. The loading process of
@@ -269,7 +270,7 @@ class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceJobManager):
+class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs that use the item
     selection interaction and that have rules that do not match the answer
     choices. These probably need to be fixed manually.
@@ -304,7 +305,7 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class ViewableExplorationsAuditJob(jobs.BaseMapReduceJobManager):
+class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that outputs a list of private explorations which are viewable."""
 
     @classmethod
@@ -330,7 +331,7 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class GadgetsOneOffJob(jobs.BaseMapReduceJobManager):
+class GadgetsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that outputs a list of explorations that use gadgets."""
 
     @classmethod
