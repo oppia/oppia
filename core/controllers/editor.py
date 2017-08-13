@@ -159,16 +159,15 @@ class ExplorationPage(EditorHandler):
             'can_edit': rights_manager.check_can_edit_activity(
                 self.user, exploration_rights),
             'can_modify_roles': (
-                rights_manager.check_can_modify_exploration_roles(
+                rights_manager.check_can_modify_activity_roles(
                     self.user, exploration_rights)),
-            'can_publish': rights_manager.check_can_publish_exploration(
+            'can_publish': rights_manager.check_can_publish_activity(
                 self.user, exploration_rights),
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(
                     self.user, exploration_rights)),
-            'can_unpublish': (
-                rights_manager.check_can_unpublish_activity(
-                    self.user, exploration_rights)),
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, exploration_rights),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
