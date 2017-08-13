@@ -20,6 +20,7 @@ from core import jobs_registry
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -63,7 +64,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
     def _run_job(self):
         self.process_and_flush_pending_tasks()
         ModifiedFeedbackAnalyticsAggregator.start_computation()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def _run_job_and_check_results(self, exp_id,
@@ -206,7 +209,10 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_3.put()
             self.process_and_flush_pending_tasks()
             ModifiedFeedbackAnalyticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
+                1)
             self.process_and_flush_pending_tasks()
             # Do a multi call for all explorations and check for stats.
             feedback_analytics_multi = (
@@ -591,7 +597,10 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Start job.
             self.process_and_flush_pending_tasks()
             ModifiedFeedbackAnalyticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
+                1)
             self.process_and_flush_pending_tasks()
 
             # Stop job.

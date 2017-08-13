@@ -30,6 +30,7 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -2652,7 +2653,8 @@ title: Old Title
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
         self.process_and_flush_pending_tasks()
 
