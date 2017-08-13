@@ -127,11 +127,13 @@ class BaseJobManager(object):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
+    def enqueue(cls, job_id, queue_name='default', additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
             job_id: str. The ID of the job to enqueue.
+            queue_name: str. The queue name the job should be run in.
+                Corresponds to the values in queue.yaml.
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
         """
@@ -143,7 +145,7 @@ class BaseJobManager(object):
 
         # Enqueue the job.
         cls._pre_enqueue_hook(job_id)
-        cls._real_enqueue(job_id, additional_job_params)
+        cls._real_enqueue(job_id, queue_name, additional_job_params)
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
@@ -333,12 +335,15 @@ class BaseJobManager(object):
             cls.cancel(model.id, user_id)
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *). Additional parameters on jobs.
+            queue_name: str. The queue name the job should be run in.
+                Corresponds to the values in queue.yaml.
+            additional_job_params: dict(str : *) or None. Additional parameters
+                on jobs.
         """
         raise NotImplementedError(
             'Subclasses of BaseJobManager should implement _real_enqueue().')
@@ -556,14 +561,19 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Puts the job in the task queue.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *). Additional params to pass into
-                the job's _run() method.
+            queue_name: str. The queue name the job should be run in.
+                Corresponds to the values in queue.yaml.
+            additional_job_params: dict(str : *) or None. Additional params to
+                pass into the job's _run() method.
         """
+        # TODO(brianrodri): taskqueue_services uses different functions for each
+        # queue. Consider adding a new function there which delegates to the
+        # correct queue?
         taskqueue_services.defer(cls._run_job, job_id, additional_job_params)
 
 
@@ -726,14 +736,16 @@ class BaseMapReduceJobManager(BaseJobManager):
             'reduce as a @staticmethod.')
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Configures, creates, and queues the pipeline for the given job and
         params.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *). Additional params to pass into
-                the job's _run() method.
+            queue_name: str. The queue name the job should be run in.
+                Corresponds to the values in queue.yaml.
+            additional_job_params: dict(str : *) or None. Additional params to
+                pass into the job's _run() method.
 
         Raises:
             Exception: Passed a value to a parameter in the mapper which has
@@ -781,7 +793,8 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         mr_pipeline = MapReduceJobPipeline(
             job_id, '%s.%s' % (cls.__module__, cls.__name__), kwargs)
-        mr_pipeline.start(base_path='/mapreduce/worker/pipeline')
+        mr_pipeline.start(
+            base_path='/mapreduce/worker/pipeline', queue_name=queue_name)
 
     @classmethod
     def _pre_cancel_hook(cls, job_id, cancel_message):

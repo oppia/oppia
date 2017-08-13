@@ -235,7 +235,7 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'start_new_job':
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):
-                        klass.enqueue(klass.create_new())
+                        klass.enqueue(klass.create_new(), queue_name='events')
                         break
             elif self.payload.get('action') == 'cancel_job':
                 job_id = self.payload.get('job_id')
