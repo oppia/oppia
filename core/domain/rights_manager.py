@@ -46,7 +46,6 @@ CMD_UPDATE_FIRST_PUBLISHED_MSEC = 'update_first_published_msec'
 
 ACTIVITY_STATUS_PRIVATE = feconf.ACTIVITY_STATUS_PRIVATE
 ACTIVITY_STATUS_PUBLIC = feconf.ACTIVITY_STATUS_PUBLIC
-ACTIVITY_STATUS_PUBLICIZED = feconf.ACTIVITY_STATUS_PUBLICIZED
 
 ROLE_OWNER = 'owner'
 ROLE_EDITOR = 'editor'
@@ -181,18 +180,10 @@ class ActivityRights(object):
     def is_published(self):
         """Checks whether activity is published.
 
-        Args:
-            activity_rights: object. Activity rights object.
-
         Returns:
             bool. Whether activity is published.
         """
-        if self.status == ACTIVITY_STATUS_PUBLIC:
-            return True
-        elif self.status == ACTIVITY_STATUS_PUBLICIZED:
-            return True
-        else:
-            return False
+        return bool(self.status == ACTIVITY_STATUS_PUBLIC)
 
     def is_private(self):
         """Checks whether activity is private.
@@ -858,49 +849,6 @@ class Actor(object):
             return False
         return self.can_modify_roles(activity_type, activity_id)
 
-    def can_publicize(self, activity_type, activity_id):
-        """Returns whether this user is allowed to publicize the given
-        activity.
-
-        Args:
-            activity_type: str. The type of activity. Possible values:
-                constants.ACTIVITY_TYPE_EXPLORATION
-                constants.ACTIVITY_TYPE_COLLECTION
-            activity_id: str. ID of the activity.
-
-        Returns:
-            bool. Whether the user has a right to publicize the given activity.
-        """
-        activity_rights = _get_activity_rights(activity_type, activity_id)
-        if activity_rights is None:
-            return False
-
-        if activity_rights.status != ACTIVITY_STATUS_PUBLIC:
-            return False
-        return self.is_moderator()
-
-    def can_unpublicize(self, activity_type, activity_id):
-        """Returns whether this user is allowed to unpublicize the given
-        activity.
-
-        Args:
-            activity_type: str. The type of activity. Possible values:
-                constants.ACTIVITY_TYPE_EXPLORATION
-                constants.ACTIVITY_TYPE_COLLECTION
-            activity_id: str. ID of the activity.
-
-        Returns:
-            bool. Whether the user has a right to unpublicize the given
-                activity.
-        """
-        activity_rights = _get_activity_rights(activity_type, activity_id)
-        if activity_rights is None:
-            return False
-
-        if activity_rights.status != ACTIVITY_STATUS_PUBLICIZED:
-            return False
-        return self.is_moderator()
-
 
 def _assign_role(
         committer_id, assignee_id, new_role, activity_id, activity_type):
@@ -1124,56 +1072,6 @@ def _unpublish_activity(committer_id, activity_id, activity_type):
     activity_services.remove_featured_activity(activity_type, activity_id)
 
 
-def _publicize_activity(committer_id, activity_id, activity_type):
-    """Publicizes the given activity.
-
-    Args:
-        committer_id: str. ID of the committer.
-        activity_id: str. ID of the activity.
-        activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
-
-    Raises:
-        Exception. The committer does not have rights to publicize the activity.
-    """
-    if not Actor(committer_id).can_publicize(activity_type, activity_id):
-        logging.error(
-            'User %s tried to publicize %s %s but was refused '
-            'permission.' % (committer_id, activity_type, activity_id))
-        raise Exception('This %s cannot be marked as "featured".' % (
-            activity_type))
-
-    _change_activity_status(
-        committer_id, activity_id, activity_type, ACTIVITY_STATUS_PUBLICIZED,
-        '%s publicized.' % activity_type)
-
-
-def _unpublicize_activity(committer_id, activity_id, activity_type):
-    """Unpublicizes the given activity.
-
-    Args:
-        committer_id: str. ID of the committer.
-        activity_id: str. ID of the activity.
-        activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
-
-    Raises:
-        Exception. The committer does not have rights to unpublicize the
-            activity.
-    """
-    if not Actor(committer_id).can_unpublicize(activity_type, activity_id):
-        logging.error(
-            'User %s tried to unpublicize exploration %s but was refused '
-            'permission.' % (committer_id, activity_id))
-        raise Exception('This exploration cannot be unmarked as "featured".')
-
-    _change_activity_status(
-        committer_id, activity_id, activity_type, ACTIVITY_STATUS_PUBLIC,
-        'Exploration unpublicized.')
-
-
 # Rights functions for activities.
 def assign_role_for_exploration(
         committer_id, exploration_id, assignee_id, new_role):
@@ -1302,39 +1200,6 @@ def unpublish_exploration(committer_id, exploration_id):
         committer_id, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
 
 
-def publicize_exploration(committer_id, exploration_id):
-    """Publicizes the given exploration.
-
-    It is the responsibility of the caller to check that the exploration is
-    valid prior to publicizing it.
-
-    Args:
-        committer_id: str. ID of the committer.
-        exploration_id: str. ID of the exploration.
-
-    Raises:
-        Exception. This could potentially throw an exception from
-            _publicize_activity.
-    """
-    _publicize_activity(
-        committer_id, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
-
-
-def unpublicize_exploration(committer_id, exploration_id):
-    """Unpublicizes the given exploration.
-
-    Args:
-        committer_id: str. ID of the committer.
-        exploration_id: str. ID of the exploration.
-
-    Raises:
-        Exception. This could potentially throw an exception from
-            _unpublicize_activity.
-    """
-    _unpublicize_activity(
-        committer_id, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
-
-
 # Rights functions for collections.
 def assign_role_for_collection(
         committer_id, collection_id, assignee_id, new_role):
@@ -1410,39 +1275,6 @@ def unpublish_collection(committer_id, collection_id):
 
     """
     _unpublish_activity(
-        committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
-
-
-def publicize_collection(committer_id, collection_id):
-    """Publicizes the given collection.
-
-    It is the responsibility of the caller to check that the collection is
-    valid prior to publicizing it.
-
-    Args:
-        committer_id: str. ID of the committer.
-        collection_id: str. ID of the collection.
-
-    Raises:
-        Exception. This could potentially throw an exception from
-            _publicize_activity.
-    """
-    _publicize_activity(
-        committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
-
-
-def unpublicize_collection(committer_id, collection_id):
-    """Unpublicizes the given collection.
-
-    Args:
-        committer_id: str. ID of the committer.
-        collection_id: str. ID of the collection.
-
-    Raises:
-        Exception. This could potentially throw an exception from
-            _unpublicize_activity.
-    """
-    _unpublicize_activity(
         committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
 
 
@@ -1657,44 +1489,6 @@ def check_can_publish_exploration(user_id, user_actions, exploration_rights):
                 return True
 
     return False
-
-
-def check_can_publicize_exploration(user_actions, exploration_rights):
-    """Checks whether the user can publicize given exploration.
-
-    Args:
-        user_actions: list(str). List of actions the user can perform.
-        exploration_rights: rights_object or None. Rights object of given
-            exploration.
-
-    Returns:
-        bool. Whether the user can publicize given exploration.
-    """
-    if exploration_rights is None:
-        return False
-
-    if exploration_rights.status == ACTIVITY_STATUS_PUBLIC:
-        if role_services.ACTION_PUBLICIZE_EXPLORATION in user_actions:
-            return True
-
-
-def check_can_unpublicize_exploration(user_actions, exploration_rights):
-    """Checks whether the user can unpublicize given exploration.
-
-    Args:
-        user_actions: list(str). List of actions the user can perform.
-        exploration_rights: rights_object or None. Rights object of given
-            exploration.
-
-    Returns:
-        bool. Whether the user can unpublicize given exploration.
-    """
-    if exploration_rights is None:
-        return False
-
-    if exploration_rights.status == ACTIVITY_STATUS_PUBLICIZED:
-        if role_services.ACTION_UNPUBLICIZE_EXPLORATION in user_actions:
-            return True
 
 
 def check_can_unpublish_exploration(user_actions, exploration_rights):

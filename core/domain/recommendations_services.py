@@ -279,17 +279,14 @@ def get_item_similarity(
     indicates the compared_exp is a better recommendation as an exploration to
     start after completing reference_exp.
 
-    Comparison of similarity is based on the similarity of exploration topics,
-    whether the explorations have the same language or author. The ranking of
-    compared_exp is increased if it is publicized or is newly updated. It
+    Comparison of similarity is based on the similarity of exploration topics
+    and whether the explorations have the same language or author. It
     returns 0.0 if compared_exp is private."""
 
     similarity_score = 0
 
     if compared_exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         return 0
-    elif compared_exp_status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
-        similarity_score += 1
 
     similarity_score += get_topic_similarity(
         reference_exp_category, compared_exp_category) * 5
