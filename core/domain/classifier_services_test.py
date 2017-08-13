@@ -223,7 +223,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # Create job and mapping for previous version.
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            'TextInput', self.exp_id, exploration.version-1, 
+            'TextInput', self.exp_id, exploration.version-1,
             next_scheduled_check_time, [], 'Old home',
             feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
         classifier_models.TrainingJobExplorationMappingModel.create(
@@ -419,7 +419,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            interaction_id, exp_id, 1, next_scheduled_check_time, [], 
+            interaction_id, exp_id, 1, next_scheduled_check_time, [],
             state_name, feconf.TRAINING_JOB_STATUS_PENDING, None, 1)
 
         classifier_training_job = (
