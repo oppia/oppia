@@ -38,7 +38,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
-    exp_jobs_one_off.GadgetsOneOffJob
+    exp_jobs_one_off.GadgetsOneOffJob,
     exp_jobs_one_off.IndexAllExplorationsJobManager,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
