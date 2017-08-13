@@ -533,9 +533,6 @@ oppia.factory('explorationRightsService', [
       isPublic: function() {
         return this._status === GLOBALS.ACTIVITY_STATUS_PUBLIC;
       },
-      isPublicized: function() {
-        return this._status === GLOBALS.ACTIVITY_STATUS_PUBLICIZED;
-      },
       isCloned: function() {
         return Boolean(this._clonedFrom);
       },
@@ -609,14 +606,14 @@ oppia.factory('explorationRightsService', [
         });
         return whenRolesSaved.promise;
       },
-      makePublic: function(makePublic) {
+      publish: function() {
         var whenPublishStatusChanged = $q.defer();
         var that = this;
 
         var requestUrl = (
           '/createhandler/status/' + explorationData.explorationId);
         $http.put(requestUrl, {
-          make_public: makePublic
+          make_public: true
         }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
@@ -628,26 +625,6 @@ oppia.factory('explorationRightsService', [
           whenPublishStatusChanged.resolve();
         });
         return whenPublishStatusChanged.promise;
-      },
-      makePublicized: function(makePublicized) {
-        var whenPublicizedStatusChanged = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-          '/createhandler/status/' + explorationData.explorationId);
-        $http.put(requestUrl, {
-          make_publicized: makePublicized
-        }).then(function(response) {
-          var data = response.data;
-          alertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenPublicizedStatusChanged.resolve();
-        });
-        return whenPublicizedStatusChanged.promise;
       },
       saveModeratorChangeToBackend: function(action, emailBody) {
         var that = this;

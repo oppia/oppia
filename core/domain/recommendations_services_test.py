@@ -288,18 +288,6 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             exp_summaries['exp_id_4'].owner_ids,
             exp_summaries['exp_id_4'].status), 9.0)
 
-        rights_manager.publicize_exploration(self.admin_id, 'exp_id_4')
-        exp_summaries = exp_services.get_all_exploration_summaries()
-        self.assertEqual(recommendations_services.get_item_similarity(
-            exp_summaries['exp_id_4'].category,
-            exp_summaries['exp_id_4'].language_code,
-            exp_summaries['exp_id_4'].owner_ids,
-            exp_summaries['exp_id_4'].category,
-            exp_summaries['exp_id_4'].language_code,
-            exp_summaries['exp_id_4'].exploration_model_last_updated,
-            exp_summaries['exp_id_4'].owner_ids,
-            exp_summaries['exp_id_4'].status), 10.0)
-
         rights_manager.unpublish_exploration(self.admin_id, 'exp_id_2')
         exp_summaries = exp_services.get_all_exploration_summaries()
         self.assertEqual(recommendations_services.get_item_similarity(

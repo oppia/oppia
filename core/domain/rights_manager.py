@@ -46,7 +46,6 @@ CMD_UPDATE_FIRST_PUBLISHED_MSEC = 'update_first_published_msec'
 
 ACTIVITY_STATUS_PRIVATE = feconf.ACTIVITY_STATUS_PRIVATE
 ACTIVITY_STATUS_PUBLIC = feconf.ACTIVITY_STATUS_PUBLIC
-ACTIVITY_STATUS_PUBLICIZED = feconf.ACTIVITY_STATUS_PUBLICIZED
 
 ROLE_OWNER = 'owner'
 ROLE_EDITOR = 'editor'
@@ -181,18 +180,10 @@ class ActivityRights(object):
     def is_published(self):
         """Checks whether activity is published.
 
-        Args:
-            activity_rights: object. Activity rights object.
-
         Returns:
             bool. Whether activity is published.
         """
-        if self.status == ACTIVITY_STATUS_PUBLIC:
-            return True
-        elif self.status == ACTIVITY_STATUS_PUBLICIZED:
-            return True
-        else:
-            return False
+        return bool(self.status == ACTIVITY_STATUS_PUBLIC)
 
     def is_private(self):
         """Checks whether activity is private.
@@ -1657,44 +1648,6 @@ def check_can_publish_exploration(user_id, user_actions, exploration_rights):
                 return True
 
     return False
-
-
-def check_can_publicize_exploration(user_actions, exploration_rights):
-    """Checks whether the user can publicize given exploration.
-
-    Args:
-        user_actions: list(str). List of actions the user can perform.
-        exploration_rights: rights_object or None. Rights object of given
-            exploration.
-
-    Returns:
-        bool. Whether the user can publicize given exploration.
-    """
-    if exploration_rights is None:
-        return False
-
-    if exploration_rights.status == ACTIVITY_STATUS_PUBLIC:
-        if role_services.ACTION_PUBLICIZE_EXPLORATION in user_actions:
-            return True
-
-
-def check_can_unpublicize_exploration(user_actions, exploration_rights):
-    """Checks whether the user can unpublicize given exploration.
-
-    Args:
-        user_actions: list(str). List of actions the user can perform.
-        exploration_rights: rights_object or None. Rights object of given
-            exploration.
-
-    Returns:
-        bool. Whether the user can unpublicize given exploration.
-    """
-    if exploration_rights is None:
-        return False
-
-    if exploration_rights.status == ACTIVITY_STATUS_PUBLICIZED:
-        if role_services.ACTION_UNPUBLICIZE_EXPLORATION in user_actions:
-            return True
 
 
 def check_can_unpublish_exploration(user_actions, exploration_rights):
