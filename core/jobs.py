@@ -571,10 +571,8 @@ class BaseDeferredJobManager(BaseJobManager):
             additional_job_params: dict(str : *) or None. Additional params to
                 pass into the job's _run() method.
         """
-        # TODO(brianrodri): taskqueue_services uses different functions for each
-        # queue. Consider adding a new function there which delegates to the
-        # correct queue?
-        taskqueue_services.defer(cls._run_job, job_id, additional_job_params)
+        taskqueue_services.defer(
+            cls._run_job, queue_name, job_id, additional_job_params)
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):

@@ -40,9 +40,9 @@ class BaseEventHandler(object):
         """Dispatch events asynchronously to continuous computation realtime
         layers that are listening for them.
         """
-        taskqueue_services.defer_to_events_queue(
+        taskqueue_services.defer(
             jobs_registry.ContinuousComputationEventDispatcher.dispatch_event,
-            cls.EVENT_TYPE, *args, **kwargs)
+            'events', cls.EVENT_TYPE, *args, **kwargs)
 
     @classmethod
     def _handle_event(cls, *args, **kwargs):
