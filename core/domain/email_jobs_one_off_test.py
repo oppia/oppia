@@ -35,10 +35,11 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = email_jobs_one_off.EmailHashRegenerationOneOffJob.create_new()
-        email_jobs_one_off.EmailHashRegenerationOneOffJob.enqueue(job_id)
+        email_jobs_one_off.EmailHashRegenerationOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         self.process_and_flush_pending_tasks()
 

@@ -59,10 +59,11 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_jobs_one_off.UserContributionsOneOffJob.create_new()
-        user_jobs_one_off.UserContributionsOneOffJob.enqueue(job_id)
+        user_jobs_one_off.UserContributionsOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         self.process_and_flush_pending_tasks()
 
@@ -163,10 +164,11 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         """Runs the one-off MapReduce job."""
         job_id = (
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.create_new())
-        user_jobs_one_off.UsernameLengthDistributionOneOffJob.enqueue(job_id)
+        user_jobs_one_off.UsernameLengthDistributionOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
@@ -244,10 +246,11 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         """Runs the one-off MapReduce job."""
         job_id = (
             user_jobs_one_off.LongUserBiosOneOffJob.create_new())
-        user_jobs_one_off.LongUserBiosOneOffJob.enqueue(job_id)
+        user_jobs_one_off.LongUserBiosOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         self.process_and_flush_pending_tasks()
 
@@ -326,10 +329,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_jobs_one_off.DashboardSubscriptionsOneOffJob.create_new()
-        user_jobs_one_off.DashboardSubscriptionsOneOffJob.enqueue(job_id)
+        user_jobs_one_off.DashboardSubscriptionsOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         self.process_and_flush_pending_tasks()
 
@@ -675,10 +679,11 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_jobs_one_off.DashboardStatsOneOffJob.create_new()
-        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(job_id)
+        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         self.process_and_flush_pending_tasks()
 
@@ -899,7 +904,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # Test that no contribution time is set.
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
-        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
         self.assertIsNone(
             user_services.get_user_settings(
@@ -920,7 +926,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             }], 'commit')
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
-        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
@@ -944,7 +951,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # explorations.
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
-        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
@@ -969,7 +977,8 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
 
         job_id = (
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
+        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
         def _mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
@@ -993,7 +1002,8 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
 
         job_id = (
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
+        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
         def _mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
@@ -1022,10 +1032,11 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         """Runs the one-off MapReduce job."""
         job_id = (
             user_jobs_one_off.UserLastExplorationActivityOneOffJob.create_new())
-        user_jobs_one_off.UserLastExplorationActivityOneOffJob.enqueue(job_id)
+        user_jobs_one_off.UserLastExplorationActivityOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         self.process_and_flush_pending_tasks()
 
@@ -1182,7 +1193,8 @@ class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         job_id = (
             user_jobs_one_off.UserRolesMigrationOneOffJob.create_new())
-        user_jobs_one_off.UserRolesMigrationOneOffJob.enqueue(job_id)
+        user_jobs_one_off.UserRolesMigrationOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         user_final_roles = {}

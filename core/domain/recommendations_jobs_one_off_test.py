@@ -22,6 +22,7 @@ from core.domain import recommendations_services
 from core.domain import recommendations_services_test
 from core.domain import rights_manager
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 (recommendations_models,) = models.Registry.import_models([
     models.NAMES.recommendations])
 taskqueue_services = models.Registry.import_taskqueue_services()
@@ -50,10 +51,12 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS',
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
-            self.job_class.enqueue(self.job_class.create_new())
+            self.job_class.enqueue(
+                self.job_class.create_new(),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -73,10 +76,13 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS',
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
-            self.job_class.enqueue(self.job_class.create_new())
+            self.job_class.enqueue(
+                self.job_class.create_new(),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                    queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+                1)
             self.process_and_flush_pending_tasks()
 
             recommendations = (
@@ -87,10 +93,13 @@ class ExplorationRecommendationsOneOffJobUnitTests(
 
             rights_manager.unpublish_exploration(self.admin_id, 'exp_id_4')
 
-            self.job_class.enqueue(self.job_class.create_new())
+            self.job_class.enqueue(
+                self.job_class.create_new(),
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                    queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+                1)
             self.process_and_flush_pending_tasks()
             recommendations = (
                 recommendations_services.get_exploration_recommendations(

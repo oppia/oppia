@@ -28,6 +28,10 @@ QUEUE_NAME_DEFAULT = 'default'
 QUEUE_NAME_EVENTS = 'events'
 # Taskqueue for sending email.
 QUEUE_NAME_EMAILS = 'emails'
+# Taskqueue for running one-off jobs.
+QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
+# Taskqueue for running continuous computation jobs.
+QUEUE_NAME_CONTINUOUS_JOBS = 'continuous-jobs'
 
 
 def defer(fn, queue_name, *args, **kwargs):

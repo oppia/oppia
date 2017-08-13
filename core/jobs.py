@@ -127,13 +127,16 @@ class BaseJobManager(object):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id, queue_name='default', additional_job_params=None):
+    def enqueue(
+            cls, job_id, queue_name=taskqueue_services.QUEUE_NAME_DEFAULT,
+            additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in.
-                Corresponds to the values in queue.yaml.
+            queue_name: str. The queue name the job should be run in. See
+                core/platform/taskqueue/gae_taskqueue_services for supported
+                values.
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
         """
@@ -340,8 +343,9 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in.
-                Corresponds to the values in queue.yaml.
+            queue_name: str. The queue name the job should be run in.  See
+                core/platform/taskqueue/gae_taskqueue_services for supported
+                values.
             additional_job_params: dict(str : *) or None. Additional parameters
                 on jobs.
         """
@@ -566,8 +570,9 @@ class BaseDeferredJobManager(BaseJobManager):
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in.
-                Corresponds to the values in queue.yaml.
+            queue_name: str. The queue name the job should be run in.  See
+                core/platform/taskqueue/gae_taskqueue_services for supported
+                values.
             additional_job_params: dict(str : *) or None. Additional params to
                 pass into the job's _run() method.
         """
@@ -740,8 +745,9 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in.
-                Corresponds to the values in queue.yaml.
+            queue_name: str. The queue name the job should be run in.  See
+                core/platform/taskqueue/gae_taskqueue_services for supported
+                values.
             additional_job_params: dict(str : *) or None. Additional params to
                 pass into the job's _run() method.
 
@@ -1271,7 +1277,9 @@ class BaseContinuousComputationManager(object):
             return
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
-        job_manager.enqueue(job_id)
+        job_manager.enqueue(
+                job_id,
+                queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS)
 
     @classmethod
     def _register_end_of_batch_job_and_return_status(cls):

@@ -8,3 +8,7 @@ queue:
   rate: 5/s
 - name: emails
   rate: 5/s
+- name: one-off-jobs
+  rate: 10/s
+- name: continuous-jobs
+  rate: 2/m

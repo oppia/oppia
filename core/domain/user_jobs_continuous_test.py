@@ -129,7 +129,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -172,7 +172,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
             ModifiedRecentUpdatesAggregator.stop_computation(USER_ID)
@@ -199,7 +199,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -230,7 +230,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -257,7 +257,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -310,7 +310,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -362,7 +362,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -426,7 +426,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -473,7 +473,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -507,7 +507,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 
@@ -535,7 +535,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
                 1)
             self.process_and_flush_pending_tasks()
 

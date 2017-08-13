@@ -56,10 +56,11 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             'query_id': query_id
         }
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            additional_job_params=params)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 

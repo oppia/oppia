@@ -21,6 +21,7 @@ from core.domain import collection_jobs_one_off
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -62,7 +63,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         # Start migration job.
         job_id = (
             collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+        collection_jobs_one_off.CollectionMigrationJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         # Verify the collection is exactly the same after migration.
@@ -98,7 +100,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         # Start migration job on sample collection.
         job_id = (
             collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+        collection_jobs_one_off.CollectionMigrationJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
         # This running without errors indicates the deleted collection is
         # being ignored.
@@ -134,7 +137,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         # Start migration job on sample collection.
         job_id = (
             collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+        collection_jobs_one_off.CollectionMigrationJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
         # This running without errors indicates the collection is migrated.
         self.process_and_flush_pending_tasks()
@@ -184,7 +188,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         # Run the job. This should populate collection_contents.
         job_id = (
             collection_jobs_one_off.CollectionMigrationJob.create_new())
-        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+        collection_jobs_one_off.CollectionMigrationJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)

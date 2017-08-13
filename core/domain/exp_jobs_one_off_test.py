@@ -22,6 +22,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -175,7 +176,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             # Run batch job.
             job_id = (
                 exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
-            exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
+            exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
             self.process_and_flush_pending_tasks()
 
             # Get and check job output.
@@ -220,7 +222,8 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(owner_id, self.EXP_ID)
         job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
         job_id = job_class.create_new()
-        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
         exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
@@ -235,7 +238,8 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         rights_manager.unpublish_exploration(admin_id, self.EXP_ID)
         rights_manager.publish_exploration(owner_id, self.EXP_ID)
         job_id = job_class.create_new()
-        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         # Test to see whether first_published_msec remains the same despite the
@@ -268,7 +272,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID, user_a_id)
         job_id = (
             exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         exploration_summary = exp_services.get_exploration_summary_by_id(
@@ -296,7 +301,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Run the job to compute the contributor ids.
         job_id = (
             exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         # Verify that the length of the contributor list is one, and that
@@ -330,7 +336,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Run the job to compute the contributor ids.
         job_id = (
             exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         # Verify that the committer list does not contain the user
@@ -348,7 +355,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Run the job to compute the contributor ids.
         job_id = (
             exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
         # Check that the system id was not added to the exploration's
         # contributor ids.
@@ -367,7 +375,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Run the job to compute the contributor ids.
         job_id = (
             exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
         # Check that the migration bot id was not added to the exploration's
         # contributor ids.
@@ -421,7 +430,8 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         # Run the job to compute contributors summary
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         exploration_summary = exp_services.get_exploration_summary_by_id(
@@ -460,7 +470,8 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         # Run the job to compute the contributors summary.
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         exploration_summary = exp_services.get_exploration_summary_by_id(
@@ -504,7 +515,8 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         # Run the job to compute the contributor summary.
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         # Check that USER A's number of contributions is equal to 2
@@ -530,7 +542,8 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         # Run the job to compute the contributor summary.
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         # Check that no system id was added to the exploration's
@@ -569,7 +582,8 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
 
     def test_standard_operation(self):
         job_id = (exp_jobs_one_off.IndexAllExplorationsJobManager.create_new())
-        exp_jobs_one_off.IndexAllExplorationsJobManager.enqueue(job_id)
+        exp_jobs_one_off.IndexAllExplorationsJobManager.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
@@ -631,7 +645,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         # Verify the exploration is exactly the same after migration.
@@ -652,7 +667,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         # Verify the new exploration has been migrated by the job.
@@ -686,7 +702,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
         # This running without errors indicates the deleted exploration is
         # being ignored, since otherwise exp_services.get_exploration_by_id
@@ -734,7 +751,8 @@ class GadgetsOneOffJobTest(test_utils.GenericTestBase):
     def test_explorations_with_gadgets_are_listed(self):
         """Tests that explorations with gadgets are listed."""
         job_id = exp_jobs_one_off.GadgetsOneOffJob.create_new()
-        exp_jobs_one_off.GadgetsOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.GadgetsOneOffJob.enqueue(
+            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         self.process_and_flush_pending_tasks()
 
         actual_values = [
