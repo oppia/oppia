@@ -326,6 +326,56 @@
             </div>
           </div>
 
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="numberDeletedExplorationPlaylist !== 0">
+              <span ng-if="numberDeletedExplorationPlaylist === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_EXPLORATION_FROM_PLAYLIST"
+                    translate-values="{numberDeleted: numberDeletedExplorationPlaylist}"></span>
+              <span ng-if="numberDeletedExplorationPlaylist > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_EXPLORATIONS_FROM_PLAYLIST"
+                    translate-values="{numberDeleted: numberDeletedExplorationPlaylist}"></span>
+              &#9785
+            </span>
+
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="explorationPlaylist.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
+            <div ng-repeat="tile in explorationPlaylist"
+                 style="display: inline-block; margin-left: 1px;"
+                 ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
+              <i class="remove-icon fa fa-times"
+                 ng-show="showRemoveIcon"
+                 aria-hidden="true"
+                 ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+                 tooltip="Remove"
+                 tooltip-placement="top"></i>
+              <exploration-summary-tile
+                                      exploration-id="tile.id"
+                                      exploration-title="tile.title"
+                                      last-updated-msec="tile.last_updated_msec"
+                                      objective="tile.objective"
+                                      category="tile.category"
+                                      ratings="tile.ratings"
+                                      num-views="tile.num_views"
+                                      thumbnail-icon-url="tile.thumbnail_icon_url"
+                                      thumbnail-bg-color="tile.thumbnail_bg_color"
+                                      class="protractor-test-exp-summary-tile">
+              </exploration-summary-tile>
+            </div>
+          </div>
+
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteCollections !== 0">
@@ -381,6 +431,55 @@
               <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C8;</i>
             </div>
           </div>
+
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="numberDeletedCollectionPlaylist !== 0">
+              <span ng-if="numberDeletedCollectionPlaylist === 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COLLECTION_FROM_PLAYLIST"
+                    translate-values="{numberDeleted: numberDeletedCollectionPlaylist}"></span>
+              <span ng-if="numberDeletedCollectionPlaylist > 1"
+                    translate="I18N_LEARNER_DASHBOARD_DELETED_COLLECTIONS_FROM_PLAYLIST"
+                    translate-values="{numberDeleted: numberDeletedCollectionPlaylist}"></span>
+              &#9785
+            </span>
+
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="collectionPlaylist.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_COLLECTION_PLAYLIST"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
+            <div ng-repeat="tile in collectionPlaylist"
+                 style="display: inline-block; margin-left: 1px;"
+                 ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
+              <i class="remove-icon fa fa-times"
+                 ng-show="showRemoveIcon"
+                 aria-hidden="true"
+                 ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+                 tooltip="Remove"
+                 tooltip-placement="top"></i>
+              <collection-summary-tile
+                                       collection-id="tile.id"
+                                       collection-title="tile.title"
+                                       last-updated-msec="tile.last_updated_msec"
+                                       objective="tile.objective"
+                                       node-count="tile.node_count"
+                                       category="tile.category"
+                                       thumbnail-icon-url="tile.thumbnail_icon_url"
+                                       thumbnail-bg-color="tile.thumbnail_bg_color">
+              </collection-summary-tile>
+            </div>
+          </div>
+
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="completedToIncompleteCollections.length !== 0">
@@ -441,6 +540,8 @@
               <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C8;</i>
             </div>
           </div>
+
+
 
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS" style="margin-top: 5px;">
             <md-card layout="row"

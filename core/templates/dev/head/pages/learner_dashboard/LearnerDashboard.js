@@ -455,6 +455,12 @@ oppia.controller('LearnerDashboard', [
         $scope.numberDeletedCompletedCollections = (
           responseData.number_of_deleted_activities.completed_collections
         );
+        $scope.numberDeletedExplorationPlaylist = (
+          responseData.number_of_deleted_activities.exploration_playlist
+        );
+        $scope.numberDeletedCollectionPlaylist = (
+          responseData.number_of_deleted_activities.collection_playlist
+        );
         $scope.completedToIncompleteCollections = (
           responseData.completed_to_incomplete_collections
         );
@@ -466,8 +472,8 @@ oppia.controller('LearnerDashboard', [
               threadSummaryDicts[index]));
         }
         $scope.numberOfUnreadThreads = responseData.number_of_unread_threads;
-        $scope.explorationPLaylist = responseData.exploration_playlist;
-        console.log($scope.explorationPLaylist);
+        $scope.explorationPlaylist = responseData.exploration_playlist;
+        $scope.collectionPlaylist = responseData.collection_playlist;
         $scope.activeSection = LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE;
         $scope.activeSubsection = (
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
