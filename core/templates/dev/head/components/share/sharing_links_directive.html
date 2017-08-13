@@ -17,6 +17,12 @@
     </a>
   </li>
 
+  <li>
+    <a ng-href="https://classroom.google.com/share?url=<[serverName]>/<[activityType]>/<[activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
+      <img class="share-option-img" ng-src="<[classroomUrl]>" alt="Classroom">
+    </a>
+  </li>
+
   <li ng-if="shareType === 'exploration'">
     <a ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top" tabindex="0">
       <i class="material-icons md-48 embed-link">&#xE86F;</i>
