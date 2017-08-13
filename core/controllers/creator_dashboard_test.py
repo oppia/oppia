@@ -543,12 +543,6 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PUBLIC)
 
-        rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-        self.assertEqual(
-            response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLICIZED)
         self.logout()
 
     def test_collaborators_can_see_explorations(self):
@@ -573,13 +567,6 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PUBLIC)
 
-        rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-        self.assertEqual(
-            response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLICIZED)
-
         self.logout()
 
     def test_viewer_cannot_see_explorations(self):
@@ -598,9 +585,6 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
 
-        rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(response['explorations_list'], [])
         self.logout()
 
     def test_can_see_feedback_thread_counts(self):

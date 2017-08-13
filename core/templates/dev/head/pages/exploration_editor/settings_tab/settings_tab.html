@@ -435,26 +435,6 @@
       <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
         <h3>Admin Controls</h3>
 
-        {% if can_publicize %}
-          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublic()">
-            <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
-              Boost search ranking
-              <span ng-if="currentUserIsAdmin">(as admin)</span>
-              <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-            </button>
-          </p>
-        {% endif %}
-
-        {% if can_unpublicize %}
-          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublicized()">
-            <button type="button" class="btn btn-default" ng-click="unpublicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
-              Remove search ranking boost
-              <span ng-if="currentUserIsAdmin">(as admin)</span>
-              <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-            </button>
-          </p>
-        {% endif %}
-
         {% if can_unpublish %}
           <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublic()">
             <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
@@ -545,15 +525,11 @@
 <script type="text/ng-template" id="modals/takeModeratorAction">
   <div class="modal-header">
     <h3 ng-if="action === 'unpublish_exploration'">Unpublish exploration (as moderator)</h3>
-    <h3 ng-if="action === 'publicize_exploration'">Boost exploration ranking (as moderator)</h3>
   </div>
 
   <div class="modal-body">
     <p ng-if="action === 'unpublish_exploration'">
       You are about to unpublish this exploration.
-    </p>
-    <p ng-if="action === 'publicize_exploration'">
-      You are about to give this exploration a ranking boost in the Oppia library search results.
     </p>
 
     <div ng-if="willEmailBeSent">
@@ -574,7 +550,6 @@
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success" ng-click="reallyTakeAction()">
       <span ng-if="action === 'unpublish_exploration'">Unpublish Exploration</span>
-      <span ng-if="action === 'publicize_exploration'" class="protractor-test-feature-exploration-button">Boost Exploration Ranking</span>
     </button>
   </div>
 </script>

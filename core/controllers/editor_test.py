@@ -1154,9 +1154,6 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         config_services.set_property(
-            self.admin_id, 'publicize_exploration_email_html_body',
-            'Default publicization email body')
-        config_services.set_property(
             self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
 
@@ -1183,11 +1180,11 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response_dict['error'], 'Invalid moderator action.')
 
-            # Try to publicize the exploration without an email body. This
+            # Try to unpublish the exploration without an email body. This
             # should cause an error.
             response_dict = self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                     'email_body': None,
                     'version': 1,
                 }, csrf_token, expect_errors=True, expected_status_int=400)
@@ -1197,7 +1194,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
 
             response_dict = self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                     'email_body': '',
                     'version': 1,
                 }, csrf_token, expect_errors=True, expected_status_int=400)
@@ -1205,10 +1202,10 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 'Moderator actions should include an email',
                 response_dict['error'])
 
-            # Try to publicize the exploration even if the relevant feconf
+            # Try to unpublish the exploration even if the relevant feconf
             # flags are not set. This should cause a system error.
             valid_payload = {
-                'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                 'email_body': 'Your exploration is featured!',
                 'version': 1,
             }
@@ -1224,68 +1221,6 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                     valid_payload, csrf_token)
 
             # Log out.
-            self.logout()
-
-    def test_email_is_sent_correctly_when_publicizing(self):
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', True):
-            # Log in as a moderator.
-            self.login(self.MODERATOR_EMAIL)
-
-            # Go to the exploration editor page.
-            response = self.testapp.get('/create/%s' % self.EXP_ID)
-            self.assertEqual(response.status_int, 200)
-            csrf_token = self.get_csrf_token_from_response(response)
-
-            new_email_body = 'Your exploration is featured!'
-
-            valid_payload = {
-                'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
-                'email_body': new_email_body,
-                'version': 1,
-            }
-
-            self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token)
-
-            # Check that an email was sent with the correct content.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.EDITOR_EMAIL)
-            self.assertEqual(1, len(messages))
-
-            self.assertEqual(
-                messages[0].sender,
-                'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
-            self.assertFalse(hasattr(messages[0], 'cc'))
-            self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(
-                messages[0].subject,
-                'Your Oppia exploration "My Exploration" has been featured!')
-            self.assertEqual(messages[0].body.decode(), (
-                'Hi %s,\n\n'
-                '%s\n\n'
-                'Thanks!\n'
-                '%s (Oppia moderator)\n\n'
-                'You can change your email preferences via the Preferences '
-                'page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
-            self.assertEqual(messages[0].html.decode(), (
-                'Hi %s,<br><br>'
-                '%s<br><br>'
-                'Thanks!<br>'
-                '%s (Oppia moderator)<br><br>'
-                'You can change your email preferences via the '
-                '<a href="https://www.example.com">Preferences</a> page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
-
             self.logout()
 
     def test_email_is_sent_correctly_when_unpublishing(self):

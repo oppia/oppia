@@ -1663,43 +1663,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-    def test_update_publicized_collection_status_in_search(self):
-
-        def mock_get_doc(doc_id, index):
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            self.assertEqual(doc_id, self.COLLECTION_ID)
-            return {}
-
-        def mock_add_docs(docs, index):
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            self.assertEqual(docs, [{'is': 'featured'}])
-
-        def mock_get_rights(unused_collection_id):
-            return rights_manager.ActivityRights(
-                self.COLLECTION_ID,
-                [self.owner_id], [self.editor_id], [self.viewer_id],
-                status=rights_manager.ACTIVITY_STATUS_PUBLICIZED
-            )
-
-        get_doc_counter = test_utils.CallCounter(mock_get_doc)
-        add_docs_counter = test_utils.CallCounter(mock_add_docs)
-
-        get_doc_swap = self.swap(
-            search_services, 'get_document_from_index', get_doc_counter)
-        add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter)
-        get_rights_swap = self.swap(
-            rights_manager, 'get_collection_rights', mock_get_rights)
-
-        with get_doc_swap, add_docs_swap, get_rights_swap:
-            collection_services.update_collection_status_in_search(
-                self.COLLECTION_ID)
-
-        self.assertEqual(get_doc_counter.times_called, 1)
-        self.assertEqual(add_docs_counter.times_called, 1)
-
     def test_update_private_collection_status_in_search(self):
 
         def mock_delete_docs(ids, index):
@@ -1759,22 +1722,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
-
-    def test_get_search_rank(self):
-        self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
-
-        base_search_rank = 20
-
-        self.assertEqual(
-            collection_services._get_search_rank(self.COLLECTION_ID),
-            base_search_rank)
-
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        rights_manager.publicize_collection(
-            self.user_id_admin, self.COLLECTION_ID)
-        self.assertEqual(
-            collection_services._get_search_rank(self.COLLECTION_ID),
-            base_search_rank + 30)
 
 
 class CollectionSummaryTests(CollectionServicesUnitTests):
