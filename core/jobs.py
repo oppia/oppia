@@ -145,7 +145,7 @@ class BaseJobManager(object):
 
         # Enqueue the job.
         cls._pre_enqueue_hook(job_id)
-        cls._real_enqueue(job_id, additional_job_params, queue_name)
+        cls._real_enqueue(job_id, queue_name, additional_job_params)
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
@@ -335,15 +335,15 @@ class BaseJobManager(object):
             cls.cancel(model.id, user_id)
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params, queue_name):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *) or None. Additional parameters
-                on jobs.
             queue_name: str. The queue name the job should be run in.
                 Corresponds to the values in queue.yaml.
+            additional_job_params: dict(str : *) or None. Additional parameters
+                on jobs.
         """
         raise NotImplementedError(
             'Subclasses of BaseJobManager should implement _real_enqueue().')
@@ -561,15 +561,15 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params, queue_name):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Puts the job in the task queue.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *) or None. Additional params to
-                pass into the job's _run() method.
             queue_name: str. The queue name the job should be run in.
                 Corresponds to the values in queue.yaml.
+            additional_job_params: dict(str : *) or None. Additional params to
+                pass into the job's _run() method.
         """
         # TODO(brianrodri): taskqueue_services uses different functions for each
         # queue. Consider adding a new function there which delegates to the
@@ -736,16 +736,16 @@ class BaseMapReduceJobManager(BaseJobManager):
             'reduce as a @staticmethod.')
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params, queue_name):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Configures, creates, and queues the pipeline for the given job and
         params.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *) or None. Additional params to
-                pass into the job's _run() method.
             queue_name: str. The queue name the job should be run in.
                 Corresponds to the values in queue.yaml.
+            additional_job_params: dict(str : *) or None. Additional params to
+                pass into the job's _run() method.
 
         Raises:
             Exception: Passed a value to a parameter in the mapper which has
