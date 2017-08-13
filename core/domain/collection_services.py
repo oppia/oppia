@@ -53,11 +53,6 @@ SEARCH_INDEX_COLLECTIONS = 'collections'
 # search query.
 MAX_ITERATIONS = 10
 
-# TODO(bhenning): Improve the ranking calculation. Some possible suggestions
-# for a better ranking include using an average of the search ranks of each
-# exploration referenced in the collection and/or demoting collections
-# for any validation errors from explorations referenced in the collection.
-_STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
@@ -1248,20 +1243,6 @@ def get_next_page_of_all_non_private_commits(
     ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-def _collection_rights_to_search_dict(rights):
-    """Returns a search dict with information about the collection rights. This
-    allows searches like "is:featured".
-
-    Args:
-        rights: ActivityRights. Rights object for a collection.
-    """
-
-    doc = {}
-    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
-        doc['is'] = 'featured'
-    return doc
-
-
 def _should_index(collection):
     """Checks if a particular collection should be indexed.
 
@@ -1270,28 +1251,6 @@ def _should_index(collection):
     """
     rights = rights_manager.get_collection_rights(collection.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
-
-
-def _get_search_rank(collection_id):
-    """Gets the search rank of a given collection.
-
-    Args:
-        collection_id: str. ID of the collection whose rank is to be retrieved.
-
-    Returns:
-        int. An integer determining the document's rank in search.
-
-        Featured collections get a ranking bump, and so do collections that
-        have been more recently updated.
-    """
-    rights = rights_manager.get_collection_rights(collection_id)
-    rank = _DEFAULT_RANK + (
-        _STATUS_PUBLICIZED_BONUS
-        if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
-        else 0)
-
-    # Ranks must be non-negative.
-    return max(rank, 0)
 
 
 def _collection_to_search_dict(collection):
@@ -1303,7 +1262,6 @@ def _collection_to_search_dict(collection):
     Returns:
         The search dict of the collection domain object.
     """
-    rights = rights_manager.get_collection_rights(collection.id)
     doc = {
         'id': collection.id,
         'title': collection.title,
@@ -1311,9 +1269,8 @@ def _collection_to_search_dict(collection):
         'objective': collection.objective,
         'language_code': collection.language_code,
         'tags': collection.tags,
-        'rank': _get_search_rank(collection.id),
+        'rank': _DEFAULT_RANK,
     }
-    doc.update(_collection_rights_to_search_dict(rights))
     return doc
 
 
@@ -1367,8 +1324,7 @@ def update_collection_status_in_search(collection_id):
     if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([collection_id])
     else:
-        patch_collection_search_document(
-            rights.id, _collection_rights_to_search_dict(rights))
+        patch_collection_search_document(rights.id, {})
 
 
 def delete_documents_from_search_index(collection_ids):
@@ -1391,8 +1347,9 @@ def search_collections(query, limit, sort=None, cursor=None):
             of space separated values. Each value should start with a '+' or a
             '-' character indicating whether to sort in ascending or descending
             order respectively. This character should be followed by a field
-            name to sort on. When this is None, results are based on 'rank'. See
-            _get_search_rank to see how rank is determined.
+            name to sort on. When this is None, results are returned based on
+            their ranking (which is currently set to the same default value
+            for all collections).
         limit: int. the maximum number of results to return.
         cursor: str. A cursor, used to get the next page of results.
             If there are more documents that match the query than 'limit', this
