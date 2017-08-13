@@ -576,7 +576,7 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
 
-    def test_assign_to_specific_queue(self):
+    def test_enqueue_job_to_specific_queue(self):
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(job_id, queue_name='events')
         self.assertEqual(self.count_jobs_in_taskqueue(queue_name='events'), 1)
