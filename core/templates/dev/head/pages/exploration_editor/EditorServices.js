@@ -19,11 +19,13 @@
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
   '$http', '$log',
+  '$window',
   'alertsService',
   'EditableExplorationBackendApiService',
   'LocalStorageService',
   'ReadOnlyExplorationBackendApiService','$q',
   function($http, $log,
+    $window,
     alertsService,
     EditableExplorationBackendApiService,
     LocalStorageService,
@@ -102,6 +104,7 @@ oppia.factory('explorationData', [
           // changes applied. This makes a force-refresh necessary when changes
           // are discarded, otherwise the exploration-with-draft-changes
           // (which is cached here) will be reused.
+          console.log(errorCallback);
           return (
             EditableExplorationBackendApiService.fetchApplyDraftExploration(
             explorationId).then(function(response) {
@@ -118,7 +121,7 @@ oppia.factory('explorationData', [
                     // a reload is needed so that the changelist just saved is
                     // loaded as opposed to the exploration returned by this
                     // response
-                    window.location.reload();
+                    $window.location.reload();
                   });
               } else if (draftChanges &&
                 draftChanges.draftChangeListId !== draftChangeListId) {
@@ -2496,7 +2499,7 @@ oppia.factory('autosaveInfoModalsService', [
   'explorationData', 'LocalStorageService', 'lostChangesService',
    'UrlInterpolationService',
   function(
-      $log, $modal, $timeout, $window, 
+      $log, $modal, $timeout, $window,
       explorationData, LocalStorageService, lostChangesService,
       UrlInterpolationService) {
     var _isModalOpen = false;
