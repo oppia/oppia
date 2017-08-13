@@ -343,7 +343,7 @@ class BaseJobManager(object):
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in.  See
+            queue_name: str. The queue name the job should be run in. See
                 core/platform/taskqueue/gae_taskqueue_services for supported
                 values.
             additional_job_params: dict(str : *) or None. Additional parameters
@@ -570,7 +570,7 @@ class BaseDeferredJobManager(BaseJobManager):
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in.  See
+            queue_name: str. The queue name the job should be run in. See
                 core/platform/taskqueue/gae_taskqueue_services for supported
                 values.
             additional_job_params: dict(str : *) or None. Additional params to
@@ -745,7 +745,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in.  See
+            queue_name: str. The queue name the job should be run in. See
                 core/platform/taskqueue/gae_taskqueue_services for supported
                 values.
             additional_job_params: dict(str : *) or None. Additional params to
