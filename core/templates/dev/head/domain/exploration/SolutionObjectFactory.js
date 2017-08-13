@@ -51,14 +51,14 @@ oppia.factory('SolutionObjectFactory', [
         this.answerIsExclusive ? 'The only' : 'One');
       var correctAnswer = null;
       if (interactionId === 'GraphInput') {
-        correctAnswer = '[Graph Object]';
+        correctAnswer = '[Graph]';
       } else if (interactionId === 'MathExpressionInput') {
         correctAnswer = this.correctAnswer.latex;
       } else if (interactionId === 'CodeRepl' ||
         interactionId === 'PencilCodeEditor') {
         correctAnswer = this.correctAnswer.code;
       } else if (interactionId === 'MusicNotesInput') {
-        correctAnswer = '[Music Notes Object]';
+        correctAnswer = '[Music Notes]';
       } else if (interactionId === 'LogicProof') {
         correctAnswer = this.correctAnswer.correct;
       } else {

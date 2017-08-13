@@ -56,6 +56,7 @@ oppia.directive('tutorCard', [
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'HINT_REQUEST_STRING_I18N_IDS', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
+        'SolutionManagerService', 'oppiaExplorationHtmlFormatterService',
         function(
           $scope, $timeout, oppiaPlayerService, HintManagerService,
           playerPositionService, playerTranscriptService,
@@ -63,7 +64,8 @@ oppia.directive('tutorCard', [
           urlService, AudioPlayerService,
           TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
           CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-          HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC) {
+          HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC,
+          SolutionManagerService, oppiaExplorationHtmlFormatterService) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -86,9 +88,15 @@ oppia.directive('tutorCard', [
             $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints.length);
 
-            $scope.contentAudioTranslations =
+            SolutionManagerService.reset(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).solution);
+
+            $scope.solutionExists = Boolean(oppiaPlayerService.getInteraction(
+              $scope.activeCard.stateName).solution);
+
+            $scope.contentAudioTranslations = (
               oppiaPlayerService.getStateContentAudioTranslations(
-                $scope.activeCard.stateName);
+                $scope.activeCard.stateName));
 
             AudioPlayerService.stop();
           };
@@ -109,6 +117,24 @@ oppia.directive('tutorCard', [
             }
           };
 
+          $scope.consumeSolution = function() {
+            playerTranscriptService.addNewInput(
+              'Please show me the answer.', true);
+            var solution = SolutionManagerService.consumeSolution();
+            var interaction = oppiaPlayerService.getInteraction(
+              playerPositionService.getCurrentStateName());
+            var answer = oppiaExplorationHtmlFormatterService.getAnswerHtml(
+              solution.correctAnswer,
+              interaction.id,
+              interaction.customizationArgs);
+            var answerIsExclusive = (
+              solution.answerIsExclusive ? 'The only' : 'One');
+            var response = (
+            answerIsExclusive + ' answer is:<br>' + answer +
+            '<br><br>Explanation:<br>' + solution.explanation);
+            playerTranscriptService.addNewResponse(response);
+          };
+
           $scope.isHintAvailable = function() {
             var hintIsAvailable = (
               HintManagerService.isCurrentHintAvailable() &&
@@ -118,6 +144,10 @@ oppia.directive('tutorCard', [
 
           $scope.areAllHintsExhausted = function() {
             return HintManagerService.areAllHintsExhausted();
+          };
+
+          $scope.isCurrentSolutionAvailable = function () {
+            return SolutionManagerService.isCurrentSolutionAvailable();
           };
 
           $scope.isIframed = urlService.isIframed();

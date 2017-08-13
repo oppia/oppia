@@ -25,10 +25,15 @@
        angular-html-bind="activeCard.interactionHtml">
   </div>
   <div ng-if="hintsExist" style="text-align: left; padding: 8px">
-    <hint-button on-click-hint-button="consumeHint()"
+    <hint-button ng-if="!areAllHintsExhausted()"
+                 on-click-hint-button="consumeHint()"
                  current-hint-is-available="isHintAvailable()"
                  all-hints-are-exhausted="areAllHintsExhausted()">
     </hint-button>
+    <solution-button ng-if="areAllHintsExhausted()"
+                     on-click-solution-button="consumeSolution()"
+                     solution-is-available="isCurrentSolutionAvailable()">
+    </solution-button>
   </div>
 </div>
 
@@ -97,8 +102,19 @@
     color: #ffffff;
   }
 
+  .conversation-skin-supplemental-card .solution-button {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    color: #fff;
+  }
+
   .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:focus,
   .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:hover {
     background-color: #115FD4;
+  }
+
+  .conversation-skin-supplemental-card button.md-button.md-default-theme.solution-button:focus,
+  .conversation-skin-supplemental-card button.md-button.md-default-theme.solution-button:hover {
+    background-color: #da190b;
   }
 </style>

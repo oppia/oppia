@@ -1057,6 +1057,7 @@ oppia.factory('explorationStatesService', [
                   result.outcome.dest));
               SolutionValidityService.updateValidity(
                 stateName, solutionIsValid);
+              $rootScope.$broadcast('refreshGraph');
             });
           }
         });
