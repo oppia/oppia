@@ -829,15 +829,15 @@ class BaseMapReduceJobManager(BaseJobManager):
 
 
 class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
+    """Overriden to use taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS as the
+    default queue.
+    """
 
     @classmethod
     def enqueue(
             cls, job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
             additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing.
-
-        Overriden to use taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS as the
-        default queue.
 
         Args:
             job_id: str. The ID of the job to enqueue.
