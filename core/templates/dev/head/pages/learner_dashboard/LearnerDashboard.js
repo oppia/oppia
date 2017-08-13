@@ -66,7 +66,7 @@ oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
 });
 
 oppia.controller('LearnerDashboard', [
-  '$scope', '$rootScope', '$window', '$http', '$modal',
+  '$scope', '$rootScope', '$window', '$http', '$modal', 'alertsService',
   'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
   'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES', 
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
@@ -75,7 +75,7 @@ oppia.controller('LearnerDashboard', [
   'oppiaDatetimeFormatter', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
   function(
-      $scope, $rootScope, $window, $http, $modal,
+      $scope, $rootScope, $window, $http, $modal, alertsService,
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
       SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
       LearnerDashboardBackendApiService, UrlInterpolationService,
@@ -371,19 +371,25 @@ oppia.controller('LearnerDashboard', [
             $scope.subsectionName = subsectionName;
             $scope.activityTitle = activity.title;
             $scope.remove = function() {
-              /* eslint-disable max-len */
               if (subsectionName ===
                   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-              /* eslint-enable max-len */
-                $http.post(
-                  '/learner_dashboard/remove_in_progress_exploration', {
-                    exploration_id: activity.id
+                var removeExpUrl = UrlInterpolationService.interpolateUrl(
+                  '/learnerincompleteactivityhandler/<activityType>' +
+                  '/<activityId>', {
+                    activityType: constants.ACTIVITY_TYPE_EXPLORATION,
+                    activityId: activity.id
                   });
+                $http['delete'](removeExpUrl);
               } else if (subsectionName ===
                          LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-                $http.post('/learner_dashboard/remove_in_progress_collection', {
-                  collection_id: activity.id
-                });
+                var removeCollectionUrl = (
+                  UrlInterpolationService.interpolateUrl(
+                  '/learnerincompleteactivityhandler/<activityType>' +
+                  '/<activityId>', {
+                    activityType: constants.ACTIVITY_TYPE_COLLECTION,
+                    activityId: activity.id
+                  }));
+                $http['delete'](removeCollectionUrl);
               }
               $modalInstance.close();
             };

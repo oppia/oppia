@@ -318,19 +318,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_a, exp_rights))
 
-    def test_can_publicize_exploration(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, title='A title', category='A category')
-        exp_services.save_new_exploration(self.user_id_a, exp)
-
-        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
-        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-
-        self.assertFalse(rights_manager.check_can_publicize_exploration(
-            self.user_a, exp_rights))
-        self.assertTrue(rights_manager.check_can_publicize_exploration(
-            self.user_admin, exp_rights))
-
     def test_changing_viewability_of_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='A title', category='A category')
@@ -707,51 +694,6 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_a, collection_rights))
-
-
-class CheckCanUnpublicizeExplorationTest(test_utils.GenericTestBase):
-    """Tests for check_can_unpublicize_exploration function."""
-    publicized_exp_id = 'exp_id_1'
-
-    def setUp(self):
-        super(CheckCanUnpublicizeExplorationTest, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_moderators([self.MODERATOR_USERNAME])
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(
-            self.admin_id, user_services.get_user_role_from_id(self.admin_id))
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id, user_services.get_user_role_from_id(self.owner_id))
-        self.moderator = user_services.UserActionsInfo(
-            self.moderator_id,
-            user_services.get_user_role_from_id(self.moderator_id))
-        self.save_new_valid_exploration(
-            self.publicized_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.publicized_exp_id)
-        rights_manager.publicize_exploration(
-            self.moderator_id, self.publicized_exp_id)
-
-    def test_admin_can_unpublicize_publicized_exploration(self):
-        self.assertTrue(rights_manager.check_can_unpublicize_exploration(
-            self.admin,
-            rights_manager.get_exploration_rights(self.publicized_exp_id)))
-
-    def test_owner_cannot_unpublicize_publicized_exploration(self):
-        self.assertFalse(rights_manager.check_can_unpublicize_exploration(
-            self.owner,
-            rights_manager.get_exploration_rights(self.publicized_exp_id)))
-
-    def test_moderator_can_unpublicize_publicized_exploration(self):
-        self.assertTrue(rights_manager.check_can_unpublicize_exploration(
-            self.moderator,
-            rights_manager.get_exploration_rights(self.publicized_exp_id)))
-
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
     """Tests for check_can_release_ownership function."""

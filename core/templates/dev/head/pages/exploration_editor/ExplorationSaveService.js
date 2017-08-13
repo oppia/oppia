@@ -124,7 +124,7 @@ oppia.factory('explorationSaveService', [
           onStartSaveCallback();
         }
 
-        explorationRightsService.makePublic(true).then(
+        explorationRightsService.publish().then(
           function() {
             if (onSaveDoneCallback) {
               onSaveDoneCallback();

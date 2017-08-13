@@ -325,7 +325,6 @@ EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION = 'subscription_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
-EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
@@ -340,7 +339,6 @@ BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
-MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
@@ -349,15 +347,6 @@ DEFAULT_SIGNOFF_HTML_FN = (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
 VALID_MODERATOR_ACTIONS = {
-    MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
-        'email_config': 'publicize_exploration_email_html_body',
-        'email_subject_fn': (
-            lambda exp_title: (
-                'Your Oppia exploration "%s" has been featured!' % exp_title)),
-        'email_intent': EMAIL_INTENT_PUBLICIZE_EXPLORATION,
-        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
-        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
-    },
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
         'email_subject_fn': (
@@ -416,7 +405,7 @@ GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
 # files.
 
 if DEV_MODE:
-    AUDIO_URL_TEMPLATE = '/assets/test/<exploration_id>/audio/<filename>'
+    AUDIO_URL_TEMPLATE = '/audiohandler/<exploration_id>/audio/<filename>'
 else:
     AUDIO_URL_TEMPLATE = (
         'https://storage.googleapis.com/%s/<exploration_id>/'
@@ -531,7 +520,7 @@ DEMO_EXPLORATIONS = {
     u'14': 'about_oppia.yaml',
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
-    u'17': 'audio_test.yaml',
+    u'17': 'audio_test',
 }
 
 DEMO_COLLECTIONS = {
@@ -653,7 +642,6 @@ EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
-ACTIVITY_STATUS_PUBLICIZED = 'publicized'
 
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'
@@ -671,7 +659,7 @@ TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with base.js
-ENABLE_STRING_CLASSIFIER = False
+ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 

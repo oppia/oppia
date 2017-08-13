@@ -17,17 +17,32 @@
  */
 
 oppia.factory('LanguageUtilService', [function() {
-  var _getAudioLanguageDescription = function(languageCode) {
-    for (var i = 0; i < constants.SUPPORTED_AUDIO_LANGUAGES.length; i++) {
-      if (constants.SUPPORTED_AUDIO_LANGUAGES[i].id === languageCode) {
-        return constants.SUPPORTED_AUDIO_LANGUAGES[i].text;
-      }
-    }
-  };
+  var supportedAudioLanguages = constants.SUPPORTED_AUDIO_LANGUAGES;
+
+  var allAudioLanguageCodes = (
+    supportedAudioLanguages.map(function(audioLanguage) {
+      return audioLanguage.id;
+    }));
+  var audioLanguagesCount = allAudioLanguageCodes.length;
+
+  var audioLanguageCodesToDescriptions = {};
+  supportedAudioLanguages.forEach(function(audioLanguage) {
+    audioLanguageCodesToDescriptions[audioLanguage.id] = audioLanguage.text;
+  });
 
   return {
-    getAudioLanguageDescription: function(languageAudioCode) {
-      return _getAudioLanguageDescription(languageAudioCode);
+    getAudioLanguagesCount: function() {
+      return audioLanguagesCount;
+    },
+    getAudioLanguageDescription: function(audioLanguageCode) {
+      return audioLanguageCodesToDescriptions[audioLanguageCode];
+    },
+    // Given a list of audio language codes, returns the complement list, i.e.
+    // the list of audio language codes not in the input list.
+    getComplementAudioLanguageCodes: function(audioLanguageCodes) {
+      return allAudioLanguageCodes.filter(function(languageCode) {
+        return audioLanguageCodes.indexOf(languageCode) === -1;
+      });
     }
   }
 }]);

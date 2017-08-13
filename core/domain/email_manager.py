@@ -108,13 +108,6 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
 
-PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
-    'publicize_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
-    'Default content for the email sent after an exploration is publicized by '
-    'a moderator. These emails are only sent if the functionality is enabled '
-    'in feconf.py. Leave this field blank if emails should not be sent.',
-    'Congratulations, your exploration has been featured in the Oppia '
-    'library!')
 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
     'Default content for the email sent after an exploration is unpublished '
@@ -126,8 +119,6 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
 
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION: (
-        user_services.is_at_least_moderator),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
         user_services.is_at_least_moderator),
     feconf.EMAIL_INTENT_DAILY_BATCH: (
@@ -418,8 +409,8 @@ def require_moderator_email_prereqs_are_satisfied():
 
 def send_moderator_action_email(
         sender_id, recipient_id, intent, exploration_title, email_body):
-    """Sends a email immediately following a moderator action (publicize,
-    unpublish, delete) to the given user.
+    """Sends a email immediately following a moderator action (unpublish,
+    delete) to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
     feconf.CAN_SEND_EMAILS is False).

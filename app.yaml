@@ -143,3 +143,33 @@ libraries:
 # running the server in the dev environment.
 env_variables:
   MINIFICATION: false
+
+
+skip_files:
+# .pyc and .pyo files
+- ^(.*/)?.*\.py[co]$
+# Unix hidden files whose names begin with a dot
+- ^(.*/)?\..*$
+# Karma test files
+- ^(.*/)Spec.js$
+# Other folders to ignore
+- tests/
+- scripts/
+- integrations/
+- integrations_dev/
+# Some third_party static scripts are directly imported, namely: jquery,
+# jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
+# ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
+# We exclude some of the scripts that are not directly imported in order to
+# reduce deployed file count.
+# TODO(sll): Find a more structured way of doing this.
+- third_party/static/angular-audio-1.7.4
+- third_party/static/angular-scroll-1.0.0
+- third_party/static/angular-toastr-1.7.0
+- third_party/static/font-awesome-4.4.0
+- third_party/static/messageformat-0.3.1
+- third_party/static/ng-img-crop-0.3.2
+- third_party/static/nginfinitescroll-1.0.0
+- third_party/static/perfectscrollbar-0.6.16
+- third_party/static/textAngular-1.4.5
+- third_party/static/widget

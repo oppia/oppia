@@ -40,7 +40,6 @@ describe('Assets Backend API Service', function() {
   it('Should successfully fetch and cache audio', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
-    var bucketName = 'oppia.resources'
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
       GLOBALS.AUDIO_URL_TEMPLATE, {

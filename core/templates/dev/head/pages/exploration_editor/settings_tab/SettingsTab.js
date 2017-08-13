@@ -370,18 +370,6 @@ oppia.controller('SettingsTab', [
       openModalForModeratorAction('unpublish_exploration');
     };
 
-    $scope.publicizeExplorationAsModerator = function() {
-      openModalForModeratorAction('publicize_exploration');
-    };
-
-    $scope.unpublicizeExplorationAsModerator = function() {
-      // TODO(sll): Migrate this and deleteExplorationAsModerator to the
-      // 'moderator action' path, and implement an option for different actions
-      // saying whether emails should be sent for these, or not. At present,
-      // we don't expect to send an email when an exploration is unpublicized.
-      explorationRightsService.makePublicized(false);
-    };
-
     $scope.isExplorationLockedForEditing = function() {
       return changeListService.isExplorationLockedForEditing();
     };

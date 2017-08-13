@@ -88,6 +88,7 @@ class ConfigProperty(object):
     - moderator_ids
     - moderator_request_forum_url
     - moderator_usernames
+    - publicize_exploration_email_html_body
     - sharing_options
     - sharing_options_twitter_text
     - sidebar_menu_additional_links

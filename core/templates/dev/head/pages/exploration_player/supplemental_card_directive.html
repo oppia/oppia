@@ -14,14 +14,17 @@
                ng-click="onClickContinueButton()"
                ng-if="helpCardHasContinueButton"
                style="margin-top: 12px;"
-               translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
+               aria-label="Continue">
+      <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
+      <i class="fa fa-arrow-right"
+         style="font-size: 19px; padding-top: 1.5px;"></i>
     </md-button>
   </div>
 
   <div class="protractor-test-conversation-input"
        angular-html-bind="activeCard.interactionHtml">
   </div>
-  <div ng-if="hintsExist" style="text-align: right; padding: 8px">
+  <div ng-if="hintsExist" style="text-align: left; padding: 8px">
     <hint-button on-click-hint-button="consumeHint()"
                  current-hint-is-available="isHintAvailable()"
                  all-hints-are-exhausted="areAllHintsExhausted()">

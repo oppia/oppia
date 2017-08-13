@@ -25,9 +25,24 @@ describe('Language util service', function() {
     lus = $injector.get('LanguageUtilService');
   }));
 
-  it('should get the correct description given an audio ' +
-      'language code', function() {
-    expect(lus.getAudioLanguageDescription('en')).toEqual('English');
-    expect(lus.getAudioLanguageDescription('hi-en')).toEqual('Hinglish');
+  it('should get the correct language count', function() {
+    expect(lus.getAudioLanguagesCount()).toEqual(2);
+  });
+
+  it('should get the correct description given an audio language code',
+    function() {
+      expect(lus.getAudioLanguageDescription('en')).toEqual('English');
+      expect(lus.getAudioLanguageDescription('hi-en')).toEqual('Hinglish');
+    }
+  );
+
+  it('should correctly compute the complement languages', function() {
+    expect(lus.getComplementAudioLanguageCodes([])).toEqual(['en', 'hi-en']);
+    expect(lus.getComplementAudioLanguageCodes(['en'])).toEqual(['hi-en']);
+    expect(lus.getComplementAudioLanguageCodes(['hi-en'])).toEqual(['en']);
+    expect(lus.getComplementAudioLanguageCodes(['hi-en', 'en'])).toEqual([]);
+
+    expect(lus.getComplementAudioLanguageCodes(['abcdefg'])).toEqual([
+      'en', 'hi-en']);
   });
 });

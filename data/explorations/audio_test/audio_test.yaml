@@ -17,12 +17,12 @@ states:
       audio_translations:
         en:
           filename: 'test_audio_2_en.mp3'
-          file_size_bytes: 2
+          file_size_bytes: 59289
           needs_update: false
         hi-en:
           filename: 'test_audio_2_hi_en.mp3'
-          file_size_bytes: 3
-          needs_update: false
+          file_size_bytes: 88905
+          needs_update: true
       html: Congratulations, you have finished!
     interaction:
       answer_groups: []
@@ -42,8 +42,8 @@ states:
       audio_translations:
         hi-en:
           filename: 'test_audio_3_hi_en.mp3'
-          file_size_bytes: 2
-          needs_update: false
+          file_size_bytes: 59613
+          needs_update: true
       html: <p>Try typing some code.</p>
     interaction:
       answer_groups:
@@ -82,11 +82,11 @@ states:
       audio_translations:
         en:
           filename: 'test_audio_1_en.mp3'
-          file_size_bytes: 1
+          file_size_bytes: 95426
           needs_update: false
         hi-en:
           filename: 'test_audio_1_hi_en.mp3'
-          file_size_bytes: 4
+          file_size_bytes: 132719 
           needs_update: false
       html: <p>Try clicking on the speaker! After listening, click continue.</p>
     interaction:

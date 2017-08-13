@@ -111,13 +111,7 @@
     }
   </style>
 
-  {% include 'pages/exploration_player/exploration_successfully_flagged_modal.html' %}
   {% include 'pages/exploration_player/feedback_popup_directive.html' %}
-  {% include 'pages/exploration_player/flag_exploration_modal.html' %}
-  {% include 'pages/exploration_player/information_card_modal.html' %}
-  {% include 'pages/exploration_player/take_break_modal.html' %}
-  {% include 'pages/exploration_player/audio_translation_settings_modal.html' %}
-
 {% endblock %}
 
 {% block footer %}
@@ -135,7 +129,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/AudioPlayerService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AssetsBackendApiService.js"></script>  
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AssetsBackendApiService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
@@ -188,6 +182,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioTranslationManagerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioControlsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioPreloaderService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
