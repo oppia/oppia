@@ -828,7 +828,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         return job_queued_msec >= created_on_msec
 
 
-class BaseMapReduceOneOffJobManager(BaseJobManager):
+class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
 
     @classmethod
     def enqueue(
