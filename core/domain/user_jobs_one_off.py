@@ -30,7 +30,7 @@ import utils
         models.NAMES.feedback, models.NAMES.user]))
 
 
-class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
+class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
     """
@@ -68,7 +68,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
                     edited_exploration_ids))
 
 
-class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
+class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for calculating the distribution of username lengths."""
 
     @classmethod
@@ -87,7 +87,7 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
         yield (key, len(username_counter))
 
 
-class LongUserBiosOneOffJob(jobs.BaseMapReduceJobManager):
+class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for calculating the length of user_bios."""
 
     @classmethod
@@ -109,7 +109,7 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceJobManager):
             yield (userbio_length, stringified_usernames)
 
 
-class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
+class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for subscribing users to explorations, collections, and
     feedback threads.
     """
@@ -216,7 +216,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
                 subscription_services.subscribe_to_collection(key, item['id'])
 
 
-class DashboardStatsOneOffJob(jobs.BaseMapReduceJobManager):
+class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for populating weekly dashboard stats for all registered
     users who have a non-None value of UserStatsModel.
     """
@@ -233,7 +233,7 @@ class DashboardStatsOneOffJob(jobs.BaseMapReduceJobManager):
         pass
 
 
-class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
+class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that updates first contribution time in milliseconds for
     current users. This job makes the assumption that once an exploration is
     published, it remains published. This job is not completely precise in that
@@ -276,7 +276,7 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
             user_id, first_contribution_msec)
 
 
-class UserProfilePictureOneOffJob(jobs.BaseMapReduceJobManager):
+class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that updates profile pictures for users which do not
     currently have them. Users who already have profile pictures are
     unaffected.
@@ -298,7 +298,7 @@ class UserProfilePictureOneOffJob(jobs.BaseMapReduceJobManager):
         pass
 
 
-class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceJobManager):
+class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):

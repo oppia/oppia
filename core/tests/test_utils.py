@@ -667,17 +667,15 @@ class AppEngineTestBase(TestBase):
             # Enables the testbed urlfetch mock
             self.testbed.init_urlfetch_stub()
 
-    def count_jobs_in_taskqueue(self, queue_name=None):
-        """Counts the jobs in the given queue. If queue_name is None,
-        defaults to counting the jobs in all queues available.
-        """
+    def count_jobs_in_taskqueue(self, queue_name):
+        """Counts the jobs in the given queue."""
         return len(self.get_pending_tasks(queue_name))
 
     def get_pending_tasks(self, queue_name=None):
-        """Returns the jobs in the given queue. If queue_name is None,
-        defaults to returning the jobs in all queues available.
+        """Returns the jobs in the given queue. If queue_name is None, defaults
+        to returning the jobs in all available queues.
         """
-        if queue_name:
+        if queue_name is not None:
             return self.taskqueue_stub.get_filtered_tasks(
                 queue_names=[queue_name])
         else:

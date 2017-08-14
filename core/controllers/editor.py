@@ -23,6 +23,7 @@ import StringIO
 
 import jinja2
 import mutagen
+from mutagen import mp3
 
 from constants import constants
 from core.controllers import base
@@ -847,12 +848,22 @@ class AudioUploadHandler(EditorHandler):
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:
-            audio = mutagen.File(tempbuffer)
+            # For every accepted extension, use the mutagen-specific
+            # constructor for that type. This will catch mismatched audio
+            # types e.g. uploading a flac file with an MP3 extension.
+            if extension == 'mp3':
+                audio = mp3.MP3(tempbuffer)
+            else:
+                audio = mutagen.File(tempbuffer)
         except mutagen.MutagenError:
-            # Mutagen occasionally has problems with certain files
-            # for unknown reasons.
-            raise self.InvalidInputException('Could not open uploaded'
-                                             'audio file')
+            # The calls to mp3.MP3() versus mutagen.File() seem to behave
+            # differently upon not being able to interpret the audio.
+            # mp3.MP3() raises a MutagenError whereas mutagen.File()
+            # seems to return None. It's not clear if this is always
+            # the case. Occasionally, mutagen.File() also seems to
+            # raise a MutagenError.
+            raise self.InvalidInputException('Audio not recognized '
+                                             'as a %s file' % extension)
         tempbuffer.close()
 
         if audio is None:

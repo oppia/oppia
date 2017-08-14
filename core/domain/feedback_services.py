@@ -704,7 +704,7 @@ def enqueue_feedback_message_batch_email_task(user_id):
     Args:
         user_id: str. The user to be notified.
     """
-    taskqueue_services.enqueue_task(
+    taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, {'user_id': user_id},
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
@@ -722,7 +722,7 @@ def enqueue_feedback_message_instant_email_task(user_id, reference):
         'user_id': user_id,
         'reference_dict': reference.to_dict()
     }
-    taskqueue_services.enqueue_task(
+    taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS, payload, 0)
 
 
@@ -743,7 +743,7 @@ def _enqueue_feedback_thread_status_change_email_task(
         'old_status': old_status,
         'new_status': new_status
     }
-    taskqueue_services.enqueue_task(
+    taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_FEEDBACK_STATUS_EMAILS, payload, 0)
 
 
@@ -760,7 +760,7 @@ def _enqueue_suggestion_email_task(exploration_id, thread_id):
         'thread_id': thread_id
     }
     # Suggestion emails are sent immediately.
-    taskqueue_services.enqueue_task(
+    taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
 
 

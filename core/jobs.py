@@ -127,11 +127,14 @@ class BaseJobManager(object):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
+    def enqueue(cls, job_id, queue_name, additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
             job_id: str. The ID of the job to enqueue.
+            queue_name: str. The queue name the job should be run in. See
+                core.platform.taskqueue.gae_taskqueue_services for supported
+                values.
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
         """
@@ -143,7 +146,7 @@ class BaseJobManager(object):
 
         # Enqueue the job.
         cls._pre_enqueue_hook(job_id)
-        cls._real_enqueue(job_id, additional_job_params)
+        cls._real_enqueue(job_id, queue_name, additional_job_params)
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
@@ -333,12 +336,16 @@ class BaseJobManager(object):
             cls.cancel(model.id, user_id)
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *). Additional parameters on jobs.
+            queue_name: str. The queue name the job should be run in. See
+                core.platform.taskqueue.gae_taskqueue_services for supported
+                values.
+            additional_job_params: dict(str : *) or None. Additional parameters
+                on jobs.
         """
         raise NotImplementedError(
             'Subclasses of BaseJobManager should implement _real_enqueue().')
@@ -556,15 +563,19 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Puts the job in the task queue.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *). Additional params to pass into
-                the job's _run() method.
+            queue_name: str. The queue name the job should be run in. See
+                core.platform.taskqueue.gae_taskqueue_services for supported
+                values.
+            additional_job_params: dict(str : *) or None. Additional params to
+                pass into the job's _run() method.
         """
-        taskqueue_services.defer(cls._run_job, job_id, additional_job_params)
+        taskqueue_services.defer(
+            cls._run_job, queue_name, job_id, additional_job_params)
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
@@ -726,14 +737,17 @@ class BaseMapReduceJobManager(BaseJobManager):
             'reduce as a @staticmethod.')
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Configures, creates, and queues the pipeline for the given job and
         params.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *). Additional params to pass into
-                the job's _run() method.
+            queue_name: str. The queue name the job should be run in. See
+                core.platform.taskqueue.gae_taskqueue_services for supported
+                values.
+            additional_job_params: dict(str : *) or None. Additional params to
+                pass into the job's _run() method.
 
         Raises:
             Exception: Passed a value to a parameter in the mapper which has
@@ -781,7 +795,8 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         mr_pipeline = MapReduceJobPipeline(
             job_id, '%s.%s' % (cls.__module__, cls.__name__), kwargs)
-        mr_pipeline.start(base_path='/mapreduce/worker/pipeline')
+        mr_pipeline.start(
+            base_path='/mapreduce/worker/pipeline', queue_name=queue_name)
 
     @classmethod
     def _pre_cancel_hook(cls, job_id, cancel_message):
@@ -809,6 +824,23 @@ class BaseMapReduceJobManager(BaseJobManager):
         job_queued_msec = float(context.get().mapreduce_spec.mapper.params[
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
         return job_queued_msec >= created_on_msec
+
+
+class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
+    """Overriden to force subclass jobs into the one-off jobs queue."""
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        """Marks a job as queued and adds it to a queue for processing.
+
+        Args:
+            job_id: str. The ID of the job to enqueue.
+            additional_job_params: dict(str : *) or None. Additional parameters
+                for the job.
+        """
+        super(BaseMapReduceOneOffJobManager, cls).enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            additional_job_params=additional_job_params)
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
@@ -1260,7 +1292,8 @@ class BaseContinuousComputationManager(object):
             return
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
-        job_manager.enqueue(job_id)
+        job_manager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS)
 
     @classmethod
     def _register_end_of_batch_job_and_return_status(cls):
@@ -1656,7 +1689,7 @@ def get_stuck_jobs(recency_msecs):
     return stuck_jobs
 
 
-class JobCleanupManager(BaseMapReduceJobManager):
+class JobCleanupManager(BaseMapReduceOneOffJobManager):
     """One-off job for cleaning up old auxiliary entities for MR jobs."""
 
     @classmethod
@@ -1724,4 +1757,5 @@ class JobCleanupManager(BaseMapReduceJobManager):
 
 ABSTRACT_BASE_CLASSES = frozenset([
     BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager,
+    BaseMapReduceOneOffJobManager,
     BaseMapReduceJobManagerForContinuousComputations])
