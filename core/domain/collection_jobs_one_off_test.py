@@ -21,7 +21,6 @@ from core.domain import collection_jobs_one_off
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
