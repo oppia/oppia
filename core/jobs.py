@@ -1689,7 +1689,7 @@ def get_stuck_jobs(recency_msecs):
     return stuck_jobs
 
 
-class JobCleanupManager(BaseMapReduceJobManager):
+class JobCleanupManager(BaseMapReduceOneOffJobManager):
     """One-off job for cleaning up old auxiliary entities for MR jobs."""
 
     @classmethod
