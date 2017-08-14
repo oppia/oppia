@@ -1058,7 +1058,7 @@ oppia.factory('explorationStatesService', [
                 var solutionIsValid = stateName !== result.outcome.dest;
                 SolutionValidityService.updateValidity(
                   stateName, solutionIsValid);
-            }));
+              }));
           }
         });
         $q.all(answerClassificationPromises).then(function() {
