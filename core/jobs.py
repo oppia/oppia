@@ -1757,4 +1757,5 @@ class JobCleanupManager(BaseMapReduceOneOffJobManager):
 
 ABSTRACT_BASE_CLASSES = frozenset([
     BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager,
+    BaseMapReduceOneOffJobManager,
     BaseMapReduceJobManagerForContinuousComputations])
