@@ -29,6 +29,7 @@ class InteractiveMap(base.BaseInteraction):
     instructions = 'Click on the map'
     narrow_instructions = 'View map'
     needs_summary = True
+    can_have_solution = False
 
     _customization_arg_specs = [{
         'name': 'latitude',

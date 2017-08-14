@@ -597,7 +597,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -619,7 +619,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -664,7 +664,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   Renamed state:
     classifier_model_id: null
@@ -686,7 +686,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -800,7 +800,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -825,7 +825,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """)
     }
@@ -851,7 +851,7 @@ interaction:
   fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """)
     }
@@ -2531,7 +2531,7 @@ states:
       fallbacks: []
       hints: []
       id: EndExploration
-      solution: {}
+      solution: null
     param_changes: []
   %s:
     classifier_model_id: null
@@ -2551,7 +2551,7 @@ states:
       fallbacks: []
       hints: []
       id: Continue
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []

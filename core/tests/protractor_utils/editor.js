@@ -1448,6 +1448,61 @@ var sendResponseToLatestFeedback = function(feedbackResponse) {
     click();
 };
 
+var addHint = function(hint) {
+  element(by.css('.protractor-test-oppia-add-hint-button')).click();
+  general.waitForSystem();
+  element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
+    .last().click();
+  browser.switchTo().activeElement().sendKeys(hint);
+  general.waitForSystem();
+  element(by.css('.protractor-test-save-hint')).click();
+};
+
+// Hints are zero-indexed.
+var HintEditor = function(hintNum) {
+  var headerElem = element.all(by.css('.protractor-test-hint-tab')).get(
+    hintNum);
+
+  var hintBodyElem = element(
+    by.css('.protractor-test-hint-body-' + hintNum));
+  hintBodyElem.isPresent().then(function(isVisible) {
+    if (!isVisible) {
+      headerElem.click();
+    }
+  });
+
+  return {
+    setHint: function(hint) {
+      hintBodyElem.click();
+      hintBodyElem.all(by.tagName('p')).click();
+      browser.switchTo().activeElement().clear();
+      browser.switchTo().activeElement().sendKeys(hint);
+      general.waitForSystem();
+      element(by.css('.protractor-test-save-hint-edit')).click();
+    },
+    deleteHint: function() {
+      headerElem.element(by.css('.protractor-test-delete-response')).click();
+      element(by.css('.protractor-test-confirm-delete-hint')).click();
+    },
+    expectCannotDeleteHint: function() {
+      expect(headerElem.element(by.css(
+        '.protractor-test-delete-response')).isPresent()).toBeFalsy();
+    }
+  };
+};
+
+// This only handles TextInput interaction.
+var addSolution = function(solution) {
+  element(by.css('.protractor-test-oppia-add-solution-button')).click();
+  browser.switchTo().activeElement().sendKeys(solution.explanation);
+  element(by.css('.protractor-test-interaction-html'))
+    .all(by.tagName('input')).first().click().sendKeys(solution.correctAnswer);
+  browser.waitForAngular();
+  general.waitForSystem();
+  element(by.css('.protractor-test-submit-solution-button')).click();
+  general.waitForSystem();
+};
+
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 exports.startTutorial = startTutorial;
 exports.progressInTutorial = progressInTutorial;
@@ -1496,6 +1551,11 @@ exports.ResponseEditor = ResponseEditor;
 exports.expectCannotAddResponse = expectCannotAddResponse;
 
 exports.setDefaultOutcome = setDefaultOutcome;
+
+exports.HintEditor = HintEditor;
+exports.addHint = addHint;
+
+exports.addSolution = addSolution;
 
 exports.addFallback = addFallback;
 exports.FallbackEditor = FallbackEditor;
