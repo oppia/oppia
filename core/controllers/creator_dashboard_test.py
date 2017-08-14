@@ -118,13 +118,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
          start_computation())
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            0)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         self.process_and_flush_pending_tasks()
 
     def _run_stats_aggregator_jobs(self):
@@ -132,13 +130,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
          .start_computation())
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            0)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         self.process_and_flush_pending_tasks()
 
     def test_stats_no_explorations(self):
