@@ -22,16 +22,18 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
 
 # NOTE: The following constants should match the queue names in queue.yaml.
-# Default queue for processing tasks (including MapReduce ones).
-QUEUE_NAME_DEFAULT = 'default'
-# Deferred queue for processing events outside the request/response cycle.
-QUEUE_NAME_EVENTS = 'events'
-# Taskqueue for sending email.
-QUEUE_NAME_EMAILS = 'emails'
-# Taskqueue for running one-off jobs.
-QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
+# Taskqueue for backing up state.
+QUEUE_NAME_BACKUPS = 'backups'
 # Taskqueue for running continuous computation jobs.
 QUEUE_NAME_CONTINUOUS_JOBS = 'continuous-jobs'
+# Default queue for processing tasks (including MapReduce ones).
+QUEUE_NAME_DEFAULT = 'default'
+# Taskqueue for sending email.
+QUEUE_NAME_EMAILS = 'emails'
+# Deferred queue for processing events outside the request/response cycle.
+QUEUE_NAME_EVENTS = 'events'
+# Taskqueue for running one-off jobs.
+QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
 
 
 def defer(fn, queue_name, *args, **kwargs):
