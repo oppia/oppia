@@ -537,8 +537,8 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
     def test_failing_job(self):
         self._populate_data()
         job_id = FailingAdditionJobManager.create_new()
-        FailingAdditionJobManager.enqueue(job_id,
-                taskqueue_services.QUEUE_NAME_DEFAULT)
+        FailingAdditionJobManager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         with self.assertRaisesRegexp(
