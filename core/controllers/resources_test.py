@@ -397,6 +397,5 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
-        self.assertIn(
-            'Although the filename extension indicates the file',
-            response_dict['error'])
+        self.assertEqual(response_dict['error'], 'Audio not recognized as '
+                         'a mp3 file')
