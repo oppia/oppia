@@ -116,17 +116,17 @@ oppia.factory('explorationData', [
                 explorationId);
               if (draftChanges &&
                 draftChanges.draftChangeListId === draftChangeListId) {
-                  var changeList = draftChanges.draftChanges;
-                  explorationData.autosaveChangeList(changeList, function() {
-                    // a reload is needed so that the changelist just saved is
-                    // loaded as opposed to the exploration returned by this
-                    // response
-                    $window.location.reload();
-                  });
+                var changeList = draftChanges.draftChanges;
+                explorationData.autosaveChangeList(changeList, function() {
+                  // a reload is needed so that the changelist just saved is
+                  // loaded as opposed to the exploration returned by this
+                  // response
+                  $window.location.reload();
+                });
               } else if (draftChanges &&
                 draftChanges.draftChangeListId !== draftChangeListId) {
-                  errorCallback(explorationId, draftChanges.draftChanges);
-                }
+                errorCallback(explorationId, draftChanges.draftChanges);
+              }
               return response;
             })
           );
@@ -2497,7 +2497,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 oppia.factory('autosaveInfoModalsService', [
   '$log', '$modal', '$timeout', '$window',
   'explorationData', 'LocalStorageService', 'lostChangesService',
-   'UrlInterpolationService',
+  'UrlInterpolationService',
   function(
       $log, $modal, $timeout, $window,
       explorationData, LocalStorageService, lostChangesService,
