@@ -851,14 +851,14 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
 
             # When the task queue is flushed, the data is recorded in the two
             # realtime layers.
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_DEFAULT), 0)
+                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             self.assertEqual(StartExplorationRealtimeModel.get(
@@ -882,7 +882,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 stats_models.ExplorationAnnotationsModel.get(
