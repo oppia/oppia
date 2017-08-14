@@ -60,6 +60,16 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
 
+        self.owner_role = user_services.get_user_role_from_id(
+            self.owner_id)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, self.owner_role)
+        self.system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
+
+
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
         editable."""
@@ -82,8 +92,9 @@ class EditorTest(BaseEditorControllerTest):
     def setUp(self):
         super(EditorTest, self).setUp()
         exp_services.load_demo('0')
+
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, '0')
+            self.system_user, '0')
 
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
@@ -232,7 +243,7 @@ class EditorTest(BaseEditorControllerTest):
             exp_id = '15'
             exp_services.load_demo(exp_id)
             rights_manager.release_ownership_of_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id)
+                self.system_user, exp_id)
 
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
@@ -608,7 +619,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id, unpublished_exp_id, self.editor_id,
+            self.owner, unpublished_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
         self.login(self.EDITOR_EMAIL)
@@ -637,7 +648,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id, published_exp_id, self.editor_id,
+            self.owner, published_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
         rights_manager.publish_exploration(self.owner_id, published_exp_id)
 
@@ -758,7 +769,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
 
         exp_services.load_demo(self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID)
+            self.system_user, self.EXP_ID)
 
         self.login(self.EDITOR_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -879,7 +890,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         exp_id = '0'
         exp_services.load_demo(exp_id)
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id)
+            self.system_user, exp_id)
 
         # Sign-up new editors Joe and Sandra.
         self.signup('joe@example.com', 'joe')

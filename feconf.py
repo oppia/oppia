@@ -801,7 +801,7 @@ SITE_NAME = 'Oppia.org'
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
 
-# Following are the constants for the role Ids.
+# Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
@@ -810,7 +810,7 @@ ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 
 # Intent of the User making query to role structure via admin interface. Used
-# to store audit data regarding queries to role Ids.
+# to store audit data regarding queries to role IDs.
 ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'

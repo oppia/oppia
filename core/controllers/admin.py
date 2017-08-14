@@ -225,7 +225,7 @@ class AdminHandler(base.BaseHandler):
                 (self.user_id, exploration_id))
             exp_services.load_demo(unicode(exploration_id))
             rights_manager.release_ownership_of_exploration(
-                feconf.SYSTEM_COMMITTER_ID, unicode(exploration_id))
+                self.system_user, unicode(exploration_id))
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -236,7 +236,7 @@ class AdminHandler(base.BaseHandler):
                 (self.user_id, collection_id))
             collection_services.load_demo(unicode(collection_id))
             rights_manager.release_ownership_of_collection(
-                feconf.SYSTEM_COMMITTER_ID, unicode(collection_id))
+                self.system_user, unicode(collection_id))
         else:
             raise Exception('Cannot reload a collection in production.')
 

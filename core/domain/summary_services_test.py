@@ -86,6 +86,9 @@ class ExplorationDisplayableSummariesTest(
         self.albert = user_services.UserActionsInfo(
             self.albert_id,
             user_services.get_user_role_from_id(self.albert_id))
+        self.bob = user_services.UserActionsInfo(
+            self.bob_id,
+            user_services.get_user_role_from_id(self.bob_id))
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
@@ -182,8 +185,7 @@ class ExplorationDisplayableSummariesTest(
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
-                user_services.UserActionsInfo()))
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
         expected_summary = {
             'category': u'A category',
             'community_owned': False,
@@ -217,7 +219,7 @@ class ExplorationDisplayableSummariesTest(
         # However, if Albert is granted editor access to Bob's exploration,
         # then Albert has access to the corresponding summary.
         rights_manager.assign_role_for_exploration(
-            self.bob_id, self.EXP_ID_5, self.albert_id,
+            self.bob, self.EXP_ID_5, self.albert_id,
             rights_manager.ROLE_EDITOR)
 
         displayable_summaries = (

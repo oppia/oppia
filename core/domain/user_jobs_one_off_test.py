@@ -348,6 +348,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
 
+        self.user_a_role = user_services.get_user_role_from_id(
+            self.user_a_id)
+        self.user_a = user_services.UserActionsInfo(
+            self.user_a_id, self.user_a_role)
+
         with self.swap(
             subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
@@ -418,11 +423,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID_1, self.user_b_id,
+                self.user_a, self.EXP_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # User A adds user C as a viewer of the exploration.
             rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID_1, self.user_c_id,
+                self.user_a, self.EXP_ID_1, self.user_c_id,
                 rights_manager.ROLE_VIEWER)
 
         self._run_one_off_job()
@@ -470,12 +475,12 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID_1, self.user_b_id,
+                self.user_a, self.EXP_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # The exploration becomes community-owned.
             rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
             rights_manager.release_ownership_of_exploration(
-                self.user_a_id, self.EXP_ID_1)
+                self.user_a, self.EXP_ID_1)
             # User C edits the exploration.
             exp_services.update_exploration(
                 self.user_c_id, self.EXP_ID_1, [], 'Update exploration')
@@ -528,11 +533,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
-                self.user_a_id, self.COLLECTION_ID_1, self.user_b_id,
+                self.user_a, self.COLLECTION_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # User A adds user C as a viewer of the collection.
             rights_manager.assign_role_for_collection(
-                self.user_a_id, self.COLLECTION_ID_1, self.user_c_id,
+                self.user_a, self.COLLECTION_ID_1, self.user_c_id,
                 rights_manager.ROLE_VIEWER)
 
         self._run_one_off_job()
@@ -883,6 +888,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(
+            self.admin_id, user_services.get_user_role_from_id(self.admin_id))
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -909,7 +916,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         exp_services.publish_exploration_and_update_user_profiles(
             self.admin_id, self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
                 'cmd': 'edit_state_property',

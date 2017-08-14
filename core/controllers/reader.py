@@ -40,7 +40,6 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
-from core.domain import user_services
 import feconf
 import utils
 
@@ -548,8 +547,7 @@ class RecommendationsHandler(base.BaseHandler):
         self.values.update({
             'summaries': (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    author_recommended_exp_ids + auto_recommended_exp_ids,
-                    user_services.UserActionsInfo())),
+                    author_recommended_exp_ids + auto_recommended_exp_ids)),
         })
         self.render_json(self.values)
 

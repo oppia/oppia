@@ -67,6 +67,11 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
+        self.owner_role = user_services.get_user_role_from_id(
+            self.owner_id)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, self.owner_role)
+
 
 class CollectionQueriesUnitTests(CollectionServicesUnitTests):
     """Tests query methods."""
@@ -1750,10 +1755,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
 
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_collection(
-            self.owner_id, self.COLLECTION_ID, self.viewer_id,
+            self.owner, self.COLLECTION_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         rights_manager.assign_role_for_collection(
-            self.owner_id, self.COLLECTION_ID, self.editor_id,
+            self.owner, self.COLLECTION_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
         # Check that owner and editor may edit, but not viewer.
@@ -1772,6 +1777,9 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        albert_role = user_services.get_user_role_from_id(albert_id)
+        albert = user_services.UserActionsInfo(albert_id, albert_role)
+
         # Have Albert create a collection.
         self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
         # Have Bob edit the collection.
@@ -1785,10 +1793,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             'Changed title to Bob title.')
         # Albert adds an owner and an editor.
         rights_manager.assign_role_for_collection(
-            albert_id, self.COLLECTION_ID, self.viewer_id,
+            albert, self.COLLECTION_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         rights_manager.assign_role_for_collection(
-            albert_id, self.COLLECTION_ID, self.editor_id,
+            albert, self.COLLECTION_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
         # Verify that only Albert and Bob are listed as contributors for the
         # collection.

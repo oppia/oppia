@@ -190,6 +190,10 @@ class BaseHandler(webapp2.RequestHandler):
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
         self.user = user_services.UserActionsInfo(self.user_id, self.role)
+        self.system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
 
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())

@@ -76,6 +76,11 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
+        self.owner_role = user_services.get_user_role_from_id(
+            self.owner_id)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, self.owner_role)
+
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
@@ -2254,10 +2259,10 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_exploration(
-            self.owner_id, self.EXP_ID, self.viewer_id,
+            self.owner, self.EXP_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         rights_manager.assign_role_for_exploration(
-            self.owner_id, self.EXP_ID, self.editor_id,
+            self.owner, self.EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
         # Check that owner and editor may edit, but not viewer.

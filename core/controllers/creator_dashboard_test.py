@@ -25,6 +25,7 @@ from core.domain import rights_manager
 from core.domain import stats_jobs_continuous_test
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_continuous_test
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -90,6 +91,10 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
 
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
+        self.owner_1_role = user_services.get_user_role_from_id(
+            self.owner_id_1)
+        self.owner_1 = user_services.UserActionsInfo(
+            self.owner_id_1, self.owner_1_role)
 
     def _record_start(self, exp_id, exp_version, state):
         """Record start event to an exploration.
@@ -319,7 +324,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id_1, self.EXP_ID_1, self.owner_id_2,
+            self.owner_1, self.EXP_ID_1, self.owner_id_2,
             rights_manager.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_1)
@@ -369,10 +374,10 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id_1, self.EXP_ID_1, self.owner_id_2,
+            self.owner_1, self.EXP_ID_1, self.owner_id_2,
             rights_manager.ROLE_OWNER)
         rights_manager.assign_role_for_exploration(
-            self.owner_id_1, self.EXP_ID_2, self.owner_id_2,
+            self.owner_1, self.EXP_ID_2, self.owner_id_2,
             rights_manager.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_2)
@@ -461,6 +466,14 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
+        self.owner_role = user_services.get_user_role_from_id(
+            self.owner_id)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, self.owner_role)
+        self.owner_1_role = user_services.get_user_role_from_id(
+            self.owner_id_1)
+        self.owner_1 = user_services.UserActionsInfo(
+            self.owner_id_1, self.owner_1_role)
         self.collaborator_id = self.get_user_id_from_email(
             self.COLLABORATOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
@@ -549,7 +562,7 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
-            self.owner_id, self.EXP_ID, self.collaborator_id,
+            self.owner, self.EXP_ID, self.collaborator_id,
             rights_manager.ROLE_EDITOR)
         self.set_admins([self.OWNER_USERNAME])
 
@@ -573,7 +586,7 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
-            self.owner_id, self.EXP_ID, self.viewer_id,
+            self.owner, self.EXP_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         self.set_admins([self.OWNER_USERNAME])
 

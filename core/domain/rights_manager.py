@@ -728,11 +728,12 @@ def check_can_unpublish_activity(user, activity_rights):
 
 
 def _assign_role(
-        committer_id, assignee_id, new_role, activity_id, activity_type):
+        committer, assignee_id, new_role, activity_id, activity_type):
     """Assigns a new role to the user.
 
     Args:
-        committer_id: str. ID of the user who is performing the action.
+        committer: UserActionsInfo. UserActionInfo object for the user
+            who is performing the action.
         activity_rights: ExplorationRightsModel|CollectionRightsModel. The
             storage object for the rights of the given activity.
         assignee_id: str. ID of the user whose role is being changed.
@@ -754,12 +755,10 @@ def _assign_role(
         Exception. The activity is already publicly viewable.
         Exception. The role is invalid.
     """
-    committer_role = user_services.get_user_role_from_id(committer_id)
-    user = user_services.UserActionsInfo(committer_id, committer_role)
+    committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_modify_activity_roles(
-            user, activity_rights):
+    if not check_can_modify_activity_roles(committer, activity_rights):
         logging.error(
             'User %s tried to allow user %s to be a(n) %s of activity %s '
             'but was refused permission.' % (
@@ -829,11 +828,12 @@ def _assign_role(
     _update_activity_summary(activity_type, activity_rights)
 
 
-def _release_ownership_of_activity(committer_id, activity_id, activity_type):
+def _release_ownership_of_activity(committer, activity_id, activity_type):
     """Releases ownership of the given activity to the community.
 
     Args:
-        committer_id: str. ID of the user who is performing the action.
+        committer: UserActionsInfo. UserActionsInfo object for the user who
+            is performing the action.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
@@ -842,11 +842,10 @@ def _release_ownership_of_activity(committer_id, activity_id, activity_type):
     Raise:
         Exception. The committer does not have release rights.
     """
-    committer_role = user_services.get_user_role_from_id(committer_id)
-    user = user_services.UserActionsInfo(committer_id, committer_role)
+    committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_release_ownership(user, activity_rights):
+    if not check_can_release_ownership(committer, activity_rights):
         logging.error(
             'User %s tried to release ownership of %s %s but was '
             'refused permission.' % (committer_id, activity_type, activity_id))
@@ -968,7 +967,7 @@ def _unpublish_activity(committer_id, activity_id, activity_type):
 
 # Rights functions for activities.
 def assign_role_for_exploration(
-        committer_id, exploration_id, assignee_id, new_role):
+        committer, exploration_id, assignee_id, new_role):
     """Assigns a user to the given role and subscribes the assignee to future
     exploration updates.
 
@@ -976,7 +975,8 @@ def assign_role_for_exploration(
     the system.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. The UserActionsInfo object for the
+            committer.
         exploration_id: str. ID of the exploration.
         assignee_id: str. ID of the user whose role is being changed.
         new_role: str. The name of the new role: One of
@@ -988,18 +988,18 @@ def assign_role_for_exploration(
             _assign_role.
     """
     _assign_role(
-        committer_id, assignee_id, new_role, exploration_id,
+        committer, assignee_id, new_role, exploration_id,
         constants.ACTIVITY_TYPE_EXPLORATION)
     if new_role in [ROLE_OWNER, ROLE_EDITOR]:
         subscription_services.subscribe_to_exploration(
             assignee_id, exploration_id)
 
 
-def release_ownership_of_exploration(committer_id, exploration_id):
+def release_ownership_of_exploration(committer, exploration_id):
     """Releases ownership of the given exploration to the community.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         exploration_id: str. ID of the exploration.
 
     Raises:
@@ -1007,11 +1007,11 @@ def release_ownership_of_exploration(committer_id, exploration_id):
             _release_ownership_of_activity.
     """
     _release_ownership_of_activity(
-        committer_id, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
+        committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
 
 
 def set_private_viewability_of_exploration(
-        committer_id, exploration_id, viewable_if_private):
+        committer, exploration_id, viewable_if_private):
     """Sets the viewable_if_private attribute for the given exploration's rights
     object.
 
@@ -1019,7 +1019,7 @@ def set_private_viewability_of_exploration(
     to be viewed by anyone with the link.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         exploration_id: str. ID of the exploration.
         viewable_if_private: bool. Whether the exploration should be made
             viewable (by anyone with the link).
@@ -1029,12 +1029,11 @@ def set_private_viewability_of_exploration(
             action.
         Exception. If the viewable_if_private property is already as desired.
     """
-    committer_role = user_services.get_user_role_from_id(committer_id)
-    user = user_services.UserActionsInfo(committer_id, committer_role)
+    committer_id = committer.user_id
     exploration_rights = get_exploration_rights(exploration_id)
 
     # The user who can publish activity can change its private viewability.
-    if not check_can_publish_activity(user, exploration_rights):
+    if not check_can_publish_activity(committer, exploration_rights):
         logging.error(
             'User %s tried to change private viewability of exploration %s '
             'but was refused permission.' % (committer_id, exploration_id))
@@ -1099,7 +1098,7 @@ def unpublish_exploration(committer_id, exploration_id):
 
 # Rights functions for collections.
 def assign_role_for_collection(
-        committer_id, collection_id, assignee_id, new_role):
+        committer, collection_id, assignee_id, new_role):
     """Assign the given user to the given role and subscribes the assignee
     to future collection updates.
 
@@ -1107,7 +1106,7 @@ def assign_role_for_collection(
     the system.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         collection_id: str. ID of the collection.
         assignee_id: str. ID of the user whose role is being changed.
         new_role: str. The name of the new role: One of
@@ -1119,18 +1118,18 @@ def assign_role_for_collection(
             _assign_role.
     """
     _assign_role(
-        committer_id, assignee_id, new_role, collection_id,
+        committer, assignee_id, new_role, collection_id,
         constants.ACTIVITY_TYPE_COLLECTION)
     if new_role in [ROLE_OWNER, ROLE_EDITOR]:
         subscription_services.subscribe_to_collection(
             assignee_id, collection_id)
 
 
-def release_ownership_of_collection(committer_id, collection_id):
+def release_ownership_of_collection(committer, collection_id):
     """Releases ownership of the given collection to the community.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         collection_id: str. ID of the collection.
 
     Raises:
@@ -1138,7 +1137,7 @@ def release_ownership_of_collection(committer_id, collection_id):
             _release_ownership_of_activity.
     """
     _release_ownership_of_activity(
-        committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
+        committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
 
 
 def publish_collection(committer_id, collection_id):

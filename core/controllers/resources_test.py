@@ -18,6 +18,7 @@ import os
 
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
@@ -33,8 +34,13 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
+        self.system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
+
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, '0')
+            self.system_user, '0')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
     def test_image_upload_and_download(self):
@@ -229,8 +235,13 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         super(AudioHandlerTest, self).setUp()
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
+        self.system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
+
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, '0')
+            self.system_user, '0')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
     def test_audio_upload(self):

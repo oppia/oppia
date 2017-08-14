@@ -168,13 +168,17 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
+        creator_user_role = user_services.get_user_role_from_id(
+            creator_user_id)
+        creator = user_services.UserActionsInfo(
+            creator_user_id, creator_user_role)
         editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
         exploration_id = '1_en_test_exploration'
         self.save_new_valid_exploration(
             exploration_id, creator_user_id, title='Test',
             category='Test', language_code='en')
         rights_manager.assign_role_for_exploration(
-            creator_user_id, exploration_id, editor_user_id,
+            creator, exploration_id, editor_user_id,
             rights_manager.ROLE_EDITOR)
         self.logout()
         self.login(self.TEST_EDITOR_EMAIL)

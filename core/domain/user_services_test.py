@@ -456,6 +456,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+        self.admin_role = user_services.get_user_role_from_id(
+            self.admin_id)
+        self.admin = user_services.UserActionsInfo(
+            self.admin_id, self.admin_role)
+
     def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
@@ -470,7 +475,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test editor of published exploration has updated contribution time.
         rights_manager.release_ownership_of_exploration(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
 
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
@@ -508,7 +513,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that another user who commits to unpublished exploration does not
         # have updated first contribution time.
         rights_manager.assign_role_for_exploration(
-            self.admin_id, self.EXP_ID, self.editor_id, 'editor')
+            self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
                 'cmd': 'rename_state',
@@ -531,7 +536,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         rights_manager.assign_role_for_exploration(
-            self.admin_id, self.EXP_ID, self.editor_id, 'editor')
+            self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.publish_exploration_and_update_user_profiles(
             self.admin_id, self.EXP_ID)
 
@@ -575,7 +580,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test editor of published collection has updated
         # first contribution time.
         rights_manager.release_ownership_of_collection(
-            self.admin_id, self.COL_ID)
+            self.admin, self.COL_ID)
 
         collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
@@ -614,7 +619,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that another user who commits to unpublished collection does not
         # have updated first contribution time.
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COL_ID, self.editor_id, 'editor')
+            self.admin, self.COL_ID, self.editor_id, 'editor')
         collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
@@ -641,7 +646,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COL_ID, self.editor_id, 'editor')
+            self.admin, self.COL_ID, self.editor_id, 'editor')
         collection_services.publish_collection_and_update_user_profiles(
             self.admin_id, self.COL_ID)
 

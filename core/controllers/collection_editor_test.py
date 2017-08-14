@@ -17,6 +17,7 @@
 from core.domain import collection_services
 from core.domain import collection_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
@@ -38,6 +39,15 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
+        self.owner_role = user_services.get_user_role_from_id(
+            self.owner_id)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, self.owner_role)
+        self.admin_role = user_services.get_user_role_from_id(
+            self.admin_id)
+        self.admin = user_services.UserActionsInfo(
+            self.admin_id, self.admin_role)
+
         self.json_dict = {
             'version' : 1,
             'commit_message' : 'changed title',
@@ -53,10 +63,14 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
     def setUp(self):
         super(CollectionEditorTest, self).setUp()
+        user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
 
         collection_services.load_demo(self.COLLECTION_ID)
         rights_manager.release_ownership_of_collection(
-            feconf.SYSTEM_COMMITTER_ID, self.COLLECTION_ID)
+            user, self.COLLECTION_ID)
 
     def test_access_collection_editor_page(self):
         """Test access to editor pages for the sample collection."""
@@ -119,7 +133,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COLLECTION_ID, self.viewer_id,
+            self.admin, self.COLLECTION_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
 
@@ -149,7 +163,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COLLECTION_ID, self.editor_id,
+            self.admin, self.COLLECTION_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
 
@@ -178,7 +192,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         # Check that collection is published correctly.
         rights_manager.assign_role_for_collection(
-            self.owner_id, collection_id, self.editor_id,
+            self.owner, collection_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner_id, collection_id)
 

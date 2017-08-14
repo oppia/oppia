@@ -326,7 +326,7 @@ class ExplorationRightsHandler(EditorHandler):
                     'Sorry, we could not find the specified user.')
 
             rights_manager.assign_role_for_exploration(
-                self.user_id, exploration_id, new_member_id, new_member_role)
+                self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(
                 self.user_id, new_member_id, new_member_role, exploration_id,
                 exploration.title)
@@ -339,11 +339,11 @@ class ExplorationRightsHandler(EditorHandler):
                 raise self.InvalidInputException(e)
 
             rights_manager.release_ownership_of_exploration(
-                self.user_id, exploration_id)
+                self.user, exploration_id)
 
         elif viewable_if_private is not None:
             rights_manager.set_private_viewability_of_exploration(
-                self.user_id, exploration_id, viewable_if_private)
+                self.user, exploration_id, viewable_if_private)
 
         else:
             raise self.InvalidInputException(

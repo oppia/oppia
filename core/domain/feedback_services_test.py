@@ -972,6 +972,11 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
+        self.editor_role = user_services.get_user_role_from_id(
+            self.editor_id)
+        self.editor = user_services.UserActionsInfo(
+            self.editor_id, self.editor_role)
+
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
         self.can_send_emails_ctx = self.swap(
@@ -1041,7 +1046,7 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
 
     def test_correct_email_is_sent_for_multiple_recipients(self):
         rights_manager.assign_role_for_exploration(
-            self.editor_id, self.exploration.id, self.owner_id,
+            self.editor, self.exploration.id, self.owner_id,
             rights_manager.ROLE_OWNER)
 
         expected_editor_email_html_body = (

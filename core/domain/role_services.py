@@ -55,7 +55,7 @@ ACTION_SUGGEST_CHANGES_TO_EXPLORATION = 'SUGGEST_CHANGES_TO_EXPLORATION'
 ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY = 'UNPUBLISH_ANY_PUBLIC_ACTIVITY'
 
 
-# Users can be updated to the following list of role Ids via admin interface.
+# Users can be updated to the following list of role IDs via admin interface.
 UPDATABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
@@ -64,7 +64,7 @@ UPDATABLE_ROLES = [
     feconf.ROLE_ID_MODERATOR
 ]
 
-# Users can be viewed by following list of role Ids via admin interface.
+# Users can be viewed by following list of role IDs via admin interface.
 VIEWABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
@@ -72,7 +72,7 @@ VIEWABLE_ROLES = [
     feconf.ROLE_ID_MODERATOR,
 ]
 
-# The string corresponding to role Ids that should be visible to admin.
+# The string corresponding to role IDs that should be visible to admin.
 HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_ADMIN: 'admin',
     feconf.ROLE_ID_BANNED_USER: 'banned user',
@@ -210,7 +210,7 @@ def get_role_graph_data():
                         source: Role Id from which edge is going out.
                         target: Role Id to which edge is incoming.
                     }
-            nodes: dict(str:str). Mapping of role Id to its human readable
+            nodes: dict(str:str). Mapping of role ID to its human readable
                 format.
         }
     """

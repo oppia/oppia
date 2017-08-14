@@ -234,7 +234,7 @@ def get_exploration_metadata_dicts(exploration_ids, user):
         exploration_ids: list(str). A list of exploration ids for which
             exploration metadata dicts are to be returned.
         user: UserActionsInfo. Object having user_id, role and actions for
-            given user..
+            given user.
 
     Returns:
         list(dict). A list of metadata dicts corresponding to the given
@@ -271,7 +271,7 @@ def get_exploration_metadata_dicts(exploration_ids, user):
         for summary in filtered_exploration_summaries]
 
 
-def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user):
+def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
     """Gets a summary of explorations in human readable form from
     exploration ids.
 
@@ -285,8 +285,8 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user):
 
     Args:
         exploration_ids: list(str). List of exploration ids.
-        user: UserActionsInfo. Object having user_id, role and actions for
-            given user.
+        user: UserActionsInfo or None. Object having user_id, role and actions
+            for given user.
 
     Return:
         list(dict). A list of exploration summary dicts in human readable form.
@@ -320,7 +320,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user):
             continue
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if user.user_id is None:
+            if user is None:
                 continue
             if not rights_manager.check_can_edit_activity(
                     user, exploration_rights):
@@ -630,7 +630,7 @@ def get_featured_activity_summary_dicts(language_codes):
         activity_references)
 
     exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exploration_ids, user_services.UserActionsInfo())
+        exploration_ids)
     col_summary_dicts = get_displayable_collection_summary_dicts_matching_ids(
         collection_ids)
 

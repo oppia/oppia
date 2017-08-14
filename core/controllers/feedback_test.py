@@ -22,6 +22,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
@@ -514,6 +515,11 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
+        self.editor_role = user_services.get_user_role_from_id(
+            self.editor_id)
+        self.editor = user_services.UserActionsInfo(
+            self.editor_id, self.editor_role)
+
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
@@ -546,7 +552,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
         rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.editor_id, self.EXP_ID, self.owner_id,
+            self.editor, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)
 
         response = self.testapp.get('/explore/%s' % self.EXP_ID)
