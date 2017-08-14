@@ -220,7 +220,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 subscription_services.subscribe_to_collection(key, item['id'])
 
 
-class DashboardStatsOneOffJob(jobs.BaseMapReduceJobManager):
+class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for populating weekly dashboard stats for all registered
     users who have a non-None value of UserStatsModel.
     """
