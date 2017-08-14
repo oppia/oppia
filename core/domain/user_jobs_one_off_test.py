@@ -62,8 +62,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserContributionsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def setUp(self):
@@ -166,8 +165,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UsernameLengthDistributionOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
@@ -247,8 +245,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.LongUserBiosOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
         stringified_output = (
@@ -329,8 +326,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.DashboardSubscriptionsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def _null_fn(self, *args, **kwargs):
@@ -678,8 +674,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.DashboardStatsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def setUp(self):
@@ -1025,8 +1020,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserLastExplorationActivityOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def test_that_last_created_time_is_updated(self):

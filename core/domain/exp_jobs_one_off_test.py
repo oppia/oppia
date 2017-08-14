@@ -22,6 +22,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -571,7 +572,9 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
         job_id = (exp_jobs_one_off.IndexAllExplorationsJobManager.create_new())
         exp_jobs_one_off.IndexAllExplorationsJobManager.enqueue(job_id)
 
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         indexed_docs = []
 

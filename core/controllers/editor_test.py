@@ -31,6 +31,7 @@ from core.domain import stats_jobs_continuous_test
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -277,9 +278,13 @@ class EditorTest(BaseEditorControllerTest):
                 self.ALL_CC_MANAGERS_FOR_TESTS):
                 # Run job on exploration with answers
                 stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator.start_computation() # pylint: disable=line-too-long
-                self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
                 self.process_and_flush_pending_tasks()
-                self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)

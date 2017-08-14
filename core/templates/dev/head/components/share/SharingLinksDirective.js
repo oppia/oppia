@@ -78,6 +78,9 @@ oppia.directive('sharingLinks', [
 
           $scope.twitterUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/twitter.png');
+
+          $scope.classroomUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/classroom.png');
         }
       ]
     };
