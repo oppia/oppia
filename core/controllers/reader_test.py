@@ -223,7 +223,8 @@ class ExplorationHandlerTest(test_utils.GenericTestBase):
         expected_state_classifier_mapping = {
             'text': {
                 'algorithm_id': 'LDAStringClassifier',
-                'classifier_data': {}
+                'classifier_data': {},
+                'data_schema_version': 1
             },
             'final': None
         }

@@ -28,9 +28,7 @@
      it('should return correct structure of predicted values.', function() {
        var classifierData = {};
        var answer = '';
-       var expectedResult = {
-         answerGroupIndex: 0
-       };
+       var expectedResult = 1;
        var generatedResult = predictionService.predict(
          classifierData, answer);
 

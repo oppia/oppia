@@ -19,18 +19,39 @@
  oppia.factory('PredictionAlgorithmRegistryService', [
    'PredictionAlgorithmSampleService',
    function(PredictionAlgorithmSampleService) {
-     // This mapping needs to be updated whenever a new prediction service needs
-     // to be added for classification.
+    /**
+    * This mapping needs to be updated whenever a new prediction service needs
+    * to be added for classification. The mapping is from algorithmId to a
+    * list of objects. The mapping should be of the type:
+    * {
+    * algorithmId: [{
+    *   'predictionService': predictionService,
+    *   'dataSchemaVersion': dataSchemaVersion
+    * }]
+    * }
+    */
      var algorithmIdPredictionServiceMapping = {};
 
      return {
-       getPredictionService: function(algorithmId) {
+       getPredictionService: function(algorithmId, dataSchemaVersion) {
          if (algorithmIdPredictionServiceMapping.hasOwnProperty(algorithmId)) {
-           return algorithmIdPredictionServiceMapping[algorithmId];
+           for (var i = 0; i < algorithmIdPredictionServiceMapping[
+             algorithmId].length; i++) {
+             var predictionServiceDetails = algorithmIdPredictionServiceMapping[
+               algorithmId][i];
+             if (dataSchemaVersion === (
+                 predictionServiceDetails.dataSchemaVersion)) {
+               return predictionServiceDetails.predictionService;
+             } else {
+               return null;
+             }
+           }
          } else {
            return null;
          }
        },
+       // The below function is required for running tests with sample
+       // prediction services.
        setMapping: function(newAlgorithmIdPredictionServiceMapping) {
          algorithmIdPredictionServiceMapping = (
            newAlgorithmIdPredictionServiceMapping);

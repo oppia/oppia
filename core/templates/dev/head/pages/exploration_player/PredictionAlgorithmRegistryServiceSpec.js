@@ -28,11 +28,15 @@ describe('Prediction algorithm registry service', function() {
 
     it('should return correct prediction algorithm service.', function() {
       var algorithmId = 'LDAStringClassifier';
+      var dataSchemaVersion = 1;
       registryService.setMapping({
-        LDAStringClassifier: predictionService
+        LDAStringClassifier: [{
+          predictionService: predictionService,
+          dataSchemaVersion: dataSchemaVersion
+        }]
       });
       var generatedPredictionService = registryService.getPredictionService(
-        algorithmId);
+        algorithmId, dataSchemaVersion);
 
       expect(generatedPredictionService.toString()).toEqual(
         predictionService.toString());

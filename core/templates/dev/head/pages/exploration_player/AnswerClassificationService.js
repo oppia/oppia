@@ -27,13 +27,15 @@ oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
   '$http', '$q', 'LearnerParamsService', 'alertsService',
-  'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
-  'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
-  'DEFAULT_OUTCOME_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
+  'AnswerClassificationResult', 'PredictionAlgorithmRegistryService',
+  'StateClassifierMappingService', 'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS',
+  'EXPLICIT_CLASSIFICATION', 'DEFAULT_OUTCOME_CLASSIFICATION',
+  'TRAINING_DATA_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
   function($http, $q, LearnerParamsService, alertsService,
-      PredictionAlgorithmRegistryService, StateClassifierMappingService,
-      INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
-      DEFAULT_OUTCOME_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
+      AnswerClassificationResult, PredictionAlgorithmRegistryService,
+      StateClassifierMappingService, INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS,
+      EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
+      TRAINING_DATA_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -44,14 +46,7 @@ oppia.factory('AnswerClassificationService', [
      * @param {function} interactionRulesService The service which contains the
      *     explicit rules of that interaction.
      *
-     * @return {object} An object representing the answer group with the
-     *     following properties:
-     * <ul>
-     *   <li> **outcome**: the outcome of the answer group
-     *   <li> **answerGroupIndex**: the index of the matched answer group
-     *   <li> **ruleIndex**: the index of the rule in the matched answer
-     *     group.
-     * </ul>
+     * @return {object} An AnswerClassificationResult domain object.
      */
     var classifyAnswer = function(
         answer, answerGroups, defaultOutcome, interactionRulesService) {
@@ -63,12 +58,8 @@ oppia.factory('AnswerClassificationService', [
           if (rule.type !== RULE_TYPE_CLASSIFIER &&
               interactionRulesService[rule.type](
                 answer, rule.inputs)) {
-            return {
-              outcome: answerGroups[i].outcome,
-              answerGroupIndex: i,
-              ruleIndex: j,
-              classificationCategorization: EXPLICIT_CLASSIFICATION
-            };
+            return AnswerClassificationResult.createNew(
+              answerGroups[i].outcome, i, j, EXPLICIT_CLASSIFICATION);
           }
         }
       }
@@ -76,14 +67,20 @@ oppia.factory('AnswerClassificationService', [
       // If no rule in any answer group returns true, the default 'group' is
       // returned. Throws an error if the default outcome is not defined.
       if (defaultOutcome) {
-        return {
-          outcome: defaultOutcome,
-          answerGroupIndex: answerGroups.length,
-          ruleIndex: 0,
-          classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
-        };
+        return AnswerClassificationResult.createNew(
+          defaultOutcome, answerGroups.length, 0, DEFAULT_OUTCOME_CLASSIFICATION
+        );
       } else {
         alertsService.addWarning('Something went wrong with the exploration.');
+      }
+    };
+
+    var findRuleIndex = function(answerGroup, answerGroupIndex) {
+      for (var i = 0; i < answerGroup.rules.length; i++) {
+        var rule = answerGroup.rules[i];
+        if (rule.type == RULE_TYPE_CLASSIFIER) {
+          return i;
+        }
       }
     };
 
@@ -100,14 +97,8 @@ oppia.factory('AnswerClassificationService', [
        * @param {function} interactionRulesService - The service which contains
        *   the explicit rules of that interaction.
        *
-       * @return {promise} A promise for an object representing the answer group
-       *     with the following properties:
-       * <ul>
-       *   <li> **outcome**: the outcome of the answer group
-       *   <li> **answerGroupIndex**: the index of the matched answer group
-       *   <li> **ruleIndex**: the index of the rule in the matched answer
-       *            group
-       * </ul>
+       * @return {promise} A promise for an AnswerClassificationResult domain
+       *   object.
        */
       getMatchingClassificationResult: function(
           explorationId, stateName, oldState, answer, isInEditorMode,
@@ -130,29 +121,36 @@ oppia.factory('AnswerClassificationService', [
         var ruleBasedOutcomeIsDefault = (result.outcome === defaultOutcome);
         var interactionIsTrainable = INTERACTION_SPECS[
           oldState.interaction.id].is_interaction_trainable;
+
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
           var classifierData = StateClassifierMappingService.getClassifierData(
             stateName);
           var algorithmId = StateClassifierMappingService.getAlgorithmId(
             stateName);
-          if (classifierData && algorithmId) {
+          var dataSchemaVersion = (
+            StateClassifierMappingService.getDataSchemaVersion(stateName));
+          if (classifierData && algorithmId && dataSchemaVersion) {
             var predictionService = (
               PredictionAlgorithmRegistryService.getPredictionService(
-                algorithmId));
+                algorithmId, dataSchemaVersion));
             var predictedAnswerGroupIndex;
+            // If prediction service exists, we run classifier. We return the
+            // default outcome otherwise.
             if (predictionService) {
               predictedAnswerGroupIndex = predictionService.predict(
-                classifierData, answer).answerGroupIndex;
+                classifierData, answer);
+              var classificationResult = AnswerClassificationResult.createNew(
+                answerGroups[predictedAnswerGroupIndex].outcome,
+                predictedAnswerGroupIndex,
+                findRuleIndex(answerGroups[predictedAnswerGroupIndex],
+                              predictedAnswerGroupIndex),
+                TRAINING_DATA_CLASSIFICATION
+              );
             } else {
-              predictedAnswerGroupIndex = result.answerGroupIndex;
+              var classificationResult = result;
             }
-            deferred.resolve({
-              outcome: result.outcome,
-              ruleIndex: result.ruleIndex,
-              answerGroupIndex: predictedAnswerGroupIndex,
-              classificationCategorization: result.classificationCategorization
-            });
+            deferred.resolve(classificationResult);
           } else {
             deferred.resolve(result);
           }

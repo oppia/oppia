@@ -38,6 +38,14 @@
        } else {
          return null;
        }
+     },
+
+     getDataSchemaVersion: function(stateName) {
+       if (stateClassifierMapping.hasOwnProperty(stateName)) {
+         return stateClassifierMapping[stateName].data_schema_version;
+       } else {
+         return null;
+       }
      }
    };
  }]);

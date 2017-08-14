@@ -19,9 +19,7 @@
  oppia.factory('PredictionAlgorithmSampleService', [function() {
    return {
      predict: function(classifierData, answer) {
-       return {
-         answerGroupIndex: 0
-       };
+       return 1;
      }
    };
  }]);

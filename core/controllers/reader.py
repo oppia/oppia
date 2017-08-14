@@ -226,9 +226,12 @@ class ExplorationHandler(base.BaseHandler):
                 classifier_data = classifier_training_jobs[
                     index].classifier_data
                 algorithm_id = classifier_training_jobs[index].algorithm_id
+                data_schema_version = (
+                    classifier_training_jobs[index].data_schema_version)
                 state_classifier_mapping[state_name] = {
                     'algorithm_id': algorithm_id,
-                    'classifier_data': classifier_data
+                    'classifier_data': classifier_data,
+                    'data_schema_version': data_schema_version
                 }
 
         self.values.update({
