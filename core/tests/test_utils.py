@@ -643,7 +643,9 @@ class AppEngineTestBase(TestBase):
         return len(self.get_pending_tasks(queue_name))
 
     def get_pending_tasks(self, queue_name):
-        """Returns the jobs in the given queue."""
+        """Returns the jobs in the given queue. If queue_name is None, defaults
+        to returning the jobs in all available queues.
+        """
         if queue_name is not None:
             return self.taskqueue_stub.get_filtered_tasks(
                 queue_names=[queue_name])

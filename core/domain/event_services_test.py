@@ -62,8 +62,9 @@ class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
 
         event_services.CompleteExplorationEventHandler.record(
             'eid1', 1, 'sid1', 'session1', 100, {}, feconf.PLAY_TYPE_NORMAL)
-        self.assertEqual(self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_EVENTS), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EVENTS),
+            1)
 
         self.process_and_flush_pending_tasks()
 
