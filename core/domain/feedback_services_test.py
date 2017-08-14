@@ -265,13 +265,11 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
          start_computation())
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-            1)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-            0)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         self.process_and_flush_pending_tasks()
 
     def test_get_threads_single_exploration(self):
@@ -467,9 +465,11 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
     def test_create_new_batch_task(self):
         user_id = 'user'
         feedback_services.enqueue_feedback_message_batch_email_task(user_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
+            1)
 
-        tasks = self.get_pending_tasks()
+        tasks = self.get_pending_tasks(taskqueue_services.QUEUE_NAME_EMAILS)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
 
@@ -486,9 +486,11 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
 
         feedback_services.enqueue_feedback_message_instant_email_task(
             user_id, reference)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
+            1)
 
-        tasks = self.get_pending_tasks()
+        tasks = self.get_pending_tasks(taskqueue_services.QUEUE_NAME_EMAILS)
         payload = json.loads(tasks[0].payload)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
@@ -533,7 +535,12 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             }
             # There are two jobs in the taskqueue: one for the realtime event
             # associated with creating a thread, and one for sending the email.
-            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
             model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
 
             self.assertEqual(len(model.feedback_message_references), 1)
@@ -556,7 +563,12 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 'editor message')
             # There are two jobs in the taskqueue: one for the realtime event
             # associated with creating a thread, and one for sending the email.
-            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
 
             messagelist = feedback_services.get_messages(
                 self.exploration.id, thread_id)
@@ -595,7 +607,9 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -612,7 +626,9 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -625,7 +641,9 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -638,9 +656,14 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
             # There are two jobs in the taskqueue: one for the realtime event
             # associated with creating a thread, and one for sending the email.
-            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
 
-            tasks = self.get_pending_tasks()
+            tasks = self.get_pending_tasks(taskqueue_services.QUEUE_NAME_EMAILS)
             self.assertEqual(
                 tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
             self.process_and_flush_pending_tasks()
@@ -660,7 +683,9 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -673,7 +698,9 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -686,7 +713,9 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -698,7 +727,12 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 'a subject', 'A message')
             # There are two jobs in the taskqueue: one for the realtime event
             # associated with creating a thread, and one for sending the email.
-            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
@@ -708,7 +742,12 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             feedback_services.create_message(
                 self.exploration.id, thread_id, self.editor_id, None, None,
                 'editor message')
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_changing_status_of_thread(self):
@@ -718,7 +757,12 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 'a subject', 'A message')
             # There are two jobs in the taskqueue: one for the realtime event
             # associated with creating a thread, and one for sending the email.
-            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
@@ -731,7 +775,12 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             # There are two jobs in the taskqueue: one for the realtime event
             # associated with changing subject of thread, and one for sending
             # the email.
-            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_each_feedback_message(self):
@@ -744,19 +793,34 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             thread_id = threadlist[0].get_thread_id()
             # There are two jobs in the taskqueue: one for the realtime event
             # associated with creating a thread, and one for sending the email.
-            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
 
             feedback_services.create_message(
                 self.exploration.id, thread_id, self.editor_id, None, None,
                 'editor message')
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.process_and_flush_pending_tasks()
 
             feedback_services.create_message(
                 self.exploration.id, thread_id, self.editor_id, None, None,
                 'editor message2')
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EMAILS), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.process_and_flush_pending_tasks()
 
     def test_that_reply_to_id_is_created(self):

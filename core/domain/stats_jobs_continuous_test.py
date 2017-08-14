@@ -124,8 +124,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             state_hit_counts = (
@@ -171,8 +170,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -202,8 +200,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -230,8 +227,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -257,8 +253,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -304,8 +299,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -333,8 +327,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             results = ModifiedStatisticsAggregator.get_statistics(
                 exp_id_1, stats_jobs_continuous.VERSION_ALL)
@@ -466,13 +459,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                0)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'AnswerFrequencies'
 
@@ -555,13 +546,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                0)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'AnswerFrequencies'
 
@@ -618,13 +607,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                0)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Extract the output from the job.
             calc_output_first_domain_object = (
@@ -770,13 +757,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                0)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
 
@@ -869,13 +854,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                0)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Retrieve outputs for all of the computations running on this
             # interaction.

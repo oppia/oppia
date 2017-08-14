@@ -81,9 +81,13 @@ class LibraryPageTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         job_id = (exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
-        self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertGreaterEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         # change title and category
         exp_services.update_exploration(

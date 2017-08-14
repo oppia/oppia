@@ -91,7 +91,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                taskqueue_services.QUEUE_NAME_DEFAULT), 1)
 
         self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_QUEUED)
@@ -108,14 +108,18 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job_id = JobWithNoRunMethodManager.create_new()
         JobWithNoRunMethodManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         with self.assertRaisesRegexp(Exception, 'NotImplementedError'):
             self.process_and_flush_pending_tasks()
 
     def test_complete_job(self):
         job_id = DummyJobManager.create_new()
         DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
@@ -151,7 +155,9 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             job_id_2, taskqueue_services.QUEUE_NAME_DEFAULT,
             additional_job_params={'random': 20, 'correct': 25})
 
-        self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            2)
         self.process_and_flush_pending_tasks()
 
         self.assertTrue(DummyJobManagerWithParams.has_finished(job_id_1))
@@ -163,7 +169,9 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job_id = DummyFailingJobManager.create_new()
         DummyFailingJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         with self.assertRaisesRegexp(Exception, 'Task failed'):
             self.process_and_flush_pending_tasks()
 
@@ -497,7 +505,9 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         TestAdditionJobManager.enqueue(
             TestAdditionJobManager.create_new(),
             taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self._get_stored_total(), 6)
 
@@ -506,7 +516,9 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         TestAdditionJobManager.enqueue(
             TestAdditionJobManager.create_new(),
             taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self._get_stored_total(), 9)
 
@@ -521,7 +533,9 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
             TestAdditionJobManager.create_new(),
             taskqueue_services.QUEUE_NAME_DEFAULT)
 
-        self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            2)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self._get_stored_total(), 9)
 
@@ -531,7 +545,9 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         FailingAdditionJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         with self.assertRaisesRegexp(
             taskqueue_services.PermanentTaskFailure, 'Oops, I failed'
             ):
@@ -580,7 +596,7 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                taskqueue_services.QUEUE_NAME_DEFAULT), 1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
@@ -686,7 +702,9 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         job_id = TwoClassesMapReduceJobManager.create_new()
         TwoClassesMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
@@ -831,12 +849,16 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 {}, feconf.PLAY_TYPE_NORMAL)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_DEFAULT), 1)
 
             # When the task queue is flushed, the data is recorded in the two
             # realtime layers.
             self.process_and_flush_pending_tasks()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_DEFAULT), 0)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             self.assertEqual(StartExplorationRealtimeModel.get(
@@ -858,7 +880,9 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertIsNone(StartExplorationRealtimeModel.get(
                 '1:%s' % self.EXP_ID, strict=False))
 
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_DEFAULT), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 stats_models.ExplorationAnnotationsModel.get(

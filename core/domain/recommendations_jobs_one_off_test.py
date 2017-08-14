@@ -54,8 +54,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recommendations = (
@@ -77,8 +76,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recommendations = (
@@ -92,8 +90,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
             self.process_and_flush_pending_tasks()
             recommendations = (
                 recommendations_services.get_exploration_recommendations(

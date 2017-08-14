@@ -66,7 +66,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
         ModifiedFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def _run_job_and_check_results(self, exp_id,
@@ -211,8 +211,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedFeedbackAnalyticsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             # Do a multi call for all explorations and check for stats.
             feedback_analytics_multi = (
@@ -279,7 +278,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Stop job.
             ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Close thread.
             thread = (feedback_models.FeedbackThreadModel.
@@ -313,7 +314,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Stop job.
             ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Close thread.
             thread = (feedback_models.FeedbackThreadModel.
@@ -329,7 +332,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Stop job.
             ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Reopen thread.
             thread = (feedback_models.FeedbackThreadModel.
@@ -363,7 +368,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Stop job.
             ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Close thread.
             thread = (feedback_models.FeedbackThreadModel.
@@ -379,7 +386,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Stop job.
             ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Change thread status.
             thread = (feedback_models.FeedbackThreadModel.
@@ -599,13 +608,14 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             ModifiedFeedbackAnalyticsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             # Stop job.
             ModifiedFeedbackAnalyticsAggregator.stop_computation(user_id)
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             self._flush_tasks_and_check_analytics(exp_id, {
                 'num_open_threads': 1,
