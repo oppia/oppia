@@ -89,23 +89,14 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         """Test the enqueueing of a job."""
         job_id = DummyJobManager.create_new()
         DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
 
         self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_QUEUED)
         self.assertIsNotNone(DummyJobManager.get_time_queued_msec(job_id))
         self.assertIsNone(DummyJobManager.get_output(job_id))
-
-    def test_enqueue_job_to_specific_queue(self):
-        """Test the enqueueing of a job to a particular queue."""
-        job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_EVENTS)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 0)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 1)
 
     def test_failure_for_job_enqueued_using_wrong_manager(self):
         job_id = DummyJobManager.create_new()
@@ -587,7 +578,9 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
@@ -595,13 +588,6 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
-
-    def test_enqueue_job_to_specific_queue(self):
-        job_id = SampleMapReduceJobManager.create_new()
-        SampleMapReduceJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_EVENTS)
-        self.assertEqual(self.count_jobs_in_taskqueue(queue_name='events'), 1)
-        self.process_and_flush_pending_tasks()
 
 
 class JobRegistryTests(test_utils.GenericTestBase):
