@@ -190,15 +190,18 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         collection_services.update_collection(
             self.owner_id, self.COL_ID_0,
             [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'skill0'
+            }, {
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXP_ID_0,
-                'property_name': 'acquired_skills',
-                'new_value': ['0_exp_skill']
+                'property_name': 'acquired_skill_ids',
+                'new_value': ['skill0']
             }, {
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXP_ID_2,
-                'property_name': 'prerequisite_skills',
-                'new_value': ['0_exp_skill']
+                'property_name': 'prerequisite_skill_ids',
+                'new_value': ['skill0']
             }],
             'Updated exp 2 to require exp 0 before being playable')
 
@@ -913,50 +916,131 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
                     'new_value': ['duplicate', 'duplicate']
                 }], 'Add a new tag')
 
-    def test_update_collection_node_prerequisite_skills(self):
-        # Verify initial prerequisite skills are empty.
+    def test_add_collection_skill(self):
+        # Verify skills table is initially empty.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.skills, {})
+
+        # Add a skill.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+
+        # Verify that the skill is added.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.skills.keys(), ['skill0'])
+
+    def test_adding_duplicate_collection_skill_raises_error(self):
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+
+        # Verify that error will be thrown when duplicate skill is added.
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Skill with name "test" already exists.'):
+            collection_services.update_collection(
+                self.owner_id, self.COLLECTION_ID, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                    'name': 'test'
+                }], 'Add a new skill, again')
+
+    def test_delete_collection_skill(self):
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+
+        # Delete a skill.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_DELETE_COLLECTION_SKILL,
+                'skill_id': 'skill0'
+            }], 'Delete skill')
+
+        # Verify that the skill is deleted.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.skills.keys(), [])
+
+
+    def test_update_collection_node_prerequisite_skill_ids(self):
+        # Verify initial prerequisite skill ids are empty.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         collection_node = collection.get_node(self.EXPLORATION_ID)
-        self.assertEqual(collection_node.prerequisite_skills, [])
+        self.assertEqual(collection_node.prerequisite_skill_ids, [])
+
+        # Add skills
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'new skill 1'
+            }], 'Add a new skill')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'new skill 2'
+            }], 'Add a new skill')
 
         # Update the prerequisite skills.
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXPLORATION_ID,
-                'property_name': 'prerequisite_skills',
-                'new_value': ['first', 'second']
-            }], 'Changed the prerequisite skills of a collection node')
+                'property_name': 'prerequisite_skill_ids',
+                'new_value': ['skill0', 'skill1']
+            }], 'Changed the prerequisite skill ids of a collection node')
 
         # Verify the prerequisites are different.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(
-            collection_node.prerequisite_skills, ['first', 'second'])
+            collection_node.prerequisite_skill_ids, ['skill0', 'skill1'])
 
-    def test_update_collection_node_acquired_skills(self):
-        # Verify initial acquired skills are empty.
+    def test_update_collection_node_acquired_skill_ids(self):
+        # Verify initial acquired skill ids are empty.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         collection_node = collection.get_node(self.EXPLORATION_ID)
-        self.assertEqual(collection_node.acquired_skills, [])
+        self.assertEqual(collection_node.acquired_skill_ids, [])
 
-        # Update the acquired skills.
+        # Add skills
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'new skill 1'
+            }], 'Add a new skill')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'new skill 2'
+            }], 'Add a new skill')
+
+        # Update the acquired skill ids.
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXPLORATION_ID,
-                'property_name': 'acquired_skills',
-                'new_value': ['third', 'fourth']
-            }], 'Changed the acquired skills of a collection node')
+                'property_name': 'acquired_skill_ids',
+                'new_value': ['skill0', 'skill1']
+            }], 'Changed the acquired skill ids of a collection node')
 
         # Verify the acquired are different.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         collection_node = collection.get_node(self.EXPLORATION_ID)
-        self.assertEqual(collection_node.acquired_skills, ['third', 'fourth'])
+        self.assertEqual(
+            collection_node.acquired_skill_ids, ['skill0', 'skill1'])
+
 
 def _get_node_change_list(exploration_id, property_name, new_value):
     """Generates a change list for a single collection node change."""
@@ -1009,10 +1093,9 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                self.EXP_ID,
-                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                ['Skill']), 'A message')
+            self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                collection_domain.COLLECTION_PROPERTY_TITLE,
+                'New Title'), 'A message')
 
         self.assertEqual(
             collection_services.get_collection_snapshots_metadata(
@@ -1029,31 +1112,27 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
             'received none.'
             ):
             collection_services.update_collection(
-                self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                    self.EXP_ID,
-                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                    ['Skill']), '')
+                self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                    collection_domain.COLLECTION_PROPERTY_TITLE,
+                    'New Title'), '')
 
     def test_unpublished_collections_can_accept_commit_message(self):
         """Test unpublished collections can accept optional commit messages."""
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                self.EXP_ID,
-                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                ['Skill']), 'A message')
+            self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                collection_domain.COLLECTION_PROPERTY_TITLE,
+                'New Title'), 'A message')
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                self.EXP_ID,
-                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                ['Skill']), '')
+            self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                collection_domain.COLLECTION_PROPERTY_TITLE,
+                'New Title'), '')
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                self.EXP_ID,
-                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                ['Skill']), None)
+            self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                collection_domain.COLLECTION_PROPERTY_TITLE,
+                'New Title'), None)
 
 
 class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
@@ -1584,43 +1663,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-    def test_update_publicized_collection_status_in_search(self):
-
-        def mock_get_doc(doc_id, index):
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            self.assertEqual(doc_id, self.COLLECTION_ID)
-            return {}
-
-        def mock_add_docs(docs, index):
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            self.assertEqual(docs, [{'is': 'featured'}])
-
-        def mock_get_rights(unused_collection_id):
-            return rights_manager.ActivityRights(
-                self.COLLECTION_ID,
-                [self.owner_id], [self.editor_id], [self.viewer_id],
-                status=rights_manager.ACTIVITY_STATUS_PUBLICIZED
-            )
-
-        get_doc_counter = test_utils.CallCounter(mock_get_doc)
-        add_docs_counter = test_utils.CallCounter(mock_add_docs)
-
-        get_doc_swap = self.swap(
-            search_services, 'get_document_from_index', get_doc_counter)
-        add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter)
-        get_rights_swap = self.swap(
-            rights_manager, 'get_collection_rights', mock_get_rights)
-
-        with get_doc_swap, add_docs_swap, get_rights_swap:
-            collection_services.update_collection_status_in_search(
-                self.COLLECTION_ID)
-
-        self.assertEqual(get_doc_counter.times_called, 1)
-        self.assertEqual(add_docs_counter.times_called, 1)
-
     def test_update_private_collection_status_in_search(self):
 
         def mock_delete_docs(ids, index):
@@ -1680,22 +1722,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
-
-    def test_get_search_rank(self):
-        self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
-
-        base_search_rank = 20
-
-        self.assertEqual(
-            collection_services._get_search_rank(self.COLLECTION_ID),
-            base_search_rank)
-
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        rights_manager.publicize_collection(
-            self.user_id_admin, self.COLLECTION_ID)
-        self.assertEqual(
-            collection_services._get_search_rank(self.COLLECTION_ID),
-            base_search_rank + 30)
 
 
 class CollectionSummaryTests(CollectionServicesUnitTests):

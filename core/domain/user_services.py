@@ -63,6 +63,7 @@ class UserSettings(object):
             last edited an exploration.
         profile_picture_data_url: str or None. User uploaded profile picture as
             a dataURI string.
+        default_dashboard: str or None. The default dashboard of the user.
         user_bio: str. User-specified biography.
         subject_interests: list(str) or None. Subject interests specified by
             the user.
@@ -77,8 +78,9 @@ class UserSettings(object):
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
             last_logged_in=None, last_created_an_exploration=None,
             last_edited_an_exploration=None, profile_picture_data_url=None,
-            user_bio='', subject_interests=None, first_contribution_msec=None,
-            preferred_language_codes=None, preferred_site_language_code=None
+            default_dashboard=None, user_bio='', subject_interests=None,
+            first_contribution_msec=None, preferred_language_codes=None,
+            preferred_site_language_code=None
     ):
         """Constructs a UserSettings domain object.
 
@@ -121,6 +123,7 @@ class UserSettings(object):
         self.last_edited_an_exploration = last_edited_an_exploration
         self.last_created_an_exploration = last_created_an_exploration
         self.profile_picture_data_url = profile_picture_data_url
+        self.default_dashboard = default_dashboard
         self.user_bio = user_bio
         self.subject_interests = (
             subject_interests if subject_interests else [])
@@ -372,6 +375,7 @@ def get_users_settings(user_ids):
                 last_created_an_exploration=(
                     model.last_created_an_exploration),
                 profile_picture_data_url=model.profile_picture_data_url,
+                default_dashboard=model.default_dashboard,
                 user_bio=model.user_bio,
                 subject_interests=model.subject_interests,
                 first_contribution_msec=model.first_contribution_msec,
@@ -538,6 +542,7 @@ def _save_user_settings(user_settings):
         last_created_an_exploration=(
             user_settings.last_created_an_exploration),
         profile_picture_data_url=user_settings.profile_picture_data_url,
+        default_dashboard=user_settings.default_dashboard,
         user_bio=user_settings.user_bio,
         subject_interests=user_settings.subject_interests,
         first_contribution_msec=user_settings.first_contribution_msec,
@@ -703,6 +708,18 @@ def update_user_bio(user_id, user_bio):
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
+    _save_user_settings(user_settings)
+
+
+def update_user_default_dashboard(user_id, default_dashboard):
+    """Updates the default dashboard of user with given user id.
+
+    Args:
+        user_id: str. The user id.
+        default_dashboard: str. The dashboard the user wants.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.default_dashboard = default_dashboard
     _save_user_settings(user_settings)
 
 

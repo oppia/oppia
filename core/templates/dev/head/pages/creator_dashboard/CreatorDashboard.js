@@ -178,6 +178,10 @@ oppia.controller('CreatorDashboard', [
       return value;
     };
 
+    $scope.getCompleteThumbnailIconUrl = function (iconUrl) {
+      return UrlInterpolationService.getStaticImageUrl(iconUrl);
+    };
+
     $rootScope.loadingMessage = 'Loading';
     CreatorDashboardBackendApiService.fetchDashboardData().then(
       function(response) {

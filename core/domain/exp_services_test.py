@@ -580,7 +580,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -602,7 +602,7 @@ states:
   New state:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -647,7 +647,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -669,7 +669,7 @@ states:
   Renamed state:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -783,7 +783,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     contents."""
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -808,7 +808,7 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'New state': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -834,7 +834,7 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -1396,7 +1396,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<b>Test content</b>',
-                    'audio_translations': [],
+                    'audio_translations': {},
                 }),
             '')
 
@@ -2062,39 +2062,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-    def test_update_publicized_exploration_status_in_search(self):
-
-        def mock_get_doc(doc_id, index):
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(doc_id, self.EXP_ID)
-            return {}
-
-        def mock_add_docs(docs, index):
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(docs, [{'is': 'featured'}])
-
-        def mock_get_rights(unused_exp_id):
-            return rights_manager.ActivityRights(
-                self.EXP_ID,
-                [self.owner_id], [self.editor_id], [self.viewer_id],
-                status=rights_manager.ACTIVITY_STATUS_PUBLICIZED)
-
-        get_doc_counter = test_utils.CallCounter(mock_get_doc)
-        add_docs_counter = test_utils.CallCounter(mock_add_docs)
-
-        get_doc_swap = self.swap(
-            search_services, 'get_document_from_index', get_doc_counter)
-        add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter)
-        get_rights_swap = self.swap(
-            rights_manager, 'get_exploration_rights', mock_get_rights)
-
-        with get_doc_swap, add_docs_swap, get_rights_swap:
-            exp_services.update_exploration_status_in_search(self.EXP_ID)
-
-        self.assertEqual(get_doc_counter.times_called, 1)
-        self.assertEqual(add_docs_counter.times_called, 1)
-
     def test_update_private_exploration_status_in_search(self):
 
         def mock_delete_docs(ids, index):
@@ -2227,19 +2194,18 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             exp_services.get_search_rank(self.EXP_ID), base_search_rank)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
         self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 30)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_ID, 5)
         self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 40)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 10)
 
         rating_services.assign_rating_to_exploration(
             self.user_id_admin, self.EXP_ID, 2)
         self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 38)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 8)
 
     def test_search_ranks_cannot_be_negative(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -2553,7 +2519,7 @@ states:
   END:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: Congratulations, you have finished!
     interaction:
       answer_groups: []
@@ -2570,7 +2536,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -2798,6 +2764,7 @@ title: Old Title
         # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
+
 class SuggestionActionUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion action functions in exp_services."""
     THREAD_ID1 = '1111'
@@ -2835,14 +2802,18 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
         self.signup(self.USER_EMAIL, self.USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID1, self.editor_id)
+        self.save_new_valid_exploration(self.EXP_ID2, self.editor_id)
+        self.initial_state_name = exploration.init_state_name
         with self.swap(feedback_models.FeedbackThreadModel,
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
-                self.EXP_ID1, self.user_id, 3, 'state_name', 'description',
-                {'type': 'text', 'value': ''})
+                self.EXP_ID1, self.user_id, 3, self.initial_state_name,
+                'description', 'new text')
             feedback_services.create_suggestion(
-                self.EXP_ID2, self.user_id, 3, 'state_name', 'description',
-                {'type': 'text', 'value': ''})
+                self.EXP_ID2, self.user_id, 3, self.initial_state_name,
+                'description', 'new text')
 
     def test_accept_suggestion_valid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid',
@@ -2851,7 +2822,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                            self._check_commit_message):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID1,
-                    self.COMMIT_MESSAGE)
+                    self.COMMIT_MESSAGE, False)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID1, self.THREAD_ID1))
@@ -2871,7 +2842,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                 ):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2,
-                    self.COMMIT_MESSAGE)
+                    self.COMMIT_MESSAGE, False)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID2, self.THREAD_ID1))
@@ -2882,20 +2853,20 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                                      'Commit message cannot be empty.'):
             exp_services.accept_suggestion(
                 self.editor_id, self.THREAD_ID1, self.EXP_ID2,
-                self.EMPTY_COMMIT_MESSAGE)
+                self.EMPTY_COMMIT_MESSAGE, False)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID2, self.THREAD_ID1))
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
-    def test_accept_suggestion_actioned_suggestion(self):
+    def test_accept_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
         with self.swap(exp_services, '_is_suggestion_handled',
                        self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2,
-                    self.COMMIT_MESSAGE)
+                    self.COMMIT_MESSAGE, False)
 
     def test_reject_suggestion(self):
         exp_services.reject_suggestion(
@@ -2906,7 +2877,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.status,
                          feedback_models.STATUS_CHOICES_IGNORED)
 
-    def test_reject_actioned_suggestion(self):
+    def test_reject_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
         with self.swap(exp_services, '_is_suggestion_handled',
                        self._return_true):

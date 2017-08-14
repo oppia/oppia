@@ -39,6 +39,7 @@ LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+_LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
 
 _PARSER = argparse.ArgumentParser()
@@ -54,6 +55,10 @@ _PARSER.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
     type=str)
+_PARSER.add_argument(
+    '--exclude_load_tests',
+    help='optional; if specified, exclude load tests from being run',
+    action='store_true')
 _PARSER.add_argument(
     '-v',
     '--verbose',
@@ -198,7 +203,7 @@ def _execute_tasks(tasks, batch_size=24):
         log('----------------------------------------')
 
 
-def _get_all_test_targets(test_path=None):
+def _get_all_test_targets(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -215,6 +220,12 @@ def _get_all_test_targets(test_path=None):
             result.append(_convert_to_test_target(
                 os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
+            if _LOAD_TESTS_DIR in subroot and include_load_tests:
+                for f in files:
+                    if f.endswith('_test.py'):
+                        result.append(_convert_to_test_target(
+                            os.path.join(subroot, f)))
+
             for f in files:
                 if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
@@ -238,8 +249,10 @@ def main():
     if parsed_args.test_target:
         all_test_targets = [parsed_args.test_target]
     else:
+        include_load_tests = not parsed_args.exclude_load_tests
         all_test_targets = _get_all_test_targets(
-            test_path=parsed_args.test_path)
+            test_path=parsed_args.test_path,
+            include_load_tests=include_load_tests)
 
     # Prepare tasks.
     task_to_taskspec = {}

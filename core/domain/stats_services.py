@@ -31,6 +31,21 @@ from core.platform import models
 def get_visualizations_info(exploration_id, state_name):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        state_name: str. Name of the state.
+
+    Returns:
+        list(dict). Each item in the list is a dict with keys representing
+        - 'id': str. The visualization ID.
+        - 'data': list(dict). A list of calculation IDs.
+        - 'options': dict. The visualization options.
+
+        An example of the returned value may be:
+        [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
+        'id': 'BarChart',
+        'data': [{u'frequency': 1, u'answer': 0}]}]
     """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     if exploration.states[state_name].interaction.id is None:
@@ -57,7 +72,6 @@ def get_visualizations_info(exploration_id, state_name):
 
         calculation_ids_to_outputs[calculation_id] = (
             calc_output_domain_object.calculation_output)
-
     return [{
         'id': visualization.id,
         'data': calculation_ids_to_outputs[visualization.calculation_id],
@@ -68,7 +82,24 @@ def get_visualizations_info(exploration_id, state_name):
 
 # TODO(bhenning): Test
 def get_versions_for_exploration_stats(exploration_id):
-    """Returns list of versions for this exploration."""
+    """Returns a list of strings, each string representing a version of the
+    given exploration_id for which statistics data exists. These versions are
+    retrieved from ExplorationAnnotationsModel created when StatisticsAggregator
+    job is run.
+
+    An example of the return list may look like [u'3', u'all']
+    where '3' and 'all' are versions of the given exploration ID from
+    ExplorationAnnotationsModel.
+
+    Args:
+        exploration_id: str. The exploration ID.
+
+    Returns:
+        list(str). The versions of the given exploration for which statistics
+        data exists. These may either be 'all' (which indicates that the
+        statistics have been aggregated over all versions), or specific
+        (stringified) version numbers.
+    """
     return stats_models.ExplorationAnnotationsModel.get_versions(
         exploration_id)
 
@@ -77,7 +108,33 @@ def get_versions_for_exploration_stats(exploration_id):
 def get_exploration_stats(exploration_id, exploration_version):
     """Returns a dict with state statistics for the given exploration id.
 
-    Note that exploration_version should be a string.
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: str. The version of the exploration from
+            ExplorationAnnotationsModel. It can be 'all' or version number as
+            string like '3'.
+
+    Returns:
+        dict. A dict with state statistics for the given exploration ID.
+        The keys and values of the dict are as follows:
+        - 'last_updated': float. Last updated timestamp of the exploration.
+        - 'num_starts': int. The number of "start exploration" events recorded.
+        - 'num_completions': int. The number of "complete exploration" events
+            recorded.
+        - 'state_stats': dict(dict). Contains state stats of states
+            contained in the given exploration ID. The keys of the dict are the
+            names of the states and its values are dict containing the
+            statistics data of the respective state in the key.
+            The keys and values of the dict are as follows:
+            - state_name: dict. The statistics data of the state.
+                The keys and values of the statistics data dict are as follows:
+                - "first_entry_count": int. The number of sessions which hit
+                    the state.
+                - "name": str. The name of the state.
+                - "total_entry_count": int. The total number of hits for the
+                    state.
+                - "no_submitted_answer_count": int. The number of hits with
+                    no answer for this state.
     """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     exp_stats = stats_jobs_continuous.StatisticsAggregator.get_statistics(
@@ -85,7 +142,6 @@ def get_exploration_stats(exploration_id, exploration_version):
 
     last_updated = exp_stats['last_updated']
     state_hit_counts = exp_stats['state_hit_counts']
-
     return {
         'last_updated': last_updated,
         'num_completions': exp_stats['complete_exploration_count'],
@@ -111,6 +167,13 @@ def record_answer(
         exploration_id, exploration_version, state_name, interaction_id,
         submitted_answer):
     """Record an answer by storing it to the corresponding StateAnswers entity.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration.
+        state_name: str. The name of the state.
+        interaction_id: str. The ID of the interaction.
+        submitted_answer: SubmittedAnswer. The submitted answer.
     """
     record_answers(
         exploration_id, exploration_version, state_name, interaction_id,
@@ -122,6 +185,14 @@ def record_answers(
         submitted_answer_list):
     """Optimally record a group of answers using an already loaded exploration..
     The submitted_answer_list is a list of SubmittedAnswer domain objects.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration.
+        state_name: str. The name of the state.
+        interaction_id: str. The ID of the interaction.
+        submitted_answer_list: list(SubmittedAnswer). The list of answers to be
+            recorded.
     """
     state_answers = stats_domain.StateAnswers(
         exploration_id, exploration_version, state_name, interaction_id,
@@ -139,6 +210,16 @@ def get_state_answers(exploration_id, exploration_version, state_name):
     """Returns a StateAnswers object containing all answers associated with the
     specified exploration state, or None if no such answers have yet been
     submitted.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration to fetch
+            answers for.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        StateAnswers or None. A StateAnswers object containing all answers
+        associated with the state, or None if no such answers exist.
     """
     state_answers_models = stats_models.StateAnswersModel.get_all_models(
         exploration_id, exploration_version, state_name)

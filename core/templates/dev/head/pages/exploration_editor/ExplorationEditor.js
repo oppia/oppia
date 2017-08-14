@@ -228,7 +228,7 @@ oppia.controller('ExplorationEditor', [
       selector: _ID_TUTORIAL_STATE_CONTENT,
       heading: 'Content',
       text: (
-        '<p>An Oppia exploration is divided into several \'cards.\' ' +
+        '<p>An Oppia exploration is divided into several \'cards\'. ' +
         'The first part of a card is the <b>content</b>.</p>' +
         '<p>Use the content section to set the scene. ' +
         'Tell the learner a story, give them some information, ' +
@@ -251,7 +251,7 @@ oppia.controller('ExplorationEditor', [
       text: (
         '<p>After you\'ve written the content of your conversation, ' +
         'choose an <b>interaction type</b>. ' +
-        'An interaction is how you want your leaner to respond ' +
+        'An interaction is how you want your learner to respond ' +
         'to your question.</p> ' +
         '<p>Oppia has several built-in interactions, including:</p>' +
         '<ul>' +

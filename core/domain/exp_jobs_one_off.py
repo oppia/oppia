@@ -19,6 +19,7 @@
 import ast
 import logging
 
+from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -39,10 +40,9 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     information described in ExpSummariesAggregator.
 
     The summaries store the following information:
-        title, category, objective, language_code, tags,
-        last_updated, created_on, status (private, public or
-        publicized), community_owned, owner_ids, editor_ids,
-        viewer_ids, version.
+        title, category, objective, language_code, tags, last_updated,
+        created_on, status (private, public), community_owned, owner_ids,
+        editor_ids, viewer_ids, version.
 
         Note: contributor_ids field populated by
         ExpSummariesContributorsOneOffJob.
@@ -139,7 +139,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
             commit_time_string in stringified_commit_times_msecs]
         first_published_msec = min(commit_times_msecs)
         rights_manager.update_activity_first_published_msec(
-            feconf.ACTIVITY_TYPE_EXPLORATION, exp_id,
+            constants.ACTIVITY_TYPE_EXPLORATION, exp_id,
             first_published_msec)
 
 
@@ -330,8 +330,8 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
-    """Job that outputs a list of fallbacks."""
+class GadgetsOneOffJob(jobs.BaseMapReduceJobManager):
+    """Job that outputs a list of explorations that use gadgets."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -343,22 +343,10 @@ class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
             return
 
         exploration = exp_services.get_exploration_from_model(item)
-        exp_rights = rights_manager.get_exploration_rights(item.id)
-        if exp_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
-            for state_name, state in exploration.states.iteritems():
-                for fallback in state.interaction.fallbacks:
-                    num_submits = (
-                        fallback.trigger.customization_args['num_submits'])
-                    feedback = (
-                        fallback.outcome.feedback[0]
-                        if len(fallback.outcome.feedback) > 0 else 'ERROR')
-                    yield (
-                        '%s: %s' % (
-                            item.id,
-                            state_name.encode('utf-8')),
-                        '%s: %s' % (
-                            num_submits['value'],
-                            feedback.encode('utf-8')))
+        panel_contents_dict = exploration.skin_instance.panel_contents_dict
+        for panel_name, gadget_list in panel_contents_dict.iteritems():
+            if gadget_list:
+                yield (item.id, panel_name)
 
     @staticmethod
     def reduce(key, values):

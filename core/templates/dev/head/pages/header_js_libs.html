@@ -1,5 +1,7 @@
 <script src="{{ASSET_DIR_PREFIX}}/assets/constants.js"></script>
-
+{% if MINIFICATION or not DEV_MODE %}
+  <script src="{{ASSET_DIR_PREFIX}}/assets/hashes.js"></script>
+{% endif %}
 <!-- jquery.js, angular.js and jquery-ui.js are removed from bundled js because
 they need to be at the header. Including bundled js at the header will block
 rendering.-->

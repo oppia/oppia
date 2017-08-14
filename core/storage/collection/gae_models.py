@@ -164,8 +164,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
             feconf.ACTIVITY_STATUS_PRIVATE,
-            feconf.ACTIVITY_STATUS_PUBLIC,
-            feconf.ACTIVITY_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PUBLIC
         ]
     )
 
@@ -263,8 +262,7 @@ class CollectionCommitLogEntryModel(base_models.BaseModel):
     # for commits to an collection (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()
 
-    # The status of the collection after the edit event ('private', 'public',
-    # 'publicized').
+    # The status of the collection after the edit event ('private', 'public').
     post_commit_status = ndb.StringProperty(indexed=True, required=True)
     # Whether the collection is community-owned after the edit event.
     post_commit_community_owned = ndb.BooleanProperty(indexed=True)
@@ -330,8 +328,8 @@ class CollectionSummaryModel(base_models.BaseModel):
     A CollectionSummaryModel instance stores the following information:
 
         id, title, category, objective, language_code, tags,
-        last_updated, created_on, status (private, public or
-        publicized), community_owned, owner_ids, editor_ids,
+        last_updated, created_on, status (private, public),
+        community_owned, owner_ids, editor_ids,
         viewer_ids, version.
 
     The key of each instance is the collection id.
@@ -365,8 +363,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
             feconf.ACTIVITY_STATUS_PRIVATE,
-            feconf.ACTIVITY_STATUS_PUBLIC,
-            feconf.ACTIVITY_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PUBLIC
         ]
     )
 

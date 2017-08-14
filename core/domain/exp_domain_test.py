@@ -16,14 +16,18 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 
+import copy
 import os
 
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
@@ -48,7 +52,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -66,7 +70,7 @@ states:
   New state:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -184,7 +188,7 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -206,7 +210,7 @@ states:
   New state:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -228,7 +232,7 @@ states:
   Second state:
     classifier_model_id: null
     content:
-      audio_translations: []
+      audio_translations: {}
       html: ''
     interaction:
       answer_groups: []
@@ -955,20 +959,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_audio_translation_validation(self):
         """Test validation of audio translations."""
-        audio_translation = exp_domain.AudioTranslation(
-            'hi-en', 'a.mp3', 20, True)
+        audio_translation = exp_domain.AudioTranslation('a.mp3', 20, True)
         audio_translation.validate()
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected language code to be a string'
-            ):
-            with self.swap(audio_translation, 'language_code', 20):
-                audio_translation.validate()
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Unrecognized language code'
-            ):
-            with self.swap(audio_translation, 'language_code', 'invalid-code'):
-                audio_translation.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected audio filename to be a string'
@@ -1011,9 +1003,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_subtitled_html_validation(self):
         """Test validation of subtitled HTML."""
         audio_translation = exp_domain.AudioTranslation(
-            'hi-en', 'a.mp3', 20, True)
-        subtitled_html = exp_domain.SubtitledHtml(
-            'some html', [audio_translation])
+            'a.mp3', 20, True)
+        subtitled_html = exp_domain.SubtitledHtml('some html', {
+            'hi-en': audio_translation,
+        })
         subtitled_html.validate()
 
         with self.assertRaisesRegexp(
@@ -1023,10 +1016,235 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 subtitled_html.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected audio_translations to be a list'
+            utils.ValidationError, 'Expected audio_translations to be a dict'
             ):
-            with self.swap(subtitled_html, 'audio_translations', 'not_list'):
+            with self.swap(subtitled_html, 'audio_translations', 'not_dict'):
                 subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected language code to be a string'
+            ):
+            with self.swap(subtitled_html, 'audio_translations',
+                           {20: audio_translation}):
+                subtitled_html.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Unrecognized language code'
+            ):
+            with self.swap(subtitled_html, 'audio_translations',
+                           {'invalid-code': audio_translation}):
+                subtitled_html.validate()
+
+    def test_get_state_names_mapping(self):
+        """Test the get_state_names_mapping() method."""
+        exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Rename a state.
+        exploration.rename_state('Home', 'Renamed state')
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        }]
+
+        expected_dict = {
+            'Renamed state': 'Home',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Add a state
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }]
+
+        expected_dict = {
+            'New state': 'New state',
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Delete state.
+        exploration.delete_state('New state')
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        }]
+
+        expected_dict = {
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Test addition and multiple renames.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        exploration.rename_state('New state', 'New state2')
+        exploration.rename_state('New state2', 'New state3')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        }]
+
+        expected_dict = {
+            'New state3': 'New state',
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+    def test_get_trainable_states_dict(self):
+        """Test the get_trainable_states_dict() method."""
+        exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+
+        exploration_model = exp_models.ExplorationModel.get(
+            exp_id, strict=False)
+        old_states = exp_services.get_exploration_from_model(
+            exploration_model).states
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Rename a state to add it in unchanged answer group.
+        exploration.rename_state('Home', 'Renamed state')
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [],
+            'state_names_with_unchanged_answer_groups': ['Renamed state']
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Modify answer groups to trigger change in answer groups.
+        state = exploration.states['Renamed state']
+        exploration.states['Renamed state'].interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[3])
+        answer_groups = []
+        for answer_group in state.interaction.answer_groups:
+            answer_groups.append(answer_group.to_dict())
+        change_list = [{
+            'cmd': 'edit_state_property',
+            'state_name': 'Renamed state',
+            'property_name': 'answer_groups',
+            'new_value': answer_groups
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Add new state to trigger change in answer groups.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'New state', 'Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Delete state.
+        exploration.delete_state('New state')
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Test addition and multiple renames.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        exploration.rename_state('New state', 'New state2')
+        exploration.rename_state('New state2', 'New state3')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'Renamed state', 'New state3'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
 
     def test_is_demo_property(self):
         """Test the is_demo property."""
@@ -1072,7 +1290,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'content': {
                 'html': '',
-                'audio_translations': []
+                'audio_translations': {}
             },
             'interaction': {
                 'answer_groups': [],
@@ -2236,7 +2454,96 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V14
+    YAML_CONTENT_V15 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 15
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: {}
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+states_schema_version: 12
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V15
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2322,6 +2629,12 @@ title: Title
             'eid', self.YAML_CONTENT_V14)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v15(self):
+        """Test direct loading from a v15 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V15)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -2338,7 +2651,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             return {
                 'classifier_model_id': None,
                 'content': {
-                    'audio_translations': [],
+                    'audio_translations': {},
                     'html': content_str,
                 },
                 'interaction': {
@@ -2402,6 +2715,29 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         # A state with no training examples.
         self.assertFalse(
             state_without_training_data.can_undergo_classification())
+
+    def test_get_training_data(self):
+        """Test retrieval of training data."""
+        exploration_id = 'eid'
+        test_exp_filepath = os.path.join(
+            feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            assets_list)
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        state = exploration.states['text']
+
+        expected_training_data = [{
+            'answer_group_index': 1,
+            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
+                        u'overjoyed', u'pleased', u'thrilled', u'smile']}]
+
+        observed_training_data = state.get_training_data()
+
+        self.assertEqual(observed_training_data, expected_training_data)
 
     def test_delete_state(self):
         """Test deletion of states."""
