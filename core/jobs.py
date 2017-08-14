@@ -127,9 +127,7 @@ class BaseJobManager(object):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(
-            cls, job_id, queue_name=taskqueue_services.QUEUE_NAME_DEFAULT,
-            additional_job_params=None):
+    def enqueue(cls, job_id, queue_name, additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:

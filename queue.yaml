@@ -1,7 +1,5 @@
 total_storage_limit: 120M
 queue:
-- name: default
-  rate: 2/m
 - name: events
   rate: 5/s
 - name: backups
