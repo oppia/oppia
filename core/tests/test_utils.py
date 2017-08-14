@@ -642,7 +642,7 @@ class AppEngineTestBase(TestBase):
         """Counts the jobs in the given queue."""
         return len(self.get_pending_tasks(queue_name))
 
-    def get_pending_tasks(self, queue_name):
+    def get_pending_tasks(self, queue_name=None):
         """Returns the jobs in the given queue. If queue_name is None, defaults
         to returning the jobs in all available queues.
         """
