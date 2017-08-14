@@ -839,7 +839,7 @@ class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
                 for the job.
         """
         super(BaseMapReduceOneOffJobManager, cls).enqueue(
-            job_id, queue_name=taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            job_id, taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
             additional_job_params=additional_job_params)
 
 
