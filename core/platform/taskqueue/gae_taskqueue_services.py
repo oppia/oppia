@@ -49,7 +49,7 @@ def defer(fn, queue_name, *args, **kwargs):
     deferred.defer(fn, *args, _queue=queue_name, **kwargs)
 
 
-def enqueue_task(url, params, countdown):
+def enqueue_email_task(url, params, countdown):
     """Adds a new task for sending email.
 
     Args:
