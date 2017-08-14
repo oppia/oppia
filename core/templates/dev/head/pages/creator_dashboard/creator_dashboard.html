@@ -101,7 +101,7 @@
     </div>
 
     <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
-      <h2 class="oppia-dashboard-title">
+      <h2 class="oppia-dashboard-title" translate="I18N_DASHBOARD_TITLE">
         Creator Dashboard
       </h2>
     </div>
@@ -112,13 +112,14 @@
                  class="oppia-page-card oppia-dashboard-intro-card"
                  style="margin-top: 0;">
           <div>
-            <p>
+            <p translate="I18N_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS">
               It looks like you haven't created any explorations yet.
               Let's get started!
             </p>
             <button type="button"
                     class="btn oppia-dashboard-intro-button oppia-transition-200"
-                    ng-click="createNewExploration()">
+                    ng-click="createNewExploration()"
+                    translate="I18N_DASHBOARD_CREATE_EXPLORATION">
               Create Exploration
             </button>
           </div>
@@ -324,7 +325,7 @@
               ng-if="activeTab === 'mySubscribers'"
               ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
               style="float: right;">
-          <p class="sort-by-text">Sort By</p>
+          <p class="sort-by-text" translate="I18N_DASHBOARD_EXPLORATIONS_SORT_BY">Sort By </p>
           <select ng-model="currentSubscribersSortType"
                   class="sort-options"
                   ng-change="setSubscriptionSortingOptions(currentSubscribersSortType)"

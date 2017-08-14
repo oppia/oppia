@@ -222,7 +222,7 @@ var constants = {
     "text": "Deutsch"
   }, {
     "id": "fr",
-    "text": "français"
+    "text": "Français"
   }, {
     "id": "nl",
     "text": "Nederlands"
@@ -231,7 +231,7 @@ var constants = {
     "text": "Español"
   }, {
     "id": "hu",
-    "text": "magyar"
+    "text": "Magyar"
   }, {
     "id": "pt",
     "text": "Português"
