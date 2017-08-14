@@ -243,7 +243,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
+class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs, grouped by the
     interaction they use.
 
