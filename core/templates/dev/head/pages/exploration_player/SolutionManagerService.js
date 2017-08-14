@@ -1,6 +1,3 @@
-/**
- * Created by kevin on 8/13/17.
- */
 // Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,24 +19,26 @@
 oppia.factory('SolutionManagerService', [
   function() {
     var solution = null;
-    var solutionIsExhausted = false;
+    var solutionHasBeenViewed = false;
     var _getCurrentSolution = function() {
       return solution;
     };
-
     return {
-      consumeSolution: function () {
-        if (!solutionIsExhausted) {
-          solutionIsExhausted = true;
-          return _getCurrentSolution();
+      viewSolution: function () {
+        if (!solutionHasBeenViewed) {
+          solutionHasBeenViewed = true;
         }
+        return _getCurrentSolution();
       },
       isCurrentSolutionAvailable: function() {
-        return solution && !solutionIsExhausted;
+        return solution;
+      },
+      hasSolutionBeenViewed: function() {
+        return solutionHasBeenViewed;
       },
       reset: function(newSolution) {
         solution = newSolution;
-        solutionIsExhausted = false;
+        solutionHasBeenViewed = false;
       }
     };
   }]);

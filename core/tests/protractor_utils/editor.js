@@ -1494,9 +1494,13 @@ var HintEditor = function(hintNum) {
 // This only handles TextInput interaction.
 var addSolution = function(solution) {
   element(by.css('.protractor-test-oppia-add-solution-button')).click();
-  browser.switchTo().activeElement().sendKeys(solution.explanation);
+  browser.waitForAngular();
+  general.waitForSystem();
   element(by.css('.protractor-test-interaction-html'))
     .all(by.tagName('input')).first().click().sendKeys(solution.correctAnswer);
+  browser.waitForAngular();
+  general.waitForSystem();
+  browser.switchTo().activeElement().sendKeys(solution.explanation);
   browser.waitForAngular();
   general.waitForSystem();
   element(by.css('.protractor-test-submit-solution-button')).click();

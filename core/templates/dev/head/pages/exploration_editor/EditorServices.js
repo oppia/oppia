@@ -908,13 +908,13 @@ oppia.factory('explorationParamChangesService', [
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector',
+  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'explorationGadgetsService',
   'StatesObjectFactory', 'SolutionValidityService', 'angularNameService',
   'AnswerClassificationService', 'explorationContextService',
   function(
-      $log, $modal, $filter, $location, $rootScope, $injector,
+      $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, explorationGadgetsService,
       StatesObjectFactory, SolutionValidityService, angularNameService,
@@ -1041,25 +1041,28 @@ oppia.factory('explorationStatesService', [
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
         SolutionValidityService.init();
+        var answerClassificationPromises = [];
         _states.getStateNames().forEach(function(stateName) {
           var solution = _states.getState(stateName).interaction.solution;
           if (solution) {
-            AnswerClassificationService.getMatchingClassificationResult(
-              explorationContextService.getExplorationId(),
-              _states.getState(stateName),
-              solution.correctAnswer,
-              true,
-              $injector.get(angularNameService.getNameOfInteractionRulesService(
-                _states.getState(stateName).interaction.id))
-            ).then(function(result) {
-              var solutionIsValid = (
-                editorContextService.getActiveStateName() !== (
-                  result.outcome.dest));
-              SolutionValidityService.updateValidity(
-                stateName, solutionIsValid);
-              $rootScope.$broadcast('refreshGraph');
-            });
+            answerClassificationPromises.push(
+              AnswerClassificationService.getMatchingClassificationResult(
+                explorationContextService.getExplorationId(),
+                _states.getState(stateName),
+                solution.correctAnswer,
+                true,
+                $injector.get(
+                  angularNameService.getNameOfInteractionRulesService(
+                    _states.getState(stateName).interaction.id))
+              ).then(function(result) {
+                var solutionIsValid = stateName !== result.outcome.dest;
+                SolutionValidityService.updateValidity(
+                  stateName, solutionIsValid);
+            }));
           }
+        });
+        $q.all(answerClassificationPromises).then(function() {
+          $rootScope.$broadcast('refreshGraph');
         });
       },
       getStates: function() {

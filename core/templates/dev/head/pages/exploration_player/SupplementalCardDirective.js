@@ -58,11 +58,11 @@ oppia.directive('supplementalCard', [
             $scope.hintsExist = Boolean(oppiaPlayerService.getInteraction(
               $scope.activeCard.stateName).hints.length);
 
-            SolutionManagerService.reset(oppiaPlayerService.getInteraction(
-              $scope.activeCard.stateName).solution);
+            var solution = oppiaPlayerService.getSolution(
+              $scope.activeCard.stateName);
 
-            $scope.solutionExists = Boolean(oppiaPlayerService.getInteraction(
-              $scope.activeCard.stateName).solution);
+            SolutionManagerService.reset(solution);
+            $scope.solutionExists = Boolean(solution);
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
@@ -92,26 +92,15 @@ oppia.directive('supplementalCard', [
             }
           };
 
-          $scope.consumeSolution = function() {
+          $scope.viewSolution = function() {
             playerTranscriptService.addNewInput(
               'Please show me the answer.', true);
-            var solution = SolutionManagerService.consumeSolution();
-            var interactionId = oppiaPlayerService.getInteraction(
+            var solution = SolutionManagerService.viewSolution();
+            var interaction = oppiaPlayerService.getInteraction(
               playerPositionService.getCurrentStateName());
-            var answer = (
-              oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-                solution.correctAnswer,
-                interactionId,
-                explorationStatesService
-                  .getInteractionCustomizationArgsMemento(
-                    $scope.activeCard.stateName)));
-            var answerIsExclusive = (
-              solution.answerIsExclusive ? 'The only' : 'One');
-            var response = (
-              answerIsExclusive + ' answer is:<br>' + answer +
-              '<br><br>Explanation:<br>' + solution.explanation);
-            playerTranscriptService.addNewResponse(response);
-            $scope.helpCardHtml = response;
+            var responseHtml = solution.getOppiaResponseHtml(interaction);
+            playerTranscriptService.addNewResponse(responseHtml);
+            $scope.helpCardHtml = responseHtml;
           };
 
           $scope.isHintAvailable = function() {

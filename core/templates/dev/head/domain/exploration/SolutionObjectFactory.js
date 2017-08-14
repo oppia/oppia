@@ -18,8 +18,8 @@
  */
 
 oppia.factory('SolutionObjectFactory', [
-  '$filter', 'oppiaHtmlEscaper',
-  function($filter, oppiaHtmlEscaper) {
+  '$filter', 'oppiaHtmlEscaper', 'oppiaExplorationHtmlFormatterService',
+  function($filter, oppiaHtmlEscaper, oppiaExplorationHtmlFormatterService) {
     var Solution = function(answerIsExclusive, correctAnswer, explanation) {
       this.answerIsExclusive = answerIsExclusive;
       this.correctAnswer = correctAnswer;
@@ -77,6 +77,14 @@ oppia.factory('SolutionObjectFactory', [
 
     Solution.prototype.setExplanation = function(explanation) {
       this.explanation = explanation;
+    };
+
+    Solution.prototype.getOppiaResponseHtml = function(interaction) {
+      return (
+        (this.answerIsExclusive ? 'The only' : 'One') + ' answer is:<br>' +
+        oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+          this.correctAnswer, interaction.id, interaction.customizationArgs) +
+        '<br><br>Explanation:<br>' + this.explanation);
     };
 
     return Solution;

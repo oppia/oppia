@@ -214,7 +214,6 @@ describe('State editor', function() {
   });
 
   it('should add/modify/delete a hint', function() {
-    users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
     users.login('stateEditorUser1@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
@@ -236,7 +235,6 @@ describe('State editor', function() {
   });
 
   it('should add a solution', function() {
-    users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
     users.login('stateEditorUser1@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));

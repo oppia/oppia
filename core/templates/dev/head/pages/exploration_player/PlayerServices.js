@@ -282,6 +282,9 @@ oppia.factory('oppiaPlayerService', [
         }
         return randomSuffix;
       },
+      getSolution: function(stateName) {
+        return exploration.getInteraction(stateName).solution;
+      },
       isLoggedIn: function() {
         return _isLoggedIn;
       },
