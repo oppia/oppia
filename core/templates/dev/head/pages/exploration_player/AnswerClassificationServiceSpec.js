@@ -241,7 +241,7 @@ describe('Answer classification service with string classifier enabled',
 
     var EXPLICIT_CLASSIFICATION = 'explicit';
     var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
-    var TRAINING_DATA_CLASSIFICATION = 'training_data_match';
+    var MACHINE_LEARNING_CLASSIFICATION = 'ml_classifier';
 
     var acs, scms, sof, oof, acr, $httpBackend, successHandler, failHandler,
       $rootScope, stateName, state, state2, registryService, predictionService,
@@ -325,10 +325,9 @@ describe('Answer classification service with string classifier enabled',
       scms.init(stateClassifierMapping);
 
       registryService.setMapping({
-        LDAStringClassifier: [{
-          predictionService: predictionService,
-          dataSchemaVersion: 1
-        }]
+        LDAStringClassifier: {
+          1: predictionService
+        }
       });
 
       state2 = angular.copy(state);
@@ -361,7 +360,7 @@ describe('Answer classification service with string classifier enabled',
       $rootScope.$apply();
       var expectedClassificationResult = acr.createNew(
         state.interaction.answerGroups[1].outcome, 1, 2,
-        TRAINING_DATA_CLASSIFICATION);
+        MACHINE_LEARNING_CLASSIFICATION);
 
       expect(successHandler).toHaveBeenCalledWith(expectedClassificationResult);
       expect(failHandler).not.toHaveBeenCalled();

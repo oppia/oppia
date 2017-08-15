@@ -16,36 +16,48 @@
  * @fileoverview Services for mapping state names to classifier details.
  */
 
- oppia.factory('StateClassifierMappingService', [function() {
-   var stateClassifierMapping = null;
+ oppia.factory('StateClassifierMappingService', [
+   'ClassifierObjectFactory', function(ClassifierObjectFactory) {
+     var stateClassifierMapping = null;
 
-   return {
-     init: function(newStateClassifierMapping) {
-       stateClassifierMapping = newStateClassifierMapping;
-     },
+     return {
+       init: function(backendStateClassifierMapping) {
+         stateClassifierMapping = {};
+         var algorithmId, classifierData, dataSchemaVersion;
+         for (var stateName in backendStateClassifierMapping) {
+           algorithmId = backendStateClassifierMapping[stateName].algorithm_id;
+           classifierData = backendStateClassifierMapping[
+             stateName].classifier_data;
+           dataSchemaVersion = backendStateClassifierMapping[
+             stateName].data_schema_version
+           stateClassifierMapping[stateName] = ClassifierObjectFactory.create(
+             algorithmId, classifierData, dataSchemaVersion);
+         }
+       },
 
-     getClassifierData: function(stateName) {
-       if (stateClassifierMapping.hasOwnProperty(stateName)) {
-         return stateClassifierMapping[stateName].classifier_data;
-       } else {
-         return null;
+       getClassifierData: function(stateName) {
+         if (stateClassifierMapping.hasOwnProperty(stateName)) {
+           return stateClassifierMapping[stateName].classifierData;
+         } else {
+           return null;
+         }
+       },
+
+       getAlgorithmId: function(stateName) {
+         if (stateClassifierMapping.hasOwnProperty(stateName)) {
+           return stateClassifierMapping[stateName].algorithmId;
+         } else {
+           return null;
+         }
+       },
+
+       getDataSchemaVersion: function(stateName) {
+         if (stateClassifierMapping.hasOwnProperty(stateName)) {
+           return stateClassifierMapping[stateName].dataSchemaVersion;
+         } else {
+           return null;
+         }
        }
-     },
-
-     getAlgorithmId: function(stateName) {
-       if (stateClassifierMapping.hasOwnProperty(stateName)) {
-         return stateClassifierMapping[stateName].algorithm_id;
-       } else {
-         return null;
-       }
-     },
-
-     getDataSchemaVersion: function(stateName) {
-       if (stateClassifierMapping.hasOwnProperty(stateName)) {
-         return stateClassifierMapping[stateName].data_schema_version;
-       } else {
-         return null;
-       }
-     }
-   };
- }]);
+     };
+   }
+ ]);

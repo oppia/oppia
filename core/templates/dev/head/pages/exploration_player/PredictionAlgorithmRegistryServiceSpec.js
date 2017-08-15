@@ -30,10 +30,9 @@ describe('Prediction algorithm registry service', function() {
       var algorithmId = 'LDAStringClassifier';
       var dataSchemaVersion = 1;
       registryService.setMapping({
-        LDAStringClassifier: [{
-          predictionService: predictionService,
-          dataSchemaVersion: dataSchemaVersion
-        }]
+        LDAStringClassifier: {
+          1: predictionService
+        }
       });
       var generatedPredictionService = registryService.getPredictionService(
         algorithmId, dataSchemaVersion);

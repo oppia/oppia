@@ -193,20 +193,25 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ExplorationHandlerTest(test_utils.GenericTestBase):
+class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
     """Test the handler for initialising exploration with
     state_classifier_mapping.
     """
 
     def test_creation_of_state_classifier_mapping(self):
-        super(ExplorationHandlerTest, self).setUp()
+        super(ExplorationStateClassifierMappingTests, self).setUp()
         exploration_id = '15'
 
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-        # Load demo exploration.
         exp_services.delete_demo(exploration_id)
+        # We enable ENABLE_ML_CLASSIFIERS so that the subsequent call to
+        # save_exploration handles job creation for trainable states.
+        # Since only one demo exploration has a trainable state, we modify our
+        # values for MIN_ASSIGNED_LABELS and MIN_TOTAL_TRAINING_EXAMPLES to let
+        # the classifier_demo_exploration.yaml be trainable. This is
+        # completely for testing purposes.
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):

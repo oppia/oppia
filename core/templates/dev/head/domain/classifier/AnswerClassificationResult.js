@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Factory for creating new frontend instances of answer
- Classification Result domain objects.
+ *     Classification Result domain objects.
  */
 
 oppia.factory('AnswerClassificationResult', [function() {

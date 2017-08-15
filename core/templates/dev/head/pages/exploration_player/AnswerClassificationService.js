@@ -24,18 +24,19 @@ oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit')
 oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match')
 oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
+oppia.constant('MACHINE_LEARNING_CLASSIFICATION', 'ml_classifier')
 
 oppia.factory('AnswerClassificationService', [
   '$http', '$q', 'LearnerParamsService', 'alertsService',
   'AnswerClassificationResult', 'PredictionAlgorithmRegistryService',
   'StateClassifierMappingService', 'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS',
   'EXPLICIT_CLASSIFICATION', 'DEFAULT_OUTCOME_CLASSIFICATION',
-  'TRAINING_DATA_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
+  'MACHINE_LEARNING_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
   function($http, $q, LearnerParamsService, alertsService,
       AnswerClassificationResult, PredictionAlgorithmRegistryService,
       StateClassifierMappingService, INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS,
       EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
-      TRAINING_DATA_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
+      MACHINE_LEARNING_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -75,13 +76,23 @@ oppia.factory('AnswerClassificationService', [
       }
     };
 
-    var findRuleIndex = function(answerGroup, answerGroupIndex) {
+    /**
+     * Finds the first rule that contains RULE_TYPE_CLASSIFIER as rule type.
+     *
+     * @param {object} answerGroup - An answer group of the interaction. Each
+     *     answer group containts rule_specs which is a list of rules.
+     *
+     * @return {integer} The index of the retrieved rule with rule_type
+     *     RULE_TYPE_CLASSIFIER.
+     */
+    var findClassifierRuleIndex = function(answerGroup) {
       for (var i = 0; i < answerGroup.rules.length; i++) {
         var rule = answerGroup.rules[i];
         if (rule.type == RULE_TYPE_CLASSIFIER) {
           return i;
         }
       }
+      return null;
     };
 
     return {
@@ -134,29 +145,22 @@ oppia.factory('AnswerClassificationService', [
             var predictionService = (
               PredictionAlgorithmRegistryService.getPredictionService(
                 algorithmId, dataSchemaVersion));
-            var predictedAnswerGroupIndex;
             // If prediction service exists, we run classifier. We return the
             // default outcome otherwise.
             if (predictionService) {
-              predictedAnswerGroupIndex = predictionService.predict(
+              var predictedAnswerGroupIndex = predictionService.predict(
                 classifierData, answer);
-              var classificationResult = AnswerClassificationResult.createNew(
+              result = AnswerClassificationResult.createNew(
                 answerGroups[predictedAnswerGroupIndex].outcome,
                 predictedAnswerGroupIndex,
-                findRuleIndex(answerGroups[predictedAnswerGroupIndex],
-                              predictedAnswerGroupIndex),
-                TRAINING_DATA_CLASSIFICATION
+                findClassifierRuleIndex(
+                  answerGroups[predictedAnswerGroupIndex]),
+                MACHINE_LEARNING_CLASSIFICATION
               );
-            } else {
-              var classificationResult = result;
             }
-            deferred.resolve(classificationResult);
-          } else {
-            deferred.resolve(result);
           }
-        } else {
-          deferred.resolve(result);
         }
+        deferred.resolve(result);
         return deferred.promise;
       }
     };

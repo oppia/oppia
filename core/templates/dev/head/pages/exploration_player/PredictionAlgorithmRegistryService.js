@@ -20,32 +20,22 @@
    'PredictionAlgorithmSampleService',
    function(PredictionAlgorithmSampleService) {
     /**
-    * This mapping needs to be updated whenever a new prediction service needs
-    * to be added for classification. The mapping is from algorithmId to a
-    * list of objects. The mapping should be of the type:
-    * {
-    * algorithmId: [{
-    *   'predictionService': predictionService,
-    *   'dataSchemaVersion': dataSchemaVersion
-    * }]
-    * }
-    */
+     * This mapping needs to be updated whenever a new prediction service needs
+     * to be added for classification. The mapping is from algorithmId to a
+     * list of objects. The mapping should be of the type:
+     * {
+     *   algorithmId: {
+     *     dataSchemaVersion: predictionService
+     *   }
+     * }
+     */
      var algorithmIdPredictionServiceMapping = {};
 
      return {
        getPredictionService: function(algorithmId, dataSchemaVersion) {
          if (algorithmIdPredictionServiceMapping.hasOwnProperty(algorithmId)) {
-           for (var i = 0; i < algorithmIdPredictionServiceMapping[
-             algorithmId].length; i++) {
-             var predictionServiceDetails = algorithmIdPredictionServiceMapping[
-               algorithmId][i];
-             if (dataSchemaVersion === (
-                 predictionServiceDetails.dataSchemaVersion)) {
-               return predictionServiceDetails.predictionService;
-             } else {
-               return null;
-             }
-           }
+           return algorithmIdPredictionServiceMapping[algorithmId][
+             dataSchemaVersion.toString()]
          } else {
            return null;
          }
