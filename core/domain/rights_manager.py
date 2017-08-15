@@ -849,49 +849,6 @@ class Actor(object):
             return False
         return self.can_modify_roles(activity_type, activity_id)
 
-    def can_publicize(self, activity_type, activity_id):
-        """Returns whether this user is allowed to publicize the given
-        activity.
-
-        Args:
-            activity_type: str. The type of activity. Possible values:
-                constants.ACTIVITY_TYPE_EXPLORATION
-                constants.ACTIVITY_TYPE_COLLECTION
-            activity_id: str. ID of the activity.
-
-        Returns:
-            bool. Whether the user has a right to publicize the given activity.
-        """
-        activity_rights = _get_activity_rights(activity_type, activity_id)
-        if activity_rights is None:
-            return False
-
-        if activity_rights.status != ACTIVITY_STATUS_PUBLIC:
-            return False
-        return self.is_moderator()
-
-    def can_unpublicize(self, activity_type, activity_id):
-        """Returns whether this user is allowed to unpublicize the given
-        activity.
-
-        Args:
-            activity_type: str. The type of activity. Possible values:
-                constants.ACTIVITY_TYPE_EXPLORATION
-                constants.ACTIVITY_TYPE_COLLECTION
-            activity_id: str. ID of the activity.
-
-        Returns:
-            bool. Whether the user has a right to unpublicize the given
-                activity.
-        """
-        activity_rights = _get_activity_rights(activity_type, activity_id)
-        if activity_rights is None:
-            return False
-
-        if activity_rights.status != ACTIVITY_STATUS_PUBLICIZED:
-            return False
-        return self.is_moderator()
-
 
 def _assign_role(
         committer_id, assignee_id, new_role, activity_id, activity_type):
