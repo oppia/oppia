@@ -77,7 +77,6 @@ class ActivityRights(object):
 
     def validate(self):
         """Validates an ActivityRights object.
-
         Raises:
           utils.ValidationError: if any of the owners, editors and viewers
           lists overlap, or if a community-owned exploration has owners,
@@ -115,7 +114,6 @@ class ActivityRights(object):
 
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
-
         Returns:
             dict. A dict version of ActivityRights suitable for use by the
                 frontend.
@@ -146,10 +144,8 @@ class ActivityRights(object):
 
     def is_owner(self, user_id):
         """Checks whether given user is owner of activity.
-
         Args:
             user_id: str or None. Id of the user.
-
         Returns:
             bool. Whether user is in activity owners.
         """
@@ -157,10 +153,8 @@ class ActivityRights(object):
 
     def is_editor(self, user_id):
         """Checks whether given user is editor of activity.
-
         Args:
             user_id: str or None. Id of the user.
-
         Returns:
             bool. Whether user is in activity editors.
         """
@@ -168,10 +162,8 @@ class ActivityRights(object):
 
     def is_viewer(self, user_id):
         """Checks whether given user is viewer of activity.
-
         Args:
             user_id: str or None. Id of the user.
-
         Returns:
             bool. Whether user is in activity viewers of.
         """
@@ -179,7 +171,6 @@ class ActivityRights(object):
 
     def is_published(self):
         """Checks whether activity is published.
-
         Returns:
             bool. Whether activity is published.
         """
@@ -187,7 +178,6 @@ class ActivityRights(object):
 
     def is_private(self):
         """Checks whether activity is private.
-
         Returns:
             bool. Whether activity is private.
         """
@@ -196,14 +186,12 @@ class ActivityRights(object):
 
 def _get_activity_rights_from_model(activity_rights_model, activity_type):
     """Constructs an ActivityRights object from the given activity rights model.
-
     Args:
         activity_rights_model: ActivityRightsModel. Activity rights from the
             datastore.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
             constants.ACTIVITY_TYPE_COLLECTION
-
     Returns:
         ActivityRights. The rights object created from the model.
     """
@@ -227,7 +215,6 @@ def _save_activity_rights(
         commit_cmds):
     """Saves an ExplorationRights or CollectionRights domain object to the
     datastore.
-
     Args:
         committer_id: str. ID of the committer.
         activity_rights: ActivityRights. The rights object for the given
@@ -261,9 +248,7 @@ def _save_activity_rights(
 def _update_exploration_summary(activity_rights):
     """Updates the exploration summary for the activity associated with the
     given rights object.
-
     The ID of rights object is the same as the ID of associated activity.
-
     Args:
         activity_rights: ActivityRights. The rights object for the given
             activity.
@@ -277,9 +262,7 @@ def _update_exploration_summary(activity_rights):
 def _update_collection_summary(activity_rights):
     """Updates the collection summary for the given activity associated with
     the given rights object.
-
     The ID of rights object is the same as the ID of associated activity.
-
     Args:
         activity_rights: ActivityRights. The rights object for the given
             activity.
@@ -292,9 +275,7 @@ def _update_collection_summary(activity_rights):
 def _update_activity_summary(activity_type, activity_rights):
     """Updates the activity summary for the given activity associated with
     the given rights object.
-
     The ID of rights object is the same as the ID of associated activity.
-
     Args:
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
@@ -311,10 +292,8 @@ def _update_activity_summary(activity_type, activity_rights):
 def update_activity_first_published_msec(
         activity_type, activity_id, first_published_msec):
     """Updates the first_published_msec field for the given activity.
-
     The caller is responsible for ensuring that this value is not already
     set before updating it.
-
     Args:
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
@@ -338,7 +317,6 @@ def update_activity_first_published_msec(
 def create_new_exploration_rights(exploration_id, committer_id):
     """Creates a new exploration rights object and saves it to the datastore.
     Subscribes the committer to the new exploration.
-
     Args:
         exploration_id: str. ID of the exploration.
         committer_id: str. ID of the committer.
@@ -364,15 +342,12 @@ def create_new_exploration_rights(exploration_id, committer_id):
 
 def get_exploration_rights(exploration_id, strict=True):
     """Retrieves the rights for this exploration from the datastore.
-
     Args:
         exploration_id: str. ID of the exploration.
         strict: bool. Whether to raise an error if there is no exploration
             matching the given ID.
-
     Returns:
         ActivityRights. The rights object for the given exploration.
-
     Raises:
         EntityNotFoundError. The exploration with ID exploration_id was not
             found in the datastore.
@@ -387,10 +362,8 @@ def get_exploration_rights(exploration_id, strict=True):
 
 def is_exploration_private(exploration_id):
     """Returns whether exploration is private.
-
     Args:
         exploration_id: str. ID of the exploration.
-
     Returns:
         bool. Whether the exploration is private or not.
     """
@@ -400,10 +373,8 @@ def is_exploration_private(exploration_id):
 
 def is_exploration_public(exploration_id):
     """Returns whether exploration is public.
-
     Args:
         exploration_id: str. ID of the exploration.
-
     Returns:
         bool. Whether the exploration is public.
     """
@@ -413,10 +384,8 @@ def is_exploration_public(exploration_id):
 
 def is_exploration_cloned(exploration_id):
     """Returns whether the exploration is a clone of another exploration.
-
     Args:
         exploration_id: str. ID of the exploration.
-
     Returns:
         bool. Whether the exploration is a clone of another exploration.
     """
@@ -427,7 +396,6 @@ def is_exploration_cloned(exploration_id):
 def create_new_collection_rights(collection_id, committer_id):
     """Creates a new collection rights object and saves it to the datastore.
     Subscribes the committer to the new collection.
-
     Args:
         collection_id: str. ID of the collection.
         committer_id: str. ID of the committer.
@@ -451,14 +419,11 @@ def create_new_collection_rights(collection_id, committer_id):
 
 def get_collection_rights(collection_id, strict=True):
     """Retrieves the rights for this collection from the datastore.
-
     Args:
         collection_id: str. ID of the collection.
         strict: bool. Whether to raise an error if ID is not found.
-
     Returns:
         ActivityRights. The rights object for the collection.
-
     Raises:
         EntityNotFoundError. The collection with ID collection_id is not found
             in the datastore.
@@ -473,10 +438,8 @@ def get_collection_rights(collection_id, strict=True):
 
 def get_collection_owner_names(collection_id):
     """Retrieves the owners for this collection from the datastore.
-
     Args:
         collection_id: str. ID of the collection.
-
     Returns:
         list(str). Human-readable usernames (or truncated email addresses) of
             owners for this collection.
@@ -488,10 +451,8 @@ def get_collection_owner_names(collection_id):
 
 def is_collection_private(collection_id):
     """Returns whether the collection is private.
-
     Args:
         collection_id: str. ID of the collection.
-
     Returns:
         bool. Whether the collection is private.
     """
@@ -501,10 +462,8 @@ def is_collection_private(collection_id):
 
 def is_collection_public(collection_id):
     """Returns whether the collection is public.
-
     Args:
         collection_id: str. ID of the collection.
-
     Returns:
         bool. Whether the collection is public.
     """
@@ -515,16 +474,13 @@ def is_collection_public(collection_id):
 def _get_activity_rights(activity_type, activity_id):
     """Retrieves the rights object for the given activity
     based on its type.
-
     Args:
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
             constants.ACTIVITY_TYPE_COLLECTION
         activity_id: str. ID of the activity.
-
     Returns:
         ActivityRights. The rights object associated with the given activity.
-
     Raises:
         Exception. activity_type provided is unknown.
     """
@@ -553,7 +509,6 @@ class Actor(object):
 
     def is_admin(self):
         """Returns whether this user is an administrator.
-
         Returns:
             bool. Whether this user is an administrator.
         """
@@ -563,7 +518,6 @@ class Actor(object):
 
     def is_moderator(self):
         """Returns whether this user is a moderator.
-
         Returns:
             bool. Whether this user is a moderator.
         """
@@ -619,13 +573,11 @@ class Actor(object):
 
     def is_owner(self, activity_type, activity_id):
         """Returns whether this user is an owner of the given activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user is an owner of the given activity.
         """
@@ -636,13 +588,11 @@ class Actor(object):
 
     def has_editing_rights(self, activity_type, activity_id):
         """Returns whether this user has editing rights for the given activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user is in the owner/editor list for the given
                 activity.
@@ -654,13 +604,11 @@ class Actor(object):
 
     def has_viewing_rights(self, activity_type, activity_id):
         """Returns whether this user has viewing rights for the given activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user has the right to view the given activity.
         """
@@ -671,13 +619,11 @@ class Actor(object):
 
     def can_play(self, activity_type, activity_id):
         """Returns whether this user has rights to play the given activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user has the right to play the given activity.
         """
@@ -688,13 +634,11 @@ class Actor(object):
 
     def can_view(self, activity_type, activity_id):
         """Returns whether this user has rights to view the given activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user has the right to view the given activity.
         """
@@ -704,13 +648,11 @@ class Actor(object):
     # rather than having this check in the controller.
     def can_edit(self, activity_type, activity_id):
         """Returns whether this user has rights to edit the given activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user has the right to edit the given activity.
         """
@@ -721,13 +663,11 @@ class Actor(object):
 
     def can_delete(self, activity_type, activity_id):
         """Returns whether this user has rights to delete the given activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user has the right to delete the given activity.
         """
@@ -740,16 +680,13 @@ class Actor(object):
             self, activity_type, activity_id):
         """Returns whether this user is allowed to change the viewability of
         the given private activity.
-
         The caller is responsible for ensuring that the given activity is
         private.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user is allowed to change the viewability of
                 the given private activity.
@@ -759,13 +696,11 @@ class Actor(object):
 
     def can_publish(self, activity_type, activity_id):
         """Returns whether this user is allowed to publish the given activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user is allowed to publish the given activity.
         """
@@ -783,13 +718,11 @@ class Actor(object):
     def can_unpublish(self, activity_type, activity_id):
         """Returns whether this user is allowed to unpublish the given
         activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user is allowed to unpublish the given
                 activity.
@@ -808,13 +741,11 @@ class Actor(object):
     def can_modify_roles(self, activity_type, activity_id):
         """Returns whether this user has the right to modify roles for the given
         activity.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user has the right to modify roles for the given
                 activity.
@@ -830,13 +761,11 @@ class Actor(object):
     def can_release_ownership(self, activity_type, activity_id):
         """Returns whether this user is allowed to release ownership of the
         given activity to the community.
-
         Args:
             activity_type: str. The type of activity. Possible values:
                 constants.ACTIVITY_TYPE_EXPLORATION
                 constants.ACTIVITY_TYPE_COLLECTION
             activity_id: str. ID of the activity.
-
         Returns:
             bool. Whether the user is allowed to release ownership of the
                 given activity to the community.
@@ -853,7 +782,6 @@ class Actor(object):
 def _assign_role(
         committer_id, assignee_id, new_role, activity_id, activity_type):
     """Assigns a new role to the user.
-
     Args:
         committer_id: str. ID of the user who is performing the action.
         activity_rights: ExplorationRightsModel|CollectionRightsModel. The
@@ -867,7 +795,6 @@ def _assign_role(
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
             constants.ACTIVITY_TYPE_COLLECTION
-
     Raises:
         Exception. The committer does not have rights to modify a role.
         Exception. The user already owns the activity.
@@ -948,14 +875,12 @@ def _assign_role(
 
 def _release_ownership_of_activity(committer_id, activity_id, activity_type):
     """Releases ownership of the given activity to the community.
-
     Args:
         committer_id: str. ID of the user who is performing the action.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
             constants.ACTIVITY_TYPE_COLLECTION
-
     Raise:
         Exception. The committer does not have release rights.
     """
@@ -985,7 +910,6 @@ def _release_ownership_of_activity(committer_id, activity_id, activity_type):
 def _change_activity_status(
         committer_id, activity_id, activity_type, new_status, commit_message):
     """Changes the status of the given activity.
-
     Args:
         committer_id: str. ID of the user who is performing the update action.
         activity_id: str. ID of the activity.
@@ -1022,14 +946,12 @@ def _change_activity_status(
 
 def _publish_activity(committer_id, activity_id, activity_type):
     """Publishes the given activity.
-
     Args:
         committer_id: str. ID of the committer.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
             constants.ACTIVITY_TYPE_COLLECTION
-
     Raises:
         Exception. The committer does not have rights to publish the
             activity.
@@ -1047,14 +969,12 @@ def _publish_activity(committer_id, activity_id, activity_type):
 
 def _unpublish_activity(committer_id, activity_id, activity_type):
     """Unpublishes the given activity.
-
     Args:
         committer_id: str. ID of the committer.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
             constants.ACTIVITY_TYPE_COLLECTION
-
     Raises:
         Exception. The committer does not have rights to unpublish the
             activity.
@@ -1072,65 +992,13 @@ def _unpublish_activity(committer_id, activity_id, activity_type):
     activity_services.remove_featured_activity(activity_type, activity_id)
 
 
-def _publicize_activity(committer_id, activity_id, activity_type):
-    """Publicizes the given activity.
-
-    Args:
-        committer_id: str. ID of the committer.
-        activity_id: str. ID of the activity.
-        activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
-
-    Raises:
-        Exception. The committer does not have rights to publicize the activity.
-    """
-    if not Actor(committer_id).can_publicize(activity_type, activity_id):
-        logging.error(
-            'User %s tried to publicize %s %s but was refused '
-            'permission.' % (committer_id, activity_type, activity_id))
-        raise Exception('This %s cannot be marked as "featured".' % (
-            activity_type))
-
-    _change_activity_status(
-        committer_id, activity_id, activity_type, ACTIVITY_STATUS_PUBLICIZED,
-        '%s publicized.' % activity_type)
-
-
-def _unpublicize_activity(committer_id, activity_id, activity_type):
-    """Unpublicizes the given activity.
-
-    Args:
-        committer_id: str. ID of the committer.
-        activity_id: str. ID of the activity.
-        activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
-
-    Raises:
-        Exception. The committer does not have rights to unpublicize the
-            activity.
-    """
-    if not Actor(committer_id).can_unpublicize(activity_type, activity_id):
-        logging.error(
-            'User %s tried to unpublicize exploration %s but was refused '
-            'permission.' % (committer_id, activity_id))
-        raise Exception('This exploration cannot be unmarked as "featured".')
-
-    _change_activity_status(
-        committer_id, activity_id, activity_type, ACTIVITY_STATUS_PUBLIC,
-        'Exploration unpublicized.')
-
-
 # Rights functions for activities.
 def assign_role_for_exploration(
         committer_id, exploration_id, assignee_id, new_role):
     """Assigns a user to the given role and subscribes the assignee to future
     exploration updates.
-
     The caller should ensure that assignee_id corresponds to a valid user in
     the system.
-
     Args:
         committer_id: str. ID of the committer.
         exploration_id: str. ID of the exploration.
@@ -1138,7 +1006,6 @@ def assign_role_for_exploration(
         new_role: str. The name of the new role: One of
             ROLE_OWNER
             ROLE_EDITOR
-
     Raises:
         Exception. This could potentially throw an exception from
             _assign_role.
@@ -1153,11 +1020,9 @@ def assign_role_for_exploration(
 
 def release_ownership_of_exploration(committer_id, exploration_id):
     """Releases ownership of the given exploration to the community.
-
     Args:
         committer_id: str. ID of the committer.
         exploration_id: str. ID of the exploration.
-
     Raises:
         Exception. This could potentially throw an exception from
             _release_ownership_of_activity.
@@ -1170,16 +1035,13 @@ def set_private_viewability_of_exploration(
         committer_id, exploration_id, viewable_if_private):
     """Sets the viewable_if_private attribute for the given exploration's rights
     object.
-
     If viewable_if_private is True, this allows a private exploration
     to be viewed by anyone with the link.
-
     Args:
         committer_id: str. ID of the committer.
         exploration_id: str. ID of the exploration.
         viewable_if_private: bool. Whether the exploration should be made
             viewable (by anyone with the link).
-
     Raises:
         Exception. The committer does not have the permission to perform change
             action.
@@ -1219,14 +1081,11 @@ def set_private_viewability_of_exploration(
 
 def publish_exploration(committer_id, exploration_id):
     """Publishes the given exploration.
-
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
-
     Args:
         committer_id: str. ID of the committer.
         exploration_id: str. ID of the exploration.
-
     Raises:
         Exception. This could potentially throw an exception from
             _publish_activity.
@@ -1237,11 +1096,9 @@ def publish_exploration(committer_id, exploration_id):
 
 def unpublish_exploration(committer_id, exploration_id):
     """Unpublishes the given exploration.
-
     Args:
         committer_id: str. ID of the committer.
         exploration_id: str. ID of the exploration.
-
     Raises:
         Exception. This could potentially throw an exception from
             _unpublish_activity.
@@ -1250,48 +1107,13 @@ def unpublish_exploration(committer_id, exploration_id):
         committer_id, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
 
 
-def publicize_exploration(committer_id, exploration_id):
-    """Publicizes the given exploration.
-
-    It is the responsibility of the caller to check that the exploration is
-    valid prior to publicizing it.
-
-    Args:
-        committer_id: str. ID of the committer.
-        exploration_id: str. ID of the exploration.
-
-    Raises:
-        Exception. This could potentially throw an exception from
-            _publicize_activity.
-    """
-    _publicize_activity(
-        committer_id, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
-
-
-def unpublicize_exploration(committer_id, exploration_id):
-    """Unpublicizes the given exploration.
-
-    Args:
-        committer_id: str. ID of the committer.
-        exploration_id: str. ID of the exploration.
-
-    Raises:
-        Exception. This could potentially throw an exception from
-            _unpublicize_activity.
-    """
-    _unpublicize_activity(
-        committer_id, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
-
-
 # Rights functions for collections.
 def assign_role_for_collection(
         committer_id, collection_id, assignee_id, new_role):
     """Assign the given user to the given role and subscribes the assignee
     to future collection updates.
-
     The caller should ensure that assignee_id corresponds to a valid user in
     the system.
-
     Args:
         committer_id: str. ID of the committer.
         collection_id: str. ID of the collection.
@@ -1299,7 +1121,6 @@ def assign_role_for_collection(
         new_role: str. The name of the new role: One of
             ROLE_OWNER
             ROLE_EDITOR
-
     Raises:
         Exception. This could potentially throw an exception from
             _assign_role.
@@ -1314,11 +1135,9 @@ def assign_role_for_collection(
 
 def release_ownership_of_collection(committer_id, collection_id):
     """Releases ownership of the given collection to the community.
-
     Args:
         committer_id: str. ID of the committer.
         collection_id: str. ID of the collection.
-
     Raises:
         Exception. This could potentially throw an exception from
             _release_ownership_of_activity.
@@ -1329,14 +1148,11 @@ def release_ownership_of_collection(committer_id, collection_id):
 
 def publish_collection(committer_id, collection_id):
     """Publishes the given collection.
-
     It is the responsibility of the caller to check that the collection is
     valid prior to publication.
-
     Args:
         committer_id: str. ID of the committer.
         collection_id: str. ID of the collection.
-
     Raises:
         Exception. This could potentially throw an exception from
             _publish_activity.
@@ -1347,57 +1163,20 @@ def publish_collection(committer_id, collection_id):
 
 def unpublish_collection(committer_id, collection_id):
     """Unpublishes the given collection.
-
     Args:
         committer_id: str. ID of the committer.
         collection_id: str. ID of the collection.
-
     Raises:
         Exception. This could potentially throw an exception from
             _unpublish_activity.
-
     """
     _unpublish_activity(
-        committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
-
-
-def publicize_collection(committer_id, collection_id):
-    """Publicizes the given collection.
-
-    It is the responsibility of the caller to check that the collection is
-    valid prior to publicizing it.
-
-    Args:
-        committer_id: str. ID of the committer.
-        collection_id: str. ID of the collection.
-
-    Raises:
-        Exception. This could potentially throw an exception from
-            _publicize_activity.
-    """
-    _publicize_activity(
-        committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
-
-
-def unpublicize_collection(committer_id, collection_id):
-    """Unpublicizes the given collection.
-
-    Args:
-        committer_id: str. ID of the committer.
-        collection_id: str. ID of the collection.
-
-    Raises:
-        Exception. This could potentially throw an exception from
-            _unpublicize_activity.
-    """
-    _unpublicize_activity(
         committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
 
 
 def check_can_access_activity(
         user_id, user_actions, activity_type, activity_rights):
     """Checks whether the user can access given activity.
-
     Args:
         user_id: str or None. Id of the given user.
         user_actions: list(str). List of actions given user can perform.
@@ -1405,7 +1184,6 @@ def check_can_access_activity(
             collection.
         activity_rights: rights_object or None. Rights object of the given
             activity.
-
     Returns:
         bool. Whether the given activity can be accessed.
     """
@@ -1435,7 +1213,6 @@ def check_can_access_activity(
 def check_can_edit_activity(
         user_id, user_actions, activity_type, activity_rights):
     """Checks whether the user can edit given activity.
-
     Args:
         user_id: str or None. Id of the given user.
         user_actions: list(str). List of actions the user can perform.
@@ -1443,7 +1220,6 @@ def check_can_edit_activity(
             collection.
         activity_rights: rights_object or None. Rights object of the given
             activity.
-
     Returns:
         bool. Whether the given user can edit this activity.
     """
@@ -1480,12 +1256,10 @@ def check_can_edit_activity(
 
 def check_can_unpublish_collection(user_actions, collection_rights):
     """Checks whether the user can unpublish given collection.
-
     Args:
         user_actions: list(str). List of actions the user can perform.
         collection_rights: rights_object or None. Rights object of given
             collection.
-
     Returns:
         bool. Whether the user can unpublish given collection.
     """
@@ -1501,13 +1275,11 @@ def check_can_unpublish_collection(user_actions, collection_rights):
 
 def check_can_delete_exploration(user_id, user_actions, exploration_rights):
     """Checks whether the user can delete given exploration.
-
     Args:
         user_id: str or None. Id of the user.
         user_actions: list(str). List of actions the user can perform.
         exploration_rights: rights_object or None. Rights object of given
             exploration.
-
     Returns:
         bool. Whether the user can delete given exploration.
     """
@@ -1529,13 +1301,11 @@ def check_can_delete_exploration(user_id, user_actions, exploration_rights):
 def check_can_modify_exploration_roles(
         user_id, user_actions, exploration_rights):
     """Checks whether the user can modify roles for given exploration.
-
     Args:
         user_id: str or None. Id of the user.
         user_actions: list(str). List of actions the user can perform.
         exploration_rights: rights_object or None. Rights Object of given
             exploration.
-
     Returns:
         bool. Whether the user can modify roles for given exploration.
     """
@@ -1558,13 +1328,11 @@ def check_can_modify_exploration_roles(
 
 def check_can_release_ownership(user_id, user_actions, exploration_rights):
     """Checks whether the user can release ownership for given exploration.
-
     Args:
         user_id: str or None. Id of the user.
         user_actions: list(str). List of actions the user can perform.
         exploration_rights: rights_object or None. Rights Object of given
             exploration.
-
     Returns:
         bool. Whether the user can release ownership for given exploration.
     """
@@ -1580,13 +1348,11 @@ def check_can_release_ownership(user_id, user_actions, exploration_rights):
 
 def check_can_publish_exploration(user_id, user_actions, exploration_rights):
     """Checks whether the user can publish given exploration.
-
     Args:
         user_id: str or None. Id of the user.
         user_actions: list(str). List of actions the user can perform.
         exploration_rights: rights_object or None. Rights Object of given
             exploration.
-
     Returns:
         bool. Whether the user can publish given exploration.
     """
@@ -1609,12 +1375,10 @@ def check_can_publish_exploration(user_id, user_actions, exploration_rights):
 
 def check_can_unpublish_exploration(user_actions, exploration_rights):
     """Checks whether the user can unpublish given exploration.
-
     Args:
         user_actions: list(str). List of actions the user can perform.
         exploration_rights: rights_object or None. Rights object of given
             exploration.
-
     Returns:
         bool. Whether the user can unpublish given exploration.
     """
