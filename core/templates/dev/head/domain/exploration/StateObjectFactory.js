@@ -22,8 +22,8 @@ oppia.factory('StateObjectFactory', [
   'SubtitledHtmlObjectFactory', 'ParamChangesObjectFactory',
   function(AnswerGroupObjectFactory, InteractionObjectFactory,
     SubtitledHtmlObjectFactory, ParamChangesObjectFactory) {
-    var State = function(name, classifierModelId, content,
-      interaction, paramChanges) {
+    var State = function(name, classifierModelId, content, interaction,
+      paramChanges) {
       this.name = name;
       this.classifierModelId = classifierModelId;
       this.content = content;

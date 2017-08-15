@@ -35,15 +35,11 @@
 
      it('should return correct classifier details.', function() {
        var stateName = 'stateName1'
-       var retrievedAlgorithmId = mappingService.getAlgorithmId(stateName);
-       var retrievedClassifierData = mappingService.getClassifierData(
-         stateName);
-       var retrievedDataSchemaVersion = mappingService.getDataSchemaVersion(
-         stateName);
+       var retrievedClassifier = mappingService.getClassifier(stateName);
 
-       expect(retrievedAlgorithmId).toEqual('LDAStringClassifier');
-       expect(retrievedClassifierData).toEqual({});
-       expect(retrievedDataSchemaVersion).toEqual(1);
+       expect(retrievedClassifier.algorithmId).toEqual('LDAStringClassifier');
+       expect(retrievedClassifier.classifierData).toEqual({});
+       expect(retrievedClassifier.dataSchemaVersion).toEqual(1);
      });
    });
  });

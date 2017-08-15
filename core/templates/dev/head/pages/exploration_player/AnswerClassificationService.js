@@ -134,21 +134,18 @@ oppia.factory('AnswerClassificationService', [
 
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
-          var classifierData = StateClassifierMappingService.getClassifierData(
+          var classifier = StateClassifierMappingService.getClassifier(
             stateName);
-          var algorithmId = StateClassifierMappingService.getAlgorithmId(
-            stateName);
-          var dataSchemaVersion = (
-            StateClassifierMappingService.getDataSchemaVersion(stateName));
-          if (classifierData && algorithmId && dataSchemaVersion) {
+          if (classifier.classifierData && classifier.algorithmId && (
+            classifier.dataSchemaVersion)) {
             var predictionService = (
               PredictionAlgorithmRegistryService.getPredictionService(
-                algorithmId, dataSchemaVersion));
+                classifier.algorithmId, classifier.dataSchemaVersion));
             // If prediction service exists, we run classifier. We return the
             // default outcome otherwise.
             if (predictionService) {
               var predictedAnswerGroupIndex = predictionService.predict(
-                classifierData, answer);
+                classifier.classifierData, answer);
               result = AnswerClassificationResult.createNew(
                 answerGroups[predictedAnswerGroupIndex].outcome,
                 predictedAnswerGroupIndex,

@@ -35,25 +35,9 @@
          }
        },
 
-       getClassifierData: function(stateName) {
+       getClassifier: function(stateName) {
          if (stateClassifierMapping.hasOwnProperty(stateName)) {
-           return stateClassifierMapping[stateName].classifierData;
-         } else {
-           return null;
-         }
-       },
-
-       getAlgorithmId: function(stateName) {
-         if (stateClassifierMapping.hasOwnProperty(stateName)) {
-           return stateClassifierMapping[stateName].algorithmId;
-         } else {
-           return null;
-         }
-       },
-
-       getDataSchemaVersion: function(stateName) {
-         if (stateClassifierMapping.hasOwnProperty(stateName)) {
-           return stateClassifierMapping[stateName].dataSchemaVersion;
+           return stateClassifierMapping[stateName];
          } else {
            return null;
          }
