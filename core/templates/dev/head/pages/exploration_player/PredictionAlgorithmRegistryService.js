@@ -17,8 +17,7 @@
  */
 
  oppia.factory('PredictionAlgorithmRegistryService', [
-   'PredictionAlgorithmSampleService',
-   function(PredictionAlgorithmSampleService) {
+   function() {
     /**
      * This mapping needs to be updated whenever a new prediction service needs
      * to be added for classification. The mapping is from algorithmId to a
@@ -34,8 +33,10 @@
      return {
        getPredictionService: function(algorithmId, dataSchemaVersion) {
          if (algorithmIdPredictionServiceMapping.hasOwnProperty(algorithmId)) {
+           // We convert dataSchemaVersion to a string below since JS objects
+           // can't have integer properties.
            return algorithmIdPredictionServiceMapping[algorithmId][
-             dataSchemaVersion.toString()]
+             dataSchemaVersion.toString()];
          } else {
            return null;
          }

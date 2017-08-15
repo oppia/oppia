@@ -33,9 +33,7 @@ describe('Answer classification service with string classifier disabled',
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    var EXPLICIT_CLASSIFICATION = 'explicit';
-    var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
-
+    var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION;
     var acs, sof, oof, acr, $httpBackend, successHandler, failHandler,
       $rootScope, stateName, state;
     beforeEach(inject(function($injector) {
@@ -43,6 +41,9 @@ describe('Answer classification service with string classifier disabled',
       sof = $injector.get('StateObjectFactory');
       oof = $injector.get('OutcomeObjectFactory');
       acr = $injector.get('AnswerClassificationResult');
+      EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
+      DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
+        'DEFAULT_OUTCOME_CLASSIFICATION');
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
       successHandler = jasmine.createSpy('success');
@@ -234,15 +235,20 @@ describe('Answer classification service with string classifier enabled',
           }
         });
         $provide.constant('ENABLE_ML_CLASSIFIERS', true);
+        $provide.factory('PredictionSampleService', [function() {
+          return {
+            predict: function(classifierData, answer) {
+              return 1;
+            }
+          };
+        }]);
       });
     });
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    var EXPLICIT_CLASSIFICATION = 'explicit';
-    var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
-    var MACHINE_LEARNING_CLASSIFICATION = 'ml_classifier';
-
+    var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
+      STATISTICAL_CLASSIFICATION;
     var acs, scms, sof, oof, acr, $httpBackend, successHandler, failHandler,
       $rootScope, stateName, state, state2, registryService, predictionService,
       stateClassifierMapping;
@@ -252,10 +258,14 @@ describe('Answer classification service with string classifier enabled',
       sof = $injector.get('StateObjectFactory');
       oof = $injector.get('OutcomeObjectFactory');
       acr = $injector.get('AnswerClassificationResult');
+      EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
+      DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
+        'DEFAULT_OUTCOME_CLASSIFICATION');
+      STATISTICAL_CLASSIFICATION = $injector.get('STATISTICAL_CLASSIFICATION');
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
       registryService = $injector.get('PredictionAlgorithmRegistryService');
-      predictionService = $injector.get('PredictionAlgorithmSampleService');
+      predictionService = $injector.get('PredictionSampleService');
       successHandler = jasmine.createSpy('success');
       failHandler = jasmine.createSpy('fail');
 
@@ -360,7 +370,7 @@ describe('Answer classification service with string classifier enabled',
       $rootScope.$apply();
       var expectedClassificationResult = acr.createNew(
         state.interaction.answerGroups[1].outcome, 1, 2,
-        MACHINE_LEARNING_CLASSIFICATION);
+        STATISTICAL_CLASSIFICATION);
 
       expect(successHandler).toHaveBeenCalledWith(expectedClassificationResult);
       expect(failHandler).not.toHaveBeenCalled();

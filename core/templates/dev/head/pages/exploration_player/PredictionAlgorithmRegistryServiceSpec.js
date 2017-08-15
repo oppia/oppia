@@ -21,19 +21,33 @@ describe('Prediction algorithm registry service', function() {
 
   describe('Test prediction algorithm registry functions', function() {
     var registryService, predictionService;
-    beforeEach(inject(function($injector) {
-      predictionService = $injector.get('PredictionAlgorithmSampleService');
-      registryService = $injector.get('PredictionAlgorithmRegistryService');
-    }));
 
-    it('should return correct prediction algorithm service.', function() {
-      var algorithmId = 'LDAStringClassifier';
-      var dataSchemaVersion = 1;
+    beforeEach(function() {
+      module(function($provide) {
+        $provide.factory('PredictionSampleService', [function() {
+          return {
+            predict: function(classifierData, answer) {
+              return 1;
+            }
+          };
+        }]);
+      });
+    });
+
+    beforeEach(inject(function($injector) {
+      registryService = $injector.get('PredictionAlgorithmRegistryService');
+      predictionService = $injector.get('PredictionSampleService');
+
       registryService.setMapping({
         LDAStringClassifier: {
           1: predictionService
         }
       });
+    }));
+
+    it('should return correct prediction algorithm service.', function() {
+      var algorithmId = 'LDAStringClassifier';
+      var dataSchemaVersion = 1;
       var generatedPredictionService = registryService.getPredictionService(
         algorithmId, dataSchemaVersion);
 

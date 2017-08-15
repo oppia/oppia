@@ -27,7 +27,7 @@
    Classifier.create = function(
        algorithmId, classifierData, dataSchemaVersion) {
      return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-   }
+   };
 
    return Classifier;
  }]);

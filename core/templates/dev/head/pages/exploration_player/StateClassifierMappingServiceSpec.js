@@ -25,7 +25,7 @@
        mappingService = $injector.get('StateClassifierMappingService');
 
        mappingService.init({
-         'stateName1': {
+         stateName1: {
            algorithm_id: 'LDAStringClassifier',
            classifier_data: {},
            data_schema_version: 1

@@ -24,19 +24,18 @@ oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit')
 oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match')
 oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
-oppia.constant('MACHINE_LEARNING_CLASSIFICATION', 'ml_classifier')
 
 oppia.factory('AnswerClassificationService', [
   '$http', '$q', 'LearnerParamsService', 'alertsService',
   'AnswerClassificationResult', 'PredictionAlgorithmRegistryService',
   'StateClassifierMappingService', 'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS',
   'EXPLICIT_CLASSIFICATION', 'DEFAULT_OUTCOME_CLASSIFICATION',
-  'MACHINE_LEARNING_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
+  'STATISTICAL_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
   function($http, $q, LearnerParamsService, alertsService,
       AnswerClassificationResult, PredictionAlgorithmRegistryService,
       StateClassifierMappingService, INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS,
       EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
-      MACHINE_LEARNING_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
+      STATISTICAL_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -88,11 +87,11 @@ oppia.factory('AnswerClassificationService', [
     var findClassifierRuleIndex = function(answerGroup) {
       for (var i = 0; i < answerGroup.rules.length; i++) {
         var rule = answerGroup.rules[i];
-        if (rule.type == RULE_TYPE_CLASSIFIER) {
+        if (rule.type === RULE_TYPE_CLASSIFIER) {
           return i;
         }
       }
-      return null;
+      throw Error('Classifier Rule type is not present in this answer group.');
     };
 
     return {
@@ -155,7 +154,7 @@ oppia.factory('AnswerClassificationService', [
                 predictedAnswerGroupIndex,
                 findClassifierRuleIndex(
                   answerGroups[predictedAnswerGroupIndex]),
-                MACHINE_LEARNING_CLASSIFICATION
+                STATISTICAL_CLASSIFICATION
               );
             }
           }

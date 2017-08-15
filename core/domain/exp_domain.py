@@ -99,9 +99,6 @@ TRAINING_DATA_CLASSIFICATION = 'training_data_match'
 # Represents answers which were predicted using a statistical training model
 # from training data within an answer group.
 STATISTICAL_CLASSIFICATION = 'statistical_classifier'
-# Represents answers which were predicted using a machine learning model from
-# training data within an answer group.
-MACHINE_LEARNING_CLASSIFICATION = 'ml_classifier'
 # Represents answers which led to the 'default outcome' of an interaction,
 # rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
