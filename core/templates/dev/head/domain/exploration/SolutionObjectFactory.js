@@ -84,7 +84,7 @@ oppia.factory('SolutionObjectFactory', [
         (this.answerIsExclusive ? 'The only' : 'One') + ' answer is:<br>' +
         oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
           this.correctAnswer, interaction.id, interaction.customizationArgs) +
-        '<br><br>Explanation:<br>' + this.explanation);
+        '. ' + this.explanation);
     };
 
     return Solution;
