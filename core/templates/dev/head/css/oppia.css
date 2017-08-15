@@ -251,7 +251,7 @@ body {
   text-align: right;
 }
 
-.oppia-exploration-playlist-tile {
+.oppia-activity-summary-tile.oppia-exploration-playlist-tile {
   border-bottom: 1px solid #C0C0C0;
   height: 145px;
   margin: 0;
@@ -4020,21 +4020,21 @@ md-card.preview-conversation-skin-supplemental-card {
   box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
 }
 
-.oppia-exploration-playlist-tile .title-section {
+.oppia-activity-summary-tile.oppia-exploration-playlist-tile .title-section {
   display: inline-block;
   height: 7em;
   margin: 16px 0 10px 16px;
   width: 27%;
 }
 
-.oppia-exploration-playlist-tile .summary-section {
+.oppia-activity-summary-tile.oppia-exploration-playlist-tile .summary-section {
   display: inline-block;
   float: right;
   margin-top: 3%;
   width: 67%;
 }
 
-.oppia-exploration-playlist-tile .activity-title {
+.oppia-activity-summary-tile.oppia-exploration-playlist-tile .activity-title {
   font-size: 0.85em;
   text-align: center;
 }

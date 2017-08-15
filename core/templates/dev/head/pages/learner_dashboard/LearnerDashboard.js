@@ -262,7 +262,7 @@ oppia.controller('LearnerDashboard', [
             '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
               activityType: constants.ACTIVITY_TYPE_EXPLORATION,
               activityId: (
-                $scope.explorationPlaylist[ui.item.sortable.dropindex].id)
+                $scope.explorationPlaylist[ui.item.sortable.index].id)
             }));
 
         $http.post(insertExpInLearnerPlaylistUrl, {

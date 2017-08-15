@@ -354,7 +354,7 @@
 
             <div ui-sortable="explorationPlaylistSortableOptions" ng-model="explorationPlaylist">
               <div class="oppia-learner-playlist-tiles"
-                   ng-repeat="tile in explorationPlaylist"
+                   ng-repeat="tile in explorationPlaylist track by $index"
                    ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false"
                    style="height: 145px;">
                 <i class="remove-icon fa fa-times"
@@ -465,7 +465,7 @@
             </md-card>
 
             <div ui-sortable="collectionPlaylistSortableOptions" ng-model="collectionPlaylist">
-              <div ng-repeat="tile in collectionPlaylist"
+              <div ng-repeat="tile in collectionPlaylist track by $index"
                    style="display: inline-block; margin-left: 1px;"
                    ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
                 <i class="remove-icon fa fa-times"
