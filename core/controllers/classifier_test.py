@@ -127,12 +127,6 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.post_json('/ml/trainedclassifierhandler', self.payload,
                        expect_errors=True, expected_status_int=400)
 
-    def test_error_on_existing_classifier(self):
-        # Create ClassifierDataModel before the controller is called.
-        classifier_services.create_classifier(self.job_id, self.classifier_data)
-        self.post_json('/ml/trainedclassifierhandler', self.payload,
-                       expect_errors=True, expected_status_int=500)
-
 
 class NextJobHandlerTest(test_utils.GenericTestBase):
     """Test the handler for fetching next training job."""
@@ -190,9 +184,9 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
             self.post_json('/ml/nextjobhandler', self.payload,
                            expect_errors=True, expected_status_int=401)
 
-    def test_error_on_different_signatures(self):
+    def test_error_on_modified_message(self):
         # Altering data to result in different signatures.
-        self.payload['vm_id'] = 'different_vm_id'
+        self.payload['message'] = 'different'
         self.post_json('/ml/nextjobhandler', self.payload,
                        expect_errors=True, expected_status_int=401)
 

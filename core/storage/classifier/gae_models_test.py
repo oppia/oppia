@@ -58,23 +58,23 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             'LDAStringClassifier', 'TextInput', 'exp_id1', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW)
+            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, None, 1)
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id2', 2,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING)
+            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, None, 1)
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id3', 3,
             next_scheduled_check_time + datetime.timedelta(
                 minutes=feconf.CLASSIFIER_JOB_TTL_MINS),
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING)
+            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, None, 1)
         classifier_models.ClassifierTrainingJobModel.create(
             'LDAStringClassifier', 'TextInput', 'exp_id4', 4,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_FAILED)
+            'state_name2', feconf.TRAINING_JOB_STATUS_FAILED, None, 1)
 
         training_jobs, cursor, more = (
             classifier_models.ClassifierTrainingJobModel.

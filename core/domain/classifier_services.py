@@ -327,11 +327,11 @@ def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
     next_scheduled_check_time = datetime.datetime.utcnow()
     dummy_classifier_training_job = classifier_domain.ClassifierTrainingJob(
         'job_id_dummy', algorithm_id, interaction_id, exp_id, exp_version,
-        next_scheduled_check_time, state_name, status, training_data, 1, None)
+        next_scheduled_check_time, state_name, status, training_data, None, 1)
     dummy_classifier_training_job.validate()
     job_id = classifier_models.ClassifierTrainingJobModel.create(
         algorithm_id, interaction_id, exp_id, exp_version,
-        next_scheduled_check_time, training_data, state_name, status)
+        next_scheduled_check_time, training_data, state_name, status, None, 1)
     return job_id
 
 
