@@ -83,6 +83,7 @@ class ConfigProperty(object):
     - embedded_google_group_url
     - full_site_url
     - moderator_request_forum_url
+    - publicize_exploration_email_html_body
     - sharing_options
     - sharing_options_twitter_text
     - sidebar_menu_additional_links

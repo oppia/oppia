@@ -155,29 +155,15 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_publish_or_publicize_activity_does_not_affect_featured_list(self):
+    def test_publish_activity_does_not_affect_featured_list(self):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
-        rights_manager.publicize_exploration(self.moderator_id, self.EXP_ID_0)
-        self._compare_lists(
-            activity_services.get_featured_activity_references(), [])
-        rights_manager.unpublicize_exploration(
-            self.moderator_id, self.EXP_ID_0)
-        self._compare_lists(
-            activity_services.get_featured_activity_references(), [])
 
         rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
-        self._compare_lists(
-            activity_services.get_featured_activity_references(), [])
-        rights_manager.publicize_collection(self.moderator_id, self.COL_ID_2)
-        self._compare_lists(
-            activity_services.get_featured_activity_references(), [])
-        rights_manager.unpublicize_collection(
-            self.moderator_id, self.COL_ID_2)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 

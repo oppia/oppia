@@ -26,7 +26,7 @@ from core.platform import models
 ])
 
 
-class StatisticsAudit(jobs.BaseMapReduceJobManager):
+class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
     """A one-off statistics audit.
 
     Performs a brief audit of exploration completions and state hit counts to

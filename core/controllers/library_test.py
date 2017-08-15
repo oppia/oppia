@@ -22,6 +22,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_manager
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -73,9 +74,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-        # Publicize the demo exploration.
         self.set_admins([self.ADMIN_USERNAME])
-        rights_manager.publicize_exploration(self.admin_id, '0')
 
         # Run migration job to create exploration summaries.
         # This is not necessary, but serves as additional check that
@@ -83,9 +82,13 @@ class LibraryPageTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         job_id = (exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
-        self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertGreaterEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         # change title and category
         exp_services.update_exploration(
@@ -109,7 +112,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'title': 'A new title!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
     def test_library_handler_for_created_explorations(self):
@@ -146,7 +149,6 @@ class LibraryPageTest(test_utils.GenericTestBase):
         exp_services._save_exploration(  # pylint: disable=protected-access
             self.admin_id, exploration, 'Exploration B', [])
         rights_manager.publish_exploration(self.admin_id, 'B')
-        rights_manager.publicize_exploration(self.admin_id, 'B')
 
         # Publish exploration A
         rights_manager.publish_exploration(self.admin_id, 'A')
@@ -162,8 +164,8 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-        }, response_dict['activity_list'][0])
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_list'][1])
         self.assertDictContainsSubset({
             'id': 'A',
             'category': 'Category A',
@@ -171,7 +173,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'Objective A',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_list'][1])
+        }, response_dict['activity_list'][0])
 
         # Delete exploration A
         exp_services.delete_exploration(self.admin_id, 'A')
@@ -185,7 +187,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
 

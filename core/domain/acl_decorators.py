@@ -442,10 +442,6 @@ def can_publish_exploration(handler):
                 self.user_id, self.actions, exploration_rights):
             return handler(self, exploration_id, *args, **kwargs)
 
-        if rights_manager.check_can_publicize_exploration(
-                self.actions, exploration_rights):
-            return handler(self, exploration_id, *args, **kwargs)
-
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to publish this exploration.')
     test_can_publish.__wrapped__ = True
