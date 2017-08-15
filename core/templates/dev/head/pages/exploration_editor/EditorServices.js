@@ -1040,7 +1040,7 @@ oppia.factory('explorationStatesService', [
       init: function(statesBackendDict) {
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
-        SolutionValidityService.init();
+        SolutionValidityService.init(_states.getStateNames());
         var answerClassificationPromises = [];
         _states.getStateNames().forEach(function(stateName) {
           var solution = _states.getState(stateName).interaction.solution;

@@ -37,7 +37,7 @@ describe('Solution Validity Service', function() {
           expect(svs.isSolutionValid('State 1')).toBe(true);
 
           svs.deleteSolutionValidity('State 1');
-          expect(Object.keys(svs.getAllValidities()).length === 0).toBe(true);
+          expect(Object.keys(svs.getAllValidities())).toEqual([]);
 
           svs.updateValidity('State 1', false);
           expect(svs.isSolutionValid('State 1')).toBe(false);

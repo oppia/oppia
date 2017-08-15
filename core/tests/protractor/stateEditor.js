@@ -246,7 +246,7 @@ describe('State editor', function() {
     }, 'final card', true, 'Equals', 'Some Text');
 
     editor.addHint('hint one');
-    editor.addSolution({
+    editor.addSolution('TextInput', {
       answerIsExclusive: true,
       correctAnswer: 'Some Text',
       explanation: 'sample explanation'

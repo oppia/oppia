@@ -1491,15 +1491,17 @@ var HintEditor = function(hintNum) {
   };
 };
 
-// This only handles TextInput interaction.
-var addSolution = function(solution) {
+var addSolution = function(interactionId, solution) {
   element(by.css('.protractor-test-oppia-add-solution-button')).click();
   browser.waitForAngular();
   general.waitForSystem();
-  element(by.css('.protractor-test-interaction-html'))
-    .all(by.tagName('input')).first().click().sendKeys(solution.correctAnswer);
-  browser.waitForAngular();
+  interactions.getInteraction(interactionId).submitAnswer(
+    element(by.css('.protractor-test-interaction-html')),
+    solution.correctAnswer);
   general.waitForSystem();
+  browser.waitForAngular();
+  element(by.css('.protractor-test-explanation-textarea'))
+    .all(by.tagName('p')).first().click();
   browser.switchTo().activeElement().sendKeys(solution.explanation);
   browser.waitForAngular();
   general.waitForSystem();

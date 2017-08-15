@@ -16,8 +16,12 @@
 oppia.factory('SolutionValidityService', [
   function() {
     return {
-      init: function() {
+      init: function(stateNames) {
         this.solutionValidities = {};
+        var self = this;
+        stateNames.forEach(function(stateName) {
+          self.solutionValidities[stateName] = true;
+        });
       },
       updateValidity: function(stateName, solutionIsValid) {
         this.solutionValidities[stateName] = solutionIsValid;
