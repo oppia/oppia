@@ -31,7 +31,7 @@ import feconf
 
 # pylint: disable=too-many-return-statements
 
-class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
+class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for excuting query with given query parameters.
     For each user we check if he/she satisfies query criteria. If the user
     satisfies the query criteria, then yield a tuple (query_id, user_id).
@@ -44,7 +44,8 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(user_settings_model):
-        query_id = jobs.BaseMapReduceJobManager.get_mapper_param('query_id')
+        query_id = (
+            jobs.BaseMapReduceOneOffJobManager.get_mapper_param('query_id'))
         query_model = user_models.UserQueryModel.get(query_id)
         user_id = user_settings_model.id
         user_contributions = user_models.UserContributionsModel.get(user_id)

@@ -118,13 +118,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
          start_computation())
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            0)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         self.process_and_flush_pending_tasks()
 
     def _run_stats_aggregator_jobs(self):
@@ -132,13 +130,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
          .start_computation())
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            0)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         self.process_and_flush_pending_tasks()
 
     def test_stats_no_explorations(self):
@@ -716,20 +712,5 @@ class CreationButtonsTest(test_utils.GenericTestBase):
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
         )[creator_dashboard.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
-
-        self.logout()
-
-    def test_exploration_upload_button(self):
-        """Test that the exploration upload button appears when appropriate."""
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
-
-        with self.swap(feconf, 'ALLOW_YAML_FILE_UPLOAD', True):
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-            self.assertEqual(response.status_int, 200)
-            response.mustcontain('ng-click="showUploadExplorationModal()"')
 
         self.logout()

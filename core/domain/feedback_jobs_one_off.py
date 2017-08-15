@@ -26,7 +26,7 @@ from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 
-class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
+class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for calculating the number of messages in a thread."""
 
     @classmethod

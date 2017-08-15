@@ -76,7 +76,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         # Check that MR job has been enqueued.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
@@ -179,7 +179,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Check that MR job has been enqueued.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
             # Check that qualified users are valid.
@@ -283,7 +283,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
             query_models = user_models.UserQueryModel.query().fetch()
