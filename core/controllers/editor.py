@@ -41,6 +41,7 @@ from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import visualization_registry
+from core.domain import search_services
 from core.platform import models
 import feconf
 import utils
@@ -442,7 +443,7 @@ class ExplorationRightsHandler(EditorHandler):
 
                 exp_services.publish_exploration_and_update_user_profiles(
                     self.user_id, exploration_id)
-                exp_services.index_explorations_given_ids([exploration_id])
+                search_services.index_explorations_given_ids([exploration_id])
             else:
                 rights_manager.unpublish_exploration(
                     self.user_id, exploration_id)

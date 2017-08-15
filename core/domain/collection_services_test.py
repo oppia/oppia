@@ -20,6 +20,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import search_services as activity_search_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -338,7 +339,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         rights_manager.publish_collection(self.owner_id, self.COL_ID_4)
 
         # Add the collections to the search index.
-        collection_services.index_collections_given_ids([
+        activity_search_services.index_collections_given_ids([
             self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
             self.COL_ID_4])
 
@@ -1512,51 +1513,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         results = collection_services.search_collections('Welcome', 2)[0]
         self.assertEqual(results, ['0'])
 
-    def test_index_collections_given_ids(self):
-        all_collection_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
-        expected_collection_ids = all_collection_ids[:-1]
-        all_collection_titles = [
-            'title 0', 'title 1', 'title 2', 'title 3', 'title 4']
-        expected_collection_titles = all_collection_titles[:-1]
-        all_collection_categories = ['cat0', 'cat1', 'cat2', 'cat3', 'cat4']
-        expected_collection_categories = all_collection_categories[:-1]
-
-        def mock_add_documents_to_index(docs, index):
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            ids = [doc['id'] for doc in docs]
-            titles = [doc['title'] for doc in docs]
-            categories = [doc['category'] for doc in docs]
-            self.assertEqual(set(ids), set(expected_collection_ids))
-            self.assertEqual(set(titles), set(expected_collection_titles))
-            self.assertEqual(
-                set(categories), set(expected_collection_categories))
-            return ids
-
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(search_services,
-                                  'add_documents_to_index',
-                                  add_docs_counter)
-
-        for ind in xrange(5):
-            self.save_new_valid_collection(
-                all_collection_ids[ind],
-                self.owner_id,
-                all_collection_titles[ind],
-                category=all_collection_categories[ind])
-
-        # We're only publishing the first 4 collections, so we're not
-        # expecting the last collection to be indexed.
-        for ind in xrange(4):
-            rights_manager.publish_collection(
-                self.owner_id,
-                expected_collection_ids[ind])
-
-        with add_docs_swap:
-            collection_services.index_collections_given_ids(all_collection_ids)
-
-        self.assertEqual(add_docs_counter.times_called, 1)
-
     def test_patch_collection_search_document(self):
 
         def mock_get_doc(doc_id, index):
@@ -1680,23 +1636,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
-
-    def test_get_search_rank(self):
-        self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
-
-        base_search_rank = 20
-
-        self.assertEqual(
-            collection_services._get_search_rank(self.COLLECTION_ID),
-            base_search_rank)
-
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        rights_manager.publicize_collection(
-            self.user_id_admin, self.COLLECTION_ID)
-        self.assertEqual(
-            collection_services._get_search_rank(self.COLLECTION_ID),
-            base_search_rank + 30)
-
 
 class CollectionSummaryTests(CollectionServicesUnitTests):
     """Test collection summaries."""

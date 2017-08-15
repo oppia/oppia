@@ -33,6 +33,7 @@ from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import search_services as activity_search_services
 from core.platform import models
 import feconf
 import utils
@@ -45,7 +46,7 @@ search_services = models.Registry.import_search_services()
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
 
-# Name for the collection search index.
+# Name for collection search index.
 SEARCH_INDEX_COLLECTIONS = 'collections'
 
 # The maximum number of iterations allowed for populating the results of a
@@ -732,7 +733,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
-    index_collections_given_ids([collection.id])
+    activity_search_services.index_collections_given_ids([collection.id])
 
     collection.version += 1
 
@@ -1136,7 +1137,7 @@ def load_demo(collection_id):
     publish_collection_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, collection_id)
 
-    index_collections_given_ids([collection_id])
+    activity_search_services.index_collections_given_ids([collection_id])
 
     # Now, load all of the demo explorations that are part of the collection.
     for collection_node in collection.nodes:
@@ -1239,61 +1240,6 @@ def _collection_rights_to_search_dict(rights):
     return doc
 
 
-def _should_index(collection):
-    """Checks if a particular collection should be indexed.
-
-    Args:
-        collection: Collection.
-    """
-    rights = rights_manager.get_collection_rights(collection.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
-
-
-def _get_search_rank(collection_id):
-    """Gets the search rank of a given collection.
-
-    Args:
-        collection_id: str. ID of the collection whose rank is to be retrieved.
-
-    Returns:
-        int. An integer determining the document's rank in search.
-
-        Featured collections get a ranking bump, and so do collections that
-        have been more recently updated.
-    """
-    rights = rights_manager.get_collection_rights(collection_id)
-    rank = _DEFAULT_RANK + (
-        _STATUS_PUBLICIZED_BONUS
-        if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
-        else 0)
-
-    # Ranks must be non-negative.
-    return max(rank, 0)
-
-
-def _collection_to_search_dict(collection):
-    """Converts a collection domain object to a search dict.
-
-    Args:
-        collection: Collection. The collection domain object to be converted.
-
-    Returns:
-        The search dict of the collection domain object.
-    """
-    rights = rights_manager.get_collection_rights(collection.id)
-    doc = {
-        'id': collection.id,
-        'title': collection.title,
-        'category': collection.category,
-        'objective': collection.objective,
-        'language_code': collection.language_code,
-        'tags': collection.tags,
-        'rank': _get_search_rank(collection.id),
-    }
-    doc.update(_collection_rights_to_search_dict(rights))
-    return doc
-
-
 def clear_search_index():
     """Clears the search index.
 
@@ -1301,23 +1247,6 @@ def clear_search_index():
     many entries in the index.
     """
     search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
-
-
-def index_collections_given_ids(collection_ids):
-    """Adds the given collections to the search index.
-
-    Args:
-        collection_ids: list(str). List of collection ids whose collections are
-            to be indexed.
-    """
-    # We pass 'strict=False' so as not to index deleted collections.
-    collection_list = get_multiple_collections_by_id(
-        collection_ids, strict=False).values()
-    search_services.add_documents_to_index([
-        _collection_to_search_dict(collection)
-        for collection in collection_list
-        if _should_index(collection)
-    ], SEARCH_INDEX_COLLECTIONS)
 
 
 def patch_collection_search_document(collection_id, update):

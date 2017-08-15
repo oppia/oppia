@@ -38,6 +38,7 @@ from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import search_services as activity_search_services
 from core.platform import models
 import feconf
 import utils
@@ -812,7 +813,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
-    index_explorations_given_ids([exploration.id])
+    activity_search_services.index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
 
@@ -1426,7 +1427,7 @@ def load_demo(exploration_id):
     publish_exploration_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
-    index_explorations_given_ids([exploration_id])
+    activity_search_services.index_explorations_given_ids([exploration_id])
 
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 
@@ -1531,17 +1532,6 @@ def _exp_rights_to_search_dict(rights):
     return doc
 
 
-def _should_index(exp):
-    """Returns whether the given exploration should be indexed for future
-    search queries.
-
-    Args:
-        exp: Exploration domain object.
-    """
-    rights = rights_manager.get_exploration_rights(exp.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
-
-
 def get_number_of_ratings(ratings):
     """Gets the total number of ratings represented by the given ratings
     object.
@@ -1606,96 +1596,11 @@ def get_scaled_average_rating(ratings):
     return 1 + 4 * wilson_score_lower_bound
 
 
-def get_search_rank_from_exp_summary(exp_summary):
-    """Returns an integer determining the document's rank in search.
-
-    Featured explorations get a ranking bump, and so do explorations that
-    have been more recently updated. Good ratings will increase the ranking
-    and bad ones will lower it.
-
-    Args:
-        exp_summary: ExplorationSummary. ExplorationSummary domain object.
-
-    Returns:
-        int. Document's rank in search.
-    """
-    # TODO(sll): Improve this calculation.
-    rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
-
-    rank = _DEFAULT_RANK + (
-        _STATUS_PUBLICIZED_BONUS
-        if exp_summary.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
-        else 0)
-
-    if exp_summary.ratings:
-        for rating_value in exp_summary.ratings:
-            rank += (
-                exp_summary.ratings[rating_value] *
-                rating_weightings[rating_value])
-
-    # Ranks must be non-negative.
-    return max(rank, 0)
-
-
-def get_search_rank(exp_id):
-    """Returns the search rank.
-
-    Args:
-        exp_id: str. The id of the exploration.
-
-    Returns:
-        int. The rank of the exploration.
-    """
-    exp_summary = get_exploration_summary_by_id(exp_id)
-    return get_search_rank_from_exp_summary(exp_summary)
-
-
-def _exp_to_search_dict(exp):
-    """Updates the dict to be returned, whether the given exploration is to
-    be indexed for further queries or not.
-
-    Args:
-        exp: Exploration. Exploration domain object.
-
-    Returns:
-        dict. The representation of the given exploration, in a form that can
-        be used by the search index.
-    """
-    rights = rights_manager.get_exploration_rights(exp.id)
-    doc = {
-        'id': exp.id,
-        'language_code': exp.language_code,
-        'title': exp.title,
-        'category': exp.category,
-        'tags': exp.tags,
-        'blurb': exp.blurb,
-        'objective': exp.objective,
-        'author_notes': exp.author_notes,
-        'rank': get_search_rank(exp.id),
-    }
-    doc.update(_exp_rights_to_search_dict(rights))
-    return doc
-
-
 def clear_search_index():
     """WARNING: This runs in-request, and may therefore fail if there are too
     many entries in the index.
     """
     search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
-
-
-def index_explorations_given_ids(exp_ids):
-    """Indexes the explorations corresponding to the given exploration ids.
-
-    Args:
-        exp_ids: list(str). List of ids of the explorations to be indexed.
-    """
-    # We pass 'strict=False' so as not to index deleted explorations.
-    exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
-    search_services.add_documents_to_index([
-        _exp_to_search_dict(exp) for exp in exploration_models.values()
-        if _should_index(exp)
-    ], SEARCH_INDEX_EXPLORATIONS)
 
 
 def patch_exploration_search_document(exp_id, update):
@@ -1711,7 +1616,6 @@ def patch_exploration_search_document(exp_id, update):
         exp_id, SEARCH_INDEX_EXPLORATIONS)
     doc.update(update)
     search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
-
 
 def update_exploration_status_in_search(exp_id):
     """Updates the exploration status in its search doc.
@@ -1751,7 +1655,8 @@ def search_explorations(query, limit, sort=None, cursor=None):
             '+' or a '-' character indicating whether to sort in ascending or
             descending order respectively. This character should be followed by
             a field name to sort on. When this is None, results are based on
-            'rank'. See get_search_rank to see how rank is determined.
+            'rank'. See core.domain.search_services.get_search_rank to see
+            how rank is determined.
         cursor: str or None. A cursor, used to get the next page of results. If
             there are more documents that match the query than 'limit', this
             function will return a cursor to get the next page.

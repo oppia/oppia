@@ -21,9 +21,9 @@ from pipeline import pipeline
 from core import jobs
 from core.controllers import base
 from core.domain import email_manager
-from core.domain import exp_jobs_one_off
 from core.domain import recommendations_jobs_one_off
 from core.domain import user_jobs_one_off
+from core.domain import activity_jobs_one_off
 from core.platform import models
 import utils
 
@@ -120,14 +120,14 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
         job_class.enqueue(job_class.create_new())
 
 
-class CronExplorationSearchRankHandler(base.BaseHandler):
-    """Handler for computing exploration search ranks."""
+class CronActivitySearchRankHandler(base.BaseHandler):
+    """Handler for computing activity search ranks."""
 
     @require_cron_or_superadmin
     def get(self):
         """Handles GET requests."""
-        exp_jobs_one_off.IndexAllExplorationsJobManager.enqueue(
-            exp_jobs_one_off.IndexAllExplorationsJobManager.create_new())
+        activity_jobs_one_off.IndexAllActivitiesJobManager.enqueue(
+            activity_jobs_one_off.IndexAllActivitiesJobManager.create_new())
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):

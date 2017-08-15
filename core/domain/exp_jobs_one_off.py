@@ -143,23 +143,6 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
             first_published_msec)
 
 
-class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
-    """One-off job that indexes all explorations and computes their ranks."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if not item.deleted:
-            exp_services.index_explorations_given_ids([item.id])
-
-    @staticmethod
-    def reduce(key, values):
-        pass
-
-
 class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
     """Job that checks that all explorations have appropriate validation
     statuses.
