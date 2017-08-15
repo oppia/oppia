@@ -26,7 +26,7 @@
  * https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L2481
  */
 
-oppia.factory('SVMPredictionService', [function() {
+oppia.factory('SVMPredictionService', ['$log', function($log) {
   return {
     kernel: function(kernelParams, supportVectors, input) {
       var kernel = kernelParams.kernel;
@@ -58,6 +58,12 @@ oppia.factory('SVMPredictionService', [function() {
       startIndices[0] = 0;
       for(var i = 1; i < nSupport.length; i++) {
         startIndices[i] = startIndices[i - 1] + nSupport[i - 1];
+      }
+
+      if (supportVectors[0].length !== input.length) {
+        // Support vector and input dimensions do not match.
+        $log.error(
+          'Dimension of support vectors and given input is different.');
       }
 
       // Find kernel values for supportVectors and given input. Assumes that

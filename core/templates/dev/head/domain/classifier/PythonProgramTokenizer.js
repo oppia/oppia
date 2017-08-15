@@ -15,10 +15,10 @@
 /**
  * Tokenizer for Python code.
  *
- * IMPORTANT NOTE: The tokenizer is build using Python's own tokenizer module.
+ * IMPORTANT NOTE: The tokenizer is built using Python's own tokenizer module.
  * These functions are simply translated from Python code to JS code and they
  * both do same task. The unnecessary code from Python's tokenizer module
- * has been removed before translating it into JS andcCode relevant to
+ * has been removed before translating it into JS and code relevant to
  * generating tokens has been kept intact. If Python version changes on Oppia-ml
  * then changes in Python's tokenizer module must be propagated here.
  *
