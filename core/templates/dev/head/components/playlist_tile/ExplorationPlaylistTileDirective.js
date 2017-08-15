@@ -46,8 +46,8 @@ oppia.directive('explorationPlaylistTile', [
         mobileCutoffPx: '@mobileCutoffPx'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary_tile/' +
-        'exploration_summary_tile_directive.html'),
+        '/components/playlist_tile/' +
+        'exploration_playlist_tile_directive.html'),
       link: function(scope, element) {
         element.find('.exploration-summary-avatars').on('mouseenter',
           function() {

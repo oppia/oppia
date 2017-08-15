@@ -27,6 +27,7 @@ class LearnerPlaylistHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def post(self, activity_type, activity_id):
         position_to_be_inserted_in = self.payload.get('index')
+        print "Hello", position_to_be_inserted_in
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
             (belongs_to_completed_or_incomplete_list,
              playlist_limit_exceeded,

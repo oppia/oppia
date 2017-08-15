@@ -352,28 +352,34 @@
               </div>
             </md-card>
 
-            <div ng-repeat="tile in explorationPlaylist"
-                 style="display: inline-block; margin-left: 1px;"
-                 ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
-              <i class="remove-icon fa fa-times"
-                 ng-show="showRemoveIcon"
-                 aria-hidden="true"
-                 ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-                 tooltip="Remove"
-                 tooltip-placement="top"></i>
-              <exploration-playlist-tile
-                                      exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.last_updated_msec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      num-views="tile.num_views"
-                                      thumbnail-icon-url="tile.thumbnail_icon_url"
-                                      thumbnail-bg-color="tile.thumbnail_bg_color"
-                                      class="protractor-test-exp-summary-tile">
-              </exploration-playlist-tile>
+            <div ui-sortable="explorationPlaylistSortableOptions" ng-model="explorationPlaylist">
+              <div class="oppia-learner-playlist-tiles"
+                   ng-repeat="tile in explorationPlaylist"
+                   ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false"
+                   style="height: 145px;">
+                <i class="remove-icon fa fa-times"
+                   ng-show="showRemoveIcon"
+                   aria-hidden="true"
+                   style="color: black;" 
+                   ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+                   tooltip="Remove"
+                   tooltip-placement="top"></i>
+                <exploration-playlist-tile
+                                        style="height: 145px; display: block;"
+                                        exploration-id="tile.id"
+                                        exploration-title="tile.title"
+                                        last-updated-msec="tile.last_updated_msec"
+                                        objective="tile.objective"
+                                        category="tile.category"
+                                        ratings="tile.ratings"
+                                        num-views="tile.num_views"
+                                        thumbnail-icon-url="tile.thumbnail_icon_url"
+                                        thumbnail-bg-color="tile.thumbnail_bg_color"
+                                        class="protractor-test-exp-summary-tile">
+                </exploration-playlist-tile>
+              </div>
             </div>
+
           </div>
 
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
@@ -458,25 +464,27 @@
               </div>
             </md-card>
 
-            <div ng-repeat="tile in collectionPlaylist"
-                 style="display: inline-block; margin-left: 1px;"
-                 ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
-              <i class="remove-icon fa fa-times"
-                 ng-show="showRemoveIcon"
-                 aria-hidden="true"
-                 ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-                 tooltip="Remove"
-                 tooltip-placement="top"></i>
-              <collection-summary-tile
-                                       collection-id="tile.id"
-                                       collection-title="tile.title"
-                                       last-updated-msec="tile.last_updated_msec"
-                                       objective="tile.objective"
-                                       node-count="tile.node_count"
-                                       category="tile.category"
-                                       thumbnail-icon-url="tile.thumbnail_icon_url"
-                                       thumbnail-bg-color="tile.thumbnail_bg_color">
-              </collection-summary-tile>
+            <div ui-sortable="collectionPlaylistSortableOptions" ng-model="collectionPlaylist">
+              <div ng-repeat="tile in collectionPlaylist"
+                   style="display: inline-block; margin-left: 1px;"
+                   ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
+                <i class="remove-icon fa fa-times"
+                   ng-show="showRemoveIcon"
+                   aria-hidden="true"
+                   ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+                   tooltip="Remove"
+                   tooltip-placement="top"></i>
+                <collection-summary-tile
+                                         collection-id="tile.id"
+                                         collection-title="tile.title"
+                                         last-updated-msec="tile.last_updated_msec"
+                                         objective="tile.objective"
+                                         node-count="tile.node_count"
+                                         category="tile.category"
+                                         thumbnail-icon-url="tile.thumbnail_icon_url"
+                                         thumbnail-bg-color="tile.thumbnail_bg_color">
+                </collection-summary-tile>
+              </div>
             </div>
           </div>
 
