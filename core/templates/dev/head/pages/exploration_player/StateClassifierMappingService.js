@@ -25,7 +25,7 @@
          stateClassifierMapping = {};
          var algorithmId, classifierData, dataSchemaVersion;
          for (var stateName in backendStateClassifierMapping) {
-           if (backendStateClassifierMapping[stateName]) {
+           if (backendStateClassifierMapping.hasOwnProperty(stateName)) {
              algorithmId = backendStateClassifierMapping[
                stateName].algorithm_id;
              classifierData = backendStateClassifierMapping[
