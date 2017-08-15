@@ -155,7 +155,11 @@ oppia.controller('Library', [
             activityType: activityType,
             activityId: activityId
           }));
-      $http.post(addActivityToLearnerPlaylistUrl, {});
+      $http.post(addActivityToLearnerPlaylistUrl, {})
+        .then(function(response) {
+          // DO MODALS JOBS OVER HERE.
+          console.log(response.data.playlist_limit_exceeded);
+        });
 
       if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
         $scope.learnerDashboardActivityIds.exploration_playlist_ids.push(

@@ -28,11 +28,25 @@ class LearnerPlaylistHandler(base.BaseHandler):
     def post(self, activity_type, activity_id):
         position_to_be_inserted_in = self.payload.get('index')
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-            learner_progress_services.add_exp_to_learner_playlist(
-                self.user_id, activity_id, position_to_be_inserted_in)
+            (belongs_to_completed_or_incomplete_list,
+             playlist_limit_exceeded,
+             belongs_to_subscribed_activities) = (
+                 learner_progress_services.add_exp_to_learner_playlist(
+                     self.user_id, activity_id, position_to_be_inserted_in))
         elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-            learner_progress_services.add_collection_to_learner_playlist(
-                self.user_id, activity_id, position_to_be_inserted_in)
+            (belongs_to_completed_or_incomplete_list,
+             playlist_limit_exceeded,
+             belongs_to_subscribed_activities) = (
+                 learner_progress_services.add_collection_to_learner_playlist(
+                     self.user_id, activity_id, position_to_be_inserted_in))
+
+        self.values.update({
+            'belongs_to_completed_or_incomplete_list': (
+                belongs_to_completed_or_incomplete_list),
+            'playlist_limit_exceeded': playlist_limit_exceeded,
+            'belongs_to_subscribed_activities': (
+                belongs_to_subscribed_activities)
+        })
 
         self.render_json(self.values)
 

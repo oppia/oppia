@@ -361,7 +361,7 @@
                  ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                  tooltip="Remove"
                  tooltip-placement="top"></i>
-              <exploration-summary-tile
+              <exploration-playlist-tile
                                       exploration-id="tile.id"
                                       exploration-title="tile.title"
                                       last-updated-msec="tile.last_updated_msec"
@@ -372,7 +372,7 @@
                                       thumbnail-icon-url="tile.thumbnail_icon_url"
                                       thumbnail-bg-color="tile.thumbnail_bg_color"
                                       class="protractor-test-exp-summary-tile">
-              </exploration-summary-tile>
+              </exploration-playlist-tile>
             </div>
           </div>
 
@@ -793,6 +793,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/playlist_tile/ExplorationPlaylistTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js"></script>

@@ -324,14 +324,26 @@ def add_exp_to_learner_playlist(
         position_to_be_inserted: int|None. If this is specified the exploration
             gets inserted at the given position. Otherwise it gets added at the
             end.
+
+    Returns:
+        bool. It is true if the exploration being added belongs to the completed
+            or incomplete list.
     """
     completed_exploration_ids = get_all_completed_exp_ids(user_id)
     incomplete_exploration_ids = get_all_incomplete_exp_ids(user_id)
 
     if (exploration_id not in completed_exploration_ids and
             exploration_id not in incomplete_exploration_ids):
-        learner_playlist_services.mark_exploration_to_be_played_later(
-            user_id, exploration_id, position_to_be_inserted)
+        playlist_limit_exceeded, belongs_to_subscribed_activities = (
+            learner_playlist_services.mark_exploration_to_be_played_later(
+                user_id, exploration_id, position_to_be_inserted))
+        belongs_to_completed_or_incomplete_list = False
+    else:
+        belongs_to_completed_or_incomplete_list = True
+
+    return (belongs_to_completed_or_incomplete_list,
+            playlist_limit_exceeded,
+            belongs_to_subscribed_activities)
 
 
 def add_collection_to_learner_playlist(
@@ -353,8 +365,16 @@ def add_collection_to_learner_playlist(
 
     if (collection_id not in completed_collection_ids and
             collection_id not in incomplete_collection_ids):
-        learner_playlist_services.mark_collection_to_be_played_later(
-            user_id, collection_id, position_to_be_inserted)
+        playlist_limit_exceeded, belongs_to_subscribed_activities = (
+            learner_playlist_services.mark_collection_to_be_played_later(
+                user_id, collection_id, position_to_be_inserted))
+        belongs_to_completed_or_incomplete_list = False
+    else:
+        belongs_to_completed_or_incomplete_list = True
+
+    return (belongs_to_completed_or_incomplete_list,
+            playlist_limit_exceeded,
+            belongs_to_subscribed_activities)
 
 
 def _remove_activity_ids_from_playlist(user_id, exploration_ids,
