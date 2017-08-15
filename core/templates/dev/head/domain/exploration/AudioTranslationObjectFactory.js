@@ -32,6 +32,11 @@ oppia.factory('AudioTranslationObjectFactory', [function() {
     this.needsUpdate = !this.needsUpdate;
   };
 
+  AudioTranslation.prototype.getFileSizeMB = function() {
+    var NUM_BYTES_IN_MB = 1 << 20;
+    return this.fileSizeBytes / NUM_BYTES_IN_MB;
+  };
+
   AudioTranslation.prototype.toBackendDict = function() {
     return {
       filename: this.filename,

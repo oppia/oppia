@@ -331,8 +331,8 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
-    """Job that outputs a list of fallbacks."""
+class GadgetsOneOffJob(jobs.BaseMapReduceJobManager):
+    """Job that outputs a list of explorations that use gadgets."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -344,22 +344,10 @@ class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
             return
 
         exploration = exp_services.get_exploration_from_model(item)
-        exp_rights = rights_manager.get_exploration_rights(item.id)
-        if exp_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
-            for state_name, state in exploration.states.iteritems():
-                for fallback in state.interaction.fallbacks:
-                    num_submits = (
-                        fallback.trigger.customization_args['num_submits'])
-                    feedback = (
-                        fallback.outcome.feedback[0]
-                        if len(fallback.outcome.feedback) > 0 else 'ERROR')
-                    yield (
-                        '%s: %s' % (
-                            item.id,
-                            state_name.encode('utf-8')),
-                        '%s: %s' % (
-                            num_submits['value'],
-                            feedback.encode('utf-8')))
+        panel_contents_dict = exploration.skin_instance.panel_contents_dict
+        for panel_name, gadget_list in panel_contents_dict.iteritems():
+            if gadget_list:
+                yield (item.id, panel_name)
 
     @staticmethod
     def reduce(key, values):
