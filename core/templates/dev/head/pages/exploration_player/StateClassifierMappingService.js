@@ -25,13 +25,16 @@
          stateClassifierMapping = {};
          var algorithmId, classifierData, dataSchemaVersion;
          for (var stateName in backendStateClassifierMapping) {
-           algorithmId = backendStateClassifierMapping[stateName].algorithm_id;
-           classifierData = backendStateClassifierMapping[
-             stateName].classifier_data;
-           dataSchemaVersion = backendStateClassifierMapping[
-             stateName].data_schema_version
-           stateClassifierMapping[stateName] = ClassifierObjectFactory.create(
-             algorithmId, classifierData, dataSchemaVersion);
+           if (backendStateClassifierMapping[stateName]) {
+             algorithmId = backendStateClassifierMapping[
+               stateName].algorithm_id;
+             classifierData = backendStateClassifierMapping[
+               stateName].classifier_data;
+             dataSchemaVersion = backendStateClassifierMapping[
+               stateName].data_schema_version
+             stateClassifierMapping[stateName] = ClassifierObjectFactory.create(
+               algorithmId, classifierData, dataSchemaVersion);
+           }
          }
        },
 
