@@ -91,7 +91,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.get_exploration_rights(non_exp_id, strict=False))
 
     def test_demo_exploration(self):
-        exp_services.load_demo('1')
+        exp_services.load_demo(self.system_user, '1')
         rights_manager.release_ownership_of_exploration(
             self.system_user, '1')
         exp_rights = rights_manager.get_exploration_rights('1')
@@ -120,7 +120,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
         # explorations, whether or not they are on the splash page.
-        exp_services.load_demo('3')
+        exp_services.load_demo(self.system_user, '3')
         rights_manager.release_ownership_of_exploration(
             self.system_user, '3')
         exp_rights = rights_manager.get_exploration_rights('3')
@@ -285,7 +285,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_access_activity(
             self.user_b, exp_rights))
 
-        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
@@ -293,7 +293,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_unpublish_activity(
             self.user_a, exp_rights))
 
-        rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.user_admin, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
@@ -310,13 +310,13 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_a, exp_rights))
 
-        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_a, exp_rights))
 
-        rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.user_admin, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_delete_activity(
@@ -445,7 +445,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             rights_manager.get_collection_rights(non_col_id, strict=False))
 
     def test_demo_collection(self):
-        collection_services.load_demo('0')
+        collection_services.load_demo(self.system_user, '0')
         rights_manager.release_ownership_of_collection(
             self.system_user, '0')
         collection_rights = rights_manager.get_collection_rights('0')
@@ -662,7 +662,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_access_activity(
             self.user_b, collection_rights))
 
-        rights_manager.publish_collection(self.user_id_a, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.user_a, self.COLLECTION_ID)
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
 
@@ -672,7 +672,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, collection_rights))
 
         rights_manager.unpublish_collection(
-            self.user_id_admin, self.COLLECTION_ID)
+            self.user_admin, self.COLLECTION_ID)
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
 
@@ -689,7 +689,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_a, collection_rights))
 
-        rights_manager.publish_collection(self.user_id_a, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.user_a, self.COLLECTION_ID)
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
 
@@ -697,7 +697,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, collection_rights))
 
         rights_manager.unpublish_collection(
-            self.user_id_admin, self.COLLECTION_ID)
+            self.user_admin, self.COLLECTION_ID)
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
 
@@ -724,8 +724,7 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_admin_can_release_ownership_of_published_exploration(self):
         self.assertTrue(rights_manager.check_can_release_ownership(
@@ -782,10 +781,8 @@ class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.private_col_id, self.owner_id,
             exploration_id=self.private_col_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
-        rights_manager.publish_collection(
-            self.owner_id, self.published_col_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+        rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_admin_can_unpublish_published_collection(self):
         self.assertTrue(rights_manager.check_can_unpublish_activity(

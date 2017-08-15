@@ -19,6 +19,7 @@
 from core.domain import dependency_registry
 from core.domain import exp_services
 from core.domain import interaction_registry
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
@@ -38,6 +39,13 @@ class DependencyRegistryTests(test_utils.GenericTestBase):
 class DependencyControllerTests(test_utils.GenericTestBase):
     """Tests for dependency loading on user-facing pages."""
 
+    def setUp(self):
+        super(DependencyControllerTests, self).setUp()
+        self.system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
+
     def test_no_dependencies_in_non_exploration_pages(self):
         response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
@@ -48,7 +56,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         response.mustcontain(no=['skulpt'])
 
     def test_dependencies_loaded_in_exploration_editor(self):
-        exp_services.load_demo('0')
+        exp_services.load_demo(self.system_user, '0')
 
         # Register and login as an editor.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -74,7 +82,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
     def test_dependency_does_not_load_in_exploration_not_containing_it(self):
         exp_id = '0'
 
-        exp_services.load_demo(exp_id)
+        exp_services.load_demo(self.system_user, exp_id)
 
         # Verify that exploration 0 does not have a Skulpt dependency.
         exploration = exp_services.get_exploration_by_id(exp_id)
@@ -92,7 +100,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
     def test_dependency_loads_in_exploration_containing_it(self):
         exp_id = '1'
 
-        exp_services.load_demo(exp_id)
+        exp_services.load_demo(self.system_user, exp_id)
 
         # Verify that exploration 1 has a Skulpt dependency.
         exploration = exp_services.get_exploration_by_id(exp_id)

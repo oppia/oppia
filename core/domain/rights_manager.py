@@ -904,11 +904,11 @@ def _change_activity_status(
     _update_activity_summary(activity_type, activity_rights)
 
 
-def _publish_activity(committer_id, activity_id, activity_type):
+def _publish_activity(committer, activity_id, activity_type):
     """Publishes the given activity.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
@@ -918,11 +918,10 @@ def _publish_activity(committer_id, activity_id, activity_type):
         Exception. The committer does not have rights to publish the
             activity.
     """
-    committer_role = user_services.get_user_role_from_id(committer_id)
-    user = user_services.UserActionsInfo(committer_id, committer_role)
+    committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_publish_activity(user, activity_rights):
+    if not check_can_publish_activity(committer, activity_rights):
         logging.error(
             'User %s tried to publish %s %s but was refused '
             'permission.' % (committer_id, activity_type, activity_id))
@@ -933,11 +932,11 @@ def _publish_activity(committer_id, activity_id, activity_type):
         '%s published.' % activity_type)
 
 
-def _unpublish_activity(committer_id, activity_id, activity_type):
+def _unpublish_activity(committer, activity_id, activity_type):
     """Unpublishes the given activity.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
@@ -947,12 +946,10 @@ def _unpublish_activity(committer_id, activity_id, activity_type):
         Exception. The committer does not have rights to unpublish the
             activity.
     """
-    committer_role = user_services.get_user_role_from_id(committer_id)
-    user = user_services.UserActionsInfo(committer_id, committer_role)
+    committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_unpublish_activity(
-            user, activity_rights):
+    if not check_can_unpublish_activity(committer, activity_rights):
         logging.error(
             'User %s tried to unpublish %s %s but was refused '
             'permission.' % (committer_id, activity_type, activity_id))
@@ -1063,14 +1060,14 @@ def set_private_viewability_of_exploration(
     _update_exploration_summary(exploration_rights)
 
 
-def publish_exploration(committer_id, exploration_id):
+def publish_exploration(committer, exploration_id):
     """Publishes the given exploration.
 
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         exploration_id: str. ID of the exploration.
 
     Raises:
@@ -1078,14 +1075,14 @@ def publish_exploration(committer_id, exploration_id):
             _publish_activity.
     """
     _publish_activity(
-        committer_id, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
+        committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
 
 
-def unpublish_exploration(committer_id, exploration_id):
+def unpublish_exploration(committer, exploration_id):
     """Unpublishes the given exploration.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         exploration_id: str. ID of the exploration.
 
     Raises:
@@ -1093,7 +1090,7 @@ def unpublish_exploration(committer_id, exploration_id):
             _unpublish_activity.
     """
     _unpublish_activity(
-        committer_id, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
+        committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
 
 
 # Rights functions for collections.
@@ -1140,14 +1137,14 @@ def release_ownership_of_collection(committer, collection_id):
         committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
 
 
-def publish_collection(committer_id, collection_id):
+def publish_collection(committer, collection_id):
     """Publishes the given collection.
 
     It is the responsibility of the caller to check that the collection is
     valid prior to publication.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         collection_id: str. ID of the collection.
 
     Raises:
@@ -1155,14 +1152,14 @@ def publish_collection(committer_id, collection_id):
             _publish_activity.
     """
     _publish_activity(
-        committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
+        committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
 
 
-def unpublish_collection(committer_id, collection_id):
+def unpublish_collection(committer, collection_id):
     """Unpublishes the given collection.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         collection_id: str. ID of the collection.
 
     Raises:
@@ -1171,4 +1168,4 @@ def unpublish_collection(committer_id, collection_id):
 
     """
     _unpublish_activity(
-        committer_id, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
+        committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION)

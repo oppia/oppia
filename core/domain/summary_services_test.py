@@ -120,12 +120,12 @@ class ExplorationDisplayableSummariesTest(
         with self.assertRaisesRegexp(
             Exception, 'This exploration cannot be published'
             ):
-            rights_manager.publish_exploration(self.bob_id, self.EXP_ID_2)
+            rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
@@ -326,13 +326,16 @@ class FeaturedExplorationDisplayableSummariesTest(
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert = user_services.UserActionsInfo(
+            self.albert_id,
+            user_services.get_user_role_from_id(self.albert_id))
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.albert_id, language_code=self.LANGUAGE_CODE_ES)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         self.set_admins([self.ADMIN_USERNAME])
 
@@ -434,7 +437,11 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.owner = user_services.UserActionsInfo(
-            self.owner_id, user_services.get_user_role_from_id(self.owner_id))
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
+        self.editor = user_services.UserActionsInfo(
+            self.editor_id,
+            user_services.get_user_role_from_id(self.editor_id))
 
     def test_get_learner_dict_with_deleted_exp_fails_validation(self):
         self.save_new_valid_collection(
@@ -461,7 +468,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             }], 'Added another creator\'s private exploration')
 
         # A collection cannot access someone else's private exploration.
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected collection to only reference valid explorations, but '
@@ -470,7 +477,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
                 self.COLLECTION_ID, self.owner)
 
         # After the exploration is published, the dict can now be created.
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner)
 
@@ -484,7 +491,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             self.COLLECTION_ID, self.owner)
 
         # A public collection referencing a private exploration is bad, however.
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Cannot reference a private exploration within a public '
@@ -494,7 +501,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         # After the exploration is published, the learner dict can be crated
         # again.
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner)
 
@@ -508,7 +515,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
                 'exploration_id': self.EXP_ID_1
             }], 'Added another creator\'s private exploration')
 
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         collection_dict = summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner,
@@ -583,6 +590,9 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert = user_services.UserActionsInfo(
+            self.albert_id,
+            user_services.get_user_role_from_id(self.albert_id))
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
@@ -594,15 +604,15 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.save_new_valid_exploration(self.EXP_ID_8, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_9, self.albert_id)
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_4)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_5)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_6)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_7)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_8)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_9)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_4)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_5)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_6)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_7)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_8)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_9)
 
         self.set_admins([self.ADMIN_USERNAME])
 
@@ -736,6 +746,9 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert = user_services.UserActionsInfo(
+            self.albert_id,
+            user_services.get_user_role_from_id(self.albert_id))
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.albert_id,
@@ -747,9 +760,9 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             self.EXP_ID_3, self.albert_id,
             end_state_name='End')
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
 
         self.set_admins([self.ADMIN_USERNAME])
 
@@ -839,6 +852,9 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         super(ActivityReferenceAccessCheckerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
 
     def test_requiring_nonexistent_activities_be_public_raises_exception(self):
         with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
@@ -870,8 +886,8 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
 
         # There are no validation errors.
         summary_services.require_activities_to_be_public([
@@ -933,10 +949,10 @@ class CollectionNodeMetadataDictsTest(
                                         title='Exploration 5 Albert title',
                                         objective='An objective 5')
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID1)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID2)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID3)
-        rights_manager.publish_exploration(self.bob_id, self.EXP_ID4)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID3)
+        rights_manager.publish_exploration(self.bob, self.EXP_ID4)
 
         exp_services.index_explorations_given_ids([
             self.EXP_ID1, self.EXP_ID2, self.EXP_ID3,

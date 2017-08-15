@@ -223,7 +223,7 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(unicode(exploration_id))
+            exp_services.load_demo(self.system_user, unicode(exploration_id))
             rights_manager.release_ownership_of_exploration(
                 self.system_user, unicode(exploration_id))
         else:
@@ -234,7 +234,8 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
-            collection_services.load_demo(unicode(collection_id))
+            collection_services.load_demo(
+                self.system_user, unicode(collection_id))
             rights_manager.release_ownership_of_collection(
                 self.system_user, unicode(collection_id))
         else:
@@ -275,7 +276,7 @@ class AdminHandler(base.BaseHandler):
                 if i <= num_dummy_exps_to_publish - 1:
                     exploration_ids_to_publish.append(new_exploration_id)
                     rights_manager.publish_exploration(
-                        self.user_id, new_exploration_id)
+                        self.user, new_exploration_id)
             exp_services.index_explorations_given_ids(
                 exploration_ids_to_publish)
         else:

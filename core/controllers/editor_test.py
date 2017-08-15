@@ -69,7 +69,13 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             user_services.get_user_role_from_id(
                 feconf.SYSTEM_COMMITTER_ID))
-
+        self.editor = user_services.UserActionsInfo(
+            self.editor_id, user_services.get_user_role_from_id(
+                self.editor_id))
+        self.system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
@@ -92,7 +98,7 @@ class EditorTest(BaseEditorControllerTest):
 
     def setUp(self):
         super(EditorTest, self).setUp()
-        exp_services.load_demo('0')
+        exp_services.load_demo(self.system_user, '0')
 
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
@@ -242,7 +248,7 @@ class EditorTest(BaseEditorControllerTest):
 
             # Load the string classifier demo exploration.
             exp_id = '15'
-            exp_services.load_demo(exp_id)
+            exp_services.load_demo(self.system_user, exp_id)
             rights_manager.release_ownership_of_exploration(
                 self.system_user, exp_id)
 
@@ -655,7 +661,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
-        rights_manager.publish_exploration(self.owner_id, published_exp_id)
+        rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.delete(
@@ -772,7 +778,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         """Create exploration with two versions"""
         super(VersioningIntegrationTest, self).setUp()
 
-        exp_services.load_demo(self.EXP_ID)
+        exp_services.load_demo(self.system_user, self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
             self.system_user, self.EXP_ID)
 
@@ -893,7 +899,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         """Test that banned users are banned."""
 
         exp_id = '0'
-        exp_services.load_demo(exp_id)
+        exp_services.load_demo(self.system_user, exp_id)
         rights_manager.release_ownership_of_exploration(
             self.system_user, exp_id)
 
@@ -1164,7 +1170,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title='My Exploration',
             end_state_name='END')
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         # Set the default email config.
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)

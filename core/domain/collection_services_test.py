@@ -71,6 +71,10 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
             self.owner_id)
         self.owner = user_services.UserActionsInfo(
             self.owner_id, self.owner_role)
+        self.system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
 
 
 class CollectionQueriesUnitTests(CollectionServicesUnitTests):
@@ -339,11 +343,11 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
 
         # Publish collections 0-4. Private collections should not show up in
         # a search query, even if they're indexed.
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_0)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_1)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_3)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_4)
+        rights_manager.publish_collection(self.owner, self.COL_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_1)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
+        rights_manager.publish_collection(self.owner, self.COL_ID_3)
+        rights_manager.publish_collection(self.owner, self.COL_ID_4)
 
         # Add the collections to the search index.
         collection_services.index_collections_given_ids([
@@ -655,8 +659,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         exp_id = 'exp_id'
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=exp_id)
-        rights_manager.publish_exploration(self.owner_id, exp_id)
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         # This should not give an error.
         collection_services.update_collection(
@@ -685,7 +689,7 @@ class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
         for collection_id in feconf.DEMO_COLLECTIONS:
             start_time = datetime.datetime.utcnow()
 
-            collection_services.load_demo(collection_id)
+            collection_services.load_demo(self.system_user, collection_id)
             collection = collection_services.get_collection_by_id(
                 collection_id)
             collection.validate()
@@ -758,7 +762,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         private_exp_id = 'private_exp_id0'
         self.save_new_valid_exploration(private_exp_id, self.owner_id)
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.assertTrue(
             rights_manager.is_collection_public(self.COLLECTION_ID))
@@ -781,7 +785,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         private_exp_id = 'private_exp_id0'
         self.save_new_valid_exploration(public_exp_id, self.owner_id)
         self.save_new_valid_exploration(private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(self.owner_id, public_exp_id)
+        rights_manager.publish_exploration(self.owner, public_exp_id)
 
         self.assertTrue(
             rights_manager.is_collection_private(self.COLLECTION_ID))
@@ -1094,8 +1098,8 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 
     def test_record_commit_message(self):
         """Check published collections record commit messages."""
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
@@ -1109,7 +1113,7 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 
     def test_demand_commit_message(self):
         """Check published collections demand commit messages."""
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         with self.assertRaisesRegexp(
             ValueError,
@@ -1174,8 +1178,8 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
         # Publish the collection and any explorations contained within it. This
         # does not affect the collection version history.
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        rights_manager.publish_exploration(self.owner_id, exp_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+        rights_manager.publish_exploration(self.owner, exp_id)
 
         snapshots_metadata = (
             collection_services.get_collection_snapshots_metadata(
@@ -1469,6 +1473,12 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert = user_services.UserActionsInfo(
+            self.albert_id,
+            user_services.get_user_role_from_id(self.albert_id))
+        self.bob = user_services.UserActionsInfo(
+            self.bob_id,
+            user_services.get_user_role_from_id(self.bob_id))
 
         # This needs to be done in a toplevel wrapper because the datastore
         # puts to the event log are asynchronous.
@@ -1506,10 +1516,10 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
                 Exception, 'This collection cannot be published'
                 ):
                 rights_manager.publish_collection(
-                    self.bob_id, self.COLLECTION_ID_2)
+                    self.bob, self.COLLECTION_ID_2)
 
             rights_manager.publish_collection(
-                self.albert_id, self.COLLECTION_ID_2)
+                self.albert, self.COLLECTION_ID_2)
 
         populate_datastore()
 
@@ -1592,7 +1602,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         results = collection_services.search_collections('Welcome', 2)[0]
         self.assertEqual(results, [])
 
-        collection_services.load_demo('0')
+        collection_services.load_demo(self.system_user, '0')
         results = collection_services.search_collections('Welcome', 2)[0]
         self.assertEqual(results, ['0'])
 
@@ -1633,8 +1643,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         # expecting the last collection to be indexed.
         for ind in xrange(4):
             rights_manager.publish_collection(
-                self.owner_id,
-                expected_collection_ids[ind])
+                self.owner, expected_collection_ids[ind])
 
         with add_docs_swap:
             collection_services.index_collections_given_ids(all_collection_ids)

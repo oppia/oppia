@@ -1010,7 +1010,7 @@ def _get_last_updated_by_human_ms(exp_id):
     return last_human_update_ms
 
 
-def publish_exploration_and_update_user_profiles(committer_id, exp_id):
+def publish_exploration_and_update_user_profiles(committer, exp_id):
     """Publishes the exploration with publish_exploration() function in
     rights_manager.py, as well as updates first_contribution_msec. Sends an
     email to the subscribers of the commiter informing them that an exploration
@@ -1020,13 +1020,14 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
     valid prior to publication.
 
     Args:
-        committer_id: str. The id of the user who made the commit.
+        committer: UserActionsInfo. UserActionsInfo object for the user who
+            made the commit.
         exp_id: str. The id of the exploration to be published.
     """
-    rights_manager.publish_exploration(committer_id, exp_id)
+    rights_manager.publish_exploration(committer, exp_id)
     exp_title = get_exploration_by_id(exp_id).title
     email_subscription_services.inform_subscribers(
-        committer_id, exp_id, exp_title)
+        committer.user_id, exp_id, exp_title)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
     for contributor in contributor_ids:
@@ -1431,13 +1432,15 @@ def delete_demo(exploration_id):
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
 
 
-def load_demo(exploration_id):
+def load_demo(user, exploration_id):
     """Loads a demo exploration.
 
     The resulting exploration will have two commits in its history (one for
     its initial creation and one for its subsequent modification.)
 
     Args:
+        user: UserActionsInfo. UserActionsInfo object of the user calling this
+            function.
         exploration_id: str. The id of the demo exploration.
 
     Raises:
@@ -1456,7 +1459,7 @@ def load_demo(exploration_id):
         assets_list)
 
     publish_exploration_and_update_user_profiles(
-        feconf.SYSTEM_COMMITTER_ID, exploration_id)
+        user, exploration_id)
 
     index_explorations_given_ids([exploration_id])
 

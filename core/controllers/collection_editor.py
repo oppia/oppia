@@ -178,11 +178,11 @@ class CollectionRightsHandler(CollectionEditorHandler):
                     raise self.InvalidInputException(e)
 
                 collection_services.publish_collection_and_update_user_profiles(
-                    self.user_id, collection_id)
+                    self.user, collection_id)
                 collection_services.index_collections_given_ids([
                     collection_id])
             else:
-                rights_manager.unpublish_collection(self.user_id, collection_id)
+                rights_manager.unpublish_collection(self.user, collection_id)
                 collection_services.delete_documents_from_search_index([
                     collection_id])
 

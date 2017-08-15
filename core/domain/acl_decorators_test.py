@@ -17,6 +17,7 @@
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import webapp2
@@ -42,6 +43,9 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -50,8 +54,7 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_guest_can_access_published_exploration(self):
         response = self.get_json('/mock/%s' % self.published_exp_id)
@@ -103,6 +106,9 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -117,10 +123,8 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.private_col_id, self.owner_id,
             exploration_id=self.private_col_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
-        rights_manager.publish_collection(
-            self.owner_id, self.published_col_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+        rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_guest_can_access_published_collection(self):
         response = self.get_json('/mock/%s' % self.published_col_id)
@@ -175,6 +179,9 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -189,10 +196,8 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.private_col_id, self.owner_id,
             exploration_id=self.private_col_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
-        rights_manager.publish_collection(
-            self.owner_id, self.published_col_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+        rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_guest_is_redirected_to_login_page(self):
         response = self.testapp.get(
@@ -369,6 +374,9 @@ class CommentOnFeedbackTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -378,8 +386,7 @@ class CommentOnFeedbackTest(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
 
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_guest_cannot_comment_on_feedback_threads(self):
         response = self.testapp.get(
@@ -623,6 +630,9 @@ class EditExplorationTest(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.username])
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -631,8 +641,7 @@ class EditExplorationTest(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_banned_user_cannot_edit_exploration(self):
         self.login(self.user_email)
@@ -721,6 +730,9 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -729,8 +741,7 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_owner_can_delete_owned_private_exploration(self):
         self.login(self.OWNER_EMAIL)
@@ -814,6 +825,9 @@ class PublishExplorationTest(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -822,8 +836,7 @@ class PublishExplorationTest(test_utils.GenericTestBase):
             self.public_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.public_exp_id)
+        rights_manager.publish_exploration(self.owner, self.public_exp_id)
 
     def test_owner_can_publish_owned_exploration(self):
         self.login(self.OWNER_EMAIL)
@@ -921,6 +934,9 @@ class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -935,10 +951,8 @@ class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.private_col_id, self.owner_id,
             exploration_id=self.private_col_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
-        rights_manager.publish_collection(
-            self.owner_id, self.published_col_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+        rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_owner_can_publish_collection(self):
         self.login(self.OWNER_EMAIL)

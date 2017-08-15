@@ -474,7 +474,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self.user_a, self.EXP_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # The exploration becomes community-owned.
-            rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
+            rights_manager.publish_exploration(self.user_a, self.EXP_ID_1)
             rights_manager.release_ownership_of_exploration(
                 self.user_a, self.EXP_ID_1)
             # User C edits the exploration.
@@ -888,6 +888,9 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id,
+            user_services.get_user_role_from_id(self.owner_id))
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -909,7 +912,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # Test all owners and editors of exploration after publication have
         # updated times.
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
         exp_services.update_exploration(
@@ -933,13 +936,13 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         exp_services.publish_exploration_and_update_user_profiles(
-            self.owner_id, self.EXP_ID)
+            self.owner, self.EXP_ID)
         # We now manually reset the user's first_contribution_msec to None.
         # This is to test that the one off job skips over the unpublished
         # exploration and does not reset the user's first_contribution_msec.
         user_services._update_first_contribution_msec(  # pylint: disable=protected-access
             self.owner_id, None)
-        rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
 
         # Test that first contribution time is not set for unpublished
         # explorations.

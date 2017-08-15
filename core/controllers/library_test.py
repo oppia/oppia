@@ -41,6 +41,14 @@ class LibraryPageTest(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(
+            self.admin_id,
+            user_services.get_user_role_from_id(self.admin_id))
+        self.system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
+
 
     def test_library_page(self):
         """Test access to the library page."""
@@ -61,7 +69,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
         }, response_dict)
 
         # Load a public demo exploration.
-        exp_services.load_demo('0')
+        exp_services.load_demo(self.system_user, '0')
 
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -149,10 +157,10 @@ class LibraryPageTest(test_utils.GenericTestBase):
             objective='Objective B')
         exp_services._save_exploration(  # pylint: disable=protected-access
             self.admin_id, exploration, 'Exploration B', [])
-        rights_manager.publish_exploration(self.admin_id, 'B')
+        rights_manager.publish_exploration(self.admin, 'B')
 
         # Publish exploration A
-        rights_manager.publish_exploration(self.admin_id, 'A')
+        rights_manager.publish_exploration(self.admin, 'A')
 
         exp_services.index_explorations_given_ids(['A', 'B'])
 
@@ -194,6 +202,13 @@ class LibraryPageTest(test_utils.GenericTestBase):
 
 class LibraryGroupPageTest(test_utils.GenericTestBase):
 
+    def setUp(self):
+        super(LibraryGroupPageTest, self).setUp()
+        self.system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
+
     def test_library_group_pages(self):
         """Test access to the top rated and recently published pages."""
         response = self.testapp.get(feconf.LIBRARY_TOP_RATED_URL)
@@ -217,7 +232,7 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
         }, response_dict)
 
         # Load a public demo exploration.
-        exp_services.load_demo('0')
+        exp_services.load_demo(self.system_user, '0')
 
         response_dict = self.get_json(
             feconf.LIBRARY_GROUP_DATA_URL,
@@ -240,7 +255,7 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
         """Test library handler for top rated group page."""
 
         # Load a public demo exploration.
-        exp_services.load_demo('0')
+        exp_services.load_demo(self.system_user, '0')
 
         response_dict = self.get_json(
             feconf.LIBRARY_GROUP_DATA_URL,
@@ -277,7 +292,7 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
         }, response_dict['activity_list'][0])
 
         # Load another public demo exploration.
-        exp_services.load_demo('1')
+        exp_services.load_demo(self.system_user, '1')
 
         # Assign rating to exploration to test handler for top rated
         # explorations page.
@@ -351,7 +366,7 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
             self.PRIVATE_EXP_ID_VIEWER, self.viewer_id)
 
         rights_manager.publish_exploration(
-            self.editor_id, self.PUBLIC_EXP_ID_EDITOR)
+            self.editor, self.PUBLIC_EXP_ID_EDITOR)
 
     def test_can_get_public_exploration_summaries(self):
         self.login(self.VIEWER_EMAIL)

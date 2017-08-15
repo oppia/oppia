@@ -15,6 +15,7 @@
 """Tests for the moderator page."""
 
 from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
 
 
@@ -63,9 +64,12 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
         self.signup(self.user_email, self.user)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.user_id = self.get_user_id_from_email(self.user_email)
+        self.user = user_services.UserActionsInfo(
+            self.user_id,
+            user_services.get_user_role_from_id(self.user_id))
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id)
-        rights_manager.publish_exploration(self.user_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.user, self.EXP_ID_1)
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
 

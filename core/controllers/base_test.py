@@ -302,7 +302,11 @@ class LogoutPageTest(test_utils.GenericTestBase):
 
     def test_logout_page(self):
         """Tests for logout handler."""
-        exp_services.load_demo('0')
+        system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
+        exp_services.load_demo(system_user, '0')
         # Logout with valid query arg. This test only validates that the login
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'

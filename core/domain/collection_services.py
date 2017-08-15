@@ -869,7 +869,7 @@ def get_collection_snapshots_metadata(collection_id):
         collection_id, version_nums)
 
 
-def publish_collection_and_update_user_profiles(committer_id, collection_id):
+def publish_collection_and_update_user_profiles(committer, collection_id):
     """Publishes the collection with publish_collection() function in
     rights_manager.py, as well as updates first_contribution_msec.
 
@@ -877,10 +877,10 @@ def publish_collection_and_update_user_profiles(committer_id, collection_id):
     valid prior to publication.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         collection_id: str. ID of the collection to be published.
     """
-    rights_manager.publish_collection(committer_id, collection_id)
+    rights_manager.publish_collection(committer, collection_id)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     collection_summary = get_collection_summary_by_id(collection_id)
     contributor_ids = collection_summary.contributor_ids
@@ -1125,13 +1125,15 @@ def delete_demo(collection_id):
             feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)
 
 
-def load_demo(collection_id):
+def load_demo(user, collection_id):
     """Loads a demo collection.
 
     The resulting collection will have version 2 (one for its initial
     creation and one for its subsequent modification.)
 
     Args:
+        user: UserActionsInfo. UserActionsInfo for the user calling the
+            function.
         collection_id: str. ID of the collection to be loaded.
     """
     delete_demo(collection_id)
@@ -1152,7 +1154,7 @@ def load_demo(collection_id):
         feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
     publish_collection_and_update_user_profiles(
-        feconf.SYSTEM_COMMITTER_ID, collection_id)
+        user, collection_id)
 
     index_collections_given_ids([collection_id])
 
@@ -1161,7 +1163,7 @@ def load_demo(collection_id):
         exp_id = collection_node.exploration_id
         # Only load the demo exploration if it is not yet loaded.
         if exp_services.get_exploration_by_id(exp_id, strict=False) is None:
-            exp_services.load_demo(exp_id)
+            exp_services.load_demo(user, exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
 

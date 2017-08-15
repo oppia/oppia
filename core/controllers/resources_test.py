@@ -33,11 +33,11 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         super(ImageHandlerTest, self).setUp()
 
         exp_services.delete_demo('0')
-        exp_services.load_demo('0')
         self.system_user = user_services.UserActionsInfo(
             feconf.SYSTEM_COMMITTER_ID,
             user_services.get_user_role_from_id(
                 feconf.SYSTEM_COMMITTER_ID))
+        exp_services.load_demo(self.system_user, '0')
 
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
@@ -234,11 +234,11 @@ class AudioHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(AudioHandlerTest, self).setUp()
         exp_services.delete_demo('0')
-        exp_services.load_demo('0')
         self.system_user = user_services.UserActionsInfo(
             feconf.SYSTEM_COMMITTER_ID,
             user_services.get_user_role_from_id(
                 feconf.SYSTEM_COMMITTER_ID))
+        exp_services.load_demo(self.system_user, '0')
 
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')

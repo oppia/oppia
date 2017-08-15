@@ -47,6 +47,8 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
             self.admin_id)
         self.admin = user_services.UserActionsInfo(
             self.admin_id, self.admin_role)
+        self.owner = user_services.UserActionsInfo(
+            self.owner_id, self.owner_role)
 
         self.json_dict = {
             'version' : 1,
@@ -63,14 +65,14 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
     def setUp(self):
         super(CollectionEditorTest, self).setUp()
-        user = user_services.UserActionsInfo(
+        system_user = user_services.UserActionsInfo(
             feconf.SYSTEM_COMMITTER_ID,
             user_services.get_user_role_from_id(
                 feconf.SYSTEM_COMMITTER_ID))
 
-        collection_services.load_demo(self.COLLECTION_ID)
+        collection_services.load_demo(system_user, self.COLLECTION_ID)
         rights_manager.release_ownership_of_collection(
-            user, self.COLLECTION_ID)
+            system_user, self.COLLECTION_ID)
 
     def test_access_collection_editor_page(self):
         """Test access to editor pages for the sample collection."""
@@ -135,7 +137,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         rights_manager.assign_role_for_collection(
             self.admin, self.COLLECTION_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.VIEWER_EMAIL)
 
@@ -165,7 +167,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         rights_manager.assign_role_for_collection(
             self.admin, self.COLLECTION_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.EDITOR_EMAIL)
 
@@ -194,18 +196,18 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         rights_manager.assign_role_for_collection(
             self.owner, collection_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
-        rights_manager.publish_collection(self.owner_id, collection_id)
+        rights_manager.publish_collection(self.owner, collection_id)
 
         # Check that collection cannot be unpublished by non admin.
         with self.assertRaisesRegexp(
             Exception, 'This collection cannot be unpublished.'):
-            rights_manager.unpublish_collection(self.owner_id, collection_id)
+            rights_manager.unpublish_collection(self.owner, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(collection_rights.status,
                          rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         # Check that collection can be unpublished by admin.
-        rights_manager.unpublish_collection(self.admin_id, collection_id)
+        rights_manager.unpublish_collection(self.admin, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(collection_rights.status,
                          rights_manager.ACTIVITY_STATUS_PRIVATE)
@@ -222,7 +224,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         collection_services.save_new_collection(self.owner_id, collection)
 
         # Check that collection is published correctly.
-        rights_manager.publish_collection(self.owner_id, collection_id)
+        rights_manager.publish_collection(self.owner, collection_id)
 
         json_response = self.get_json(
             '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, self.COLLECTION_ID))

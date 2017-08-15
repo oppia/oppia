@@ -375,7 +375,7 @@ class ExplorationStatusHandler(EditorHandler):
             raise self.InvalidInputException(e)
 
         exp_services.publish_exploration_and_update_user_profiles(
-            self.user_id, exploration_id)
+            self.user, exploration_id)
         exp_services.index_explorations_given_ids([exploration_id])
 
     @acl_decorators.can_publish_exploration
@@ -419,8 +419,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
         # Perform the moderator action.
         if action == 'unpublish_exploration':
-            rights_manager.unpublish_exploration(
-                self.user_id, exploration_id)
+            rights_manager.unpublish_exploration(self.user, exploration_id)
             exp_services.delete_documents_from_search_index([
                 exploration_id])
         else:
