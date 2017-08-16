@@ -53,7 +53,6 @@ var submitAnswer = function(elem, answer) {
       inputElem.isPresent().then(function(present) {
         if (present) {
           inputElem.sendKeys(answer + '\n');
-          textInputElem.element(by.tagName('button')).click();
         }
       });
     }

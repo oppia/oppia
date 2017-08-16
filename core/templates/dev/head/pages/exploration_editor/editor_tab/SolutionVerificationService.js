@@ -29,9 +29,8 @@ oppia.factory('SolutionVerificationService', [
         var rulesServiceName = (
           angularNameService.getNameOfInteractionRulesService(interactionId));
         var rulesService = $injector.get(rulesServiceName);
-        return (
-          AnswerClassificationService.getMatchingClassificationResult(
-          explorationId, state, correctAnswer, true, rulesService)
+        return AnswerClassificationService.getMatchingClassificationResult(
+          explorationId, state, correctAnswer, true, rulesService
         ).then(function(result) {
           if (
             editorContextService.getActiveStateName() !== result.outcome.dest) {
