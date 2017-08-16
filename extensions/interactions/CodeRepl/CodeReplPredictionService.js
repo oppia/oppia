@@ -76,7 +76,7 @@ oppia.factory('CodeReplPredictionService', [
       },
 
       getTokenizedProgramForCV: function(programTokens) {
-      	// Tokenize Python programs in dataset for winnowing.
+        // Tokenize Python programs in dataset for winnowing.
         tokenizedProgram = [];
 
         for (var i = 0; i < programTokens.length; i++) {
@@ -96,7 +96,7 @@ oppia.factory('CodeReplPredictionService', [
             tokenizedProgram.push(TOKEN_NAME_VAR);
           }
           else {
-          	tokenizedProgram.push(tokenName);
+            tokenizedProgram.push(tokenName);
           }
         }
 
@@ -264,7 +264,7 @@ oppia.factory('CodeReplPredictionService', [
           program.split('\n'));
 
         var tokenizedProgram = this.getTokenizedProgramForCV(
-        	pythonProgramTokens);
+          pythonProgramTokens);
         var programVector = CountVectorizerService.vectorize(
           tokenizedProgram, cvVocabulary);
 
