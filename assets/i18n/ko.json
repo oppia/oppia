@@ -1,8 +1,6 @@
 {
 	"I18N_ABOUT_PAGE_ABOUT_TAB_HEADING": "Oppia 정보",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "게시하고 공유하기",
-	"I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "제작진",
-	"I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI": "크라우드소스를 통한 번역을 제공한 <a href=\"https://translatewiki.net/wiki/Translating:Oppia\">translatewiki.net</a>에 감사를 표합니다.",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_DONATE_BUTTON": "기부",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_GET_INVOLVED_BUTTON": "참여하기",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_HEADING": "Oppia 재단",
@@ -41,6 +39,8 @@
 	"I18N_CREATE_EXPLORATION_UPLOAD": "업로드",
 	"I18N_CREATE_NO_THANKS": "아니오, 괜찮습니다",
 	"I18N_CREATE_YES_PLEASE": "예!",
+	"I18N_CREDITS_PAGE_HEADING": "제작진",
+	"I18N_CREDITS_PAGE_THANK_TRANSLATEWIKI": "크라우드소스를 통한 번역을 제공한 <a href=\"https://translatewiki.net/wiki/Translating:Oppia\">translatewiki.net</a>에 감사를 표합니다.",
 	"I18N_DASHBOARD_COLLECTIONS": "모음집",
 	"I18N_DASHBOARD_EXPLORATIONS": "탐험",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY": "정렬 기준",
