@@ -26,12 +26,16 @@ oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
-  '$http', '$q', 'LearnerParamsService', 'alertsService', 'INTERACTION_SPECS',
-  'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
-  'DEFAULT_OUTCOME_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
-  function($http, $q, LearnerParamsService, alertsService, INTERACTION_SPECS,
-      ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
-      DEFAULT_OUTCOME_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
+  '$http', '$q', 'LearnerParamsService', 'alertsService',
+  'AnswerClassificationResult', 'PredictionAlgorithmRegistryService',
+  'StateClassifierMappingService', 'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS',
+  'EXPLICIT_CLASSIFICATION', 'DEFAULT_OUTCOME_CLASSIFICATION',
+  'STATISTICAL_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
+  function($http, $q, LearnerParamsService, alertsService,
+      AnswerClassificationResult, PredictionAlgorithmRegistryService,
+      StateClassifierMappingService, INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS,
+      EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
+      STATISTICAL_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -42,14 +46,7 @@ oppia.factory('AnswerClassificationService', [
      * @param {function} interactionRulesService The service which contains the
      *     explicit rules of that interaction.
      *
-     * @return {object} An object representing the answer group with the
-     *     following properties:
-     * <ul>
-     *   <li> **outcome**: the outcome of the answer group
-     *   <li> **answerGroupIndex**: the index of the matched answer group
-     *   <li> **ruleIndex**: the index of the rule in the matched answer
-     *     group.
-     * </ul>
+     * @return {object} An AnswerClassificationResult domain object.
      */
     var classifyAnswer = function(
         answer, answerGroups, defaultOutcome, interactionRulesService) {
@@ -61,12 +58,8 @@ oppia.factory('AnswerClassificationService', [
           if (rule.type !== RULE_TYPE_CLASSIFIER &&
               interactionRulesService[rule.type](
                 answer, rule.inputs)) {
-            return {
-              outcome: answerGroups[i].outcome,
-              answerGroupIndex: i,
-              ruleIndex: j,
-              classificationCategorization: EXPLICIT_CLASSIFICATION
-            };
+            return AnswerClassificationResult.createNew(
+              answerGroups[i].outcome, i, j, EXPLICIT_CLASSIFICATION);
           }
         }
       }
@@ -74,15 +67,31 @@ oppia.factory('AnswerClassificationService', [
       // If no rule in any answer group returns true, the default 'group' is
       // returned. Throws an error if the default outcome is not defined.
       if (defaultOutcome) {
-        return {
-          outcome: defaultOutcome,
-          answerGroupIndex: answerGroups.length,
-          ruleIndex: 0,
-          classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
-        };
+        return AnswerClassificationResult.createNew(
+          defaultOutcome, answerGroups.length, 0, DEFAULT_OUTCOME_CLASSIFICATION
+        );
       } else {
         alertsService.addWarning('Something went wrong with the exploration.');
       }
+    };
+
+    /**
+     * Finds the first rule that contains RULE_TYPE_CLASSIFIER as rule type.
+     *
+     * @param {object} answerGroup - An answer group of the interaction. Each
+     *     answer group containts rule_specs which is a list of rules.
+     *
+     * @return {integer} The index of the retrieved rule with rule_type
+     *     RULE_TYPE_CLASSIFIER.
+     */
+    var findClassifierRuleIndex = function(answerGroup) {
+      for (var i = 0; i < answerGroup.rules.length; i++) {
+        var rule = answerGroup.rules[i];
+        if (rule.type === RULE_TYPE_CLASSIFIER) {
+          return i;
+        }
+      }
+      throw Error('Classifier Rule type is not present in this answer group.');
     };
 
     return {
@@ -98,17 +107,11 @@ oppia.factory('AnswerClassificationService', [
        * @param {function} interactionRulesService - The service which contains
        *   the explicit rules of that interaction.
        *
-       * @return {promise} A promise for an object representing the answer group
-       *     with the following properties:
-       * <ul>
-       *   <li> **outcome**: the outcome of the answer group
-       *   <li> **answerGroupIndex**: the index of the matched answer group
-       *   <li> **ruleIndex**: the index of the rule in the matched answer
-       *            group
-       * </ul>
+       * @return {promise} A promise for an AnswerClassificationResult domain
+       *   object.
        */
       getMatchingClassificationResult: function(
-          explorationId, oldState, answer, isInEditorMode,
+          explorationId, stateName, oldState, answer, isInEditorMode,
           interactionRulesService) {
         var deferred = $q.defer();
         var result = null;
@@ -125,30 +128,35 @@ oppia.factory('AnswerClassificationService', [
           return deferred.promise;
         }
 
-        if (result.outcome === defaultOutcome &&
-            INTERACTION_SPECS[oldState.interaction.id]
-              .is_string_classifier_trainable &&
-            ENABLE_ML_CLASSIFIERS) {
-          var classifyUrl = '/explorehandler/classify/' + explorationId;
-          var params = (
-            isInEditorMode ? {} : LearnerParamsService.getAllParams());
+        var ruleBasedOutcomeIsDefault = (result.outcome === defaultOutcome);
+        var interactionIsTrainable = INTERACTION_SPECS[
+          oldState.interaction.id].is_interaction_trainable;
 
-          $http.post(classifyUrl, {
-            old_state: oldState.toBackendDict(),
-            params: params,
-            answer: answer
-          }).then(function(response) {
-            var result = response.data;
-            deferred.resolve({
-              outcome: result.outcome,
-              ruleIndex: result.rule_spec_index,
-              answerGroupIndex: result.answer_group_index,
-              classificationCategorization: result.classification_categorization
-            });
-          });
-        } else {
-          deferred.resolve(result);
+        if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
+            ENABLE_ML_CLASSIFIERS) {
+          var classifier = StateClassifierMappingService.getClassifier(
+            stateName);
+          if (classifier.classifierData && classifier.algorithmId && (
+            classifier.dataSchemaVersion)) {
+            var predictionService = (
+              PredictionAlgorithmRegistryService.getPredictionService(
+                classifier.algorithmId, classifier.dataSchemaVersion));
+            // If prediction service exists, we run classifier. We return the
+            // default outcome otherwise.
+            if (predictionService) {
+              var predictedAnswerGroupIndex = predictionService.predict(
+                classifier.classifierData, answer);
+              result = AnswerClassificationResult.createNew(
+                answerGroups[predictedAnswerGroupIndex].outcome,
+                predictedAnswerGroupIndex,
+                findClassifierRuleIndex(
+                  answerGroups[predictedAnswerGroupIndex]),
+                STATISTICAL_CLASSIFICATION
+              );
+            }
+          }
         }
+        deferred.resolve(result);
         return deferred.promise;
       }
     };

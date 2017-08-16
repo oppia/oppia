@@ -727,18 +727,3 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         self.assertEqual(len(exp_a_id), 12)
 
         self.logout()
-
-    def test_exploration_upload_button(self):
-        """Test that the exploration upload button appears when appropriate."""
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
-
-        with self.swap(feconf, 'ALLOW_YAML_FILE_UPLOAD', True):
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-            self.assertEqual(response.status_int, 200)
-            response.mustcontain('ng-click="showUploadExplorationModal()"')
-
-        self.logout()

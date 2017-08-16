@@ -45,7 +45,8 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(user_settings_model):
-        query_id = jobs.BaseMapReduceJobManager.get_mapper_param('query_id')
+        query_id = (
+            jobs.BaseMapReduceOneOffJobManager.get_mapper_param('query_id'))
         query_model = user_models.UserQueryModel.get(query_id)
         user_id = user_settings_model.id
         user_contributions = user_models.UserContributionsModel.get(user_id)
