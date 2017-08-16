@@ -7,7 +7,7 @@ v2.5.2 (9 Jul 2017)
 -------------------
 Fallbacks/hints:
 * Fix #3537: Handles empty feedbacks for fallback outcomes (#3538)
-* Fix  #3532: Implement back-end for Hints and Solution feature (#3533)
+* Fix #3532: Implement back-end for Hints and Solution feature (#3533)
 * Fix #3554: Migration of Fallbacks to Hints (#3555)
 * Fix #3571: Introduce first version of Hints UI for learners  (#3577)
 
@@ -22,7 +22,7 @@ Permissions:
 Machine Learning:
 * Fix #3465: Updated and renamed to ClassifierDataModel (#3504)
 * Fix #3466: Add storage, domain classes and tests for TrainClassifierJobModel. (#3511)
-* Fix #3528 : Add helper functions for ClassifierTrainingJobModel (#3529)
+* Fix #3528: Add helper functions for ClassifierTrainingJobModel (#3529)
 
 Explorations and Interactions:
 * Fix a bug in the LogicProof interaction where operators were not being included in the student language, causing operators like 'A(x)' to be rejected even if they occur in the question. (#3545)
