@@ -64,9 +64,7 @@ describe('Read only exploration backend API service', function() {
         }
       },
       version: 1,
-      state_classifier_mapping: {
-        Introduction: null
-      }
+      state_classifier_mapping: {}
     };
   }));
 

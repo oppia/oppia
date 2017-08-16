@@ -230,8 +230,7 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
                 'algorithm_id': 'LDAStringClassifier',
                 'classifier_data': {},
                 'data_schema_version': 1
-            },
-            'final': None
+            }
         }
         # Call the handler.
         exploration_dict = self.get_json(
