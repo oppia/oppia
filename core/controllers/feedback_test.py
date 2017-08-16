@@ -568,7 +568,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
             self.editor, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)

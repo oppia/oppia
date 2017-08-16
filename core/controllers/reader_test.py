@@ -389,6 +389,9 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
+        self.editor = user_services.UserActionsInfo(
+            self.editor_id,
+            user_services.get_user_role_from_id(self.editor_id))
 
         self.system_user = user_services.UserActionsInfo(
             feconf.SYSTEM_COMMITTER_ID,

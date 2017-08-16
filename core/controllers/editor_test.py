@@ -1162,6 +1162,9 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         super(ModeratorEmailsTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(
+            self.editor_id, user_services.get_user_role_from_id(
+                self.editor_id))
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])

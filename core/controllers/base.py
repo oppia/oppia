@@ -142,11 +142,7 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user_id = (
-            current_user_services.get_user_id(
-                current_user_services.get_current_user())
-            if current_user_services.get_current_user()
-            else None)
+        self.user_id = current_user_services.get_current_user_id()
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False

@@ -692,13 +692,15 @@ def check_can_publish_activity(user, activity_rights):
     if activity_rights.cloned_from:
         return False
 
+    if activity_rights.is_published():
+        return False
+
     if role_services.ACTION_PUBLISH_ANY_ACTIVITY in user.actions:
         return True
 
-    if activity_rights.is_private():
-        if role_services.ACTION_PUBLISH_OWNED_ACTIVITY in user.actions:
-            if activity_rights.is_owner(user.user_id):
-                return True
+    if role_services.ACTION_PUBLISH_OWNED_ACTIVITY in user.actions:
+        if activity_rights.is_owner(user.user_id):
+            return True
 
     return False
 

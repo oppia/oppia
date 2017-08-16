@@ -845,6 +845,13 @@ class PublishExplorationTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
+    def test_already_published_exploration_cannot_be_published(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.public_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
     def test_moderator_cannot_publish_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         response = self.testapp.get(
@@ -853,10 +860,6 @@ class PublishExplorationTest(test_utils.GenericTestBase):
 
     def test_admin_can_publish_any_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.testapp.get(
-            '/mock/%s' % self.public_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
-
         response = self.testapp.get(
             '/mock/%s' % self.private_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
