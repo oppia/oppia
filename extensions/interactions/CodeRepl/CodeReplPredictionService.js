@@ -75,6 +75,34 @@ oppia.factory('CodeReplPredictionService', [
         return tokenizedProgram;
       },
 
+      getTokenizedProgramForCV: function(programTokens) {
+      	// Tokenize Python programs in dataset for winnowing.
+        tokenizedProgram = [];
+
+        for (var i = 0; i < programTokens.length; i++) {
+          var token = programTokens[i];
+          var tokenId = token[0];
+          var tokenName = token[1];
+
+          if (
+            tokenId == PythonProgramTokenType.NL ||
+            tokenId == PythonProgramTokenType.COMMENT ||
+            tokenName.trim() == '') {
+            continue;
+          }
+          else if (
+            tokenId == PythonProgramTokenType.NAME &&
+            KW_LIST.indexOf(tokenName) == -1) {
+            tokenizedProgram.push(TOKEN_NAME_VAR);
+          }
+          else {
+          	tokenizedProgram.push(tokenName);
+          }
+        }
+
+        return tokenizedProgram;
+      },
+
       calcJaccardIndex: function(multisetA, multisetB) {
         // Calculate jaccard index between two multisets.
         multisetA.sort();
@@ -235,7 +263,8 @@ oppia.factory('CodeReplPredictionService', [
         var pythonProgramTokens = PythonProgramTokenizer.generateTokens(
           program.split('\n'));
 
-        var tokenizedProgram = this.getTokenizedProgram(pythonProgramTokens);
+        var tokenizedProgram = this.getTokenizedProgramForCV(
+        	pythonProgramTokens);
         var programVector = CountVectorizerService.vectorize(
           tokenizedProgram, cvVocabulary);
 

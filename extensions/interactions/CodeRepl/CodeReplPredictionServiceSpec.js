@@ -71,5 +71,20 @@ describe('CodeRepl prediction service', function() {
 
       expect(normalizedTokens).toEqual(expectedTokens);
     });
+
+    it('should produce program tokens for count vector correctly.', function() {
+      var program = (
+        '# This is a comment.\nvariable = 15\nif variable > 5:' +
+        '\n    print "Hello"\nprint " World"');
+
+      var programTokens = tokenizer.generateTokens(program.split('\n'));
+      var expectedTokens = [
+        'V', '=', '15', 'if', 'V', '>', '5', ':', 'print', '"Hello"',
+        'print', '" World"'];
+
+      var CVTokens = service.getTokenizedProgramForCV(programTokens);
+
+      expect(CVTokens).toEqual(expectedTokens);
+    });
   });
 });
