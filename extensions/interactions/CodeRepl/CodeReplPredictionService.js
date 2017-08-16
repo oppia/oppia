@@ -230,7 +230,12 @@ oppia.factory('CodeReplPredictionService', [
         }
 
         // If KNN fails to predict then use SVM to predict the output class.
-        var tokenizedProgram = this.getTokenizedProgram(program);
+
+        // Find program tokens using python program tokenizer.
+        var pythonProgramTokens = PythonProgramTokenizer.generateTokens(
+          program.split('\n'));
+
+        var tokenizedProgram = this.getTokenizedProgram(pythonProgramTokens);
         var programVector = CountVectorizerService.vectorize(
           tokenizedProgram, cvVocabulary);
 
