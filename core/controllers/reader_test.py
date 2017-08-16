@@ -221,6 +221,10 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
+        system_user = user_services.UserActionsInfo(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_user_role_from_id(
+                feconf.SYSTEM_COMMITTER_ID))
         exp_services.delete_demo(exploration_id)
         # We enable ENABLE_ML_CLASSIFIERS so that the subsequent call to
         # save_exploration handles job creation for trainable states.
@@ -231,7 +235,7 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.load_demo(exploration_id)
+                    exp_services.load_demo(system_user, exploration_id)
 
         # Retrieve job_id of created job (because of save_exp).
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
