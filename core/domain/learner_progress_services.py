@@ -311,6 +311,42 @@ def mark_collection_as_incomplete(user_id, collection_id):
         _save_incomplete_activities(incomplete_activities)
 
 
+def add_collection_to_learner_playlist(
+        user_id, collection_id, position_to_be_inserted=None):
+    """This function checks if the collection exists in the completed list or
+    the incomplete list. If it does not exist we call the function in learner
+    playlist services to add the collection to the play later list.
+
+    Args:
+        user_id: str. The id of the user.
+        collection_id: str. The id of the collection to be added to the
+            learner playlist.
+        position_to_be_inserted: int|None. If this is specified the collection
+            gets inserted at the given position. Otherwise it gets added at the
+            end.
+    """
+    completed_collection_ids = get_all_completed_collection_ids(user_id)
+    incomplete_collection_ids = get_all_incomplete_collection_ids(user_id)
+    playlist_limit_exceeded = False
+    belongs_to_subscribed_activities = False
+    belongs_to_completed_or_incomplete_list = False
+
+    if (collection_id not in completed_collection_ids and
+            collection_id not in incomplete_collection_ids):
+        
+        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
+            learner_playlist_services.mark_collection_to_be_played_later(
+                user_id, collection_id, position_to_be_inserted))
+        
+        belongs_to_completed_or_incomplete_list = False
+    else:
+        belongs_to_completed_or_incomplete_list = True
+
+    return (belongs_to_completed_or_incomplete_list,
+            playlist_limit_exceeded,
+            belongs_to_subscribed_activities)
+
+
 def add_exp_to_learner_playlist(
         user_id, exploration_id, position_to_be_inserted=None):
     """This function checks if the exploration exists in the completed list or
@@ -331,44 +367,19 @@ def add_exp_to_learner_playlist(
     """
     completed_exploration_ids = get_all_completed_exp_ids(user_id)
     incomplete_exploration_ids = get_all_incomplete_exp_ids(user_id)
+    playlist_limit_exceeded = False
+    belongs_to_subscribed_activities = False
+    belongs_to_completed_or_incomplete_list = False
 
     if (exploration_id not in completed_exploration_ids and
             exploration_id not in incomplete_exploration_ids):
-        playlist_limit_exceeded, belongs_to_subscribed_activities = (
+
+        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_exploration_to_be_played_later(
                 user_id, exploration_id, position_to_be_inserted))
+
         belongs_to_completed_or_incomplete_list = False
-    else:
-        belongs_to_completed_or_incomplete_list = True
-
-    return (belongs_to_completed_or_incomplete_list,
-            playlist_limit_exceeded,
-            belongs_to_subscribed_activities)
-
-
-def add_collection_to_learner_playlist(
-        user_id, collection_id, position_to_be_inserted=None):
-    """This function checks if the collection exists in the completed list or
-    the incomplete list. If it does not exist we call the function in learner
-    playlist services to add the collection to the play later list.
-
-    Args:
-        user_id: str. The id of the user.
-        collection_id: str. The id of the collection to be added to the
-            learner playlist.
-        position_to_be_inserted: int|None. If this is specified the collection
-            gets inserted at the given position. Otherwise it gets added at the
-            end.
-    """
-    completed_collection_ids = get_all_completed_collection_ids(user_id)
-    incomplete_collection_ids = get_all_incomplete_collection_ids(user_id)
-
-    if (collection_id not in completed_collection_ids and
-            collection_id not in incomplete_collection_ids):
-        playlist_limit_exceeded, belongs_to_subscribed_activities = (
-            learner_playlist_services.mark_collection_to_be_played_later(
-                user_id, collection_id, position_to_be_inserted))
-        belongs_to_completed_or_incomplete_list = False
+    
     else:
         belongs_to_completed_or_incomplete_list = True
 
