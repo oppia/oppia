@@ -86,14 +86,16 @@ oppia.directive('activityTilesInfinityGrid', [
               .then(function(response) {
                 if (response.data.belongs_to_completed_or_incomplete_list) {
                   alertsService.addInfoMessage(
-                    'You have already completed or are completing this activity.');
+                    'You have already completed or are completing this ' +
+                    ' activity.');
                 } else if (response.data.belongs_to_subscribed_activities) {
                   alertsService.addInfoMessage(
                     'This is present in your creator dashboard');
                 } else if (response.data.playlist_limit_exceeded) {
                   alertsService.addInfoMessage(
-                    'Your \'Play Later\' list is full!  Either you can complete' +
-                    'some or you can head to the learner dashboard and remove some.');
+                    'Your \'Play Later\' list is full!  Either you can complete ' +
+                    'some or you can head to the learner dashboard and remove '+
+                    'some.');
                 } else {
                   alertsService.addSuccessMessage(
                     'Succesfully added to your \'Play Later\' list.');
@@ -127,17 +129,19 @@ oppia.directive('activityTilesInfinityGrid', [
               },
               controller: [
                 '$scope', '$modalInstance', '$http', 'UrlInterpolationService',
-                function($scope, $modalInstance, $http, UrlInterpolationService) {
+                function(
+                  $scope, $modalInstance, $http, UrlInterpolationService) {
                   $scope.sectionNameI18nId = (
                     'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
                   $scope.activityTitle = activityTitle;
                   var removeFromLearnerPlaylistUrl = (
+                    /* eslint-disable max-len */
                     UrlInterpolationService.interpolateUrl(
                       '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
                         activityType: activityType,
                         activityId: activityId
                       }));
-
+                    /* eslint-enable max-len */
                   $scope.remove = function() {
                     $http['delete'](removeFromLearnerPlaylistUrl);
                     $modalInstance.close();
@@ -150,6 +154,7 @@ oppia.directive('activityTilesInfinityGrid', [
               ]
             }).result.then(function() {
               if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
+                /* eslint-disable max-len */
                 var index = (
                   $scope.learnerDashboardActivityIds.exploration_playlist_ids.indexOf(
                     activityId));
@@ -166,6 +171,7 @@ oppia.directive('activityTilesInfinityGrid', [
                     index, 1);
                 }
               }
+              /* eslint-enable max-len */
             });
           };
 
