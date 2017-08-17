@@ -393,20 +393,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_a).can_delete(
                 constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
-    def test_can_publicize_exploration(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, title='A title', category='A category')
-        exp_services.save_new_exploration(self.user_id_a, exp)
-
-        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
-
-        self.assertFalse(
-            rights_manager.Actor(self.user_id_a).can_publicize(
-                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
-        self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_publicize(
-                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
-
     def test_changing_viewability_of_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='A title', category='A category')
@@ -903,18 +889,6 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             rights_manager.Actor(self.user_id_a).can_delete(
-                constants.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
-
-    def test_can_publicize_collection(self):
-        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
-
-        rights_manager.publish_collection(self.user_id_a, self.COLLECTION_ID)
-
-        self.assertFalse(
-            rights_manager.Actor(self.user_id_a).can_publicize(
-                constants.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
-        self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_publicize(
                 constants.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
 
 
