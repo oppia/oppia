@@ -93,9 +93,9 @@ oppia.directive('activityTilesInfinityGrid', [
                     'This is present in your creator dashboard');
                 } else if (response.data.playlist_limit_exceeded) {
                   alertsService.addInfoMessage(
-                    'Your \'Play Later\' list is full!  Either you can complete ' +
-                    'some or you can head to the learner dashboard and remove '+
-                    'some.');
+                    'Your \'Play Later\' list is full!  Either you can ' +
+                    'complete some or you can head to the learner dashboard ' +
+                    'and remove some.');
                 } else {
                   alertsService.addSuccessMessage(
                     'Succesfully added to your \'Play Later\' list.');
