@@ -20,14 +20,20 @@ oppia.directive('activityTilesInfinityGrid', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {
+        learnerDashboardActivityIds: '=learnerDashboardActivityIds',
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/' +
         'activity_tiles_infinity_grid_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'searchService',
-        function($scope, $rootScope, searchService) {
+        '$scope', '$rootScope', '$http', 'searchService', 'alertsService',
+        '$modal', function(
+          $scope, $rootScope, $http, searchService, alertsService, $modal) {
           $scope.endOfPageIsReached = false;
           $scope.allActivitiesInOrder = [];
+          var hoverOverActivity = false;
+          var activeActivityId = '';
 
           // Called when the first batch of search results is retrieved from the
           // server.
@@ -37,6 +43,131 @@ oppia.directive('activityTilesInfinityGrid', [
               $scope.endOfPageIsReached = false;
             }
           );
+
+          $scope.setHoverOverActivity = function(activityId) {
+            activeActivityId = activityId;
+            hoverOverActivity = !hoverOverActivity;
+          };
+
+          $scope.showAddToLearnerPlaylistIcon = function(activityId) {
+            var incompleteExplorationIds = (
+              $scope.learnerDashboardActivityIds.incomplete_exploration_ids);
+            var incompleteCollectionIds = (
+              $scope.learnerDashboardActivityIds.incomplete_collection_ids);
+            var completedExplorationIds = (
+              $scope.learnerDashboardActivityIds.completed_exploration_ids);
+            var completedCollectionIds = (
+              $scope.learnerDashboardActivityIds.completed_collection_ids);
+            var explorationPlaylistIds = (
+              $scope.learnerDashboardActivityIds.exploration_playlist_ids);
+            var collectionPlaylistIds = (
+              $scope.learnerDashboardActivityIds.collection_playlist_ids);
+
+            if (incompleteExplorationIds.indexOf(activityId) !== -1 ||
+                incompleteCollectionIds.indexOf(activityId) !== -1 ||
+                completedExplorationIds.indexOf(activityId) !== -1 ||
+                completedCollectionIds.indexOf(activityId) !== -1 ||
+                explorationPlaylistIds.indexOf(activityId) !== -1 ||
+                collectionPlaylistIds.indexOf(activityId) !== -1) {
+              return false;
+            } else {
+              return hoverOverActivity && (activeActivityId == activityId);
+            }
+          };
+
+          $scope.addToLearnerPlaylist = function(activityType, activityId) {
+            var addActivityToLearnerPlaylistUrl = (
+              UrlInterpolationService.interpolateUrl(
+                '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                  activityType: activityType,
+                  activityId: activityId
+                }));
+            $http.post(addActivityToLearnerPlaylistUrl, {})
+              .then(function(response) {
+                if (response.data.belongs_to_completed_or_incomplete_list) {
+                  alertsService.addInfoMessage(
+                    'You have already completed or are completing this activity.');
+                } else if (response.data.belongs_to_subscribed_activities) {
+                  alertsService.addInfoMessage(
+                    'This is present in your creator dashboard');
+                } else if (response.data.playlist_limit_exceeded) {
+                  alertsService.addInfoMessage(
+                    'Your \'Play Later\' list is full!  Either you can complete' +
+                    'some or you can head to the learner dashboard and remove some.');
+                } else {
+                  alertsService.addSuccessMessage(
+                    'Succesfully added to your \'Play Later\' list.');
+                }
+              });
+
+            if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
+              $scope.learnerDashboardActivityIds.exploration_playlist_ids.push(
+                activityId);
+            } else {
+              $scope.learnerDashboardActivityIds.collection_playlist_ids.push(
+                activityId);
+            }
+          };
+
+          $scope.removeFromLearnerPlaylist = function(
+            activityId, activityType, activityTitle) {
+            $modal.open({
+              templateUrl: 'modals/removeActivity',
+              backdrop: true,
+              resolve: {
+                activityId: function() {
+                  return activityId;
+                },
+                activityType: function() {
+                  return activityType;
+                },
+                activityTitle: function() {
+                  return activityTitle;
+                }
+              },
+              controller: [
+                '$scope', '$modalInstance', '$http', 'UrlInterpolationService',
+                function($scope, $modalInstance, $http, UrlInterpolationService) {
+                  $scope.sectionNameI18nId = (
+                    'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
+                  $scope.activityTitle = activityTitle;
+                  var removeFromLearnerPlaylistUrl = (
+                    UrlInterpolationService.interpolateUrl(
+                      '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                        activityType: activityType,
+                        activityId: activityId
+                      }));
+
+                  $scope.remove = function() {
+                    $http['delete'](removeFromLearnerPlaylistUrl);
+                    $modalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            }).result.then(function() {
+              if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
+                var index = (
+                  $scope.learnerDashboardActivityIds.exploration_playlist_ids.indexOf(
+                    activityId));
+                if (index !== -1) {
+                  $scope.learnerDashboardActivityIds.exploration_playlist_ids.splice(
+                    index, 1);
+                }
+              } else {
+                var index = (
+                  $scope.learnerDashboardActivityIds.collection_playlist_ids.indexOf(
+                    activityId));
+                if (index !== -1) {
+                  $scope.learnerDashboardActivityIds.collection_playlist_ids.splice(
+                    index, 1);
+                }
+              }
+            });
+          };
 
           $scope.showMoreActivities = function() {
             if (!$rootScope.loadingMessage && !$scope.endOfPageIsReached) {

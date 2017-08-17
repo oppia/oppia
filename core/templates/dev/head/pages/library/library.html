@@ -41,8 +41,7 @@
     <div style="position: relative; z-index: 3;">
       <div>
         <div class="oppia-exp-summary-tiles-container" ng-if="pageMode === LIBRARY_PAGE_MODES.SEARCH">
-          <[learnerDashboardActivityIds.incomplete_exploration_ids]>
-          <search-results learner-dashboard-activity-ids="activityList.length"></search-results>
+          <search-results ng-if="learnerDashboardActivityIds" learner-dashboard-activity-ids="learnerDashboardActivityIds"></search-results>
         </div>
 
         <div class="oppia-exp-summary-tiles-container"
@@ -150,7 +149,8 @@
                                              node-count="tile.node_count"
                                              category="tile.category"
                                              thumbnail-icon-url="tile.thumbnail_icon_url"
-                                             thumbnail-bg-color="tile.thumbnail_bg_color">
+                                             thumbnail-bg-color="tile.thumbnail_bg_color"
+                                             style="position: relative; z-index: 5;">
                     </collection-summary-tile>
                     <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
                                               exploration-id="tile.id"

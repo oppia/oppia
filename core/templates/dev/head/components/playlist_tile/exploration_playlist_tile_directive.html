@@ -1,25 +1,13 @@
-<md-card class="oppia-activity-summary-tile oppia-exploration-playlist-tile">
+<md-card class="oppia-activity-summary-tile oppia-activity-playlist-tile">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
       <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>"
            alt="<[getCategory()]>"
            style="width: 60px; top: 6px;">
-      <h3 class="activity-title protractor-test-exp-summary-tile-title">
+      <h3 class="activity-title protractor-test-exp-summary-tile-title" style="width: 93%;">
         <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
         <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
       </h3>
-
-      <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
-      <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
-        <div>
-          <circular-image ng-if="avatarsList.length > 0"
-                          src="avatarsList[0].image"
-                          link="avatarsList[0].link"
-                          tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
-                          tooltip-placement="right">
-          </circular-image>
-        </div>
-      </div>
     </div>
     <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>"
          class="summary-section">

@@ -444,6 +444,10 @@
 
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="collectionPlaylist.length > 0">
+              <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
+            </span>
+            <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCollectionPlaylist !== 0">
               <span ng-if="numberDeletedCollectionPlaylist === 1"
                     translate="I18N_LEARNER_DASHBOARD_DELETED_COLLECTION_FROM_PLAYLIST"
@@ -469,16 +473,19 @@
             </md-card>
 
             <div ui-sortable="collectionPlaylistSortableOptions" ng-model="collectionPlaylist">
-              <div ng-repeat="tile in collectionPlaylist track by $index"
-                   style="display: inline-block; margin-left: 1px;"
+              <div class="oppia-learner-playlist-tiles"
+                   ng-repeat="tile in collectionPlaylist track by $index"
+                   style="display: inline-block; margin-left: 1px; height: 145px;"
                    ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
                 <i class="remove-icon fa fa-times"
                    ng-show="showRemoveIcon"
+                   style="color: black;"
                    aria-hidden="true"
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                    tooltip="Remove"
                    tooltip-placement="top"></i>
-                <collection-summary-tile
+                <collection-playlist-tile
+                                         style="height: 145px; display: block;"
                                          collection-id="tile.id"
                                          collection-title="tile.title"
                                          last-updated-msec="tile.last_updated_msec"
@@ -487,7 +494,7 @@
                                          category="tile.category"
                                          thumbnail-icon-url="tile.thumbnail_icon_url"
                                          thumbnail-bg-color="tile.thumbnail_bg_color">
-                </collection-summary-tile>
+                </collection-playlist-tile>
               </div>
             </div>
           </div>
@@ -806,6 +813,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/playlist_tile/ExplorationPlaylistTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/playlist_tile/CollectionPlaylistTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js"></script>
