@@ -20,7 +20,13 @@ oppia.directive('searchResults', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {
+        learnerDashboardActivityIds: '=',
+      },
       templateUrl: 'components/searchResults',
+      link: function(scope, element, attrs) {
+        console.log(scope.learnerDashboardActivityIds);
+      },
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
         function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
@@ -28,6 +34,7 @@ oppia.directive('searchResults', [
           $scope.someResultsExist = true;
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
 
+          console.log($scope.learnerDashboardActivityIds);
           // Called when the first batch of search results is retrieved from the
           // server.
           $scope.$on(

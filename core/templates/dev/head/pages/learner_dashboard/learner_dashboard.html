@@ -328,6 +328,10 @@
 
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="explorationPlaylist.length > 0">
+              <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
+            </span>
+            <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedExplorationPlaylist !== 0">
               <span ng-if="numberDeletedExplorationPlaylist === 1"
                     translate="I18N_LEARNER_DASHBOARD_DELETED_EXPLORATION_FROM_PLAYLIST"

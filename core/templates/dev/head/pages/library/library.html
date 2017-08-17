@@ -41,7 +41,8 @@
     <div style="position: relative; z-index: 3;">
       <div>
         <div class="oppia-exp-summary-tiles-container" ng-if="pageMode === LIBRARY_PAGE_MODES.SEARCH">
-          <search-results></search-results>
+          <[learnerDashboardActivityIds.incomplete_exploration_ids]>
+          <search-results learner-dashboard-activity-ids="activityList.length"></search-results>
         </div>
 
         <div class="oppia-exp-summary-tiles-container"
@@ -119,7 +120,7 @@
                   <div ng-repeat="tile in group.activity_summary_dicts"
                        style="display: inline-block;"
                        ng-mouseenter="setHoverOverActivity(tile.id)" ng-mouseleave="setHoverOverActivity(tile.id)">
-                    <i class="oppia-learner-dashboard-icon fa fa-clock-o"
+                    <i class="protractor-test-add-exp-to-playlist-icon oppia-learner-dashboard-icon fa fa-clock-o"
                        ng-show="showAddToLearnerPlaylistIcon(tile.id)"
                        ng-click="addToLearnerPlaylist(tile.activity_type, tile.id)"
                        aria-hidden="true"
