@@ -17,6 +17,7 @@
 import ast
 import logging
 
+from constants import constants
 from core import jobs
 from core.domain import config_domain
 from core.domain import exp_services
@@ -71,6 +72,32 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
 
+
+class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for populating the default dashboard field for users.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        yield (item.id, 1)
+
+    @staticmethod
+    def reduce(key, _):
+        user_contributions = user_services.get_user_contributions(key)
+        user_is_creator = user_contributions and (
+            user_contributions.created_exploration_ids or
+            user_contributions.edited_exploration_ids)
+
+        if user_is_creator:
+            user_services.update_user_default_dashboard(
+                key, constants.DASHBOARD_TYPE_CREATOR)
+        else:
+            user_services.update_user_default_dashboard(
+                key, constants.DASHBOARD_TYPE_LEARNER)
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for calculating the distribution of username lengths."""
