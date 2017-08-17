@@ -255,13 +255,6 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
-  it('displays the exploration playlist', function() {
-    users.login('learner@learnerDashboard.com');
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    element.all(by.css(
-      '.protractor-test-add-exp-to-playlist-icon')).first().click();
-  });
-
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });
