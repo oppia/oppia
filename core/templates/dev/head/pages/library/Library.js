@@ -159,15 +159,18 @@ oppia.controller('Library', [
       $http.post(addActivityToLearnerPlaylistUrl, {})
         .then(function(response) {
           if (response.data.belongs_to_completed_or_incomplete_list) {
-            alertsService.addInfoMessage('You have already completed or are completing this activity.');
+            alertsService.addInfoMessage(
+              'You have already completed or are completing this activity.');
           } else if (response.data.belongs_to_subscribed_activities) {
-            alertsService.addInfoMessage('This is present in your creator dashboard');
+            alertsService.addInfoMessage(
+              'This is present in your creator dashboard');
           } else if (response.data.playlist_limit_exceeded) {
             alertsService.addInfoMessage(
               'Your \'Play Later\' list is full!  Either you can complete' +
               'some or you can head to the learner dashboard and remove some.');
           } else {
-            alertsService.addSuccessMessage('Succesfully added to your \'Play Later\' list.');
+            alertsService.addSuccessMessage(
+              'Succesfully added to your \'Play Later\' list.');
           }
         });
 
