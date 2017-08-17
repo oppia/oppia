@@ -20,7 +20,6 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
@@ -49,33 +48,15 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.user_role_a = user_services.get_user_role_from_id(self.user_id_a)
-        self.user_role_b = user_services.get_user_role_from_id(self.user_id_b)
-        self.user_role_c = user_services.get_user_role_from_id(self.user_id_c)
-        self.user_role_d = user_services.get_user_role_from_id(self.user_id_d)
-        self.user_role_e = user_services.get_user_role_from_id(self.user_id_e)
-        self.user_role_admin = user_services.get_user_role_from_id(
-            self.user_id_admin)
-        self.user_role_moderator = user_services.get_user_role_from_id(
-            self.user_id_moderator)
-        self.user_a = user_services.UserActionsInfo(
-            self.user_id_a, self.user_role_a)
-        self.user_b = user_services.UserActionsInfo(
-            self.user_id_b, self.user_role_b)
-        self.user_c = user_services.UserActionsInfo(
-            self.user_id_c, self.user_role_c)
-        self.user_d = user_services.UserActionsInfo(
-            self.user_id_d, self.user_role_d)
-        self.user_e = user_services.UserActionsInfo(
-            self.user_id_e, self.user_role_e)
-        self.user_admin = user_services.UserActionsInfo(
-            self.user_id_admin, self.user_role_admin)
+        self.user_a = user_services.UserActionsInfo(self.user_id_a)
+        self.user_b = user_services.UserActionsInfo(self.user_id_b)
+        self.user_c = user_services.UserActionsInfo(self.user_id_c)
+        self.user_d = user_services.UserActionsInfo(self.user_id_d)
+        self.user_e = user_services.UserActionsInfo(self.user_id_e)
+        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
         self.user_moderator = user_services.UserActionsInfo(
-            self.user_id_moderator, self.user_role_moderator)
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
+            self.user_id_moderator)
+        self.system_user = user_services.get_system_user()
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -91,7 +72,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.get_exploration_rights(non_exp_id, strict=False))
 
     def test_demo_exploration(self):
-        exp_services.load_demo(self.system_user, '1')
+        exp_services.load_demo('1')
         rights_manager.release_ownership_of_exploration(
             self.system_user, '1')
         exp_rights = rights_manager.get_exploration_rights('1')
@@ -120,7 +101,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
         # explorations, whether or not they are on the splash page.
-        exp_services.load_demo(self.system_user, '3')
+        exp_services.load_demo('3')
         rights_manager.release_ownership_of_exploration(
             self.system_user, '3')
         exp_rights = rights_manager.get_exploration_rights('3')
@@ -402,33 +383,15 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.MODERATOR_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.user_role_a = user_services.get_user_role_from_id(self.user_id_a)
-        self.user_role_b = user_services.get_user_role_from_id(self.user_id_b)
-        self.user_role_c = user_services.get_user_role_from_id(self.user_id_c)
-        self.user_role_d = user_services.get_user_role_from_id(self.user_id_d)
-        self.user_role_e = user_services.get_user_role_from_id(self.user_id_e)
-        self.user_role_admin = user_services.get_user_role_from_id(
-            self.user_id_admin)
-        self.user_role_moderator = user_services.get_user_role_from_id(
-            self.user_id_moderator)
-        self.user_a = user_services.UserActionsInfo(
-            self.user_id_a, self.user_role_a)
-        self.user_b = user_services.UserActionsInfo(
-            self.user_id_b, self.user_role_b)
-        self.user_c = user_services.UserActionsInfo(
-            self.user_id_c, self.user_role_c)
-        self.user_d = user_services.UserActionsInfo(
-            self.user_id_d, self.user_role_d)
-        self.user_e = user_services.UserActionsInfo(
-            self.user_id_e, self.user_role_e)
-        self.user_admin = user_services.UserActionsInfo(
-            self.user_id_admin, self.user_role_admin)
+        self.user_a = user_services.UserActionsInfo(self.user_id_a)
+        self.user_b = user_services.UserActionsInfo(self.user_id_b)
+        self.user_c = user_services.UserActionsInfo(self.user_id_c)
+        self.user_d = user_services.UserActionsInfo(self.user_id_d)
+        self.user_e = user_services.UserActionsInfo(self.user_id_e)
+        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
         self.user_moderator = user_services.UserActionsInfo(
-            self.user_id_moderator, self.user_role_moderator)
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
+            self.user_id_moderator)
+        self.system_user = user_services.get_system_user()
 
 
     def test_get_collection_rights_for_nonexistent_collection(self):
@@ -445,7 +408,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             rights_manager.get_collection_rights(non_col_id, strict=False))
 
     def test_demo_collection(self):
-        collection_services.load_demo(self.system_user, '0')
+        collection_services.load_demo('0')
         rights_manager.release_ownership_of_collection(
             self.system_user, '0')
         collection_rights = rights_manager.get_collection_rights('0')
@@ -716,10 +679,8 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(
-            self.admin_id, user_services.get_user_role_from_id(self.admin_id))
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id, user_services.get_user_role_from_id(self.owner_id))
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -764,13 +725,9 @@ class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin = user_services.UserActionsInfo(
-            self.admin_id, user_services.get_user_role_from_id(self.admin_id))
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id, user_services.get_user_role_from_id(self.owner_id))
-        self.moderator = user_services.UserActionsInfo(
-            self.moderator_id,
-            user_services.get_user_role_from_id(self.moderator_id))
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.moderator = user_services.UserActionsInfo(self.moderator_id)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(

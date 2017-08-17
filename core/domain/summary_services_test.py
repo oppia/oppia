@@ -83,12 +83,8 @@ class ExplorationDisplayableSummariesTest(
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        self.albert = user_services.UserActionsInfo(
-            self.albert_id,
-            user_services.get_user_role_from_id(self.albert_id))
-        self.bob = user_services.UserActionsInfo(
-            self.bob_id,
-            user_services.get_user_role_from_id(self.bob_id))
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
@@ -326,9 +322,7 @@ class FeaturedExplorationDisplayableSummariesTest(
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert = user_services.UserActionsInfo(
-            self.albert_id,
-            user_services.get_user_role_from_id(self.albert_id))
+        self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.albert_id, language_code=self.LANGUAGE_CODE_ES)
@@ -436,12 +430,8 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
-        self.editor = user_services.UserActionsInfo(
-            self.editor_id,
-            user_services.get_user_role_from_id(self.editor_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
     def test_get_learner_dict_with_deleted_exp_fails_validation(self):
         self.save_new_valid_collection(
@@ -590,9 +580,7 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert = user_services.UserActionsInfo(
-            self.albert_id,
-            user_services.get_user_role_from_id(self.albert_id))
+        self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
@@ -746,9 +734,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert = user_services.UserActionsInfo(
-            self.albert_id,
-            user_services.get_user_role_from_id(self.albert_id))
+        self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.albert_id,
@@ -852,9 +838,7 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         super(ActivityReferenceAccessCheckerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
     def test_requiring_nonexistent_activities_be_public_raises_exception(self):
         with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
@@ -922,12 +906,8 @@ class CollectionNodeMetadataDictsTest(
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        self.albert = user_services.UserActionsInfo(
-            self.albert_id,
-            user_services.get_user_role_from_id(self.albert_id))
-        self.bob = user_services.UserActionsInfo(
-            self.bob_id,
-            user_services.get_user_role_from_id(self.bob_id))
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
 
         self.save_new_valid_exploration(self.EXP_ID1, self.albert_id,
                                         title='Exploration 1 Albert title',

@@ -39,16 +39,8 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.owner_role = user_services.get_user_role_from_id(
-            self.owner_id)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id, self.owner_role)
-        self.admin_role = user_services.get_user_role_from_id(
-            self.admin_id)
-        self.admin = user_services.UserActionsInfo(
-            self.admin_id, self.admin_role)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id, self.owner_role)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
 
         self.json_dict = {
             'version' : 1,
@@ -65,12 +57,9 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
     def setUp(self):
         super(CollectionEditorTest, self).setUp()
-        system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
+        system_user = user_services.get_system_user()
 
-        collection_services.load_demo(system_user, self.COLLECTION_ID)
+        collection_services.load_demo(self.COLLECTION_ID)
         rights_manager.release_ownership_of_collection(
             system_user, self.COLLECTION_ID)
 

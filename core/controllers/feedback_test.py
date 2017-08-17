@@ -42,14 +42,9 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackThreadPermissionsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
-
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
-        exp_services.load_demo(system_user, self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
 
         # Get the CSRF token and create a single thread with a single message.
         # The corresponding user has already registered as an editor, and has a
@@ -126,17 +121,11 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         super(FeedbackThreadIntegrationTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(
-            self.editor_id,
-            user_services.get_user_role_from_id(self.editor_id))
-        system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
-        exp_services.load_demo(system_user, self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
 
     def test_create_thread(self):
         self.login(self.EDITOR_EMAIL)
@@ -375,9 +364,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        self.owner_2 = user_services.UserActionsInfo(
-            self.owner_id_2,
-            user_services.get_user_role_from_id(self.owner_id_2))
+        self.owner_2 = user_services.UserActionsInfo(self.owner_id_2)
 
         # Create an exploration.
         self.save_new_valid_exploration(
@@ -529,18 +516,11 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.editor_role = user_services.get_user_role_from_id(
-            self.editor_id)
-        self.editor = user_services.UserActionsInfo(
-            self.editor_id, self.editor_role)
-        system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
-        exp_services.load_demo(system_user, self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)

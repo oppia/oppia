@@ -223,9 +223,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(self.system_user, unicode(exploration_id))
+            exp_services.load_demo(unicode(exploration_id))
             rights_manager.release_ownership_of_exploration(
-                self.system_user, unicode(exploration_id))
+                user_services.get_system_user(), unicode(exploration_id))
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -234,10 +234,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
-            collection_services.load_demo(
-                self.system_user, unicode(collection_id))
+            collection_services.load_demo(unicode(collection_id))
             rights_manager.release_ownership_of_collection(
-                self.system_user, unicode(collection_id))
+                user_services.get_system_user(), unicode(collection_id))
         else:
             raise Exception('Cannot reload a collection in production.')
 

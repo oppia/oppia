@@ -43,9 +43,7 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -106,9 +104,7 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -179,9 +175,7 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -374,9 +368,7 @@ class CommentOnFeedbackTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -630,9 +622,7 @@ class EditExplorationTest(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.username])
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -730,9 +720,7 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -825,9 +813,7 @@ class PublishExplorationTest(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -937,9 +923,7 @@ class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,

@@ -250,18 +250,14 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         for exp_id, exp in self.EXP_DATA.iteritems():
             self.save_new_valid_exploration(
                 exp_id, exp['owner_id'], category=exp['category'])
-            owner = user_services.UserActionsInfo(
-                exp['owner_id'],
-                user_services.get_user_role_from_id(exp['owner_id']))
+            owner = user_services.UserActionsInfo(exp['owner_id'])
             rights_manager.publish_exploration(owner, exp_id)
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         user_services.create_new_user(self.admin_id, self.ADMIN_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(
-            self.admin_id,
-            user_services.get_user_role_from_id(self.admin_id))
+        self.admin = user_services.UserActionsInfo(self.admin_id)
 
     def test_recommendation_categories_and_matrix_headers_match(self):
         topic_similarities_lines = (

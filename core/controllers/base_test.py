@@ -168,10 +168,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        creator_user_role = user_services.get_user_role_from_id(
-            creator_user_id)
-        creator = user_services.UserActionsInfo(
-            creator_user_id, creator_user_role)
+        creator = user_services.UserActionsInfo(creator_user_id)
         editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
         exploration_id = '1_en_test_exploration'
         self.save_new_valid_exploration(
@@ -302,11 +299,7 @@ class LogoutPageTest(test_utils.GenericTestBase):
 
     def test_logout_page(self):
         """Tests for logout handler."""
-        system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
-        exp_services.load_demo(system_user, '0')
+        exp_services.load_demo('0')
         # Logout with valid query arg. This test only validates that the login
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'

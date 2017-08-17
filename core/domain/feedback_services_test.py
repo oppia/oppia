@@ -1036,10 +1036,7 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.editor_role = user_services.get_user_role_from_id(
-            self.editor_id)
-        self.editor = user_services.UserActionsInfo(
-            self.editor_id, self.editor_role)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')

@@ -1125,15 +1125,13 @@ def delete_demo(collection_id):
             feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)
 
 
-def load_demo(user, collection_id):
+def load_demo(collection_id):
     """Loads a demo collection.
 
     The resulting collection will have version 2 (one for its initial
     creation and one for its subsequent modification.)
 
     Args:
-        user: UserActionsInfo. UserActionsInfo for the user calling the
-            function.
         collection_id: str. ID of the collection to be loaded.
     """
     delete_demo(collection_id)
@@ -1153,8 +1151,8 @@ def load_demo(user, collection_id):
     collection = save_new_collection_from_yaml(
         feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
-    publish_collection_and_update_user_profiles(
-        user, collection_id)
+    system_user = user_services.get_system_user()
+    publish_collection_and_update_user_profiles(system_user, collection_id)
 
     index_collections_given_ids([collection_id])
 
@@ -1163,7 +1161,7 @@ def load_demo(user, collection_id):
         exp_id = collection_node.exploration_id
         # Only load the demo exploration if it is not yet loaded.
         if exp_services.get_exploration_by_id(exp_id, strict=False) is None:
-            exp_services.load_demo(user, exp_id)
+            exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
 

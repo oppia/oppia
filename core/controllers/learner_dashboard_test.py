@@ -17,7 +17,6 @@
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import subscription_services
-from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
@@ -168,13 +167,9 @@ class LearnerDashboardFeedbackThreadHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(LearnerDashboardFeedbackThreadHandlerTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
 
         # Load exploration 0.
-        exp_services.load_demo(system_user, self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
 
         # Get the CSRF token and create a single thread with a single message.
         self.login(self.EDITOR_EMAIL)

@@ -61,21 +61,9 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
 
-        self.owner_role = user_services.get_user_role_from_id(
-            self.owner_id)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id, self.owner_role)
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
-        self.editor = user_services.UserActionsInfo(
-            self.editor_id, user_services.get_user_role_from_id(
-                self.editor_id))
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.system_user = user_services.get_system_user()
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
@@ -98,7 +86,7 @@ class EditorTest(BaseEditorControllerTest):
 
     def setUp(self):
         super(EditorTest, self).setUp()
-        exp_services.load_demo(self.system_user, '0')
+        exp_services.load_demo('0')
 
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
@@ -248,7 +236,7 @@ class EditorTest(BaseEditorControllerTest):
 
             # Load the string classifier demo exploration.
             exp_id = '15'
-            exp_services.load_demo(self.system_user, exp_id)
+            exp_services.load_demo(exp_id)
             rights_manager.release_ownership_of_exploration(
                 self.system_user, exp_id)
 
@@ -778,7 +766,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         """Create exploration with two versions"""
         super(VersioningIntegrationTest, self).setUp()
 
-        exp_services.load_demo(self.system_user, self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
             self.system_user, self.EXP_ID)
 
@@ -899,7 +887,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         """Test that banned users are banned."""
 
         exp_id = '0'
-        exp_services.load_demo(self.system_user, exp_id)
+        exp_services.load_demo(exp_id)
         rights_manager.release_ownership_of_exploration(
             self.system_user, exp_id)
 
@@ -1162,9 +1150,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         super(ModeratorEmailsTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(
-            self.editor_id, user_services.get_user_role_from_id(
-                self.editor_id))
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])

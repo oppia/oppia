@@ -76,17 +76,10 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
-        self.owner_role = user_services.get_user_role_from_id(
-            self.owner_id)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id, self.owner_role)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
 
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
@@ -548,7 +541,7 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
         for exp_id in demo_exploration_ids:
             start_time = datetime.datetime.utcnow()
 
-            exp_services.load_demo(self.system_user, exp_id)
+            exp_services.load_demo(exp_id)
             exploration = exp_services.get_exploration_by_id(exp_id)
             warnings = exploration.validate(strict=True)
             if warnings:
@@ -1877,12 +1870,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert = user_services.UserActionsInfo(
-            self.albert_id,
-            user_services.get_user_role_from_id(self.albert_id))
-        self.bob = user_services.UserActionsInfo(
-            self.bob_id,
-            user_services.get_user_role_from_id(self.bob_id))
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
 
         # This needs to be done in a toplevel wrapper because the datastore
         # puts to the event log are asynchronous.
@@ -2006,7 +1995,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         results, _ = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, [])
 
-        exp_services.load_demo(self.system_user, '0')
+        exp_services.load_demo('0')
         results, _ = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, ['0'])
 
@@ -2396,12 +2385,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert = user_services.UserActionsInfo(
-            self.albert_id,
-            user_services.get_user_role_from_id(self.albert_id))
-        self.bob = user_services.UserActionsInfo(
-            self.bob_id,
-            user_services.get_user_role_from_id(self.bob_id))
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 

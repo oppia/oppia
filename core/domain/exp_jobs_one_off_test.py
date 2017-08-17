@@ -88,9 +88,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.login(self.ADMIN_EMAIL)
             admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
             self.set_admins([self.ADMIN_USERNAME])
-            admin = user_services.UserActionsInfo(
-                admin_id,
-                user_services.get_user_role_from_id(admin_id))
+            admin = user_services.UserActionsInfo(admin_id)
 
             # Create and delete an exploration (to make sure job handles
             # deleted explorations correctly).
@@ -219,10 +217,8 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        owner = user_services.UserActionsInfo(
-            owner_id, user_services.get_user_role_from_id(owner_id))
-        admin = user_services.UserActionsInfo(
-            admin_id, user_services.get_user_role_from_id(admin_id))
+        owner = user_services.UserActionsInfo(owner_id)
+        admin = user_services.UserActionsInfo(admin_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID, owner_id, end_state_name='End')
@@ -563,9 +559,7 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s%s' % (self.EXP_ID, i),
@@ -722,14 +716,10 @@ class GadgetsOneOffJobTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
 
-        exp_services.load_demo(self.system_user, self.REGULAR_EXP_ID)
+        exp_services.load_demo(self.REGULAR_EXP_ID)
 
-        exp_services.load_demo(self.system_user, self.GADGET_EXP_ID)
+        exp_services.load_demo(self.GADGET_EXP_ID)
         exploration = exp_services.get_exploration_by_id(self.GADGET_EXP_ID)
         exp_services.update_exploration(self.owner_id, self.GADGET_EXP_ID, [{
             'cmd': exp_domain.CMD_ADD_GADGET,

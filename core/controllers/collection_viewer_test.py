@@ -33,9 +33,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(
-            self.editor_id, user_services.get_user_role_from_id(
-                self.editor_id))
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
@@ -110,14 +108,10 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
 
     def test_welcome_collection(self):
         """Test a learner's progression through the default collection."""
-        collection_services.load_demo(self.system_user, '0')
+        collection_services.load_demo('0')
 
         # Login as the user who will play the collection.
         self.login(self.VIEWER_EMAIL)

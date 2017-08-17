@@ -67,14 +67,7 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.owner_role = user_services.get_user_role_from_id(
-            self.owner_id)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id, self.owner_role)
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
 
 class CollectionQueriesUnitTests(CollectionServicesUnitTests):
@@ -689,7 +682,7 @@ class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
         for collection_id in feconf.DEMO_COLLECTIONS:
             start_time = datetime.datetime.utcnow()
 
-            collection_services.load_demo(self.system_user, collection_id)
+            collection_services.load_demo(collection_id)
             collection = collection_services.get_collection_by_id(
                 collection_id)
             collection.validate()
@@ -1473,12 +1466,8 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert = user_services.UserActionsInfo(
-            self.albert_id,
-            user_services.get_user_role_from_id(self.albert_id))
-        self.bob = user_services.UserActionsInfo(
-            self.bob_id,
-            user_services.get_user_role_from_id(self.bob_id))
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
 
         # This needs to be done in a toplevel wrapper because the datastore
         # puts to the event log are asynchronous.
@@ -1602,7 +1591,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         results = collection_services.search_collections('Welcome', 2)[0]
         self.assertEqual(results, [])
 
-        collection_services.load_demo(self.system_user, '0')
+        collection_services.load_demo('0')
         results = collection_services.search_collections('Welcome', 2)[0]
         self.assertEqual(results, ['0'])
 
@@ -1786,8 +1775,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        albert_role = user_services.get_user_role_from_id(albert_id)
-        albert = user_services.UserActionsInfo(albert_id, albert_role)
+        albert = user_services.UserActionsInfo(albert_id)
 
         # Have Albert create a collection.
         self.save_new_valid_collection(self.COLLECTION_ID, albert_id)

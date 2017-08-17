@@ -45,9 +45,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(
-            self.editor_id,
-            user_services.get_user_role_from_id(self.editor_id))
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
@@ -137,17 +135,12 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
-
         # Load demo exploration.
         self.exp_id = '0'
         self.title = 'Testing String Classifier'
         self.category = 'Test'
         exp_services.delete_demo(self.exp_id)
-        exp_services.load_demo(self.system_user, self.exp_id)
+        exp_services.load_demo(self.exp_id)
 
         # Creating the exploration domain object.
         self.exploration = exp_domain.Exploration.from_untitled_yaml(
@@ -175,13 +168,6 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
     """Test the handler for giving feedback."""
 
-    def setUp(self):
-        super(FeedbackIntegrationTest, self).setUp()
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
-
     def test_give_feedback_handler(self):
         """Test giving feedback handler."""
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -189,7 +175,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         # Load demo exploration
         exp_id = '0'
         exp_services.delete_demo('0')
-        exp_services.load_demo(self.system_user, '0')
+        exp_services.load_demo('0')
 
         # Viewer opens exploration
         self.login(self.VIEWER_EMAIL)
@@ -221,10 +207,6 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-        system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
         exp_services.delete_demo(exploration_id)
         # We enable ENABLE_ML_CLASSIFIERS so that the subsequent call to
         # save_exploration handles job creation for trainable states.
@@ -235,7 +217,7 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.load_demo(system_user, exploration_id)
+                    exp_services.load_demo(exploration_id)
 
         # Retrieve job_id of created job (because of save_exp).
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
@@ -326,12 +308,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RatingsIntegrationTests, self).setUp()
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
-
-        exp_services.load_demo(self.system_user, self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
 
     def test_assign_and_read_ratings(self):
         """Test the PUT and GET methods for ratings."""
@@ -447,17 +424,10 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.editor = user_services.UserActionsInfo(
-            self.editor_id,
-            user_services.get_user_role_from_id(self.editor_id))
-
-        self.system_user = user_services.UserActionsInfo(
-            feconf.SYSTEM_COMMITTER_ID,
-            user_services.get_user_role_from_id(
-                feconf.SYSTEM_COMMITTER_ID))
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         # Load exploration 0.
-        exp_services.load_demo(self.system_user, self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
 
         # Login and create exploration.
         self.login(self.EDITOR_EMAIL)
@@ -568,9 +538,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
         # Save and publish explorations.
         self.save_new_valid_exploration(

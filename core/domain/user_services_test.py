@@ -456,13 +456,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.admin_role = user_services.get_user_role_from_id(
-            self.admin_id)
-        self.admin = user_services.UserActionsInfo(
-            self.admin_id, self.admin_role)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
     def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(

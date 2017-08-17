@@ -1432,15 +1432,13 @@ def delete_demo(exploration_id):
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
 
 
-def load_demo(user, exploration_id):
+def load_demo(exploration_id):
     """Loads a demo exploration.
 
     The resulting exploration will have two commits in its history (one for
     its initial creation and one for its subsequent modification.)
 
     Args:
-        user: UserActionsInfo. UserActionsInfo object of the user calling this
-            function.
         exploration_id: str. The id of the demo exploration.
 
     Raises:
@@ -1459,7 +1457,7 @@ def load_demo(user, exploration_id):
         assets_list)
 
     publish_exploration_and_update_user_profiles(
-        user, exploration_id)
+        user_services.get_system_user(), exploration_id)
 
     index_explorations_given_ids([exploration_id])
 

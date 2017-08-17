@@ -58,10 +58,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
 
-        self.owner_role = user_services.get_user_role_from_id(
-            self.owner_id)
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id, self.owner_role)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
     def _get_thread_ids_subscribed_to(self, user_id):
         subscriptions_model = user_models.UserSubscriptionsModel.get(

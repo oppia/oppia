@@ -53,12 +53,8 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.owner = user_services.UserActionsInfo(
-            self.owner_id,
-            user_services.get_user_role_from_id(self.owner_id))
-        self.moderator = user_services.UserActionsInfo(
-            self.moderator_id,
-            user_services.get_user_role_from_id(self.moderator_id))
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.moderator = user_services.UserActionsInfo(self.moderator_id)
 
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)
