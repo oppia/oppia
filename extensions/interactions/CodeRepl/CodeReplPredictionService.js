@@ -52,14 +52,14 @@ oppia.factory('CodeReplPredictionService', [
           var tokenName = token[1];
 
           if (
-            tokenId == PythonProgramTokenType.NL ||
-            tokenId == PythonProgramTokenType.COMMENT ||
-            tokenName.trim() == '') {
+            tokenId === PythonProgramTokenType.NL ||
+            tokenId === PythonProgramTokenType.COMMENT ||
+            tokenName.trim() === '') {
             continue;
           }
           else if (
-            tokenId == PythonProgramTokenType.NAME &&
-            KW_LIST.indexOf(tokenName) == -1) {
+            tokenId === PythonProgramTokenType.NAME &&
+            KW_LIST.indexOf(tokenName) === -1) {
             tokenizedProgram.push(TOKEN_NAME_VAR);
           }
           else {
@@ -85,14 +85,14 @@ oppia.factory('CodeReplPredictionService', [
           var tokenName = token[1];
 
           if (
-            tokenId == PythonProgramTokenType.NL ||
-            tokenId == PythonProgramTokenType.COMMENT ||
-            tokenName.trim() == '') {
+            tokenId === PythonProgramTokenType.NL ||
+            tokenId === PythonProgramTokenType.COMMENT ||
+            tokenName.trim() === '') {
             continue;
           }
           else if (
-            tokenId == PythonProgramTokenType.NAME &&
-            KW_LIST.indexOf(tokenName) == -1) {
+            tokenId === PythonProgramTokenType.NAME &&
+            KW_LIST.indexOf(tokenName) === -1) {
             tokenizedProgram.push(TOKEN_NAME_VAR);
           }
           else {
