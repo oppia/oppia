@@ -333,11 +333,11 @@ def add_collection_to_learner_playlist(
 
     if (collection_id not in completed_collection_ids and
             collection_id not in incomplete_collection_ids):
-        
+
         (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_collection_to_be_played_later(
                 user_id, collection_id, position_to_be_inserted))
-        
+
         belongs_to_completed_or_incomplete_list = False
     else:
         belongs_to_completed_or_incomplete_list = True
@@ -379,7 +379,7 @@ def add_exp_to_learner_playlist(
                 user_id, exploration_id, position_to_be_inserted))
 
         belongs_to_completed_or_incomplete_list = False
-    
+
     else:
         belongs_to_completed_or_incomplete_list = True
 
