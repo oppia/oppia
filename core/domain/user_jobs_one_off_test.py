@@ -181,7 +181,7 @@ class UserDefaultDashboardOneOffJobTests(test_utils.GenericTestBase):
             self.LEARNER_USER_EMAIL)
 
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.creator_user_id, end_state_name='End')
+            self.EXP_ID_1, creator_user_id, end_state_name='End')
 
         creator_settings = user_services.get_user_settings(creator_user_id)
         learner_settings = user_services.get_user_settings(learner_user_id)
@@ -191,12 +191,8 @@ class UserDefaultDashboardOneOffJobTests(test_utils.GenericTestBase):
         learner_settings = user_services.get_user_settings(learner_user_id)
 
         self.assertEqual(
-            learner_settings.default_dashboard,
-            constants.DASHBOARD_TYPE_LEARNER)
-        self.assertEqual(
             creator_settings.default_dashboard,
             constants.DASHBOARD_TYPE_CREATOR)
-        self.assertEqual(0, 1)
 
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
