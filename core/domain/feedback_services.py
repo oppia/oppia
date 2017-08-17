@@ -520,7 +520,7 @@ def get_thread_summaries(user_id, full_thread_ids):
             last_message_read = False
 
         if last_two_messages[index][0].author_id is None:
-            author_last_message = 'Anonymous'
+            author_last_message = None
         else:
             author_last_message = user_services.get_username(
                 last_two_messages[index][0].author_id)
@@ -538,7 +538,7 @@ def get_thread_summaries(user_id, full_thread_ids):
                 second_last_message_read = False
 
             if last_two_messages[index][1].author_id is None:
-                author_second_last_message = 'Anonymous'
+                author_second_last_message = None
             else:
                 author_second_last_message = user_services.get_username(
                     last_two_messages[index][1].author_id)

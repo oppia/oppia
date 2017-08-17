@@ -491,9 +491,27 @@
                       <strong><[thread.authorSecondLastMessage | truncate:7]>, </strong>
                     </span>
                   </span>
-                  <span ng-if="thread.lastMessageRead"><[thread.authorLastMessage | truncate:7]></span>
-                  <span ng-if="!thread.lastMessageRead">
-                    <strong><[thread.authorLastMessage | truncate:7]></strong>
+                  <span ng-if="!thread.authorSecondLastMessage">
+                    <span ng-if="thread.total_message_count > 1 && thread.secondLastMessageRead">
+                      <span translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>, 
+                    </span>
+                    <span ng-if="thread.total_message_count > 1 &&  !thread.secondLastMessageRead">
+                      <span>
+                        <strong translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></strong>, 
+                      </span>
+                    </span>
+                  </span>
+                  <span ng-if="thread.authorLastMessage">
+                    <span ng-if="thread.lastMessageRead"><[thread.authorLastMessage | truncate:7]></span>
+                    <span ng-if="!thread.lastMessageRead">
+                      <strong><[thread.authorLastMessage | truncate:7]></strong>
+                    </span>
+                  </span>
+                  <span ng-if="!thread.authorLastMessage">
+                    <span ng-if="thread.lastMessageRead" translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>
+                    <span ng-if="!thread.lastMessageRead">
+                      <strong translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></strong>
+                    </span>
                   </span>
                   <span class="feedback-thread-message-count">(<[thread.totalMessageCount]>)</span>
                 </td>
