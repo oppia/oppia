@@ -136,8 +136,8 @@ oppia.factory('AnswerClassificationService', [
             ENABLE_ML_CLASSIFIERS) {
           var classifier = StateClassifierMappingService.getClassifier(
             stateName);
-          if (classifier.classifierData && classifier.algorithmId && (
-            classifier.dataSchemaVersion)) {
+          if (classifier && classifier.classifierData && (
+            classifier.algorithmId && classifier.dataSchemaVersion)) {
             var predictionService = (
               PredictionAlgorithmRegistryService.getPredictionService(
                 classifier.algorithmId, classifier.dataSchemaVersion));

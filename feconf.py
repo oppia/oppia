@@ -78,6 +78,9 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
+PREDICTION_SERVICES_DEPENDENCIES_DIR = os.path.join(
+    DEPENDENCIES_TEMPLATES_DIR, 'prediction_service_dependencies')
+
 # A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
