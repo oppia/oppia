@@ -1,5 +1,4 @@
-<md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}]"
-         class="oppia-exploration-playlist-tile">
+<md-card class="oppia-activity-summary-tile oppia-exploration-playlist-tile">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
       <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>"
@@ -63,10 +62,6 @@
           </span>
         </li>
       </ul>
-      <button ng-if="isCollectionPreviewTile" class="oppia-learner-continue-button md-button md-default-theme"
-              style="display: block; margin: auto; touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-        <span translate="I18N_PLAYER_PLAY_EXPLORATION"></span>
-      </button>
     </div>
   </a>
 </md-card>
