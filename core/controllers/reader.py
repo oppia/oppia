@@ -91,6 +91,19 @@ def _get_exploration_player_data(
         interaction_registry.Registry.get_interaction_html(
             interaction_ids))
 
+    interaction_ids_with_prediction_service = []
+    classifier_training_jobs = (
+        classifier_services.get_classifier_training_jobs(
+            exploration_id, exploration.version, exploration.states))
+    for index, state_name in enumerate(exploration.states):
+        if (classifier_training_jobs[index] and
+                classifier_training_jobs[index].classifier_data):
+            interaction_ids_with_prediction_service.append(
+                exploration.states[state_name].interaction.id)
+    prediction_services_html = (
+        interaction_registry.Registry.get_all_html_for_prediction_service(
+            interaction_ids_with_prediction_service))
+
     return {
         'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
         'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
@@ -105,6 +118,8 @@ def _get_exploration_player_data(
         'collection_id': collection_id,
         'collection_title': collection_title,
         'gadget_templates': jinja2.utils.Markup(gadget_templates),
+        'prediction_services_html': jinja2.utils.Markup(
+            prediction_services_html),
         'interaction_templates': jinja2.utils.Markup(
             interaction_templates),
         'is_private': rights_manager.is_exploration_private(
@@ -220,7 +235,8 @@ class ExplorationHandler(base.BaseHandler):
             classifier_services.get_classifier_training_jobs(
                 exploration_id, exploration.version, exploration.states))
         for index, state_name in enumerate(exploration.states):
-            if classifier_training_jobs[index] is not None:
+            if (classifier_training_jobs[index] and
+                    classifier_training_jobs[index].classifier_data):
                 classifier_data = classifier_training_jobs[
                     index].classifier_data
                 algorithm_id = classifier_training_jobs[index].algorithm_id

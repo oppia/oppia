@@ -89,6 +89,11 @@ class BaseInteraction(object):
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
     _dependency_ids = []
+    # Additional JS library dependencies that should be loaded in pages
+    # if interactions is trainable and prediction service is required in
+    # frontend. These should correspond to names of files in
+    # feconf.PREDICTION_SERVICES_DEPENDENCIES_DIR. Overridden in subclasses.
+    _prediction_dependency_ids = []
     # The type of answer (as a string) accepted by this interaction, e.g.
     # 'CodeEvaluation'. This should be None for linear and terminal
     # interactions.
@@ -148,6 +153,10 @@ class BaseInteraction(object):
     @property
     def dependency_ids(self):
         return copy.deepcopy(self._dependency_ids)
+
+    @property
+    def prediction_dependency_ids(self):
+        return copy.deepcopy(self._prediction_dependency_ids)
 
     def normalize_answer(self, answer):
         """Normalizes a learner's input to this interaction."""

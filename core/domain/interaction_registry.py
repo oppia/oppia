@@ -21,6 +21,7 @@ import os
 import pkgutil
 
 import feconf
+import utils
 
 
 class Registry(object):
@@ -103,3 +104,16 @@ class Registry(object):
             interaction.id: interaction.to_dict()
             for interaction in cls.get_all_interactions()
         }
+
+    @classmethod
+    def get_all_html_for_prediction_service(cls, interaction_ids):
+        """Returns the HTML bodies of the prediction service dependencies of
+        given list of interaction ids."""
+        dependencies = set([])
+        for interaction_id in interaction_ids:
+            interaction = cls.get_interaction_by_id(interaction_id)
+            dependencies.update(interaction.prediction_dependency_ids)
+
+        return '\n'.join([utils.get_file_contents(os.path.join(
+            feconf.PREDICTION_SERVICES_DEPENDENCIES_DIR,
+            '%s.html' % dependency)) for dependency in dependencies])
