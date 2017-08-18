@@ -245,7 +245,7 @@ class ExplorationHandler(base.BaseHandler):
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
             'preferred_audio_language_code':
-                user_settings.preferred_audio_language_code
+                user_settings.preferred_audio_language_code,
             'state_classifier_mapping': state_classifier_mapping
         })
         self.render_json(self.values)
