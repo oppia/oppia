@@ -26,22 +26,22 @@ oppia.factory('AudioTranslationManagerService', [
     var _currentAudioLanguageCode = null;
     var _allLanguageCodesInExploration = null;
 
-    var _init = function(allLanguageCodesInExploration) {
+    var _init = function(
+      allLanguageCodesInExploration, preferredAudioLanguageCode) {
       _allLanguageCodesInExploration = allLanguageCodesInExploration;
 
       // TODO(tjiang11): Define an order. Preferably, we'd want
       // to promote the user's preferred languages, and promote
       // the exploration's default language if available.
-      _allLanguageCodesInExploration.sort();
 
-      if (_allLanguageCodesInExploration.length === 1) {
-        _currentAudioLanguageCode = _allLanguageCodesInExploration[0];
-      }
-
-      if (_allLanguageCodesInExploration.length > 1) {
-        // TODO(tjiang11): Need to use a pick-language modal instead of
-        // defaulting to a language.
-        _currentAudioLanguageCode = _allLanguageCodesInExploration[0];
+      if (preferredAudioLanguageCode) {
+        _currentAudioLanguageCode = preferredAudioLanguageCode;
+      } else {
+        if (_allLanguageCodesInExploration.length >= 1) {
+          _allLanguageCodesInExploration.sort(
+            LanguageUtilService.getAudioLanguageCodeSortingComparator());
+          _currentAudioLanguageCode = _allLanguageCodesInExploration[0];
+        }
       }
     };
 
@@ -95,8 +95,9 @@ oppia.factory('AudioTranslationManagerService', [
     };
 
     return {
-      init: function(allLanguageCodesInExploration) {
-        _init(allLanguageCodesInExploration);
+      init: function(
+        allLanguageCodesInExploration, preferredAudioLanguageCode) {
+        _init(allLanguageCodesInExploration, preferredAudioLanguageCode);
       },
       getCurrentAudioLanguageCode: function() {
         return _currentAudioLanguageCode;

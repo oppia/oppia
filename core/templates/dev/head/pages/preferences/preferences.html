@@ -191,6 +191,30 @@
           </div>
         </div>
 
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <!--
+                If the ng-if is omitted, the select2-dropdown directive won't be
+                updated after the initial page load.
+              -->
+              <div ng-if="hasPageLoaded && select2DropdownIsShown">
+                <select2-dropdown
+                  class="protractor-test-system-language-selector"
+                  choices="AUDIO_LANGUAGE_CHOICES"
+                  item="$parent.preferredAudioLanguageCode"
+                  allow-multiple-choices="false"
+                  width="100%"
+                  placeholder="<['I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_PLACEHOLDER' | translate]>"
+                  on-selection-change="savePreferredAudioLanguageCode($parent.preferredAudioLanguageCode)">
+                </select2-dropdown>
+              </div>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN"></span>
+            </div>
+          </div>
+        </div>
+
 
         <hr>
 

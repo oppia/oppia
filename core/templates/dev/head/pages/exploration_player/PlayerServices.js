@@ -213,6 +213,7 @@ oppia.factory('oppiaPlayerService', [
                 _explorationId));
           }
           loadedExploration.then(function(data) {
+            console.log(data);
             exploration = ExplorationObjectFactory.createFromBackendDict(
               data.exploration);
             version = data.version;
@@ -221,9 +222,9 @@ oppia.factory('oppiaPlayerService', [
             StatsReportingService.initSession(
               _explorationId, version, data.session_id,
               GLOBALS.collectionId);
-
             AudioTranslationManagerService.init(
-              exploration.getAllAudioLanguageCodes());
+              exploration.getAllAudioLanguageCodes(),
+              data.preferred_audio_language_code);
 
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');

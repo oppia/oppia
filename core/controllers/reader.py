@@ -40,6 +40,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
+from core.domain import user_services
 import feconf
 import utils
 
@@ -213,6 +214,7 @@ class ExplorationHandler(base.BaseHandler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+        user_settings = user_services.get_user_settings(self.user_id)
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
@@ -222,7 +224,9 @@ class ExplorationHandler(base.BaseHandler):
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
-            'version': exploration.version
+            'version': exploration.version,
+            'preferred_audio_language_code':
+                user_settings.preferred_audio_language_code
         })
         self.render_json(self.values)
 

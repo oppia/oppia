@@ -78,6 +78,10 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_site_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES])
+    # Audio language preference used for audio translations.
+    preferred_audio_language_code = ndb.StringProperty(
+        default=None, choices=[
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):

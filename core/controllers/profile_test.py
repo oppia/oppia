@@ -389,9 +389,14 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             ['en'], original_preferences['preferred_language_codes'])
         self.assertIsNone(original_preferences['preferred_site_language_code'])
+        self.assertIsNone(original_preferences['preferred_audio_language_code'])
         self.put_json(
             '/preferenceshandler/data',
             {'update_type': 'preferred_site_language_code', 'data': 'en'},
+            csrf_token=csrf_token)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'preferred_audio_language_code', 'data': 'hi-en'},
             csrf_token=csrf_token)
         self.put_json(
             '/preferenceshandler/data',
@@ -400,6 +405,8 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         new_preferences = self.get_json('/preferenceshandler/data')
         self.assertEqual(new_preferences['preferred_language_codes'], ['de'])
         self.assertEqual(new_preferences['preferred_site_language_code'], 'en')
+        self.assertEqual(
+            new_preferences['preferred_audio_language_code'], 'hi-en')
 
     def test_profile_data_is_independent_of_currently_logged_in_user(self):
         self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
