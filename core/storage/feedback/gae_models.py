@@ -16,6 +16,8 @@
 
 """Models for Oppia feedback threads and messages."""
 
+import datetime
+
 from core.platform import models
 import feconf
 import utils
@@ -72,6 +74,25 @@ class FeedbackThreadModel(base_models.BaseModel):
     has_suggestion = ndb.BooleanProperty(indexed=True, default=False)
     # The number of messages in the thread.
     message_count = ndb.IntegerProperty(indexed=True)
+    # When this thread was last updated. This overrides the field in
+    # BaseModel. We are overriding it because we do not want the last_updated
+    # field to be updated everytime the feedback thread is changed. For example,
+    # on running the job for calculating the number of messages in a thread
+    # and updating the message_count field we do not wish the last_updated field
+    # to be updated.
+    last_updated = ndb.DateTimeProperty(indexed=True)
+
+    def put(self, update_last_updated_time=True):
+        """Writes the given thread instance to the datastore.
+
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the thread.
+        """
+        if update_last_updated_time:
+            self.last_updated = datetime.datetime.utcnow()
+
+        return super(FeedbackThreadModel, self).put()
 
     @classmethod
     def generate_new_thread_id(cls, exploration_id):
