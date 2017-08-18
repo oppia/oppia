@@ -16,8 +16,9 @@
 
 """Models for Oppia feedback threads and messages."""
 
-from core.platform import models
 import datetime
+
+from core.platform import models
 import feconf
 import utils
 
