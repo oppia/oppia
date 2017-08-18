@@ -83,21 +83,21 @@ class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        yield (item.id, 1)
-
-    @staticmethod
-    def reduce(key, _):
-        user_contributions = user_services.get_user_contributions(key)
+        user_contributions = user_services.get_user_contributions(item.id)
         user_is_creator = user_contributions and (
             user_contributions.created_exploration_ids or
             user_contributions.edited_exploration_ids)
 
         if user_is_creator:
             user_services.update_user_default_dashboard(
-                key, constants.DASHBOARD_TYPE_CREATOR)
+                item.id, constants.DASHBOARD_TYPE_CREATOR)
         else:
             user_services.update_user_default_dashboard(
-                key, constants.DASHBOARD_TYPE_LEARNER)
+                item.id, constants.DASHBOARD_TYPE_LEARNER)
+
+    @staticmethod
+    def reduce(item):
+        pass
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for calculating the distribution of username lengths."""
