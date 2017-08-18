@@ -63,7 +63,7 @@ oppia.factory('CollectionRightsBackendApiService', [
       $http.put(requestUrl, putParams).then(function(response) {
         // Check if the response from the backend does not contradict
         // putParams.
-        if (response.data.is_private !== isPublic) {
+        if (response.data.is_private === isPublic) {
           if (errorCallback) {
             errorCallback(response.data);
           }
