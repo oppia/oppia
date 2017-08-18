@@ -213,7 +213,6 @@ oppia.factory('oppiaPlayerService', [
                 _explorationId));
           }
           loadedExploration.then(function(data) {
-            console.log(data);
             exploration = ExplorationObjectFactory.createFromBackendDict(
               data.exploration);
             version = data.version;
