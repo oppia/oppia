@@ -35,9 +35,10 @@ describe('Solution Verification Service', function() {
     });
   });
 
-  var scope, ecs, cls, ess, siis, scas, idc, sof, svs, IS;
-  var $httpBackend;
+  var ecs, ess, siis, scas, idc, sof, svs, IS, mockFunctions;
+  var rootScope;
   var mockExplorationData;
+  var successCallbackSpy, errorCallbackSpy;
 
   beforeEach(function() {
     mockExplorationData = {
@@ -51,9 +52,7 @@ describe('Solution Verification Service', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    scope = $rootScope.$new();
     ecs = $injector.get('editorContextService');
-    cls = $injector.get('changeListService');
     ess = $injector.get('explorationStatesService');
     siis = $injector.get('stateInteractionIdService');
     scas = $injector.get('stateCustomizationArgsService');
@@ -61,10 +60,7 @@ describe('Solution Verification Service', function() {
     sof = $injector.get('SolutionObjectFactory');
     svs = $injector.get('SolutionVerificationService');
     IS = $injector.get('INTERACTION_SPECS');
-    $httpBackend = $injector.get('$httpBackend');
-    scope.stateInteractionIdService = siis;
-    scope.stateCustomizationArgsService = scas;
-    scope.interactionDetailsCache = idc;
+    rootScope = $injector.get('$rootScope');
 
     ess.init({
       'First State': {
@@ -123,98 +119,91 @@ describe('Solution Verification Service', function() {
         param_changes: []
       }
     });
-
-    var stateEditorCtrl = $controller('StateEditor', {
-      $scope: scope,
-      editorContextService: ecs,
-      changeListService: cls,
-      explorationStatesService: ess,
-      editabilityService: {
-        isEditable: function() {
-          return true;
-        }
-      },
-      INTERACTION_SPECS: IS
-    });
-
-    var interactionCtrl = $controller('StateInteraction', {
-      $scope: scope,
-      editorContextService: ecs,
-      changeListService: cls,
-      explorationStatesService: ess,
-      editabilityService: {
-        isEditable: function() {
-          return true;
-        }
-      },
-      stateInteractionIdService: siis,
-      stateCustomizationArgsService: scas,
-      interactionDetailsCache: idc,
-      INTERACTION_SPECS: IS
-    });
   }));
 
-  it('should verify a correct solution',
-    function(done) {
-      ecs.setActiveStateName('First State');
-      scope.initStateEditor();
-      var state = ess.getState('First State');
-      siis.init(
-        'First State', state.interaction.id, state.interaction, 'widget_id');
-      scas.init(
-        'First State', state.interaction.customizationArgs,
-        state.interaction, 'widget_customization_args');
+  describe('Success case', function() {
+    it('should verify a correct solution',
+      function(done) {
+        mockFunctions = {
+          successCallback: function() {
+            done();
+          },
+          errorCallback: function() {
+            done();
+          }
+        };
 
-      siis.displayed = 'TextInput';
-      scope.onCustomizationModalSavePostHook();
+        successCallbackSpy = spyOn(
+          mockFunctions, 'successCallback').and.callThrough();
+        errorCallbackSpy = spyOn(
+          mockFunctions, 'errorCallback').and.callThrough();
 
-      ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
+        ecs.setActiveStateName('First State');
+        var state = ess.getState('First State');
+        siis.init(
+          'First State', state.interaction.id, state.interaction, 'widget_id');
+        scas.init(
+          'First State', state.interaction.customizationArgs,
+          state.interaction, 'widget_customization_args');
 
-      svs.verifySolution(0, state,
-        ess.getState('First State').interaction.solution.correctAnswer,
-        function() {
-          ess.updateSolutionValidity('First State', true);
-        },
-        function() {
-          ess.updateSolutionValidity('First State', false);
-        }
-        ).then(function() {
-          expect(ess.isSolutionValid('First State')).toBe(true);
-          done();
-        });
-      scope.$apply();
-    }
-  );
+        siis.savedMemento = 'TextInput';
+        ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
 
-  it('should verify an incorrect solution',
-    function(done) {
-      ecs.setActiveStateName('First State');
-      scope.initStateEditor();
-      var state = ess.getState('First State');
-      siis.init(
-        'First State', state.interaction.id, state.interaction, 'widget_id');
-      scas.init(
-        'First State', state.interaction.customizationArgs,
-        state.interaction, 'widget_customization_args');
+        svs.verifySolution(0, state,
+          ess.getState('First State').interaction.solution.correctAnswer,
+          mockFunctions.successCallback, mockFunctions.errorCallback);
+        // This is needed to invoke then() on
+        // AnswerClassificationService.getMatchingClassificationResult().
+        rootScope.$apply();
+      }
+    );
 
-      siis.displayed = 'TextInput';
-      scope.onCustomizationModalSavePostHook();
+    afterEach(function() {
+      expect(successCallbackSpy).toHaveBeenCalled();
+      expect(errorCallbackSpy).not.toHaveBeenCalled();
+    });
+  });
 
-      ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
+  describe('Failure case', function() {
+    it('should verify an incorrect solution',
+      function(done) {
+        mockFunctions = {
+          successCallback: function() {
+            done();
+          },
+          errorCallback: function() {
+            done();
+          }
+        };
 
-      svs.verifySolution(0, state,
-        ess.getState('First State').interaction.solution.correctAnswer,
-        function() {
-          ess.updateSolutionValidity('First State', true);
-        },
-        function() {
-          ess.updateSolutionValidity('First State', false);
-        }
-      ).then(function() {
-        expect(ess.isSolutionValid('First State')).toBe(false);
-        done();
-      });
-      scope.$apply();
-    }
-  );
+        successCallbackSpy = spyOn(
+          mockFunctions, 'successCallback').and.callThrough();
+        errorCallbackSpy = spyOn(
+          mockFunctions, 'errorCallback').and.callThrough();
+
+        ecs.setActiveStateName('First State');
+        var state = ess.getState('First State');
+        siis.init(
+          'First State', state.interaction.id, state.interaction, 'widget_id');
+        scas.init(
+          'First State', state.interaction.customizationArgs,
+          state.interaction, 'widget_customization_args');
+
+        siis.savedMemento = 'TextInput';
+        ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
+
+        svs.verifySolution(0, state,
+          ess.getState('First State').interaction.solution.correctAnswer,
+          mockFunctions.successCallback, mockFunctions.errorCallback);
+        // This is needed to invoke then() on
+        // AnswerClassificationService.getMatchingClassificationResult().
+        rootScope.$apply();
+      }
+    );
+
+    afterEach(function() {
+      expect(successCallbackSpy).not.toHaveBeenCalled();
+      expect(errorCallbackSpy).toHaveBeenCalled();
+    });
+  });
 });
