@@ -45,7 +45,7 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         thread_model = feedback_models.FeedbackThreadModel.get(key)
         next_message_id = max(message_ids) + 1
         thread_model.message_count = next_message_id
-        thread_model.put()
+        thread_model.put(False)
 
         if next_message_id != len(message_ids):
             exploration_and_thread_id = key.split('.')
