@@ -264,10 +264,12 @@ var constants = {
     "text": "中文(繁體)"
   }],
 
-  // The priority values are used to determine what language should be
-  // picked by default in an exploration when the learner has no preferred
-  // audio language set. Lower values signify a higher priority. When
-  // adding a new language, make the priority values distinct.
+  "//" : [
+    "The priority values are used to determine what language should be ",
+    "picked by default in an exploration when the learner has no preferred ",
+    "audio language set. Lower values signify a higher priority. When ",
+    "adding a new language, make the priority values distinct."
+  ],
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
     "text": "English",
