@@ -24,7 +24,7 @@ describe('Answer classification service with string classifier disabled',
       module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           RuleTest: {
-            is_string_classifier_trainable: false
+            is_interaction_trainable: false
           }
         });
         $provide.constant('ENABLE_ML_CLASSIFIERS', false);
@@ -33,21 +33,24 @@ describe('Answer classification service with string classifier disabled',
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    var EXPLICIT_CLASSIFICATION = 'explicit';
-    var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
-
-    var acs, sof, oof, $httpBackend, successHandler, failHandler, $rootScope,
-      state;
+    var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION;
+    var acs, sof, oof, acr, $httpBackend, successHandler, failHandler,
+      $rootScope, stateName, state;
     beforeEach(inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');
       sof = $injector.get('StateObjectFactory');
       oof = $injector.get('OutcomeObjectFactory');
+      acr = $injector.get('AnswerClassificationResult');
+      EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
+      DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
+        'DEFAULT_OUTCOME_CLASSIFICATION');
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
       successHandler = jasmine.createSpy('success');
       failHandler = jasmine.createSpy('fail');
 
-      state = sof.createFromBackendDict('stateName', {
+      stateName = 'stateName';
+      state = sof.createFromBackendDict(stateName, {
         content: {
           html: 'content',
           audio_translations: {}
@@ -125,8 +128,9 @@ describe('Answer classification service with string classifier disabled',
     };
 
     it('should fail if no frontend rules are provided', function() {
-      acs.getMatchingClassificationResult(explorationId, state, 0, false).then(
-        successHandler, failHandler);
+      acs.getMatchingClassificationResult(
+        explorationId, stateName, state, 0, false).then(
+          successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
@@ -135,59 +139,47 @@ describe('Answer classification service with string classifier disabled',
     it('should return the first matching answer group and first matching rule' +
        'spec', function() {
       acs.getMatchingClassificationResult(
-        explorationId, state, 10, false, rules)
+        explorationId, stateName, state, 10, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
-      expect(successHandler).toHaveBeenCalledWith({
-        outcome: oof.createNew('outcome 1', [''], []),
-        answerGroupIndex: 0,
-        ruleIndex: 0,
-        classificationCategorization: EXPLICIT_CLASSIFICATION
-      });
+      expect(successHandler).toHaveBeenCalledWith(acr.createNew(
+        oof.createNew('outcome 1', [''], []), 0, 0, EXPLICIT_CLASSIFICATION
+      ));
       expect(failHandler).not.toHaveBeenCalled();
 
       acs.getMatchingClassificationResult(
-        explorationId, state, 5, false, rules)
+        explorationId, stateName, state, 5, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
-      expect(successHandler).toHaveBeenCalledWith({
-        outcome: oof.createNew('outcome 2', [''], []),
-        answerGroupIndex: 1,
-        ruleIndex: 0,
-        classificationCategorization: EXPLICIT_CLASSIFICATION
-      });
+      expect(successHandler).toHaveBeenCalledWith(acr.createNew(
+        oof.createNew('outcome 2', [''], []), 1, 0, EXPLICIT_CLASSIFICATION
+      ));
       expect(failHandler).not.toHaveBeenCalled();
 
       acs.getMatchingClassificationResult(
-        explorationId, state, 6, false, rules)
+        explorationId, stateName, state, 6, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
-      expect(successHandler).toHaveBeenCalledWith({
-        outcome: oof.createNew('outcome 2', [''], []),
-        answerGroupIndex: 1,
-        ruleIndex: 1,
-        classificationCategorization: EXPLICIT_CLASSIFICATION
-      });
+      expect(successHandler).toHaveBeenCalledWith(acr.createNew(
+        oof.createNew('outcome 2', [''], []), 1, 1, EXPLICIT_CLASSIFICATION
+      ));
       expect(failHandler).not.toHaveBeenCalled();
     });
 
     it('should return the default rule if no answer group matches', function() {
       acs.getMatchingClassificationResult(
-        explorationId, state, 7, false, rules)
+        explorationId, stateName, state, 7, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
-      expect(successHandler).toHaveBeenCalledWith({
-        outcome: oof.createNew('default', [], []),
-        answerGroupIndex: 2,
-        ruleIndex: 0,
-        classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
-      });
+      expect(successHandler).toHaveBeenCalledWith(acr.createNew(
+        oof.createNew('default', [], []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
+      ));
       expect(failHandler).not.toHaveBeenCalled();
     });
 
     it('should fail if no answer group matches and no default rule is ' +
        'provided', function() {
-      var state2 = sof.createFromBackendDict('stateName', {
+      var state2 = sof.createFromBackendDict(stateName, {
         content: {
           html: 'content',
           audio_translations: {}
@@ -219,8 +211,9 @@ describe('Answer classification service with string classifier disabled',
         param_changes: []
       });
 
-      acs.getMatchingClassificationResult(explorationId, state, 0, false).then(
-        successHandler, failHandler);
+      acs.getMatchingClassificationResult(
+        explorationId, stateName, state, 0, false).then(
+          successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
@@ -235,33 +228,49 @@ describe('Answer classification service with string classifier enabled',
       module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           TrainableInteraction: {
-            is_string_classifier_trainable: true
+            is_interaction_trainable: true
           },
           UntrainableInteraction: {
-            is_string_classifier_trainable: false
+            is_interaction_trainable: false
           }
         });
         $provide.constant('ENABLE_ML_CLASSIFIERS', true);
+        $provide.factory('PredictionSampleService', [function() {
+          return {
+            predict: function(classifierData, answer) {
+              return 1;
+            }
+          };
+        }]);
       });
     });
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    var EXPLICIT_CLASSIFICATION = 'explicit';
-    var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
-
-    var acs, sof, oof, $httpBackend, successHandler, failHandler, $rootScope,
-      state, state2;
+    var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
+      STATISTICAL_CLASSIFICATION;
+    var acs, scms, sof, oof, acr, $httpBackend, successHandler, failHandler,
+      $rootScope, stateName, state, state2, registryService, predictionService,
+      stateClassifierMapping;
     beforeEach(inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');
+      scms = $injector.get('StateClassifierMappingService');
       sof = $injector.get('StateObjectFactory');
       oof = $injector.get('OutcomeObjectFactory');
+      acr = $injector.get('AnswerClassificationResult');
+      EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
+      DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
+        'DEFAULT_OUTCOME_CLASSIFICATION');
+      STATISTICAL_CLASSIFICATION = $injector.get('STATISTICAL_CLASSIFICATION');
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
+      registryService = $injector.get('PredictionAlgorithmRegistryService');
+      predictionService = $injector.get('PredictionSampleService');
       successHandler = jasmine.createSpy('success');
       failHandler = jasmine.createSpy('fail');
 
-      state = sof.createFromBackendDict('stateName', {
+      stateName = 'stateName';
+      state = sof.createFromBackendDict(stateName, {
         content: {
           html: 'content',
           audio_translations: {}
@@ -316,6 +325,21 @@ describe('Answer classification service with string classifier enabled',
         param_changes: []
       });
 
+      stateClassifierMapping = {
+        stateName: {
+          algorithm_id: 'LDAStringClassifier',
+          classifier_data: {},
+          data_schema_version: 1
+        }
+      };
+      scms.init(stateClassifierMapping);
+
+      registryService.setMapping({
+        LDAStringClassifier: {
+          1: predictionService
+        }
+      });
+
       state2 = angular.copy(state);
       state2.interaction.id = 'UntrainableInteraction';
     }));
@@ -336,28 +360,17 @@ describe('Answer classification service with string classifier enabled',
       }
     };
 
-    it('should query the backend if no answer group matches and interaction ' +
-       'is trainable', function() {
-      var backendClassifiedOutcome = {
-        outcome: 'outcome',
-        answer_group_index: 0,
-        rule_spec_index: 0,
-        classification_categorization: EXPLICIT_CLASSIFICATION
-      };
-      var expectedClassificationResult = {
-        outcome: 'outcome',
-        answerGroupIndex: 0,
-        ruleIndex: 0,
-        classificationCategorization: EXPLICIT_CLASSIFICATION
-      };
-      $httpBackend.expectPOST(
-        '/explorehandler/classify/' + explorationId).respond(
-        backendClassifiedOutcome);
+    it('should query the prediction service if no answer group matches and ' +
+       'interaction is trainable', function() {
+      // The prediction result is the same as default until there is a mapping
+      // in PredictionAlgorithmRegistryService.
       acs.getMatchingClassificationResult(
-        explorationId, state, 0, false, rules)
+        explorationId, stateName, state, 0, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$apply();
-      $httpBackend.flush();
+      var expectedClassificationResult = acr.createNew(
+        state.interaction.answerGroups[1].outcome, 1, 2,
+        STATISTICAL_CLASSIFICATION);
 
       expect(successHandler).toHaveBeenCalledWith(expectedClassificationResult);
       expect(failHandler).not.toHaveBeenCalled();
@@ -366,15 +379,12 @@ describe('Answer classification service with string classifier enabled',
     it('should return the default rule if no answer group matches and ' +
        'interaction is not trainable', function() {
       acs.getMatchingClassificationResult(
-        explorationId, state2, 0, false, rules)
+        explorationId, stateName, state2, 0, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
-      expect(successHandler).toHaveBeenCalledWith({
-        outcome: oof.createNew('default', [], []),
-        answerGroupIndex: 2,
-        ruleIndex: 0,
-        classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
-      });
+      expect(successHandler).toHaveBeenCalledWith(acr.createNew(
+        oof.createNew('default', [], []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
+      ));
       expect(failHandler).not.toHaveBeenCalled();
     });
   }

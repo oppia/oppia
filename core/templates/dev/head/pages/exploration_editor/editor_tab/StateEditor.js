@@ -139,7 +139,8 @@ oppia.factory('trainingModalService', [
                 var rulesService = $injector.get(rulesServiceName);
 
                 AnswerClassificationService.getMatchingClassificationResult(
-                  explorationId, state, unhandledAnswer, true, rulesService)
+                  explorationId, currentStateName, state, unhandledAnswer, true,
+                  rulesService)
                   .then(function(classificationResult) {
                     var feedback = 'Nothing';
                     var dest = classificationResult.outcome.dest;

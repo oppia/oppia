@@ -622,7 +622,7 @@ oppia.controller('StateResponses', [
                   stateCustomizationArgsService.savedMemento));
 
               AnswerClassificationService.getMatchingClassificationResult(
-                _explorationId, _state, answer, true, rulesService)
+                _explorationId, _stateName, _state, answer, true, rulesService)
                 .then(function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
