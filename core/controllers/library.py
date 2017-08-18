@@ -299,7 +299,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
         if include_private_exps:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    exp_ids, self.user))
+                    exp_ids, user=self.user))
         else:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(

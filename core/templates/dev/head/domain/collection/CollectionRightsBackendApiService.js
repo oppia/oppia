@@ -49,7 +49,7 @@ oppia.factory('CollectionRightsBackendApiService', [
         '/collection_editor_handler/publish/<collection_id>', {
           collection_id: collectionId
         });
-      var collectionUnPublishUrl = UrlInterpolationService.interpolateUrl(
+      var collectionUnpublishUrl = UrlInterpolationService.interpolateUrl(
         '/collection_editor_handler/unpublish/<collection_id>', {
           collection_id: collectionId
         });
@@ -58,12 +58,12 @@ oppia.factory('CollectionRightsBackendApiService', [
         version: collectionVersion
       };
       var requestUrl = (
-        isPublic ? collectionPublishUrl : collectionUnPublishUrl);
+        isPublic ? collectionPublishUrl : collectionUnpublishUrl);
 
       $http.put(requestUrl, putParams).then(function(response) {
         // Check if the response from the backend does not contradict
         // putParams.
-        if (response.data.is_private === isPublic) {
+        if (response.data.is_private !== isPublic) {
           if (errorCallback) {
             errorCallback(response.data);
           }

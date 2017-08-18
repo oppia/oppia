@@ -928,7 +928,7 @@ def _publish_activity(committer, activity_id, activity_type):
             'User %s tried to publish %s %s but was refused '
             'permission.' % (committer_id, activity_type, activity_id))
         raise Exception('This %s cannot be published.' % activity_type)
-    print "hello"
+
     _change_activity_status(
         committer_id, activity_id, activity_type, ACTIVITY_STATUS_PUBLIC,
         '%s published.' % activity_type)

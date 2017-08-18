@@ -165,8 +165,6 @@ class CollectionPublishHandler(base.BaseHandler):
         collection = collection_services.get_collection_by_id(collection_id)
         version = self.payload.get('version')
         _require_valid_version(version, collection.version)
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
 
         try:
             collection.validate(strict=True)
@@ -180,6 +178,9 @@ class CollectionPublishHandler(base.BaseHandler):
         collection_services.index_collections_given_ids([
             collection_id])
 
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
+
         self.values.update({
             'can_edit': True,
             'can_unpublish': rights_manager.check_can_unpublish_activity(
@@ -189,6 +190,7 @@ class CollectionPublishHandler(base.BaseHandler):
             'owner_names': rights_manager.get_collection_owner_names(
                 collection_id)
         })
+        self.render_json(self.values)
 
 
 class CollectionUnpublishHandler(base.BaseHandler):
@@ -199,12 +201,13 @@ class CollectionUnpublishHandler(base.BaseHandler):
         collection = collection_services.get_collection_by_id(collection_id)
         version = self.payload.get('version')
         _require_valid_version(version, collection.version)
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
 
         rights_manager.unpublish_collection(self.user, collection_id)
         collection_services.delete_documents_from_search_index([
             collection_id])
+
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
 
         self.values.update({
             'can_edit': True,
@@ -215,6 +218,7 @@ class CollectionUnpublishHandler(base.BaseHandler):
             'owner_names': rights_manager.get_collection_owner_names(
                 collection_id)
         })
+        self.render_json(self.values)
 
 
 class ExplorationMetadataSearchHandler(base.BaseHandler):

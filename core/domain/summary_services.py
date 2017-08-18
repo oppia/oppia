@@ -120,7 +120,7 @@ def get_learner_collection_dict_by_id(
 
     exp_ids = collection.exploration_ids
     exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exp_ids, user)
+        exp_ids, user=user)
     exp_summaries_dict_map = {
         exp_summary_dict['id']: exp_summary_dict
         for exp_summary_dict in exp_summary_dicts

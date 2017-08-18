@@ -206,7 +206,7 @@ class ExplorationDisplayableSummariesTest(
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
-                self.albert))
+                user=self.albert))
 
         self.assertEqual(len(displayable_summaries), 2)
         self.assertEqual(displayable_summaries[0]['id'], self.EXP_ID_1)
@@ -221,7 +221,7 @@ class ExplorationDisplayableSummariesTest(
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
-                self.albert))
+                user=self.albert))
 
         self.assertEqual(len(displayable_summaries), 3)
         self.assertEqual(displayable_summaries[0]['status'], 'private')

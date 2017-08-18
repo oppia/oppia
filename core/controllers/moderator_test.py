@@ -55,13 +55,13 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
 
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
-    user = 'albert'
+    username = 'albert'
     user_email = 'albert@example.com'
 
     def setUp(self):
         super(FeaturedActivitiesHandlerTest, self).setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.user_email, self.user)
+        self.signup(self.user_email, self.username)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.user = user_services.UserActionsInfo(self.user_id)
