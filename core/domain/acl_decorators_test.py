@@ -898,8 +898,8 @@ class ModifyExplorationRolesTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
-    """Tests can_manage_collection_publish_status decorator."""
+class CollectionPublishStatusTest(test_utils.GenericTestBase):
+    """Tests can_publish_collection and can_unpublish_collection decorators."""
 
     user_email = 'user@example.com'
     username = 'user'
@@ -908,13 +908,18 @@ class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
     published_col_id = 'col_id_1'
     private_col_id = 'col_id_2'
 
-    class MockHandler(base.BaseHandler):
-        @acl_decorators.can_manage_collection_publish_status
+    class MockPublishHandler(base.BaseHandler):
+        @acl_decorators.can_publish_collection
+        def get(self, collection_id):
+            return self.render_json({'collection_id': collection_id})
+
+    class MockUnpublishHandler(base.BaseHandler):
+        @acl_decorators.can_unpublish_collection
         def get(self, collection_id):
             return self.render_json({'collection_id': collection_id})
 
     def setUp(self):
-        super(ManageCollectionPublishStatusTest, self).setUp()
+        super(CollectionPublishStatusTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
@@ -925,7 +930,13 @@ class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
         self.set_collection_editors([self.OWNER_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
+            [
+                webapp2.Route(
+                    '/mock_publish/<collection_id>', self.MockPublishHandler),
+                webapp2.Route(
+                    '/mock_unpublish/<collection_id>',
+                    self.MockUnpublishHandler)
+            ],
             debug=feconf.DEBUG,
         ))
         self.save_new_valid_exploration(
@@ -944,29 +955,36 @@ class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
     def test_owner_can_publish_collection(self):
         self.login(self.OWNER_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.private_col_id, expect_errors=True)
+            '/mock_publish/%s' % self.private_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_owner_cannot_unpublish_public_collection(self):
         self.login(self.OWNER_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.published_col_id, expect_errors=True)
+            '/mock_unpublish/%s' % self.published_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
     def test_moderator_can_unpublish_public_collection(self):
         self.login(self.MODERATOR_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.published_col_id, expect_errors=True)
+            '/mock_unpublish/%s' % self.published_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_admin_can_publish_any_collection(self):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.private_col_id, expect_errors=True)
+            '/mock_publish/%s' % self.private_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_admin_cannot_publish_already_published_collection(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '/mock_publish/%s' % self.published_col_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
         self.logout()
 
 

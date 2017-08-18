@@ -47,11 +47,7 @@ describe('Collection rights backend API service', function() {
     // PUT request. The typical expect() syntax with a passed-in object payload
     // does not seem to be working correctly.
     $httpBackend.expect(
-      'PUT', '/collection_editor_handler/rights/0').respond(200, {
-        data: {
-          is_private: false
-        }
-      });
+      'PUT', '/collection_editor_handler/publish/0').respond(200);
     CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
       successHandler, failHandler);
     $httpBackend.flush();
@@ -83,9 +79,7 @@ describe('Collection rights backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
-      'PUT', '/collection_editor_handler/rights/0').respond(200, {
-        is_private: true
-      });
+      'PUT', '/collection_editor_handler/publish/0').respond(200);
     CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
       successHandler, failHandler);
     $httpBackend.flush();

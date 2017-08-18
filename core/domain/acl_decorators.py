@@ -443,23 +443,14 @@ def can_publish_exploration(handler):
     return test_can_publish
 
 
-def can_manage_collection_publish_status(handler):
-    """Decorator to check whether user can publish exploration."""
+def can_publish_collection(handler):
+    """Decorator to check whether user can publish collection."""
 
-    def test_can_manage_collection_publish_status(
-            self, collection_id, **kwargs):
+    def test_can_publish_collection(self, collection_id, **kwargs):
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
-
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
-
-        if collection_rights.is_published():
-            if (role_services.ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY in
-                    self.user.actions):
-                return handler(self, collection_id, **kwargs)
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to unpublish this collection.')
 
         if rights_manager.check_can_publish_activity(
                 self.user, collection_rights):
@@ -467,9 +458,29 @@ def can_manage_collection_publish_status(handler):
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to publish this collection.')
-    test_can_manage_collection_publish_status.__wrapped__ = True
+    test_can_publish_collection.__wrapped__ = True
 
-    return test_can_manage_collection_publish_status
+    return test_can_publish_collection
+
+
+def can_unpublish_collection(handler):
+    """Decorator to check whether user can unpublish collection."""
+
+    def test_can_unpublish_collection(self, collection_id, **kwargs):
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id)
+        if collection_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_unpublish_activity(
+                self.user, collection_rights):
+            return handler(self, collection_id, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to unpublish this collection.')
+    test_can_unpublish_collection.__wrapped__ = True
+
+    return test_can_unpublish_collection
 
 
 def can_modify_exploration_roles(handler):

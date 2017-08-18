@@ -75,7 +75,11 @@ def get_user_id_from_email(email):
 
 
 def get_current_user_id():
-    """ Gives the user_id of current user."""
+    """Gets the user_id of current user.
+
+    Returns:
+        str or None. User id for the current user.
+    """
     user = get_current_user()
     if user is None:
         return None
@@ -83,6 +87,14 @@ def get_current_user_id():
         return user.user_id()
 
 
-def get_user_email(user):
-    """ Given an user object, get the user's email. """
-    return user.email()
+def get_current_user_email():
+    """Get the email for current user.
+
+    Returns:
+        str or None. Email for the current user.
+    """
+    user = get_current_user()
+    if user is None:
+        return None
+    else:
+        return user.email()

@@ -153,8 +153,7 @@ class BaseHandler(webapp2.RequestHandler):
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
             if user_settings is None:
-                email = current_user_services.get_user_email(
-                    current_user_services.get_current_user())
+                email = current_user_services.get_current_user_email()
                 user_settings = user_services.create_new_user(
                     self.user_id, email)
             self.values['user_email'] = user_settings.email
