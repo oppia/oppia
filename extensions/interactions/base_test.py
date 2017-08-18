@@ -256,6 +256,22 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             except Exception:
                 pass
 
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir,
+                    '%sPredictionService.js' % interaction_id)))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir,
+                    '%sPredictionServiceSpec.js' % interaction_id)))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
             self.assertEqual(
                 optional_dirs_and_files_count + 5, len(dir_contents),
                 dir_contents
