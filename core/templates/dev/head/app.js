@@ -44,8 +44,6 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_ML_CLASSIFIERS', false);
 // Feature still in development.
-oppia.constant('ENABLE_HINT_EDITOR', true);
-oppia.constant('ENABLE_FALLBACK_EDITOR', false);
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
   'The current solution does not lead to another card.');
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',

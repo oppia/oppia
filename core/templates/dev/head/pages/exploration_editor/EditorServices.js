@@ -1803,7 +1803,6 @@ oppia.factory('computeGraphService', [
             links.push({
               source: stateName,
               target: groups[h].outcome.dest,
-              isFallback: false
             });
           }
 
@@ -1811,7 +1810,6 @@ oppia.factory('computeGraphService', [
             links.push({
               source: stateName,
               target: interaction.defaultOutcome.dest,
-              isFallback: false
             });
           }
         }
@@ -1976,11 +1974,9 @@ oppia.factory('explorationWarningsService', [
     // - nodes: an object whose keys are node ids, and whose values are node
     //     names
     // - edges: a list of edges, each of which is an object with keys 'source',
-    //     'target', and 'isFallback'
-    // - allowFallbackEdges: a boolean specifying whether to treat fallback
-    //     edges as valid edges for the purposes of this computation.
+    //     and 'target'.
     var _getUnreachableNodeNames = function(
-        initNodeIds, nodes, edges, allowFallbackEdges) {
+        initNodeIds, nodes, edges) {
       var queue = initNodeIds;
       var seen = {};
       for (var i = 0; i < initNodeIds.length; i++) {
@@ -1989,8 +1985,7 @@ oppia.factory('explorationWarningsService', [
       while (queue.length > 0) {
         var currNodeId = queue.shift();
         edges.forEach(function(edge) {
-          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target) &&
-              (allowFallbackEdges || !edge.isFallback)) {
+          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
             seen[edge.target] = true;
             queue.push(edge.target);
           }
@@ -2016,7 +2011,6 @@ oppia.factory('explorationWarningsService', [
         return {
           source: link.target,
           target: link.source,
-          isFallback: link.isFallback
         };
       });
     };
@@ -2144,8 +2138,6 @@ oppia.factory('explorationWarningsService', [
       });
 
       if (_graphData) {
-        // Note that it is fine for states to be reachable by means of fallback
-        // edges only.
         var unreachableStateNames = _getUnreachableNodeNames(
           [_graphData.initStateId], _graphData.nodes, _graphData.links, true);
 
@@ -2161,8 +2153,7 @@ oppia.factory('explorationWarningsService', [
             }
           });
         } else {
-          // Only perform this check if all states are reachable. There must be
-          // a non-fallback path from each state to the END state.
+          // Only perform this check if all states are reachable.
           var deadEndStates = _getUnreachableNodeNames(
             _graphData.finalStateIds, _graphData.nodes,
             _getReversedLinks(_graphData.links), false);
