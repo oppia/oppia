@@ -4348,7 +4348,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-card-view-item .oppia-sharing-links {
   margin-top: 3px;
-  padding-left: 12px;
+  padding-left: 0px;
 }
 
 .oppia-dashboard-card-view-item .oppia-sharing-links .share-option-img,
