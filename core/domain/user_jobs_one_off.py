@@ -73,7 +73,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
                     edited_exploration_ids))
 
 
-class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for populating the default dashboard field for users.
     """
 
@@ -99,7 +99,7 @@ class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(item):
         pass
 
-class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for calculating the distribution of username lengths."""
 
     @classmethod
