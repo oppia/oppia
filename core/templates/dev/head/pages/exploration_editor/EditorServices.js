@@ -265,7 +265,6 @@ oppia.factory('changeListService', [
       confirmed_unclassified_answers: true,
       content: true,
       default_outcome: true,
-      fallbacks: true,
       hints: true,
       param_changes: true,
       solution: true,
@@ -916,11 +915,6 @@ oppia.factory('explorationStatesService', [
           return null;
         }
       },
-      fallbacks: function(fallbacks) {
-        return fallbacks.map(function(fallback) {
-          return fallback.toBackendDict();
-        });
-      },
       hints: function(hints) {
         return hints.map(function(hint) {
           return hint.toBackendDict();
@@ -948,7 +942,6 @@ oppia.factory('explorationStatesService', [
       content: ['content'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
-      fallbacks: ['interaction', 'fallbacks'],
       hints: ['interaction', 'hints'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
@@ -1116,12 +1109,6 @@ oppia.factory('explorationStatesService', [
       },
       saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
-      },
-      getFallbacksMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'fallbacks');
-      },
-      saveFallbacks: function(stateName, newFallbacks) {
-        saveStateProperty(stateName, 'fallbacks', newFallbacks);
       },
       getHintsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'hints')
@@ -1387,15 +1374,6 @@ oppia.factory('stateCustomizationArgsService', [
   'statePropertyService', function(statePropertyService) {
     var child = Object.create(statePropertyService);
     child.setterMethodKey = 'saveInteractionCustomizationArgs';
-    return child;
-  }
-]);
-
-// A data service that stores the current interaction fallbacks.
-oppia.factory('stateFallbacksService', [
-  'statePropertyService', function(statePropertyService) {
-    var child = Object.create(statePropertyService);
-    child.setterMethodKey = 'saveFallbacks';
     return child;
   }
 ]);
@@ -1834,15 +1812,6 @@ oppia.factory('computeGraphService', [
               source: stateName,
               target: interaction.defaultOutcome.dest,
               isFallback: false
-            });
-          }
-
-          var fallbacks = interaction.fallbacks;
-          for (var h = 0; h < fallbacks.length; h++) {
-            links.push({
-              source: stateName,
-              target: fallbacks[h].outcome.dest,
-              isFallback: true
             });
           }
         }

@@ -87,7 +87,6 @@ describe('Solution Verification Service', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: [{
             hint_text: 'one'
           }, {
@@ -113,7 +112,6 @@ describe('Solution Verification Service', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []

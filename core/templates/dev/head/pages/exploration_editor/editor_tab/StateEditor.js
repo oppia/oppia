@@ -19,17 +19,13 @@
 oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'explorationStatesService',
   'INTERACTION_SPECS', 'explorationAdvancedFeaturesService',
-  'UrlInterpolationService', 'ENABLE_FALLBACK_EDITOR', 'stateContentService',
+  'UrlInterpolationService', 'stateContentService',
   function(
       $scope, $rootScope, editorContextService, explorationStatesService,
       INTERACTION_SPECS, explorationAdvancedFeaturesService,
-      UrlInterpolationService, ENABLE_FALLBACK_EDITOR, stateContentService) {
+      UrlInterpolationService, stateContentService) {
     $scope.areParametersEnabled = (
       explorationAdvancedFeaturesService.areParametersEnabled);
-    $scope.areFallbacksEnabled = (
-      explorationAdvancedFeaturesService.areFallbacksEnabled);
-
-    $scope.fallbackEditorIsEnabled = ENABLE_FALLBACK_EDITOR;
 
     $scope.currentStateIsTerminal = false;
     $scope.interactionIdIsSet = false;
