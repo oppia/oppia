@@ -16,7 +16,7 @@
            angular-html-bind="correctAnswerEditorHtml">
       </div>
       <br>
-      <div ng-show="data.correctAnswer">
+      <div ng-show="data.correctAnswer !== null">
         <strong>Explanation:</strong>
         <schema-based-editor class="protractor-test-explanation-textarea"
                              schema="EXPLANATION_FORM_SCHEMA"
@@ -31,7 +31,7 @@
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-submit-solution-button"
           ng-click="saveSolution()"
-          ng-disabled="!data.correctAnswer ||
+          ng-disabled="data.correctAnswer === null ||
                        !data.explanation">
     Check and Save Solution
   </button>
