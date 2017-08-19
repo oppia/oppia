@@ -368,7 +368,7 @@
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                    tooltip="Remove"
                    tooltip-placement="top"></i>
-                <exploration-playlist-tile
+                <exploration-summary-tile
                                         style="height: 145px; display: block;"
                                         exploration-id="tile.id"
                                         exploration-title="tile.title"
@@ -379,8 +379,9 @@
                                         num-views="tile.num_views"
                                         thumbnail-icon-url="tile.thumbnail_icon_url"
                                         thumbnail-bg-color="tile.thumbnail_bg_color"
-                                        class="protractor-test-exp-summary-tile">
-                </exploration-playlist-tile>
+                                        class="protractor-test-exp-summary-tile"
+                                        playlist-mode="true">
+                </exploration-summary-tile>
               </div>
             </div>
 
@@ -484,7 +485,7 @@
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                    tooltip="Remove"
                    tooltip-placement="top"></i>
-                <collection-playlist-tile
+                <collection-summary-tile
                                          style="height: 145px; display: block;"
                                          collection-id="tile.id"
                                          collection-title="tile.title"
@@ -493,8 +494,9 @@
                                          node-count="tile.node_count"
                                          category="tile.category"
                                          thumbnail-icon-url="tile.thumbnail_icon_url"
-                                         thumbnail-bg-color="tile.thumbnail_bg_color">
-                </collection-playlist-tile>
+                                         thumbnail-bg-color="tile.thumbnail_bg_color"
+                                         playlist-mode="true">
+                </collection-summary-tile>
               </div>
             </div>
           </div>
@@ -812,8 +814,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/playlist_tile/ExplorationPlaylistTileDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/playlist_tile/CollectionPlaylistTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js"></script>

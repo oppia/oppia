@@ -324,6 +324,14 @@ def add_collection_to_learner_playlist(
         position_to_be_inserted: int|None. If this is specified the collection
             gets inserted at the given position. Otherwise it gets added at the
             end.
+
+    Returns:
+        bool. Indicates whether the collection belongs to the completed or
+            incomplete list of collections.
+        bool. Indicates whether the playlist limit of the user has been
+            exceeded.
+        bool. Indicates whether the collection belongs to the created or edited
+            collections of the user.
     """
     completed_collection_ids = get_all_completed_collection_ids(user_id)
     incomplete_collection_ids = get_all_incomplete_collection_ids(user_id)
@@ -362,8 +370,12 @@ def add_exp_to_learner_playlist(
             end.
 
     Returns:
-        bool. It is true if the exploration being added belongs to the completed
-            or incomplete list.
+        bool. Indicates whether the exploration belongs to the completed or
+            incomplete list of explorations.
+        bool. Indicates whether the playlist limit of the user has been
+            exceeded.
+        bool. Indicates whether the exploration belongs to the created or edited
+            explorations of the user.
     """
     completed_exploration_ids = get_all_completed_exp_ids(user_id)
     incomplete_exploration_ids = get_all_incomplete_exp_ids(user_id)

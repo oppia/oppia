@@ -424,54 +424,37 @@ oppia.controller('LearnerDashboard', [
             $scope.subsectionName = subsectionName;
             $scope.activityTitle = activity.title;
             $scope.remove = function() {
+              var activityType = '';
+              if (subsectionName ===
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+                activityType = constants.ACTIVITY_TYPE_EXPLORATION;
+              } else if (subsectionName ===
+                         LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+                activityType = constants.ACTIVITY_TYPE_COLLECTION;
+              }
+
+              var removeActivityUrl = '';
               if (sectionNameI18nId ===
                   LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-                if (subsectionName ===
-                    LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                  /* eslint-disable max-len */
-                  var removeFromLearnerPlaylistUrl = (
-                    UrlInterpolationService.interpolateUrl(
-                      '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-                        activityType: constants.ACTIVITY_TYPE_EXPLORATION,
-                        activityId: activity.id
-                      }));
-                  /* eslint-enable max-len */
-                  $http['delete'](removeFromLearnerPlaylistUrl);
-                } else if (subsectionName ===
-                           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-                  /* eslint-disable max-len */
-                  var removeFromLearnerPlaylistUrl = (
-                    UrlInterpolationService.interpolateUrl(
-                      '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-                        activityType: constants.ACTIVITY_TYPE_COLLECTION,
-                        activityId: activity.id
-                      }));
-                  /* eslint-enable max-len */
-                  $http['delete'](removeFromLearnerPlaylistUrl);
-                }
-              } else if (sectionNameI18nId ===
-                         LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-                if (subsectionName ===
-                    LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                  var removeExpUrl = UrlInterpolationService.interpolateUrl(
-                    '/learnerincompleteactivityhandler/<activityType>' +
-                    '/<activityId>', {
-                      activityType: constants.ACTIVITY_TYPE_EXPLORATION,
-                      activityId: activity.id
-                    });
-                  $http['delete'](removeExpUrl);
-                } else if (subsectionName ===
-                           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-                  var removeCollectionUrl = (
-                    UrlInterpolationService.interpolateUrl(
-                    '/learnerincompleteactivityhandler/<activityType>' +
-                    '/<activityId>', {
-                      activityType: constants.ACTIVITY_TYPE_COLLECTION,
+                /* eslint-disable max-len */
+                removeActivityUrl = (
+                  UrlInterpolationService.interpolateUrl(
+                    '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                      activityType: activityType,
                       activityId: activity.id
                     }));
-                  $http['delete'](removeCollectionUrl);
-                }
+                /* eslint-enable max-len */
+              } else if (sectionNameI18nId ===
+                         LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+                removeActivityUrl = UrlInterpolationService.interpolateUrl(
+                  '/learnerincompleteactivityhandler/<activityType>' +
+                  '/<activityId>', {
+                    activityType: activityType,
+                    activityId: activity.id
+                  });
               }
+
+              $http['delete'](removeActivityUrl);
               $modalInstance.close();
             };
 

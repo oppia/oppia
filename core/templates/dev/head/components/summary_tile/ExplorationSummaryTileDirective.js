@@ -43,7 +43,8 @@ oppia.directive('explorationSummaryTile', [
         // version of the summary tile is displayed. This attribute is optional:
         // if it is not specified, it is treated as 0, which means that the
         // desktop version of the summary tile is always displayed.
-        mobileCutoffPx: '@mobileCutoffPx'
+        mobileCutoffPx: '@mobileCutoffPx',
+        playlistMode: '=?playlistMode'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +

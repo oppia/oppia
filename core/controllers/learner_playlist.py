@@ -28,8 +28,8 @@ class LearnerPlaylistHandler(base.BaseHandler):
     def post(self, activity_type, activity_id):
         position_to_be_inserted_in = self.payload.get('index')
 
-        playlist_limit_exceeded = False
         belongs_to_completed_or_incomplete_list = False
+        playlist_limit_exceeded = False
         belongs_to_subscribed_activities = False
 
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:

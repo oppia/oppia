@@ -1,12 +1,12 @@
-<md-card class="oppia-activity-summary-tile">
+<md-card class="oppia-activity-summary-tile" ng-class="{'oppia-activity-playlist-tile': playlistMode}">
   <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
       <img class="collection-corner-image" ng-src="<[getStaticImageUrl('/general/collection_corner.svg')]>" alt="">
-      <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>">
-      <h3 class="activity-title protractor-test-collection-summary-tile-title"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
+      <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="playlistMode && {'top': '6px', 'width': '60px'}">
+      <h3 class="activity-title protractor-test-collection-summary-tile-title" ng-style="playlistMode && {'width': '93%', 'text-align': 'center'}"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
     </div>
 
-    <div>
+    <div ng-style="playlistMode && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
       <div class="objective">
         <[getObjective() | truncateAndCapitalize: 95]>
         <span ng-if="!getObjective()">No objective specified.</span>
@@ -25,7 +25,7 @@
         </li>
       </ul>
     </div>
-    <div class="title-section-mask"></div>
+    <div ng-if="!playlistMode" class="title-section-mask"></div>
   </a>
 </md-card>
 
