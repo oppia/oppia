@@ -46,10 +46,18 @@ oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
+  'stateSolutionService', 'SolutionVerificationService', 'alertsService',
+  'explorationContextService', 'explorationWarningsService',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
-      explorationStatesService, graphDataService, OutcomeObjectFactory) {
+      explorationStatesService, graphDataService, OutcomeObjectFactory,
+      stateSolutionService, SolutionVerificationService, alertsService,
+      explorationContextService, explorationWarningsService,
+      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -69,10 +77,50 @@ oppia.factory('responsesService', [
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
         $rootScope.$broadcast('answerGroupChanged');
-
         explorationStatesService.saveInteractionAnswerGroups(
           editorContextService.getActiveStateName(),
           angular.copy(newAnswerGroups));
+
+        // To check if the solution is valid once a rule has been changed or
+        // added.
+        var currentInteractionId = stateInteractionIdService.savedMemento;
+        var interactionCanHaveSolution = (
+          currentInteractionId &&
+          INTERACTION_SPECS[currentInteractionId].can_have_solution);
+        var solutionExists = (
+          stateSolutionService.savedMemento &&
+          stateSolutionService.savedMemento.correctAnswer !== null);
+
+        if (interactionCanHaveSolution && solutionExists) {
+          var currentStateName = editorContextService.getActiveStateName();
+          var solutionWasPreviouslyValid = (
+            explorationStatesService.isSolutionValid(
+              editorContextService.getActiveStateName()));
+          SolutionVerificationService.verifySolution(
+            explorationContextService.getExplorationId(),
+            explorationStatesService.getState(currentStateName),
+            stateSolutionService.savedMemento.correctAnswer,
+            function() {
+              explorationStatesService.updateSolutionValidity(
+                currentStateName, true);
+              explorationWarningsService.updateWarnings();
+              if (!solutionWasPreviouslyValid) {
+                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
+              }
+            },
+            function() {
+              explorationStatesService.updateSolutionValidity(
+                currentStateName, false);
+              explorationWarningsService.updateWarnings();
+              if (solutionWasPreviouslyValid) {
+                alertsService.addInfoMessage(
+                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+              } else {
+                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+              }
+            }
+          );
+        }
 
         graphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);

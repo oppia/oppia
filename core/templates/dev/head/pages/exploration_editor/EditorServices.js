@@ -268,6 +268,7 @@ oppia.factory('changeListService', [
       fallbacks: true,
       hints: true,
       param_changes: true,
+      solution: true,
       state_name: true,
       widget_customization_args: true,
       widget_id: true
@@ -884,15 +885,17 @@ oppia.factory('explorationParamChangesService', [
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope',
+  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'explorationGadgetsService',
-  'StatesObjectFactory',
+  'StatesObjectFactory', 'SolutionValidityService', 'angularNameService',
+  'AnswerClassificationService', 'explorationContextService',
   function(
-      $log, $modal, $filter, $location, $rootScope,
+      $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, explorationGadgetsService,
-      StatesObjectFactory) {
+      StatesObjectFactory, SolutionValidityService, angularNameService,
+      AnswerClassificationService, explorationContextService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -927,6 +930,13 @@ oppia.factory('explorationStatesService', [
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
         });
+      },
+      solution: function(solution) {
+        if (solution) {
+          return solution.toBackendDict();
+        } else {
+          return null;
+        }
       }
     };
 
@@ -940,6 +950,7 @@ oppia.factory('explorationStatesService', [
       param_changes: ['paramChanges'],
       fallbacks: ['interaction', 'fallbacks'],
       hints: ['interaction', 'hints'],
+      solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs']
     };
@@ -1005,6 +1016,26 @@ oppia.factory('explorationStatesService', [
     return {
       init: function(statesBackendDict) {
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
+        // Initialize the solutionValidityService.
+        SolutionValidityService.init(_states.getStateNames());
+        _states.getStateNames().forEach(function(stateName) {
+          var solution = _states.getState(stateName).interaction.solution;
+          if (solution) {
+            var result = (
+              AnswerClassificationService.getMatchingClassificationResult(
+                explorationContextService.getExplorationId(),
+              stateName,
+              _states.getState(stateName),
+              solution.correctAnswer,
+              true,
+              $injector.get(
+                angularNameService.getNameOfInteractionRulesService(
+                  _states.getState(stateName).interaction.id))));
+            var solutionIsValid = stateName !== result.outcome.dest;
+            SolutionValidityService.updateValidity(
+              stateName, solutionIsValid);
+          }
+        });
       },
       getStates: function() {
         return angular.copy(_states);
@@ -1030,6 +1061,15 @@ oppia.factory('explorationStatesService', [
         }
         return (
           validatorsService.isValidStateName(newStateName, showWarnings));
+      },
+      isSolutionValid: function(stateName) {
+        return SolutionValidityService.isSolutionValid(stateName);
+      },
+      updateSolutionValidity: function(stateName, solutionIsValid) {
+        SolutionValidityService.updateValidity(stateName, solutionIsValid);
+      },
+      deleteSolutionValidity: function(stateName) {
+        SolutionValidityService.deleteSolutionValidity(stateName);
       },
       getStateContentMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'content');
@@ -1088,6 +1128,12 @@ oppia.factory('explorationStatesService', [
       },
       saveHints: function(stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);
+      },
+      getSolutionMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'solution');
+      },
+      saveSolution: function(stateName, newSolution) {
+        saveStateProperty(stateName, 'solution', newSolution);
       },
       isInitialized: function() {
         return _states != null;
@@ -1359,6 +1405,15 @@ oppia.factory('stateHintsService', [
   'statePropertyService', function(statePropertyService) {
     var child = Object.create(statePropertyService);
     child.setterMethodKey = 'saveHints';
+    return child;
+  }
+]);
+
+// A data service that stores the current interaction solution.
+oppia.factory('stateSolutionService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveSolution';
     return child;
   }
 ]);
@@ -1897,20 +1952,22 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   ADD_INTERACTION: 'Please add an interaction to this card.',
   STATE_UNREACHABLE: 'This card is unreachable.',
   UNABLE_TO_END_EXPLORATION: (
-    'There\'s no way to complete the exploration starting from this card.')
+    'There\'s no way to complete the exploration starting from this card.'),
+  INCORRECT_SOLUTION: (
+    'The current solution does not lead to another card.')
 });
 
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
+  'parameterMetadataService', 'INTERACTION_SPECS',
+  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
+      parameterMetadataService, INTERACTION_SPECS,
+      WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1927,6 +1984,19 @@ oppia.factory('explorationWarningsService', [
       });
 
       return statesWithoutInteractionIds;
+    };
+
+    var _getStatesWithIncorrectSolution = function() {
+      var statesWithIncorrectSolution = [];
+
+      var states = explorationStatesService.getStates();
+      states.getStateNames().forEach(function(stateName) {
+        if (states.getState(stateName).interaction.solution &&
+            !explorationStatesService.isSolutionValid(stateName)) {
+          statesWithIncorrectSolution.push(stateName);
+        }
+      });
+      return statesWithIncorrectSolution;
     };
 
     // Returns a list of names of all nodes which are unreachable from the
@@ -2092,6 +2162,15 @@ oppia.factory('explorationWarningsService', [
         } else {
           stateWarnings[stateWithoutInteractionIds] = [
             STATE_ERROR_MESSAGES.ADD_INTERACTION];
+        }
+      });
+
+      var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
+      angular.forEach(statesWithIncorrectSolution, function(state) {
+        if (stateWarnings.hasOwnProperty(state)) {
+          stateWarnings[state].push(STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
+        } else {
+          stateWarnings[state] = [STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
         }
       });
 

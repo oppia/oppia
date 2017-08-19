@@ -65,7 +65,7 @@ states:
       fallbacks: []
       hints: []
       id: null
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -92,7 +92,7 @@ states:
           trigger_type: NthResubmission
       hints: []
       id: null
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -205,7 +205,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -227,7 +227,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   Second state:
     classifier_model_id: null
@@ -249,7 +249,7 @@ states:
       fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -696,7 +696,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
         # Add hint and delete hint
@@ -719,23 +720,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
+        # Solution should be set to None as default.
+        self.assertEquals(init_state.interaction.solution, None)
+
         init_state.add_hint('hint #1')
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+
         # Object type of answer must match that of correct_answer
         with self.assertRaises(AssertionError):
-            exploration.validate()
+            init_state.interaction.solution = (
+                exp_domain.Solution.from_dict(
+                    init_state.interaction.id, solution))
 
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
     def test_tag_validation(self):
@@ -1304,7 +1311,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                 'fallbacks': [],
                 'hints': [],
                 'id': None,
-                'solution': {},
+                'solution': None,
             },
             'param_changes': [],
         }
@@ -2543,7 +2550,96 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V15
+    YAML_CONTENT_V16 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 16
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V16
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2666,7 +2762,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'fallbacks': [],
                     'hints': [],
                     'id': None,
-                    'solution': {},
+                    'solution': None,
                 },
                 'param_changes': [],
             }

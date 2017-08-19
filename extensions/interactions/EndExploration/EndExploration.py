@@ -35,6 +35,8 @@ class EndExploration(base.BaseInteraction):
     instructions = None
     narrow_instructions = None
     needs_summary = False
+    # Linear interactions are not supposed to have a solution.
+    can_have_solution = False
 
     _customization_arg_specs = [{
         'name': 'recommendedExplorationIds',

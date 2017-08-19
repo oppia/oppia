@@ -150,7 +150,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       25: {
-        text: '  solution: {}',
+        text: '  solution: null',
         highlighted: false
       },
       26: {
@@ -227,7 +227,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       16: {
-        text: '  solution: {}',
+        text: '  solution: null',
         highlighted: false
       },
       17: {
@@ -258,7 +258,7 @@ describe('Exploration history', function() {
       '  fallbacks: []\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
-      '  solution: {}\n' +
+      '  solution: null\n' +
       'param_changes: []\n' +
       ' ';
 

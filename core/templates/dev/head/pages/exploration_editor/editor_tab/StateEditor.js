@@ -44,7 +44,10 @@ oppia.controller('StateEditor', [
 
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
       $scope.interactionIdIsSet = Boolean(newInteractionId);
-      $scope.currentStateIsTerminal = (
+      $scope.currentInteractionCanHaveSolution = Boolean(
+        $scope.interactionIdIsSet &&
+        INTERACTION_SPECS[newInteractionId].can_have_solution);
+      $scope.currentStateIsTerminal = Boolean(
         $scope.interactionIdIsSet && INTERACTION_SPECS[
           newInteractionId].is_terminal);
     });
@@ -60,7 +63,10 @@ oppia.controller('StateEditor', [
         var interactionId = explorationStatesService.getInteractionIdMemento(
           stateName);
         $scope.interactionIdIsSet = Boolean(interactionId);
-        $scope.currentStateIsTerminal = (
+        $scope.currentInteractionCanHaveSolution = Boolean(
+          $scope.interactionIdIsSet &&
+          INTERACTION_SPECS[interactionId].can_have_solution);
+        $scope.currentStateIsTerminal = Boolean(
           $scope.interactionIdIsSet &&
           INTERACTION_SPECS[interactionId].is_terminal);
 
