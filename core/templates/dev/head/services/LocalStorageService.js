@@ -20,8 +20,10 @@
  //
  // Note that the draft is only saved if localStorage exists and works
  // (i.e. has storage capacity).
- oppia.factory('LocalStorageService', function() {
-   // check that local storage exists and works as expected.
+ oppia.factory('LocalStorageService', [
+   'ExplorationDraftObjectFactory',
+   function(ExplorationDraftObjectFactory) {
+   // Check that local storage exists and works as expected.
    // If it does storage stores the localStorage object,
    // else storage is undefined or false.
    var storage = (function() {
@@ -80,11 +82,13 @@
      */
      getExplorationDraft: function(explorationId) {
        if (storage) {
-         return JSON.parse(storage.getItem(_createExplorationDraftKey(
+         var saveObject = JSON.parse(storage.getItem(_createExplorationDraftKey(
            explorationId)));
-       } else {
-         return null;
+         if (saveObject) {
+           return ExplorationDraftObjectFactory.createFromDict(saveObject);
+         }
        }
+       return null;
      },
      /**
      * Remove the local save of the changeList associated with the given
@@ -98,4 +102,4 @@
        }
      }
    };
- });
+ }]);

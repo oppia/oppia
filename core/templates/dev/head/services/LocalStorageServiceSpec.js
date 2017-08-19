@@ -23,7 +23,8 @@
      var LocalStorageService = null;
      var explorationIdOne = '100';
      var draftChangeListIdOne = 2;
-     var changeList = []
+     var changeListOne = [{change: 'A change'}];
+     var changeListTwo = [{change: 'A different change'}];
      var explorationIdTwo = '101';
      var draftChangeListIdTwo = 1;
      var saveOne = {
@@ -34,9 +35,15 @@
        draftChanges: changeList,
        draftChangeListId: draftChangeListIdTwo
      };
+     var saveOneObject = null;
+     var saveTwoObject = null;
 
      beforeEach(inject(function($injector) {
        LocalStorageService = $injector.get('LocalStorageService');
+       ExplorationDraftObjectFactory = $injector.get(
+         'ExplorationDraftObjectFactory');
+       saveOneObject = ExplorationDraftObjectFactory.createFromDict(saveOne);
+       saveTwoObject = ExplorationDraftObjectFactory.createFromDict(saveTwo);
      }));
 
      it('should correctly save the draft', function() {
@@ -45,9 +52,9 @@
        LocalStorageService.saveExplorationDraft(explorationIdTwo,
          changeList, draftChangeListIdTwo);
        expect(LocalStorageService.getExplorationDraft(
-         explorationIdOne)).toEqual(saveOne);
+         explorationIdOne)).toEqual(saveOneObject);
        expect(LocalStorageService.getExplorationDraft(
-         explorationIdTwo)).toEqual(saveTwo);
+         explorationIdTwo)).toEqual(saveTwoObject);
      });
 
      it('should correctly remove the draft', function() {

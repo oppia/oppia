@@ -18,18 +18,12 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log',
-  '$window',
-  'alertsService',
-  'EditableExplorationBackendApiService',
-  'LocalStorageService',
-  'ReadOnlyExplorationBackendApiService','$q',
-  function($http, $log,
-    $window,
-    alertsService,
-    EditableExplorationBackendApiService,
-    LocalStorageService,
-    ReadOnlyExplorationBackendApiService, $q) {
+  '$http', '$log', '$window', '$q', 'alertsService',
+  'EditableExplorationBackendApiService', 'LocalStorageService',
+  'ReadOnlyExplorationBackendApiService',
+  function($http, $log, $window, $q, alertsService,
+    EditableExplorationBackendApiService, LocalStorageService,
+    ReadOnlyExplorationBackendApiService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
@@ -56,7 +50,7 @@ oppia.factory('explorationData', [
     var explorationData = {
       explorationId: explorationId,
       // Note that the changeList is the full changeList since the last
-      // commited version.
+      // commited version (as opposed to the most recent autosave).
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
         // First save locally to be retrieved later if save is unsuccessful.
         LocalStorageService.saveExplorationDraft(
@@ -104,7 +98,6 @@ oppia.factory('explorationData', [
           // changes applied. This makes a force-refresh necessary when changes
           // are discarded, otherwise the exploration-with-draft-changes
           // (which is cached here) will be reused.
-          console.log(errorCallback);
           return (
             EditableExplorationBackendApiService.fetchApplyDraftExploration(
             explorationId).then(function(response) {
@@ -112,20 +105,20 @@ oppia.factory('explorationData', [
               $log.info(response);
               draftChangeListId = response.draft_change_list_id;
               explorationData.data = response;
-              var draftChanges = LocalStorageService.getExplorationDraft(
+              var draft = LocalStorageService.getExplorationDraft(
                 explorationId);
-              if (draftChanges &&
-                draftChanges.draftChangeListId === draftChangeListId) {
-                var changeList = draftChanges.draftChanges;
+              if (draft &&
+                draft.isDraftValid(draftChangeListId)) {
+                var changeList = draft.getDraftChanges();
                 explorationData.autosaveChangeList(changeList, function() {
-                  // a reload is needed so that the changelist just saved is
+                  // A reload is needed so that the changelist just saved is
                   // loaded as opposed to the exploration returned by this
-                  // response
+                  // response.
                   $window.location.reload();
                 });
-              } else if (draftChanges &&
-                draftChanges.draftChangeListId !== draftChangeListId) {
-                errorCallback(explorationId, draftChanges.draftChanges);
+              } else if (draft &&
+                !draft.isDraftValid(draftChangeListId)) {
+                errorCallback(explorationId, draft.getDraftChanges());
               }
               return response;
             })
@@ -2586,11 +2579,9 @@ oppia.factory('autosaveInfoModalsService', [
               $modalInstance.dismiss('cancel');
             };
 
-            $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
-            if ($scope.hasLostChanges) {
-              $scope.lostChangesHtml = (
-                lostChangesService.makeHumanReadable(lostChanges).html());
-              $log.error('Lost changes: ' + JSON.stringify(lostChanges));
+            $scope.lostChangesHtml = (
+              lostChangesService.makeHumanReadable(lostChanges).html());
+            $log.error('Lost changes: ' + JSON.stringify(lostChanges));
             }
           }],
           windowClass: 'oppia-lost-changes-modal'
