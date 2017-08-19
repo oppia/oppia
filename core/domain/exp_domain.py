@@ -3503,7 +3503,7 @@ class Exploration(object):
         """
         for state_dict in states_dict.values():
             if 'fallbacks' in state_dict['interaction']:
-                del interaction['fallbacks']
+                del state_dict['interaction']['fallbacks']
             if not state_dict['interaction']['solution']:
                 state_dict['interaction']['solution'] = None
         return states_dict

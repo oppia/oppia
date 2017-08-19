@@ -116,6 +116,7 @@ states:
         dest: %s
         feedback: []
         param_changes: []
+      fallbacks: []
       id: null
     param_changes: []
   New state:
@@ -129,6 +130,7 @@ states:
         dest: New state
         feedback: []
         param_changes: []
+      fallbacks: []
       id: null
     param_changes: []
 states_schema_version: %d
