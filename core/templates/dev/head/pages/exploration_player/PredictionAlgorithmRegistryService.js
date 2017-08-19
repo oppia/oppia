@@ -16,8 +16,8 @@
  * @fileoverview Service for mapping algorithmId to PredictionAlgorithmService.
  */
 
- oppia.factory('PredictionAlgorithmRegistryService', [
-   function() {
+oppia.factory('PredictionAlgorithmRegistryService', [
+  '$injector', function($injector) {
     /**
      * This mapping needs to be updated whenever a new prediction service needs
      * to be added for classification. The mapping is from algorithmId to a
@@ -28,24 +28,29 @@
      *   }
      * }
      */
-     var algorithmIdPredictionServiceMapping = {};
+    var algorithmIdPredictionServiceMapping = {
+      CodeClassifier: {
+        1: 'CodeReplPredictionService'
+      }
+    };
 
-     return {
-       getPredictionService: function(algorithmId, dataSchemaVersion) {
-         if (algorithmIdPredictionServiceMapping.hasOwnProperty(algorithmId)) {
-           // We convert dataSchemaVersion to a string below since JS objects
-           // can't have integer properties.
-           return algorithmIdPredictionServiceMapping[algorithmId][
-             dataSchemaVersion.toString()];
-         } else {
-           return null;
-         }
-       },
-       // The below function is required for running tests with sample
-       // prediction services.
-       setMapping: function(newAlgorithmIdPredictionServiceMapping) {
-         algorithmIdPredictionServiceMapping = (
-           newAlgorithmIdPredictionServiceMapping);
-       }
-     };
-   }]);
+    return {
+      getPredictionService: function(algorithmId, dataSchemaVersion) {
+        if (algorithmIdPredictionServiceMapping.hasOwnProperty(algorithmId)) {
+          // We convert dataSchemaVersion to a string below since JS objects
+          // can't have integer properties.
+          var serviceName = algorithmIdPredictionServiceMapping[algorithmId][
+            dataSchemaVersion.toString()];
+          return $injector.get(serviceName);
+        } else {
+          return null;
+        }
+      },
+      // The below function is required for running tests with sample
+      // prediction services.
+      setMapping: function(newAlgorithmIdPredictionServiceMapping) {
+        algorithmIdPredictionServiceMapping = (
+          newAlgorithmIdPredictionServiceMapping);
+      }
+    };
+  }]);

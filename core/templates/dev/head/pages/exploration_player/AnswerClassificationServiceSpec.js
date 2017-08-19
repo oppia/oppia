@@ -250,7 +250,7 @@ describe('Answer classification service with string classifier enabled',
     var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
       STATISTICAL_CLASSIFICATION;
     var acs, scms, sof, oof, acr, $httpBackend, successHandler, failHandler,
-      $rootScope, stateName, state, state2, registryService, predictionService,
+      $rootScope, stateName, state, state2, registryService,
       stateClassifierMapping;
     beforeEach(inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');
@@ -265,7 +265,6 @@ describe('Answer classification service with string classifier enabled',
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
       registryService = $injector.get('PredictionAlgorithmRegistryService');
-      predictionService = $injector.get('PredictionSampleService');
       successHandler = jasmine.createSpy('success');
       failHandler = jasmine.createSpy('fail');
 
@@ -336,7 +335,7 @@ describe('Answer classification service with string classifier enabled',
 
       registryService.setMapping({
         LDAStringClassifier: {
-          1: predictionService
+          1: 'PredictionSampleService'
         }
       });
 

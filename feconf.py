@@ -83,6 +83,10 @@ INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'LDAStringClassifier',
         'current_data_schema_version': 1
+    },
+    'CodeRepl': {
+        'algorithm_id': 'CodeClassifier',
+        'current_data_schema_version': 1
     }
 }
 
