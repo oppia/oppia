@@ -116,7 +116,19 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                params, play_type, unused_version=1):
-        """Creates a new start exploration event."""
+        """Creates a new start exploration event.
+
+        Args:
+            exp_id: str. The exploration ID
+            exp_version: int. The version of exploration to fetch answers
+            state_name: str. The name of the state to fetch answers
+            session_id: ID of the current student's session
+            params: Current parameter values, in the form of a map of parameter
+                name to value
+            play_type: 'normal'
+        Returns:
+            StateAnswersModel
+        """
         # TODO(sll): Some events currently do not have an entity id that was
         # set using this method; it was randomly set instead due tg an error.
         # Might need to migrate them.
