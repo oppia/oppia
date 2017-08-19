@@ -48,7 +48,7 @@ oppia.factory('responsesService', [
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'alertsService',
   'explorationContextService', 'explorationWarningsService',
-  'INFO_MESSAGE_SOLUTION_IS_VALID',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
@@ -56,7 +56,7 @@ oppia.factory('responsesService', [
       explorationStatesService, graphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, alertsService,
       explorationContextService, explorationWarningsService,
-      INFO_MESSAGE_SOLUTION_IS_VALID,
+      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
@@ -112,8 +112,12 @@ oppia.factory('responsesService', [
               explorationStatesService.updateSolutionValidity(
                 currentStateName, false);
               explorationWarningsService.updateWarnings();
-              alertsService.addInfoMessage(
-                INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+              if (solutionWasPreviouslyValid) {
+                alertsService.addInfoMessage(
+                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+              } else {
+                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+              }
             }
           );
         }

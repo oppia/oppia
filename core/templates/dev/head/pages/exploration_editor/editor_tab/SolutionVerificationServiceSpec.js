@@ -152,9 +152,6 @@ describe('Solution Verification Service', function() {
         svs.verifySolution(0, state,
           ess.getState('First State').interaction.solution.correctAnswer,
           mockFunctions.successCallback, mockFunctions.errorCallback);
-        // This is needed to invoke then() on
-        // AnswerClassificationService.getMatchingClassificationResult().
-        rootScope.$apply();
       }
     );
 
@@ -194,10 +191,7 @@ describe('Solution Verification Service', function() {
 
         svs.verifySolution(0, state,
           ess.getState('First State').interaction.solution.correctAnswer,
-          mockFunctions.successCallback, mockFunctions.errorCallback);
-        // This is needed to invoke then() on
-        // AnswerClassificationService.getMatchingClassificationResult().
-        rootScope.$apply();
+          mockFunctions.successCallback, mockFunctions.errorCallback)
       }
     );
 

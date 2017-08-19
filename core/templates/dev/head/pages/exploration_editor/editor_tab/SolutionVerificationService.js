@@ -29,16 +29,15 @@ oppia.factory('SolutionVerificationService', [
         var rulesServiceName = (
           angularNameService.getNameOfInteractionRulesService(interactionId));
         var rulesService = $injector.get(rulesServiceName);
-        AnswerClassificationService.getMatchingClassificationResult(
-          explorationId, state, correctAnswer, true, rulesService
-        ).then(function(result) {
-          if (
-            editorContextService.getActiveStateName() !== result.outcome.dest) {
-            successCallback();
-          } else {
-            errorCallback();
-          }
-        });
+        var result = (
+          AnswerClassificationService.getMatchingClassificationResult(
+            explorationId, state.name, state, correctAnswer, true, rulesService
+          ));
+        if (editorContextService.getActiveStateName() !== result.outcome.dest) {
+          successCallback();
+        } else {
+          errorCallback();
+        }
       }
     }
   }]);

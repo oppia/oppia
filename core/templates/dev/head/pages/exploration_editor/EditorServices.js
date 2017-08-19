@@ -1018,28 +1018,23 @@ oppia.factory('explorationStatesService', [
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
         SolutionValidityService.init(_states.getStateNames());
-        var answerClassificationPromises = [];
         _states.getStateNames().forEach(function(stateName) {
           var solution = _states.getState(stateName).interaction.solution;
           if (solution) {
-            answerClassificationPromises.push(
+            var result = (
               AnswerClassificationService.getMatchingClassificationResult(
                 explorationContextService.getExplorationId(),
-                _states.getState(stateName),
-                solution.correctAnswer,
-                true,
-                $injector.get(
-                  angularNameService.getNameOfInteractionRulesService(
-                    _states.getState(stateName).interaction.id))
-              ).then(function(result) {
-                var solutionIsValid = stateName !== result.outcome.dest;
-                SolutionValidityService.updateValidity(
-                  stateName, solutionIsValid);
-              }));
+              stateName,
+              _states.getState(stateName),
+              solution.correctAnswer,
+              true,
+              $injector.get(
+                angularNameService.getNameOfInteractionRulesService(
+                  _states.getState(stateName).interaction.id))));
+            var solutionIsValid = stateName !== result.outcome.dest;
+            SolutionValidityService.updateValidity(
+              stateName, solutionIsValid);
           }
-        });
-        $q.all(answerClassificationPromises).then(function() {
-          $rootScope.$broadcast('refreshGraph');
         });
       },
       getStates: function() {
