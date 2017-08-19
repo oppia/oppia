@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <h3>
+    <span translate="I18N_PLAYER_BANDWIDTH_USAGE_WARNING_MODAL_TITLE"></span>
+  </h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    <span translate="I18N_PLAYER_BANDWIDTH_USAGE_WARNING_MODAL_BODY" translate-values="{fileSizeMB: '<[fileSizeOfCurrentAudioTranslationMB]>', languageDescription: '<[currentLanguageDescription]>'}"></span>
+  </p>
+  <br/>
+  <input id="downloadAllAudioCheckbox" type="checkbox" ng-model="shouldDownloadAllAudioInExploration" />
+  <label style="font-weight: normal;"for="downloadAllAudioCheckbox" translate="I18N_PLAYER_BANDWIDTH_USAGE_WARNING_MODAL_DOWNLOAD_ALL_AUDIO" translate-values="{fileSizeMB: '<[totalFileSizeOfAllAudioTranslationsMB]>', languageDescription: '<[currentLanguageDescription]>'}"></label>
+  <br/>
+  <br/>
+  <a ng-click="chooseDifferentLanguage()">Choose a different language</a>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
+  <button class="btn btn-success" ng-click="confirm()" translate="I18N_MODAL_CONTINUE_BUTTON"></button>
+</div>

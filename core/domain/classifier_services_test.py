@@ -222,7 +222,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             'TextInput', self.exp_id, exploration.version-1, [], 'Old home',
-            feconf.TRAINING_JOB_STATUS_COMPLETE)
+            feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.exp_id, exploration.version-1, 'Old home', job_id)
         classifier_services.handle_non_retrainable_states(
@@ -243,82 +243,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(job_exploration_mapping.exp_id, self.exp_id)
         self.assertEqual(job_exploration_mapping.state_name, 'Home')
 
-    def test_retrieval_of_classifiers(self):
-        """Test the get_classifier_by_id method."""
-
-        with self.assertRaisesRegexp(Exception, (
-            "Entity for class ClassifierDataModel with id fake_id not found")):
-            classifier_services.get_classifier_by_id('fake_id')
-
-        exp_id = u'1'
-        classifier_id = u'1'
-        state = 'Home'
-        classifier_id = classifier_models.ClassifierDataModel.create(
-            classifier_id, exp_id, 1, state,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                'algorithm_id'], [], 1)
-        classifier = classifier_services.get_classifier_by_id(
-            classifier_id)
-        self.assertEqual(classifier.exp_id, exp_id)
-        self.assertEqual(classifier.state_name, state)
-        self.assertEqual(classifier.id, classifier_id)
-
-    def test_deletion_of_classifiers(self):
-        """Test the delete_classifier method."""
-
-        with self.assertRaisesRegexp(Exception, (
-            "Entity for class ClassifierDataModel with id fake_id not found")):
-            classifier_services.delete_classifier('fake_id')
-
-        exp_id = u'1'
-        classifier_id = u'1'
-        state = 'Home'
-        classifier_id = classifier_models.ClassifierDataModel.create(
-            classifier_id, exp_id, 1, state,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                'algorithm_id'], [], 1)
-        classifier_services.delete_classifier(classifier_id)
-        with self.assertRaisesRegexp(Exception, (
-            "Entity for class ClassifierDataModel with id %s not found" %(
-                classifier_id))):
-            classifier_services.get_classifier_by_id(classifier_id)
-
-    def test_creation_of_classifiers(self):
-        """Test the create_classifier method."""
-
-        exp_id = u'1'
-        state_name = 'Home'
-        interaction_id = 'TextInput'
-        classifier_data = {
-            '_alpha': 0.1,
-            '_beta': 0.001,
-            '_prediction_threshold': 0.5,
-            '_training_iterations': 25,
-            '_prediction_iterations': 5,
-            '_num_labels': 10,
-            '_num_docs': 12,
-            '_num_words': 20,
-            '_label_to_id': {'text': 1},
-            '_word_to_id': {'hello': 2},
-            '_w_dp': [],
-            '_b_dl': [],
-            '_l_dp': [],
-            '_c_dl': [],
-            '_c_lw': [],
-            '_c_l': []
-        }
-        job_id = classifier_models.ClassifierTrainingJobModel.create(
-            feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp_id, 1, [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW)
-        classifier_id = (
-            classifier_services.create_classifier(job_id, classifier_data))
-        classifier = classifier_services.get_classifier_by_id(
-            classifier_id)
-        self.assertEqual(classifier.exp_id, exp_id)
-        self.assertEqual(classifier.state_name, state_name)
-        self.assertEqual(classifier.id, classifier_id)
-
     def test_retrieval_of_classifier_training_jobs(self):
         """Test the get_classifier_training_job_by_id method."""
 
@@ -333,7 +257,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             interaction_id, exp_id, 1, [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW)
+            feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.algorithm_id,
@@ -346,6 +270,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier_training_job.state_name, state_name)
         self.assertEqual(classifier_training_job.status,
                          feconf.TRAINING_JOB_STATUS_NEW)
+        self.assertEqual(classifier_training_job.classifier_data, {})
+        self.assertEqual(classifier_training_job.data_schema_version, 1)
 
     def test_deletion_of_classifier_training_jobs(self):
         """Test the delete_classifier_training_job method."""
@@ -356,7 +282,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             interaction_id, exp_id, 1, [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW)
+            feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
         self.assertTrue(job_id)
         classifier_services.delete_classifier_training_job(job_id)
         with self.assertRaisesRegexp(Exception, (
@@ -374,7 +300,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             interaction_id, exp_id, 1, [], state_name,
-            feconf.TRAINING_JOB_STATUS_PENDING)
+            feconf.TRAINING_JOB_STATUS_PENDING, {}, 1)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -395,6 +321,27 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 feconf.TRAINING_JOB_STATUS_COMPLETE))):
             classifier_services.mark_training_job_complete(job_id)
 
+    def test_store_classifier_data(self):
+        """Test the store_classifier_data method."""
+        exp_id = u'1'
+        state_name = 'Home'
+        interaction_id = 'TextInput'
+
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            interaction_id, exp_id, 1, [], state_name,
+            feconf.TRAINING_JOB_STATUS_PENDING, None, 1)
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.classifier_data, None)
+
+        classifier_services.store_classifier_data(job_id, {})
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.classifier_data, {})
+
     def test_retrieval_of_classifier_training_jobs_from_exploration_attributes(
             self):
         """Test the get_classifier_training_jobs method."""
@@ -404,7 +351,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             'TextInput', exp_id, 1, [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW)
+            feconf.TRAINING_JOB_STATUS_NEW, None, 1)
         classifier_models.TrainingJobExplorationMappingModel.create(
             exp_id, 1, state_name, job_id)
         classifier_training_jobs = (

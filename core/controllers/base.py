@@ -309,8 +309,6 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
             'ACTIVITY_STATUS_PUBLIC': (
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
-            'ACTIVITY_STATUS_PUBLICIZED': (
-                rights_manager.ACTIVITY_STATUS_PUBLICIZED),
             'AUDIO_URL_TEMPLATE': feconf.AUDIO_URL_TEMPLATE,
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
@@ -327,7 +325,8 @@ class BaseHandler(webapp2.RequestHandler):
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
-            'preferred_site_language_code': self.preferred_site_language_code
+            'preferred_site_language_code': self.preferred_site_language_code,
+            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
         })
         if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value

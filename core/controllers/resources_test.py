@@ -223,6 +223,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
     TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
     TEST_AUDIO_FILE_FLAC = 'cafe.flac'
     TEST_AUDIO_FILE_OVER_MAX_LENGTH = 'cafe-over-five-minutes.mp3'
+    TEST_AUDIO_FILE_MPEG_CONTAINER = 'test-mpeg-container.mp3'
     AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
 
     def setUp(self):
@@ -244,6 +245,23 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': self.TEST_AUDIO_FILE_MP3},
+            csrf_token=csrf_token,
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+        )
+        self.logout()
+
+    def test_audio_upload_mpeg_container(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(
+            feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MPEG_CONTAINER),
+                  mode='rb') as f:
+            raw_audio = f.read()
+        self.post_json(
+            '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
+            {'filename': self.TEST_AUDIO_FILE_MPEG_CONTAINER},
             csrf_token=csrf_token,
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
@@ -397,6 +415,5 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['code'], 400)
-        self.assertIn(
-            'Although the filename extension indicates the file',
-            response_dict['error'])
+        self.assertEqual(response_dict['error'], 'Audio not recognized as '
+                         'a mp3 file')

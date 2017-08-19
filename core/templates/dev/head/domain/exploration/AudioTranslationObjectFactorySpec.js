@@ -27,7 +27,7 @@ describe('AudioTranslation object factory', function() {
       atof = $injector.get('AudioTranslationObjectFactory');
       audioTranslation = atof.createFromBackendDict({
         filename: 'a.mp3',
-        file_size_bytes: 20,
+        file_size_bytes: 200000,
         needs_update: false
       });
     }));
@@ -36,7 +36,7 @@ describe('AudioTranslation object factory', function() {
       audioTranslation.markAsNeedingUpdate();
       expect(audioTranslation).toEqual(atof.createFromBackendDict({
         filename: 'a.mp3',
-        file_size_bytes: 20,
+        file_size_bytes: 200000,
         needs_update: true
       }));
     }));
@@ -45,14 +45,14 @@ describe('AudioTranslation object factory', function() {
       audioTranslation.toggleNeedsUpdateAttribute();
       expect(audioTranslation).toEqual(atof.createFromBackendDict({
         filename: 'a.mp3',
-        file_size_bytes: 20,
+        file_size_bytes: 200000,
         needs_update: true
       }));
 
       audioTranslation.toggleNeedsUpdateAttribute();
       expect(audioTranslation).toEqual(atof.createFromBackendDict({
         filename: 'a.mp3',
-        file_size_bytes: 20,
+        file_size_bytes: 200000,
         needs_update: false
       }));
     }));
@@ -60,19 +60,25 @@ describe('AudioTranslation object factory', function() {
     it('should convert to backend dict correctly', inject(function() {
       expect(audioTranslation.toBackendDict()).toEqual({
         filename: 'a.mp3',
-        file_size_bytes: 20,
+        file_size_bytes: 200000,
         needs_update: false
       });
     }));
 
     it('should create a new audio translation', inject(function() {
-      expect(atof.createNew('filename.mp3', 10)).toEqual(
+      expect(atof.createNew('filename.mp3', 100000)).toEqual(
         atof.createFromBackendDict({
           filename: 'filename.mp3',
-          file_size_bytes: 10,
+          file_size_bytes: 100000,
           needs_update: false
         })
       );
+    }));
+
+    it('should get the correct file size in MB', inject(function() {
+      var NUM_BYTES_IN_MB = 1 << 20;
+      expect(audioTranslation.getFileSizeMB()).toEqual(
+        200000 / NUM_BYTES_IN_MB);
     }));
   });
 });
