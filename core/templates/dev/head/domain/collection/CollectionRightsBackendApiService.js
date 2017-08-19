@@ -61,17 +61,9 @@ oppia.factory('CollectionRightsBackendApiService', [
         isPublic ? collectionPublishUrl : collectionUnpublishUrl);
 
       $http.put(requestUrl, putParams).then(function(response) {
-        // Check if the response from the backend does not contradict
-        // putParams.
-        if (response.data.is_private === isPublic) {
-          if (errorCallback) {
-            errorCallback(response.data);
-          }
-        } else {
-          collectionRightsCache[collectionId] = response.data;
-          if (successCallback) {
-            successCallback(collectionRightsCache[collectionId]);
-          }
+        collectionRightsCache[collectionId] = response.data;
+        if (successCallback) {
+          successCallback(response.data);
         }
       }, function(errorResponse) {
         if (errorCallback) {
