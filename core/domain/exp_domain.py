@@ -32,7 +32,6 @@ from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
-from core.domain import trigger_registry
 from core.platform import models
 import feconf
 import jinja_utils
