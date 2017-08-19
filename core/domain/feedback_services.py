@@ -518,8 +518,12 @@ def get_thread_summaries(user_id, full_thread_ids):
                 in feedback_thread_user_models[index].message_ids_read_by_user)
         else:
             last_message_read = False
-        author_last_message = user_services.get_username(
-            last_two_messages[index][0].author_id)
+
+        if last_two_messages[index][0].author_id is None:
+            author_last_message = None
+        else:
+            author_last_message = user_services.get_username(
+                last_two_messages[index][0].author_id)
 
         second_last_message_read = None
         author_second_last_message = None
@@ -532,8 +536,12 @@ def get_thread_summaries(user_id, full_thread_ids):
                     in feedback_thread_user_models[index].message_ids_read_by_user) # pylint: disable=line-too-long
             else:
                 second_last_message_read = False
-            author_second_last_message = user_services.get_username(
-                last_two_messages[index][1].author_id)
+
+            if last_two_messages[index][1].author_id is None:
+                author_second_last_message = None
+            else:
+                author_second_last_message = user_services.get_username(
+                    last_two_messages[index][1].author_id)
         if not last_message_read:
             number_of_unread_threads += 1
 
