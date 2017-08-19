@@ -23,8 +23,7 @@
      var LocalStorageService = null;
      var explorationIdOne = '100';
      var draftChangeListIdOne = 2;
-     var changeListOne = [{change: 'A change'}];
-     var changeListTwo = [{change: 'A different change'}];
+     var changeList = [];
      var explorationIdTwo = '101';
      var draftChangeListIdTwo = 1;
      var saveOne = {

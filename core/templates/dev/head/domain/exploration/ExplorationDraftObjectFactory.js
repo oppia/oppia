@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating nre frontend instances of ExplorationDraft
+ * @fileoverview Factory for creating instances of ExplorationDraft
  * domain objects..
  */
 
@@ -39,5 +39,5 @@
          explorationDraftDict.draftChangeListId);
      };
      return ExplorationDraft;
-   };
+   }
  ]);
