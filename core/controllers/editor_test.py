@@ -427,7 +427,6 @@ interaction:
     dest: State A
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
   solution: null
@@ -449,7 +448,6 @@ interaction:
     dest: State B
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
   solution: null
@@ -471,7 +469,6 @@ interaction:
     dest: %s
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
   solution: null
@@ -495,7 +492,6 @@ interaction:
     dest: State A
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
   solution: null

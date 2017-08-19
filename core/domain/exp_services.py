@@ -682,10 +682,6 @@ def apply_change_list(exploration_id, change_list):
                         change.new_value)
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS):
-                    state.update_interaction_fallbacks(change.new_value)
-                elif (
-                        change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     state.update_interaction_hints(change.new_value)
                 elif (

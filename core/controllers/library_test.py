@@ -116,7 +116,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
         }, response_dict['activity_list'][0])
 
     def test_library_handler_for_created_explorations(self):
-        """Test the library data handler for manually created explirations."""
+        """Test the library data handler for manually created explorations."""
         self.set_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
