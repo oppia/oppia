@@ -471,7 +471,8 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
       var date = new Date(millisSinceEpoch);
       if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
         // The replace function removes 'seconds' from the time returned.
-        return date.toLocaleTimeString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true});
+        return date.toLocaleTimeString('en-US',
+          {hour: 'numeric', minute: 'numeric', hour12: true});
       } else if (date.getFullYear() === new Date().getFullYear()) {
         return $filter('date')(date, 'MMM d');
       } else {
