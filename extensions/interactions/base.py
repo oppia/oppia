@@ -84,7 +84,7 @@ class BaseInteraction(object):
     is_trainable = False
     # Whether this interaction supports the string classifier.
     # TODO(chiangs): remove once classifier_services is generalized.
-    is_string_classifier_trainable = False
+    is_interaction_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
@@ -213,8 +213,8 @@ class BaseInteraction(object):
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
             'is_trainable': self.is_trainable,
-            'is_string_classifier_trainable':
-                self.is_string_classifier_trainable,
+            'is_interaction_trainable':
+                self.is_interaction_trainable,
             'is_linear': self.is_linear,
             'needs_summary': self.needs_summary,
             'customization_arg_specs': [{

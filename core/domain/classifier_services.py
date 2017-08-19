@@ -57,7 +57,7 @@ def classify(state, answer):
     normalized_answer = interaction_instance.normalize_answer(answer)
     response = None
 
-    if interaction_instance.is_string_classifier_trainable:
+    if interaction_instance.is_interaction_trainable:
         response = classify_string_classifier_rule(state, normalized_answer)
     else:
         raise Exception('No classifier found for interaction.')

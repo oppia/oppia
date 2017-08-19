@@ -12,8 +12,14 @@
   </li>
 
   <li>
-    <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/<[activityType]>/<[activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
+    <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/<[activityType]>/<[activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="registerShareEvent('twitter')" target="_window">
       <img class="share-option-img" ng-src="<[twitterUrl]>" alt="Twitter">
+    </a>
+  </li>
+
+  <li>
+    <a ng-href="https://classroom.google.com/share?url=<[serverName]>/<[activityType]>/<[activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="registerShareEvent('classroom')" target="_window">
+      <img class="share-option-img" ng-src="<[classroomUrl]>" alt="Classroom">
     </a>
   </li>
 

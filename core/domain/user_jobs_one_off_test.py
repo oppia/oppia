@@ -20,6 +20,7 @@ import ast
 import datetime
 import re
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_services
@@ -62,8 +63,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserContributionsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def setUp(self):
@@ -148,6 +148,54 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             [self.EXP_ID_2])
 
 
+class UserDefaultDashboardOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off username length distribution job."""
+
+    CREATOR_USER_EMAIL = 'creator@example.com'
+    CREATOR_USER_USERNAME = 'creator'
+    LEARNER_USER_EMAIL = 'learner@example.com'
+    LEARNER_USER_USERNAME = 'learner'
+
+    EXP_ID_1 = 'exp_id_1'
+    EXP_ID_2 = 'exp_id_2'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UserDefaultDashboardOneOffJob.create_new())
+        user_jobs_one_off.UserDefaultDashboardOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+    def test_default_dashboard(self):
+        """Tests whether the one off jobs assigns the correct dashboard
+        to the user.
+        """
+        self.signup(self.CREATOR_USER_EMAIL, self.CREATOR_USER_USERNAME)
+        creator_user_id = self.get_user_id_from_email(
+            self.CREATOR_USER_EMAIL)
+        self.signup(self.LEARNER_USER_EMAIL, self.LEARNER_USER_USERNAME)
+        learner_user_id = self.get_user_id_from_email(
+            self.LEARNER_USER_EMAIL)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, creator_user_id, end_state_name='End')
+
+        self._run_one_off_job()
+
+        creator_settings = user_services.get_user_settings(creator_user_id)
+        learner_settings = user_services.get_user_settings(learner_user_id)
+
+        self.assertEqual(
+            creator_settings.default_dashboard,
+            constants.DASHBOARD_TYPE_CREATOR)
+        self.assertEqual(
+            learner_settings.default_dashboard,
+            constants.DASHBOARD_TYPE_LEARNER)
+
+
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
     USER_A_EMAIL = 'a@example.com'
@@ -166,8 +214,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UsernameLengthDistributionOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
@@ -247,8 +294,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.LongUserBiosOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
         stringified_output = (
@@ -329,8 +375,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.DashboardSubscriptionsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def _null_fn(self, *args, **kwargs):
@@ -678,8 +723,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.DashboardStatsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def setUp(self):
@@ -1025,8 +1069,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserLastExplorationActivityOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def test_that_last_created_time_is_updated(self):

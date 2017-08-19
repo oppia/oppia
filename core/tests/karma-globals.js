@@ -67,7 +67,7 @@ var GLOBALS = {
           'is equal to {{x|NormalizedString}}, taking case into account',
         Equals: 'is equal to {{x|NormalizedString}}'
       },
-      is_string_classifier_trainable: true,
+      is_interaction_trainable: true,
       is_trainable: true,
       narrow_instructions: null
     }
