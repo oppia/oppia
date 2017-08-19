@@ -26,16 +26,18 @@ oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
-  '$http', '$q', 'LearnerParamsService', 'alertsService',
-  'AnswerClassificationResult', 'PredictionAlgorithmRegistryService',
-  'StateClassifierMappingService', 'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS',
-  'EXPLICIT_CLASSIFICATION', 'DEFAULT_OUTCOME_CLASSIFICATION',
-  'STATISTICAL_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
-  function($http, $q, LearnerParamsService, alertsService,
-      AnswerClassificationResult, PredictionAlgorithmRegistryService,
-      StateClassifierMappingService, INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS,
-      EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
-      STATISTICAL_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
+  '$http', 'LearnerParamsService', 'alertsService',
+  'AnswerClassificationResultObjectFactory',
+  'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
+  'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
+  'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
+  'RULE_TYPE_CLASSIFIER',
+  function($http, LearnerParamsService, alertsService,
+      AnswerClassificationResultObjectFactory,
+      PredictionAlgorithmRegistryService, StateClassifierMappingService,
+      INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
+      DEFAULT_OUTCOME_CLASSIFICATION, STATISTICAL_CLASSIFICATION,
+      RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -58,7 +60,7 @@ oppia.factory('AnswerClassificationService', [
           if (rule.type !== RULE_TYPE_CLASSIFIER &&
               interactionRulesService[rule.type](
                 answer, rule.inputs)) {
-            return AnswerClassificationResult.createNew(
+            return AnswerClassificationResultObjectFactory.createNew(
               answerGroups[i].outcome, i, j, EXPLICIT_CLASSIFICATION);
           }
         }
@@ -67,7 +69,7 @@ oppia.factory('AnswerClassificationService', [
       // If no rule in any answer group returns true, the default 'group' is
       // returned. Throws an error if the default outcome is not defined.
       if (defaultOutcome) {
-        return AnswerClassificationResult.createNew(
+        return AnswerClassificationResultObjectFactory.createNew(
           defaultOutcome, answerGroups.length, 0, DEFAULT_OUTCOME_CLASSIFICATION
         );
       } else {
@@ -96,7 +98,8 @@ oppia.factory('AnswerClassificationService', [
 
     return {
       /**
-       * Gets a promise to the matching answer group.
+       * Classifies the answer according to the answer groups. and returns the
+       * corresponding answer classification result.
        *
        * @param {string} explorationId - The exploration ID.
        * @param {object} oldState - The state where the user submitted the
@@ -107,31 +110,31 @@ oppia.factory('AnswerClassificationService', [
        * @param {function} interactionRulesService - The service which contains
        *   the explicit rules of that interaction.
        *
-       * @return {promise} A promise for an AnswerClassificationResult domain
-       *   object.
+       * @return {AnswerClassificationResult} The resulting
+       *   AnswerClassificationResult domain object.
        */
       getMatchingClassificationResult: function(
           explorationId, stateName, oldState, answer, isInEditorMode,
           interactionRulesService) {
-        var deferred = $q.defer();
-        var result = null;
+        var answerClassificationResult = null;
+
         var answerGroups = oldState.interaction.answerGroups;
         var defaultOutcome = oldState.interaction.defaultOutcome;
         if (interactionRulesService) {
-          result = classifyAnswer(
+          answerClassificationResult = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);
         } else {
           alertsService.addWarning(
             'Something went wrong with the exploration: no ' +
             'interactionRulesService was available.');
-          deferred.reject();
-          return deferred.promise;
+          throw Error(
+            'No interactionRulesService was available to classify the answer.');
         }
 
-        var ruleBasedOutcomeIsDefault = (result.outcome === defaultOutcome);
+        var ruleBasedOutcomeIsDefault = (
+          answerClassificationResult.outcome === defaultOutcome);
         var interactionIsTrainable = INTERACTION_SPECS[
           oldState.interaction.id].is_interaction_trainable;
-
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
           var classifier = StateClassifierMappingService.getClassifier(
@@ -146,18 +149,18 @@ oppia.factory('AnswerClassificationService', [
             if (predictionService) {
               var predictedAnswerGroupIndex = predictionService.predict(
                 classifier.classifierData, answer);
-              result = AnswerClassificationResult.createNew(
-                answerGroups[predictedAnswerGroupIndex].outcome,
-                predictedAnswerGroupIndex,
-                findClassifierRuleIndex(
-                  answerGroups[predictedAnswerGroupIndex]),
-                STATISTICAL_CLASSIFICATION
-              );
+              answerClassificationResult = (
+                AnswerClassificationResultObjectFactory.createNew(
+                  answerGroups[predictedAnswerGroupIndex].outcome,
+                  predictedAnswerGroupIndex,
+                  findClassifierRuleIndex(
+                    answerGroups[predictedAnswerGroupIndex]),
+                  STATISTICAL_CLASSIFICATION));
             }
           }
         }
-        deferred.resolve(result);
-        return deferred.promise;
+
+        return answerClassificationResult;
       }
     };
   }
