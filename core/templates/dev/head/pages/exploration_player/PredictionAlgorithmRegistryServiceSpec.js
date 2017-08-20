@@ -40,7 +40,7 @@ describe('Prediction algorithm registry service', function() {
 
       registryService.setMapping({
         LDAStringClassifier: {
-          1: 'PredictionSampleService'
+          v1: 'PredictionSampleService'
         }
       });
     }));

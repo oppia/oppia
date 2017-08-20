@@ -455,7 +455,9 @@ oppia.controller('StateResponses', [
 
     $scope.isCurrentInteractionTrainable = function() {
       var interactionId = $scope.getCurrentInteractionId();
-      return interactionId && INTERACTION_SPECS[interactionId].is_trainable;
+      return (
+        interactionId &&
+        INTERACTION_SPECS[interactionId].is_trainable);
     };
 
     $scope.isCreatingNewState = function(outcome) {

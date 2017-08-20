@@ -24,7 +24,7 @@ describe('Answer classification service with string classifier disabled',
       module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           RuleTest: {
-            is_interaction_trainable: false
+            is_trainable: false
           }
         });
         $provide.constant('ENABLE_ML_CLASSIFIERS', false);
@@ -228,10 +228,10 @@ describe('Answer classification service with string classifier enabled',
       module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           TrainableInteraction: {
-            is_interaction_trainable: true
+            is_trainable: true
           },
           UntrainableInteraction: {
-            is_interaction_trainable: false
+            is_trainable: false
           }
         });
         $provide.constant('ENABLE_ML_CLASSIFIERS', true);
@@ -335,7 +335,7 @@ describe('Answer classification service with string classifier enabled',
 
       registryService.setMapping({
         LDAStringClassifier: {
-          1: 'PredictionSampleService'
+          v1: 'PredictionSampleService'
         }
       });
 

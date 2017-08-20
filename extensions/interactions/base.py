@@ -80,11 +80,9 @@ class BaseInteraction(object):
     is_terminal = False
     # Whether the interaction has only one possible answer.
     is_linear = False
-    # Whether this interaction supports training and statistical classification.
-    is_trainable = False
-    # Whether this interaction supports the string classifier.
+    # Whether this interaction supports machine learning classification.
     # TODO(chiangs): remove once classifier_services is generalized.
-    is_interaction_trainable = False
+    is_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.

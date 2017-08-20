@@ -30,7 +30,7 @@ oppia.factory('PredictionAlgorithmRegistryService', [
      */
     var algorithmIdPredictionServiceMapping = {
       CodeClassifier: {
-        1: 'CodeReplPredictionService'
+        v1: 'CodeReplPredictionService'
       }
     };
 
@@ -39,8 +39,9 @@ oppia.factory('PredictionAlgorithmRegistryService', [
         if (algorithmIdPredictionServiceMapping.hasOwnProperty(algorithmId)) {
           // We convert dataSchemaVersion to a string below since JS objects
           // can't have integer properties.
-          var serviceName = algorithmIdPredictionServiceMapping[algorithmId][
-            dataSchemaVersion.toString()];
+          var serviceName = (
+            algorithmIdPredictionServiceMapping[algorithmId][
+              'v' + dataSchemaVersion.toString()]);
           return $injector.get(serviceName);
         } else {
           return null;

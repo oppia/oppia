@@ -130,7 +130,7 @@ oppia.factory('AnswerClassificationService', [
 
         var ruleBasedOutcomeIsDefault = (result.outcome === defaultOutcome);
         var interactionIsTrainable = INTERACTION_SPECS[
-          oldState.interaction.id].is_interaction_trainable;
+          oldState.interaction.id].is_trainable;
 
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
