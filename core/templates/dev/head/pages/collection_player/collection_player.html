@@ -147,14 +147,13 @@
         </svg>
 
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-mascot">
-        <a ng-repeat="node in collection.getCollectionNodes()" href="<[getExplorationUrl(node.getExplorationId())]>">
+        <a ng-repeat="node in collection.getCollectionNodes()" href="<[getExplorationUrl(node.getExplorationId())]>" ng-style="{position: 'absolute', left: '<[pathIconParameters[$index].left]>', top: '<[pathIconParameters[$index].top]>'}">
           <svg class="protractor-test-collection-exploration"
                width="100"
                height="125"
                xmlns="http://www.w3.org/2000/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
                version="1.1"
-               ng-attr-style="position: absolute; left: <[pathIconParameters[$index].left]>; top: <[pathIconParameters[$index].top]>;"
                class="protractor-test-collection-node">
             <defs>
               <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
@@ -221,14 +220,13 @@
       <div ng-if="collection" class="oppia-collection-table hidden-md hidden-lg hidden-xl">
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
         <div class="mobile-path-segment" ng-repeat="node in collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
-          <a href="<[getExplorationUrl(node.getExplorationId())]>">
+          <a ng-style="{position: 'absolute', left: '50%', transform: 'translate(-50%, 195px)', 'z-index': '1'}">
             <svg class="protractor-test-collection-exploration"
                  width="100"
                  height="150"
                  xmlns="http://www.w3.org/2000/svg"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
                  version="1.1"
-                 ng-attr-style="position: absolute; left: 50%; transform: translate(-50%, 195px);"
                  ng-click="scrollToLocation('mobile-path-anchor-' + $index); updateExplorationPreview(node.getExplorationId());">
               <image ng-if="!collectionPlaythrough.hasStartedCollection() && $index===0"
                      x="0"
