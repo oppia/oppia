@@ -515,8 +515,8 @@ def get_thread_summaries(user_id, full_thread_ids):
                 feedback_thread_user_models[index] is not None)
             if feedback_thread_user_model_exists:
                 last_message_read = (
-                    last_two_messages[index][0].message_id
-                    in feedback_thread_user_models[index].message_ids_read_by_user)
+                    last_two_messages[index][0].message_id in
+                    feedback_thread_user_models[index].message_ids_read_by_user)
             else:
                 last_message_read = False
 
@@ -529,7 +529,8 @@ def get_thread_summaries(user_id, full_thread_ids):
             second_last_message_read = None
             author_second_last_message = None
 
-            does_second_message_exist = (last_two_messages[index][1] is not None)
+            does_second_message_exist = (
+                last_two_messages[index][1] is not None)
             if does_second_message_exist:
                 if feedback_thread_user_model_exists:
                     second_last_message_read = (
@@ -558,7 +559,8 @@ def get_thread_summaries(user_id, full_thread_ids):
             thread_summary = {
                 'status': thread.status,
                 'original_author_id': thread.original_author_id,
-                'last_updated': utils.get_time_in_millisecs(thread.last_updated),
+                'last_updated': (
+                    utils.get_time_in_millisecs(thread.last_updated)),
                 'last_message_text': last_two_messages[index][0].text,
                 'total_message_count': total_message_count,
                 'last_message_read': last_message_read,
