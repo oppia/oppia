@@ -11,7 +11,7 @@
         <div class="protractor-test-conversation-content"
              angular-html-bind="activeCard.contentHtml">
         </div>
-        <div ng-if="isContentAudioTranslationAvailable()" 
+        <div ng-if="isContentAudioTranslationAvailable()"
              class="conversation-skin-audio-controls">
           <audio-controls audio-translations="contentAudioTranslations">
           </audio-controls>
@@ -161,10 +161,9 @@
     padding: 0 20px;
   }
 
-  .conversation-skin-tutor-card-top-content > p {
+  .conversation-skin-tutor-card-top-content p:not(:last-child) {
     line-height: 28px;
     margin-bottom: 18px;
-    margin-top: 18px;
   }
 
   .conversation-skin-tutor-card-top-content {
