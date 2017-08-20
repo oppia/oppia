@@ -50,7 +50,7 @@ oppia.factory('explorationData', [
     var explorationData = {
       explorationId: explorationId,
       // Note that the changeList is the full changeList since the last
-      // commited version (as opposed to the most recent autosave).
+      // committed version (as opposed to the most recent autosave).
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
         // First save locally to be retrieved later if save is unsuccessful.
         LocalStorageService.saveExplorationDraft(
