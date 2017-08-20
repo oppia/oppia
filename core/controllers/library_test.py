@@ -22,6 +22,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
@@ -40,6 +41,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
 
     def test_library_page(self):
         """Test access to the library page."""
@@ -148,10 +150,10 @@ class LibraryPageTest(test_utils.GenericTestBase):
             objective='Objective B')
         exp_services._save_exploration(  # pylint: disable=protected-access
             self.admin_id, exploration, 'Exploration B', [])
-        rights_manager.publish_exploration(self.admin_id, 'B')
+        rights_manager.publish_exploration(self.admin, 'B')
 
         # Publish exploration A
-        rights_manager.publish_exploration(self.admin_id, 'A')
+        rights_manager.publish_exploration(self.admin, 'A')
 
         exp_services.index_explorations_given_ids(['A', 'B'])
 
@@ -337,6 +339,8 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
         self.save_new_valid_exploration(
             self.PRIVATE_EXP_ID_EDITOR, self.editor_id)
         self.save_new_valid_exploration(
@@ -345,7 +349,7 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
             self.PRIVATE_EXP_ID_VIEWER, self.viewer_id)
 
         rights_manager.publish_exploration(
-            self.editor_id, self.PUBLIC_EXP_ID_EDITOR)
+            self.editor, self.PUBLIC_EXP_ID_EDITOR)
 
     def test_can_get_public_exploration_summaries(self):
         self.login(self.VIEWER_EMAIL)
@@ -387,7 +391,7 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
         # If the viewer user is granted edit access to the editor user's
         # private exploration, then it will show up for the next request.
         rights_manager.assign_role_for_exploration(
-            self.editor_id, self.PRIVATE_EXP_ID_EDITOR, self.viewer_id,
+            self.editor, self.PRIVATE_EXP_ID_EDITOR, self.viewer_id,
             rights_manager.ROLE_EDITOR)
 
         response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {

@@ -76,6 +76,8 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
@@ -172,13 +174,13 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
         # Publish explorations 0-6. Private explorations should not show up in
         # a search query, even if they're indexed.
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_2)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_3)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_4)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_5)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_6)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_4)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_5)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_6)
 
         # Add the explorations to the search index.
         exp_services.index_explorations_given_ids([
@@ -514,7 +516,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_update_exploration_by_migration_bot(self):
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='end')
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [{
@@ -1362,7 +1364,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
     def test_record_commit_message(self):
         """Check published explorations record commit messages."""
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
@@ -1377,7 +1379,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
     def test_demand_commit_message(self):
         """Check published explorations demand commit messages"""
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
         with self.assertRaisesRegexp(
             ValueError,
@@ -1463,7 +1465,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Publish the exploration. This does not affect the exploration version
         # history.
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_ID)
@@ -1805,6 +1807,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
 
         # This needs to be done in a toplevel wrapper because the datastore
         # puts to the event log are asynchronous.
@@ -1837,9 +1841,9 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             with self.assertRaisesRegexp(
                 Exception, 'This exploration cannot be published'
                 ):
-                rights_manager.publish_exploration(self.bob_id, self.EXP_ID_2)
+                rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
 
-            rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+            rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         populate_datastore()
 
@@ -1967,8 +1971,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         # expecting the last exploration to be indexed.
         for i in xrange(4):
             rights_manager.publish_exploration(
-                self.owner_id,
-                expected_exp_ids[i])
+                self.owner, expected_exp_ids[i])
 
         with add_docs_swap:
             exp_services.index_explorations_given_ids(all_exp_ids)
@@ -2130,7 +2133,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_search_rank(self.EXP_ID), base_search_rank)
 
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         self.assertEqual(
             exp_services.get_search_rank(self.EXP_ID), base_search_rank)
 
@@ -2191,10 +2194,10 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_exploration(
-            self.owner_id, self.EXP_ID, self.viewer_id,
+            self.owner, self.EXP_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         rights_manager.assign_role_for_exploration(
-            self.owner_id, self.EXP_ID, self.editor_id,
+            self.owner, self.EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
         # Check that owner and editor may edit, but not viewer.
@@ -2319,6 +2322,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
@@ -2350,12 +2355,12 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
             Exception, 'This exploration cannot be published'
             ):
-            rights_manager.publish_exploration(self.bob_id, self.EXP_ID_2)
+            rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
     def test_get_non_private_exploration_summaries(self):

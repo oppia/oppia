@@ -33,7 +33,6 @@ from google.appengine.api import users
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -143,9 +142,7 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user = current_user_services.get_current_user()
-        self.user_id = current_user_services.get_user_id(
-            self.user) if self.user else None
+        self.user_id = current_user_services.get_current_user_id()
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
@@ -156,7 +153,7 @@ class BaseHandler(webapp2.RequestHandler):
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
             if user_settings is None:
-                email = current_user_services.get_user_email(self.user)
+                email = current_user_services.get_current_user_email()
                 user_settings = user_services.create_new_user(
                     self.user_id, email)
             self.values['user_email'] = user_settings.email
@@ -187,16 +184,14 @@ class BaseHandler(webapp2.RequestHandler):
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
-        self.actions = role_services.get_all_actions(self.role)
+        self.user = user_services.UserActionsInfo(self.user_id)
 
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
-        self.values['is_moderator'] = bool(
-            self.role == feconf.ROLE_ID_MODERATOR or
-            self.role == feconf.ROLE_ID_ADMIN)
-        self.values['is_admin'] = bool(
-            self.role == feconf.ROLE_ID_ADMIN)
+        self.values['is_moderator'] = user_services.is_at_least_moderator(
+            self.user_id)
+        self.values['is_admin'] = user_services.is_admin(self.user_id)
         self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):
