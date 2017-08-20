@@ -82,8 +82,8 @@
        */
        getExplorationDraft: function(explorationId) {
          if (storage) {
-           var saveObject = JSON.parse(storage.getItem(_createExplorationDraftKey(
-             explorationId)));
+           var saveObject = JSON.parse(
+             storage.getItem(_createExplorationDraftKey(explorationId)));
            if (saveObject) {
              return ExplorationDraftObjectFactory.createFromDict(saveObject);
            }
