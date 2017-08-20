@@ -10,7 +10,7 @@
                              objective="activity.objective"
                              thumbnail-icon-url="activity.thumbnail_icon_url"
                              thumbnail-bg-color="activity.thumbnail_bg_color"
-                             style="margin-right: 3px; position: relative; z-index: 5;">
+                             learner-dashboard-activity-ids="getLearnerDashboardActivityIds()">
     </collection-summary-tile>
     <exploration-summary-tile ng-if="activity.activity_type === 'exploration'"
                               exploration-id="activity.id"
@@ -26,8 +26,7 @@
                               is-community-owned="activity.community_owned"
                               is-community-editable="activity.community_editable"
                               class="protractor-test-exp-summary-tile"
-                              learner-dashboard-activity-ids="getLearnerDashboardActivityIds()"
-                              style="position: relative; z-index: 5;">
+                              learner-dashboard-activity-ids="getLearnerDashboardActivityIds()">
     </exploration-summary-tile>
   </div>
 </div>

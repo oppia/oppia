@@ -128,23 +128,14 @@ oppia.directive('explorationSummaryTile', [
             if ($scope.learnerDashboardActivityIds) {
               var incompleteExplorationIds = (
                 $scope.learnerDashboardActivityIds.incomplete_exploration_ids);
-              var incompleteCollectionIds = (
-                $scope.learnerDashboardActivityIds.incomplete_collection_ids);
               var completedExplorationIds = (
                 $scope.learnerDashboardActivityIds.completed_exploration_ids);
-              var completedCollectionIds = (
-                $scope.learnerDashboardActivityIds.completed_collection_ids);
               var explorationPlaylistIds = (
                 $scope.learnerDashboardActivityIds.exploration_playlist_ids);
-              var collectionPlaylistIds = (
-                $scope.learnerDashboardActivityIds.collection_playlist_ids);
 
               if (incompleteExplorationIds.indexOf(activityId) !== -1 ||
-                  incompleteCollectionIds.indexOf(activityId) !== -1 ||
                   completedExplorationIds.indexOf(activityId) !== -1 ||
-                  completedCollectionIds.indexOf(activityId) !== -1 ||
-                  explorationPlaylistIds.indexOf(activityId) !== -1 ||
-                  collectionPlaylistIds.indexOf(activityId) !== -1) {
+                  explorationPlaylistIds.indexOf(activityId) !== -1) {
                 return false;
               } else {
                 return hoverOverActivity && (activeActivityId == activityId);
@@ -181,9 +172,6 @@ oppia.directive('explorationSummaryTile', [
 
             if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
               $scope.learnerDashboardActivityIds.exploration_playlist_ids.push(
-                activityId);
-            } else {
-              $scope.learnerDashboardActivityIds.collection_playlist_ids.push(
                 activityId);
             }
           };
@@ -238,14 +226,6 @@ oppia.directive('explorationSummaryTile', [
                     activityId));
                 if (index !== -1) {
                   $scope.learnerDashboardActivityIds.exploration_playlist_ids.splice(
-                    index, 1);
-                }
-              } else {
-                var index = (
-                  $scope.learnerDashboardActivityIds.collection_playlist_ids.indexOf(
-                    activityId));
-                if (index !== -1) {
-                  $scope.learnerDashboardActivityIds.collection_playlist_ids.splice(
                     index, 1);
                 }
               }

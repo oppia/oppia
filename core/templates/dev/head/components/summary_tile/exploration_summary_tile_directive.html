@@ -1,3 +1,4 @@
+<span ng-if="learnerDashboardActivityIds">
 <i class="protractor-test-add-exp-to-playlist-icon oppia-learner-dashboard-icon fa fa-clock-o"
    ng-show="showAddToLearnerPlaylistIcon(getExplorationId())"
    ng-click="addToLearnerPlaylist(explorationType, getExplorationId())"
@@ -6,26 +7,27 @@
    tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-clock-o"
-   ng-if="learnerDashboardActivityIds.exploration_playlist_ids.indexOf(getExplorationId()) !== -1 || learnerDashboardActivityIds.collection_playlist_ids.indexOf(getExplorationId()) !== -1"
+   ng-if="learnerDashboardActivityIds.exploration_playlist_ids.indexOf(getExplorationId()) !== -1"
    ng-click="removeFromLearnerPlaylist(getExplorationId(), explorationType, getExplorationTitle())"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-check-circle-o"
-   ng-if="learnerDashboardActivityIds.completed_exploration_ids.indexOf(getExplorationId()) !== -1 || learnerDashboardActivityIds.completed_collection_ids.indexOf(getExplorationId()) !== -1 "
+   ng-if="learnerDashboardActivityIds.completed_exploration_ids.indexOf(getExplorationId()) !== -1"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-spinner"
-   ng-if="learnerDashboardActivityIds.incomplete_exploration_ids.indexOf(getExplorationId()) !== -1 || learnerDashboardActivityIds.incomplete_collection_ids.indexOf(getExplorationId()) !== -1"
+   ng-if="learnerDashboardActivityIds.incomplete_exploration_ids.indexOf(getExplorationId()) !== -1"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate]>"
    tooltip-placement="left"></i>
+</span>
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': playlistMode}]"
          ng-mouseenter="setHoverOverActivity(getExplorationId())" ng-mouseleave="setHoverOverActivity(getExplorationId())"
          style="position: relative; z-index: 5;">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
-    <div class="title-section" style="background-color: <[getThumbnailBgColor()]>; position: relative; z-index: 5;">
+    <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
       <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="playlistMode && {'top': '6px', 'width': '60px'}">
       <h3 class="activity-title protractor-test-exp-summary-tile-title" ng-style="playlistMode && {'width': '93%'}">
         <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
@@ -33,16 +35,7 @@
       </h3>
 
       <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
-      <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
-        <div>
-          <circular-image ng-if="avatarsList.length > 0"
-                          src="avatarsList[0].image"
-                          link="avatarsList[0].link"
-                          tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
-                          tooltip-placement="right">
-          </circular-image>
-        </div>
-      </div>
+
     </div>
     <div ng-if="!playlistMode" class="title-section-mask"></div>
     <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>" class="summary-section">
