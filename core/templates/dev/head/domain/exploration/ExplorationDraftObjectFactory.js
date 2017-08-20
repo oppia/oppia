@@ -32,11 +32,11 @@
        return this.draftChanges;
      };
 
-     ExplorationDraft.createFromDict = function(
-       explorationDraftDict) {
+     ExplorationDraft.createFromJSON = function(
+       explorationDraftJSON) {
        return new ExplorationDraft(
-         explorationDraftDict.draftChanges,
-         explorationDraftDict.draftChangeListId);
+         explorationDraftJSON.draftChanges,
+         explorationDraftJSON.draftChangeListId);
      };
      return ExplorationDraft;
    }

@@ -85,7 +85,7 @@
            var saveObject = JSON.parse(
              storage.getItem(_createExplorationDraftKey(explorationId)));
            if (saveObject) {
-             return ExplorationDraftObjectFactory.createFromDict(saveObject);
+             return ExplorationDraftObjectFactory.createFromJSON(saveObject);
            }
          }
          return null;
