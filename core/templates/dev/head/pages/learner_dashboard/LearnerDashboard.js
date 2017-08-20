@@ -268,10 +268,10 @@ oppia.controller('LearnerDashboard', [
             $scope.threadSummaries[index].threadId === threadId) {
           threadIndex = index;
           var threadSummary = $scope.threadSummaries[index];
-          threadSummary.markTheLastTwoMessagesAsRead();
           if (!threadSummary.lastMessageRead) {
             $scope.numberOfUnreadThreads -= 1;
           }
+          threadSummary.markTheLastTwoMessagesAsRead();
         }
       }
 
