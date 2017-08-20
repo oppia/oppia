@@ -85,7 +85,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             self.assertEqual(
                 recommendations, ['exp_id_4', 'exp_id_2', 'exp_id_3'])
 
-            rights_manager.unpublish_exploration(self.admin_id, 'exp_id_4')
+            rights_manager.unpublish_exploration(self.admin, 'exp_id_4')
 
             self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(

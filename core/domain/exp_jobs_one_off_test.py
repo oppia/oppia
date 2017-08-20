@@ -21,6 +21,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -87,6 +88,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.login(self.ADMIN_EMAIL)
             admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
             self.set_admins([self.ADMIN_USERNAME])
+            admin = user_services.UserActionsInfo(admin_id)
 
             # Create and delete an exploration (to make sure job handles
             # deleted explorations correctly).
@@ -116,7 +118,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
 
                 # Publish exploration.
                 if spec['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
-                    rights_manager.publish_exploration(admin_id, exp_id)
+                    rights_manager.publish_exploration(admin, exp_id)
 
                 # Do not include user_id here, so all explorations are not
                 # editable for now (will be updated depending on user_id
@@ -215,10 +217,12 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner = user_services.UserActionsInfo(owner_id)
+        admin = user_services.UserActionsInfo(admin_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID, owner_id, end_state_name='End')
-        rights_manager.publish_exploration(owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(owner, self.EXP_ID)
         job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
@@ -233,8 +237,8 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         self.assertLess(
             exp_first_published, last_updated_time_msec)
 
-        rights_manager.unpublish_exploration(admin_id, self.EXP_ID)
-        rights_manager.publish_exploration(owner_id, self.EXP_ID)
+        rights_manager.unpublish_exploration(admin, self.EXP_ID)
+        rights_manager.publish_exploration(owner, self.EXP_ID)
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -555,6 +559,7 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s%s' % (self.EXP_ID, i),
@@ -564,7 +569,7 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
-            rights_manager.publish_exploration(self.owner_id, exp.id)
+            rights_manager.publish_exploration(self.owner, exp.id)
 
         self.process_and_flush_pending_tasks()
 

@@ -265,9 +265,9 @@ oppia.factory('changeListService', [
       confirmed_unclassified_answers: true,
       content: true,
       default_outcome: true,
-      fallbacks: true,
       hints: true,
       param_changes: true,
+      solution: true,
       state_name: true,
       widget_customization_args: true,
       widget_id: true
@@ -884,15 +884,17 @@ oppia.factory('explorationParamChangesService', [
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope',
+  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'explorationGadgetsService',
-  'StatesObjectFactory',
+  'StatesObjectFactory', 'SolutionValidityService', 'angularNameService',
+  'AnswerClassificationService', 'explorationContextService',
   function(
-      $log, $modal, $filter, $location, $rootScope,
+      $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, explorationGadgetsService,
-      StatesObjectFactory) {
+      StatesObjectFactory, SolutionValidityService, angularNameService,
+      AnswerClassificationService, explorationContextService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -913,11 +915,6 @@ oppia.factory('explorationStatesService', [
           return null;
         }
       },
-      fallbacks: function(fallbacks) {
-        return fallbacks.map(function(fallback) {
-          return fallback.toBackendDict();
-        });
-      },
       hints: function(hints) {
         return hints.map(function(hint) {
           return hint.toBackendDict();
@@ -927,6 +924,13 @@ oppia.factory('explorationStatesService', [
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
         });
+      },
+      solution: function(solution) {
+        if (solution) {
+          return solution.toBackendDict();
+        } else {
+          return null;
+        }
       }
     };
 
@@ -938,8 +942,8 @@ oppia.factory('explorationStatesService', [
       content: ['content'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
-      fallbacks: ['interaction', 'fallbacks'],
       hints: ['interaction', 'hints'],
+      solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs']
     };
@@ -1005,6 +1009,26 @@ oppia.factory('explorationStatesService', [
     return {
       init: function(statesBackendDict) {
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
+        // Initialize the solutionValidityService.
+        SolutionValidityService.init(_states.getStateNames());
+        _states.getStateNames().forEach(function(stateName) {
+          var solution = _states.getState(stateName).interaction.solution;
+          if (solution) {
+            var result = (
+              AnswerClassificationService.getMatchingClassificationResult(
+                explorationContextService.getExplorationId(),
+              stateName,
+              _states.getState(stateName),
+              solution.correctAnswer,
+              true,
+              $injector.get(
+                angularNameService.getNameOfInteractionRulesService(
+                  _states.getState(stateName).interaction.id))));
+            var solutionIsValid = stateName !== result.outcome.dest;
+            SolutionValidityService.updateValidity(
+              stateName, solutionIsValid);
+          }
+        });
       },
       getStates: function() {
         return angular.copy(_states);
@@ -1030,6 +1054,15 @@ oppia.factory('explorationStatesService', [
         }
         return (
           validatorsService.isValidStateName(newStateName, showWarnings));
+      },
+      isSolutionValid: function(stateName) {
+        return SolutionValidityService.isSolutionValid(stateName);
+      },
+      updateSolutionValidity: function(stateName, solutionIsValid) {
+        SolutionValidityService.updateValidity(stateName, solutionIsValid);
+      },
+      deleteSolutionValidity: function(stateName) {
+        SolutionValidityService.deleteSolutionValidity(stateName);
       },
       getStateContentMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'content');
@@ -1077,17 +1110,17 @@ oppia.factory('explorationStatesService', [
       saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
       },
-      getFallbacksMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'fallbacks');
-      },
-      saveFallbacks: function(stateName, newFallbacks) {
-        saveStateProperty(stateName, 'fallbacks', newFallbacks);
-      },
       getHintsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'hints')
       },
       saveHints: function(stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);
+      },
+      getSolutionMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'solution');
+      },
+      saveSolution: function(stateName, newSolution) {
+        saveStateProperty(stateName, 'solution', newSolution);
       },
       isInitialized: function() {
         return _states != null;
@@ -1345,20 +1378,20 @@ oppia.factory('stateCustomizationArgsService', [
   }
 ]);
 
-// A data service that stores the current interaction fallbacks.
-oppia.factory('stateFallbacksService', [
-  'statePropertyService', function(statePropertyService) {
-    var child = Object.create(statePropertyService);
-    child.setterMethodKey = 'saveFallbacks';
-    return child;
-  }
-]);
-
 // A data service that stores the current interaction hints.
 oppia.factory('stateHintsService', [
   'statePropertyService', function(statePropertyService) {
     var child = Object.create(statePropertyService);
     child.setterMethodKey = 'saveHints';
+    return child;
+  }
+]);
+
+// A data service that stores the current interaction solution.
+oppia.factory('stateSolutionService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveSolution';
     return child;
   }
 ]);
@@ -1770,7 +1803,6 @@ oppia.factory('computeGraphService', [
             links.push({
               source: stateName,
               target: groups[h].outcome.dest,
-              isFallback: false
             });
           }
 
@@ -1778,16 +1810,6 @@ oppia.factory('computeGraphService', [
             links.push({
               source: stateName,
               target: interaction.defaultOutcome.dest,
-              isFallback: false
-            });
-          }
-
-          var fallbacks = interaction.fallbacks;
-          for (var h = 0; h < fallbacks.length; h++) {
-            links.push({
-              source: stateName,
-              target: fallbacks[h].outcome.dest,
-              isFallback: true
             });
           }
         }
@@ -1897,20 +1919,22 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   ADD_INTERACTION: 'Please add an interaction to this card.',
   STATE_UNREACHABLE: 'This card is unreachable.',
   UNABLE_TO_END_EXPLORATION: (
-    'There\'s no way to complete the exploration starting from this card.')
+    'There\'s no way to complete the exploration starting from this card.'),
+  INCORRECT_SOLUTION: (
+    'The current solution does not lead to another card.')
 });
 
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
+  'parameterMetadataService', 'INTERACTION_SPECS',
+  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
+      parameterMetadataService, INTERACTION_SPECS,
+      WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1929,6 +1953,19 @@ oppia.factory('explorationWarningsService', [
       return statesWithoutInteractionIds;
     };
 
+    var _getStatesWithIncorrectSolution = function() {
+      var statesWithIncorrectSolution = [];
+
+      var states = explorationStatesService.getStates();
+      states.getStateNames().forEach(function(stateName) {
+        if (states.getState(stateName).interaction.solution &&
+            !explorationStatesService.isSolutionValid(stateName)) {
+          statesWithIncorrectSolution.push(stateName);
+        }
+      });
+      return statesWithIncorrectSolution;
+    };
+
     // Returns a list of names of all nodes which are unreachable from the
     // initial node.
     //
@@ -1937,11 +1974,9 @@ oppia.factory('explorationWarningsService', [
     // - nodes: an object whose keys are node ids, and whose values are node
     //     names
     // - edges: a list of edges, each of which is an object with keys 'source',
-    //     'target', and 'isFallback'
-    // - allowFallbackEdges: a boolean specifying whether to treat fallback
-    //     edges as valid edges for the purposes of this computation.
+    //     and 'target'.
     var _getUnreachableNodeNames = function(
-        initNodeIds, nodes, edges, allowFallbackEdges) {
+        initNodeIds, nodes, edges) {
       var queue = initNodeIds;
       var seen = {};
       for (var i = 0; i < initNodeIds.length; i++) {
@@ -1950,8 +1985,7 @@ oppia.factory('explorationWarningsService', [
       while (queue.length > 0) {
         var currNodeId = queue.shift();
         edges.forEach(function(edge) {
-          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target) &&
-              (allowFallbackEdges || !edge.isFallback)) {
+          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
             seen[edge.target] = true;
             queue.push(edge.target);
           }
@@ -1977,7 +2011,6 @@ oppia.factory('explorationWarningsService', [
         return {
           source: link.target,
           target: link.source,
-          isFallback: link.isFallback
         };
       });
     };
@@ -2095,9 +2128,16 @@ oppia.factory('explorationWarningsService', [
         }
       });
 
+      var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
+      angular.forEach(statesWithIncorrectSolution, function(state) {
+        if (stateWarnings.hasOwnProperty(state)) {
+          stateWarnings[state].push(STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
+        } else {
+          stateWarnings[state] = [STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
+        }
+      });
+
       if (_graphData) {
-        // Note that it is fine for states to be reachable by means of fallback
-        // edges only.
         var unreachableStateNames = _getUnreachableNodeNames(
           [_graphData.initStateId], _graphData.nodes, _graphData.links, true);
 
@@ -2113,8 +2153,7 @@ oppia.factory('explorationWarningsService', [
             }
           });
         } else {
-          // Only perform this check if all states are reachable. There must be
-          // a non-fallback path from each state to the END state.
+          // Only perform this check if all states are reachable.
           var deadEndStates = _getUnreachableNodeNames(
             _graphData.finalStateIds, _graphData.nodes,
             _getReversedLinks(_graphData.links), false);

@@ -132,8 +132,7 @@ class ExplorationPageEmbed(base.BaseHandler):
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
         can_edit = rights_manager.check_can_edit_activity(
-            self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
-            exploration_rights)
+            self.user, exploration_rights)
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
@@ -178,8 +177,7 @@ class ExplorationPage(base.BaseHandler):
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
         can_edit = rights_manager.check_can_edit_activity(
-            self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
-            exploration_rights)
+            self.user, exploration_rights)
 
         try:
             # If the exploration does not exist, a 404 error is raised.
@@ -235,8 +233,7 @@ class ExplorationHandler(base.BaseHandler):
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
-                    self.user_id, self.actions,
-                    constants.ACTIVITY_TYPE_EXPLORATION, exploration_rights)),
+                    self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),

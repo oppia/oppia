@@ -820,130 +820,6 @@ var expectCannotAddResponse = function() {
     '.protractor-test-open-add-response-modal')).isPresent()).toBeFalsy();
 };
 
-// FALLBACKS
-
-// Fallbacks are zero-indexed.
-var FallbackEditor = function(fallbackNum) {
-  var headerElem = element.all(by.css('.protractor-test-fallback-tab')).get(
-    fallbackNum);
-
-  var fallbackBodyElem = element(
-    by.css('.protractor-test-fallback-body-' + fallbackNum));
-  fallbackBodyElem.isPresent().then(function(isVisible) {
-    if (!isVisible) {
-      headerElem.click();
-    }
-  });
-
-  return {
-    setFeedback: function(richTextInstructions) {
-      // Begin editing feedback.
-      element(by.css('.protractor-test-open-outcome-feedback-editor')).click();
-
-      // Set feedback contents.
-      var feedbackElement = element(by.css(
-        '.protractor-test-edit-outcome-feedback'));
-      _setOutcomeFeedback(feedbackElement, richTextInstructions);
-
-      // Save feedback.
-      element(by.css('.protractor-test-save-outcome-feedback')).click();
-    },
-    // This saves the rule after the destination is selected.
-    //  - destinationName: The name of the state to move to, or null to stay on
-    //    the same state.
-    //  - createState: whether the destination state is new and must be created
-    //    at this point.
-    setDestination: function(destinationName, createState) {
-      // Begin editing destination.
-      element(by.css('.protractor-test-open-outcome-dest-editor')).click();
-
-      // Set destination contents.
-      var destElement = element(by.css(
-        '.protractor-test-edit-outcome-dest'));
-      _setOutcomeDest(destElement, destinationName, createState);
-
-      // Save destination.
-      element(by.css('.protractor-test-save-outcome-dest')).click();
-    },
-    // eslint-disable-next-line quote-props
-    delete: function() {
-      headerElem.element(by.css('.protractor-test-delete-response')).click();
-      element(by.css('.protractor-test-confirm-delete-fallback')).click();
-    },
-    expectCannotChangeTriggerCondition: function() {
-      var triggerEditorElem = element(by.css(
-        '.protractor-test-open-trigger-editor'));
-      expect(triggerEditorElem.isPresent()).toBeFalsy();
-    },
-    expectCannotSetFeedback: function() {
-      var feedbackEditorElem = element(by.css(
-        '.protractor-test-open-outcome-feedback-editor'));
-      expect(feedbackEditorElem.isPresent()).toBeFalsy();
-    },
-    expectCannotSetDestination: function() {
-      var destEditorElem = element(by.css(
-        '.protractor-test-open-outcome-dest-editor'));
-      expect(destEditorElem.isPresent()).toBeFalsy();
-    },
-    expectCannotDeleteFallback: function() {
-      expect(headerElem.element(by.css(
-        '.protractor-test-delete-response')).isPresent()).toBeFalsy();
-    }
-  };
-};
-
-var expectCannotAddFallback = function() {
-  expect(element(by.css(
-    '.protractor-test-open-add-response-modal')).isPresent()).toBeFalsy();
-};
-
-// This clicks the "add new fallback" button and then selects the fallback
-// trigger, enters its feedback and destination, and closes the fallback
-// editor. It takes the following arguments:
-// - numSubmits: the number of incorrect submits needed to trigger the fallback.
-// - feedbackInstructions: a rich-text object containing feedback, or null.
-// - destStateName: the name of the destination state of the rule, or null if
-//     the rule loops to the current state.
-// - createState: true if the user creates a new state, else false.
-//
-// Note that feedbackInstructions may be null (which means 'specify no
-// feedback'), and only represents a single feedback element.
-var addFallback = function(
-    numSubmits, feedbackInstructions, destStateName, createState) {
-  // Open the "Add Feedback" modal if it is not already open.
-  var headerElem = element(by.css(
-    '.protractor-test-add-fallback-modal-header'));
-  headerElem.isPresent().then(function(isVisible) {
-    if (!isVisible) {
-      element(by.css('.protractor-test-open-add-fallback-modal')).click();
-      general.waitForSystem();
-    }
-  });
-
-  var fallbackElem = element(by.css('.protractor-test-add-fallback-details'));
-
-  // Set the fallback description.
-  var numSubmitsField = fallbackElem.element(
-    by.css('.protractor-test-fallback-num-submits'));
-  var intEditor = forms.getEditor('Real')(numSubmitsField);
-  intEditor.setValue(numSubmits);
-
-  if (feedbackInstructions) {
-    // Set feedback contents.
-    _setOutcomeFeedback(fallbackElem, feedbackInstructions);
-  }
-
-  // If the destination is being changed, open the corresponding editor.
-  if (destStateName) {
-    // Set destination contents.
-    _setOutcomeDest(fallbackElem, destStateName, createState);
-  }
-
-  // Close the modal.
-  element(by.css('.protractor-test-add-new-fallback')).click();
-  general.waitForSystem();
-};
-
 // STATE GRAPH
 
 // NOTE: if the state is not visible in the state graph this function will fail
@@ -1070,12 +946,6 @@ var enableParameters = function() {
 var enableGadgets = function() {
   runFromSettingsTab(function() {
     element(by.css('.protractor-test-enable-gadgets')).click();
-  });
-};
-
-var enableFallbacks = function() {
-  runFromSettingsTab(function() {
-    element(by.css('.protractor-test-enable-fallbacks')).click();
   });
 };
 
@@ -1448,6 +1318,67 @@ var sendResponseToLatestFeedback = function(feedbackResponse) {
     click();
 };
 
+var addHint = function(hint) {
+  element(by.css('.protractor-test-oppia-add-hint-button')).click();
+  general.waitForSystem();
+  element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
+    .last().click();
+  browser.switchTo().activeElement().sendKeys(hint);
+  general.waitForSystem();
+  element(by.css('.protractor-test-save-hint')).click();
+};
+
+// Hints are zero-indexed.
+var HintEditor = function(hintNum) {
+  var headerElem = element.all(by.css('.protractor-test-hint-tab')).get(
+    hintNum);
+
+  var hintBodyElem = element(
+    by.css('.protractor-test-hint-body-' + hintNum));
+  hintBodyElem.isPresent().then(function(isVisible) {
+    if (!isVisible) {
+      headerElem.click();
+    }
+  });
+
+  return {
+    setHint: function(hint) {
+      hintBodyElem.click();
+      hintBodyElem.all(by.tagName('p')).click();
+      browser.switchTo().activeElement().clear();
+      browser.switchTo().activeElement().sendKeys(hint);
+      general.waitForSystem();
+      element(by.css('.protractor-test-save-hint-edit')).click();
+    },
+    deleteHint: function() {
+      headerElem.element(by.css('.protractor-test-delete-response')).click();
+      element(by.css('.protractor-test-confirm-delete-hint')).click();
+    },
+    expectCannotDeleteHint: function() {
+      expect(headerElem.element(by.css(
+        '.protractor-test-delete-response')).isPresent()).toBeFalsy();
+    }
+  };
+};
+
+var addSolution = function(interactionId, solution) {
+  element(by.css('.protractor-test-oppia-add-solution-button')).click();
+  browser.waitForAngular();
+  general.waitForSystem();
+  interactions.getInteraction(interactionId).submitAnswer(
+    element(by.css('.protractor-test-interaction-html')),
+    solution.correctAnswer);
+  general.waitForSystem();
+  browser.waitForAngular();
+  element(by.css('.protractor-test-explanation-textarea'))
+    .all(by.tagName('p')).first().click();
+  browser.switchTo().activeElement().sendKeys(solution.explanation);
+  browser.waitForAngular();
+  general.waitForSystem();
+  element(by.css('.protractor-test-submit-solution-button')).click();
+  general.waitForSystem();
+};
+
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 exports.startTutorial = startTutorial;
 exports.progressInTutorial = progressInTutorial;
@@ -1497,9 +1428,10 @@ exports.expectCannotAddResponse = expectCannotAddResponse;
 
 exports.setDefaultOutcome = setDefaultOutcome;
 
-exports.addFallback = addFallback;
-exports.FallbackEditor = FallbackEditor;
-exports.expectCannotAddFallback = expectCannotAddFallback;
+exports.HintEditor = HintEditor;
+exports.addHint = addHint;
+
+exports.addSolution = addSolution;
 
 exports.moveToState = moveToState;
 exports.deleteState = deleteState;
@@ -1514,7 +1446,6 @@ exports.expectAvailableFirstStatesToBe = expectAvailableFirstStatesToBe;
 exports.setFirstState = setFirstState;
 exports.enableParameters = enableParameters;
 exports.enableGadgets = enableGadgets;
-exports.enableFallbacks = enableFallbacks;
 exports.openAndClosePreviewSummaryTile = openAndClosePreviewSummaryTile;
 
 exports.saveChanges = saveChanges;

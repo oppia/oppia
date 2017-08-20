@@ -56,7 +56,6 @@ describe('StateImprovementSuggestionService', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []
@@ -91,7 +90,6 @@ describe('StateImprovementSuggestionService', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []
@@ -122,7 +120,6 @@ describe('StateImprovementSuggestionService', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []
@@ -157,7 +154,6 @@ describe('StateImprovementSuggestionService', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []
@@ -188,7 +184,6 @@ describe('StateImprovementSuggestionService', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []

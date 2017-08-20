@@ -29,6 +29,7 @@ class LogicProof(base.BaseInteraction):
     instructions = 'Construct a proof'
     narrow_instructions = 'Construct a proof'
     needs_summary = True
+    can_have_solution = True
 
     _customization_arg_specs = [{
         'name': 'question',

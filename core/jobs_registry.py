@@ -51,7 +51,6 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
-    user_jobs_one_off.UserRolesMigrationOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
 ]
 

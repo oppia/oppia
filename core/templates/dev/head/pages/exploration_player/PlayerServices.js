@@ -289,6 +289,9 @@ oppia.factory('oppiaPlayerService', [
         }
         return randomSuffix;
       },
+      getSolution: function(stateName) {
+        return exploration.getInteraction(stateName).solution;
+      },
       isLoggedIn: function() {
         return _isLoggedIn;
       },
@@ -303,78 +306,78 @@ oppia.factory('oppiaPlayerService', [
         answerIsBeingProcessed = true;
         var oldStateName = playerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
-        AnswerClassificationService.getMatchingClassificationResult(
-          _explorationId, oldStateName, oldState, answer, false,
-          interactionRulesService
-        ).then(function(classificationResult) {
-          if (!_editorPreviewMode) {
-            StatsReportingService.recordAnswerSubmitted(
-              oldStateName,
-              LearnerParamsService.getAllParams(),
-              answer,
-              classificationResult.answerGroupIndex,
-              classificationResult.ruleIndex,
-              classificationResult.classificationCategorization);
-          }
+        var classificationResult = (
+          AnswerClassificationService.getMatchingClassificationResult(
+            _explorationId, oldStateName, oldState, answer, false,
+            interactionRulesService));
 
-          // Use angular.copy() to clone the object
-          // since classificationResult.outcome points
-          // at oldState.interaction.default_outcome
-          var outcome = angular.copy(classificationResult.outcome);
+        if (!_editorPreviewMode) {
+          StatsReportingService.recordAnswerSubmitted(
+            oldStateName,
+            LearnerParamsService.getAllParams(),
+            answer,
+            classificationResult.answerGroupIndex,
+            classificationResult.ruleIndex,
+            classificationResult.classificationCategorization);
+        }
 
-          var newStateName = outcome.dest;
-          var newState = exploration.getState(newStateName);
+        // Use angular.copy() to clone the object
+        // since classificationResult.outcome points
+        // at oldState.interaction.default_outcome
+        var outcome = angular.copy(classificationResult.outcome);
 
-          // Compute the data for the next state.
-          var oldParams = LearnerParamsService.getAllParams();
-          oldParams.answer = answer;
-          var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
-          if (feedbackHtml === null) {
-            answerIsBeingProcessed = false;
-            alertsService.addWarning('Expression parsing error.');
-            return;
-          }
+        var newStateName = outcome.dest;
+        var newState = exploration.getState(newStateName);
 
-          var newParams = (
-            newState ? makeParams(
-              oldParams, newState.paramChanges, [oldParams]) : oldParams);
-          if (newParams === null) {
-            answerIsBeingProcessed = false;
-            alertsService.addWarning('Expression parsing error.');
-            return;
-          }
-
-          var questionHtml = makeQuestion(newState, [newParams, {
-            answer: 'answer'
-          }]);
-          if (questionHtml === null) {
-            answerIsBeingProcessed = false;
-            alertsService.addWarning('Expression parsing error.');
-            return;
-          }
-
-          // TODO(sll): Remove the 'answer' key from newParams.
-          newParams.answer = answer;
-
+        // Compute the data for the next state.
+        var oldParams = LearnerParamsService.getAllParams();
+        oldParams.answer = answer;
+        var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
+        if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
+          alertsService.addWarning('Expression parsing error.');
+          return;
+        }
 
-          oldStateName = playerTranscriptService.getLastStateName();
-          var refreshInteraction = (
-            oldStateName !== newStateName ||
-            exploration.isInteractionInline(oldStateName));
+        var newParams = (
+          newState ? makeParams(
+            oldParams, newState.paramChanges, [oldParams]) : oldParams);
+        if (newParams === null) {
+          answerIsBeingProcessed = false;
+          alertsService.addWarning('Expression parsing error.');
+          return;
+        }
 
-          if (!_editorPreviewMode) {
-            StatsReportingService.recordStateTransition(
-              oldStateName, newStateName, answer,
-              LearnerParamsService.getAllParams());
-          }
+        var questionHtml = makeQuestion(newState, [newParams, {
+          answer: 'answer'
+        }]);
+        if (questionHtml === null) {
+          answerIsBeingProcessed = false;
+          alertsService.addWarning('Expression parsing error.');
+          return;
+        }
 
-          $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
-          $rootScope.$broadcast('playerStateChange', newStateName);
-          successCallback(
-            newStateName, refreshInteraction, feedbackHtml, questionHtml,
-            newParams);
-        });
+        // TODO(sll): Remove the 'answer' key from newParams.
+        newParams.answer = answer;
+
+        answerIsBeingProcessed = false;
+
+        oldStateName = playerTranscriptService.getLastStateName();
+        var refreshInteraction = (
+          oldStateName !== newStateName ||
+          exploration.isInteractionInline(oldStateName));
+
+        if (!_editorPreviewMode) {
+          StatsReportingService.recordStateTransition(
+            oldStateName, newStateName, answer,
+            LearnerParamsService.getAllParams());
+        }
+
+        $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
+        $rootScope.$broadcast('playerStateChange', newStateName);
+        successCallback(
+          newStateName, refreshInteraction, feedbackHtml, questionHtml,
+          newParams);
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;
