@@ -474,8 +474,11 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-        // The replace function removes 'seconds' from the time returned.
-        return date.toLocaleTimeString().replace(/:\d\d /, ' ');
+        return date.toLocaleTimeString([], {
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true
+        });
       } else if (date.getFullYear() === new Date().getFullYear()) {
         return $filter('date')(date, 'MMM d');
       } else {
