@@ -36,7 +36,7 @@
        saveOneObject = ExplorationDraftObjectFactory.createFromDict(saveOne);
      }));
 
-     fit('should determine if the draft is valid', function() {
+     it('should determine if the draft is valid', function() {
        expect(saveOneObject.isDraftValid(draftChangeListIdOne)).toBeTruthy();
        expect(saveOneObject.isDraftValid(draftChangeListIdOne + 1)).toBeFalsy();
      });
