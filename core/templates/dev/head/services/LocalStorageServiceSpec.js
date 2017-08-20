@@ -41,8 +41,8 @@
        LocalStorageService = $injector.get('LocalStorageService');
        ExplorationDraftObjectFactory = $injector.get(
          'ExplorationDraftObjectFactory');
-       saveOneObject = ExplorationDraftObjectFactory.createFromDict(saveOne);
-       saveTwoObject = ExplorationDraftObjectFactory.createFromDict(saveTwo);
+       saveOneObject = ExplorationDraftObjectFactory.createFromJSON(saveOne);
+       saveTwoObject = ExplorationDraftObjectFactory.createFromJSON(saveTwo);
      }));
 
      it('should correctly save the draft', function() {
