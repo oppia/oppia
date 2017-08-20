@@ -403,7 +403,9 @@ oppia.controller('LearnerDashboard', [
     $scope.openRemoveActivityModal = function(
       sectionNameI18nId, subsectionName, activity) {
       $modal.open({
-        templateUrl: 'modals/removeActivity',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/learner_dashboard/' +
+          'remove_activity_from_learner_dashboard_modal_directive.html'),
         backdrop: true,
         resolve: {
           sectionNameI18nId: function() {

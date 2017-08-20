@@ -232,10 +232,10 @@ body {
   color: white;
   float: right;
   font-size: 19px;
-  left: -11px;
   margin-left: -16px;
-  margin-top: 12px;
   position: relative;
+  right: 13px;
+  top: 13px;
   z-index: 10;
 }
 

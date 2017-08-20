@@ -117,30 +117,7 @@
                    ng-swipe-left="scroll($index, false)">
                 <div class="oppia-library-carousel-tiles">
                   <div ng-repeat="tile in group.activity_summary_dicts"
-                       style="display: inline-block;"
-                       ng-mouseenter="setHoverOverActivity(tile.id)" ng-mouseleave="setHoverOverActivity(tile.id)">
-                    <i class="protractor-test-add-exp-to-playlist-icon oppia-learner-dashboard-icon fa fa-clock-o"
-                       ng-show="showAddToLearnerPlaylistIcon(tile.id)"
-                       ng-click="addToLearnerPlaylist(tile.activity_type, tile.id)"
-                       aria-hidden="true"
-                       tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
-                       tooltip-placement="left"></i>
-                    <i class="oppia-learner-dashboard-icon fa fa-clock-o"
-                       ng-if="learnerDashboardActivityIds.exploration_playlist_ids.indexOf(tile.id) !== -1 || learnerDashboardActivityIds.collection_playlist_ids.indexOf(tile.id) !== -1"
-                       ng-click="removeFromLearnerPlaylist(tile.id, tile.activity_type, tile.title)"
-                       aria-hidden="true"
-                       tooltip="<['I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate]>"
-                       tooltip-placement="left"></i>
-                    <i class="oppia-learner-dashboard-icon fa fa-check-circle-o"
-                       ng-if="learnerDashboardActivityIds.completed_exploration_ids.indexOf(tile.id) !== -1 || learnerDashboardActivityIds.completed_collection_ids.indexOf(tile.id) !== -1 "
-                       aria-hidden="true"
-                       tooltip="<['I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate]>"
-                       tooltip-placement="left"></i>
-                    <i class="oppia-learner-dashboard-icon fa fa-spinner"
-                       ng-if="learnerDashboardActivityIds.incomplete_exploration_ids.indexOf(tile.id) !== -1 || learnerDashboardActivityIds.incomplete_collection_ids.indexOf(tile.id) !== -1"
-                       aria-hidden="true"
-                       tooltip="<['I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate]>"
-                       tooltip-placement="left"></i>
+                       style="display: inline-block;">
                     <collection-summary-tile ng-if="tile.activity_type == 'collection'"
                                              collection-id="tile.id"
                                              collection-title="tile.title"
@@ -150,7 +127,7 @@
                                              category="tile.category"
                                              thumbnail-icon-url="tile.thumbnail_icon_url"
                                              thumbnail-bg-color="tile.thumbnail_bg_color"
-                                             style="position: relative; z-index: 5;">
+                                             learner-dashboard-activity-ids="learnerDashboardActivityIds">
                     </collection-summary-tile>
                     <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
                                               exploration-id="tile.id"
@@ -163,7 +140,7 @@
                                               thumbnail-icon-url="tile.thumbnail_icon_url"
                                               thumbnail-bg-color="tile.thumbnail_bg_color"
                                               class="protractor-test-exp-summary-tile"
-                                              style="position: relative; z-index: 5;">
+                                              learner-dashboard-activity-ids="learnerDashboardActivityIds">
                     </exploration-summary-tile>
                   </div>
                 </div>
@@ -229,24 +206,6 @@
       </div>
     </div>
   </div>
-
-  <script type="text/ng-template" id="modals/removeActivity">
-    <div class="modal-header">
-      <h3 translate="I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER" translate-values="{sectionNameI18nId: sectionNameI18nId}"></h3>
-    </div>
-
-    <div class="modal-body">
-      <p translate="I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY" translate-values="{entityTitle: activityTitle, sectionNameI18nId: sectionNameI18nId}"></p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
-      <button class="btn btn-danger protractor-test-confirm-delete-interaction"
-              ng-click="remove()" translate="I18N_LEARNER_DASHBOARD_REMOVE_BUTTON">
-      </button>
-    </div>
-  </script>
-
   {% include 'pages/library/search_results_directive.html' %}
 
 {% endblock %}

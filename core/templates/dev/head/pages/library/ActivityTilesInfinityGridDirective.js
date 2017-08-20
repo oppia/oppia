@@ -21,7 +21,7 @@ oppia.directive('activityTilesInfinityGrid', [
     return {
       restrict: 'E',
       scope: {
-        learnerDashboardActivityIds: '&learnerDashboardActivityIds',
+        getLearnerDashboardActivityIds: '&learnerDashboardActivityIds',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/' +
@@ -35,7 +35,7 @@ oppia.directive('activityTilesInfinityGrid', [
           $scope.allActivitiesInOrder = [];
           var hoverOverActivity = false;
           var activeActivityId = '';
-
+          console.log($scope.getLearnerDashboardActivityIds());
           // Called when the first batch of search results is retrieved from the
           // server.
           $scope.$on(
@@ -118,7 +118,9 @@ oppia.directive('activityTilesInfinityGrid', [
           $scope.removeFromLearnerPlaylist = function(
             activityId, activityType, activityTitle) {
             $modal.open({
-              templateUrl: 'modals/removeActivity',
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/learner_dashboard/' +
+                'remove_activity_from_learner_dashboard_modal_directive.html'),
               backdrop: true,
               resolve: {
                 activityId: function() {

@@ -44,7 +44,8 @@ oppia.directive('explorationSummaryTile', [
         // if it is not specified, it is treated as 0, which means that the
         // desktop version of the summary tile is always displayed.
         mobileCutoffPx: '@mobileCutoffPx',
-        playlistMode: '=?playlistMode'
+        playlistMode: '=?playlistMode',
+        learnerDashboardActivityIds: '=?learnerDashboardActivityIds',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -76,14 +77,17 @@ oppia.directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http',
+        '$scope', '$http', '$modal',
         'oppiaDatetimeFormatter', 'RatingComputationService',
-        'windowDimensionsService',
+        'windowDimensionsService', 'UrlInterpolationService',
+        'alertsService',
         function(
-          $scope, $http,
+          $scope, $http, $modal,
           oppiaDatetimeFormatter, RatingComputationService,
-          windowDimensionsService) {
+          windowDimensionsService, UrlInterpolationService,
+          alertsService) {
           var contributorsSummary = $scope.getContributorsSummary() || {};
+          $scope.explorationType = constants.ACTIVITY_TYPE_EXPLORATION;
           $scope.contributors = Object.keys(
             contributorsSummary).sort(
             function(contributorUsername1, contributorUsername2) {
@@ -112,6 +116,142 @@ oppia.directive('explorationSummaryTile', [
           }
 
           $scope.MAX_AVATARS_TO_DISPLAY = 5;
+          var hoverOverActivity = false;
+          var activeActivityId = '';
+
+          $scope.setHoverOverActivity = function(activityId) {
+            activeActivityId = activityId;
+            hoverOverActivity = !hoverOverActivity;
+          };
+
+          $scope.showAddToLearnerPlaylistIcon = function(activityId) {
+            if ($scope.learnerDashboardActivityIds) {
+              var incompleteExplorationIds = (
+                $scope.learnerDashboardActivityIds.incomplete_exploration_ids);
+              var incompleteCollectionIds = (
+                $scope.learnerDashboardActivityIds.incomplete_collection_ids);
+              var completedExplorationIds = (
+                $scope.learnerDashboardActivityIds.completed_exploration_ids);
+              var completedCollectionIds = (
+                $scope.learnerDashboardActivityIds.completed_collection_ids);
+              var explorationPlaylistIds = (
+                $scope.learnerDashboardActivityIds.exploration_playlist_ids);
+              var collectionPlaylistIds = (
+                $scope.learnerDashboardActivityIds.collection_playlist_ids);
+
+              if (incompleteExplorationIds.indexOf(activityId) !== -1 ||
+                  incompleteCollectionIds.indexOf(activityId) !== -1 ||
+                  completedExplorationIds.indexOf(activityId) !== -1 ||
+                  completedCollectionIds.indexOf(activityId) !== -1 ||
+                  explorationPlaylistIds.indexOf(activityId) !== -1 ||
+                  collectionPlaylistIds.indexOf(activityId) !== -1) {
+                return false;
+              } else {
+                return hoverOverActivity && (activeActivityId == activityId);
+              }
+            }
+          };
+
+          $scope.addToLearnerPlaylist = function(activityType, activityId) {
+            var addActivityToLearnerPlaylistUrl = (
+              UrlInterpolationService.interpolateUrl(
+                '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                  activityType: activityType,
+                  activityId: activityId
+                }));
+            $http.post(addActivityToLearnerPlaylistUrl, {})
+              .then(function(response) {
+                if (response.data.belongs_to_completed_or_incomplete_list) {
+                  alertsService.addInfoMessage(
+                    'You have already completed or are completing this ' +
+                    'activity.');
+                } else if (response.data.belongs_to_subscribed_activities) {
+                  alertsService.addInfoMessage(
+                    'This is present in your creator dashboard');
+                } else if (response.data.playlist_limit_exceeded) {
+                  alertsService.addInfoMessage(
+                    'Your \'Play Later\' list is full!  Either you can ' +
+                    'complete some or you can head to the learner dashboard ' +
+                    'and remove some.');
+                } else {
+                  alertsService.addSuccessMessage(
+                    'Successfully added to your \'Play Later\' list.');
+                }
+              });
+
+            if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
+              $scope.learnerDashboardActivityIds.exploration_playlist_ids.push(
+                activityId);
+            } else {
+              $scope.learnerDashboardActivityIds.collection_playlist_ids.push(
+                activityId);
+            }
+          };
+
+          $scope.removeFromLearnerPlaylist = function(
+            activityId, activityType, activityTitle) {
+            $modal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/learner_dashboard/' +
+                'remove_activity_from_learner_dashboard_modal_directive.html'),
+              backdrop: true,
+              resolve: {
+                activityId: function() {
+                  return activityId;
+                },
+                activityType: function() {
+                  return activityType;
+                },
+                activityTitle: function() {
+                  return activityTitle;
+                }
+              },
+              controller: [
+                '$scope', '$modalInstance', '$http',
+                'UrlInterpolationService', function($scope, $modalInstance,
+                  $http, UrlInterpolationService) {
+                  $scope.sectionNameI18nId = (
+                    'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
+                  $scope.activityTitle = activityTitle;
+                  var removeFromLearnerPlaylistUrl = (
+                    UrlInterpolationService.interpolateUrl(
+                      '/learnerplaylistactivityhandler/' +
+                      '<activityType>/<activityId>', {
+                        activityType: activityType,
+                        activityId: activityId
+                      }));
+                  $scope.remove = function() {
+                    $http['delete'](removeFromLearnerPlaylistUrl);
+                    $modalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            }).result.then(function() {
+              /* eslint-disable max-len */
+              if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
+                var index = (
+                  $scope.learnerDashboardActivityIds.exploration_playlist_ids.indexOf(
+                    activityId));
+                if (index !== -1) {
+                  $scope.learnerDashboardActivityIds.exploration_playlist_ids.splice(
+                    index, 1);
+                }
+              } else {
+                var index = (
+                  $scope.learnerDashboardActivityIds.collection_playlist_ids.indexOf(
+                    activityId));
+                if (index !== -1) {
+                  $scope.learnerDashboardActivityIds.collection_playlist_ids.splice(
+                    index, 1);
+                }
+              }
+              /* eslint-enable max-len */
+            });
+          };
 
           $scope.getAverageRating = function() {
             if (!$scope.getRatings()) {
