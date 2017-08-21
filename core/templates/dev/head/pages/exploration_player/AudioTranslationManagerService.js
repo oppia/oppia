@@ -46,7 +46,6 @@ oppia.factory('AudioTranslationManagerService', [
           }
         });
       });
-      return _currentAudioLanguageCode !== null;
     };
 
     var _init = function(
