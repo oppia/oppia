@@ -356,6 +356,21 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(exp_rights.is_owner(self.user_id_b))
         self.assertFalse(exp_rights.is_editor(self.user_id_b))
 
+    def test_get_multiple_exploration_rights(self):
+        exp_ids = ['exp1', 'exp2', 'exp3', 'exp4']
+
+        # saving only first 3 explorations to check that None is returned for
+        # non-existing exploration
+        for exp_id in exp_ids[:2]:
+            self.save_new_valid_exploration(exp_id, self.user_id_admin)
+        exp_rights = rights_manager.get_multiple_exploration_rights_by_ids(
+            exp_ids)
+
+        self.assertEqual(len(exp_rights), 4)
+        for right_object in exp_rights[:2]:
+            self.assertIsNotNone(right_object)
+        self.assertIsNone(exp_rights[3])
+
 
 class CollectionRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on collections work as expected."""
@@ -666,6 +681,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_a, collection_rights))
+
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
     """Tests for check_can_release_ownership function."""
