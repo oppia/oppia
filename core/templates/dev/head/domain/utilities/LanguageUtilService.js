@@ -30,9 +30,10 @@ oppia.factory('LanguageUtilService', [function() {
     audioLanguageCodesToDescriptions[audioLanguage.id] = audioLanguage.text;
   });
 
-  var audioLanguageCodesToPriority = {};
+  var audioLanguageCodesToRelatedLanguageCodes = {};
   supportedAudioLanguages.forEach(function(audioLanguage) {
-    audioLanguageCodesToPriority[audioLanguage.id] = audioLanguage.priority;
+    audioLanguageCodesToRelatedLanguageCodes[audioLanguage.id] =
+      audioLanguage.related_languages;
   });
 
   return {
@@ -49,18 +50,8 @@ oppia.factory('LanguageUtilService', [function() {
         return audioLanguageCodes.indexOf(languageCode) === -1;
       });
     },
-    getAudioLanguageCodeSortingComparator: function() {
-      return function(languageCodeA, languageCodeB) {
-        var priorityA = audioLanguageCodesToPriority[languageCodeA];
-        var priorityB = audioLanguageCodesToPriority[languageCodeB];
-        if (priorityA < priorityB) {
-          return -1;
-        }
-        if (priorityA > priorityB) {
-          return 1;
-        }
-        return 0;
-      };
-    },
+    getLanguageCodesRelatedToAudioLanguageCode: function(audioLanguageCode) {
+      return audioLanguageCodesToRelatedLanguageCodes[audioLanguageCode];
+    }
   }
 }]);

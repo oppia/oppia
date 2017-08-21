@@ -265,19 +265,17 @@ var constants = {
   }],
 
   "//" : [
-    "The priority values are used to determine what language should be ",
-    "picked by default in an exploration when the learner has no preferred ",
-    "audio language set. Lower values signify a higher priority. When ",
-    "adding a new language, make the priority values distinct."
+    "Related languages are used to prioritize an exploration's language when ",
+    "setting the default audio language."
   ],
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
     "text": "English",
-    "priority": 0
+    "related_languages": ["en"]
   }, {
     "id": "hi-en",
     "text": "Hinglish",
-    "priority": 1
+    "related_languages": ["hi", "en"]
   }]
 
 };

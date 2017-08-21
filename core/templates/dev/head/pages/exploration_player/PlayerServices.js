@@ -227,7 +227,8 @@ oppia.factory('oppiaPlayerService', [
               GLOBALS.collectionId);
             AudioTranslationManagerService.init(
               exploration.getAllAudioLanguageCodes(),
-              data.preferred_audio_language_code);
+              data.preferred_audio_language_code,
+              exploration.getLanguageCode());
 
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
