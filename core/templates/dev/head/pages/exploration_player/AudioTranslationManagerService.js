@@ -121,8 +121,8 @@ oppia.factory('AudioTranslationManagerService', [
 
     return {
       init: function(
-        allAudioLanguageCodesInExploration, preferredAudioLanguageCode, 
-        explorationLanguageCode) {
+          allAudioLanguageCodesInExploration, preferredAudioLanguageCode, 
+          explorationLanguageCode) {
         _init(allAudioLanguageCodesInExploration, preferredAudioLanguageCode,
           explorationLanguageCode);
       },
