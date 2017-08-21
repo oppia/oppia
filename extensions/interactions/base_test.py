@@ -150,7 +150,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'customization_arg_specs', 'is_trainable',
             'is_interaction_trainable', 'is_terminal', 'is_linear',
             'rule_descriptions', 'instructions', 'narrow_instructions',
-            'needs_summary', 'default_outcome_heading'])
+            'needs_summary', 'default_outcome_heading', 'can_have_solution'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
@@ -407,6 +407,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     and interaction.default_outcome_heading)
             else:
                 self.assertIsNone(interaction.default_outcome_heading)
+
+            # Check that interactions that can have solution cannot be linear.
+            if interaction.can_have_solution:
+                self.assertFalse(interaction.is_linear)
 
             default_object_values = obj_services.get_default_object_values()
 

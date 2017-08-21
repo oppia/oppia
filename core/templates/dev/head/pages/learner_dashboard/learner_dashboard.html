@@ -485,15 +485,27 @@
                   <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
                 </td>
                 <td class="col-lg-3 col-md-3 col-sm-3" style="width: 21%;">
-                  <span ng-if="thread.authorSecondLastMessage">
-                    <span ng-if="thread.secondLastMessageRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
-                    <span ng-if="!thread.secondLastMessageRead">
-                      <strong><[thread.authorSecondLastMessage | truncate:7]>, </strong>
+                  <span ng-if="thread.totalMessageCount > 1">
+                    <span ng-if="thread.authorSecondLastMessage">
+                      <span ng-if="thread.secondLastMessageRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
+                      <span ng-if="!thread.secondLastMessageRead">
+                        <strong><[thread.authorSecondLastMessage | truncate:7]>, </strong>
+                      </span>
+                    </span>
+                    <span ng-if="!thread.authorSecondLastMessage">
+                      <span ng-if="thread.totalMessageCount > 1">
+                        <span translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>, 
+                      </span>
                     </span>
                   </span>
-                  <span ng-if="thread.lastMessageRead"><[thread.authorLastMessage | truncate:7]></span>
-                  <span ng-if="!thread.lastMessageRead">
-                    <strong><[thread.authorLastMessage | truncate:7]></strong>
+                  <span ng-if="thread.authorLastMessage">
+                    <span ng-if="thread.lastMessageRead"><[thread.authorLastMessage | truncate:7]></span>
+                    <span ng-if="!thread.lastMessageRead">
+                      <strong><[thread.authorLastMessage | truncate:7]></strong>
+                    </span>
+                  </span>
+                  <span ng-if="!thread.authorLastMessage">
+                    <span translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>
                   </span>
                   <span class="feedback-thread-message-count">(<[thread.totalMessageCount]>)</span>
                 </td>
@@ -535,15 +547,20 @@
                   <div class="row">
                     <div class="col-sm-12">
                       <span class="feedback-message-header">
-                        <span style="display: inline-block;">
+                        <span ng-if="message.authorPictureDataUrl" style="display: inline-block;">
                           <img ng-src="<[message.authorPictureDataUrl]>"
                                class="oppia-navbar-profile-picture img-circle"
                                alt="User Avatar"
                                style="margin-top: 4px; min-width: 32px;">
                         </span>
+
+                        <span ng-if="!message.authorPictureDataUrl" style="display: inline-block;">
+                          <i class="material-icons md-40" style="margin-top: 4px; min-width: 32px;">&#xE853;</i>
+                        </span>
                       </span>
 
-                      <span class="feedback-message-author-name"><strong><[message.authorUsername]></strong></span>
+                      <span ng-if="message.authorUsername" class="feedback-message-author-name"><strong><[message.authorUsername]></strong></span>
+                      <span ng-if="!message.authorUsername" class="feedback-message-author-name"><strong translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></strong></span>
                       <span style="float: right; margin-right: 15px;"
                             ng-if="message.messageId !== 0 && message.updatedStatus">
                         <em translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"

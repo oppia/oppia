@@ -161,27 +161,6 @@
   <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
     <h3>Advanced Features</h3>
     <div class="row">
-      <div ng-if="fallbackEditorIsEnabled" class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <div role="form" class="form-horizontal">
-            <label for="enableFallbacks" class="col-lg-2 col-md-2 col-sm-2">
-              Fallbacks
-            </label>
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              <button type="button" class="btn btn-default protractor-test-enable-fallbacks" ng-click="enableFallbacks()" ng-if="!areFallbacksEnabled()">
-                Enable
-              </button>
-              <span ng-if="areFallbacksEnabled()">
-                Enabled
-              </span>
-            </span>
-            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Special conditions you can trigger if a learner looks stuck, e.g. if they get a question wrong many times.
-            </span>
-          </div>
-        </div>
-      </div>
-
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div role="form" class="form-horizontal">

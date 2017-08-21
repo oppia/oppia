@@ -111,6 +111,8 @@ class BaseInteraction(object):
     # The heading for the 'default outcome' section in the editor. This should
     # be None unless the interaction is linear and non-terminal.
     default_outcome_heading = None
+    # Whether the solution feature supports this interaction.
+    can_have_solution = None
 
     # Temporary cache for the rule definitions.
     _cached_rules_dict = None
@@ -227,6 +229,7 @@ class BaseInteraction(object):
             'narrow_instructions': self.narrow_instructions,
             'default_outcome_heading': self.default_outcome_heading,
             'rule_descriptions': self._rule_description_strings,
+            'can_have_solution': self.can_have_solution,
         }
 
     def get_rule_description(self, rule_name):

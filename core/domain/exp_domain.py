@@ -32,7 +32,6 @@ from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
-from core.domain import trigger_registry
 from core.platform import models
 import feconf
 import jinja_utils
@@ -55,7 +54,6 @@ STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
 STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
-STATE_PROPERTY_INTERACTION_FALLBACKS = 'fallbacks'
 STATE_PROPERTY_INTERACTION_HINTS = 'hints'
 STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
 # These two properties are kept for legacy purposes and are not used anymore.
@@ -234,7 +232,6 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_HANDLERS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-        STATE_PROPERTY_INTERACTION_FALLBACKS,
         STATE_PROPERTY_INTERACTION_HINTS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
@@ -898,129 +895,6 @@ class AnswerGroup(object):
         return None
 
 
-class TriggerInstance(object):
-    """Value object representing a trigger.
-
-    A trigger refers to a condition that may arise during a learner
-    playthrough, such as a certain number of loop-arounds on the current state,
-    or a certain amount of time having elapsed.
-    """
-    def __init__(self, trigger_type, customization_args):
-        """Initializes a TriggerInstance domain object.
-
-        Args:
-            trigger_type: str. The type of trigger.
-            customization_args: dict. The customization dict. The keys are
-                names of customization_args and the values are dicts with a
-                single key, 'value', whose corresponding value is the value of
-                the customization arg.
-        """
-        # A string denoting the type of trigger.
-        self.trigger_type = trigger_type
-        # Customization args for the trigger. This is a dict: the keys and
-        # values are the names of the customization_args for this trigger
-        # type, and the corresponding values for this instance of the trigger,
-        # respectively. The values consist of standard Python/JSON data types
-        # (i.e. strings, ints, booleans, dicts and lists, but not objects).
-        self.customization_args = customization_args
-
-    def to_dict(self):
-        """Returns a dict representing this TriggerInstance domain object.
-
-        Returns:
-            dict. A dict mapping all fields of TriggerInstance instance.
-        """
-        return {
-            'trigger_type': self.trigger_type,
-            'customization_args': self.customization_args,
-        }
-
-    @classmethod
-    def from_dict(cls, trigger_dict):
-        """Return a TriggerInstance domain object from a dict.
-
-        Args:
-            trigger_dict: dict. The dict representation of TriggerInstance
-                object.
-
-        Returns:
-            TriggerInstance. The corresponding TriggerInstance domain object.
-        """
-        return cls(
-            trigger_dict['trigger_type'],
-            trigger_dict['customization_args'])
-
-    def validate(self):
-        """Validates various properties of the TriggerInstance.
-
-        Raises:
-            ValidationError: One or more attributes of the TriggerInstance are
-            invalid.
-        """
-        if not isinstance(self.trigger_type, basestring):
-            raise utils.ValidationError(
-                'Expected trigger type to be a string, received %s' %
-                self.trigger_type)
-
-        try:
-            trigger = trigger_registry.Registry.get_trigger(self.trigger_type)
-        except KeyError:
-            raise utils.ValidationError(
-                'Unknown trigger type: %s' % self.trigger_type)
-
-        # Verify that the customization args are valid.
-        _validate_customization_args_and_values(
-            'trigger', self.trigger_type, self.customization_args,
-            trigger.customization_arg_specs)
-
-
-class Fallback(object):
-    """Value object representing a fallback.
-
-    A fallback consists of a trigger and an outcome. When the trigger is
-    satisfied, the user flow is rerouted to the given outcome.
-    """
-    def __init__(self, trigger, outcome):
-        """Initializes a Fallback domain object.
-
-        Args:
-            trigger: TriggerInstance. The satisfied trigger.
-            outcome: Outcome. The outcome to apply when the user hits the
-                trigger.
-        """
-        self.trigger = trigger
-        self.outcome = outcome
-
-    def to_dict(self):
-        """Returns a dict representing this Fallback domain object.
-
-        Returns:
-            dict. A dict mapping all fields of Fallback instance.
-        """
-        return {
-            'trigger': self.trigger.to_dict(),
-            'outcome': self.outcome.to_dict(),
-        }
-
-    @classmethod
-    def from_dict(cls, fallback_dict):
-        """Return a Fallback domain object from a dict.
-
-        Args:
-            fallback_dict: dict. The dict representation of Fallback object.
-
-        Returns:
-            Fallback. The corresponding Fallback domain object.
-        """
-        return cls(
-            TriggerInstance.from_dict(fallback_dict['trigger']),
-            Outcome.from_dict(fallback_dict['outcome']))
-
-    def validate(self):
-        self.trigger.validate()
-        self.outcome.validate()
-
-
 class Hint(object):
     """Value object representing a hint."""
 
@@ -1178,9 +1052,8 @@ class InteractionInstance(object):
                 else None),
             'confirmed_unclassified_answers': (
                 self.confirmed_unclassified_answers),
-            'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
             'hints': [hint.to_dict() for hint in self.hints],
-            'solution': self.solution,
+            'solution': self.solution.to_dict() if self.solution else None,
         }
 
     @classmethod
@@ -1198,6 +1071,11 @@ class InteractionInstance(object):
         default_outcome_dict = (
             Outcome.from_dict(interaction_dict['default_outcome'])
             if interaction_dict['default_outcome'] is not None else None)
+        solution_dict = (
+            Solution.from_dict(
+                interaction_dict['id'], interaction_dict['solution'])
+            if interaction_dict['solution'] else None)
+
         return cls(
             interaction_dict['id'],
             interaction_dict['customization_args'],
@@ -1205,14 +1083,12 @@ class InteractionInstance(object):
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
             interaction_dict['confirmed_unclassified_answers'],
-            [Fallback.from_dict(f) for f in interaction_dict['fallbacks']],
             [Hint.from_dict(h) for h in interaction_dict['hints']],
-            interaction_dict['solution'])
+            solution_dict)
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
-            default_outcome, confirmed_unclassified_answers,
-            fallbacks, hints, solution):
+            default_outcome, confirmed_unclassified_answers, hints, solution):
         """Initializes a InteractionInstance domain object.
 
         Args:
@@ -1228,7 +1104,6 @@ class InteractionInstance(object):
             confirmed_unclassified_answers: list(AnswerGroup). List of answers
                 which have been confirmed to be associated with the default
                 outcome.
-            fallbacks: list(Fallback). List of fallbacks for this interaction.
             hints: list(Hint). List of hints for this interaction.
             solution: Solution. A possible solution for the question asked in
                 this interaction.
@@ -1243,7 +1118,6 @@ class InteractionInstance(object):
         self.answer_groups = answer_groups
         self.default_outcome = default_outcome
         self.confirmed_unclassified_answers = confirmed_unclassified_answers
-        self.fallbacks = fallbacks
         self.hints = hints
         self.solution = solution
 
@@ -1258,31 +1132,18 @@ class InteractionInstance(object):
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
 
-    def get_all_non_fallback_outcomes(self):
-        """Returns a list of all non-fallback outcomes of this interaction,
-        i.e. every answer group and the default outcome.
+    def get_all_outcomes(self):
+        """Returns a list of all outcomes of this interaction, taking into
+        consideration every answer group and the default outcome.
 
         Returns:
-            list(Outcome). List of non-fallback outcomes of this interaction.
+            list(Outcome). List of all outcomes of this interaction.
         """
         outcomes = []
         for answer_group in self.answer_groups:
             outcomes.append(answer_group.outcome)
         if self.default_outcome is not None:
             outcomes.append(self.default_outcome)
-        return outcomes
-
-    def get_all_outcomes(self):
-        """Returns a list of all outcomes of this interaction, taking into
-        consideration every answer group, the default outcome, and every
-        fallback.
-
-        Returns:
-            list(Outcome). List of all outcomes of this interaction.
-        """
-        outcomes = self.get_all_non_fallback_outcomes()
-        for fallback in self.fallbacks:
-            outcomes.append(fallback.outcome)
         return outcomes
 
     def validate(self, exp_param_specs_dict):
@@ -1331,13 +1192,6 @@ class InteractionInstance(object):
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
-        if not isinstance(self.fallbacks, list):
-            raise utils.ValidationError(
-                'Expected fallbacks to be a list, received %s'
-                % self.fallbacks)
-        for fallback in self.fallbacks:
-            fallback.validate()
-
         if not isinstance(self.hints, list):
             raise utils.ValidationError(
                 'Expected hints to be a list, received %s'
@@ -1345,12 +1199,10 @@ class InteractionInstance(object):
         for hint in self.hints:
             hint.validate()
 
-        if self.hints:
-            if self.solution:
-                Solution.from_dict(
-                    self.id, self.solution).validate(self.id)
+        if self.solution:
+            self.solution.validate(self.id)
 
-        elif self.solution:
+        if self.solution and not self.hints:
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
@@ -1362,7 +1214,6 @@ class InteractionInstance(object):
             - default_outcome: dest is set to 'default_dest_state_name' and
                 feedback and param_changes are initialized as empty lists;
             - confirmed_unclassified_answers: empty list;
-            - fallbacks: empty list;
 
         Args:
             default_dest_state_name: str. The default destination state.
@@ -1374,7 +1225,7 @@ class InteractionInstance(object):
         return cls(
             cls._DEFAULT_INTERACTION_ID,
             {}, [],
-            Outcome(default_dest_state_name, [], {}), [], [], [], {}
+            Outcome(default_dest_state_name, [], {}), [], [], {}
         )
 
 
@@ -1797,9 +1648,8 @@ class State(object):
             'param_changes': [],
         },
         'confirmed_unclassified_answers': [],
-        'fallbacks': [],
         'hints': [],
-        'solution': {},
+        'solution': None,
     }
 
     def __init__(self, content, param_changes, interaction,
@@ -1827,7 +1677,7 @@ class State(object):
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
             interaction.answer_groups, interaction.default_outcome,
-            interaction.confirmed_unclassified_answers, interaction.fallbacks,
+            interaction.confirmed_unclassified_answers,
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
 
@@ -2044,31 +1894,6 @@ class State(object):
         self.interaction.confirmed_unclassified_answers = (
             confirmed_unclassified_answers)
 
-    def update_interaction_fallbacks(self, fallbacks_list):
-        """Update the fallbacks of InteractionInstance domain object.
-
-        Args:
-            fallbacks_list. list(dict). List of dicts that represent Fallback
-                domain object.
-        """
-        if not isinstance(fallbacks_list, list):
-            raise Exception(
-                'Expected fallbacks_list to be a list, received %s'
-                % fallbacks_list)
-        self.interaction.fallbacks = [
-            Fallback.from_dict(fallback_dict)
-            for fallback_dict in fallbacks_list]
-        if self.interaction.fallbacks:
-            hint_list = []
-            for fallback in self.interaction.fallbacks:
-                if fallback.outcome.feedback:
-                    # If a fallback outcome has a non-empty feedback list
-                    # the feedback is converted to a Hint. It may contain
-                    # only one list item.
-                    hint_list.append(
-                        Hint(fallback.outcome.feedback[0]).to_dict())
-        self.update_interaction_hints(hint_list)
-
     def update_interaction_hints(self, hints_list):
         """Update the list of hints.
 
@@ -2091,17 +1916,21 @@ class State(object):
         """Update the solution of interaction.
 
         Args:
-            solution_dict: dict. The dict representation of Solution object.
+            solution_dict: dict or None. The dict representation of
+                Solution object.
 
         Raises:
-            Exception: 'hint_list' is not a list.
+            Exception: 'solution_dict' is not a dict.
         """
-        if not isinstance(solution_dict, dict):
-            raise Exception(
-                'Expected solution to be a dict, received %s'
-                % solution_dict)
-        self.interaction.solution = Solution.from_dict(
-            self.interaction.id, solution_dict)
+        if solution_dict is not None:
+            if not isinstance(solution_dict, dict):
+                raise Exception(
+                    'Expected solution to be a dict, received %s'
+                    % solution_dict)
+            self.interaction.solution = Solution.from_dict(
+                self.interaction.id, solution_dict)
+        else:
+            self.interaction.solution = None
 
     def add_hint(self, hint_text):
         """Add a new hint to the list of hints.
@@ -2374,13 +2203,12 @@ class Exploration(object):
 
             solution = (
                 Solution.from_dict(idict['id'], idict['solution'])
-                if idict['solution'] else {})
+                if idict['solution'] else None)
 
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,
                 idict['confirmed_unclassified_answers'],
-                [Fallback.from_dict(f) for f in idict['fallbacks']],
                 [Hint.from_dict(h) for h in idict['hints']],
                 solution)
 
@@ -2588,24 +2416,6 @@ class Exploration(object):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-        # Check that all fallbacks and hints are valid.
-        for state in self.states.values():
-            interaction = state.interaction
-
-            for fallback in interaction.fallbacks:
-                # Check fallback destinations.
-                if fallback.outcome.dest not in all_state_names:
-                    raise utils.ValidationError(
-                        'The fallback destination %s is not a valid state.'
-                        % fallback.outcome.dest)
-
-                for param_change in fallback.outcome.param_changes:
-                    if param_change.name not in self.param_specs:
-                        raise utils.ValidationError(
-                            'The parameter %s was used in a fallback, but it '
-                            'does not exist in this exploration'
-                            % param_change.name)
-
         # Check that state names required by gadgets exist.
         state_names_required_by_gadgets = set(
             self.skin_instance.get_state_names_required_by_gadgets())
@@ -2697,8 +2507,7 @@ class Exploration(object):
                 'state: %s' % ', '.join(unseen_states))
 
     def _verify_no_dead_ends(self):
-        """Verifies that all states can reach a terminal state without using
-        fallbacks.
+        """Verifies that all states can reach a terminal state.
 
         Raises:
             ValidationError: If is impossible to complete the exploration from
@@ -2725,7 +2534,7 @@ class Exploration(object):
                 if (state_name not in curr_queue
                         and state_name not in processed_queue):
                     all_outcomes = (
-                        state.interaction.get_all_non_fallback_outcomes())
+                        state.interaction.get_all_outcomes())
                     for outcome in all_outcomes:
                         if outcome.dest == curr_state_name:
                             curr_queue.append(state_name)
@@ -3577,7 +3386,7 @@ class Exploration(object):
                         interaction['hints'].append(
                             Hint(fallback['outcome']['feedback'][0]).to_dict())
             if 'solution' not in interaction:
-                interaction['solution'] = {}
+                interaction['solution'] = None
         return states_dict
 
     @classmethod
@@ -3611,6 +3420,18 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v12_dict_to_v13_dict(cls, states_dict):
+        """Converts from version 12 to 13. Version 13 sets empty
+        solutions to None and removes fallbacks.
+        """
+        for state_dict in states_dict.values():
+            if 'fallbacks' in state_dict['interaction']:
+                del state_dict['interaction']['fallbacks']
+            if not state_dict['interaction']['solution']:
+                state_dict['interaction']['solution'] = None
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3641,7 +3462,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 15
+    CURRENT_EXP_SCHEMA_VERSION = 16
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3970,6 +3791,18 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v15_dict_to_v16_dict(cls, exploration_dict):
+        """Converts a v15 exploration dict into a v16 exploration dict."""
+        exploration_dict['schema_version'] = 16
+
+        exploration_dict['states'] = cls._convert_states_v12_dict_to_v13_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 13
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4075,6 +3908,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v14_dict_to_v15_dict(
                 exploration_dict)
             exploration_schema_version = 15
+
+        if exploration_schema_version == 15:
+            exploration_dict = cls._convert_v15_dict_to_v16_dict(
+                exploration_dict)
+            exploration_schema_version = 16
 
         return (exploration_dict, initial_schema_version)
 

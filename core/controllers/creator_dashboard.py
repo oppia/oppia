@@ -177,7 +177,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        if role_services.ACTION_CREATE_COLLECTION in self.actions:
+        if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             for collection_summary in subscribed_collection_summaries:
                 # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
                 # in summary_services, instead of replicating it like this.

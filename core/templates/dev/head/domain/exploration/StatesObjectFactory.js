@@ -58,13 +58,6 @@ oppia.factory('StatesObjectFactory', [
             interaction.defaultOutcome.dest = otherStateName;
           }
         }
-
-        var fallbacks = interaction.fallbacks;
-        for (var i = 0; i < fallbacks.length; i++) {
-          if (fallbacks[i].outcome.dest === deleteStateName) {
-            fallbacks[i].outcome.dest = otherStateName;
-          }
-        }
       }
     };
     States.prototype.renameState = function(oldStateName, newStateName) {
@@ -82,13 +75,6 @@ oppia.factory('StatesObjectFactory', [
         if (interaction.defaultOutcome) {
           if (interaction.defaultOutcome.dest === oldStateName) {
             interaction.defaultOutcome.dest = newStateName;
-          }
-        }
-
-        var fallbacks = interaction.fallbacks;
-        for (var i = 0; i < fallbacks.length; i++) {
-          if (fallbacks[i].outcome.dest === oldStateName) {
-            fallbacks[i].outcome.dest = newStateName;
           }
         }
       }

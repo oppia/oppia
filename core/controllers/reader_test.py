@@ -25,6 +25,7 @@ from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -44,6 +45,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
@@ -97,7 +99,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_published_explorations_are_visible_to_logged_out_users(self):
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
@@ -105,7 +107,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
     def test_published_explorations_are_visible_to_logged_in_users(self):
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -422,6 +424,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         # Load exploration 0.
         exp_services.load_demo(self.EXP_ID)
@@ -437,7 +440,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             objective='Test a spam exploration.')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
         self.logout()
 
     def test_that_emails_are_sent(self):
@@ -535,6 +538,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
         # Save and publish explorations.
         self.save_new_valid_exploration(
@@ -554,10 +558,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             title='Introduce Interactions in Oppia',
             category='Welcome', language_code='en')
 
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1_0)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1_1)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1_1)
 
         # Save a new collection.
         self.save_new_default_collection(
@@ -578,8 +582,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 }], 'Added new exploration')
 
         # Publish the collections.
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_0)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_1)
+        rights_manager.publish_collection(self.owner, self.COL_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_1)
 
     def test_independent_exp_complete_event_handler(self):
         """Test handler for completion of explorations not in the context of

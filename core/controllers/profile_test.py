@@ -516,9 +516,10 @@ class UserContributionsTests(test_utils.GenericTestBase):
         # a single exploration shows 1 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        user_a = user_services.UserActionsInfo(user_a_id)
         self.save_new_valid_exploration(
             self.EXP_ID_1, user_a_id, end_state_name='End')
-        rights_manager.publish_exploration(user_a_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(user_a, self.EXP_ID_1)
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
@@ -542,10 +543,10 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
         self.signup(self.EMAIL_B, self.USERNAME_B)
         user_b_id = self.get_user_id_from_email(self.EMAIL_B)
-
+        user_a = user_services.UserActionsInfo(user_a_id)
         self.save_new_valid_exploration(
             self.EXP_ID_1, user_a_id, end_state_name='End')
-        rights_manager.publish_exploration(user_a_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(user_a, self.EXP_ID_1)
 
         exp_services.update_exploration(user_b_id, self.EXP_ID_1, [{
             'cmd': 'edit_exploration_property',

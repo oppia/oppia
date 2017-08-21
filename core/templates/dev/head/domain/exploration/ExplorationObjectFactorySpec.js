@@ -53,11 +53,9 @@ describe('Exploration object factory', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: [],
             id: 'TextInput'
           },
-          fallbacks: [],
           hints: [],
           param_changes: []
         },
@@ -81,11 +79,9 @@ describe('Exploration object factory', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: [],
             id: 'TextInput'
           },
-          fallbacks: [],
           hints: [],
           param_changes: []
         }

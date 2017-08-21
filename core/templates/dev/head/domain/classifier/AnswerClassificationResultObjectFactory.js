@@ -17,8 +17,8 @@
  *     Classification Result domain objects.
  */
 
-oppia.factory('AnswerClassificationResult', [function() {
-  var ClassificationResult = function(
+oppia.factory('AnswerClassificationResultObjectFactory', [function() {
+  var AnswerClassificationResult = function(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization) {
     this.outcome = outcome;
     this.answerGroupIndex = answerGroupIndex;
@@ -26,11 +26,11 @@ oppia.factory('AnswerClassificationResult', [function() {
     this.classificationCategorization = classificationCategorization;
   };
 
-  ClassificationResult.createNew = function(
+  AnswerClassificationResult.createNew = function(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization) {
-    return new ClassificationResult(
+    return new AnswerClassificationResult(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization);
   };
 
-  return ClassificationResult;
+  return AnswerClassificationResult;
 }]);
