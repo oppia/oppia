@@ -733,7 +733,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
-    activity_search_services.index_collections_given_ids([collection.id])
+    index_collections_given_ids([collection.id])
 
     collection.version += 1
 
@@ -1137,7 +1137,7 @@ def load_demo(collection_id):
     publish_collection_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, collection_id)
 
-    activity_search_services.index_collections_given_ids([collection_id])
+    index_collections_given_ids([collection_id])
 
     # Now, load all of the demo explorations that are part of the collection.
     for collection_node in collection.nodes:
@@ -1247,6 +1247,18 @@ def clear_search_index():
     many entries in the index.
     """
     search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
+
+
+def index_collections_given_ids(collection_ids):
+    """Adds the given collections to the search index.
+
+    Args:
+        collection_ids: list(str). List of collection ids whose collections
+        are to be indexed.
+    """
+    activity_search_services.index_collection_summaries([
+        get_collection_summary_by_id(collection_id) for
+        collection_id in collection_ids])
 
 
 def patch_collection_search_document(collection_id, update):

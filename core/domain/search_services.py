@@ -3,8 +3,6 @@
 """
 from core.platform import models
 from core.domain import rights_manager
-import exp_services
-import collection_services
 
 search_services = models.Registry.import_search_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
@@ -25,119 +23,103 @@ _STATUS_PUBLICIZED_BONUS = 30
 # negative ranks are disallowed in the Search API
 _DEFAULT_RANK = 20
 
-def index_explorations_given_ids(exp_ids):
-    """Indexes the explorations corresponding to the given exploration ids.
+def index_exploration_summaries(exp_summaries):
+    """Indexes the explorations corresponding to the given exploration
+    summaries.
 
     Args:
-        exp_ids: list(str). List of ids of the explorations to be indexed.
+        exp_summaries: list(ExpSummaryModel). List of ExplorationSummary
+        domain objects to be indexed.
     """
-    exploration_models = exp_services.get_multiple_explorations_by_id(exp_ids,
-                                                                      strict
-                                                                      =False)
-    search_services.add_documents_to_index([_exp_to_search_dict(exp) for exp
-                                            in exploration_models.values()
-                                            if _should_index_exploration(exp)],
+    search_services.add_documents_to_index([_exp_summary_to_search_dict(
+        exp_summary) for exp_summary in exp_summaries if
+                                            _should_index_exploration(
+                                                exp_summary)],
                                            SEARCH_INDEX_EXPLORATIONS)
 
 
-def index_collections_given_ids(collection_ids):
+def index_collection_summaries(collection_summaries):
     """Adds the given collections to the search index.
 
     Args:
-        collection_ids: list(str). List of collection ids whose collections are
-            to be indexed.
+        collection_summaries: list(CollectionSummaryModel). List of
+        CollectionSummary domain objects to be indexed.
     """
-    collection_list = collection_services.get_multiple_collections_by_id(
-        collection_ids, strict=False).values()
-    search_services.add_documents_to_index([_collection_to_search_dict(
-        collection)
-                                            for collection in collection_list
+    search_services.add_documents_to_index([_collection_summary_to_search_dict(
+        collection_summary) for collection_summary in collection_summaries
                                             if _should_index_collection(
-                                                collection)],
+                                                collection_summary)],
                                            SEARCH_INDEX_COLLECTIONS)
 
 
-def _should_index_exploration(exp):
-    """Returns whether the given exploration should be indexed for future
-    search queries.
+def _should_index_exploration(exp_summary):
+    """Returns whether the exploration corresponding to the given
+    exploration summary should be indexed for future search queries.
 
     Args:
-        exp: Exploration domain object.
+        exp_summary: Exploration summary object.
     """
-    rights = rights_manager.get_exploration_rights(exp.id)
+    rights = rights_manager.get_exploration_rights(exp_summary.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
-def _should_index_collection(collection):
-    """Returns whether the given exploration should be indexed for future
-    search queries.
+def _should_index_collection(collection_summary):
+    """Returns whether the collection corresponding to the given
+    collection summary should be indexed for future search queries.
 
     Args:
-        collection: Collection.
+        collection_summary: Collection summary object.
     """
-    rights = rights_manager.get_collection_rights(collection.id)
+    rights = rights_manager.get_collection_rights(collection_summary.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
-def _exp_to_search_dict(exp):
+def _exp_summary_to_search_dict(exp_summary):
     """Updates the dict to be returned, whether the given exploration is to
     be indexed for further queries or not.
 
     Args:
-        exp: Exploration. Exploration domain object.
+        exp_summary: ExplorationSummary. ExplorationSummary domain object.
 
     Returns:
         dict. The representation of the given exploration, in a form that can
         be used by the search index.
     """
-    rights = rights_manager.get_exploration_rights(exp.id)
-    doc = {'id': exp.id,
-           'language_code': exp.language_code,
-           'title': exp.title,
-           'category': exp.category,
-           'tags': exp.tags,
-           'blurb': exp.blurb,
-           'objective': exp.objective,
-           'author_notes': exp.author_notes,
-           'rank': get_exp_search_rank(exp.id)
+    rights = rights_manager.get_exploration_rights(exp_summary.id)
+    doc = {'id': exp_summary.id,
+           'language_code': exp_summary.language_code,
+           'title': exp_summary.title,
+           'category': exp_summary.category,
+           'tags': exp_summary.tags,
+           'objective': exp_summary.objective,
+           'rank': get_search_rank_from_exp_summary(exp_summary)
           }
     doc.update(_exp_rights_to_search_dict(rights))
     return doc
 
 
-def _collection_to_search_dict(collection):
+def _collection_summary_to_search_dict(collection_summary):
     """Converts a collection domain object to a search dict.
 
     Args:
-        collection: Collection. The collection domain object to be converted.
+        collection_summary: Collection. The CollectionSummary domain object to
+        be converted.
 
     Returns:
-        The search dict of the collection domain object.
+        dict. The representation of the given collection, in a form that can
+        be used by the search index.
     """
-    rights = rights_manager.get_collection_rights(collection.id)
-    doc = {'id': collection.id,
-           'title': collection.title,
-           'category': collection.category,
-           'objective': collection.objective,
-           'language_code': collection.language_code,
-           'tags': collection.tags,
-           'rank': get_collection_search_rank(collection.id)
+    rights = rights_manager.get_collection_rights(collection_summary.id)
+    doc = {'id': collection_summary.id,
+           'title': collection_summary.title,
+           'category': collection_summary.category,
+           'objective': collection_summary.objective,
+           'language_code': collection_summary.language_code,
+           'tags': collection_summary.tags,
+           'rank': get_collection_search_rank(collection_summary.id)
           }
     doc.update(_collection_rights_to_search_dict(rights))
     return doc
-
-
-def get_exp_search_rank(exp_id):
-    """Returns the search rank.
-
-    Args:
-        exp_id: str. The id of the exploration.
-
-    Returns:
-        int. The rank of the exploration.
-    """
-    exp_summary = exp_services.get_exploration_summary_by_id(exp_id)
-    return get_search_rank_from_exp_summary(exp_summary)
 
 
 def get_collection_search_rank(collection_id):
@@ -207,11 +189,7 @@ def get_search_rank_from_exp_summary(exp_summary):
     """
     # TODO(sll): Improve this calculation.
     rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
-    rank = _DEFAULT_RANK + (
-        _STATUS_PUBLICIZED_BONUS
-        if exp_summary.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
-        else 0)
-
+    rank = _DEFAULT_RANK
     if exp_summary.ratings:
         for rating_value in exp_summary.ratings:
             rank += (

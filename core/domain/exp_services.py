@@ -813,7 +813,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
-    activity_search_services.index_explorations_given_ids([exploration.id])
+    index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
 
@@ -1427,7 +1427,7 @@ def load_demo(exploration_id):
     publish_exploration_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
-    activity_search_services.index_explorations_given_ids([exploration_id])
+    index_explorations_given_ids([exploration_id])
 
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 
@@ -1601,6 +1601,16 @@ def clear_search_index():
     many entries in the index.
     """
     search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
+
+
+def index_explorations_given_ids(exp_ids):
+    """Indexes the explorations corresponding to the given exploration ids.
+
+    Args:
+        list(str): List of ids of explorations to be indexed.
+    """
+    activity_search_services.index_exploration_summaries([
+        get_exploration_summary_by_id(exp_id) for exp_id in exp_ids])
 
 
 def patch_exploration_search_document(exp_id, update):

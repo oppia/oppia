@@ -25,7 +25,6 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
-from core.domain import search_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -930,7 +929,7 @@ class CollectionNodeMetadataDictsTest(
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID3)
         rights_manager.publish_exploration(self.bob_id, self.EXP_ID4)
 
-        search_services.index_explorations_given_ids([
+        exp_services.index_explorations_given_ids([
             self.EXP_ID1, self.EXP_ID2, self.EXP_ID3,
             self.EXP_ID4])
 

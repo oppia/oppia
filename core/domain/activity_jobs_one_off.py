@@ -30,15 +30,16 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel, collection_models.CollectionModel]
+        return [exp_models.ExpSummaryModel,
+                collection_models.CollectionSummaryModel]
 
     @staticmethod
     def map(item):
         if not item.deleted:
-            if isinstance(item, exp_models.ExplorationModel):
-                search_services.index_explorations_given_ids([item.id])
+            if isinstance(item, exp_models.ExpSummaryModel):
+                search_services.index_exploration_summaries([item])
             else:
-                search_services.index_collections_given_ids([item.id])
+                search_services.index_collection_summaries([item])
 
     @staticmethod
     def reduce(key, values):

@@ -20,7 +20,6 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import user_services
-from core.domain import search_services as activity_search_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -339,7 +338,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         rights_manager.publish_collection(self.owner_id, self.COL_ID_4)
 
         # Add the collections to the search index.
-        activity_search_services.index_collections_given_ids([
+        collection_services.index_collections_given_ids([
             self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
             self.COL_ID_4])
 

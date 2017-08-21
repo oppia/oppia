@@ -14,63 +14,88 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import search_services
-from core.domain import rights_manager
-from core.domain import collection_services
 from core.tests import test_utils
+from core.domain import search_services
+from core.domain import exp_services
+from core.domain import rights_manager
+from core.domain import rating_services
+from core.domain import user_services
 
 class SearchServicesUnitTests(test_utils.GenericTestBase):
     """Test the search services module"""
-
-    COLLECTION_ID = "A_collection_id"
+    EXP_ID = 'An_exploration_id'
 
     def setUp(self):
         super(SearchServicesUnitTests, self).setUp()
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
+        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-    def test_index_collections_given_ids(self):
-        all_collection_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
-        expected_collection_ids = all_collection_ids[:-1]
-        all_collection_titles = [
-            'title 0', 'title 1', 'title 2', 'title 3', 'title 4']
-        expected_collection_titles = all_collection_titles[:-1]
-        all_collection_categories = ['cat0', 'cat1', 'cat2', 'cat3', 'cat4']
-        expected_collection_categories = all_collection_categories[:-1]
+    def test_get_search_rank_from_exp_summary(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
 
-        def mock_add_documents_to_index(docs, index):
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            ids = [doc['id'] for doc in docs]
-            titles = [doc['title'] for doc in docs]
-            categories = [doc['category'] for doc in docs]
-            self.assertEqual(set(ids), set(expected_collection_ids))
-            self.assertEqual(set(titles), set(expected_collection_titles))
-            self.assertEqual(
-                set(categories), set(expected_collection_categories))
-            return ids
+        base_search_rank = 20
 
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(search_services,
-                                  'add_documents_to_index',
-                                  add_docs_counter)
+        self.assertEqual(
+            search_services.get_search_rank_from_exp_summary(exp_summary),
+            base_search_rank)
 
-        for ind in xrange(5):
-            self.save_new_valid_collection(
-                all_collection_ids[ind],
-                self.owner_id,
-                all_collection_titles[ind],
-                category=all_collection_categories[ind])
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        self.assertEqual(
+            search_services.get_search_rank_from_exp_summary(exp_summary),
+            base_search_rank)
 
-        # We're only publishing the first 4 collections, so we're not
-        # expecting the last collection to be indexed.
-        for ind in xrange(4):
-            rights_manager.publish_collection(
-                self.owner_id,
-                expected_collection_ids[ind])
+        rating_services.assign_rating_to_exploration(self.owner_id,
+                                                     self.EXP_ID, 5)
 
-        with add_docs_swap:
-            search_services.index_collections_given_ids(all_collection_ids)
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(
+            search_services.get_search_rank_from_exp_summary(exp_summary),
+            base_search_rank + 10)
 
-        self.assertEqual(add_docs_counter.times_called, 1)
+        rating_services.assign_rating_to_exploration(self.user_id_admin,
+                                                     self.EXP_ID, 2)
+        self.assertEqual(
+            search_services.get_search_rank_from_exp_summary(exp_summary),
+            base_search_rank + 8)
+
+    def test_search_ranks_cannot_be_negative(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+
+        base_search_rank = 20
+
+        self.assertEqual(
+            search_services.get_search_rank_from_exp_summary(exp_summary),
+            base_search_rank)
+
+        # A user can (down-)rate an exploration at most once.
+        for i in xrange(50):
+            rating_services.assign_rating_to_exploration(
+                'user_id_1', self.EXP_ID, 1)
+        self.assertEqual(
+            search_services.get_search_rank_from_exp_summary(exp_summary),
+            base_search_rank - 5)
+
+        for i in xrange(50):
+            rating_services.assign_rating_to_exploration(
+                'user_id_%s' % i, self.EXP_ID, 1)
+
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        # The rank will be at least 0.
+        self.assertEqual(search_services.get_search_rank_from_exp_summary(
+            exp_summary), 0)
