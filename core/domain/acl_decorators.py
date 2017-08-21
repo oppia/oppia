@@ -25,90 +25,6 @@ import feconf
 current_user_services = models.Registry.import_current_user_services()
 
 
-def check_activity_accessible(
-        user_id, user_actions, activity_type, activity_id):
-    """Returns a boolean to signify whether given activity is accessible
-    by the user or not.
-
-    Args:
-        user_id: str. Id of the given user.
-        user_actions: list(str). List of actions given user can perform.
-        activity_id: str. Id of the given activity.
-        activity_type: str. Signifies whether activity is exploration or
-            collection.
-
-    Returns:
-        bool. Whether the given activity can be accessed.
-    """
-    if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
-        if activity_id in feconf.DISABLED_EXPLORATION_IDS:
-            return False
-
-    activity_rights = (
-        rights_manager.get_exploration_rights(activity_id, strict=False)
-        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
-        else rights_manager.get_collection_rights(activity_id, strict=False))
-
-    action_play_public = (
-        role_services.ACTION_PLAY_ANY_PUBLIC_EXPLORATION
-        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
-        else role_services.ACTION_PLAY_ANY_PUBLIC_COLLECTION)
-
-    action_play_private = (
-        role_services.ACTION_PLAY_ANY_PRIVATE_EXPLORATION
-        if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION
-        else role_services.ACTION_PLAY_ANY_PRIVATE_COLLECTION)
-
-    if activity_rights is None:
-        raise base.UserFacingExceptions.PageNotFoundException
-    elif activity_rights.is_published():
-        return bool(action_play_public in user_actions)
-    elif activity_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-        return bool(
-            (action_play_private in user_actions) or
-            activity_rights.is_viewer(user_id) or
-            activity_rights.is_owner(user_id) or
-            activity_rights.is_editor(user_id) or
-            activity_rights.viewable_if_private)
-
-
-def check_exploration_editable(user_id, user_actions, exploration_id):
-    """Returns a boolean to signify whether given exploration is editable
-    by the user or not.
-
-    Args:
-        user_id: str. Id of the given user.
-        user_actions: list(str). List of actions given user can perform.
-        exploration_id: str. Exploration id.
-
-    Returns:
-        bool. Whether the given exploration can be accessed.
-    """
-    exploration_rights = rights_manager.get_exploration_rights(
-        exploration_id, strict=False)
-
-    if exploration_rights is None:
-        raise base.UserFacingExceptions.PageNotFoundException
-
-    if exploration_rights.community_owned:
-        return True
-
-    if role_services.ACTION_EDIT_ANY_EXPLORATION in user_actions:
-        return True
-
-    if exploration_rights.is_published():
-        if (role_services.ACTION_EDIT_ANY_PUBLIC_EXPLORATION in
-                user_actions):
-            return True
-
-    if role_services.ACTION_EDIT_OWNED_EXPLORATION in user_actions:
-        if (exploration_rights.is_owner(user_id) or
-                exploration_rights.is_editor(user_id)):
-            return True
-
-    return False
-
-
 def open_access(handler):
     """Decorator to give access to everyone."""
 
@@ -123,9 +39,14 @@ def can_play_exploration(handler):
     """Decorator to check whether user can play given exploration."""
 
     def test_can_play(self, exploration_id, **kwargs):
-        if check_activity_accessible(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
-                exploration_id):
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise self.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -138,9 +59,11 @@ def can_play_collection(handler):
     """Decorator to check whether user can play given collection."""
 
     def test_can_play(self, collection_id, **kwargs):
-        if check_activity_accessible(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_COLLECTION,
-                collection_id):
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
+
+        if rights_manager.check_can_access_activity(
+                self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -155,9 +78,13 @@ def can_download_exploration(handler):
     """
 
     def test_can_download(self, exploration_id, **kwargs):
-        if check_activity_accessible(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
-                exploration_id):
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -172,12 +99,16 @@ def can_view_exploration_stats(handler):
     """
 
     def test_can_view_stats(self, exploration_id, **kwargs):
-        if check_activity_accessible(
-                self.user_id, self.actions, feconf.ACTIVITY_TYPE_EXPLORATION,
-                exploration_id):
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.PageNotFoundException
+            raise base.UserFacingExceptions.PageNotFoundException
     test_can_view_stats.__wrapped__ = True
 
     return test_can_view_stats
@@ -190,30 +121,16 @@ def can_edit_collection(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
+        collection_rights = rights_manager.get_collection_rights(collection_id)
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if collection_rights.community_owned:
+        if rights_manager.check_can_edit_activity(
+                self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
-
-        if role_services.ACTION_EDIT_ANY_COLLECTION in self.actions:
-            return handler(self, collection_id, **kwargs)
-
-        if collection_rights.is_published():
-            if (role_services.ACTION_EDIT_ANY_PUBLIC_COLLECTION in
-                    self.actions):
-                return handler(self, collection_id, **kwargs)
-
-        if (role_services.ACTION_EDIT_OWNED_COLLECTION in
-                self.actions):
-            if (collection_rights.is_owner(self.user_id) or
-                    collection_rights.is_editor(self.user_id)):
-                return handler(self, collection_id, **kwargs)
-
-        raise base.UserFacingExceptions.UnauthorizedUserException(
-            'You do not have credentials to edit this collection.')
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to edit this collection.')
     test_can_edit.__wrapped__ = True
 
     return test_can_edit
@@ -226,7 +143,7 @@ def can_manage_email_dashboard(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_EMAIL_DASHBOARD in self.actions:
+        if role_services.ACTION_MANAGE_EMAIL_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -243,7 +160,7 @@ def can_access_moderator_page(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_MODERATOR_PAGE in self.actions:
+        if role_services.ACTION_ACCESS_MODERATOR_PAGE in self.user.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -260,7 +177,7 @@ def can_send_moderator_emails(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_SEND_MODERATOR_EMAILS in self.actions:
+        if role_services.ACTION_SEND_MODERATOR_EMAILS in self.user.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -277,7 +194,7 @@ def can_manage_own_profile(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_PROFILE in self.actions:
+        if role_services.ACTION_MANAGE_PROFILE in self.user.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -326,7 +243,7 @@ def can_create_exploration(handler):
         if self.user_id is None:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_CREATE_EXPLORATION in self.actions:
+        if role_services.ACTION_CREATE_EXPLORATION in self.user.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -343,7 +260,7 @@ def can_create_collection(handler):
         if self.user_id is None:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_CREATE_COLLECTION in self.actions:
+        if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -362,7 +279,7 @@ def can_access_creator_dashboard(handler):
         if self.user_id is None:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_CREATOR_DASHBOARD in self.actions:
+        if role_services.ACTION_ACCESS_CREATOR_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -381,9 +298,14 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if check_activity_accessible(
-                self.user_id, self.actions,
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -399,7 +321,8 @@ def can_rate_exploration(handler):
     """
 
     def test_can_rate(self, exploration_id, **kwargs):
-        if role_services.ACTION_RATE_EXPLORATION in self.actions:
+        if (role_services.ACTION_RATE_ANY_PUBLIC_EXPLORATION in
+                self.user.actions):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -413,7 +336,7 @@ def can_flag_exploration(handler):
     """Decorator to check whether user can flag given exploration."""
 
     def test_can_flag(self, exploration_id, **kwargs):
-        if role_services.ACTION_FLAG_EXPLORATION in self.actions:
+        if role_services.ACTION_FLAG_EXPLORATION in self.user.actions:
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -427,7 +350,7 @@ def can_subscribe_to_users(handler):
     """Decorator to check whether user can subscribe/unsubscribe a creator."""
 
     def test_can_subscribe(self, **kwargs):
-        if role_services.ACTION_SUBSCRIBE_TO_USERS in self.actions:
+        if role_services.ACTION_SUBSCRIBE_TO_USERS in self.user.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -444,8 +367,13 @@ def can_edit_exploration(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if check_exploration_editable(
-                self.user_id, self.actions, exploration_id):
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_edit_activity(
+                self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -465,15 +393,8 @@ def can_delete_exploration(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
-        if ((exploration_rights.status == (
-                rights_manager.ACTIVITY_STATUS_PRIVATE)) and
-                (role_services.ACTION_DELETE_OWNED_EXPLORATION in (
-                    self.actions)) and
-                exploration_rights.is_owner(self.user_id)):
-            return handler(self, exploration_id, **kwargs)
-        elif (exploration_rights.is_published() and
-              role_services.ACTION_DELETE_ANY_PUBLIC_EXPLORATION in (
-                  self.actions)):
+        if rights_manager.check_can_delete_activity(
+                self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -489,7 +410,8 @@ def can_suggest_changes_to_exploration(handler):
     exploration.
     """
     def test_can_suggest(self, exploration_id, **kwargs):
-        if role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in self.actions:
+        if (role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in
+                self.user.actions):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -510,21 +432,9 @@ def can_publish_exploration(handler):
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if exploration_rights.cloned_from:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to publish this exploration.')
-
-        if role_services.ACTION_PUBLISH_ANY_EXPLORATION in self.actions:
+        if rights_manager.check_can_publish_activity(
+                self.user, exploration_rights):
             return handler(self, exploration_id, *args, **kwargs)
-
-        if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-            if role_services.ACTION_PUBLISH_OWNED_EXPLORATION in self.actions:
-                if exploration_rights.is_owner(self.user_id):
-                    return handler(self, exploration_id, *args, **kwargs)
-
-        if exploration_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
-            if role_services.ACTION_PUBLICIZE_EXPLORATION in self.actions:
-                return handler(self, exploration_id, *args, **kwargs)
 
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You do not have credentials to publish this exploration.')
@@ -533,36 +443,44 @@ def can_publish_exploration(handler):
     return test_can_publish
 
 
-def can_manage_collection_publish_status(handler):
-    """Decorator to check whether user can publish exploration."""
+def can_publish_collection(handler):
+    """Decorator to check whether user can publish collection."""
 
-    def test_can_manage_collection_publish_status(
-            self, collection_id, **kwargs):
+    def test_can_publish_collection(self, collection_id, **kwargs):
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
-
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if collection_rights.is_published():
-            if role_services.ACTION_UNPUBLISH_PUBLIC_COLLECTION in self.actions:
-                return handler(self, collection_id, **kwargs)
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to unpublish this collection.')
+        if rights_manager.check_can_publish_activity(
+                self.user, collection_rights):
+            return handler(self, collection_id, **kwargs)
 
-        if collection_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-            if role_services.ACTION_PUBLISH_ANY_COLLECTION in self.actions:
-                return handler(self, collection_id, **kwargs)
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to publish this collection.')
+    test_can_publish_collection.__wrapped__ = True
 
-            if role_services.ACTION_PUBLISH_OWNED_COLLECTION in self.actions:
-                if collection_rights.is_owner(self.user_id):
-                    return handler(self, collection_id, **kwargs)
+    return test_can_publish_collection
 
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to publish this collection.')
-    test_can_manage_collection_publish_status.__wrapped__ = True
 
-    return test_can_manage_collection_publish_status
+def can_unpublish_collection(handler):
+    """Decorator to check whether user can unpublish collection."""
+
+    def test_can_unpublish_collection(self, collection_id, **kwargs):
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id)
+        if collection_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_unpublish_activity(
+                self.user, collection_rights):
+            return handler(self, collection_id, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to unpublish this collection.')
+    test_can_unpublish_collection.__wrapped__ = True
+
+    return test_can_unpublish_collection
 
 
 def can_modify_exploration_roles(handler):
@@ -574,26 +492,13 @@ def can_modify_exploration_roles(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
-        if exploration_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if (exploration_rights.community_owned or
-                exploration_rights.cloned_from):
+        if rights_manager.check_can_modify_activity_roles(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to change rights for this '
                 'exploration.')
-
-        if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_EXPLORATION in
-                self.actions):
-            return handler(self, exploration_id, **kwargs)
-        if (role_services.ACTION_MODIFY_ROLES_FOR_OWNED_EXPLORATION in
-                self.actions):
-            if exploration_rights.is_owner(self.user_id):
-                return handler(self, exploration_id, **kwargs)
-
-        raise base.UserFacingExceptions.UnauthorizedUserException(
-            'You do not have credentials to change rights for this '
-            'exploration.')
     test_can_modify.__wrapped__ = True
 
     return test_can_modify
@@ -620,7 +525,7 @@ def can_access_learner_dashboard(handler):
     """Decorator to check access to learner dashboard."""
 
     def test_can_access(self, **kwargs):
-        if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.actions:
+        if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
         else:
             raise self.NotLoggedInException
@@ -632,12 +537,10 @@ def can_access_learner_dashboard(handler):
 def require_user_id_else_redirect_to_homepage(handler):
     """Decorator that checks if a user_id is associated to the current
     session. If not, the user is redirected to the main page.
-
     Note that the user may not yet have registered.
     """
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in.
-
         If not, redirects the user to the home page.
         """
         if not self.user_id:

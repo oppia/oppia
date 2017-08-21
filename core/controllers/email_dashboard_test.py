@@ -40,7 +40,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(
             self.USER_A_EMAIL)
-        self.set_email_senders([self.SUBMITTER_USERNAME])
+        self.set_admins([self.SUBMITTER_USERNAME])
 
     def test_that_handler_works_correctly(self):
         self.login(self.SUBMITTER_EMAIL)
@@ -76,7 +76,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         # Check that MR job has been enqueued.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
@@ -152,7 +152,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         self.signup(self.NEW_SUBMITTER_EMAIL, self.NEW_SUBMITTER_USERNAME)
         self.new_submitter_id = self.get_user_id_from_email(
             self.NEW_SUBMITTER_EMAIL)
-        self.set_email_senders(
+        self.set_admins(
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
 
     def test_that_correct_emails_are_sent_to_all_users(self):
@@ -179,7 +179,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Check that MR job has been enqueued.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
             # Check that qualified users are valid.
@@ -283,7 +283,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
             query_models = user_models.UserQueryModel.query().fetch()

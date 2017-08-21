@@ -28,7 +28,7 @@ import feconf
     models.NAMES.base_model, models.NAMES.collection])
 
 
-class CollectionMigrationJob(jobs.BaseMapReduceJobManager):
+class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate collection schema
     versions. This job will load all existing collections from the data store
     and immediately store them back into the data store. The loading process of

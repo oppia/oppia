@@ -21,9 +21,9 @@ import imghdr
 import logging
 import StringIO
 
-import cloudstorage
 import jinja2
 import mutagen
+from mutagen import mp3
 
 from constants import constants
 from core.controllers import base
@@ -77,6 +77,7 @@ DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
         'Check out this interactive lesson I created on Oppia - a free '
         'platform for teaching and learning!'))
 
+
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
     all_value_generators = (
@@ -122,11 +123,8 @@ class ExplorationPage(EditorHandler):
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
 
-        can_edit = (
-            bool(self.user_id) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
 
         visualizations_html = visualization_registry.Registry.get_full_html()
 
@@ -157,28 +155,20 @@ class ExplorationPage(EditorHandler):
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
-            'can_delete': rights_manager.Actor(
-                self.user_id).can_delete(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_edit': can_edit,
-            'can_modify_roles': rights_manager.Actor(
-                self.user_id).can_modify_roles(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_publicize': rights_manager.Actor(
-                self.user_id).can_publicize(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_publish': rights_manager.Actor(
-                self.user_id).can_publish(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_release_ownership': rights_manager.Actor(
-                self.user_id).can_release_ownership(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_unpublicize': rights_manager.Actor(
-                self.user_id).can_unpublicize(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+            'can_delete': rights_manager.check_can_delete_activity(
+                self.user, exploration_rights),
+            'can_edit': rights_manager.check_can_edit_activity(
+                self.user, exploration_rights),
+            'can_modify_roles': (
+                rights_manager.check_can_modify_activity_roles(
+                    self.user, exploration_rights)),
+            'can_publish': rights_manager.check_can_publish_activity(
+                self.user, exploration_rights),
+            'can_release_ownership': (
+                rights_manager.check_can_release_ownership(
+                    self.user, exploration_rights)),
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, exploration_rights),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
@@ -300,19 +290,8 @@ class ExplorationHandler(EditorHandler):
     def delete(self, exploration_id):
         """Deletes the given exploration."""
 
-        role_description = ''
-        if self.is_admin:
-            role_description = 'admin'
-        elif self.is_moderator:
-            role_description = 'moderator'
-
-        log_debug_string = ''
-        if role_description == '':
-            log_debug_string = '%s tried to delete exploration %s' % (
-                self.user_id, exploration_id)
-        else:
-            log_debug_string = '(%s) %s tried to delete exploration %s' % (
-                role_description, self.user_id, exploration_id)
+        log_debug_string = '(%s) %s tried to delete exploration %s' % (
+            self.role, self.user_id, exploration_id)
         logging.debug(log_debug_string)
 
         is_exploration_cloned = rights_manager.is_exploration_cloned(
@@ -320,13 +299,8 @@ class ExplorationHandler(EditorHandler):
         exp_services.delete_exploration(
             self.user_id, exploration_id, force_deletion=is_exploration_cloned)
 
-        log_info_string = ''
-        if role_description == '':
-            log_info_string = '%s deleted exploration %s' % (
-                self.user_id, exploration_id)
-        else:
-            log_info_string = '(%s) %s deleted exploration %s' % (
-                role_description, self.user_id, exploration_id)
+        log_info_string = '(%s) %s deleted exploration %s' % (
+            self.role, self.user_id, exploration_id)
         logging.info(log_info_string)
 
 
@@ -353,7 +327,7 @@ class ExplorationRightsHandler(EditorHandler):
                     'Sorry, we could not find the specified user.')
 
             rights_manager.assign_role_for_exploration(
-                self.user_id, exploration_id, new_member_id, new_member_role)
+                self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(
                 self.user_id, new_member_id, new_member_role, exploration_id,
                 exploration.title)
@@ -366,11 +340,11 @@ class ExplorationRightsHandler(EditorHandler):
                 raise self.InvalidInputException(e)
 
             rights_manager.release_ownership_of_exploration(
-                self.user_id, exploration_id)
+                self.user, exploration_id)
 
         elif viewable_if_private is not None:
             rights_manager.set_private_viewability_of_exploration(
-                self.user_id, exploration_id, viewable_if_private)
+                self.user, exploration_id, viewable_if_private)
 
         else:
             raise self.InvalidInputException(
@@ -383,69 +357,33 @@ class ExplorationRightsHandler(EditorHandler):
 
 
 class ExplorationStatusHandler(EditorHandler):
-    """Handles publishing or publicizing of an exploration."""
+    """Handles publishing of an exploration."""
 
-    def _publish_exploration(self, exploration_id, make_public):
-        """Publish/Unpublish an exploration based on make_public boolean.
+    def _publish_exploration(self, exploration_id):
+        """Publish an exploration.
 
         Args:
             exploration_id: str. Id of the exploration.
-            make_public: bool. Whether to publish the exploration or
-                unpublish it.
 
         Raises:
             InvalidInputException: Given exploration is invalid.
         """
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        if make_public:
-            try:
-                exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
+        try:
+            exploration.validate(strict=True)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
-            exp_services.publish_exploration_and_update_user_profiles(
-                self.user_id, exploration_id)
-            exp_services.index_explorations_given_ids([exploration_id])
-        else:
-            rights_manager.unpublish_exploration(
-                self.user_id, exploration_id)
-            exp_services.delete_documents_from_search_index([
-                exploration_id])
-
-    def _publicize_exploration(self, exploration_id, make_publicized):
-        """Publicize/Unpublicize and exploration based on make_publicized
-        boolean.
-
-        Args:
-            exploration_id: str. Id of the exploration.
-            make_publicized: bool. Whether to publicize the exploration or
-                unpublicize it.
-
-        Raises:
-            InvalidInputException: Given exploration is invalid.
-        """
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        if make_publicized:
-            try:
-                exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
-
-            rights_manager.publicize_exploration(
-                self.user_id, exploration_id)
-        else:
-            rights_manager.unpublicize_exploration(
-                self.user_id, exploration_id)
+        exp_services.publish_exploration_and_update_user_profiles(
+            self.user, exploration_id)
+        exp_services.index_explorations_given_ids([exploration_id])
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id):
         make_public = self.payload.get('make_public')
-        make_publicized = self.payload.get('make_publicized')
 
         if make_public is not None:
-            self._publish_exploration(exploration_id, make_public)
-        elif make_publicized is not None:
-            self._publicize_exploration(exploration_id, make_publicized)
+            self._publish_exploration(exploration_id)
 
         self.render_json({
             'rights': rights_manager.get_exploration_rights(
@@ -481,18 +419,9 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
         # Perform the moderator action.
         if action == 'unpublish_exploration':
-            rights_manager.unpublish_exploration(
-                self.user_id, exploration_id)
+            rights_manager.unpublish_exploration(self.user, exploration_id)
             exp_services.delete_documents_from_search_index([
                 exploration_id])
-        elif action == 'publicize_exploration':
-            try:
-                exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
-
-            rights_manager.publicize_exploration(
-                self.user_id, exploration_id)
         else:
             raise self.InvalidInputException(
                 'No change was made to this exploration.')
@@ -883,18 +812,24 @@ class ImageUploadHandler(EditorHandler):
         self.render_json({'filepath': filename})
 
 
-class AudioFileHandler(EditorHandler):
-    """Handles audio file uploads to Google Cloud Storage."""
+class AudioUploadHandler(EditorHandler):
+    """Handles audio file uploads (to Google Cloud Storage in production, and
+    to the local datastore in dev).
+    """
+
+    # The string to prefix to the filename (before tacking the whole thing on
+    # to the end of 'assets/').
+    _FILENAME_PREFIX = 'audio'
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
 
-        raw = self.request.get('raw')
+        raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
         allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 
-        if not raw:
+        if not raw_audio_file:
             raise self.InvalidInputException('No audio supplied')
         dot_index = filename.rfind('.')
         extension = filename[dot_index + 1:].lower()
@@ -909,15 +844,25 @@ class AudioFileHandler(EditorHandler):
                 'one of the following extensions: %s' % allowed_formats)
 
         tempbuffer = StringIO.StringIO()
-        tempbuffer.write(raw)
+        tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:
-            audio = mutagen.File(tempbuffer)
+            # For every accepted extension, use the mutagen-specific
+            # constructor for that type. This will catch mismatched audio
+            # types e.g. uploading a flac file with an MP3 extension.
+            if extension == 'mp3':
+                audio = mp3.MP3(tempbuffer)
+            else:
+                audio = mutagen.File(tempbuffer)
         except mutagen.MutagenError:
-            # Mutagen occasionally has problems with certain files
-            # for unknown reasons.
-            raise self.InvalidInputException('Could not open uploaded'
-                                             'audio file')
+            # The calls to mp3.MP3() versus mutagen.File() seem to behave
+            # differently upon not being able to interpret the audio.
+            # mp3.MP3() raises a MutagenError whereas mutagen.File()
+            # seems to return None. It's not clear if this is always
+            # the case. Occasionally, mutagen.File() also seems to
+            # raise a MutagenError.
+            raise self.InvalidInputException('Audio not recognized '
+                                             'as a %s file' % extension)
         tempbuffer.close()
 
         if audio is None:
@@ -925,9 +870,9 @@ class AudioFileHandler(EditorHandler):
                                              'as a %s file' % extension)
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
-                'Audio must be under %s seconds in length. '
-                'Found length %s' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC,
-                                     audio.info.length))
+                'Audio files must be under %s seconds in length. The uploaded '
+                'file is %.2f seconds long.' % (
+                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
         if len(set(audio.mime).intersection(
                 set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
             raise self.InvalidInputException(
@@ -943,16 +888,15 @@ class AudioFileHandler(EditorHandler):
         # object being recursively passed around in app engine.
         del audio
 
-        bucket_name = constants.GCS_RESOURCE_BUCKET_NAME
-
-        # Upload to GCS bucket with filepath
-        # "<bucket>/<exploration-id>/assets/audio/<filename>".
-        gcs_file_url = ('/%s/%s/assets/audio/%s'
-                        % (bucket_name, exploration_id, filename))
-        gcs_file = cloudstorage.open(
-            gcs_file_url, 'w', content_type=mimetype)
-        gcs_file.write(raw)
-        gcs_file.close()
+        # Audio files are stored to the datastore in the dev env, and to GCS
+        # in production.
+        file_system_class = (
+            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+            else fs_domain.GcsFileSystem)
+        fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+        fs.commit(
+            self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
+            raw_audio_file, mimetype=mimetype)
 
         self.render_json({'filename': filename})
 

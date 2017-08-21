@@ -46,10 +46,18 @@ oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
+  'stateSolutionService', 'SolutionVerificationService', 'alertsService',
+  'explorationContextService', 'explorationWarningsService',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
-      explorationStatesService, graphDataService, OutcomeObjectFactory) {
+      explorationStatesService, graphDataService, OutcomeObjectFactory,
+      stateSolutionService, SolutionVerificationService, alertsService,
+      explorationContextService, explorationWarningsService,
+      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -69,10 +77,50 @@ oppia.factory('responsesService', [
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
         $rootScope.$broadcast('answerGroupChanged');
-
         explorationStatesService.saveInteractionAnswerGroups(
           editorContextService.getActiveStateName(),
           angular.copy(newAnswerGroups));
+
+        // To check if the solution is valid once a rule has been changed or
+        // added.
+        var currentInteractionId = stateInteractionIdService.savedMemento;
+        var interactionCanHaveSolution = (
+          currentInteractionId &&
+          INTERACTION_SPECS[currentInteractionId].can_have_solution);
+        var solutionExists = (
+          stateSolutionService.savedMemento &&
+          stateSolutionService.savedMemento.correctAnswer !== null);
+
+        if (interactionCanHaveSolution && solutionExists) {
+          var currentStateName = editorContextService.getActiveStateName();
+          var solutionWasPreviouslyValid = (
+            explorationStatesService.isSolutionValid(
+              editorContextService.getActiveStateName()));
+          SolutionVerificationService.verifySolution(
+            explorationContextService.getExplorationId(),
+            explorationStatesService.getState(currentStateName),
+            stateSolutionService.savedMemento.correctAnswer,
+            function() {
+              explorationStatesService.updateSolutionValidity(
+                currentStateName, true);
+              explorationWarningsService.updateWarnings();
+              if (!solutionWasPreviouslyValid) {
+                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
+              }
+            },
+            function() {
+              explorationStatesService.updateSolutionValidity(
+                currentStateName, false);
+              explorationWarningsService.updateWarnings();
+              if (solutionWasPreviouslyValid) {
+                alertsService.addInfoMessage(
+                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+              } else {
+                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+              }
+            }
+          );
+        }
 
         graphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
@@ -621,35 +669,34 @@ oppia.controller('StateResponses', [
                   answer, stateInteractionIdService.savedMemento,
                   stateCustomizationArgsService.savedMemento));
 
-              AnswerClassificationService.getMatchingClassificationResult(
-                _explorationId, _state, answer, true, rulesService)
-                .then(function(classificationResult) {
-                  var feedback = 'Nothing';
-                  var dest = classificationResult.outcome.dest;
-                  if (classificationResult.outcome.feedback.length > 0) {
-                    feedback = classificationResult.outcome.feedback[0];
-                  }
-                  if (dest === _stateName) {
-                    dest = '<em>(try again)</em>';
-                  }
-                  $scope.trainingDataAnswer = answer;
-                  $scope.trainingDataFeedback = feedback;
-                  $scope.trainingDataOutcomeDest = dest;
+              var classificationResult = (
+                AnswerClassificationService.getMatchingClassificationResult(
+                  _explorationId, _stateName, _state, answer, true,
+                  rulesService));
+              var feedback = 'Nothing';
+              var dest = classificationResult.outcome.dest;
+              if (classificationResult.outcome.feedback.length > 0) {
+                feedback = classificationResult.outcome.feedback[0];
+              }
+              if (dest === _stateName) {
+                dest = '<em>(try again)</em>';
+              }
+              $scope.trainingDataAnswer = answer;
+              $scope.trainingDataFeedback = feedback;
+              $scope.trainingDataOutcomeDest = dest;
 
-                  var answerGroupIndex =
-                    classificationResult.answerGroupIndex;
-                  var ruleIndex = classificationResult.ruleIndex;
-                  if (answerGroupIndex !==
-                    _state.interaction.answerGroups.length &&
-                      _state.interaction.answerGroups[answerGroupIndex]
-                        .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
-                    $scope.classification.answerGroupIndex = -1;
-                  } else {
-                    $scope.classification.answerGroupIndex = (
-                      classificationResult.answerGroupIndex);
-                  }
-                }
-              );
+              var answerGroupIndex =
+                classificationResult.answerGroupIndex;
+              var ruleIndex = classificationResult.ruleIndex;
+              if (answerGroupIndex !==
+                _state.interaction.answerGroups.length &&
+                  _state.interaction.answerGroups[answerGroupIndex]
+                    .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
+                $scope.classification.answerGroupIndex = -1;
+              } else {
+                $scope.classification.answerGroupIndex = (
+                  classificationResult.answerGroupIndex);
+              }
             };
           }]
       }).result.then(function(result) {

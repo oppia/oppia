@@ -29,6 +29,7 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_jobs_continuous
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -129,8 +130,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -172,8 +172,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             ModifiedRecentUpdatesAggregator.stop_computation(USER_ID)
 
@@ -199,8 +198,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -230,8 +228,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -257,8 +254,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -310,8 +306,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -362,8 +357,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications_for_user_a = (
@@ -404,6 +398,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
+            user_a = user_services.UserActionsInfo(user_a_id)
+
 
             # User A creates an exploration.
             self.save_new_valid_exploration(
@@ -421,13 +417,12 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
-                user_a_id, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
+                user_a, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications_for_user_a = (
@@ -473,8 +468,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -507,8 +501,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -535,8 +528,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -609,6 +601,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+
+        self.user_a = user_services.UserActionsInfo(self.user_a_id)
 
     def _mock_get_statistics(self, exp_id, unused_version):
         current_completions = {
@@ -886,7 +880,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.user_a_id)
 
         rights_manager.assign_role_for_exploration(
-            self.user_a_id, self.EXP_ID_1, self.user_b_id,
+            self.user_a, self.EXP_ID_1, self.user_b_id,
             rights_manager.ROLE_OWNER)
 
         exp_version = self.EXP_DEFAULT_VERSION

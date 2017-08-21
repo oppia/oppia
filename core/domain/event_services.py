@@ -22,6 +22,7 @@ from core import jobs_registry
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
 
 (stats_models, feedback_models) = models.Registry.import_models([
@@ -40,9 +41,10 @@ class BaseEventHandler(object):
         """Dispatch events asynchronously to continuous computation realtime
         layers that are listening for them.
         """
-        taskqueue_services.defer_to_events_queue(
+        taskqueue_services.defer(
             jobs_registry.ContinuousComputationEventDispatcher.dispatch_event,
-            cls.EVENT_TYPE, *args, **kwargs)
+            taskqueue_services.QUEUE_NAME_EVENTS, cls.EVENT_TYPE, *args,
+            **kwargs)
 
     @classmethod
     def _handle_event(cls, *args, **kwargs):

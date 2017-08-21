@@ -127,11 +127,14 @@ class BaseJobManager(object):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
+    def enqueue(cls, job_id, queue_name, additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
             job_id: str. The ID of the job to enqueue.
+            queue_name: str. The queue name the job should be run in. See
+                core.platform.taskqueue.gae_taskqueue_services for supported
+                values.
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
         """
@@ -143,7 +146,7 @@ class BaseJobManager(object):
 
         # Enqueue the job.
         cls._pre_enqueue_hook(job_id)
-        cls._real_enqueue(job_id, additional_job_params)
+        cls._real_enqueue(job_id, queue_name, additional_job_params)
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
@@ -182,8 +185,6 @@ class BaseJobManager(object):
             job_id: str. The ID of the job to complete.
             output_list: list(object). The output produced by the job.
         """
-        _MAX_OUTPUT_LENGTH_CHARS = 900000
-
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -198,7 +199,8 @@ class BaseJobManager(object):
         cls._post_completed_hook(job_id)
 
     @classmethod
-    def _compress_output_list(cls, output_list, test_only_max_output_len=None):
+    def _compress_output_list(
+            cls, output_list, test_only_max_output_len_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
         Ensures that the payload (i.e., [str(output) for output in output_list])
@@ -206,27 +208,34 @@ class BaseJobManager(object):
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
-            test_only_max_output_len: int or None. Overrides the intended max
-                output len limit when not None.
+            test_only_max_output_len_chars: int or None. Overrides the intended
+                max output len limit when not None.
 
         Returns:
             list(str). The compressed stringified output values.
         """
-        _MAX_OUTPUT_LEN = 900000
+        _MAX_OUTPUT_LEN_CHARS = 900000
+
+        class _OrderedCounter(collections.Counter, collections.OrderedDict):
+            """Counter that remembers the order elements are first encountered.
+
+            We use this class so that our tests can rely on deterministic
+            ordering, instead of simply using `collections.Counter` which has
+            non-deterministic ordering.
+            """
+            pass
 
         # Consolidate the lines of output since repeating them isn't useful.
-        counter = collections.Counter(str(output) for output in output_list)
+        counter = _OrderedCounter(str(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
             for (output_str, count) in counter.iteritems()
         ]
 
         # Truncate outputs to fit within given max length.
-        if test_only_max_output_len is None:
-            remaining_len = _MAX_OUTPUT_LEN
-        else:
-            remaining_len = test_only_max_output_len
-
+        remaining_len = (
+            _MAX_OUTPUT_LEN_CHARS if test_only_max_output_len_chars is None else
+            test_only_max_output_len_chars)
         for idx, output_str in enumerate(output_str_list):
             remaining_len -= len(output_str)
             if remaining_len < 0:
@@ -327,12 +336,16 @@ class BaseJobManager(object):
             cls.cancel(model.id, user_id)
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *). Additional parameters on jobs.
+            queue_name: str. The queue name the job should be run in. See
+                core.platform.taskqueue.gae_taskqueue_services for supported
+                values.
+            additional_job_params: dict(str : *) or None. Additional parameters
+                on jobs.
         """
         raise NotImplementedError(
             'Subclasses of BaseJobManager should implement _real_enqueue().')
@@ -550,15 +563,19 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Puts the job in the task queue.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *). Additional params to pass into
-                the job's _run() method.
+            queue_name: str. The queue name the job should be run in. See
+                core.platform.taskqueue.gae_taskqueue_services for supported
+                values.
+            additional_job_params: dict(str : *) or None. Additional params to
+                pass into the job's _run() method.
         """
-        taskqueue_services.defer(cls._run_job, job_id, additional_job_params)
+        taskqueue_services.defer(
+            cls._run_job, queue_name, job_id, additional_job_params)
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
@@ -720,14 +737,17 @@ class BaseMapReduceJobManager(BaseJobManager):
             'reduce as a @staticmethod.')
 
     @classmethod
-    def _real_enqueue(cls, job_id, additional_job_params):
+    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
         """Configures, creates, and queues the pipeline for the given job and
         params.
 
         Args:
             job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *). Additional params to pass into
-                the job's _run() method.
+            queue_name: str. The queue name the job should be run in. See
+                core.platform.taskqueue.gae_taskqueue_services for supported
+                values.
+            additional_job_params: dict(str : *) or None. Additional params to
+                pass into the job's _run() method.
 
         Raises:
             Exception: Passed a value to a parameter in the mapper which has
@@ -775,7 +795,8 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         mr_pipeline = MapReduceJobPipeline(
             job_id, '%s.%s' % (cls.__module__, cls.__name__), kwargs)
-        mr_pipeline.start(base_path='/mapreduce/worker/pipeline')
+        mr_pipeline.start(
+            base_path='/mapreduce/worker/pipeline', queue_name=queue_name)
 
     @classmethod
     def _pre_cancel_hook(cls, job_id, cancel_message):
@@ -803,6 +824,23 @@ class BaseMapReduceJobManager(BaseJobManager):
         job_queued_msec = float(context.get().mapreduce_spec.mapper.params[
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
         return job_queued_msec >= created_on_msec
+
+
+class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
+    """Overriden to force subclass jobs into the one-off jobs queue."""
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        """Marks a job as queued and adds it to a queue for processing.
+
+        Args:
+            job_id: str. The ID of the job to enqueue.
+            additional_job_params: dict(str : *) or None. Additional parameters
+                for the job.
+        """
+        super(BaseMapReduceOneOffJobManager, cls).enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            additional_job_params=additional_job_params)
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
@@ -1254,7 +1292,8 @@ class BaseContinuousComputationManager(object):
             return
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
-        job_manager.enqueue(job_id)
+        job_manager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS)
 
     @classmethod
     def _register_end_of_batch_job_and_return_status(cls):
@@ -1650,7 +1689,7 @@ def get_stuck_jobs(recency_msecs):
     return stuck_jobs
 
 
-class JobCleanupManager(BaseMapReduceJobManager):
+class JobCleanupManager(BaseMapReduceOneOffJobManager):
     """One-off job for cleaning up old auxiliary entities for MR jobs."""
 
     @classmethod
@@ -1718,4 +1757,5 @@ class JobCleanupManager(BaseMapReduceJobManager):
 
 ABSTRACT_BASE_CLASSES = frozenset([
     BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager,
+    BaseMapReduceOneOffJobManager,
     BaseMapReduceJobManagerForContinuousComputations])

@@ -50,7 +50,6 @@ describe('Read only exploration backend API service', function() {
             unresolved_answers: {},
             interaction: {
               customization_args: {},
-              fallbacks: [],
               answer_groups: [],
               default_outcome: {
                 param_changes: [],
@@ -63,7 +62,8 @@ describe('Read only exploration backend API service', function() {
           }
         }
       },
-      version: 1
+      version: 1,
+      state_classifier_mapping: {}
     };
   }));
 

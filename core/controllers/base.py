@@ -33,7 +33,6 @@ from google.appengine.api import users
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -143,9 +142,7 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user = current_user_services.get_current_user()
-        self.user_id = current_user_services.get_user_id(
-            self.user) if self.user else None
+        self.user_id = current_user_services.get_current_user_id()
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
@@ -156,7 +153,7 @@ class BaseHandler(webapp2.RequestHandler):
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
             if user_settings is None:
-                email = current_user_services.get_user_email(self.user)
+                email = current_user_services.get_current_user_email()
                 user_settings = user_services.create_new_user(
                     self.user_id, email)
             self.values['user_email'] = user_settings.email
@@ -187,16 +184,14 @@ class BaseHandler(webapp2.RequestHandler):
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
-        self.actions = role_services.get_all_actions(self.role)
+        self.user = user_services.UserActionsInfo(self.user_id)
 
-        rights_mgr_user = rights_manager.Actor(self.user_id)
-        self.is_moderator = rights_mgr_user.is_moderator()
-        self.is_admin = rights_mgr_user.is_admin()
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
-        self.values['is_moderator'] = self.is_moderator
-        self.values['is_admin'] = self.is_admin
+        self.values['is_moderator'] = user_services.is_at_least_moderator(
+            self.user_id)
+        self.values['is_admin'] = user_services.is_admin(self.user_id)
         self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):
@@ -309,8 +304,7 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
             'ACTIVITY_STATUS_PUBLIC': (
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
-            'ACTIVITY_STATUS_PUBLICIZED': (
-                rights_manager.ACTIVITY_STATUS_PUBLICIZED),
+            'AUDIO_URL_TEMPLATE': feconf.AUDIO_URL_TEMPLATE,
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
@@ -321,14 +315,13 @@ class BaseHandler(webapp2.RequestHandler):
 
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
-            'can_create_collections': (
-                self.username and self.username in
-                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
-            ),
+            'can_create_collections': bool(
+                self.role == feconf.ROLE_ID_COLLECTION_EDITOR),
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
-            'preferred_site_language_code': self.preferred_site_language_code
+            'preferred_site_language_code': self.preferred_site_language_code,
+            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
         })
         if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
@@ -435,6 +428,11 @@ class BaseHandler(webapp2.RequestHandler):
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
+        if isinstance(exception, self.NotLoggedInException):
+            self.redirect(
+                current_user_services.create_login_url(self.request.uri))
+            return
+
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
         logging.error('Exception raised: %s', exception)
 
@@ -443,11 +441,6 @@ class BaseHandler(webapp2.RequestHandler):
             self.error(404)
             self._render_exception(404, {
                 'error': 'Could not find the page %s.' % self.request.uri})
-            return
-
-        if isinstance(exception, self.NotLoggedInException):
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
             return
 
         if isinstance(exception, self.UnauthorizedUserException):

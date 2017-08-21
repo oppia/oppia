@@ -16,14 +16,18 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 
+import copy
 import os
 
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
@@ -58,10 +62,9 @@ states:
         dest: %s
         feedback: []
         param_changes: []
-      fallbacks: []
       hints: []
       id: null
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -76,19 +79,9 @@ states:
         dest: New state
         feedback: []
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: New state
-          feedback: []
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 42
-          trigger_type: NthResubmission
       hints: []
       id: null
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -137,16 +130,7 @@ states:
         dest: New state
         feedback: []
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: New state
-          feedback: []
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 42
-          trigger_type: NthResubmission
+      fallbacks: []
       id: null
     param_changes: []
 states_schema_version: %d
@@ -198,10 +182,9 @@ states:
         dest: %s
         feedback: []
         param_changes: []
-      fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -220,10 +203,9 @@ states:
         dest: New state
         feedback: []
         param_changes: []
-      fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   Second state:
     classifier_model_id: null
@@ -242,10 +224,9 @@ states:
         dest: Second state
         feedback: []
         param_changes: []
-      fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -522,15 +503,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.answer_groups = []
         exploration.validate()
 
-        interaction.fallbacks = {}
-        self._assert_validation_error(
-            exploration, 'Expected fallbacks to be a list')
-
         # Restore a valid exploration.
         interaction.id = 'TextInput'
         interaction.answer_groups = answer_groups
         interaction.default_outcome = default_outcome
-        interaction.fallbacks = []
         exploration.validate()
 
         interaction.hints = {}
@@ -579,102 +555,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
-    def test_fallbacks_validation(self):
-        """Test validation of state fallbacks."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')
-        exploration.objective = 'Objective'
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
-        exploration.validate()
-
-        base_outcome = {
-            'dest': exploration.init_state_name,
-            'feedback': [],
-            'param_changes': [],
-        }
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'FakeTriggerName',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 42,
-                    },
-                },
-            },
-            'outcome': base_outcome,
-        }])
-        self._assert_validation_error(exploration, 'Unknown trigger type')
-
-        with self.assertRaises(KeyError):
-            init_state.update_interaction_fallbacks([{
-                'trigger': {
-                    'trigger_type': 'NthResubmission',
-                    'customization_args': {
-                        'num_submits': {
-                            'value': 42,
-                        },
-                    },
-                },
-                'outcome': {},
-            }])
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {},
-            },
-            'outcome': base_outcome,
-        }])
-        # Default values for the customization args will be added silently.
-        exploration.validate()
-        self.assertEqual(len(init_state.interaction.fallbacks), 1)
-        self.assertEqual(
-            init_state.interaction.fallbacks[0].trigger.customization_args,
-            {
-                'num_submits': {
-                    'value': 3,
-                }
-            })
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 42,
-                    },
-                    'bad_key_that_will_get_stripped_silently': {
-                        'value': 'unused_value',
-                    }
-                },
-            },
-            'outcome': base_outcome,
-        }])
-        # Unused customization arg keys will be stripped silently.
-        exploration.validate()
-        self.assertEqual(len(init_state.interaction.fallbacks), 1)
-        self.assertEqual(
-            init_state.interaction.fallbacks[0].trigger.customization_args,
-            {
-                'num_submits': {
-                    'value': 42,
-                }
-            })
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 2,
-                    },
-                },
-            },
-            'outcome': base_outcome,
-        }])
-        exploration.validate()
-
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -692,7 +572,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
         # Add hint and delete hint
@@ -715,23 +596,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
+        # Solution should be set to None as default.
+        self.assertEquals(init_state.interaction.solution, None)
+
         init_state.add_hint('hint #1')
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+
         # Object type of answer must match that of correct_answer
         with self.assertRaises(AssertionError):
-            exploration.validate()
+            init_state.interaction.solution = (
+                exp_domain.Solution.from_dict(
+                    init_state.interaction.id, solution))
 
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
     def test_tag_validation(self):
@@ -1030,6 +917,218 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                            {'invalid-code': audio_translation}):
                 subtitled_html.validate()
 
+    def test_get_state_names_mapping(self):
+        """Test the get_state_names_mapping() method."""
+        exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Rename a state.
+        exploration.rename_state('Home', 'Renamed state')
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        }]
+
+        expected_dict = {
+            'Renamed state': 'Home',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Add a state
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }]
+
+        expected_dict = {
+            'New state': 'New state',
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Delete state.
+        exploration.delete_state('New state')
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        }]
+
+        expected_dict = {
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Test addition and multiple renames.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        exploration.rename_state('New state', 'New state2')
+        exploration.rename_state('New state2', 'New state3')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        }]
+
+        expected_dict = {
+            'New state3': 'New state',
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+    def test_get_trainable_states_dict(self):
+        """Test the get_trainable_states_dict() method."""
+        exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+
+        exploration_model = exp_models.ExplorationModel.get(
+            exp_id, strict=False)
+        old_states = exp_services.get_exploration_from_model(
+            exploration_model).states
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Rename a state to add it in unchanged answer group.
+        exploration.rename_state('Home', 'Renamed state')
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [],
+            'state_names_with_unchanged_answer_groups': ['Renamed state']
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Modify answer groups to trigger change in answer groups.
+        state = exploration.states['Renamed state']
+        exploration.states['Renamed state'].interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[3])
+        answer_groups = []
+        for answer_group in state.interaction.answer_groups:
+            answer_groups.append(answer_group.to_dict())
+        change_list = [{
+            'cmd': 'edit_state_property',
+            'state_name': 'Renamed state',
+            'property_name': 'answer_groups',
+            'new_value': answer_groups
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Add new state to trigger change in answer groups.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'New state', 'Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Delete state.
+        exploration.delete_state('New state')
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Test addition and multiple renames.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        exploration.rename_state('New state', 'New state2')
+        exploration.rename_state('New state2', 'New state3')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'Renamed state', 'New state3'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')
@@ -1085,10 +1184,9 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     'feedback': [],
                     'param_changes': [],
                 },
-                'fallbacks': [],
                 'hints': [],
                 'id': None,
-                'solution': {},
+                'solution': None,
             },
             'param_changes': [],
         }
@@ -1106,22 +1204,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             self.EXP_ID, title='Title', category='Category')
         exploration.add_states(['New state'])
         self.assertEqual(len(exploration.states), 2)
-
-        exploration.states['New state'].update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 42,
-                    },
-                },
-            },
-            'outcome': {
-                'dest': 'New state',
-                'feedback': [],
-                'param_changes': [],
-            },
-        }])
 
         exploration.validate()
 
@@ -2327,7 +2409,93 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V15
+    YAML_CONTENT_V16 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 16
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V16
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2447,10 +2615,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'feedback': [],
                         'param_changes': [],
                     },
-                    'fallbacks': [],
                     'hints': [],
                     'id': None,
-                    'solution': {},
+                    'solution': None,
                 },
                 'param_changes': [],
             }

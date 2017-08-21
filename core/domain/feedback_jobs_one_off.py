@@ -26,7 +26,7 @@ from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 
-class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
+class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for calculating the number of messages in a thread."""
 
     @classmethod
@@ -45,7 +45,7 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceJobManager):
         thread_model = feedback_models.FeedbackThreadModel.get(key)
         next_message_id = max(message_ids) + 1
         thread_model.message_count = next_message_id
-        thread_model.put()
+        thread_model.put(update_last_updated_time=False)
 
         if next_message_id != len(message_ids):
             exploration_and_thread_id = key.split('.')

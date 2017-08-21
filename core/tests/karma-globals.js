@@ -59,15 +59,15 @@ var GLOBALS = {
       rule_descriptions: {
         StartsWith: 'starts with {{x|NormalizedString}}',
         FuzzyMatches: 'is similar to {{training_data|SetOfNormalizedString}}',
-        FuzzyEquals: 
+        FuzzyEquals:
           'is equal to {{x|NormalizedString}}, ' +
           'misspelled by at most one character',
         Contains: 'contains {{x|NormalizedString}}',
-        CaseSensitiveEquals: 
+        CaseSensitiveEquals:
           'is equal to {{x|NormalizedString}}, taking case into account',
         Equals: 'is equal to {{x|NormalizedString}}'
       },
-      is_string_classifier_trainable: true,
+      is_interaction_trainable: true,
       is_trainable: true,
       narrow_instructions: null
     }
@@ -81,7 +81,11 @@ var GLOBALS = {
     id: 'en',
     text: 'English'
   }],
-  ASSET_DIR_PREFIX: ''
+  ASSET_DIR_PREFIX: '',
+  AUDIO_URL_TEMPLATE: '/assets/test/<exploration_id>/audio/<filename>',
+  // This prefix is needed to correctly interpolate directive template URLs in
+  // Karma tests. It is referenced by UrlInterpolationService.
+  TEMPLATE_DIR_PREFIX: 'core/templates/dev/head'
 };
 
 /* hashes for UrlInterpolationService tests */

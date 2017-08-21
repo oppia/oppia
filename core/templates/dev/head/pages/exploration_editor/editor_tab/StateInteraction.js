@@ -50,14 +50,14 @@ oppia.controller('StateInteraction', [
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
-  'SubtitledHtmlObjectFactory',
+  'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
       alertsService, editorContextService, oppiaHtmlEscaper,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService, interactionDetailsCache,
       oppiaExplorationHtmlFormatterService, UrlInterpolationService,
-      SubtitledHtmlObjectFactory) {
+      SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
     // Declare dummy submitAnswer() and adjustPageHeight() methods for the
@@ -107,6 +107,10 @@ oppia.controller('StateInteraction', [
       stateCustomizationArgsService.init(
         $scope.stateName, stateData.interaction.customizationArgs);
 
+      stateSolutionService.init(
+        editorContextService.getActiveStateName(),
+        stateData.interaction.solution);
+
       $rootScope.$broadcast('initializeAnswerGroups', {
         interactionId: stateData.interaction.id,
         answerGroups: stateData.interaction.answerGroups,
@@ -128,20 +132,15 @@ oppia.controller('StateInteraction', [
       var stateName = editorContextService.getActiveStateName();
 
       // Check if the content is currently empty, as expected.
-      var previousContent = explorationStatesService.getStateContentMemento(
-        stateName);
+      var previousContent = stateContentService.savedMemento;
       if (!previousContent.isEmpty()) {
         return;
       }
 
       // Update the state's content.
-      explorationStatesService.saveStateContent(
-        stateName,
-        SubtitledHtmlObjectFactory.createDefault(DEFAULT_TERMINAL_STATE_CONTENT)
-      );
-
-      // Update the state content editor view.
-      $rootScope.$broadcast('refreshStateContent');
+      stateContentService.displayed = SubtitledHtmlObjectFactory.createDefault(
+        DEFAULT_TERMINAL_STATE_CONTENT);
+      stateContentService.saveDisplayedValue();
     };
 
     $scope.onCustomizationModalSavePostHook = function() {
@@ -171,10 +170,6 @@ oppia.controller('StateInteraction', [
 
       graphDataService.recompute();
       _updateInteractionPreviewAndAnswerChoices();
-
-      // Refresh some related elements so the updated state appears (if its
-      // content has been changed).
-      $rootScope.$broadcast('refreshStateEditor');
     };
 
     $scope.openInteractionCustomizerModal = function() {
@@ -186,12 +181,12 @@ oppia.controller('StateInteraction', [
           backdrop: true,
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', '$injector',
+            '$scope', '$modalInstance', '$injector', 'stateSolutionService',
             'stateInteractionIdService', 'stateCustomizationArgsService',
             'interactionDetailsCache', 'INTERACTION_SPECS',
             'UrlInterpolationService', 'editorFirstTimeEventsService',
             function(
-                $scope, $modalInstance, $injector,
+                $scope, $modalInstance, $injector, stateSolutionService,
                 stateInteractionIdService, stateCustomizationArgsService,
                 interactionDetailsCache, INTERACTION_SPECS,
                 UrlInterpolationService, editorFirstTimeEventsService) {
@@ -372,9 +367,11 @@ oppia.controller('StateInteraction', [
       }).result.then(function() {
         stateInteractionIdService.displayed = null;
         stateCustomizationArgsService.displayed = {};
+        stateSolutionService.displayed = null;
 
         stateInteractionIdService.saveDisplayedValue();
         stateCustomizationArgsService.saveDisplayedValue();
+        stateSolutionService.saveDisplayedValue();
         $rootScope.$broadcast(
           'onInteractionIdChanged', stateInteractionIdService.savedMemento);
         graphDataService.recompute();

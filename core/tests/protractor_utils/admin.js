@@ -59,6 +59,20 @@ var editConfigProperty = function(
   );
 };
 
+var updateRole = function(name, newRole) {
+  general.waitForSystem();
+  browser.get(general.ADMIN_URL_SUFFIX);
+  element(by.css('.protractor-test-admin-roles-tab')).click();
+  browser.waitForAngular();
+  // Change values for "update role" form, and submit it.
+  element(by.css('.protractor-update-form-name')).sendKeys(name);
+  element(by.css('.protractor-update-form-role-select')).
+    element(by.cssContainingText('option', newRole)).click();
+  element(by.css('.protractor-update-form-submit')).click();
+  general.waitForSystem();
+  return true;
+}
+
 // The name should be as given in the admin page (including '.yaml' if
 // necessary).
 var reloadExploration = function(name) {
@@ -95,3 +109,4 @@ var reloadAllExplorations = function(name) {
 exports.editConfigProperty = editConfigProperty;
 exports.reloadExploration = reloadExploration;
 exports.reloadAllExplorations = reloadAllExplorations;
+exports.updateRole = updateRole;

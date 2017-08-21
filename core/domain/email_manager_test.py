@@ -28,6 +28,7 @@ import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
+
 class EmailRightsTest(test_utils.GenericTestBase):
     """Test that only certain users can send certain types of emails."""
 
@@ -53,13 +54,11 @@ class EmailRightsTest(test_utils.GenericTestBase):
         expected_validation_results = {
             feconf.EMAIL_INTENT_SIGNUP: (True, False, False, False),
             feconf.EMAIL_INTENT_DAILY_BATCH: (True, False, False, False),
-            feconf.EMAIL_INTENT_MARKETING: (False, True, False, False),
-            feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION: (
-                False, True, True, False),
+            feconf.EMAIL_INTENT_MARKETING: (True, True, False, False),
             feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-                False, True, True, False),
+                True, True, True, False),
             feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-                False, True, True, False),
+                True, True, True, False),
         }
 
         # pylint: disable=protected-access
@@ -1724,9 +1723,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
             self.RECIPIENT_B_EMAIL)
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
-        config_services.set_property(
-            self.sender_id, 'whitelisted_email_senders',
-            [self.SENDER_USERNAME])
+        self.set_admins([self.SENDER_USERNAME])
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_correct_email_is_sent(self):

@@ -29,6 +29,10 @@ class InteractiveMap(base.BaseInteraction):
     instructions = 'Click on the map'
     narrow_instructions = 'View map'
     needs_summary = True
+    # There needs to be a way to pass marker location so that an answer can be
+    # conveyed meaningfully to the learner. Once this issue is fixed,
+    # InteractiveMap interaction can be supported by the solution feature.
+    can_have_solution = False
 
     _customization_arg_specs = [{
         'name': 'latitude',
