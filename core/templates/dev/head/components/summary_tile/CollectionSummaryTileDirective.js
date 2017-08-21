@@ -76,12 +76,12 @@ oppia.directive('collectionSummaryTile', [
             return UrlInterpolationService.getStaticImageUrl(url);
           };
 
-          var hoverOverActivity = false;
+          var currentlyHoveringOverActivity = false;
           var activeActivityId = '';
 
-          $scope.setHoverOverActivity = function(activityId) {
+          $scope.setCurrentlyHoveringOverActivity = function(activityId) {
             activeActivityId = activityId;
-            hoverOverActivity = !hoverOverActivity;
+            currentlyHoveringOverActivity = !currentlyHoveringOverActivity;
           };
 
           $scope.showAddToLearnerPlaylistIcon = function(activityId) {
@@ -98,7 +98,8 @@ oppia.directive('collectionSummaryTile', [
                   collectionPlaylistIds.indexOf(activityId) !== -1) {
                 return false;
               } else {
-                return hoverOverActivity && (activeActivityId == activityId);
+                return (currentlyHoveringOverActivity &&
+                (activeActivityId == activityId));
               }
             }
           };
@@ -127,6 +128,10 @@ oppia.directive('collectionSummaryTile', [
                 } else {
                   alertsService.addSuccessMessage(
                     'Successfully added to your \'Play Later\' list.');
+                  /* eslint-disable max-len */
+                  $scope.learnerDashboardActivityIds.collection_playlist_ids.push(
+                    activityId);
+                  /* eslint-enable max-len */
                 }
               });
 

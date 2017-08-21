@@ -1,7 +1,7 @@
 <div class="oppia-activities-infinity-grid-container" infinite-scroll="
      showMoreActivities()" infinite-scroll-distance="1"
      infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading">
-  <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;" ng-mouseenter="setHoverOverActivity(activity.id)" ng-mouseleave="setHoverOverActivity(activity.id)">
+  <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;" ng-mouseenter="setCurrentlyHoveringOverActivity(activity.id)" ng-mouseleave="setCurrentlyHoveringOverActivity(activity.id)">
     <collection-summary-tile ng-if="activity.activity_type === 'collection'"
                              collection-id="activity.id"
                              collection-title="activity.title"

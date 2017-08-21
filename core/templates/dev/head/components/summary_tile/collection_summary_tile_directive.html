@@ -2,7 +2,7 @@
 <i class="protractor-test-add-exp-to-playlist-icon oppia-learner-dashboard-icon fa fa-clock-o"
    ng-show="showAddToLearnerPlaylistIcon(getCollectionId())"
    ng-click="addToLearnerPlaylist(collectionType, getCollectionId())"
-   ng-mouseenter="setHoverOverActivity(getCollectionId())" ng-mouseleave="setHoverOverActivity(getCollectionId())"
+   ng-mouseenter="setCurrentlyHoveringOverActivity(getCollectionId())" ng-mouseleave="setCurrentlyHoveringOverActivity(getCollectionId())"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
@@ -25,7 +25,7 @@
 </span>
 <md-card class="oppia-activity-summary-tile"
          ng-class="{'oppia-activity-playlist-tile': playlistMode}"
-         ng-mouseenter="setHoverOverActivity(getCollectionId())" ng-mouseleave="setHoverOverActivity(getCollectionId())"
+         ng-mouseenter="setCurrentlyHoveringOverActivity(getCollectionId())" ng-mouseleave="setCurrentlyHoveringOverActivity(getCollectionId())"
          style="position: relative; z-index: 5;">
   <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">

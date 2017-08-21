@@ -116,12 +116,12 @@ oppia.directive('explorationSummaryTile', [
           }
 
           $scope.MAX_AVATARS_TO_DISPLAY = 5;
-          var hoverOverActivity = false;
+          var currentlyHoveringOverActivity = false;
           var activeActivityId = '';
 
-          $scope.setHoverOverActivity = function(activityId) {
+          $scope.setCurrentlyHoveringOverActivity = function(activityId) {
             activeActivityId = activityId;
-            hoverOverActivity = !hoverOverActivity;
+            currentlyHoveringOverActivity = !currentlyHoveringOverActivity;
           };
 
           $scope.showAddToLearnerPlaylistIcon = function(activityId) {
@@ -138,7 +138,8 @@ oppia.directive('explorationSummaryTile', [
                   explorationPlaylistIds.indexOf(activityId) !== -1) {
                 return false;
               } else {
-                return hoverOverActivity && (activeActivityId == activityId);
+                return (currentlyHoveringOverActivity &&
+                (activeActivityId == activityId));
               }
             }
           };
@@ -167,13 +168,12 @@ oppia.directive('explorationSummaryTile', [
                 } else {
                   alertsService.addSuccessMessage(
                     'Successfully added to your \'Play Later\' list.');
+                  /* eslint-disable max-len */
+                  $scope.learnerDashboardActivityIds.exploration_playlist_ids.push(
+                    activityId);
+                  /* eslint-enable max-len */
                 }
               });
-
-            if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
-              $scope.learnerDashboardActivityIds.exploration_playlist_ids.push(
-                activityId);
-            }
           };
 
           $scope.removeFromLearnerPlaylist = function(

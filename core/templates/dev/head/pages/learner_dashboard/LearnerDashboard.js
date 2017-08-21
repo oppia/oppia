@@ -572,7 +572,9 @@ oppia.controller('LearnerDashboard', [
           ($scope.completedExplorationsList.length === 0) &&
           ($scope.completedCollectionsList.length === 0) &&
           ($scope.incompleteExplorationsList.length === 0) &&
-          ($scope.incompleteCollectionsList.length === 0));
+          ($scope.incompleteCollectionsList.length === 0) &&
+          ($scope.explorationPlaylist.length === 0) &&
+          ($scope.collectionPlaylist.length === 0));
         $rootScope.loadingMessage = '';
       },
       function(errorResponse) {

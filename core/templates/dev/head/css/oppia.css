@@ -4024,6 +4024,7 @@ md-card.preview-conversation-skin-supplemental-card {
   display: inline-block;
   height: 7em;
   margin: 16px 0 10px 16px;
+  min-width: 163px;
   width: 27%;
 }
 
@@ -4037,6 +4038,42 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile.oppia-activity-playlist-tile .activity-title {
   font-size: 0.85em;
   text-align: center;
+}
+
+@media(max-width: 895px) {
+  .oppia-activity-summary-tile.oppia-activity-playlist-tile .summary-section {
+    width: 55%;
+  }
+}
+
+@media(max-width: 743px) {
+  .oppia-activity-summary-tile.oppia-activity-playlist-tile .thumbnail-image {
+    width: 45px;
+  }
+
+  .oppia-activity-summary-tile.oppia-activity-playlist-tile .activity-title {
+    font-size: 0.75em;
+  }
+
+  .oppia-activity-summary-tile.oppia-activity-playlist-tile .title-section {
+    height: 7em;
+    min-width: 140px;
+  }
+
+  .oppia-activity-summary-tile.oppia-activity-playlist-tile .summary-section {
+    width: 50%;
+  }
+}
+
+@media(max-width: 629px) {
+  .oppia-activity-summary-tile.oppia-activity-playlist-tile .title-section {
+    height: 7em;
+    min-width: 115px;
+  }
+
+  .oppia-activity-summary-tile.oppia-activity-playlist-tile .summary-section {
+    width: 47%;
+  }
 }
 
 .oppia-activity-summary-tile .title-section {

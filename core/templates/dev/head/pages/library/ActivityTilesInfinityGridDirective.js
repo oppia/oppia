@@ -33,7 +33,7 @@ oppia.directive('activityTilesInfinityGrid', [
           $modal) {
           $scope.endOfPageIsReached = false;
           $scope.allActivitiesInOrder = [];
-          var hoverOverActivity = false;
+          var currentlyHoveringOverActivity = false;
           var activeActivityId = '';
           console.log($scope.getLearnerDashboardActivityIds());
           // Called when the first batch of search results is retrieved from the
@@ -45,9 +45,9 @@ oppia.directive('activityTilesInfinityGrid', [
             }
           );
 
-          $scope.setHoverOverActivity = function(activityId) {
+          $scope.setCurrentlyHoveringOverActivity = function(activityId) {
             activeActivityId = activityId;
-            hoverOverActivity = !hoverOverActivity;
+            currentlyHoveringOverActivity = !currentlyHoveringOverActivity;
           };
 
           $scope.showAddToLearnerPlaylistIcon = function(activityId) {
@@ -75,7 +75,8 @@ oppia.directive('activityTilesInfinityGrid', [
                 collectionPlaylistIds.indexOf(activityId) !== -1) {
               return false;
             } else {
-              return hoverOverActivity && (activeActivityId === activityId);
+              return (currentlyHoveringOverActivity &&
+                (activeActivityId === activityId));
             }
           };
 
