@@ -510,69 +510,66 @@ def get_thread_summaries(user_id, full_thread_ids):
     thread_summaries = []
     number_of_unread_threads = 0
     for index, thread in enumerate(threads):
-        if thread.original_author_id == user_id:
-            feedback_thread_user_model_exists = (
-                feedback_thread_user_models[index] is not None)
+        feedback_thread_user_model_exists = (
+            feedback_thread_user_models[index] is not None)
+        if feedback_thread_user_model_exists:
+            last_message_read = (
+                last_two_messages[index][0].message_id
+                in feedback_thread_user_models[index].message_ids_read_by_user)
+        else:
+            last_message_read = False
+
+        if last_two_messages[index][0].author_id is None:
+            author_last_message = None
+        else:
+            author_last_message = user_services.get_username(
+                last_two_messages[index][0].author_id)
+
+        second_last_message_read = None
+        author_second_last_message = None
+
+        does_second_message_exist = (last_two_messages[index][1] is not None)
+        if does_second_message_exist:
             if feedback_thread_user_model_exists:
-                last_message_read = (
-                    last_two_messages[index][0].message_id in
-                    feedback_thread_user_models[index].message_ids_read_by_user)
+                second_last_message_read = (
+                    last_two_messages[index][1].message_id
+                    in feedback_thread_user_models[index].message_ids_read_by_user) # pylint: disable=line-too-long
             else:
-                last_message_read = False
+                second_last_message_read = False
 
-            if last_two_messages[index][0].author_id is None:
-                author_last_message = None
+            if last_two_messages[index][1].author_id is None:
+                author_second_last_message = None
             else:
-                author_last_message = user_services.get_username(
-                    last_two_messages[index][0].author_id)
+                author_second_last_message = user_services.get_username(
+                    last_two_messages[index][1].author_id)
+        if not last_message_read:
+            number_of_unread_threads += 1
 
-            second_last_message_read = None
-            author_second_last_message = None
+        if thread.message_count:
+            total_message_count = thread.message_count
+        # TODO(Arunabh): Remove else clause after each thread has a message
+        # count.
+        else:
+            total_message_count = (
+                feedback_models.FeedbackMessageModel.get_message_count(
+                    thread.exploration_id, thread.get_thread_id()))
 
-            does_second_message_exist = (
-                last_two_messages[index][1] is not None)
-            if does_second_message_exist:
-                if feedback_thread_user_model_exists:
-                    second_last_message_read = (
-                        last_two_messages[index][1].message_id
-                        in feedback_thread_user_models[index].message_ids_read_by_user) # pylint: disable=line-too-long
-                else:
-                    second_last_message_read = False
+        thread_summary = {
+            'status': thread.status,
+            'original_author_id': thread.original_author_id,
+            'last_updated': utils.get_time_in_millisecs(thread.last_updated),
+            'last_message_text': last_two_messages[index][0].text,
+            'total_message_count': total_message_count,
+            'last_message_read': last_message_read,
+            'second_last_message_read': second_last_message_read,
+            'author_last_message': author_last_message,
+            'author_second_last_message': author_second_last_message,
+            'exploration_title': explorations[index].title,
+            'exploration_id': exploration_ids[index],
+            'thread_id': thread_ids[index]
+        }
 
-                if last_two_messages[index][1].author_id is None:
-                    author_second_last_message = None
-                else:
-                    author_second_last_message = user_services.get_username(
-                        last_two_messages[index][1].author_id)
-            if not last_message_read:
-                number_of_unread_threads += 1
-
-            if thread.message_count:
-                total_message_count = thread.message_count
-            # TODO(Arunabh): Remove else clause after each thread has a message
-            # count.
-            else:
-                total_message_count = (
-                    feedback_models.FeedbackMessageModel.get_message_count(
-                        thread.exploration_id, thread.get_thread_id()))
-
-            thread_summary = {
-                'status': thread.status,
-                'original_author_id': thread.original_author_id,
-                'last_updated': (
-                    utils.get_time_in_millisecs(thread.last_updated)),
-                'last_message_text': last_two_messages[index][0].text,
-                'total_message_count': total_message_count,
-                'last_message_read': last_message_read,
-                'second_last_message_read': second_last_message_read,
-                'author_last_message': author_last_message,
-                'author_second_last_message': author_second_last_message,
-                'exploration_title': explorations[index].title,
-                'exploration_id': exploration_ids[index],
-                'thread_id': thread_ids[index]
-            }
-
-            thread_summaries.append(thread_summary)
+        thread_summaries.append(thread_summary)
 
     return thread_summaries, number_of_unread_threads
 
