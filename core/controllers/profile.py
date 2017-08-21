@@ -14,8 +14,6 @@
 
 """Controllers for the profile page."""
 
-from constants import constants
-
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import email_manager
@@ -244,12 +242,6 @@ class SignupPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         return_url = str(self.request.get('return_url', self.request.uri))
-
-        # Check if the return url is the creator dashboard. If it is, we should
-        # set the default dashboard of the user as the creator dashboard.
-        if feconf.CREATOR_DASHBOARD_URL in return_url:
-            user_services.update_user_default_dashboard(
-                self.user_id, constants.DASHBOARD_TYPE_CREATOR)
 
         if user_services.has_fully_registered(self.user_id):
             self.redirect(return_url)
