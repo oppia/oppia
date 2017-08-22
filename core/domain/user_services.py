@@ -72,6 +72,7 @@ class UserSettings(object):
         preferred_language_codes: list(str) or None. Exploration language
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
+        preferred_audio_language_code: str or None. Audio language preference.
     """
     def __init__(
             self, user_id, email, role, username=None,
@@ -80,7 +81,8 @@ class UserSettings(object):
             last_edited_an_exploration=None, profile_picture_data_url=None,
             default_dashboard=None, user_bio='', subject_interests=None,
             first_contribution_msec=None, preferred_language_codes=None,
-            preferred_site_language_code=None
+            preferred_site_language_code=None,
+            preferred_audio_language_code=None
     ):
         """Constructs a UserSettings domain object.
 
@@ -111,6 +113,8 @@ class UserSettings(object):
                 preferences specified by the user.
             preferred_site_language_code: str or None. System language
                 preference.
+            preferred_audio_language_code: str or None. Default language used
+                for audio translations preference.
         """
         self.user_id = user_id
         self.email = email
@@ -131,6 +135,7 @@ class UserSettings(object):
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
+        self.preferred_audio_language_code = preferred_audio_language_code
 
     def validate(self):
         """Checks that user_id and email fields of this UserSettings domain
@@ -381,7 +386,9 @@ def get_users_settings(user_ids):
                 first_contribution_msec=model.first_contribution_msec,
                 preferred_language_codes=model.preferred_language_codes,
                 preferred_site_language_code=(
-                    model.preferred_site_language_code)
+                    model.preferred_site_language_code),
+                preferred_audio_language_code=(
+                    model.preferred_audio_language_code)
             ))
         else:
             result.append(None)
@@ -587,7 +594,9 @@ def _save_user_settings(user_settings):
         first_contribution_msec=user_settings.first_contribution_msec,
         preferred_language_codes=user_settings.preferred_language_codes,
         preferred_site_language_code=(
-            user_settings.preferred_site_language_code)
+            user_settings.preferred_site_language_code),
+        preferred_audio_language_code=(
+            user_settings.preferred_audio_language_code)
     ).put()
 
 
@@ -847,6 +856,19 @@ def update_preferred_site_language_code(user_id, preferred_site_language_code):
         preferred_site_language_code)
     _save_user_settings(user_settings)
 
+def update_preferred_audio_language_code(
+        user_id, preferred_audio_language_code):
+    """Updates preferred_audio_language_code of user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        preferred_audio_language_code: str. New audio language preference
+            to set.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.preferred_audio_language_code = (
+        preferred_audio_language_code)
+    _save_user_settings(user_settings)
 
 def update_user_role(user_id, role):
     """Updates the role of the user with given user_id.
