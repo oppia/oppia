@@ -124,6 +124,23 @@ oppia.controller('Signup', [
         agreed_to_terms: agreedToTerms,
         can_receive_email_updates: null
       };
+
+      var defaultDashboard = '';
+      var returnUrl = window.decodeURIComponent(
+        urlService.getUrlParams().return_url);
+
+      if (returnUrl.indexOf('creator_dashboard') !== -1) {
+        defaultDashboard = constants.DASHBOARD_TYPE_CREATOR;
+      } else {
+        defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
+      }
+
+      var requestParams = {
+        agreed_to_terms: agreedToTerms,
+        can_receive_email_updates: null,
+        default_dashboard: defaultDashboard
+      };
+
       if (!$scope.hasUsername) {
         requestParams.username = username;
       }
@@ -143,28 +160,11 @@ oppia.controller('Signup', [
             'Invalid value for email preferences: ' + canReceiveEmailUpdates);
         }
       }
+
       siteAnalyticsService.registerNewSignupEvent();
 
       $scope.submissionInProcess = true;
       $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
-        var returnUrl = window.decodeURIComponent(
-          urlService.getUrlParams().return_url);
-
-
-        // If the user has the return url as the creator dashboard, it is
-        // likely that he/she is a creator. Therfore we should set the
-        // default dashboard as the creator dashboard.
-        if (returnUrl.indexOf('creator_dashboard') !== -1) {
-          $http.put('/preferenceshandler/data', {
-            update_type: 'default_dashboard',
-            data: constants.DASHBOARD_TYPE_CREATOR
-          });
-        } else {
-          $http.put('/preferenceshandler/data', {
-            update_type: 'default_dashboard',
-            data: constants.DASHBOARD_TYPE_LEARNER
-          });
-        }
         window.location = window.decodeURIComponent(
           urlService.getUrlParams().return_url);
       }, function() {
