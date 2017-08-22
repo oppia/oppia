@@ -361,14 +361,14 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         # saving only first 3 explorations to check that None is returned for
         # non-existing exploration
-        for exp_id in exp_ids[:2]:
+        for exp_id in exp_ids[:3]:
             self.save_new_valid_exploration(exp_id, self.user_id_admin)
         exp_rights = rights_manager.get_multiple_exploration_rights_by_ids(
             exp_ids)
 
         self.assertEqual(len(exp_rights), 4)
-        for right_object in exp_rights[:2]:
-            self.assertIsNotNone(right_object)
+        for rights_object in exp_rights[:3]:
+            self.assertIsNotNone(rights_object)
         self.assertIsNone(exp_rights[3])
 
 
