@@ -215,6 +215,11 @@ class ExplorationHandler(base.BaseHandler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         user_settings = user_services.get_user_settings(self.user_id)
+        
+        preferred_audio_language_code = None
+        if user_settings is not None:
+            preferred_audio_language_code = (
+                user_settings.preferred_audio_language_code)
 
         # Retrieve all classifiers for the exploration.
         state_classifier_mapping = {}
@@ -244,8 +249,7 @@ class ExplorationHandler(base.BaseHandler):
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
-            'preferred_audio_language_code':
-                user_settings.preferred_audio_language_code,
+            'preferred_audio_language_code': preferred_audio_language_code,
             'state_classifier_mapping': state_classifier_mapping
         })
         self.render_json(self.values)

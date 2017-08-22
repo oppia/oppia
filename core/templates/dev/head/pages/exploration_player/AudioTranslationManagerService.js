@@ -30,21 +30,18 @@ oppia.factory('AudioTranslationManagerService', [
     var attemptToSetAudioLanguageToExplorationLanguage = function() {
       // We minimize the number of related languages, because we want to
       // pick the language that is the most directly related to the exploration
-      // language . For example, this would prioritize Hindi over Hinglish
+      // language. For example, this would prioritize Hindi over Hinglish
       // if both were available as audio languages.
       var numRelatedLanguages = Number.MAX_VALUE;
-      _allAudioLanguageCodesInExploration.map(function(audioLanguageCode) {
+      _allAudioLanguageCodesInExploration.forEach(function(audioLanguageCode) {
         var relatedLanguageCodes =
           LanguageUtilService.getLanguageCodesRelatedToAudioLanguageCode(
             audioLanguageCode);
-        relatedLanguageCodes.map(function(relatedLanguageCode) {
-          if (relatedLanguageCode === _explorationLanguageCode) {
-            if (relatedLanguageCodes.length < numRelatedLanguages) {
-              _currentAudioLanguageCode = audioLanguageCode;
-              numRelatedLanguages = relatedLanguageCodes.length;
-            }
-          }
-        });
+        if (relatedLanguageCodes.length < numRelatedLanguages &&
+            relatedLanguageCodes.indexOf(_explorationLanguageCode) !== -1) {
+          _currentAudioLanguageCode = audioLanguageCode;
+          numRelatedLanguages = relatedLanguageCodes.length;
+        }
       });
     };
 
