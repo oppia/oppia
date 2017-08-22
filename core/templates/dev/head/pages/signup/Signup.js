@@ -125,7 +125,7 @@ oppia.controller('Signup', [
         can_receive_email_updates: null
       };
 
-      var defaultDashboard = '';
+      var defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
       var returnUrl = window.decodeURIComponent(
         urlService.getUrlParams().return_url);
 

@@ -288,10 +288,6 @@ class SignupHandler(base.BaseHandler):
         has_ever_registered = user_services.has_ever_registered(self.user_id)
         has_fully_registered = user_services.has_fully_registered(self.user_id)
 
-        # Set the default dashboard for new users.
-        user_services.update_user_default_dashboard(
-            self.user_id, default_dashboard)
-
         if has_fully_registered:
             self.render_json({})
             return
@@ -322,6 +318,11 @@ class SignupHandler(base.BaseHandler):
             email_manager.send_post_signup_email(self.user_id)
 
         user_services.generate_initial_profile_picture(self.user_id)
+
+        if not has_ever_registered:
+            # Set the default dashboard for new users.
+            user_services.update_user_default_dashboard(
+                self.user_id, default_dashboard)
 
         self.render_json({})
 
