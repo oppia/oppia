@@ -78,10 +78,10 @@ exports.config = {
     ],
 
     library: [
-      'protractor/explorationRating.js'
-      // 'protractor/privileges.js',
-      // 'protractor/libraryPagesTour.js',
-      // 'protractor/publicationAndLibrary.js'
+      'protractor/explorationRating.js',
+      'protractor/privileges.js',
+      'protractor/libraryPagesTour.js',
+      'protractor/publicationAndLibrary.js'
     ],
 
     learnerDashboard: [
