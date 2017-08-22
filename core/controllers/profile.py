@@ -281,6 +281,7 @@ class SignupHandler(base.BaseHandler):
         """Handles POST requests."""
         username = self.payload.get('username')
         agreed_to_terms = self.payload.get('agreed_to_terms')
+        default_dashboard = self.payload.get('default_dashboard')
         can_receive_email_updates = self.payload.get(
             'can_receive_email_updates')
 
@@ -317,6 +318,11 @@ class SignupHandler(base.BaseHandler):
             email_manager.send_post_signup_email(self.user_id)
 
         user_services.generate_initial_profile_picture(self.user_id)
+
+        if not has_ever_registered:
+            # Set the default dashboard for new users.
+            user_services.update_user_default_dashboard(
+                self.user_id, default_dashboard)
 
         self.render_json({})
 

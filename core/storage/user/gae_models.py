@@ -58,7 +58,11 @@ class UserSettingsModel(base_models.BaseModel):
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # The preferred dashboard of the user.
     default_dashboard = ndb.StringProperty(
-        default=constants.DASHBOARD_TYPE_LEARNER, indexed=False)
+        default=constants.DASHBOARD_TYPE_LEARNER,
+        indexed=False,
+        choices=[
+            constants.DASHBOARD_TYPE_LEARNER,
+            constants.DASHBOARD_TYPE_CREATOR])
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
     # Subject interests specified by the user.
