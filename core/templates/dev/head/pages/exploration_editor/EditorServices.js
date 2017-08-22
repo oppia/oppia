@@ -107,18 +107,18 @@ oppia.factory('explorationData', [
               explorationData.data = response;
               var draft = LocalStorageService.getExplorationDraft(
                 explorationId);
-              if (draft &&
-                draft.isDraftValid(draftChangeListId)) {
-                var changeList = draft.getDraftChanges();
-                explorationData.autosaveChangeList(changeList, function() {
-                  // A reload is needed so that the changelist just saved is
-                  // loaded as opposed to the exploration returned by this
-                  // response.
-                  $window.location.reload();
-                });
-              } else if (draft &&
-                !draft.isDraftValid(draftChangeListId)) {
-                errorCallback(explorationId, draft.getDraftChanges());
+              if (draft) {
+                if (draft.isDraftValid(draftChangeListId)) {
+                  var changeList = draft.getDraftChanges();
+                  explorationData.autosaveChangeList(changeList, function() {
+                    // A reload is needed so that the changelist just saved is
+                    // loaded as opposed to the exploration returned by this
+                    // response.
+                    $window.location.reload();
+                  });
+                } else {
+                  errorCallback(explorationId, draft.getDraftChanges());
+                }
               }
               return response;
             })

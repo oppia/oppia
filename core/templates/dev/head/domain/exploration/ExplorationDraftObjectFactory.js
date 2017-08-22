@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Factory for creating instances of ExplorationDraft
- * domain objects..
+ * domain objects.
  */
 
  oppia.factory('ExplorationDraftObjectFactory', [
@@ -24,7 +24,17 @@
        this.draftChangeListId = draftChangeListId;
      };
 
-     ExplorationDraft.prototype.isDraftValid = function(validDraftId) {
+     /**
+     * Checks whether the draft object has been overwritten by another
+     * draft which has been committed to the back-end. If the supplied draft id
+     * has a different value then a newer changeList must have been committed
+     * to the back-end.
+     * @param {Integer} - currentDraftId. The id of the draft changes whch was
+     *  retrieved from the back-end.
+     * @returns {Boolean} - True iff the currentDraftId is the same as the
+     * draftChangeListId corresponding to this draft.
+     */
+     ExplorationDraft.prototype.isDraftValid = function(currentDraftId) {
        return (validDraftId === this.draftChangeListId);
      };
 
@@ -32,8 +42,8 @@
        return this.draftChanges;
      };
 
-     ExplorationDraft.createFromJSON = function(
-       explorationDraftJSON) {
+     ExplorationDraft.createFromLocalStorageDict = function(
+       explorationDraftDict) {
        return new ExplorationDraft(
          explorationDraftJSON.draftChanges,
          explorationDraftJSON.draftChangeListId);

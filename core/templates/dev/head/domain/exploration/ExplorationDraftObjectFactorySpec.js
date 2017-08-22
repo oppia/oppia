@@ -21,28 +21,28 @@
 
    describe('exploration draft object factory', function() {
      var ExplorationDraftObjectFactory = null;
-     var explorationIdOne = '100';
-     var draftChangeListIdOne = 2;
+     var explorationId = '100';
+     var draftChangeListId = 2;
      var changeList = [];
-     var saveOne = {
+     var draftDict = {
        draftChanges: changeList,
-       draftChangeListId: draftChangeListIdOne
+       draftChangeListId: draftChangeListId
      };
-     var saveOneObject = null;
+     var draft = null;
 
      beforeEach(inject(function($injector) {
        ExplorationDraftObjectFactory = $injector.get(
          'ExplorationDraftObjectFactory');
-       saveOneObject = ExplorationDraftObjectFactory.createFromJSON(saveOne);
+       draft = ExplorationDraftObjectFactory.createFromJSON(draftDict);
      }));
 
      it('should determine if the draft is valid', function() {
-       expect(saveOneObject.isDraftValid(draftChangeListIdOne)).toBeTruthy();
-       expect(saveOneObject.isDraftValid(draftChangeListIdOne + 1)).toBeFalsy();
+       expect(draft.isDraftValid(draftChangeListId)).toBeTruthy();
+       expect(draft.isDraftValid(draftChangeListId + 1)).toBeFalsy();
      });
 
      it('should return the correct changeList', function() {
-       expect(saveOneObject.getDraftChanges()).toEqual(changeList);
+       expect(draft.getDraftChanges()).toEqual(changeList);
      });
    });
  });

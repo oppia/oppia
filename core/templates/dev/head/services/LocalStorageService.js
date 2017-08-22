@@ -64,12 +64,11 @@
          draftChangeListId) {
          var localSaveKey = _createExplorationDraftKey(explorationId);
          if (storage) {
-           var saveObject = {
+           var draftDict = {
              draftChanges: changeList,
              draftChangeListId: draftChangeListId
            };
-           saveObject = JSON.stringify(saveObject);
-           storage.setItem(localSaveKey, saveObject);
+           storage.setItem(localSaveKey, JSON.stringify(draftDict));
          }
        },
        /**
@@ -82,10 +81,10 @@
        */
        getExplorationDraft: function(explorationId) {
          if (storage) {
-           var saveObject = JSON.parse(
+           var draftDict = JSON.parse(
              storage.getItem(_createExplorationDraftKey(explorationId)));
-           if (saveObject) {
-             return ExplorationDraftObjectFactory.createFromJSON(saveObject);
+           if (draftDict) {
+             return ExplorationDraftObjectFactory.createFromJSON(draftDict);
            }
          }
          return null;
