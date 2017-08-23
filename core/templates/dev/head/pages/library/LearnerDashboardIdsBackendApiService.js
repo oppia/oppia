@@ -17,12 +17,14 @@
  * dashboard.
  */
 
-oppia.factory('LearnerDashboardIdsBackendApiService', ['$http', function($http) {
-  var _fetchLearnerDashboardIds = function() {
-    return $http.get('/learnerdashboardidshandler/data');
-  };
+oppia.factory('LearnerDashboardIdsBackendApiService',[
+  '$http',function($http) {
+    var _fetchLearnerDashboardIds = function() {
+      return $http.get('/learnerdashboardidshandler/data');
+    };
 
-  return {
-    fetchLearnerDashboardIds: _fetchLearnerDashboardIds
-  };
-}]);
+    return {
+      fetchLearnerDashboardIds: _fetchLearnerDashboardIds
+    };
+  }
+]);
