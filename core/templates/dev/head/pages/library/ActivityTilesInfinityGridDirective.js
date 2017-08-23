@@ -20,22 +20,18 @@ oppia.directive('activityTilesInfinityGrid', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        getLearnerDashboardActivityIds: '&learnerDashboardActivityIds',
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/' +
         'activity_tiles_infinity_grid_directive.html'),
       controller: [
         '$scope', '$rootScope', '$http', 'searchService', 'alertsService',
-        '$modal', function(
+        '$modal', 'LearnerDashboardIdsBackendApiService', function(
           $scope, $rootScope, $http, searchService, alertsService,
-          $modal) {
+          $modal, LearnerDashboardIdsBackendApiService) {
           $scope.endOfPageIsReached = false;
           $scope.allActivitiesInOrder = [];
           var currentlyHoveringOverActivity = false;
           var activeActivityId = '';
-          console.log($scope.getLearnerDashboardActivityIds());
           // Called when the first batch of search results is retrieved from the
           // server.
           $scope.$on(
@@ -45,141 +41,16 @@ oppia.directive('activityTilesInfinityGrid', [
             }
           );
 
+          LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
+            function(response) {
+              $scope.learnerDashboardActivityIds = (
+                response.data.learner_dashboard_activity_ids);
+            }
+          );
+
           $scope.setCurrentlyHoveringOverActivity = function(activityId) {
             activeActivityId = activityId;
             currentlyHoveringOverActivity = !currentlyHoveringOverActivity;
-          };
-
-          $scope.showAddToLearnerPlaylistIcon = function(activityId) {
-            var incompleteExplorationIds = (
-              $scope.getLearnerDashboardActivityIds(
-                ).incomplete_exploration_ids);
-            var incompleteCollectionIds = (
-              $scope.getLearnerDashboardActivityIds(
-                ).incomplete_collection_ids);
-            var completedExplorationIds = (
-              $scope.getLearnerDashboardActivityIds(
-                ).completed_exploration_ids);
-            var completedCollectionIds = (
-              $scope.getLearnerDashboardActivityIds().completed_collection_ids);
-            var explorationPlaylistIds = (
-              $scope.getLearnerDashboardActivityIds().exploration_playlist_ids);
-            var collectionPlaylistIds = (
-              $scope.getLearnerDashboardActivityIds().collection_playlist_ids);
-
-            if (incompleteExplorationIds.indexOf(activityId) !== -1 ||
-                incompleteCollectionIds.indexOf(activityId) !== -1 ||
-                completedExplorationIds.indexOf(activityId) !== -1 ||
-                completedCollectionIds.indexOf(activityId) !== -1 ||
-                explorationPlaylistIds.indexOf(activityId) !== -1 ||
-                collectionPlaylistIds.indexOf(activityId) !== -1) {
-              return false;
-            } else {
-              return (currentlyHoveringOverActivity &&
-                (activeActivityId === activityId));
-            }
-          };
-
-          $scope.addToLearnerPlaylist = function(activityType, activityId) {
-            var addActivityToLearnerPlaylistUrl = (
-              UrlInterpolationService.interpolateUrl(
-                '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-                  activityType: activityType,
-                  activityId: activityId
-                }));
-            $http.post(addActivityToLearnerPlaylistUrl, {})
-              .then(function(response) {
-                if (response.data.belongs_to_completed_or_incomplete_list) {
-                  alertsService.addInfoMessage(
-                    'You have already completed or are completing this ' +
-                    'activity.');
-                } else if (response.data.belongs_to_subscribed_activities) {
-                  alertsService.addInfoMessage(
-                    'This is present in your creator dashboard');
-                } else if (response.data.playlist_limit_exceeded) {
-                  alertsService.addInfoMessage(
-                    'Your \'Play Later\' list is full!  Either you can ' +
-                    'complete some or you can head to the learner dashboard ' +
-                    'and remove some.');
-                } else {
-                  alertsService.addSuccessMessage(
-                    'Successfully added to your \'Play Later\' list.');
-                }
-              });
-
-            if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
-              $scope.getLearnerDashboardActivityIds(
-                ).exploration_playlist_ids.push(activityId);
-            } else {
-              $scope.getLearnerDashboardActivityIds(
-                ).collection_playlist_ids.push(activityId);
-            }
-          };
-
-          $scope.removeFromLearnerPlaylist = function(
-            activityId, activityType, activityTitle) {
-            $modal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/learner_dashboard/' +
-                'remove_activity_from_learner_dashboard_modal_directive.html'),
-              backdrop: true,
-              resolve: {
-                activityId: function() {
-                  return activityId;
-                },
-                activityType: function() {
-                  return activityType;
-                },
-                activityTitle: function() {
-                  return activityTitle;
-                }
-              },
-              controller: [
-                '$scope', '$modalInstance', '$http', 'UrlInterpolationService',
-                function(
-                  $scope, $modalInstance, $http, UrlInterpolationService) {
-                  $scope.sectionNameI18nId = (
-                    'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
-                  $scope.activityTitle = activityTitle;
-                  var removeFromLearnerPlaylistUrl = (
-                    /* eslint-disable max-len */
-                    UrlInterpolationService.interpolateUrl(
-                      '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-                        activityType: activityType,
-                        activityId: activityId
-                      }));
-                    /* eslint-enable max-len */
-                  $scope.remove = function() {
-                    $http['delete'](removeFromLearnerPlaylistUrl);
-                    $modalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            }).result.then(function() {
-              if (activityType == constants.ACTIVITY_TYPE_EXPLORATION) {
-                /* eslint-disable max-len */
-                var index = (
-                  $scope.getLearnerDashboardActivityIds().exploration_playlist_ids.indexOf(
-                    activityId));
-                if (index !== -1) {
-                  $scope.getLearnerDashboardActivityIds().exploration_playlist_ids.splice(
-                    index, 1);
-                }
-              } else {
-                var index = (
-                  $scope.getLearnerDashboardActivityIds().collection_playlist_ids.indexOf(
-                    activityId));
-                if (index !== -1) {
-                  $scope.getLearnerDashboardActivityIds().collection_playlist_ids.splice(
-                    index, 1);
-                }
-              }
-              /* eslint-enable max-len */
-            });
           };
 
           $scope.showMoreActivities = function() {

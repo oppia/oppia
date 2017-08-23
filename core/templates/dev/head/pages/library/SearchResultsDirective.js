@@ -20,9 +20,6 @@ oppia.directive('searchResults', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        learnerDashboardActivityIds: '=learnerDashboardActivityIds',
-      },
       templateUrl: 'components/searchResults',
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',

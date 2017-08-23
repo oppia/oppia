@@ -117,6 +117,38 @@ class LearnerDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class LearnerDashboardIdsHandler(base.BaseHandler):
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        # Get the progress of the learner - the ids of the explorations and
+        # collections completed by the user, the activities currently being
+        # completed and the ones present in the playlist of the user.
+        activity_ids = (
+            learner_progress_services.get_ids_of_activities_in_learner_dashboard( # pylint: disable=line-too-long
+                self.user_id))
+
+        learner_dashboard_activity_ids = {
+            'completed_exploration_ids': (
+                activity_ids.completed_exploration_ids),
+            'completed_collection_ids': (
+                activity_ids.completed_collection_ids),
+            'incomplete_exploration_ids': (
+                activity_ids.incomplete_exploration_ids),
+            'incomplete_collection_ids': (
+                activity_ids.incomplete_collection_ids),
+            'exploration_playlist_ids': (
+                activity_ids.exploration_playlist_ids),
+            'collection_playlist_ids': activity_ids.collection_playlist_ids
+        }
+
+        self.values.update({
+            'learner_dashboard_activity_ids': (
+                learner_dashboard_activity_ids)
+        })
+        self.render_json(self.values)
+
+
 class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
 

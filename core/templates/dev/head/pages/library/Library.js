@@ -30,11 +30,13 @@ oppia.controller('Library', [
   '$scope', '$http', '$modal', '$rootScope', '$window', '$timeout',
   'i18nIdService', 'urlService', 'ALL_CATEGORIES', 'searchService',
   'windowDimensionsService', 'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
-  'LIBRARY_TILE_WIDTH_PX', 'alertsService', function(
+  'LIBRARY_TILE_WIDTH_PX', 'alertsService',
+  'LearnerDashboardIdsBackendApiService', function(
       $scope, $http, $modal, $rootScope, $window, $timeout,
       i18nIdService, urlService, ALL_CATEGORIES, searchService,
       windowDimensionsService, UrlInterpolationService, LIBRARY_PAGE_MODES,
-      LIBRARY_TILE_WIDTH_PX, alertsService) {
+      LIBRARY_TILE_WIDTH_PX, alertsService,
+      LearnerDashboardIdsBackendApiService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -74,8 +76,15 @@ oppia.controller('Library', [
     } else {
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
-        $scope.learnerDashboardActivityIds = (
-          data.learner_dashboard_activity_ids);
+
+        if (data.user_email) {
+          LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
+            function(response) {
+              $scope.learnerDashboardActivityIds = (
+                response.data.learner_dashboard_activity_ids);
+            }
+          );
+        }
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
