@@ -1,3 +1,6 @@
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -22,7 +25,7 @@ oppia.directive('explorationObjectiveEditor', [
         labelText: '@',
         // Additional CSS style to define the width and font-weight.
         formStyle: '@',
-        // The method to call when the input field is blured.
+        // The method to call when the input field is blurred.
         onInputFieldBlur: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -36,4 +39,4 @@ oppia.directive('explorationObjectiveEditor', [
       ]
     }
   }
-]);
+])
