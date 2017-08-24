@@ -86,6 +86,7 @@
 	"I18N_ERROR_PAGE_TITLE_401": "ত্রুটি ৪০১ - Oppia",
 	"I18N_ERROR_PAGE_TITLE_404": "ত্রুটি ৪০৪ - Oppia",
 	"I18N_ERROR_PAGE_TITLE_500": "ত্রুটি ৫০০ - Oppia",
+	"I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "নামহীন",
 	"I18N_FOOTER_ABOUT": "সম্পর্কে",
 	"I18N_FOOTER_ABOUT_ALL_CAPS": "OPPIA সম্পর্কে",
 	"I18N_FOOTER_AUTHOR_PROFILES": "লেখকের প্রোফাইল",
