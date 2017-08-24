@@ -653,6 +653,7 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
+COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False

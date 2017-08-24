@@ -18,29 +18,31 @@ from core.platform import models
 
 from google.appengine.ext import ndb
 
+import utils
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 class QuestionModel(base_models.VersionedModel):
-	"""Model for storing Questions.
+    """Model for storing Questions.
 
-	The Id of the instances of this class has the form
-	{{colection_id}}.{{random_hash_of_16_chars}}
-	"""
+    The id of instances of this class has the form
+    {{collection_id}}.{{random_hash_of_16_chars}}
+    """
 
-	# The title of the question.
-	title = ndb.StringProperty(required=True, indexed=True)
-	# The question.
-	question = ndb.JsonProperty(default={}, indexed=False)
-	# The schema version for the data.
-	data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
-	# The ID of collection to which the question belongs.
-	collection_id = ndb.IntegerProperty(required=True, indexed=True)
-	# The ISO 639-1 code for the language this question is written in.
-	language_code = ndb.StringProperty(required=True, indexed=True)
+    # The title of the question.
+    title = ndb.StringProperty(required=True, indexed=True)
+    # The data of the question.
+    question_data = ndb.JsonProperty(default={}, indexed=False)
+    # The schema version for the data.
+    data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    # The ID of collection to which the question belongs.
+    collection_id = ndb.IntegerProperty(required=True, indexed=True)
+    # The ISO 639-1 code for the language this question is written in.
+    language_code = ndb.StringProperty(required=True, indexed=True)
 
-	@classmethod
-	def _get_new_id(cls, collection_id):
-		"""Generates a unique id for the training job of the form
+    @classmethod
+    def _get_new_id(cls, collection_id):
+        """Generates a unique id for the training job of the form
         {{collection_id}}.{{random_hash_of_16_chars}}
 
         Args:
@@ -69,30 +71,31 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-    	cls, title, question, data_schema_version, collection_id, language_code):
-    	"""Creates a new QuestionModel entry.
+        cls, title, question_data, data_schema_version, collection_id, language_code):
+        """Creates a new QuestionModel entry.
 
-    	Args:
-    		title: str. The title of the question.
-    		question: dict. The data of the question.
-    		data_schema_version: int. The schema version for the data.
-    		collection_id: int. ID of the collection.
-    		language_code: str. The ISO 639-1 code for the language this
-    			question is written in.
+        Args:
+            title: str. The title of the question.
+            question_data: dict. The data of the question.
+            data_schema_version: int. The schema version for the data.
+            collection_id: int. ID of the collection.
+            language_code: str. The ISO 639-1 code for the language this
+                question is written in.
 
-    	Returns:
-    		ID of the new QuestionModel entry.
+        Returns:
+            ID of the new QuestionModel entry.
 
-    	Raises:
-    		Exception: A model with the same ID already exists.
-    	"""
-    	instance_id = cls._get_new_id(collection_id)
-    	question_instance = cls(
-    		id=instance_id, title=title,
-    		question=question,
-    		data_schema_version=data_schema_version,
-    		collection_id=collection_id,
-    		language_code=language_code)
+        Raises:
+            Exception: A model with the same ID already exists.
+        """
+        instance_id = cls._get_new_id(collection_id)
+        question_instance = cls(
+            id=instance_id, title=title,
+            question_data=question_data,
+            data_schema_version=data_schema_version,
+            collection_id=collection_id,
+            language_code=language_code)
 
-    	question_instance.put()
-    	return instance_id
+        question_instance.put()
+
+        return instance_id
