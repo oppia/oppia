@@ -245,13 +245,15 @@ def get_exploration_metadata_dicts(exploration_ids, user):
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+    exploration_rights_objects = (
+        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
-    for exploration_summary in exploration_summaries:
+    for (exploration_summary, exploration_rights) in (
+            zip(exploration_summaries, exploration_rights_objects)):
         if exploration_summary is None:
             continue
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_summary.id, strict=False)
+
         if exploration_rights is None:
             continue
 
@@ -309,13 +311,15 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+    exploration_rights_objects = (
+        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
-    for exploration_summary in exploration_summaries:
+    for (exploration_summary, exploration_rights) in (
+            zip(exploration_summaries, exploration_rights_objects)):
         if exploration_summary is None:
             continue
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_summary.id)
+
         if exploration_rights is None:
             continue
         if exploration_summary.status == (

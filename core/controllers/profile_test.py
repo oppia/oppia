@@ -14,6 +14,8 @@
 
 """Tests for the profile page."""
 
+from constants import constants
+
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -110,6 +112,45 @@ class SignupTest(test_utils.GenericTestBase):
             feconf.SIGNUP_DATA_URL,
             {'username': 'abcde', 'agreed_to_terms': True},
             csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_default_dashboard_for_new_users(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # This user should have the creator dashboard as default.
+        self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {'agreed_to_terms': True, 'username': 'creatoruser',
+             'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
+             'can_receive_email_updates': None},
+            csrf_token)
+
+        user_id = user_services.get_user_id_from_username('creatoruser')
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEqual(
+            user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR)
+
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # This user should have the learner dashboard as default.
+        self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {'agreed_to_terms': True, 'username': 'learneruser',
+             'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+             'can_receive_email_updates': None},
+            csrf_token)
+
+        user_id = user_services.get_user_id_from_username('learneruser')
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEqual(
+            user_settings.default_dashboard, constants.DASHBOARD_TYPE_LEARNER)
 
         self.logout()
 
@@ -389,9 +430,14 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             ['en'], original_preferences['preferred_language_codes'])
         self.assertIsNone(original_preferences['preferred_site_language_code'])
+        self.assertIsNone(original_preferences['preferred_audio_language_code'])
         self.put_json(
             '/preferenceshandler/data',
             {'update_type': 'preferred_site_language_code', 'data': 'en'},
+            csrf_token=csrf_token)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'preferred_audio_language_code', 'data': 'hi-en'},
             csrf_token=csrf_token)
         self.put_json(
             '/preferenceshandler/data',
@@ -400,6 +446,8 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         new_preferences = self.get_json('/preferenceshandler/data')
         self.assertEqual(new_preferences['preferred_language_codes'], ['de'])
         self.assertEqual(new_preferences['preferred_site_language_code'], 'en')
+        self.assertEqual(
+            new_preferences['preferred_audio_language_code'], 'hi-en')
 
     def test_profile_data_is_independent_of_currently_logged_in_user(self):
         self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)

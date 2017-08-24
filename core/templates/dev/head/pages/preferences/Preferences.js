@@ -101,6 +101,12 @@ oppia.controller('Preferences', [
         'preferred_site_language_code', preferredSiteLanguageCode);
     };
 
+    $scope.savePreferredAudioLanguageCode = function(
+      preferredAudioLanguageCode) {
+      _saveDataItem(
+        'preferred_audio_language_code', preferredAudioLanguageCode);
+    };
+
     $scope.showUsernamePopover = function(creatorUsername) {
       // The popover on the subscription card is only shown if the length of
       // the creator username is greater than 10 and the user hovers over
@@ -202,6 +208,7 @@ oppia.controller('Preferences', [
     );
 
     $scope.SITE_LANGUAGE_CHOICES = constants.SUPPORTED_SITE_LANGUAGES;
+    $scope.AUDIO_LANGUAGE_CHOICES = constants.SUPPORTED_AUDIO_LANGUAGES;
 
     $scope.hasPageLoaded = false;
     $http.get(_PREFERENCES_DATA_URL).then(function(response) {
@@ -218,6 +225,7 @@ oppia.controller('Preferences', [
       $scope.canReceiveFeedbackMessageEmail = (
         data.can_receive_feedback_message_email);
       $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
+      $scope.preferredAudioLanguageCode = data.preferred_audio_language_code;
       $scope.subscriptionList = data.subscription_list;
       $scope.hasPageLoaded = true;
       _forceSelect2Refresh();

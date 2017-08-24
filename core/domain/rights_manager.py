@@ -384,6 +384,31 @@ def get_exploration_rights(exploration_id, strict=True):
         model, constants.ACTIVITY_TYPE_EXPLORATION)
 
 
+def get_multiple_exploration_rights_by_ids(exp_ids):
+    """Returns a list of ActivityRights objects for given exploration ids.
+
+    Args:
+        exp_ids: list(str). List of exploration ids.
+
+    Returns:
+        list(ActivityRights or None). List of rights object containing
+            ActivityRights object for existing exploration or None.
+    """
+    exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
+        exp_ids)
+    exp_models_list = []
+
+    for model in exp_rights_models:
+        if model is None:
+            exp_models_list.append(None)
+        else:
+            exp_models_list.append(
+                _get_activity_rights_from_model(
+                    model, constants.ACTIVITY_TYPE_EXPLORATION))
+
+    return exp_models_list
+
+
 def is_exploration_private(exploration_id):
     """Returns whether exploration is private.
 

@@ -24,24 +24,46 @@ oppia.factory('AudioTranslationManagerService', [
       $modal, AudioPlayerService, UrlInterpolationService,
       LanguageUtilService) {
     var _currentAudioLanguageCode = null;
-    var _allLanguageCodesInExploration = null;
+    var _allAudioLanguageCodesInExploration = null;
+    var _explorationLanguageCode = null;
 
-    var _init = function(allLanguageCodesInExploration) {
-      _allLanguageCodesInExploration = allLanguageCodesInExploration;
+    var attemptToSetAudioLanguageToExplorationLanguage = function() {
+      // We minimize the number of related languages, because we want to
+      // pick the language that is the most directly related to the exploration
+      // language. For example, this would prioritize Hindi over Hinglish
+      // if both were available as audio languages.
+      var numRelatedLanguages = Number.MAX_VALUE;
+      _allAudioLanguageCodesInExploration.forEach(function(audioLanguageCode) {
+        var relatedLanguageCodes =
+          LanguageUtilService.getLanguageCodesRelatedToAudioLanguageCode(
+            audioLanguageCode);
+        if (relatedLanguageCodes.length < numRelatedLanguages &&
+            relatedLanguageCodes.indexOf(_explorationLanguageCode) !== -1) {
+          _currentAudioLanguageCode = audioLanguageCode;
+          numRelatedLanguages = relatedLanguageCodes.length;
+        }
+      });
+    };
 
-      // TODO(tjiang11): Define an order. Preferably, we'd want
-      // to promote the user's preferred languages, and promote
-      // the exploration's default language if available.
-      _allLanguageCodesInExploration.sort();
+    var _init = function(
+      allAudioLanguageCodesInExploration, preferredAudioLanguageCode,
+      explorationLanguageCode) {
+      _allAudioLanguageCodesInExploration = allAudioLanguageCodesInExploration;
+      _explorationLanguageCode = explorationLanguageCode;
 
-      if (_allLanguageCodesInExploration.length === 1) {
-        _currentAudioLanguageCode = _allLanguageCodesInExploration[0];
+      if (preferredAudioLanguageCode &&
+          allAudioLanguageCodesInExploration.indexOf(
+            preferredAudioLanguageCode) !== -1) {
+        _currentAudioLanguageCode = preferredAudioLanguageCode;
       }
 
-      if (_allLanguageCodesInExploration.length > 1) {
-        // TODO(tjiang11): Need to use a pick-language modal instead of
-        // defaulting to a language.
-        _currentAudioLanguageCode = _allLanguageCodesInExploration[0];
+      if (_currentAudioLanguageCode === null) {
+        attemptToSetAudioLanguageToExplorationLanguage();
+      }
+
+      if (_currentAudioLanguageCode === null &&
+          _allAudioLanguageCodesInExploration.length >= 1) {
+        _currentAudioLanguageCode = _allAudioLanguageCodesInExploration[0];
       }
     };
 
@@ -61,7 +83,7 @@ oppia.factory('AudioTranslationManagerService', [
               AudioTranslationManagerService, LanguageUtilService) {
             var allLanguageCodes =
               AudioTranslationManagerService
-                .getAllLanguageCodesInExploration();
+                .getallAudioLanguageCodesInExploration();
 
             $scope.languagesInExploration = [];
 
@@ -95,8 +117,11 @@ oppia.factory('AudioTranslationManagerService', [
     };
 
     return {
-      init: function(allLanguageCodesInExploration) {
-        _init(allLanguageCodesInExploration);
+      init: function(
+          allAudioLanguageCodesInExploration, preferredAudioLanguageCode, 
+          explorationLanguageCode) {
+        _init(allAudioLanguageCodesInExploration, preferredAudioLanguageCode,
+          explorationLanguageCode);
       },
       getCurrentAudioLanguageCode: function() {
         return _currentAudioLanguageCode;
@@ -105,11 +130,14 @@ oppia.factory('AudioTranslationManagerService', [
         return LanguageUtilService.getAudioLanguageDescription(
           _currentAudioLanguageCode);
       },
-      getAllLanguageCodesInExploration: function() {
-        return _allLanguageCodesInExploration;
+      getallAudioLanguageCodesInExploration: function() {
+        return _allAudioLanguageCodesInExploration;
       },
       showAudioTranslationSettingsModal: function(onLanguageChangedCallback) {
         _showAudioTranslationSettingsModal(onLanguageChangedCallback);
+      },
+      clearCurrentAudioLanguageCode: function() {
+        _currentAudioLanguageCode = null;
       }
     };
   }]);
