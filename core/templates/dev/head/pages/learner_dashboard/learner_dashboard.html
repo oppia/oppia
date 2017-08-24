@@ -220,12 +220,9 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteExplorations !== 0">
-              <span ng-if="numberDeletedIncompleteExplorations === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATION"
-                    translate-values="{numberDeleted: numberDeletedIncompleteExplorations}"></span>
-              <span ng-if="numberDeletedIncompleteExplorations > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATIONS"
-                    translate-values="{numberDeleted: numberDeletedIncompleteExplorations}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATIONS"
+                    translate-values="{numberDeleted: <[numberDeletedIncompleteExplorations]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
@@ -278,12 +275,9 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCompletedExplorations !== 0">
-              <span ng-if="numberDeletedCompletedExplorations === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATION"
-                    translate-values="{numberDeleted: numberDeletedCompletedExplorations}"></span>
-              <span ng-if="numberDeletedCompletedExplorations > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATIONS"
-                    translate-values="{numberDeleted: numberDeletedCompletedExplorations}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATIONS"
+                    translate-values="{numberDeleted: <[numberDeletedCompletedExplorations]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
@@ -333,12 +327,9 @@
             </span>
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedExplorationPlaylist !== 0">
-              <span ng-if="numberDeletedExplorationPlaylist === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_EXPLORATION_FROM_PLAYLIST"
-                    translate-values="{numberDeleted: numberDeletedExplorationPlaylist}"></span>
-              <span ng-if="numberDeletedExplorationPlaylist > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_EXPLORATIONS_FROM_PLAYLIST"
-                    translate-values="{numberDeleted: numberDeletedExplorationPlaylist}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_EXPLORATIONS_FROM_PLAYLIST"
+                    translate-values="{numberDeleted: <[numberDeletedExplorationPlaylist]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
@@ -390,12 +381,9 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteCollections !== 0">
-              <span ng-if="numberDeletedIncompleteCollections === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTION"
-                    translate-values="{numberDeleted: numberDeletedIncompleteCollections}"></span>
-              <span ng-if="numberDeletedIncompleteCollections > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTIONS"
-                    translate-values="{numberDeleted: numberDeletedIncompleteCollections}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTIONS"
+                    translate-values="{numberDeleted: <[numberDeletedIncompleteCollections]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
@@ -450,12 +438,9 @@
             </span>
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCollectionPlaylist !== 0">
-              <span ng-if="numberDeletedCollectionPlaylist === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COLLECTION_FROM_PLAYLIST"
-                    translate-values="{numberDeleted: numberDeletedCollectionPlaylist}"></span>
-              <span ng-if="numberDeletedCollectionPlaylist > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COLLECTIONS_FROM_PLAYLIST"
-                    translate-values="{numberDeleted: numberDeletedCollectionPlaylist}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COLLECTIONS_FROM_PLAYLIST"
+                    translate-values="{numberDeleted: <[numberDeletedCollectionPlaylist]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
@@ -516,12 +501,9 @@
 
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCompletedCollections !== 0">
-              <span ng-if="numberDeletedCompletedCollections === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTION"
-                    translate-values="{numberDeleted: numberDeletedCompletedCollections}"></span>
-              <span ng-if="numberDeletedCompletedCollections > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTIONS"
-                    translate-values="{numberDeleted: numberDeletedCompletedCollections}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTIONS"
+                    translate-values="{numberDeleted: <[numberDeletedCompletedCollections]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
