@@ -1,0 +1,98 @@
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Models for storing the question data models."""
+
+from core.platform import models
+
+from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
+class QuestionModel(base_models.VersionedModel):
+	"""Model for storing Questions.
+
+	The Id of the instances of this class has the form
+	{{colection_id}}.{{random_hash_of_16_chars}}
+	"""
+
+	# The title of the question.
+	title = ndb.StringProperty(required=True, indexed=True)
+	# The question.
+	question = ndb.JsonProperty(default={}, indexed=False)
+	# The schema version for the data.
+	data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+	# The ID of collection to which the question belongs.
+	collection_id = ndb.IntegerProperty(required=True, indexed=True)
+	# The ISO 639-1 code for the language this question is written in.
+	language_code = ndb.StringProperty(required=True, indexed=True)
+
+	@classmethod
+	def _get_new_id(cls, collection_id):
+		"""Generates a unique id for the training job of the form
+        {{collection_id}}.{{random_hash_of_16_chars}}
+
+        Args:
+            collection_id: int. ID of the collection.
+
+        Returns:
+            ID of the new QuestionModel instance.
+
+        Raises:
+            Exception: The id generator for QuestionModel is
+            producing too many collisions.
+        """
+
+        for _ in range(base_models.MAX_RETRIES):
+            new_id = '%s.%s' % (
+                collection_id,
+                utils.convert_to_hash(
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    base_models.ID_LENGTH))
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception(
+            'The id generator for QuestionModel is producing too many '
+            'collisions.')
+
+    @classmethod
+    def create(
+    	cls, title, question, data_schema_version, collection_id, language_code):
+    	"""Creates a new QuestionModel entry.
+
+    	Args:
+    		title: str. The title of the question.
+    		question: dict. The data of the question.
+    		data_schema_version: int. The schema version for the data.
+    		collection_id: int. ID of the collection.
+    		language_code: str. The ISO 639-1 code for the language this
+    			question is written in.
+
+    	Returns:
+    		ID of the new QuestionModel entry.
+
+    	Raises:
+    		Exception: A model with the same ID already exists.
+    	"""
+    	instance_id = cls._get_new_id(collection_id)
+    	question_instance = cls(
+    		id=instance_id, title=title,
+    		question=question,
+    		data_schema_version=data_schema_version,
+    		collection_id=collection_id,
+    		language_code=language_code)
+
+    	question_instance.put()
+    	return instance_id
