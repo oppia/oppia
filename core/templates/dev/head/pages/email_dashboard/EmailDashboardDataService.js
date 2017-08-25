@@ -11,9 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
  * @fileoverview Services for oppia email dashboard page.
-*/
+ */
  
 oppia.factory('EmailDashboardDataService', [
   '$http', '$q', function($http, $q) {
