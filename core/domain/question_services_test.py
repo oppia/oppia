@@ -53,7 +53,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(model.title, title)
         self.assertEqual(model.question_data, question_data)
-        self.assertEqual(model.data_schema_version,data_schema_version)
+        self.assertEqual(model.data_schema_version, data_schema_version)
         self.assertEqual(model.collection_id, collection_id)
         self.assertEqual(model.language_code, language_code)
 

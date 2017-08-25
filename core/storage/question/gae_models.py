@@ -84,7 +84,8 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-        cls, title, question_data, data_schema_version, collection_id, language_code):
+            cls, title, question_data, data_schema_version, collection_id,
+            language_code):
         """Creates a new QuestionModel entry.
 
         Args:

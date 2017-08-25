@@ -35,11 +35,13 @@ def _create_question(committer_id, question, commit_message, commit_cmds):
         commit_cmds: list(dict). A list of change commands made to the given
             question.
     """
-    model = question_models.QuestionModel.create(title=question.title,
+    model = question_models.QuestionModel.create(
+        title=question.title,
         question_data=question.question_data,
         data_schema_version=question.data_schema_version,
         collection_id=question.collection_id,
-        language_code=question.language_code)
+        language_code=question.language_code,
+    )
 
     model.commit(committer_id, commit_message, commit_cmds)
     return model
