@@ -113,19 +113,26 @@ oppia.directive('collectionSummaryTile', [
                 }));
             $http.post(addActivityToLearnerPlaylistUrl, {})
               .then(function(response) {
+                var successfullyAdded = true;
                 if (response.data.belongs_to_completed_or_incomplete_list) {
+                  successfullyAdded = false;
                   alertsService.addInfoMessage(
                     'You have already completed or are completing this ' +
                     'activity.');
-                } else if (response.data.belongs_to_subscribed_activities) {
+                }
+                if (response.data.belongs_to_subscribed_activities) {
+                  successfullyAdded = false;
                   alertsService.addInfoMessage(
                     'This is present in your creator dashboard');
-                } else if (response.data.playlist_limit_exceeded) {
+                }
+                if (response.data.playlist_limit_exceeded) {
+                  successfullyAdded = false;
                   alertsService.addInfoMessage(
                     'Your \'Play Later\' list is full!  Either you can ' +
                     'complete some or you can head to the learner dashboard ' +
                     'and remove some.');
-                } else {
+                }
+                if (successfullyAdded) {
                   alertsService.addSuccessMessage(
                     'Successfully added to your \'Play Later\' list.');
                   /* eslint-disable max-len */
