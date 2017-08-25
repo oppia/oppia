@@ -233,12 +233,20 @@ class CreatorDashboardHandler(base.BaseHandler):
 
             subscribers_list.append(subscriber_summary)
 
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=False)
+        if user_settings.creator_dashboard_display:
+            display_preference = user_settings.creator_dashboard_display
+        else:
+            display_preference = 'card'
+
         self.values.update({
             'explorations_list': exp_summary_dicts,
             'collections_list': collection_summary_dicts,
             'dashboard_stats': dashboard_stats,
             'last_week_stats': last_week_stats,
-            'subscribers_list': subscribers_list
+            'subscribers_list': subscribers_list,
+            'display_preference': display_preference,
         })
         self.render_json(self.values)
 

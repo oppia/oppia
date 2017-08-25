@@ -98,7 +98,7 @@ oppia.controller('CreatorDashboard', [
       return '/collection_editor/create/' + collectionId;
     };
 
-    $scope.myExplorationsView = 'card';
+    //$scope.myExplorationsView = 'list'; TODO Delete
     $scope.setMyExplorationsView = function(viewType) {
       $scope.myExplorationsView = viewType;
     };
@@ -195,6 +195,7 @@ oppia.controller('CreatorDashboard', [
         $scope.subscribersList = responseData.subscribers_list;
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
+        $scope.myExplorationsView = responseData.display_preference;
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
