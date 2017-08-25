@@ -33,12 +33,16 @@
      beforeEach(inject(function($injector) {
        ExplorationDraftObjectFactory = $injector.get(
          'ExplorationDraftObjectFactory');
-       draft = ExplorationDraftObjectFactory.createFromLocalStorageDict(draftDict);
+       draft =
+       ExplorationDraftObjectFactory.createFromLocalStorageDict(
+         draftDict);
      }));
 
      it('should determine if the draft is valid', function() {
-       expect(draft.isDraftValid(draftChangeListId)).toBeTruthy();
-       expect(draft.isDraftValid(draftChangeListId + 1)).toBeFalsy();
+       expect(draft.isDraftValid(
+         draftChangeListId)).toBeTruthy();
+       expect(draft.isDraftValid(
+         draftChangeListId + 1)).toBeFalsy();
      });
 
      it('should return the correct changeList', function() {
