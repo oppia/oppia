@@ -84,7 +84,8 @@
            var draftDict = JSON.parse(
              storage.getItem(_createExplorationDraftKey(explorationId)));
            if (draftDict) {
-             return ExplorationDraftObjectFactory.createFromLocalStorageDict(draftDict);
+             return ExplorationDraftObjectFactory.createFromLocalStorageDict(
+               draftDict);
            }
          }
          return null;
