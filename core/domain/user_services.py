@@ -178,7 +178,7 @@ class UserSettings(object):
         if (self.creator_dashboard_display not in
                 CREATOR_DASHBOARD_DISPLAY_PREFERENCES):
             raise utils.ValidationError(
-                'Dashboard display preference %s does not exist.' \
+                'Dashboard display preferences %s does not exist.' \
                 % self.creator_dashboard_display)
 
     @property
