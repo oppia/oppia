@@ -80,7 +80,7 @@ oppia.controller('Library', [
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-        if (data.user_email) {
+        if (data.user_id) {
           LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
             function(response) {
               $scope.learnerDashboardActivityIds = (

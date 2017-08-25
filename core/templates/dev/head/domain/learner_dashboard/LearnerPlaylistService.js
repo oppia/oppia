@@ -19,6 +19,7 @@
  oppia.factory('LearnerPlaylistService', [
   '$http', '$modal', 'alertsService', 'UrlInterpolationService',
   function($http, $modal, alertsService, UrlInterpolationService) {
+
     var _addToLearnerPlaylist = function(activityId, activityType) {
       var successfullyAdded = true;
       var addToLearnerPlaylistUrl = (

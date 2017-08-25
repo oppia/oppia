@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview get the activity ids that are present in the learner
- * dashboard.
+ * @fileoverview Backend services related to fetching the ids of the
+ * activities present in the learner dashboard.
  */
 
 oppia.factory('LearnerDashboardIdsBackendApiService',[
