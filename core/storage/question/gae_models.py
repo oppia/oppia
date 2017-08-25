@@ -22,12 +22,25 @@ import utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
+class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a question snapshot."""
+    pass
+
+
+class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content of a question snapshot."""
+    pass
+
+
 class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
     The id of instances of this class has the form
     {{collection_id}}.{{random_hash_of_16_chars}}
     """
+    SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
+    ALLOW_REVERT = True
 
     # The title of the question.
     title = ndb.StringProperty(required=True, indexed=True)
@@ -96,6 +109,4 @@ class QuestionModel(base_models.VersionedModel):
             collection_id=collection_id,
             language_code=language_code)
 
-        question_instance.put()
-
-        return instance_id
+        return question_instance

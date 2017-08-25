@@ -23,39 +23,57 @@ from core.tests import test_utils
 memcache_services = models.Registry.import_memcache_services()
 
 class QuestionServicesUnitTest(test_utils.GenericTestBase):
-	"""Test the question services module."""
+    """Test the question services module."""
 
-	def setUp(self):
-		"""Before each individual test, create dummy user."""
-		super(QuestionServicesUnitTest, self).setUp()
+    def setUp(self):
+        """Before each individual test, create dummy user."""
+        super(QuestionServicesUnitTest, self).setUp()
 
-		self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-		user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
 
-		self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-		self.owner = user_services.UserActionsInfo(self.owner_id)
+    def test_save_new_question(self):
+        question_data = {}
+        title = 'A Question'
+        data_schema_version = 1
+        collection_id = 1
+        language_code = 'en'
+        question = lambda: None
+        setattr(question, 'title', title)
+        setattr(question, 'question_data', question_data)
+        setattr(question, 'data_schema_version', data_schema_version)
+        setattr(question, 'collection_id', collection_id)
+        setattr(question, 'language_code', language_code)
 
-	def test_save_new_question(self):
-		question_data = {}
-    	title = 'A Question'
-    	data_schema_version = 1
-    	collection_id = 1
-    	language_code = 'en'
-    	owner_id = 'random'
-    	question = lambda: None
-    	setattr(question, 'title', title)
-    	setattr(question, 'question_data', {})
-    	setattr(question, 'data_schema_version', data_schema_version)
-    	setattr(question, 'collection_id', collection_id)
-    	setattr(question, 'language_code', language_code)
+        question_model = question_services.add_question(self.owner_id, question)
+        model = question_models.QuestionModel.get(question_model.id)
 
-    	question_id = question_services.add_question(owner_id, question)
-    	model = question_models.QuestionModel.get(question_id)
+        self.assertEqual(model.title, title)
+        self.assertEqual(model.question_data, question_data)
+        self.assertEqual(model.data_schema_version,data_schema_version)
+        self.assertEqual(model.collection_id, collection_id)
+        self.assertEqual(model.language_code, language_code)
 
-    	self.asserEqual(model.title, title)
-    	self.asserEqual(model.question_data, question_data)
-    	self.asserEqual(model.data_schema_version,data_schema_version)
-    	self.asserEqual(model.collection_id, collection_id)
-    	self.asserEqual(model.language_code, language_code)
+    def test_delete_question(self):
+        question_data = {}
+        title = 'A Question'
+        data_schema_version = 1
+        collection_id = 1
+        language_code = 'en'
+        question = lambda: None
+        setattr(question, 'title', title)
+        setattr(question, 'question_data', question_data)
+        setattr(question, 'data_schema_version', data_schema_version)
+        setattr(question, 'collection_id', collection_id)
+        setattr(question, 'language_code', language_code)
+
+        question_model = question_services.add_question(self.owner_id, question)
+        question_services.delete_question(self.owner_id, question_model.id)
+
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class QuestionModel with id %s not found' %(
+                question_model.id))):
+            question_models.QuestionModel.get(question_model.id)

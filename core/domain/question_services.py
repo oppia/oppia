@@ -35,14 +35,14 @@ def _create_question(committer_id, question, commit_message, commit_cmds):
         commit_cmds: list(dict). A list of change commands made to the given
             question.
     """
-    model_id = question_models.QuestionModel.create(title=question.title,
+    model = question_models.QuestionModel.create(title=question.title,
         question_data=question.question_data,
         data_schema_version=question.data_schema_version,
         collection_id=question.collection_id,
         language_code=question.language_code)
 
-#    model.commit(committer_id, commit_message, commit_cmds)
-    return model_id
+    model.commit(committer_id, commit_message, commit_cmds)
+    return model
 
 
 def add_question(committer_id, question):
@@ -53,12 +53,12 @@ def add_question(committer_id, question):
     """
     commit_message = (
         'New question created with title \'%s\'.' % question.title)
-    question_id = _create_question(committer_id, question, commit_message, [{
+    question_model = _create_question(committer_id, question, commit_message, [{
         'cmd': CMD_CREATE_NEW,
         'title': question.title,
     }])
 
-    return question_id
+    return question_model
 
 def delete_question(committer_id, question_id, force_deletion=False):
     """Deletes the question with the given question_id.
