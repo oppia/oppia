@@ -902,8 +902,8 @@ def get_learner_dashboard_activities(user_id):
         user_id: str. The id of the learner.
 
     Returns:
-        ActivityIdsInLearnerDashboard. The domain object containing the ids of all activities
-            in the learner dashboard.
+        ActivityIdsInLearnerDashboard. The domain object containing the ids of
+            all activities in the learner dashboard.
     """
     learner_progress_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(

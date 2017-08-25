@@ -31,12 +31,14 @@ oppia.controller('Library', [
   'i18nIdService', 'urlService', 'ALL_CATEGORIES', 'searchService',
   'windowDimensionsService', 'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
   'LIBRARY_TILE_WIDTH_PX', 'alertsService',
-  'LearnerDashboardIdsBackendApiService', function(
+  'LearnerDashboardIdsBackendApiService',
+  'LearnerDashboardActivityIdsObjectFactory', function(
       $scope, $http, $modal, $rootScope, $window, $timeout,
       i18nIdService, urlService, ALL_CATEGORIES, searchService,
       windowDimensionsService, UrlInterpolationService, LIBRARY_PAGE_MODES,
       LIBRARY_TILE_WIDTH_PX, alertsService,
-      LearnerDashboardIdsBackendApiService) {
+      LearnerDashboardIdsBackendApiService,
+      LearnerDashboardActivityIdsObjectFactory) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -81,7 +83,8 @@ oppia.controller('Library', [
           LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
             function(response) {
               $scope.learnerDashboardActivityIds = (
-                response.data.learner_dashboard_activity_ids);
+                LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+                  response.data.learner_dashboard_activity_ids));
             }
           );
         }

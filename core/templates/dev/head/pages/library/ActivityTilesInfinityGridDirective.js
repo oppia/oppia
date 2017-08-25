@@ -25,13 +25,13 @@ oppia.directive('activityTilesInfinityGrid', [
         'activity_tiles_infinity_grid_directive.html'),
       controller: [
         '$scope', '$rootScope', '$http', 'searchService', 'alertsService',
-        '$modal', 'LearnerDashboardIdsBackendApiService', function(
+        'LearnerDashboardIdsBackendApiService',
+        'LearnerDashboardActivityIdsObjectFactory', function(
           $scope, $rootScope, $http, searchService, alertsService,
-          $modal, LearnerDashboardIdsBackendApiService) {
+          LearnerDashboardIdsBackendApiService,
+          LearnerDashboardActivityIdsObjectFactory) {
           $scope.endOfPageIsReached = false;
           $scope.allActivitiesInOrder = [];
-          var currentlyHoveringOverActivity = false;
-          var activeActivityId = '';
           // Called when the first batch of search results is retrieved from the
           // server.
           $scope.$on(
@@ -44,14 +44,10 @@ oppia.directive('activityTilesInfinityGrid', [
           LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
             function(response) {
               $scope.learnerDashboardActivityIds = (
-                response.data.learner_dashboard_activity_ids);
+                LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+                  response.data.learner_dashboard_activity_ids));
             }
           );
-
-          $scope.setCurrentlyHoveringOverActivity = function(activityId) {
-            activeActivityId = activityId;
-            currentlyHoveringOverActivity = !currentlyHoveringOverActivity;
-          };
 
           $scope.showMoreActivities = function() {
             if (!$rootScope.loadingMessage && !$scope.endOfPageIsReached) {

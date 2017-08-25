@@ -123,16 +123,8 @@ oppia.directive('explorationSummaryTile', [
 
           $scope.canExplorationBeAddedToLearnerPlaylist = function(explorationId) {
             if ($scope.getLearnerDashboardActivityIds()) {
-              var incompleteExplorationIds = (
-                $scope.getLearnerDashboardActivityIds().incomplete_exploration_ids);
-              var completedExplorationIds = (
-                $scope.getLearnerDashboardActivityIds().completed_exploration_ids);
-              var explorationPlaylistIds = (
-                $scope.getLearnerDashboardActivityIds().exploration_playlist_ids);
-
-              if (incompleteExplorationIds.indexOf(explorationId) !== -1 ||
-                  completedExplorationIds.indexOf(explorationId) !== -1 ||
-                  explorationPlaylistIds.indexOf(explorationId) !== -1) {
+              if ($scope.getLearnerDashboardActivityIds(
+                ).belongsToLearnerDashboardActivities(explorationId)) {
                 return false;
               } else {
                 return explorationIsActive;
@@ -171,10 +163,8 @@ oppia.directive('explorationSummaryTile', [
                 if (successfullyAdded) {
                   alertsService.addSuccessMessage(
                     'Successfully added to your \'Play Later\' list.');
-                  /* eslint-disable max-len */
-                  $scope.getLearnerDashboardActivityIds().exploration_playlist_ids.push(
+                  $scope.getLearnerDashboardActivityIds().addToExplorationLearnerPlaylist(
                     explorationId);
-                  /* eslint-enable max-len */
                 }
               });
           };
@@ -218,15 +208,8 @@ oppia.directive('explorationSummaryTile', [
                 }
               ]
             }).result.then(function() {
-              /* eslint-disable max-len */
-              var index = (
-                $scope.getLearnerDashboardActivityIds().exploration_playlist_ids.indexOf(
-                  explorationId));
-              if (index !== -1) {
-                $scope.getLearnerDashboardActivityIds().exploration_playlist_ids.splice(
-                  index, 1);
-              }
-              /* eslint-enable max-len */
+              $scope.getLearnerDashboardActivityIds().removeFromExplorationLearnerPlaylist(
+                explorationId);
             });
           };
 

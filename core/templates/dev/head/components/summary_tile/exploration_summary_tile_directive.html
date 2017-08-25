@@ -7,18 +7,18 @@
    tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-clock-o"
-   ng-if="getLearnerDashboardActivityIds().exploration_playlist_ids.indexOf(getExplorationId()) !== -1"
+   ng-if="getLearnerDashboardActivityIds().explorationPlaylistIds.indexOf(getExplorationId()) !== -1"
    ng-click="removeFromLearnerPlaylist(getExplorationId(), getExplorationTitle())"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-check-circle-o"
-   ng-if="getLearnerDashboardActivityIds().completed_exploration_ids.indexOf(getExplorationId()) !== -1"
+   ng-if="getLearnerDashboardActivityIds().completedExplorationIds.indexOf(getExplorationId()) !== -1"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-spinner"
-   ng-if="getLearnerDashboardActivityIds().incomplete_exploration_ids.indexOf(getExplorationId()) !== -1"
+   ng-if="getLearnerDashboardActivityIds().incompleteExplorationIds.indexOf(getExplorationId()) !== -1"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate]>"
    tooltip-placement="left"></i>
