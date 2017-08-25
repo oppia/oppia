@@ -128,24 +128,9 @@ class LearnerDashboardIdsHandler(base.BaseHandler):
             learner_progress_services.get_learner_dashboard_activities( # pylint: disable=line-too-long
                 self.user_id))
 
-        learner_dashboard_activity_ids = {
-            'completed_exploration_ids': (
-                learner_dashboard_activities.completed_exploration_ids),
-            'completed_collection_ids': (
-                learner_dashboard_activities.completed_collection_ids),
-            'incomplete_exploration_ids': (
-                learner_dashboard_activities.incomplete_exploration_ids),
-            'incomplete_collection_ids': (
-                learner_dashboard_activities.incomplete_collection_ids),
-            'exploration_playlist_ids': (
-                learner_dashboard_activities.exploration_playlist_ids),
-            'collection_playlist_ids': (
-                learner_dashboard_activities.collection_playlist_ids)
-        }
-
         self.values.update({
             'learner_dashboard_activity_ids': (
-                learner_dashboard_activity_ids)
+                learner_dashboard_activities.to_dict())
         })
         self.render_json(self.values)
 

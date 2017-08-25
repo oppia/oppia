@@ -326,8 +326,8 @@ def add_collection_to_learner_playlist(
             end.
 
     Returns:
-        bool. Indicates whether the collection belongs to the completed or
-            incomplete list of collections.
+        bool. Indicates whether the collection already exists in either of the
+            "completed collections" or "incomplete collections" lists.
         bool. Indicates whether the playlist limit of the user has been
             exceeded.
         bool. Indicates whether the collection belongs to the created or edited
@@ -902,7 +902,7 @@ def get_learner_dashboard_activities(user_id):
         user_id: str. The id of the learner.
 
     Returns:
-        activity_ids. The domain object containing the ids of all activities
+        ActivityIdsInLearnerDashboard. The domain object containing the ids of all activities
             in the learner dashboard.
     """
     learner_progress_models = (

@@ -79,3 +79,31 @@ class ActivityIdsInLearnerDashboard(object):
         self.incomplete_collection_ids = incomplete_collection_ids
         self.exploration_playlist_ids = exploration_playlist_ids
         self.collection_playlist_ids = collection_playlist_ids
+
+    def to_dict(self):
+        """Return dictionary representation of ActivityIdsInLearnerDashboard.
+
+        Return:
+            dict. The keys of the dict are:
+                'completed_exploration_ids': list(str). The ids of the
+                    explorations that are completed.
+                'completed_collection_ids': list(str). The ids of the
+                    collections that are completed.
+                'incomplete_exploration_ids': list(str). The ids of the
+                    explorations that are incomplete.
+                'incomplete_collection_ids': list(str). The ids of the
+                    collections that are incomplete.
+                'exploration_playlist_ids': list(str). The ids of the
+                    explorations that are in the playlist
+                'collection_playlist_ids': list(str). The ids of the
+                    collections that are in the playlist.
+        """
+
+        return {
+            'completed_exploration_ids': self.completed_exploration_ids,
+            'completed_collection_ids': self.completed_collection_ids,
+            'incomplete_exploration_ids': self.incomplete_exploration_ids,
+            'incomplete_collection_ids': self.incomplete_collection_ids,
+            'exploration_playlist_ids': self.exploration_playlist_ids,
+            'collection_playlist_ids': self.collection_playlist_ids
+        }
