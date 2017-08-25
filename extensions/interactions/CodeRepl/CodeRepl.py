@@ -24,10 +24,7 @@ class CodeRepl(base.BaseInteraction):
     description = 'Allows learners to enter code and get it evaluated.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     is_trainable = True
-    _dependency_ids = [
-        'skulpt', 'codemirror', 'code_repl_prediction',
-        'winnowing_preprocessing', 'svm_predictionService',
-        'count_vectorizer']
+    _dependency_ids = ['skulpt', 'codemirror', 'code_repl_prediction']
     answer_type = 'CodeEvaluation'
     instructions = 'Type code in the editor'
     narrow_instructions = 'Go to code editor'

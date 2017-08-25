@@ -213,8 +213,6 @@ class BaseInteraction(object):
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
             'is_trainable': self.is_trainable,
-            'is_interaction_trainable':
-                self.is_interaction_trainable,
             'is_linear': self.is_linear,
             'needs_summary': self.needs_summary,
             'customization_arg_specs': [{
