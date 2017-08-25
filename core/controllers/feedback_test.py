@@ -22,6 +22,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
@@ -41,7 +42,6 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackThreadPermissionsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
@@ -121,6 +121,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         super(FeedbackThreadIntegrationTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
@@ -250,7 +251,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             new_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.editor_id, exploration)
-        rights_manager.publish_exploration(self.editor_id, new_exp_id)
+        rights_manager.publish_exploration(self.editor, new_exp_id)
 
         response = self.testapp.get('/create/%s' % new_exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -363,6 +364,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.owner_2 = user_services.UserActionsInfo(self.owner_id_2)
 
         # Create an exploration.
         self.save_new_valid_exploration(
@@ -371,7 +373,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
         rights_manager.create_new_exploration_rights(
             self.EXP_ID, self.owner_id_2)
-        rights_manager.publish_exploration(self.owner_id_2, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner_2, self.EXP_ID)
 
     def _get_messages_read_by_user(self, user_id, exploration_id, thread_id):
         feedback_thread_user_model = (
@@ -514,6 +516,8 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
@@ -544,9 +548,9 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.editor_id, self.EXP_ID, self.owner_id,
+            self.editor, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)
 
         response = self.testapp.get('/explore/%s' % self.EXP_ID)

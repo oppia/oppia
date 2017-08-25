@@ -23,6 +23,7 @@ import StringIO
 
 import jinja2
 import mutagen
+from mutagen import mp3
 
 from constants import constants
 from core.controllers import base
@@ -154,27 +155,20 @@ class ExplorationPage(EditorHandler):
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
-            'can_delete': rights_manager.check_can_delete_exploration(
-                self.user_id, self.actions, exploration_rights),
+            'can_delete': rights_manager.check_can_delete_activity(
+                self.user, exploration_rights),
             'can_edit': rights_manager.check_can_edit_activity(
-                self.user_id, self.actions, constants.ACTIVITY_TYPE_EXPLORATION,
-                exploration_rights),
+                self.user, exploration_rights),
             'can_modify_roles': (
-                rights_manager.check_can_modify_exploration_roles(
-                    self.user_id, self.actions, exploration_rights)),
-            'can_publicize': rights_manager.check_can_publicize_exploration(
-                self.actions, exploration_rights),
-            'can_publish': rights_manager.check_can_publish_exploration(
-                self.user_id, self.actions, exploration_rights),
+                rights_manager.check_can_modify_activity_roles(
+                    self.user, exploration_rights)),
+            'can_publish': rights_manager.check_can_publish_activity(
+                self.user, exploration_rights),
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(
-                    self.user_id, self.actions, exploration_rights)),
-            'can_unpublicize': (
-                rights_manager.check_can_unpublicize_exploration(
-                    self.actions, exploration_rights)),
-            'can_unpublish': (
-                rights_manager.check_can_unpublish_exploration(
-                    self.actions, exploration_rights)),
+                    self.user, exploration_rights)),
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, exploration_rights),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
@@ -333,7 +327,7 @@ class ExplorationRightsHandler(EditorHandler):
                     'Sorry, we could not find the specified user.')
 
             rights_manager.assign_role_for_exploration(
-                self.user_id, exploration_id, new_member_id, new_member_role)
+                self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(
                 self.user_id, new_member_id, new_member_role, exploration_id,
                 exploration.title)
@@ -346,11 +340,11 @@ class ExplorationRightsHandler(EditorHandler):
                 raise self.InvalidInputException(e)
 
             rights_manager.release_ownership_of_exploration(
-                self.user_id, exploration_id)
+                self.user, exploration_id)
 
         elif viewable_if_private is not None:
             rights_manager.set_private_viewability_of_exploration(
-                self.user_id, exploration_id, viewable_if_private)
+                self.user, exploration_id, viewable_if_private)
 
         else:
             raise self.InvalidInputException(
@@ -363,7 +357,7 @@ class ExplorationRightsHandler(EditorHandler):
 
 
 class ExplorationStatusHandler(EditorHandler):
-    """Handles publishing or publicizing of an exploration."""
+    """Handles publishing of an exploration."""
 
     def _publish_exploration(self, exploration_id):
         """Publish an exploration.
@@ -381,36 +375,15 @@ class ExplorationStatusHandler(EditorHandler):
             raise self.InvalidInputException(e)
 
         exp_services.publish_exploration_and_update_user_profiles(
-            self.user_id, exploration_id)
+            self.user, exploration_id)
         exp_services.index_explorations_given_ids([exploration_id])
-
-    def _unpublicize_exploration(self, exploration_id):
-        """Unpublicize an exploration.
-
-        Args:
-            exploration_id: str. Id of the exploration.
-
-        Raises:
-            InvalidInputException: Given exploration is invalid.
-        """
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        try:
-            exploration.validate(strict=True)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
-        rights_manager.unpublicize_exploration(
-            self.user_id, exploration_id)
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id):
         make_public = self.payload.get('make_public')
-        make_unpublicized = self.payload.get('make_unpublicized')
 
         if make_public is not None:
             self._publish_exploration(exploration_id)
-        elif make_unpublicized is not None:
-            self._unpublicize_exploration(exploration_id)
 
         self.render_json({
             'rights': rights_manager.get_exploration_rights(
@@ -446,18 +419,9 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
         # Perform the moderator action.
         if action == 'unpublish_exploration':
-            rights_manager.unpublish_exploration(
-                self.user_id, exploration_id)
+            rights_manager.unpublish_exploration(self.user, exploration_id)
             exp_services.delete_documents_from_search_index([
                 exploration_id])
-        elif action == 'publicize_exploration':
-            try:
-                exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
-
-            rights_manager.publicize_exploration(
-                self.user_id, exploration_id)
         else:
             raise self.InvalidInputException(
                 'No change was made to this exploration.')
@@ -883,12 +847,22 @@ class AudioUploadHandler(EditorHandler):
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:
-            audio = mutagen.File(tempbuffer)
+            # For every accepted extension, use the mutagen-specific
+            # constructor for that type. This will catch mismatched audio
+            # types e.g. uploading a flac file with an MP3 extension.
+            if extension == 'mp3':
+                audio = mp3.MP3(tempbuffer)
+            else:
+                audio = mutagen.File(tempbuffer)
         except mutagen.MutagenError:
-            # Mutagen occasionally has problems with certain files
-            # for unknown reasons.
-            raise self.InvalidInputException('Could not open uploaded'
-                                             'audio file')
+            # The calls to mp3.MP3() versus mutagen.File() seem to behave
+            # differently upon not being able to interpret the audio.
+            # mp3.MP3() raises a MutagenError whereas mutagen.File()
+            # seems to return None. It's not clear if this is always
+            # the case. Occasionally, mutagen.File() also seems to
+            # raise a MutagenError.
+            raise self.InvalidInputException('Audio not recognized '
+                                             'as a %s file' % extension)
         tempbuffer.close()
 
         if audio is None:

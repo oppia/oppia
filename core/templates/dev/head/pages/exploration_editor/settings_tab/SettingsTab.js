@@ -27,7 +27,6 @@ oppia.controller('SettingsTab', [
   'explorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
-  'ENABLE_FALLBACK_EDITOR',
   function(
       $scope, $http, $window, $modal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
@@ -38,8 +37,7 @@ oppia.controller('SettingsTab', [
       explorationParamChangesService, explorationWarningsService,
       explorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
-      EditableExplorationBackendApiService, UrlInterpolationService,
-      ENABLE_FALLBACK_EDITOR) {
+      EditableExplorationBackendApiService, UrlInterpolationService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -169,16 +167,10 @@ oppia.controller('SettingsTab', [
       explorationAdvancedFeaturesService.areParametersEnabled);
     $scope.areGadgetsEnabled = (
       explorationAdvancedFeaturesService.areGadgetsEnabled);
-    $scope.areFallbacksEnabled = (
-      explorationAdvancedFeaturesService.areFallbacksEnabled);
-    $scope.fallbackEditorIsEnabled = ENABLE_FALLBACK_EDITOR;
-
     $scope.enableParameters = (
       explorationAdvancedFeaturesService.enableParameters);
     $scope.enableGadgets = (
       explorationAdvancedFeaturesService.enableGadgets);
-    $scope.enableFallbacks = (
-      explorationAdvancedFeaturesService.enableFallbacks);
 
     /********************************************
     * Methods for rights management.
@@ -368,18 +360,6 @@ oppia.controller('SettingsTab', [
 
     $scope.unpublishExplorationAsModerator = function() {
       openModalForModeratorAction('unpublish_exploration');
-    };
-
-    $scope.publicizeExplorationAsModerator = function() {
-      openModalForModeratorAction('publicize_exploration');
-    };
-
-    $scope.unpublicizeExplorationAsModerator = function() {
-      // TODO(sll): Migrate this and deleteExplorationAsModerator to the
-      // 'moderator action' path, and implement an option for different actions
-      // saying whether emails should be sent for these, or not. At present,
-      // we don't expect to send an email when an exploration is unpublicized.
-      explorationRightsService.unpublicize();
     };
 
     $scope.isExplorationLockedForEditing = function() {

@@ -85,7 +85,8 @@ INTERACTION_CLASSIFIER_MAPPING = {
         'current_data_schema_version': 1
     }
 }
-
+# Classifier job time to live (in mins).
+CLASSIFIER_JOB_TTL_MINS = 5
 TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
 TRAINING_JOB_STATUS_FAILED = 'FAILED'
 TRAINING_JOB_STATUS_NEW = 'NEW'
@@ -150,7 +151,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 12
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -325,7 +326,6 @@ EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION = 'subscription_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
-EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
@@ -340,7 +340,6 @@ BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
-MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
@@ -349,15 +348,6 @@ DEFAULT_SIGNOFF_HTML_FN = (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
 VALID_MODERATOR_ACTIONS = {
-    MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
-        'email_config': 'publicize_exploration_email_html_body',
-        'email_subject_fn': (
-            lambda exp_title: (
-                'Your Oppia exploration "%s" has been featured!' % exp_title)),
-        'email_intent': EMAIL_INTENT_PUBLICIZE_EXPLORATION,
-        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
-        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
-    },
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
         'email_subject_fn': (
@@ -408,19 +398,6 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 # exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
-
-# Google Cloud Storage bucket name.
-GCS_RESOURCE_BUCKET_NAME = 'oppia.resources'
-
-# Url prefix for destination of uploaded files and location of downloaded
-# files.
-
-if DEV_MODE:
-    AUDIO_URL_TEMPLATE = '/audiohandler/<exploration_id>/audio/<filename>'
-else:
-    AUDIO_URL_TEMPLATE = (
-        'https://storage.googleapis.com/%s/<exploration_id>/'
-        'assets/audio/<filename>' % GCS_RESOURCE_BUCKET_NAME)
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
@@ -569,6 +546,8 @@ COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
 EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
+COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
+COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
@@ -653,7 +632,6 @@ EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
-ACTIVITY_STATUS_PUBLICIZED = 'publicized'
 
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'
@@ -813,9 +791,7 @@ SITE_NAME = 'Oppia.org'
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
 
-# Following are the constants for the role Ids.
-# To check the role updation from /admin#roles, set ADMIN_SHOW_UPDATE_ROLE
-# constant in Admin.js to true.
+# Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
@@ -824,7 +800,7 @@ ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 
 # Intent of the User making query to role structure via admin interface. Used
-# to store audit data regarding queries to role Ids.
+# to store audit data regarding queries to role IDs.
 ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'

@@ -62,10 +62,9 @@ states:
         dest: %s
         feedback: []
         param_changes: []
-      fallbacks: []
       hints: []
       id: null
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -80,19 +79,9 @@ states:
         dest: New state
         feedback: []
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: New state
-          feedback: []
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 42
-          trigger_type: NthResubmission
       hints: []
       id: null
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -141,16 +130,7 @@ states:
         dest: New state
         feedback: []
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: New state
-          feedback: []
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 42
-          trigger_type: NthResubmission
+      fallbacks: []
       id: null
     param_changes: []
 states_schema_version: %d
@@ -202,10 +182,9 @@ states:
         dest: %s
         feedback: []
         param_changes: []
-      fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
@@ -224,10 +203,9 @@ states:
         dest: New state
         feedback: []
         param_changes: []
-      fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
   Second state:
     classifier_model_id: null
@@ -246,10 +224,9 @@ states:
         dest: Second state
         feedback: []
         param_changes: []
-      fallbacks: []
       hints: []
       id: TextInput
-      solution: {}
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -526,15 +503,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.answer_groups = []
         exploration.validate()
 
-        interaction.fallbacks = {}
-        self._assert_validation_error(
-            exploration, 'Expected fallbacks to be a list')
-
         # Restore a valid exploration.
         interaction.id = 'TextInput'
         interaction.answer_groups = answer_groups
         interaction.default_outcome = default_outcome
-        interaction.fallbacks = []
         exploration.validate()
 
         interaction.hints = {}
@@ -583,102 +555,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
-    def test_fallbacks_validation(self):
-        """Test validation of state fallbacks."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')
-        exploration.objective = 'Objective'
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
-        exploration.validate()
-
-        base_outcome = {
-            'dest': exploration.init_state_name,
-            'feedback': [],
-            'param_changes': [],
-        }
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'FakeTriggerName',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 42,
-                    },
-                },
-            },
-            'outcome': base_outcome,
-        }])
-        self._assert_validation_error(exploration, 'Unknown trigger type')
-
-        with self.assertRaises(KeyError):
-            init_state.update_interaction_fallbacks([{
-                'trigger': {
-                    'trigger_type': 'NthResubmission',
-                    'customization_args': {
-                        'num_submits': {
-                            'value': 42,
-                        },
-                    },
-                },
-                'outcome': {},
-            }])
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {},
-            },
-            'outcome': base_outcome,
-        }])
-        # Default values for the customization args will be added silently.
-        exploration.validate()
-        self.assertEqual(len(init_state.interaction.fallbacks), 1)
-        self.assertEqual(
-            init_state.interaction.fallbacks[0].trigger.customization_args,
-            {
-                'num_submits': {
-                    'value': 3,
-                }
-            })
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 42,
-                    },
-                    'bad_key_that_will_get_stripped_silently': {
-                        'value': 'unused_value',
-                    }
-                },
-            },
-            'outcome': base_outcome,
-        }])
-        # Unused customization arg keys will be stripped silently.
-        exploration.validate()
-        self.assertEqual(len(init_state.interaction.fallbacks), 1)
-        self.assertEqual(
-            init_state.interaction.fallbacks[0].trigger.customization_args,
-            {
-                'num_submits': {
-                    'value': 42,
-                }
-            })
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 2,
-                    },
-                },
-            },
-            'outcome': base_outcome,
-        }])
-        exploration.validate()
-
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -696,7 +572,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
         # Add hint and delete hint
@@ -719,23 +596,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
+        # Solution should be set to None as default.
+        self.assertEquals(init_state.interaction.solution, None)
+
         init_state.add_hint('hint #1')
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+
         # Object type of answer must match that of correct_answer
         with self.assertRaises(AssertionError):
-            exploration.validate()
+            init_state.interaction.solution = (
+                exp_domain.Solution.from_dict(
+                    init_state.interaction.id, solution))
 
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': 'hello_world is a string',
         }
-        init_state.interaction.solution = solution
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
     def test_tag_validation(self):
@@ -1301,10 +1184,9 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     'feedback': [],
                     'param_changes': [],
                 },
-                'fallbacks': [],
                 'hints': [],
                 'id': None,
-                'solution': {},
+                'solution': None,
             },
             'param_changes': [],
         }
@@ -1322,22 +1204,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             self.EXP_ID, title='Title', category='Category')
         exploration.add_states(['New state'])
         self.assertEqual(len(exploration.states), 2)
-
-        exploration.states['New state'].update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 42,
-                    },
-                },
-            },
-            'outcome': {
-                'dest': 'New state',
-                'feedback': [],
-                'param_changes': [],
-            },
-        }])
 
         exploration.validate()
 
@@ -2543,7 +2409,93 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V15
+    YAML_CONTENT_V16 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 16
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V16
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2663,10 +2615,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'feedback': [],
                         'param_changes': [],
                     },
-                    'fallbacks': [],
                     'hints': [],
                     'id': None,
-                    'solution': {},
+                    'solution': None,
                 },
                 'param_changes': [],
             }

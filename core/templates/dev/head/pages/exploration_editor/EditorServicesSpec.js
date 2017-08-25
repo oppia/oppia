@@ -497,7 +497,6 @@ describe('Exploration rights service', function() {
 
       GLOBALS.ACTIVITY_STATUS_PRIVATE = 'private';
       GLOBALS.ACTIVITY_STATUS_PUBLIC = 'public';
-      GLOBALS.ACTIVITY_STATUS_PUBLICIZED = 'publicized';
     }));
 
     it('correctly initializes the service', function() {
@@ -520,39 +519,32 @@ describe('Exploration rights service', function() {
       expect(ers._viewableIfPrivate).toBe(true);
     });
 
+    it('reports the correct cloning status', function() {
+      ers.init(['abc'], [], [], 'public', '1234', true);
+      expect(ers.isCloned()).toBe(true);
+      expect(ers.clonedFrom()).toEqual('1234');
+ 
+      ers.init(['abc'], [], [], 'public', null, true);
+      expect(ers.isCloned()).toBe(false);
+      expect(ers.clonedFrom()).toBeNull();
+    });
+ 
+    it('reports the correct community-owned status', function() {
+      ers.init(['abc'], [], [], 'public', '1234', false);
+      expect(ers.isCommunityOwned()).toBe(false);
+ 
+      ers.init(['abc'], [], [], 'public', '1234', true);
+      expect(ers.isCommunityOwned()).toBe(true);
+    });
+
     it('reports the correct derived statuses', function() {
       ers.init(['abc'], [], [], 'private', 'e1234', true);
       expect(ers.isPrivate()).toBe(true);
       expect(ers.isPublic()).toBe(false);
-      expect(ers.isPublicized()).toBe(false);
-
+      
       ers.init(['abc'], [], [], 'public', 'e1234', true);
       expect(ers.isPrivate()).toBe(false);
       expect(ers.isPublic()).toBe(true);
-      expect(ers.isPublicized()).toBe(false);
-
-      ers.init(['abc'], [], [], 'publicized', 'e1234', true);
-      expect(ers.isPrivate()).toBe(false);
-      expect(ers.isPublic()).toBe(false);
-      expect(ers.isPublicized()).toBe(true);
-    });
-
-    it('reports the correct cloning status', function() {
-      ers.init(['abc'], [], [], 'publicized', '1234', true);
-      expect(ers.isCloned()).toBe(true);
-      expect(ers.clonedFrom()).toEqual('1234');
-
-      ers.init(['abc'], [], [], 'publicized', null, true);
-      expect(ers.isCloned()).toBe(false);
-      expect(ers.clonedFrom()).toBeNull();
-    });
-
-    it('reports the correct community-owned status', function() {
-      ers.init(['abc'], [], [], 'publicized', '1234', false);
-      expect(ers.isCommunityOwned()).toBe(false);
-
-      ers.init(['abc'], [], [], 'publicized', '1234', true);
-      expect(ers.isCommunityOwned()).toBe(true);
     });
   });
 });

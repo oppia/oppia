@@ -25,6 +25,11 @@ oppia.factory('AssetsBackendApiService', [
     // yet to return a response.
     var _filesCurrentlyBeingRequested = [];
 
+    var AUDIO_DOWNLOAD_URL_TEMPLATE = (
+      GLOBALS.GCS_RESOURCE_BUCKET_NAME ?
+      ('https://storage.googleapis.com/' + GLOBALS.GCS_RESOURCE_BUCKET_NAME +
+       '/<exploration_id>/assets/audio/<filename>') :
+      '/audiohandler/<exploration_id>/audio/<filename>');
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
 
@@ -96,7 +101,7 @@ oppia.factory('AssetsBackendApiService', [
 
     var _getAudioDownloadUrl = function(explorationId, filename) {
       return UrlInterpolationService.interpolateUrl(
-        GLOBALS.AUDIO_URL_TEMPLATE, {
+        AUDIO_DOWNLOAD_URL_TEMPLATE, {
           exploration_id: explorationId,
           filename: filename
         });

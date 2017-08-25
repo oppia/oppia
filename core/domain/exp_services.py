@@ -61,8 +61,6 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # search query.
 MAX_ITERATIONS = 10
 
-# Constants used for search ranking.
-_STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
@@ -684,10 +682,6 @@ def apply_change_list(exploration_id, change_list):
                         change.new_value)
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS):
-                    state.update_interaction_fallbacks(change.new_value)
-                elif (
-                        change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     state.update_interaction_hints(change.new_value)
                 elif (
@@ -1012,7 +1006,7 @@ def _get_last_updated_by_human_ms(exp_id):
     return last_human_update_ms
 
 
-def publish_exploration_and_update_user_profiles(committer_id, exp_id):
+def publish_exploration_and_update_user_profiles(committer, exp_id):
     """Publishes the exploration with publish_exploration() function in
     rights_manager.py, as well as updates first_contribution_msec. Sends an
     email to the subscribers of the commiter informing them that an exploration
@@ -1022,13 +1016,14 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
     valid prior to publication.
 
     Args:
-        committer_id: str. The id of the user who made the commit.
+        committer: UserActionsInfo. UserActionsInfo object for the user who
+            made the commit.
         exp_id: str. The id of the exploration to be published.
     """
-    rights_manager.publish_exploration(committer_id, exp_id)
+    rights_manager.publish_exploration(committer, exp_id)
     exp_title = get_exploration_by_id(exp_id).title
     email_subscription_services.inform_subscribers(
-        committer_id, exp_id, exp_title)
+        committer.user_id, exp_id, exp_title)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
     for contributor in contributor_ids:
@@ -1458,7 +1453,7 @@ def load_demo(exploration_id):
         assets_list)
 
     publish_exploration_and_update_user_profiles(
-        feconf.SYSTEM_COMMITTER_ID, exploration_id)
+        user_services.get_system_user(), exploration_id)
 
     index_explorations_given_ids([exploration_id])
 
@@ -1543,26 +1538,6 @@ def get_next_page_of_all_non_private_commits(
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
     ) for entry in results], new_urlsafe_start_cursor, more)
-
-
-def _exp_rights_to_search_dict(rights):
-    # Allow searches like "is:featured".
-    """Returns a search dict with information about the exploration rights. This
-    allows searches like "is:featured".
-
-    Args:
-        rights: ActivityRights. Domain object for the rights/publication status
-            of the exploration.
-
-    Returns:
-        dict. If the status of the given exploration is publicized then it
-        returns a dict with a key "is", and the value "featured". Otherwise, it
-        returns an empty dict.
-    """
-    doc = {}
-    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
-        doc['is'] = 'featured'
-    return doc
 
 
 def _should_index(exp):
@@ -1656,11 +1631,7 @@ def get_search_rank_from_exp_summary(exp_summary):
     # TODO(sll): Improve this calculation.
     rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
 
-    rank = _DEFAULT_RANK + (
-        _STATUS_PUBLICIZED_BONUS
-        if exp_summary.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
-        else 0)
-
+    rank = _DEFAULT_RANK
     if exp_summary.ratings:
         for rating_value in exp_summary.ratings:
             rank += (
@@ -1695,7 +1666,6 @@ def _exp_to_search_dict(exp):
         dict. The representation of the given exploration, in a form that can
         be used by the search index.
     """
-    rights = rights_manager.get_exploration_rights(exp.id)
     doc = {
         'id': exp.id,
         'language_code': exp.language_code,
@@ -1707,7 +1677,6 @@ def _exp_to_search_dict(exp):
         'author_notes': exp.author_notes,
         'rank': get_search_rank(exp.id),
     }
-    doc.update(_exp_rights_to_search_dict(rights))
     return doc
 
 
@@ -1758,8 +1727,7 @@ def update_exploration_status_in_search(exp_id):
     if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([exp_id])
     else:
-        patch_exploration_search_document(
-            rights.id, _exp_rights_to_search_dict(rights))
+        patch_exploration_search_document(rights.id, {})
 
 
 def delete_documents_from_search_index(exploration_ids):

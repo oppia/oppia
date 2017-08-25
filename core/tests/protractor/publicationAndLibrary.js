@@ -26,7 +26,7 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Library index page', function() {
-  it('should display private, published and featured explorations', function() {
+  it('should display private and published explorations', function() {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_ARCHITECTURE = 'Architecture';
@@ -59,10 +59,9 @@ describe('Library index page', function() {
     browser.get(general.LIBRARY_URL_SUFFIX);
     library.playExploration(EXPLORATION_VINGILOT);
     general.moveToEditor();
-    // Moderators can edit explorations and mark them as featured.
+    // Moderators can edit explorations.
     editor.setLanguage(LANGUAGE_FRANCAIS);
     editor.saveChanges('change language');
-    workflow.markExplorationAsFeatured();
     users.logout();
 
     users.login('celebrimor@publicationAndLibrary.com');

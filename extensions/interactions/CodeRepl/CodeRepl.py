@@ -29,6 +29,7 @@ class CodeRepl(base.BaseInteraction):
     instructions = 'Type code in the editor'
     narrow_instructions = 'Go to code editor'
     needs_summary = True
+    can_have_solution = True
 
     # Language options 'lua', 'scheme', 'coffeescript', 'javascript', and
     # 'ruby' have been removed for possible later re-release.

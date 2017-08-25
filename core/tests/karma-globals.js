@@ -67,7 +67,7 @@ var GLOBALS = {
           'is equal to {{x|NormalizedString}}, taking case into account',
         Equals: 'is equal to {{x|NormalizedString}}'
       },
-      is_string_classifier_trainable: true,
+      is_interaction_trainable: true,
       is_trainable: true,
       narrow_instructions: null
     }
@@ -82,7 +82,7 @@ var GLOBALS = {
     text: 'English'
   }],
   ASSET_DIR_PREFIX: '',
-  AUDIO_URL_TEMPLATE: '/assets/test/<exploration_id>/audio/<filename>',
+  GCS_RESOURCE_BUCKET_NAME: null,
   // This prefix is needed to correctly interpolate directive template URLs in
   // Karma tests. It is referenced by UrlInterpolationService.
   TEMPLATE_DIR_PREFIX: 'core/templates/dev/head'
