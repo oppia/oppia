@@ -32,7 +32,8 @@ oppia.controller('Library', [
   'windowDimensionsService', 'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
   'LIBRARY_TILE_WIDTH_PX', 'alertsService',
   'LearnerDashboardIdsBackendApiService',
-  'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService', function(
+  'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
+  function(
       $scope, $http, $modal, $rootScope, $window, $timeout,
       i18nIdService, urlService, ALL_CATEGORIES, searchService,
       windowDimensionsService, UrlInterpolationService, LIBRARY_PAGE_MODES,

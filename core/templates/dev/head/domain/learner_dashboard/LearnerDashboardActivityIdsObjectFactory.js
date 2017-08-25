@@ -30,45 +30,46 @@ oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
     this.collectionPlaylistIds = collectionPlaylistIds;
   };
 
-  LearnerDashboardActivityIds.prototype.belongsToLearnerDashboardActivities = function(
+  LearnerDashboardActivityIds.prototype.belongsToLearnerDashboardActivities = (
+    function(
     activityId) {
-    if (this.incompleteCollectionIds.indexOf(activityId) !== -1 ||
-        this.completedCollectionIds.indexOf(activityId) !== -1 ||
-        this.collectionPlaylistIds.indexOf(activityId) !== -1 ||
-        this.incompleteExplorationIds.indexOf(activityId) !== -1 ||
-        this.completedExplorationIds.indexOf(activityId) !== -1 ||
-        this.explorationPlaylistIds.indexOf(activityId) !== -1) {
-      return true;
-    } else {
-      false;
-    }
-  };
+      if (this.incompleteCollectionIds.indexOf(activityId) !== -1 ||
+          this.completedCollectionIds.indexOf(activityId) !== -1 ||
+          this.collectionPlaylistIds.indexOf(activityId) !== -1 ||
+          this.incompleteExplorationIds.indexOf(activityId) !== -1 ||
+          this.completedExplorationIds.indexOf(activityId) !== -1 ||
+          this.explorationPlaylistIds.indexOf(activityId) !== -1) {
+        return true;
+      } else {
+        false;
+      }
+    });
 
-  LearnerDashboardActivityIds.prototype.addToExplorationLearnerPlaylist = function(
-    explorationId) {
-    this.explorationPlaylistIds.push(explorationId);
-  };
+  LearnerDashboardActivityIds.prototype.addToExplorationLearnerPlaylist = (
+    function(explorationId) {
+      this.explorationPlaylistIds.push(explorationId);
+    });
 
-  LearnerDashboardActivityIds.prototype.removeFromExplorationLearnerPlaylist = function(
-    explorationId) {
-    var index = this.explorationPlaylistIds.indexOf(explorationId);
-    if (index !== -1) {
-      this.explorationPlaylistIds.splice(index, 1);
-    }
-  };
+  LearnerDashboardActivityIds.prototype.removeFromExplorationLearnerPlaylist = (
+    function(explorationId) {
+      var index = this.explorationPlaylistIds.indexOf(explorationId);
+      if (index !== -1) {
+        this.explorationPlaylistIds.splice(index, 1);
+      }
+    });
 
-  LearnerDashboardActivityIds.prototype.removeFromCollectionLearnerPlaylist = function(
-    collectionId) {
-    var index = this.collectionPlaylistIds.indexOf(collectionId);
-    if (index !== -1) {
-      this.collectionPlaylistIds.splice(index, 1);
-    }
-  };
+  LearnerDashboardActivityIds.prototype.removeFromCollectionLearnerPlaylist = (
+    function(collectionId) {
+      var index = this.collectionPlaylistIds.indexOf(collectionId);
+      if (index !== -1) {
+        this.collectionPlaylistIds.splice(index, 1);
+      }
+    });
 
-  LearnerDashboardActivityIds.prototype.addToCollectionLearnerPlaylist = function(
-    collectionId) {
-    this.collectionPlaylistIds.push(collectionId);
-  };
+  LearnerDashboardActivityIds.prototype.addToCollectionLearnerPlaylist = (
+    function(collectionId) {
+      this.collectionPlaylistIds.push(collectionId);
+    });
 
   LearnerDashboardActivityIds.createFromBackendDict = function(
     learnerDashboardActivityIdsDict) {

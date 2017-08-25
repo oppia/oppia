@@ -83,7 +83,8 @@ oppia.directive('collectionSummaryTile', [
             collectionIsActive = !collectionIsActive;
           };
 
-          $scope.canCollectionBeAddedToLearnerPlaylist = function(collectionId) {
+          $scope.canCollectionBeAddedToLearnerPlaylist = function(
+            collectionId) {
             if ($scope.getLearnerDashboardActivityIds()) {
               if ($scope.getLearnerDashboardActivityIds(
                 ).belongsToLearnerDashboardActivities(collectionId)) {
@@ -99,8 +100,8 @@ oppia.directive('collectionSummaryTile', [
               LearnerPlaylistService.addToLearnerPlaylist(
                 collectionId, constants.ACTIVITY_TYPE_COLLECTION));
             if (isSuccessfullyAdded) {
-              $scope.getLearnerDashboardActivityIds().addToCollectionLearnerPlaylist(
-                collectionId);
+              $scope.getLearnerDashboardActivityIds(
+                ).addToCollectionLearnerPlaylist(collectionId);
             }
           };
 

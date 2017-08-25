@@ -19,7 +19,6 @@
  oppia.factory('LearnerPlaylistService', [
   '$http', '$modal', 'alertsService', 'UrlInterpolationService',
   function($http, $modal, alertsService, UrlInterpolationService) {
-    
     var _addToLearnerPlaylist = function(activityId, activityType) {
       var successfullyAdded = true;
       var addToLearnerPlaylistUrl = (
@@ -53,7 +52,7 @@
               'Successfully added to your \'Play Later\' list.');
           }
         });
-        return successfullyAdded;
+      return successfullyAdded;
     };
 
     var _removeFromLearnerPlaylist = function(activityId, activityTitle,
@@ -115,4 +114,4 @@
       addToLearnerPlaylist: _addToLearnerPlaylist,
       removeFromLearnerPlaylist: _removeFromLearnerPlaylist
     };
-}]);
+  }]);

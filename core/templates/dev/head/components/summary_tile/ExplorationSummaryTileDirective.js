@@ -121,7 +121,8 @@ oppia.directive('explorationSummaryTile', [
             explorationIsActive = !explorationIsActive;
           };
 
-          $scope.canExplorationBeAddedToLearnerPlaylist = function(explorationId) {
+          $scope.canExplorationBeAddedToLearnerPlaylist = function(
+            explorationId) {
             if ($scope.getLearnerDashboardActivityIds()) {
               if ($scope.getLearnerDashboardActivityIds(
                 ).belongsToLearnerDashboardActivities(explorationId)) {
@@ -137,8 +138,8 @@ oppia.directive('explorationSummaryTile', [
               LearnerPlaylistService.addToLearnerPlaylist(
                 explorationId, constants.ACTIVITY_TYPE_EXPLORATION));
             if (isSuccessfullyAdded) {
-              $scope.getLearnerDashboardActivityIds().addToExplorationLearnerPlaylist(
-                explorationId);
+              $scope.getLearnerDashboardActivityIds(
+                ).addToExplorationLearnerPlaylist(explorationId);
             }
           };
 
