@@ -80,12 +80,12 @@ oppia.directive('explorationSummaryTile', [
         '$scope', '$http', '$modal',
         'oppiaDatetimeFormatter', 'RatingComputationService',
         'windowDimensionsService', 'UrlInterpolationService',
-        'alertsService',
+        'alertsService', 'LearnerPlaylistService',
         function(
           $scope, $http, $modal,
           oppiaDatetimeFormatter, RatingComputationService,
           windowDimensionsService, UrlInterpolationService,
-          alertsService) {
+          alertsService, LearnerPlaylistService) {
           var contributorsSummary = $scope.getContributorsSummary() || {};
           $scope.contributors = Object.keys(
             contributorsSummary).sort(
@@ -133,84 +133,22 @@ oppia.directive('explorationSummaryTile', [
           };
 
           $scope.addToLearnerPlaylist = function(explorationId) {
-            var addExplorationToLearnerPlaylistUrl = (
-              UrlInterpolationService.interpolateUrl(
-                '/learnerplaylistactivityhandler/<activityType>/<explorationId>', {
-                  activityType: constants.ACTIVITY_TYPE_EXPLORATION,
-                  explorationId: explorationId
-                }));
-            $http.post(addExplorationToLearnerPlaylistUrl, {})
-              .then(function(response) {
-                var successfullyAdded = true;
-                if (response.data.belongs_to_completed_or_incomplete_list) {
-                  successfullyAdded = false;
-                  alertsService.addInfoMessage(
-                    'You have already completed or are completing this ' +
-                    'activity.');
-                }
-                if (response.data.belongs_to_subscribed_activities) {
-                  successfullyAdded = false;
-                  alertsService.addInfoMessage(
-                    'This is present in your creator dashboard');
-                }
-                if (response.data.playlist_limit_exceeded) {
-                  successfullyAdded = false;
-                  alertsService.addInfoMessage(
-                    'Your \'Play Later\' list is full!  Either you can ' +
-                    'complete some or you can head to the learner dashboard ' +
-                    'and remove some.');
-                }
-                if (successfullyAdded) {
-                  alertsService.addSuccessMessage(
-                    'Successfully added to your \'Play Later\' list.');
-                  $scope.getLearnerDashboardActivityIds().addToExplorationLearnerPlaylist(
-                    explorationId);
-                }
-              });
+            var isSuccessfullyAdded = (
+              LearnerPlaylistService.addToLearnerPlaylist(
+                explorationId, constants.ACTIVITY_TYPE_EXPLORATION));
+            if (isSuccessfullyAdded) {
+              $scope.getLearnerDashboardActivityIds().addToExplorationLearnerPlaylist(
+                explorationId);
+            }
           };
 
-          $scope.removeFromLearnerPlaylist = function(explorationId, explorationTitle) {
-            $modal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/learner_dashboard/' +
-                'remove_activity_from_learner_dashboard_modal_directive.html'),
-              backdrop: true,
-              resolve: {
-                explorationId: function() {
-                  return explorationId;
-                },
-                explorationTitle: function() {
-                  return explorationTitle;
-                }
-              },
-              controller: [
-                '$scope', '$modalInstance', '$http',
-                'UrlInterpolationService', function($scope, $modalInstance,
-                  $http, UrlInterpolationService) {
-                  $scope.sectionNameI18nId = (
-                    'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
-                  $scope.explorationTitle = explorationTitle;
-                  var removeFromLearnerPlaylistUrl = (
-                    UrlInterpolationService.interpolateUrl(
-                      '/learnerplaylistactivityhandler/' +
-                      '<activityType>/<explorationId>', {
-                        activityType: constants.ACTIVITY_TYPE_EXPLORATION,
-                        explorationId: explorationId
-                      }));
-                  $scope.remove = function() {
-                    $http['delete'](removeFromLearnerPlaylistUrl);
-                    $modalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            }).result.then(function() {
-              $scope.getLearnerDashboardActivityIds().removeFromExplorationLearnerPlaylist(
-                explorationId);
-            });
+          $scope.removeFromLearnerPlaylist = function(
+            explorationId, explorationTitle) {
+            var isSuccessfullyRemoved = (
+              LearnerPlaylistService.removeFromLearnerPlaylist(
+                explorationId, explorationTitle,
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                $scope.getLearnerDashboardActivityIds()));
           };
 
           $scope.getAverageRating = function() {
