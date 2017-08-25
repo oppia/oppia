@@ -33,7 +33,7 @@
      beforeEach(inject(function($injector) {
        ExplorationDraftObjectFactory = $injector.get(
          'ExplorationDraftObjectFactory');
-       draft = ExplorationDraftObjectFactory.createFromJSON(draftDict);
+       draft = ExplorationDraftObjectFactory.createFromLocalStorageDict(draftDict);
      }));
 
      it('should determine if the draft is valid', function() {

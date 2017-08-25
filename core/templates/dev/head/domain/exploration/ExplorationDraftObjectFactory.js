@@ -35,7 +35,7 @@
      * draftChangeListId corresponding to this draft.
      */
      ExplorationDraft.prototype.isDraftValid = function(currentDraftId) {
-       return (validDraftId === this.draftChangeListId);
+       return (currentDraftId === this.draftChangeListId);
      };
 
      ExplorationDraft.prototype.getDraftChanges = function() {
@@ -45,8 +45,8 @@
      ExplorationDraft.createFromLocalStorageDict = function(
        explorationDraftDict) {
        return new ExplorationDraft(
-         explorationDraftJSON.draftChanges,
-         explorationDraftJSON.draftChangeListId);
+         explorationDraftDict.draftChanges,
+         explorationDraftDict.draftChangeListId);
      };
      return ExplorationDraft;
    }
