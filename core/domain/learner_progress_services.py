@@ -893,7 +893,7 @@ def get_collection_summary_dicts(collection_summaries):
     return summary_dicts
 
 
-def get_ids_of_activities_in_learner_dashboard(user_id):
+def get_learner_dashboard_activities(user_id):
     """Returns the ids of each of the activities that are present in the various
     sections of the learner dashboard, namely the completed section, the
     incomplete section and the playlist section.
@@ -977,7 +977,7 @@ def get_activity_progress(user_id):
 
     """
     activity_ids_in_learner_dashboard = (
-        get_ids_of_activities_in_learner_dashboard(user_id))
+        get_learner_dashboard_activities(user_id))
     completed_exploration_ids = (
         activity_ids_in_learner_dashboard.completed_exploration_ids)
     completed_collection_ids = (

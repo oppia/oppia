@@ -537,7 +537,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Get the ids of all the activities.
         activity_ids = (
-            learner_progress_services.get_ids_of_activities_in_learner_dashboard( # pylint: disable=line-too-long
+            learner_progress_services.get_learner_dashboard_activities( # pylint: disable=line-too-long
                 self.user_id))
 
         self.assertEqual(
