@@ -1093,7 +1093,7 @@ oppia.factory('currentLocationService', ['$window', function($window) {
   };
 }]);
 
-// Service for assembling extension tags (for gadgets and interactions).
+// Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
   '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
     return {

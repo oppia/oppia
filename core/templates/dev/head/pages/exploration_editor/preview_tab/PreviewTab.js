@@ -21,19 +21,17 @@ oppia.controller('PreviewTab', [
   '$scope', '$modal', '$q', '$timeout', 'LearnerParamsService',
   'explorationData', 'explorationAdvancedFeaturesService',
   'explorationCategoryService', 'editorContextService',
-  'explorationGadgetsService', 'explorationInitStateNameService',
-  'explorationParamChangesService', 'explorationParamSpecsService',
-  'explorationStatesService', 'explorationTitleService',
-  'oppiaPlayerService', 'parameterMetadataService',
+  'explorationInitStateNameService', 'explorationParamChangesService',
+  'explorationParamSpecsService', 'explorationStatesService',
+  'explorationTitleService', 'oppiaPlayerService', 'parameterMetadataService',
   'ParamChangeObjectFactory', 'UrlInterpolationService',
   function(
       $scope, $modal, $q, $timeout, LearnerParamsService,
       explorationData, explorationAdvancedFeaturesService,
       explorationCategoryService, editorContextService,
-      explorationGadgetsService, explorationInitStateNameService,
-      explorationParamChangesService, explorationParamSpecsService,
-      explorationStatesService, explorationTitleService,
-      oppiaPlayerService, parameterMetadataService,
+      explorationInitStateNameService, explorationParamChangesService,
+      explorationParamSpecsService, explorationStatesService,
+      explorationTitleService, oppiaPlayerService, parameterMetadataService,
       ParamChangeObjectFactory, UrlInterpolationService) {
     $scope.isExplorationPopulated = false;
     explorationData.getData().then(function() {

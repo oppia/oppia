@@ -167,19 +167,6 @@ oppia.factory('UrlInterpolationService', [
       },
 
       /**
-       * Given a gadget type, returns the complete url path to that
-       * gadget type image.
-       */
-      getGadgetImgUrl: function(gadgetType) {
-        if (!gadgetType) {
-          alertsService.fatalWarning(
-            'Empty gadgetType passed in getGadgetImgUrl.');
-        }
-        return getExtensionResourceUrl('/gadgets/' + gadgetType +
-          '/static/images/' + gadgetType + '.png');
-      },
-
-      /**
        * Given an interaction id, returns the complete url path to
        * the thumbnail image for the interaction.
        */
