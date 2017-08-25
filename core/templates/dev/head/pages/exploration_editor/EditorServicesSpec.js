@@ -18,114 +18,104 @@
  */
 
 
- describe('Exploration data service', function() {
-   beforeEach(module('oppia'));
+describe('Exploration data service', function() {
+  beforeEach(module('oppia'));
 
-   describe('exploration data service', function() {
-     var eds = null;
-     var mockBackendApiService = null;
-     var mockLocalStorageService = null;
-     var mockUrlService = null;
-     var draftChangesValid = null;
-     var draftChangesInvalid = null;
-     var draftChangesInvalid = null;
-     var $q = null;
+  describe('getData local save', function() {
+    var eds = null;
+    var mockBackendApiService = null;
+    var mockLocalStorageService = null;
+    var mockUrlService = null;
+    var draftChangesValid = null;
+    var draftChangesInvalid = null;
+    var draftChangesInvalid = null;
+    var $q = null;
 
-     beforeEach(function() {
-       module(function($provide) {
-         $provide.value(
-           'LocalStorageService', mockLocalStorageService);
-       });
-       module(function($provide) {
-         $provide.value(
-           'EditableExplorationBackendApiService', mockBackendApiService);
-       });
-       module(function($provide) {
-         $provide.value(
-           'urlService', mockUrlService);
-       });
+    beforeEach(function() {
+      module(function($provide) {
+        $provide.value(
+          'LocalStorageService', mockLocalStorageService);
+      });
+      module(function($provide) {
+        $provide.value(
+          'EditableExplorationBackendApiService', mockBackendApiService);
+      });
+      module(function($provide) {
+        $provide.value(
+          'urlService', mockUrlService);
+      });
+    });
 
-     });
+    beforeEach(function() {
+      mockUrlService = {
+        getPathname: function() {}
+      };
 
-     beforeEach(function() {
-       mockUrlService = {
-         getPathname: function() {}
-       };
+      mockBackendApiService = {
+        fetchApplyDraftExploration: function() {}
+      };
 
-       mockBackendApiService = {
-         fetchApplyDraftExploration: function() {}
-       };
+      mockLocalStorageService = {
+        getExplorationDraft: function() {},
+        removeExplorationDraft: function() {}
+      };
+      spyOn(mockUrlService, 'getPathname').and.returnValue('/create/exp_id');
+    });
 
-       mockLocalStorageService = {
-         getExplorationDraft: function() {},
-         removeExplorationDraft: function() {}
-       };
-       spyOn(mockUrlService, 'getPathname').and.returnValue('/create/exp_id');
+    beforeEach(inject(function($injector) {
+      eds = $injector.get('explorationData');
+      $q = $injector.get('$q');
+    }));
 
+    beforeEach(function() {
+      expDataResponse = {
+        draft_change_list_id: 3,
+      };
 
-     });
+      draftChangesValid = {
+        isDraftValid: function() {
+          return true;
+        },
+        getDraftChanges: function() {
+          return [];
+        }
+      };
 
-     beforeEach(inject(function($injector) {
-       eds = $injector.get('explorationData');
-       $q = $injector.get('$q');
-     }));
+      draftChangesInvalid = {
+        isDraftValid: function() {
+          return false;
+        },
+        getDraftChanges: function() {
+          return [];
+        }
+      };
 
-     beforeEach(function() {
-       expDataResponse = {
-         draft_change_list_id: 3,
-       };
-
-       draftChangesValid = {
-         isDraftValid: function () {
-           return true;
-         },
-         getDraftChanges: function () {
-           return [];
-
-         }
-       };
-       draftChangesInvalid = {
-         isDraftValid: function () {
-           return false;
-         },
-         getDraftChanges: function () {
-           return [];
-
-         }
-       };
-
-
-       spyOn(mockBackendApiService, 'fetchApplyDraftExploration').
-         and.returnValue($q.when(expDataResponse));
-       spyOn(eds, 'autosaveChangeList');
-     });
+      spyOn(mockBackendApiService, 'fetchApplyDraftExploration').
+        and.returnValue($q.when(expDataResponse));
+      spyOn(eds, 'autosaveChangeList');
+    });
 
 
-     it('should autosave draft changes when draft ids match', function() {
-       errorCallback = function() {};
-       spyOn(mockLocalStorageService, 'getExplorationDraft').
-         and.returnValue(draftChangesValid);
-       eds.getData(errorCallback).then(function(data) {
-         expect(eds.autosaveChangeList()).toHaveBeenCalled();
-       });
-     });
+    it('should autosave draft changes when draft ids match', function() {
+      errorCallback = function() {};
+      spyOn(mockLocalStorageService, 'getExplorationDraft').
+        and.returnValue(draftChangesValid);
+      eds.getData(errorCallback).then(function(data) {
+        expect(eds.autosaveChangeList()).toHaveBeenCalled();
+      });
+    });
 
-     it('should call error callback when draft ids do not match', function() {
-       errorCallback = function() {};
-       spyOn(mockLocalStorageService, 'getExplorationDraft').
-         and.returnValue(draftChangesInvalid);
-       spyOn(window, 'errorCallback');
-       eds.getData(errorCallback).then(function(data) {
-         expect(errorCallback()).toHaveBeenCalled();
-
-       });
-     });
-
-
-
- });
+    it('should call error callback when draft ids do not match', function() {
+      errorCallback = function() {};
+      spyOn(mockLocalStorageService, 'getExplorationDraft').
+        and.returnValue(draftChangesInvalid);
+      spyOn(window, 'errorCallback');
+      eds.getData(errorCallback).then(function(data) {
+        expect(errorCallback()).toHaveBeenCalled();
+      });
+    });
+  });
 });
-
 
 describe('Editor context service', function() {
   beforeEach(module('oppia'));
