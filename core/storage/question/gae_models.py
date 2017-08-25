@@ -97,7 +97,7 @@ class QuestionModel(base_models.VersionedModel):
                 question is written in.
 
         Returns:
-            ID of the new QuestionModel entry.
+            Instance of the new QuestionModel entry.
 
         Raises:
             Exception: A model with the same ID already exists.
