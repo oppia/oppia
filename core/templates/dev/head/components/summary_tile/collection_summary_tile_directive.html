@@ -1,40 +1,40 @@
-<span ng-if="learnerDashboardActivityIds">
+<span ng-if="getLearnerDashboardActivityIds()">
 <i class="protractor-test-add-exp-to-playlist-icon oppia-learner-dashboard-icon fa fa-clock-o"
-   ng-show="showAddToLearnerPlaylistIcon(getCollectionId())"
-   ng-click="addToLearnerPlaylist(collectionType, getCollectionId())"
-   ng-mouseenter="setCurrentlyHoveringOverActivity(getCollectionId())" ng-mouseleave="setCurrentlyHoveringOverActivity(getCollectionId())"
+   ng-show="canCollectionBeAddedToLearnerPlaylist(getCollectionId())"
+   ng-click="addToLearnerPlaylist(getCollectionId())"
+   ng-mouseenter="toggleCollectionIsActive()" ng-mouseleave="toggleCollectionIsActive()"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-clock-o"
-   ng-if="learnerDashboardActivityIds.collection_playlist_ids.indexOf(getCollectionId()) !== -1"
-   ng-click="removeFromLearnerPlaylist(getCollectionId(), collectionType, getExplorationTitle())"
+   ng-if="getLearnerDashboardActivityIds().collection_playlist_ids.indexOf(getCollectionId()) !== -1"
+   ng-click="removeFromLearnerPlaylist(getCollectionId(), getCollectionTitle())"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-check-circle-o"
-   ng-if="learnerDashboardActivityIds.completed_collection_ids.indexOf(getCollectionId()) !== -1 "
+   ng-if="getLearnerDashboardActivityIds().completed_collection_ids.indexOf(getCollectionId()) !== -1 "
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-spinner"
-   ng-if="learnerDashboardActivityIds.incomplete_collection_ids.indexOf(getCollectionId()) !== -1"
+   ng-if="getLearnerDashboardActivityIds().incomplete_collection_ids.indexOf(getCollectionId()) !== -1"
    aria-hidden="true"
    tooltip="<['I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate]>"
    tooltip-placement="left"></i>
 </span>
 <md-card class="oppia-activity-summary-tile"
-         ng-class="{'oppia-activity-playlist-tile': playlistMode}"
-         ng-mouseenter="setCurrentlyHoveringOverActivity(getCollectionId())" ng-mouseleave="setCurrentlyHoveringOverActivity(getCollectionId())"
+         ng-class="{'oppia-activity-playlist-tile': isPlaylistMode()}"
+         ng-mouseenter="toggleCollectionIsActive()" ng-mouseleave="toggleCollectionIsActive()"
          style="position: relative; z-index: 5;">
   <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
       <img class="collection-corner-image" ng-src="<[getStaticImageUrl('/general/collection_corner.svg')]>" alt="">
-      <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="playlistMode && {'top': '6px', 'width': '60px'}">
-      <h3 class="activity-title protractor-test-collection-summary-tile-title" ng-style="playlistMode && {'width': '93%', 'text-align': 'center'}"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
+      <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistMode() && {'top': '6px', 'width': '60px'}">
+      <h3 class="activity-title protractor-test-collection-summary-tile-title" ng-style="isPlaylistMode() && {'width': '93%', 'text-align': 'center'}"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
     </div>
 
-    <div ng-style="playlistMode && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
+    <div ng-style="isPlaylistMode() && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
       <div class="objective">
         <[getObjective() | truncateAndCapitalize: 95]>
         <span ng-if="!getObjective()">No objective specified.</span>
@@ -53,7 +53,7 @@
         </li>
       </ul>
     </div>
-    <div ng-if="!playlistMode" class="title-section-mask"></div>
+    <div ng-if="!isPlaylistMode()" class="title-section-mask"></div>
   </a>
 </md-card>
 
