@@ -66,11 +66,12 @@
          aria-haspopup="true"
          aria-expanded="false"
          aria-label="User Menu"
-         tabindex="0">
+         tabindex="0"
+         style="padding:10px 5px;">
         <div class="oppia-navbar-profile-picture-container">
           <span ng-if="profilePictureDataUrl">
             <img ng-src="<[profilePictureDataUrl]>" class="oppia-navbar-profile-picture img-circle" alt="User Avatar">
-            <span class="caret" style="margin-top: 10px;"></span>
+            <span class="caret" style="margin: 4px;margin-left: 10px;"></span>
           </span>
           <span ng-if="!profilePictureDataUrl">
             <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
