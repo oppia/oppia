@@ -15,7 +15,7 @@
 /**
  * @fileoverview Services for oppia email dashboard page.
  */
- 
+
 oppia.factory('EmailDashboardDataService', [
   '$http', '$q', function($http, $q) {
     var QUERY_DATA_URL = '/emaildashboarddatahandler';
