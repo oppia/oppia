@@ -57,7 +57,10 @@ oppia.directive('learnerDashboardIcons', [
           $scope.canActivityBeAddedToLearnerPlaylist = function(
             activityId) {
             if ($scope.learnerDashboardActivityIds) {
-              if ($scope.learnerDashboardActivityIds.belongsToLearnerDashboardActivities(activityId)) {
+              /* eslint-disable max-len */
+              if ($scope.learnerDashboardActivityIds.belongsToLearnerDashboardActivities(
+                activityId)) {
+              /* eslint-enable max-len */
                 return false;
               } else {
                 return $scope.activityIsActive;
@@ -70,7 +73,10 @@ oppia.directive('learnerDashboardIcons', [
               LearnerPlaylistService.addToLearnerPlaylist(
                 activityId, activityType));
             if (isSuccessfullyAdded) {
-              $scope.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(activityId);
+              /* eslint-disable max-len */
+              $scope.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
+                activityId);
+              /* eslint-enable max-len */
             }
           };
 
