@@ -125,7 +125,6 @@ describe('Editor context service', function() {
 
     beforeEach(inject(function($injector) {
       ecs = $injector.get('editorContextService');
-      console.log(ecs);
     }));
 
     it('should correctly set and get state names', function() {
