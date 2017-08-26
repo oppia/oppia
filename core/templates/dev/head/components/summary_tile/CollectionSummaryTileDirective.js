@@ -41,14 +41,10 @@ oppia.directive('collectionSummaryTile', [
         '/components/summary_tile/' +
         'collection_summary_tile_directive.html'),
       controller: [
-        '$scope', '$http', '$modal', 'oppiaDatetimeFormatter',
-        'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL',
-        'UrlInterpolationService', 'alertsService',
-        'LearnerPlaylistService', function(
-          $scope, $http, $modal, oppiaDatetimeFormatter,
-          COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL,
-          UrlInterpolationService, alertsService,
-          LearnerPlaylistService) {
+        '$scope', 'oppiaDatetimeFormatter',
+        'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function($scope,
+          oppiaDatetimeFormatter, COLLECTION_VIEWER_URL,
+          COLLECTION_EDITOR_URL) {
           $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
           $scope.collectionType = constants.ACTIVITY_TYPE_COLLECTION;
 
@@ -78,7 +74,6 @@ oppia.directive('collectionSummaryTile', [
           };
 
           $scope.collectionIsActive = false;
-
           $scope.toggleCollectionIsActive = function() {
             $scope.collectionIsActive = !$scope.collectionIsActive;
           };

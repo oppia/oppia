@@ -76,15 +76,13 @@ oppia.directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http', '$modal',
+        '$scope', '$http',
         'oppiaDatetimeFormatter', 'RatingComputationService',
-        'windowDimensionsService', 'UrlInterpolationService',
-        'alertsService',
+        'windowDimensionsService',
         function(
-          $scope, $http, $modal,
+          $scope, $http,
           oppiaDatetimeFormatter, RatingComputationService,
-          windowDimensionsService, UrlInterpolationService,
-          alertsService) {
+          windowDimensionsService) {
           $scope.explorationType = constants.ACTIVITY_TYPE_EXPLORATION;
           var contributorsSummary = $scope.getContributorsSummary() || {};
           $scope.contributors = Object.keys(
@@ -115,8 +113,8 @@ oppia.directive('explorationSummaryTile', [
           }
 
           $scope.MAX_AVATARS_TO_DISPLAY = 5;
-          $scope.explorationIsActive = false;
 
+          $scope.explorationIsActive = false;
           $scope.toggleExplorationIsActive = function() {
             $scope.explorationIsActive = !$scope.explorationIsActive;
           };

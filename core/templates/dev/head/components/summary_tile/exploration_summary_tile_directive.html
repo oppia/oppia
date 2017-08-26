@@ -15,7 +15,16 @@
       </h3>
 
       <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
-
+      <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+        <div>
+          <circular-image ng-if="avatarsList.length > 0"
+                          src="avatarsList[0].image"
+                          link="avatarsList[0].link"
+                          tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
+                          tooltip-placement="right">
+          </circular-image>
+        </div>
+      </div>
     </div>
     <div ng-if="!isPlaylistMode()" class="title-section-mask"></div>
     <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>" class="summary-section">
