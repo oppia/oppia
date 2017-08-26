@@ -83,7 +83,8 @@ oppia.directive('explorationSummaryTile', [
           $scope, $http,
           oppiaDatetimeFormatter, RatingComputationService,
           windowDimensionsService) {
-          $scope.explorationType = constants.ACTIVITY_TYPE_EXPLORATION;
+          $scope.ACTIVITY_TYPE_EXPLORATION = (
+            constants.ACTIVITY_TYPE_EXPLORATION);
           var contributorsSummary = $scope.getContributorsSummary() || {};
           $scope.contributors = Object.keys(
             contributorsSummary).sort(

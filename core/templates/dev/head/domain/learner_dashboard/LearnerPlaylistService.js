@@ -105,12 +105,7 @@
       });
     };
 
-    var _fetchLearnerDashboardData = function() {
-      return $http.get('/learnerdashboardhandler/data');
-    };
-
     return {
-      fetchLearnerDashboardData: _fetchLearnerDashboardData,
       addToLearnerPlaylist: _addToLearnerPlaylist,
       removeFromLearnerPlaylist: _removeFromLearnerPlaylist
     };

@@ -252,10 +252,22 @@ oppia.controller('LearnerDashboard', [
     };
 
     var getPlaylistSortableOptions = function(activityType) {
+      var windowScrollTop = '';
+      var startSort = false;
       return {
+        'ui-floating': 'auto',
         start: function(e, ui) {
+          if(startSort){
+            windowScrollTop = $(window).scrollTop();
+          }
+          startSort = true;
           ui.placeholder.height(ui.item.height());
           $scope.$apply();
+        },
+        sort: function (e, ui) {
+          /* eslint-disable quote-props */
+          ui.helper.css({'top': ui.position.top + windowScrollTop + 'px'});
+          /* eslint-enable quote-props */
         },
         update: function(e, ui) {
           var insertExpInLearnerPlaylistUrl = (
@@ -274,8 +286,7 @@ oppia.controller('LearnerDashboard', [
         stop: function(e, ui) {
           $scope.$apply();
         },
-        axis: 'y',
-        'ui-floating': false
+        axis: 'y'
       };
     };
 

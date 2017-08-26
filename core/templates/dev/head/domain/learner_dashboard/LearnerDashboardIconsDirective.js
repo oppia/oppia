@@ -54,13 +54,10 @@ oppia.directive('learnerDashboardIcons', [
             $scope.activityIsActive = !$scope.activityIsActive;
           };
 
-          $scope.canActivityBeAddedToLearnerPlaylist = function(
-            activityId) {
+          $scope.canActivityBeAddedToLearnerPlaylist = function(activityId) {
             if ($scope.learnerDashboardActivityIds) {
-              /* eslint-disable max-len */
-              if ($scope.learnerDashboardActivityIds.belongsToLearnerDashboardActivities(
+              if ($scope.learnerDashboardActivityIds.includesActivity(
                 activityId)) {
-              /* eslint-enable max-len */
                 return false;
               } else {
                 return $scope.activityIsActive;
@@ -73,10 +70,17 @@ oppia.directive('learnerDashboardIcons', [
               LearnerPlaylistService.addToLearnerPlaylist(
                 activityId, activityType));
             if (isSuccessfullyAdded) {
-              /* eslint-disable max-len */
-              $scope.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
-                activityId);
-              /* eslint-enable max-len */
+              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+                /* eslint-disable max-len */
+                $scope.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
+                  activityId);
+                /* eslint-enable max-len */
+              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+                /* eslint-disable max-len */
+                $scope.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
+                  activityId);
+                /* eslint-enable max-len */
+              }
             }
           };
 

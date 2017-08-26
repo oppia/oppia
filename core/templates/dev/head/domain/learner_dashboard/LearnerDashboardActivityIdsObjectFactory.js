@@ -30,9 +30,8 @@ oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
     this.collectionPlaylistIds = collectionPlaylistIds;
   };
 
-  LearnerDashboardActivityIds.prototype.belongsToLearnerDashboardActivities = (
-    function(
-    activityId) {
+  LearnerDashboardActivityIds.prototype.includesActivity = (
+    function(activityId) {
       if (this.incompleteCollectionIds.indexOf(activityId) !== -1 ||
           this.completedCollectionIds.indexOf(activityId) !== -1 ||
           this.collectionPlaylistIds.indexOf(activityId) !== -1 ||
@@ -58,17 +57,17 @@ oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
       }
     });
 
+  LearnerDashboardActivityIds.prototype.addToCollectionLearnerPlaylist = (
+    function(collectionId) {
+      this.collectionPlaylistIds.push(collectionId);
+    });
+
   LearnerDashboardActivityIds.prototype.removeFromCollectionLearnerPlaylist = (
     function(collectionId) {
       var index = this.collectionPlaylistIds.indexOf(collectionId);
       if (index !== -1) {
         this.collectionPlaylistIds.splice(index, 1);
       }
-    });
-
-  LearnerDashboardActivityIds.prototype.addToCollectionLearnerPlaylist = (
-    function(collectionId) {
-      this.collectionPlaylistIds.push(collectionId);
     });
 
   LearnerDashboardActivityIds.createFromBackendDict = function(

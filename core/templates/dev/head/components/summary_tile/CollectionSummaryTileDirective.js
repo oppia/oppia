@@ -46,7 +46,7 @@ oppia.directive('collectionSummaryTile', [
           oppiaDatetimeFormatter, COLLECTION_VIEWER_URL,
           COLLECTION_EDITOR_URL) {
           $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
-          $scope.collectionType = constants.ACTIVITY_TYPE_COLLECTION;
+          $scope.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;
 
           $scope.getLastUpdatedDatetime = function() {
             return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
