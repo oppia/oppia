@@ -1,28 +1,8 @@
-<span ng-if="getLearnerDashboardActivityIds()">
-<i class="protractor-test-add-exp-to-playlist-icon oppia-learner-dashboard-icon fa fa-clock-o"
-   ng-show="canCollectionBeAddedToLearnerPlaylist(getCollectionId())"
-   ng-click="addToLearnerPlaylist(getCollectionId())"
-   ng-mouseenter="toggleCollectionIsActive()" ng-mouseleave="toggleCollectionIsActive()"
-   aria-hidden="true"
-   tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
-   tooltip-placement="left"></i>
-<i class="oppia-learner-dashboard-icon fa fa-clock-o"
-   ng-if="getLearnerDashboardActivityIds().collectionPlaylistIds.indexOf(getCollectionId()) !== -1"
-   ng-click="removeFromLearnerPlaylist(getCollectionId(), getCollectionTitle())"
-   aria-hidden="true"
-   tooltip="<['I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate]>"
-   tooltip-placement="left"></i>
-<i class="oppia-learner-dashboard-icon fa fa-check-circle-o"
-   ng-if="getLearnerDashboardActivityIds().completedCollectionIds.indexOf(getCollectionId()) !== -1 "
-   aria-hidden="true"
-   tooltip="<['I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate]>"
-   tooltip-placement="left"></i>
-<i class="oppia-learner-dashboard-icon fa fa-spinner"
-   ng-if="getLearnerDashboardActivityIds().incompleteCollectionIds.indexOf(getCollectionId()) !== -1"
-   aria-hidden="true"
-   tooltip="<['I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate]>"
-   tooltip-placement="left"></i>
-</span>
+<learner-dashboard-icons activity-type="collectionType"
+                         activity-id="getCollectionId()"
+                         activity-title="getCollectionTitle()"
+                         activity-active="collectionIsActive">
+</learner-dashboard-icons>
 <md-card class="oppia-activity-summary-tile"
          ng-class="{'oppia-activity-playlist-tile': isPlaylistMode()}"
          ng-mouseenter="toggleCollectionIsActive()" ng-mouseleave="toggleCollectionIsActive()"

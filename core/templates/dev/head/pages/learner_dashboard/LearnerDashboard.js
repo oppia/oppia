@@ -75,7 +75,6 @@ oppia.controller('LearnerDashboard', [
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'threadStatusDisplayService',
   'oppiaDatetimeFormatter', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
-  'LearnerPlaylistService',
   function(
       $scope, $rootScope, $window, $http, $modal, alertsService,
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
@@ -84,8 +83,7 @@ oppia.controller('LearnerDashboard', [
       LEARNER_DASHBOARD_SECTION_I18N_IDS,
       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, threadStatusDisplayService,
       oppiaDatetimeFormatter, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
-      FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory,
-      LearnerPlaylistService) {
+      FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
     $scope.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (

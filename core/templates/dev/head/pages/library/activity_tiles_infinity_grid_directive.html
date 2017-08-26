@@ -1,7 +1,7 @@
 <div class="oppia-activities-infinity-grid-container" infinite-scroll="
      showMoreActivities()" infinite-scroll-distance="1"
      infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading">
-  <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;" ng-mouseenter="setCurrentlyHoveringOverActivity(activity.id)" ng-mouseleave="setCurrentlyHoveringOverActivity(activity.id)">
+  <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;">
     <collection-summary-tile ng-if="activity.activity_type === 'collection'"
                              collection-id="activity.id"
                              collection-title="activity.title"
@@ -10,8 +10,7 @@
                              objective="activity.objective"
                              thumbnail-icon-url="activity.thumbnail_icon_url"
                              thumbnail-bg-color="activity.thumbnail_bg_color"
-                             style="margin-right: 3px;"
-                             learner-dashboard-activity-ids="learnerDashboardActivityIds">
+                             style="margin-right: 3px;">
     </collection-summary-tile>
     <exploration-summary-tile ng-if="activity.activity_type === 'exploration'"
                               exploration-id="activity.id"
@@ -26,8 +25,7 @@
                               contributors-summary="activity.human_readable_contributors_summary"
                               is-community-owned="activity.community_owned"
                               is-community-editable="activity.community_editable"
-                              class="protractor-test-exp-summary-tile"
-                              learner-dashboard-activity-ids="learnerDashboardActivityIds">
+                              class="protractor-test-exp-summary-tile">
     </exploration-summary-tile>
   </div>
 </div>

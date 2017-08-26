@@ -41,14 +41,6 @@ oppia.directive('activityTilesInfinityGrid', [
             }
           );
 
-          LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
-            function(response) {
-              $scope.learnerDashboardActivityIds = (
-                LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
-                  response.data.learner_dashboard_activity_ids));
-            }
-          );
-
           $scope.showMoreActivities = function() {
             if (!$rootScope.loadingMessage && !$scope.endOfPageIsReached) {
               $scope.searchResultsAreLoading = true;

@@ -80,16 +80,6 @@ oppia.controller('Library', [
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-        if (data.user_id) {
-          LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
-            function(response) {
-              $scope.learnerDashboardActivityIds = (
-                LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
-                  response.data.learner_dashboard_activity_ids));
-            }
-          );
-        }
-
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
 

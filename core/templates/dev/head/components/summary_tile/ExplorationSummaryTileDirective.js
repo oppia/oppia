@@ -44,8 +44,7 @@ oppia.directive('explorationSummaryTile', [
         // if it is not specified, it is treated as 0, which means that the
         // desktop version of the summary tile is always displayed.
         mobileCutoffPx: '@mobileCutoffPx',
-        isPlaylistMode: '&playlistMode',
-        getLearnerDashboardActivityIds: '&learnerDashboardActivityIds',
+        isPlaylistMode: '&playlistMode'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -80,12 +79,13 @@ oppia.directive('explorationSummaryTile', [
         '$scope', '$http', '$modal',
         'oppiaDatetimeFormatter', 'RatingComputationService',
         'windowDimensionsService', 'UrlInterpolationService',
-        'alertsService', 'LearnerPlaylistService',
+        'alertsService',
         function(
           $scope, $http, $modal,
           oppiaDatetimeFormatter, RatingComputationService,
           windowDimensionsService, UrlInterpolationService,
-          alertsService, LearnerPlaylistService) {
+          alertsService) {
+          $scope.explorationType = constants.ACTIVITY_TYPE_EXPLORATION;
           var contributorsSummary = $scope.getContributorsSummary() || {};
           $scope.contributors = Object.keys(
             contributorsSummary).sort(
@@ -115,41 +115,10 @@ oppia.directive('explorationSummaryTile', [
           }
 
           $scope.MAX_AVATARS_TO_DISPLAY = 5;
-          var explorationIsActive = false;
+          $scope.explorationIsActive = false;
 
-          $scope.toggleExplorationIsActive = function(explorationId) {
-            explorationIsActive = !explorationIsActive;
-          };
-
-          $scope.canExplorationBeAddedToLearnerPlaylist = function(
-            explorationId) {
-            if ($scope.getLearnerDashboardActivityIds()) {
-              if ($scope.getLearnerDashboardActivityIds(
-                ).belongsToLearnerDashboardActivities(explorationId)) {
-                return false;
-              } else {
-                return explorationIsActive;
-              }
-            }
-          };
-
-          $scope.addToLearnerPlaylist = function(explorationId) {
-            var isSuccessfullyAdded = (
-              LearnerPlaylistService.addToLearnerPlaylist(
-                explorationId, constants.ACTIVITY_TYPE_EXPLORATION));
-            if (isSuccessfullyAdded) {
-              $scope.getLearnerDashboardActivityIds(
-                ).addToExplorationLearnerPlaylist(explorationId);
-            }
-          };
-
-          $scope.removeFromLearnerPlaylist = function(
-            explorationId, explorationTitle) {
-            var isSuccessfullyRemoved = (
-              LearnerPlaylistService.removeFromLearnerPlaylist(
-                explorationId, explorationTitle,
-                constants.ACTIVITY_TYPE_EXPLORATION,
-                $scope.getLearnerDashboardActivityIds()));
+          $scope.toggleExplorationIsActive = function() {
+            $scope.explorationIsActive = !$scope.explorationIsActive;
           };
 
           $scope.getAverageRating = function() {

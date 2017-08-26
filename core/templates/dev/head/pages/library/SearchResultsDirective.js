@@ -27,6 +27,7 @@ oppia.directive('searchResults', [
           $rootScope.loadingMessage = 'Loading';
           $scope.someResultsExist = true;
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+
           // Called when the first batch of search results is retrieved from the
           // server.
           $scope.$on(

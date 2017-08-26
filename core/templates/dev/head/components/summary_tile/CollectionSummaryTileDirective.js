@@ -35,8 +35,7 @@ oppia.directive('collectionSummaryTile', [
         getThumbnailBgColor: '&thumbnailBgColor',
         isLinkedToEditorPage: '=?isLinkedToEditorPage',
         getCategory: '&category',
-        isPlaylistMode: '&playlistMode',
-        getLearnerDashboardActivityIds: '&learnerDashboardActivityIds',
+        isPlaylistMode: '&playlistMode'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -51,6 +50,7 @@ oppia.directive('collectionSummaryTile', [
           UrlInterpolationService, alertsService,
           LearnerPlaylistService) {
           $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
+          $scope.collectionType = constants.ACTIVITY_TYPE_COLLECTION;
 
           $scope.getLastUpdatedDatetime = function() {
             return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
@@ -77,41 +77,10 @@ oppia.directive('collectionSummaryTile', [
             return UrlInterpolationService.getStaticImageUrl(url);
           };
 
-          var collectionIsActive = false;
+          $scope.collectionIsActive = false;
 
           $scope.toggleCollectionIsActive = function() {
-            collectionIsActive = !collectionIsActive;
-          };
-
-          $scope.canCollectionBeAddedToLearnerPlaylist = function(
-            collectionId) {
-            if ($scope.getLearnerDashboardActivityIds()) {
-              if ($scope.getLearnerDashboardActivityIds(
-                ).belongsToLearnerDashboardActivities(collectionId)) {
-                return false;
-              } else {
-                return collectionIsActive;
-              }
-            }
-          };
-
-          $scope.addToLearnerPlaylist = function(collectionId) {
-            var isSuccessfullyAdded = (
-              LearnerPlaylistService.addToLearnerPlaylist(
-                collectionId, constants.ACTIVITY_TYPE_COLLECTION));
-            if (isSuccessfullyAdded) {
-              $scope.getLearnerDashboardActivityIds(
-                ).addToCollectionLearnerPlaylist(collectionId);
-            }
-          };
-
-          $scope.removeFromLearnerPlaylist = function(
-            collectionId, collectionTitle) {
-            var isSuccessfullyRemoved = (
-              LearnerPlaylistService.removeFromLearnerPlaylist(
-                collectionId, collectionTitle,
-                constants.ACTIVITY_TYPE_COLLECTION,
-                $scope.getLearnerDashboardActivityIds()));
+            $scope.collectionIsActive = !$scope.collectionIsActive;
           };
         }
       ]
