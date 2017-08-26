@@ -23,7 +23,7 @@ class TextInput(base.BaseInteraction):
     name = 'Text Input'
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
-    is_trainable = False
+    is_trainable = True
     _dependency_ids = []
     answer_type = 'NormalizedString'
     instructions = None
