@@ -56,7 +56,6 @@ EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if (IS_MINIFIED or not DEV_MODE) else '')
 INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
-GADGETS_DIR = os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 
@@ -226,9 +225,6 @@ for ind in range(32):
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A regular expression for alphanumeric words separated by single spaces.
-# Ex.: 'valid name', 'another valid name', 'invalid   name'.
-ALPHANUMERIC_SPACE_REGEX = r'^[0-9A-Za-z]+(?:[ ]?[0-9A-Za-z]+)*$'
 # A regular expression for tags.
 TAG_REGEX = r'^[a-z ]+$'
 
@@ -360,18 +356,6 @@ VALID_MODERATOR_ACTIONS = {
     },
 }
 
-# Panel properties and other constants for the default skin.
-GADGET_PANEL_AXIS_HORIZONTAL = 'horizontal'
-PANELS_PROPERTIES = {
-    'bottom': {
-        'width': 350,
-        'height': 100,
-        'stackable_axis': GADGET_PANEL_AXIS_HORIZONTAL,
-        'pixels_between_gadgets': 80,
-        'max_gadgets': 1
-    }
-}
-
 # When the site terms were last updated, in UTC.
 REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 
@@ -385,10 +369,6 @@ MAX_FILE_SIZE_BYTES = 1048576
 
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
-
-# The id of the default skin.
-# TODO(sll): Deprecate this; it is no longer used.
-DEFAULT_SKIN_ID = 'conversation_v1'
 
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
@@ -472,15 +452,6 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 # thus only allow for default answer classification. This value is guarded by a
 # test in extensions.interactions.base_test.
 LINEAR_INTERACTION_IDS = ['Continue']
-
-ALLOWED_GADGETS = {
-    'ScoreBar': {
-        'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
-    },
-}
-
-# Gadgets subclasses must specify a valid panel option from this list.
-ALLOWED_GADGET_PANELS = ['bottom']
 
 # Demo explorations to load through the admin panel. The id assigned to each
 # exploration is based on the key of the exploration in this dict, so ensure it

@@ -14,7 +14,6 @@
         '{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER|js_string}}');
       GLOBALS.explorationVersion = JSON.parse(
         '{{exploration_version|js_string}}');
-      GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
       GLOBALS.INTERACTION_SPECS = JSON.parse(
         '{{INTERACTION_SPECS|js_string}}');
     </script>
@@ -133,8 +132,6 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetPanelDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 
@@ -228,5 +225,4 @@
 
 
   {{ interaction_templates }}
-  {{ gadget_templates }}
 {% endblock footer_js %}

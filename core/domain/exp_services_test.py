@@ -43,12 +43,6 @@ transaction_services = models.Registry.import_transaction_services()
 # TODO(msl): test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed
 
-TEST_GADGETS = {
-    'TestGadget': {
-        'dir': os.path.join(feconf.GADGETS_DIR, 'TestGadget')
-    }
-}
-
 def _count_at_least_editable_exploration_summaries(user_id):
     return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
@@ -133,7 +127,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     EXP_ID_1 = '1_fi_arch_sillat_suomi'
     EXP_ID_2 = '2_en_welcome_introduce_oppia'
     EXP_ID_3 = '3_en_welcome_introduce_oppia_interactions'
-    EXP_ID_4 = '4_en_welcome_gadgets'
+    EXP_ID_4 = '4_en_welcome'
     EXP_ID_5 = '5_fi_welcome_vempain'
     EXP_ID_6 = '6_en_languages_learning_basic_verbs_in_spanish'
     EXP_ID_7 = '7_en_languages_private_exploration_in_spanish'
@@ -158,10 +152,10 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             title='Introduce Interactions in Oppia',
             category='Welcome', language_code='en')
         self.save_new_valid_exploration(
-            self.EXP_ID_4, self.owner_id, title='Welcome to Gadgets',
+            self.EXP_ID_4, self.owner_id, title='Welcome',
             category='Welcome', language_code='en')
         self.save_new_valid_exploration(
-            self.EXP_ID_5, self.owner_id, title='Tervetuloa gadgetien Oppia',
+            self.EXP_ID_5, self.owner_id, title='Tervetuloa Oppia',
             category='Welcome', language_code='fi')
         self.save_new_valid_exploration(
             self.EXP_ID_6, self.owner_id,
@@ -575,9 +569,6 @@ objective: The objective
 param_changes: []
 param_specs: {}
 schema_version: %d
-skin_customizations:
-  panels_contents:
-    bottom: []
 states:
   %s:
     classifier_model_id: null
@@ -640,9 +631,6 @@ objective: The objective
 param_changes: []
 param_specs: {}
 schema_version: %d
-skin_customizations:
-  panels_contents:
-    bottom: []
 states:
   %s:
     classifier_model_id: null
@@ -909,119 +897,6 @@ def _get_change_list(state_name, property_name, new_value):
         'property_name': property_name,
         'new_value': new_value
     }]
-
-
-class UpdateGadgetTests(ExplorationServicesUnitTests):
-    """Test updating a gadget."""
-    def setUp(self):
-        super(UpdateGadgetTests, self).setUp()
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-        # Default outcome specification for an interaction.
-        self.init_state_name = exploration.init_state_name
-
-        self.interaction_default_outcome = {
-            'dest': self.init_state_name,
-            'feedback': ['Incorrect', '<b>Wrong answer</b>'],
-            'param_changes': []
-        }
-
-    def test_add_gadget_cmd(self):
-        """Test adding of a gadget."""
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        self.assertNotIn('NewGadget', exploration.get_all_gadget_names())
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_ADD_GADGET,
-            'panel': 'bottom',
-            'gadget_dict' : {
-                'gadget_type': 'ScoreBar',
-                'gadget_name': 'NewGadget',
-                'customization_args': {
-                    'adviceObjects': {
-                        'value': [{
-                            'adviceTitle': 'b',
-                            'adviceHtml': '<p>c</p>'
-                        }]
-                    }
-                },
-                'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
-            }], 'add a new gadget')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        self.assertIn('NewGadget', exploration.get_all_gadget_names())
-
-    def test_rename_gadget_cmd(self):
-        """Test renaming a gadget."""
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_ADD_GADGET,
-            'panel': 'bottom',
-            'gadget_dict' : {
-                'gadget_type': 'ScoreBar',
-                'gadget_name': 'Gadget',
-                'customization_args': {
-                    'adviceObjects': {
-                        'value': [{
-                            'adviceTitle': 'b',
-                            'adviceHtml': '<p>c</p>'
-                        }]
-                    }
-                },
-                'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
-            }], 'add a new gadget')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        self.assertIn('Gadget', exploration.get_all_gadget_names())
-        self.assertNotIn('RenameGadget', exploration.get_all_gadget_names())
-
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_RENAME_GADGET,
-            'new_gadget_name': 'RenameGadget',
-            'old_gadget_name': 'Gadget',
-            }], 'rename a gadget')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        self.assertIn('RenameGadget', exploration.get_all_gadget_names())
-        self.assertNotIn('Gadget', exploration.get_all_gadget_names())
-
-    def test_delete_gadget_cmd(self):
-        """Test deleting a gadget."""
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_ADD_GADGET,
-            'panel': 'bottom',
-            'gadget_dict' : {
-                'gadget_type': 'ScoreBar',
-                'gadget_name': 'NewGadget',
-                'customization_args': {
-                    'adviceObjects': {
-                        'value': [{
-                            'adviceTitle': 'b',
-                            'adviceHtml': '<p>c</p>'
-                        }]
-                    }
-                },
-                'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
-            }], 'add a new gadget')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        self.assertIn('NewGadget', exploration.get_all_gadget_names())
-
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_DELETE_GADGET,
-            'gadget_name': 'NewGadget',
-            }], 'delete a gadget')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        self.assertNotIn('NewGadget', exploration.get_all_gadget_names())
 
 
 class UpdateStateTests(ExplorationServicesUnitTests):
@@ -2454,9 +2329,6 @@ objective: Old objective
 param_changes: []
 param_specs: {}
 schema_version: %d
-skin_customizations:
-  panels_contents:
-    bottom: []
 states:
   END:
     classifier_model_id: null

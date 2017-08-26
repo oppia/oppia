@@ -329,26 +329,3 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-
-
-class GadgetsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that outputs a list of explorations that use gadgets."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_services.get_exploration_from_model(item)
-        panel_contents_dict = exploration.skin_instance.panel_contents_dict
-        for panel_name, gadget_list in panel_contents_dict.iteritems():
-            if gadget_list:
-                yield (item.id, panel_name)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
