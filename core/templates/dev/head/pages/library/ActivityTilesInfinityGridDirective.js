@@ -24,12 +24,8 @@ oppia.directive('activityTilesInfinityGrid', [
         '/pages/library/' +
         'activity_tiles_infinity_grid_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$http', 'searchService', 'alertsService',
-        'LearnerDashboardIdsBackendApiService',
-        'LearnerDashboardActivityIdsObjectFactory', function(
-          $scope, $rootScope, $http, searchService, alertsService,
-          LearnerDashboardIdsBackendApiService,
-          LearnerDashboardActivityIdsObjectFactory) {
+        '$scope', '$rootScope', 'searchService',
+        function($scope, $rootScope, searchService) {
           $scope.endOfPageIsReached = false;
           $scope.allActivitiesInOrder = [];
           // Called when the first batch of search results is retrieved from the
