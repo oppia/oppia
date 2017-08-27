@@ -27,17 +27,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         expected_object = {
-        'question_id': 'col1.random',
-        'title': 'abc',
-        'question_data': {},
-        'data_schema_version': 1,
-        'collection_id': 'col1',
-        'language_code': 'en'
+            'question_id': 'col1.random',
+            'title': 'abc',
+            'question_data': {},
+            'data_schema_version': 1,
+            'collection_id': 'col1',
+            'language_code': 'en'
         }
 
         observed_object = question_domain.Question(
             expected_object['question_id'], expected_object['title'],
-            expected_object['question_data'], expected_object['data_schema_version'],
+            expected_object['question_data'],
+            expected_object['data_schema_version'],
             expected_object['collection_id'], expected_object['language_code'])
         self.assertDictEqual(expected_object, observed_object.to_dict())
 
@@ -45,19 +46,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify validate method of Question domain object."""
 
         test_object = {
-        'question_id': 'col1.random',
-        'title': 'abc',
-        'question_data': {},
-        'data_schema_version': 1,
-        'collection_id': 'col1',
-        'language_code': 'en'
+            'question_id': 'col1.random',
+            'title': 'abc',
+            'question_data': {},
+            'data_schema_version': 1,
+            'collection_id': 'col1',
+            'language_code': 'en'
         }
 
         question = question_domain.Question(
             test_object['question_id'], test_object['title'],
             test_object['question_data'], test_object['data_schema_version'],
             test_object['collection_id'], test_object['language_code'])
-        
+
         question.question_id = 123
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected id to be a string')):
@@ -100,16 +101,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_from_dict(self):
         expected_object = {
-        'question_id': 'col1.random',
-        'title': 'abc',
-        'question_data': {},
-        'data_schema_version': 1,
-        'collection_id': 'col1',
-        'language_code': 'en'
+            'question_id': 'col1.random',
+            'title': 'abc',
+            'question_data': {},
+            'data_schema_version': 1,
+            'collection_id': 'col1',
+            'language_code': 'en'
         }
 
         question = question_domain.Question.from_dict(expected_object)
-        self.assertDictEqual(expected_object, question.to_dict())        
+        self.assertDictEqual(expected_object, question.to_dict())
 
     def test_create_default_question(self):
         """Test to verify create_default_question method of Question domain

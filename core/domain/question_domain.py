@@ -37,7 +37,7 @@ class Question(object):
     """
 
     def __init__(self, question_id, title, question_data, data_schema_version,
-                collection_id, language_code):
+                 collection_id, language_code):
         """Constructs a Question domain object.
 
         Args:
@@ -116,15 +116,17 @@ class Question(object):
         """
         question = cls(
             question_dict['question_id'], question_dict['title'],
-            question_dict['question_data'], question_dict['data_schema_version'],
+            question_dict['question_data'],
+            question_dict['data_schema_version'],
             question_dict['collection_id'], question_dict['language_code'])
 
         return question
 
     @classmethod
-    def create_default_question(cls, question_id, collection_id,
-        title=feconf.DEFAULT_QUESTION_TITLE,
-        language_code=constants.DEFAULT_LANGUAGE_CODE):
+    def create_default_question(
+            cls, question_id, collection_id,
+            title=feconf.DEFAULT_QUESTION_TITLE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Returns a Question domain object with default values.
 
         Args:
@@ -137,5 +139,7 @@ class Question(object):
         Returns:
             Question. A Question domain object with default values.
         """
-        return cls(question_id, title, {}, feconf.CURRENT_QUESTION_SCHEMA_VERSION,
-            collection_id, language_code)
+        return cls(
+                question_id, title, {},
+                feconf.CURRENT_QUESTION_SCHEMA_VERSION,
+                collection_id, language_code)
