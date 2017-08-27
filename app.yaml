@@ -75,12 +75,6 @@ handlers:
   # TODO(Sean Lip): Add cache when system to break cache during
   # new release is figured out.
     Cache-Control: 'no-cache'
-- url: /extensions/gadgets/(.*)/static/(.*)
-  static_files: extensions/gadgets/\1/static/\2
-  upload: extensions/gadgets/(.*)/static/(.*)
-  secure: always
-  http_headers:
-    Cache-Control: 'no-cache'
 - url: /extensions/interactions/(.*)/static/(.*)
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*)
@@ -97,9 +91,9 @@ handlers:
 # under extensions in dev mode. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
 # groups from the url pattern.
-- url: /extensions/(gadgets|interactions|rich_text_components|objects|classifiers)/(.*\.(js))$
+- url: /extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js))$
   static_files: extensions/\1/\2
-  upload: extensions/(gadgets|interactions|rich_text_components|objects|classifiers)/(.*\.(js))$
+  upload: extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js))$
   secure: always
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images

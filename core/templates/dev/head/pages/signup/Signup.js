@@ -124,6 +124,23 @@ oppia.controller('Signup', [
         agreed_to_terms: agreedToTerms,
         can_receive_email_updates: null
       };
+
+      var defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
+      var returnUrl = window.decodeURIComponent(
+        urlService.getUrlParams().return_url);
+
+      if (returnUrl.indexOf('creator_dashboard') !== -1) {
+        defaultDashboard = constants.DASHBOARD_TYPE_CREATOR;
+      } else {
+        defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
+      }
+
+      var requestParams = {
+        agreed_to_terms: agreedToTerms,
+        can_receive_email_updates: null,
+        default_dashboard: defaultDashboard
+      };
+
       if (!$scope.hasUsername) {
         requestParams.username = username;
       }

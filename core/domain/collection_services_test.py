@@ -306,7 +306,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     COL_ID_0 = '0_arch_bridges_in_england'
     COL_ID_1 = '1_welcome_introduce_oppia'
     COL_ID_2 = '2_welcome_introduce_oppia_interactions'
-    COL_ID_3 = '3_welcome_gadgets'
+    COL_ID_3 = '3_welcome'
     COL_ID_4 = '4_languages_learning_basic_verbs_in_spanish'
     COL_ID_5 = '5_languages_private_collection_in_spanish'
 
@@ -325,8 +325,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             self.COL_ID_2, self.owner_id,
             title='Introduce Interactions in Oppia', category='Welcome')
         self.save_new_default_collection(
-            self.COL_ID_3, self.owner_id, title='Welcome to Gadgets',
-            category='Welcome')
+            self.COL_ID_3, self.owner_id, title='Welcome', category='Welcome')
         self.save_new_default_collection(
             self.COL_ID_4, self.owner_id,
             title='Learning basic verbs in Spanish', category='Languages')

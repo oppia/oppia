@@ -21,7 +21,6 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-import collections
 import copy
 import logging
 import re
@@ -29,7 +28,6 @@ import string
 
 from constants import constants
 from core.domain import html_cleaner
-from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.platform import models
@@ -56,10 +54,9 @@ STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
 STATE_PROPERTY_INTERACTION_HINTS = 'hints'
 STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
-# These two properties are kept for legacy purposes and are not used anymore.
+# These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
-
 GADGET_PROPERTY_VISIBILITY = 'gadget_visibility'
 GADGET_PROPERTY_CUST_ARGS = 'gadget_customization_args'
 
@@ -71,14 +68,6 @@ CMD_RENAME_STATE = 'rename_state'
 CMD_DELETE_STATE = 'delete_state'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
-# This takes an additional 'gadget_name' parameter.
-CMD_ADD_GADGET = 'add_gadget'
-# This takes additional 'old_gadget_name' and 'new_gadget_name' parameters.
-CMD_RENAME_GADGET = 'rename_gadget'
-# This takes an additional 'gadget_name' parameter.
-CMD_DELETE_GADGET = 'delete_gadget'
-# This takes additional 'property_name' and 'new_value' parameters.
-CMD_EDIT_GADGET_PROPERTY = 'edit_gadget_property'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
@@ -147,10 +136,8 @@ def _validate_customization_args_and_values(
     customization_args dict.
 
     Args:
-        item_name: str. The item_name is either 'interaction', 'gadget' or
-            'trigger'.
-        item_type: str. The item_type is the id/type of the
-            interaction/gadget/trigger, respectively.
+        item_name: str. This is always 'interaction'.
+        item_type: str. The item_type is the ID of the interaction.
         customization_args: dict. The customization dict. The keys are names of
             customization_args and the values are dicts with a
             single key, 'value', whose corresponding value is the value of
@@ -236,10 +223,6 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
 
-    GADGET_PROPERTIES = (
-        GADGET_PROPERTY_VISIBILITY,
-        GADGET_PROPERTY_CUST_ARGS)
-
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
@@ -258,18 +241,12 @@ class ExplorationChange(object):
                     - 'delete_state' (with state_name)
                     - 'edit_state_property' (with state_name, property_name,
                         new_value and, optionally, old_value)
-                    - 'add_gadget' (with gadget_dict and panel)
-                    - 'rename_gadget' (with old_gadget_name, new_gadget_name)
-                    - 'delete_gadget' (with gadget_name)
-                    - 'edit_gadget_property' (with gadget_name, property_name,
-                        new_value, and optionally, old_value)
                     - 'edit_exploration_property' (with property_name,
                         new_value and, optionally, old_value)
                     - 'migrate_states_schema' (with from_version, to_version)
                 For a state, property_name must be one of STATE_PROPERTIES.
                 For an exploration, property_name must be one of
-                EXPLORATION_PROPERTIES. For a gadget, property_name must be one
-                of GADGET_PROPERTIES.
+                EXPLORATION_PROPERTIES.
 
         Raises:
             Exception: The given change_dict is not valid.
@@ -296,22 +273,6 @@ class ExplorationChange(object):
             if (change_dict['property_name'] not in
                     self.EXPLORATION_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_ADD_GADGET:
-            self.gadget_dict = change_dict['gadget_dict']
-            self.gadget_name = change_dict['gadget_dict']['gadget_name']
-            self.panel = change_dict['panel']
-        elif self.cmd == CMD_RENAME_GADGET:
-            self.old_gadget_name = change_dict['old_gadget_name']
-            self.new_gadget_name = change_dict['new_gadget_name']
-        elif self.cmd == CMD_DELETE_GADGET:
-            self.gadget_name = change_dict['gadget_name']
-        elif self.cmd == CMD_EDIT_GADGET_PROPERTY:
-            if change_dict['property_name'] not in self.GADGET_PROPERTIES:
-                raise Exception('Invalid gadget change_dict: %s' % change_dict)
-            self.gadget_name = change_dict['gadget_name']
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
@@ -1229,412 +1190,6 @@ class InteractionInstance(object):
         )
 
 
-class GadgetInstance(object):
-    """Value object for an instance of a gadget."""
-
-    _MAX_GADGET_NAME_LENGTH = 20
-
-    def __init__(self, gadget_type, gadget_name,
-                 visible_in_states, customization_args):
-        """Initializes a GadgetInstance domain object.
-
-        Args:
-            gadget_type: str. Backend ID referring to the gadget's type in
-                gadget registry.
-            gadget_name: str. The gadget name.
-            visible_in_states: list(str). List of state name where this
-                gadget is visible.
-            customization_args: dict. The customization args for the gadget's
-                view.
-        """
-        # Backend ID referring to the gadget's type in gadget registry.
-        self.type = gadget_type
-
-        # Author-facing unique name to distinguish instances in the Editor UI.
-        # Gadgets may use this name as a title in learner facing UI as well.
-        self.name = gadget_name
-
-        # List of State name strings where this Gadget is visible.
-        self.visible_in_states = visible_in_states
-
-        # Customization args for the gadget's view.
-        self.customization_args = customization_args
-
-    @property
-    def gadget(self):
-        """Gets a gadget spec based on its type.
-
-        Returns:
-            GadgetInstance. The corresponding GadgetInstance domain object.
-        """
-        return gadget_registry.Registry.get_gadget_by_type(self.type)
-
-    @property
-    def width(self):
-        """Gets the gadget width in pixels.
-
-        Returns:
-            int. The gadget width, in pixels.
-        """
-        return self.gadget.width_px
-
-    @property
-    def height(self):
-        """Gets the gadget height in pixels.
-
-        Returns:
-            int. The gadget height, in pixels.
-        """
-        return self.gadget.height_px
-
-    @staticmethod
-    def _validate_gadget_name(gadget_name):
-        """Validates gadget_name property of the GadgetInstance. gadget_name is
-        a non-empty string of alphanumerics allowing spaces.
-
-        Raises:
-            ValidationError: gadget_name is a empty string or not alphanumeric
-            or is too long.
-        """
-        if gadget_name == '':
-            raise utils.ValidationError(
-                'Gadget name must not be an empty string.')
-
-        if not isinstance(gadget_name, basestring):
-            raise utils.ValidationError(
-                'Gadget name must be a string. Received type: %s' % str(
-                    type(gadget_name).__name__)
-            )
-
-        if len(gadget_name) > GadgetInstance._MAX_GADGET_NAME_LENGTH:
-            raise utils.ValidationError(
-                '%s gadget name exceeds maximum length of %d' % (
-                    gadget_name,
-                    GadgetInstance._MAX_GADGET_NAME_LENGTH
-                )
-            )
-
-        if not re.search(feconf.ALPHANUMERIC_SPACE_REGEX, gadget_name):
-            raise utils.ValidationError(
-                'Gadget names must be alphanumeric. Spaces are allowed.'
-                ' Received: %s' % gadget_name
-            )
-
-    def validate(self):
-        """Validates properties of the GadgetInstance.
-
-        Raises:
-            ValidationError: One or more attributes of the GadgetInstance are
-            invalid.
-        """
-        try:
-            self.gadget
-        except KeyError:
-            raise utils.ValidationError(
-                'Unknown gadget with type %s is not in the registry.' % (
-                    self.type)
-            )
-
-        self._validate_gadget_name(self.name)
-
-        _validate_customization_args_and_values(
-            'gadget', self.type, self.customization_args,
-            self.gadget.customization_arg_specs)
-
-        # Do additional per-gadget validation on the customization args.
-        self.gadget.validate(self.customization_args)
-
-        if self.visible_in_states == []:
-            raise utils.ValidationError(
-                '%s gadget not visible in any states.' % (
-                    self.name))
-
-        # Validate state name visibility isn't repeated within each gadget.
-        if len(self.visible_in_states) != len(set(self.visible_in_states)):
-            redundant_visible_states = [
-                state_name for state_name, count
-                in collections.Counter(self.visible_in_states).items()
-                if count > 1]
-            raise utils.ValidationError(
-                '%s specifies visibility repeatedly for state%s: %s' % (
-                    self.type,
-                    's' if len(redundant_visible_states) > 1 else '',
-                    ', '.join(redundant_visible_states)))
-
-    def to_dict(self):
-        """Returns a dict representing this GadgetInstance domain object.
-
-        Returns:
-            dict. A dict mapping all fields of GadgetInstance instance.
-        """
-        return {
-            'gadget_type': self.type,
-            'gadget_name': self.name,
-            'visible_in_states': self.visible_in_states,
-            'customization_args': _get_full_customization_args(
-                self.customization_args,
-                self.gadget.customization_arg_specs),
-        }
-
-    @classmethod
-    def from_dict(cls, gadget_dict):
-        """Return a GadgetInstance domain object from a dict.
-
-        Args:
-            gadget_dict: dict. The dict representation of GadgetInstance
-                object.
-
-        Returns:
-            GadgetInstance. The corresponding GadgetInstance domain object.
-        """
-        return GadgetInstance(
-            gadget_dict['gadget_type'],
-            gadget_dict['gadget_name'],
-            gadget_dict['visible_in_states'],
-            gadget_dict['customization_args'])
-
-    def update_customization_args(self, customization_args):
-        """Updates the GadgetInstance's customization arguments.
-
-        Args:
-            customization_args: dict. The customization args for the gadget's
-                view.
-        """
-        self.customization_args = customization_args
-
-    def update_visible_in_states(self, visible_in_states):
-        """Updates the GadgetInstance's visibility in different states.
-
-        Args:
-            visible_in_states: list(str). List of state names where this gadget
-                is visible.
-        """
-        self.visible_in_states = visible_in_states
-
-    def _get_full_customization_args(self):
-        """Populates the customization_args dict of the gadget with
-        default values, if any of the expected customization_args are missing.
-
-        Returns:
-            dict. The customization_args dict of the gadget.
-        """
-        full_customization_args_dict = copy.deepcopy(self.customization_args)
-
-        for ca_spec in self.gadget.customization_arg_specs:
-            if ca_spec.name not in full_customization_args_dict:
-                full_customization_args_dict[ca_spec.name] = {
-                    'value': ca_spec.default_value
-                }
-        return full_customization_args_dict
-
-
-class SkinInstance(object):
-    """Domain object for a skin instance."""
-
-    def __init__(self, skin_id, skin_customizations):
-        """Initializes SkinInstance with any customizations provided.
-        If no customizations are necessary, skin_customizations may be set to
-        None, in which case defaults will be generated that provide empty
-        gadget panels for each panel specified in the skin.
-
-        Args:
-            skin_id: str. The id of the skin.
-            skin_customizations: dict. The customization dictionary.
-        """
-        # TODO(sll): Deprecate this property; it is not used.
-        self.skin_id = skin_id
-        # panel_contents_dict has panel strings as keys and
-        # lists of GadgetInstance instances as values.
-        self.panel_contents_dict = {}
-
-        default_skin_customizations = (
-            SkinInstance._get_default_skin_customizations())
-
-        # Ensure that skin_customizations is a dict.
-        if skin_customizations is None:
-            skin_customizations = (
-                SkinInstance._get_default_skin_customizations())
-
-        # Populate panel_contents_dict with default skin customizations
-        # if they are not specified in skin_customizations.
-        for panel in default_skin_customizations['panels_contents']:
-            if panel not in skin_customizations['panels_contents']:
-                self.panel_contents_dict[panel] = []
-            else:
-                self.panel_contents_dict[panel] = [
-                    GadgetInstance(
-                        gdict['gadget_type'],
-                        gdict['gadget_name'],
-                        gdict['visible_in_states'],
-                        gdict['customization_args']
-                    ) for gdict in skin_customizations['panels_contents'][panel]
-                ]
-
-    @staticmethod
-    def _get_default_skin_customizations():
-        """Generates default skin customizations when none are specified.
-
-        Returns:
-            dict. The default skin customizations.
-        """
-        return {
-            'panels_contents': {
-                panel_name: []
-                for panel_name in feconf.PANELS_PROPERTIES
-            }
-        }
-
-    def validate_gadget_panel(self, panel_name, gadget_list):
-        """Validate proper fit given space requirements specified by
-        feconf.PANELS_PROPERTIES.
-
-        Args:
-            panel_name: str. Unique name that identifies this panel in the
-                skin. This should correspond to an entry in
-                feconf.PANELS_PROPERTIES.
-            gadget_list: list(GadgetInstance). List of GadgetInstance
-                instances.
-
-        Raises:
-            ValidationError: The space requirements are not satisfied.
-        """
-        # If the panel contains no gadgets, max() will raise an error,
-        # so we return early.
-        if not gadget_list:
-            return
-
-        panel_spec = feconf.PANELS_PROPERTIES[panel_name]
-
-        # This is a dict whose keys are state names, and whose corresponding
-        # values are lists of GadgetInstance instances representing the gadgets
-        # visible in that state. Note that the keys only include states for
-        # which at least one gadget is visible.
-        gadget_visibility_map = collections.defaultdict(list)
-        for gadget_instance in gadget_list:
-            for state_name in set(gadget_instance.visible_in_states):
-                gadget_visibility_map[state_name].append(gadget_instance)
-
-        # Validate limitations and fit considering visibility for each state.
-        for state_name, gadget_instances in gadget_visibility_map.iteritems():
-            if len(gadget_instances) > panel_spec['max_gadgets']:
-                raise utils.ValidationError(
-                    "'%s' panel expected at most %d gadget%s, but %d gadgets"
-                    " are visible in state '%s'." % (
-                        panel_name,
-                        panel_spec['max_gadgets'],
-                        's' if panel_spec['max_gadgets'] != 1 else '',
-                        len(gadget_instances),
-                        state_name))
-
-            # Calculate total width and height of gadgets given custom args and
-            # panel stackable axis.
-            total_width = 0
-            total_height = 0
-
-            if (panel_spec['stackable_axis'] ==
-                    feconf.GADGET_PANEL_AXIS_HORIZONTAL):
-                total_width += panel_spec['pixels_between_gadgets'] * (
-                    len(gadget_instances) - 1)
-                total_width += sum(
-                    gadget.width for gadget in gadget_instances)
-                total_height = max(
-                    gadget.height for gadget in gadget_instances)
-            else:
-                raise utils.ValidationError(
-                    "Unrecognized axis for '%s' panel. ")
-
-            # Validate fit for each dimension.
-            if panel_spec['height'] < total_height:
-                raise utils.ValidationError(
-                    "Height %d of panel \'%s\' exceeds limit of %d" % (
-                        total_height, panel_name, panel_spec['height']))
-            elif panel_spec['width'] < total_width:
-                raise utils.ValidationError(
-                    "Width %d of panel \'%s\' exceeds limit of %d" % (
-                        total_width, panel_name, panel_spec['width']))
-
-    def validate(self):
-        """Validates that gadgets fit the skin panel dimensions, and that the
-        gadgets themselves are valid.
-
-        Raises:
-            ValidationError: One or more attributes of the SkinInstance are
-            invalid.
-        """
-        # A list to validate each gadget_instance.name is unique.
-        gadget_instance_names = []
-
-        for panel_name, gadget_instances in (
-                self.panel_contents_dict.iteritems()):
-
-            # Validate existence of panels in the skin.
-            if panel_name not in feconf.PANELS_PROPERTIES:
-                raise utils.ValidationError(
-                    'The panel name \'%s\' is invalid.' % panel_name)
-
-            # Validate gadgets fit each skin panel.
-            self.validate_gadget_panel(panel_name, gadget_instances)
-
-            # Validate gadget internal attributes.
-            for gadget_instance in gadget_instances:
-                gadget_instance.validate()
-                if gadget_instance.name in gadget_instance_names:
-                    raise utils.ValidationError(
-                        '%s gadget instance name must be unique.' % (
-                            gadget_instance.name)
-                    )
-                gadget_instance_names.append(gadget_instance.name)
-
-    def to_dict(self):
-        """Returns a dict representing this SkinInstance domain object.
-
-        Returns:
-            dict. A dict mapping all fields of SkinInstance instance.
-        """
-        return {
-            'skin_id': self.skin_id,
-            'skin_customizations': {
-                'panels_contents': {
-                    panel: [
-                        gadget_instance.to_dict() for gadget_instance
-                        in instances_list]
-                    for panel, instances_list in
-                    self.panel_contents_dict.iteritems()
-                },
-            }
-        }
-
-    @classmethod
-    def from_dict(cls, skin_dict):
-        """Return a SkinInstance domain object from a dict.
-
-        Args:
-            content_dict: dict. The dict representation of SkinInstance object.
-
-        Returns:
-            SkinInstance. The corresponding SkinInstance domain object.
-        """
-        return SkinInstance(
-            skin_dict['skin_id'],
-            skin_dict['skin_customizations'])
-
-    def get_state_names_required_by_gadgets(self):
-        """Returns a list of strings representing State names required by
-        GadgetInstances in this skin.
-
-        Returns:
-            list(str). List of State names required.
-        """
-        state_names = set()
-        for gadget_instances in self.panel_contents_dict.values():
-            for gadget_instance in gadget_instances:
-                for state_name in gadget_instance.visible_in_states:
-                    state_names.add(state_name)
-
-        # We convert to a sorted list for clean deterministic testing.
-        return sorted(state_names)
-
-
 class State(object):
     """Domain object for a state."""
 
@@ -2013,7 +1568,7 @@ class Exploration(object):
     """Domain object for an Oppia exploration."""
 
     def __init__(self, exploration_id, title, category, objective,
-                 language_code, tags, blurb, author_notes, skin_customizations,
+                 language_code, tags, blurb, author_notes,
                  states_schema_version, init_state_name, states_dict,
                  param_specs_dict, param_changes_list, version,
                  created_on=None, last_updated=None):
@@ -2028,8 +1583,6 @@ class Exploration(object):
             tags: list(str). The tags given to the exploration.
             blurb: str. The blurb of the exploration.
             author_notes: str. The author notes.
-            skin_customizations: dict. The customization dictionary of
-                SkinInstance domain object.
             states_schema_version: int. Tbe schema version of the exploration.
             init_state_name: str. The name for the initial state of the
                 exploration.
@@ -2057,9 +1610,6 @@ class Exploration(object):
         self.author_notes = author_notes
         self.states_schema_version = states_schema_version
         self.init_state_name = init_state_name
-
-        self.skin_instance = SkinInstance(
-            feconf.DEFAULT_SKIN_ID, skin_customizations)
 
         self.states = {}
         for (state_name, state_dict) in states_dict.iteritems():
@@ -2089,8 +1639,7 @@ class Exploration(object):
             list; 'states_schema_version' and 'init_state_name' are taken from
             feconf; 'states_dict' is derived from feconf; 'param_specs_dict' is
             an empty dict; 'blurb' and 'author_notes' are initialized to empty
-            empty string; 'skin_customizations' is a null object; 'version' is
-            initializated to 0.
+            empty string; 'version' is initializated to 0.
 
         Args:
             exploration_id: str. The id of the exploration.
@@ -2112,7 +1661,7 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', None, feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
             feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
 
     @classmethod
@@ -2217,9 +1766,6 @@ class Exploration(object):
         exploration.param_changes = [
             param_domain.ParamChange.from_dict(pc)
             for pc in exploration_dict['param_changes']]
-
-        exploration.skin_instance = SkinInstance(
-            feconf.DEFAULT_SKIN_ID, exploration_dict['skin_customizations'])
 
         exploration.version = exploration_version
         exploration.created_on = exploration_created_on
@@ -2415,21 +1961,6 @@ class Exploration(object):
                             'The parameter %s was used in an answer group, '
                             'but it does not exist in this exploration'
                             % param_change.name)
-
-        # Check that state names required by gadgets exist.
-        state_names_required_by_gadgets = set(
-            self.skin_instance.get_state_names_required_by_gadgets())
-        missing_state_names = state_names_required_by_gadgets - set(
-            self.states.keys())
-        if missing_state_names:
-            raise utils.ValidationError(
-                'Exploration missing required state%s: %s' % (
-                    's' if len(missing_state_names) > 1 else '',
-                    ', '.join(sorted(missing_state_names)))
-                )
-
-        # Check that GadgetInstances fit the skin and that gadgets are valid.
-        self.skin_instance.validate()
 
         if strict:
             warnings_list = []
@@ -2861,180 +2392,6 @@ class Exploration(object):
 
         return trainable_states_dict
 
-    # Methods relating to gadgets.
-    def add_gadget(self, gadget_dict, panel):
-        """Adds a gadget to the associated panel.
-
-        Args:
-            gadget_dict: dict. The dict representation of GadgetInstance
-                object.
-            panel: str. The panel name.
-        """
-        gadget_instance = GadgetInstance(
-            gadget_dict['gadget_type'], gadget_dict['gadget_name'],
-            gadget_dict['visible_in_states'],
-            gadget_dict['customization_args'])
-
-        self.skin_instance.panel_contents_dict[panel].append(
-            gadget_instance)
-
-    def rename_gadget(self, old_gadget_name, new_gadget_name):
-        """Renames the given gadget.
-
-        Args:
-            old_gadget_name: str. The old name of gadget to rename.
-            new_gadget_name: str. The new gadget name.
-
-        Raises:
-            ValueError: The old gadget name does not exist or the new gadget
-            name already exists.
-        """
-        if old_gadget_name not in self.get_all_gadget_names():
-            raise ValueError('Gadget %s does not exist.' % old_gadget_name)
-        if (old_gadget_name != new_gadget_name and
-                new_gadget_name in self.get_all_gadget_names()):
-            raise ValueError('Duplicate gadget name: %s' % new_gadget_name)
-
-        if old_gadget_name == new_gadget_name:
-            return
-
-        GadgetInstance._validate_gadget_name(new_gadget_name)  # pylint: disable=protected-access
-
-        gadget_instance = self.get_gadget_instance_by_name(old_gadget_name)
-        gadget_instance.name = new_gadget_name
-
-    def delete_gadget(self, gadget_name):
-        """Deletes the given gadget.
-
-        Args:
-            gadget_name: str. The name of the gadget to be deleted.
-
-        Raises:
-            ValueError: The gadget does not exist.
-        """
-        if gadget_name not in self.get_all_gadget_names():
-            raise ValueError('Gadget %s does not exist.' % gadget_name)
-
-        panel = self._get_panel_for_gadget(gadget_name)
-        gadget_index = None
-        for index in range(len(
-                self.skin_instance.panel_contents_dict[panel])):
-            if self.skin_instance.panel_contents_dict[
-                    panel][index].name == gadget_name:
-                gadget_index = index
-                break
-        del self.skin_instance.panel_contents_dict[panel][gadget_index]
-
-    def get_gadget_instance_by_name(self, gadget_name):
-        """Returns the GadgetInstance with the given name.
-
-        Args:
-            gadget_name: str. The gadget name.
-
-        Returns:
-            GadgetInstance. The corresponding GadgetInstance domain object.
-
-        Raises:
-            ValueError: The gadget does not exist.
-        """
-        for gadget_instances in (
-                self.skin_instance.panel_contents_dict.itervalues()):
-            for gadget_instance in gadget_instances:
-                if gadget_instance.name == gadget_name:
-                    return gadget_instance
-        raise ValueError('Gadget %s does not exist.' % gadget_name)
-
-    def get_all_gadget_names(self):
-        """Gets a list of names of all gadgets used in this exploration.
-
-        Returns:
-            list(GadgetInstance). The list of all gadget names.
-        """
-        gadget_names = set()
-        for gadget_instances in (
-                self.skin_instance.panel_contents_dict.itervalues()):
-            for gadget_instance in gadget_instances:
-                gadget_names.add(gadget_instance.name)
-        return sorted(gadget_names)
-
-    def _get_panel_for_gadget(self, gadget_name):
-        """Returns the panel name for the given GadgetInstance.
-
-        Args:
-            gadget_name: str. The gadget name.
-
-        Returns:
-            str. The corresponding panel name.
-
-        Raises:
-            ValueError: The gadget does not exist.
-        """
-        for panel, gadget_instances in (
-                self.skin_instance.panel_contents_dict.iteritems()):
-            for gadget_instance in gadget_instances:
-                if gadget_instance.name == gadget_name:
-                    return panel
-        raise ValueError('Gadget %s does not exist.' % gadget_name)
-
-    def _update_gadget_visibilities_for_renamed_state(
-            self, old_state_name, new_state_name):
-        """Updates the visible_in_states property for gadget instances
-        visible in the renamed state.
-
-        Args:
-            old_state_name: str. The name of state to remove.
-            new_state_name: str. The new gadget name to append in
-                'visible_in_states' list.
-        """
-        affected_gadget_instances = (
-            self._get_gadget_instances_visible_in_state(old_state_name))
-
-        for gadget_instance in affected_gadget_instances:
-            # Order within visible_in_states does not affect functionality.
-            # It's sorted purely for deterministic testing.
-            gadget_instance.visible_in_states.remove(old_state_name)
-            gadget_instance.visible_in_states.append(new_state_name)
-            gadget_instance.visible_in_states.sort()
-
-    def _update_gadget_visibilities_for_deleted_state(self, state_name):
-        """Updates the visible_in_states property for gadget instances
-        visible in the deleted state.
-
-        Args:
-            state_name: str. The state name.
-        """
-        affected_gadget_instances = (
-            self._get_gadget_instances_visible_in_state(state_name))
-
-        for gadget_instance in affected_gadget_instances:
-            gadget_instance.visible_in_states.remove(state_name)
-            if len(gadget_instance.visible_in_states) == 0:
-                raise utils.ValidationError(
-                    "Deleting '%s' state leaves '%s' gadget with no visible "
-                    'states. This is not currently supported and should be '
-                    'handled with editor guidance on the front-end.' % (
-                        state_name,
-                        gadget_instance.name)
-                )
-
-    def _get_gadget_instances_visible_in_state(self, state_name):
-        """Helper function to retrieve gadget instances visible in
-        a given state.
-
-        Args:
-            state_name: str. The name of state in which search for gadgets.
-
-        Returns:
-            list(GadgetInstance). List of gadgets visibile in a givent state.
-        """
-        visible_gadget_instances = []
-        for gadget_instances in (
-                self.skin_instance.panel_contents_dict.itervalues()):
-            for gadget_instance in gadget_instances:
-                if state_name in gadget_instance.visible_in_states:
-                    visible_gadget_instances.append(gadget_instance)
-        return visible_gadget_instances
-
     @classmethod
     def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
         """Converts old states schema to the modern v1 schema. v1 contains the
@@ -3462,7 +2819,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 16
+    CURRENT_EXP_SCHEMA_VERSION = 17
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3803,6 +3160,19 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v16_dict_to_v17_dict(cls, exploration_dict):
+        """Converts a v16 exploration dict into a v17 exploration dict.
+
+        Removes gadgets and skins.
+        """
+        exploration_dict['schema_version'] = 17
+
+        if 'skin_customizations' in exploration_dict:
+            del exploration_dict['skin_customizations']
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3914,6 +3284,11 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 16
 
+        if exploration_schema_version == 16:
+            exploration_dict = cls._convert_v16_dict_to_v17_dict(
+                exploration_dict)
+            exploration_schema_version = 17
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -4012,8 +3387,6 @@ class Exploration(object):
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
             'tags': self.tags,
-            'skin_customizations': self.skin_instance.to_dict()[
-                'skin_customizations'],
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()}
         })
@@ -4032,8 +3405,6 @@ class Exploration(object):
                 - param_specs: dict. A dict where each key-value pair
                     represents respectively, a param spec name and a dict used
                     to initialize a ParamSpec domain object.
-                - skin_customizations: dict. The customization dictionary of
-                    SkinInstance domain object.
                 - states: dict. Keys are states names and values are dict
                     representation of State domain object.
                 - title: str. The exploration title.
@@ -4043,8 +3414,6 @@ class Exploration(object):
             'init_state_name': self.init_state_name,
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
-            'skin_customizations': self.skin_instance.to_dict()[
-                'skin_customizations'],
             'states': {
                 state_name: state.to_dict()
                 for (state_name, state) in self.states.iteritems()
@@ -4052,20 +3421,6 @@ class Exploration(object):
             'title': self.title,
             'language_code': self.language_code,
         }
-
-    def get_gadget_types(self):
-        """Gets all gadget types used in this exploration.
-
-        Returns:
-            set(str). The collection of gadget types.
-        """
-        result = set()
-        for gadget_instances in (
-                self.skin_instance.panel_contents_dict.itervalues()):
-            result.update([
-                gadget_instance.type for gadget_instance
-                in gadget_instances])
-        return sorted(result)
 
     def get_interaction_ids(self):
         """Gets all interaction ids used in this exploration.

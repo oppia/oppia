@@ -34,7 +34,6 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
-from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
@@ -143,14 +142,8 @@ class ExplorationPage(EditorHandler):
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
 
-        gadget_types = gadget_registry.Registry.get_all_gadget_types()
-        gadget_templates = (
-            gadget_registry.Registry.get_gadget_html(gadget_types))
-
         self.values.update({
-            'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'PANEL_SPECS': feconf.PANELS_PROPERTIES,
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
@@ -170,7 +163,6 @@ class ExplorationPage(EditorHandler):
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
@@ -179,7 +171,6 @@ class ExplorationPage(EditorHandler):
                 get_value_generators_js()),
             'title': exploration.title,
             'visualizations_html': jinja2.utils.Markup(visualizations_html),
-            'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
@@ -242,8 +233,6 @@ class ExplorationHandler(EditorHandler):
                 exploration_id).to_dict(),
             'show_state_editor_tutorial_on_load': (
                 self.user_id and not self.has_seen_editor_tutorial),
-            'skin_customizations': exploration.skin_instance.to_dict()[
-                'skin_customizations'],
             'states': states,
             'tags': exploration.tags,
             'title': exploration.title,

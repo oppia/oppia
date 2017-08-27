@@ -467,7 +467,8 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
-
+    get_redirect_route(
+        r'/ml/nextjobhandler', classifier.NextJobHandler),
     get_redirect_route(
         r'/.well-known/acme-challenge/<challenge>',
         admin.SslChallengeHandler),
