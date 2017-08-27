@@ -210,7 +210,9 @@ oppia.factory('CodeReplPredictionService', [
         return nearestNeighborsIndexes;
       },
 
-      predict: function(classifierData, program) {
+      predict: function(classifierData, answer) {
+        // Get python code from the input answer.
+        var program = answer.code;
         var knnData = classifierData.KNN;
         var svmData = classifierData.SVM;
         var cvVocabulary = classifierData.cv_vocabulary;
