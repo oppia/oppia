@@ -125,7 +125,8 @@
                                              node-count="tile.node_count"
                                              category="tile.category"
                                              thumbnail-icon-url="tile.thumbnail_icon_url"
-                                             thumbnail-bg-color="tile.thumbnail_bg_color">
+                                             thumbnail-bg-color="tile.thumbnail_bg_color"
+                                             show-learner-dashboard-icons="userIsLoggedIn">
                     </collection-summary-tile>
                     <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
                                               exploration-id="tile.id"
@@ -137,7 +138,8 @@
                                               num-views="tile.num_views"
                                               thumbnail-icon-url="tile.thumbnail_icon_url"
                                               thumbnail-bg-color="tile.thumbnail_bg_color"
-                                              class="protractor-test-exp-summary-tile">
+                                              class="protractor-test-exp-summary-tile"
+                                              show-learner-dashboard-icons="userIsLoggedIn">
                     </exploration-summary-tile>
                   </div>
                 </div>

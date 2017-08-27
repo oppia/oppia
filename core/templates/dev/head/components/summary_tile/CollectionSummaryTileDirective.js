@@ -35,7 +35,8 @@ oppia.directive('collectionSummaryTile', [
         getThumbnailBgColor: '&thumbnailBgColor',
         isLinkedToEditorPage: '=?isLinkedToEditorPage',
         getCategory: '&category',
-        isPlaylistMode: '&playlistMode'
+        isPlaylistMode: '&playlistMode',
+        showLearnerDashboardIcons: '&showLearnerDashboardIcons'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +

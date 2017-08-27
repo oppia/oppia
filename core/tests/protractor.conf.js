@@ -57,56 +57,57 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor/*.js'
-    ],
-
-    mainEditor: [
-      'protractor/editorAndPlayer.js',
-      'protractor/stateEditor.js',
-      'protractor/explorationFeedback.js'
-    ],
-
-    editorFeatures: [
-      'protractor/gadgetEditor.js',
-      'protractor/historyTab.js',
-      'protractor/parameters.js'
-    ],
-
-    extensions: [
-      'protractor/richTextComponents.js',
-      'protractor/interactions.js'
-    ],
-
-    library: [
-      'protractor/explorationRating.js',
-      'protractor/privileges.js',
+      // 'protractor/*.js'
       'protractor/libraryPagesTour.js',
-      'protractor/publicationAndLibrary.js'
     ],
 
-    learnerDashboard: [
-      'protractor/learnerDashboard.js',
-    ],
+    // mainEditor: [
+    //   'protractor/editorAndPlayer.js',
+    //   'protractor/stateEditor.js',
+    //   'protractor/explorationFeedback.js'
+    // ],
 
-    users: [
-      'protractor/userManagement.js',
-      'protractor/loginFlow.js',
-      'protractor/subscriptions.js',
-      'protractor/preferences.js'
-    ],
+    // editorFeatures: [
+    //   'protractor/gadgetEditor.js',
+    //   'protractor/historyTab.js',
+    //   'protractor/parameters.js'
+    // ],
 
-    misc: [
-      'protractor/suggestions.js',
-      'protractor/cacheSlugs.js',
-      'protractor/staticPagesTour.js',
-      'protractor/collections.js',
-      'protractor/accessibility.js',
-      'protractor/i18n.js'
-    ],
+    // extensions: [
+    //   'protractor/richTextComponents.js',
+    //   'protractor/interactions.js'
+    // ],
 
-    embedding: [
-      'protractor/embedding.js'
-    ]
+    // library: [
+    //   'protractor/explorationRating.js',
+    //   'protractor/privileges.js',
+    //   'protractor/libraryPagesTour.js',
+    //   'protractor/publicationAndLibrary.js'
+    // ],
+
+    // learnerDashboard: [
+    //   'protractor/learnerDashboard.js',
+    // ],
+
+    // users: [
+    //   'protractor/userManagement.js',
+    //   'protractor/loginFlow.js',
+    //   'protractor/subscriptions.js',
+    //   'protractor/preferences.js'
+    // ],
+
+    // misc: [
+    //   'protractor/suggestions.js',
+    //   'protractor/cacheSlugs.js',
+    //   'protractor/staticPagesTour.js',
+    //   'protractor/collections.js',
+    //   'protractor/accessibility.js',
+    //   'protractor/i18n.js'
+    // ],
+
+    // embedding: [
+    //   'protractor/embedding.js'
+    // ]
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----

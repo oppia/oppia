@@ -28,6 +28,7 @@ oppia.directive('activityTilesInfinityGrid', [
         function($scope, $rootScope, searchService) {
           $scope.endOfPageIsReached = false;
           $scope.allActivitiesInOrder = [];
+          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           // Called when the first batch of search results is retrieved from the
           // server.
           $scope.$on(
