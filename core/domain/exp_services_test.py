@@ -2620,7 +2620,6 @@ title: Old Title
         exploration_model.title = 'New title'
         exploration_model.commit(
             self.albert_id, 'Changed title.', [])
-
         # In version 3, a new state is added.
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=True, version=None)
@@ -2628,6 +2627,7 @@ title: Old Title
             self.VERSION_0_STATES_DICT[feconf.DEFAULT_INIT_STATE_NAME])
         new_state['interaction']['id'] = 'TextInput'
         exploration_model.states['New state'] = new_state
+
 
         # Properly link in the new state to avoid an invalid exploration.
         init_state = exploration_model.states[feconf.DEFAULT_INIT_STATE_NAME]

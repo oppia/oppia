@@ -131,7 +131,11 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             'category': collection_category,
         }])
 
-        # Start migration job on sample collection.
+        collection_summary = collection_services.compute_summary_of_collection(
+            model, self.albert_id)
+        collection_services.save_collection_summary(collection_summary)
+
+       # Start migration job on sample collection.
         job_id = (
             collection_jobs_one_off.CollectionMigrationJob.create_new())
         collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
@@ -173,6 +177,10 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             'title': collection_title,
             'category': collection_category,
         }])
+
+        collection_summary = collection_services.compute_summary_of_collection(
+            model, self.albert_id)
+        collection_services.save_collection_summary(collection_summary)
 
         # Check that collection_contents is empty
         self.assertEqual(model.collection_contents, {})

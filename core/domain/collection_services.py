@@ -935,7 +935,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     object and return it.
 
     Args:
-        collection_id: str. ID of the collection.
+        collection: Collection. The domain object represting the collection.
         contributor_id_to_add: str. ID of the contributor to be added to the
             collection summary.
 

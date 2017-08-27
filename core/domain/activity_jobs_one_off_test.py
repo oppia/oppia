@@ -17,13 +17,16 @@
 """Tests for Activity-related jobs."""
 
 from core.domain import exp_domain
+from core.domain import collection_domain
 from core.domain import activity_jobs_one_off
 from core.domain import exp_services
+from core.domain import collection_services
 from core.domain import rights_manager
+from core.domain import search_services
 from core.platform import models
 from core.tests import test_utils
 
-search_services = models.Registry.import_search_services()
+gae_search_services = models.Registry.import_search_services()
 
 class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
 
@@ -38,14 +41,25 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s%s' % (self.EXP_ID, i),
+            '%s' % i,
             title='title %d' % i,
             category='category%d' % i
-        ) for i in xrange(5)]
+        ) for i in xrange(3)]
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
             rights_manager.publish_exploration(self.owner_id, exp.id)
+
+        # Setup collections
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' %i,
+            category='category%d' %i
+        ) for i in range(3, 6)]
+
+        for collection in collections:
+            collection_services.save_new_collection(self.owner_id, collection)
+            rights_manager.publish_collection(self.owner_id, collection.id)
 
         self.process_and_flush_pending_tasks()
 
@@ -61,10 +75,11 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
 
         def add_docs_mock(docs, index):
             indexed_docs.extend(docs)
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            self.assertIn(index, (search_services.SEARCH_INDEX_EXPLORATIONS,
+                                  search_services.SEARCH_INDEX_COLLECTIONS))
 
         add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_mock)
+            gae_search_services, 'add_documents_to_index', add_docs_mock)
 
         with add_docs_swap:
             self.process_and_flush_pending_tasks()
@@ -73,7 +88,7 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
         titles = [doc['title'] for doc in indexed_docs]
         categories = [doc['category'] for doc in indexed_docs]
 
-        for index in xrange(5):
-            self.assertIn("%s%s" % (self.EXP_ID, index), ids)
+        for index in xrange(6):
+            self.assertIn("%s" % index, ids)
             self.assertIn('title %d' % index, titles)
             self.assertIn('category%d' % index, categories)
