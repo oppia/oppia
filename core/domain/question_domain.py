@@ -140,6 +140,6 @@ class Question(object):
             Question. A Question domain object with default values.
         """
         return cls(
-                question_id, title, {},
-                feconf.CURRENT_QUESTION_SCHEMA_VERSION,
-                collection_id, language_code)
+            question_id, title, {},
+            feconf.CURRENT_QUESTION_SCHEMA_VERSION,
+            collection_id, language_code)
