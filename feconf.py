@@ -159,6 +159,9 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 4
 
+# The current version of the question schema.
+CURRENT_QUESTION_SCHEMA_VERSION = 1
+
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
@@ -193,6 +196,9 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
+
+# Default title for a new question.
+DEFAULT_QUESTION_TITLE = ''
 
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'

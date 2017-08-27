@@ -44,25 +44,25 @@ class QuestionModel(base_models.VersionedModel):
 
     # The title of the question.
     title = ndb.StringProperty(required=True, indexed=True)
-    # The data of the question.
+    # The data for the question data.
     question_data = ndb.JsonProperty(default={}, indexed=False)
     # The schema version for the data.
     data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
     # The ID of collection to which the question belongs.
-    collection_id = ndb.IntegerProperty(required=True, indexed=True)
+    collection_id = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
     def _get_new_id(cls, collection_id):
-        """Generates a unique id for the training job of the form
+        """Generates a unique id for the question of the form
         {{collection_id}}.{{random_hash_of_16_chars}}
 
         Args:
-            collection_id: int. ID of the collection.
+            collection_id: str. ID of the collection.
 
         Returns:
-            ID of the new QuestionModel instance.
+           new_id: int. ID of the new QuestionModel instance.
 
         Raises:
             Exception: The id generator for QuestionModel is
@@ -90,14 +90,15 @@ class QuestionModel(base_models.VersionedModel):
 
         Args:
             title: str. The title of the question.
-            question_data: dict. The data of the question.
+            question_data: dict. The data for the question data.
             data_schema_version: int. The schema version for the data.
-            collection_id: int. ID of the collection.
+            collection_id: str. ID of the collection.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
         Returns:
-            Instance of the new QuestionModel entry.
+            question_instance: QuestionModel. Instance of the new QuestionModel
+                entry.
 
         Raises:
             Exception: A model with the same ID already exists.

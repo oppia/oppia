@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core.domain import question_domain
 from core.domain import question_services
 from core.domain import user_services
 from core.platform import models
@@ -37,16 +38,15 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_save_new_question(self):
         question_data = {}
+        question_id = 'dummy'
         title = 'A Question'
         data_schema_version = 1
-        collection_id = 1
+        collection_id = 'col1'
         language_code = 'en'
-        question = lambda: None
-        setattr(question, 'title', title)
-        setattr(question, 'question_data', question_data)
-        setattr(question, 'data_schema_version', data_schema_version)
-        setattr(question, 'collection_id', collection_id)
-        setattr(question, 'language_code', language_code)
+        question = question_domain.Question(
+            question_id, title, question_data, data_schema_version,
+            collection_id, language_code)
+        question.validate()
 
         question_model = question_services.add_question(self.owner_id, question)
         model = question_models.QuestionModel.get(question_model.id)
@@ -59,16 +59,15 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_delete_question(self):
         question_data = {}
+        question_id = 'dummy'
         title = 'A Question'
         data_schema_version = 1
-        collection_id = 1
+        collection_id = 'col1'
         language_code = 'en'
-        question = lambda: None
-        setattr(question, 'title', title)
-        setattr(question, 'question_data', question_data)
-        setattr(question, 'data_schema_version', data_schema_version)
-        setattr(question, 'collection_id', collection_id)
-        setattr(question, 'language_code', language_code)
+        question = question_domain.Question(
+            question_id, title, question_data, data_schema_version,
+            collection_id, language_code)
+        question.validate()
 
         question_model = question_services.add_question(self.owner_id, question)
         question_services.delete_question(self.owner_id, question_model.id)
