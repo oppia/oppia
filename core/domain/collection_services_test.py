@@ -1844,3 +1844,23 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         #       self.COLLECTION_ID, 4, 3)
         # self._check_contributors_summary(self.COLLECTION_ID,
         #                                 {albert_id: 1, bob_id: 2})
+
+
+class GetCollectionAndCollectionRightsTest(CollectionServicesUnitTests):
+
+    def test_get_collection_and_collection_rights_object(self):
+        collection_id = self.COLLECTION_ID
+        self.save_new_valid_collection(
+            collection_id, self.owner_id, objective='The objective')
+
+        (collection, collection_rights) = (
+            collection_services.get_collection_and_collection_rights_by_id(
+                collection_id, version=1))
+        self.assertEqual(collection.id, collection_id)
+        self.assertEqual(collection_rights.id, collection_id)
+
+        (collection, collection_rights) = (
+            collection_services.get_collection_and_collection_rights_by_id(
+                'fake_id', version=1))
+        self.assertIsNone(collection)
+        self.assertIsNone(collection_rights)

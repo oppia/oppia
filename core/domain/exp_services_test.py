@@ -2856,3 +2856,23 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
+
+
+class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
+
+    def test_get_exploration_and_exploration_rights_object(self):
+        exploration_id = self.EXP_ID
+        self.save_new_valid_exploration(
+            exploration_id, self.owner_id, objective='The objective')
+
+        (exp, exp_rights) = (
+            exp_services.get_exploration_and_exploration_rights_by_id(
+                exploration_id, version=1))
+        self.assertEqual(exp.id, exploration_id)
+        self.assertEqual(exp_rights.id, exploration_id)
+
+        (exp, exp_rights) = (
+            exp_services.get_exploration_and_exploration_rights_by_id(
+                'fake_id', version=1))
+        self.assertIsNone(exp)
+        self.assertIsNone(exp_rights)

@@ -198,14 +198,12 @@ class ExplorationHandler(base.BaseHandler):
         version = self.request.get('v')
         version = int(version) if version else None
 
-        try:
-            exploration = exp_services.get_exploration_by_id(
-                exploration_id, version=version)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        (exploration, exploration_rights) = (
+            exp_services.get_exploration_and_exploration_rights_by_id(
+                exploration_id, version=version))
+        if exploration is None:
+            raise self.PageNotFoundException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
         user_settings = user_services.get_user_settings(self.user_id)
 
         preferred_audio_language_code = None

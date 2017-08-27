@@ -50,6 +50,7 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
+datastore_services = models.Registry.import_datastore_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -314,6 +315,52 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 
     result.update(db_results_dict)
     return result
+
+
+def get_exploration_and_exploration_rights_by_id(exploration_id, version=None):
+    """Returns a tuple for exploration domain object and exploration rights
+        object.
+
+    Args:
+        exploration_id: str. Id of the exploration.
+        version: str. Version of the exploration.
+
+    Returns:
+        Tuple(exploration object or None, exploration rights object or None).
+    """
+    exploration_memcache_key = _get_exploration_memcache_key(
+        exploration_id, version=version)
+    memcached_exploration = memcache_services.get_multi(
+        [exploration_memcache_key]).get(exploration_memcache_key)
+
+    if memcached_exploration is not None:
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        return (memcached_exploration, exploration_rights)
+    else:
+        exploration_and_rights = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                [
+                    ('ExplorationModel', [exploration_id]),
+                    ('ExplorationRightsModel', [exploration_id])
+                ]))
+        print exploration_and_rights
+        if exploration_and_rights[0][0]:
+            exploration = get_exploration_from_model(
+                exploration_and_rights[0][0])
+            memcache_services.set_multi({
+                exploration_memcache_key: exploration})
+        else:
+            exploration = None
+
+        if exploration_and_rights[1][0]:
+            exploration_rights = (
+                rights_manager.get_activity_rights_from_model(
+                    exploration_and_rights[1][0],
+                    constants.ACTIVITY_TYPE_EXPLORATION))
+        else:
+            exploration_rights = None
+    return (exploration, exploration_rights)
 
 
 def get_new_exploration_id():
