@@ -1,4 +1,4 @@
-<learner-dashboard-icons ng-if="showLearnerDashboardIcons()"
+<learner-dashboard-icons ng-if="showLearnerDashboardIconsIfPossible() && userIsLoggedIn"
                          activity-type="ACTIVITY_TYPE_EXPLORATION"
                          activity-id="getExplorationId()"
                          activity-title="getExplorationTitle()"

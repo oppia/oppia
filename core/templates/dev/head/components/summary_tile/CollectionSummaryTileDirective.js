@@ -36,7 +36,7 @@ oppia.directive('collectionSummaryTile', [
         isLinkedToEditorPage: '=?isLinkedToEditorPage',
         getCategory: '&category',
         isPlaylistMode: '&playlistMode',
-        showLearnerDashboardIcons: '&showLearnerDashboardIcons'
+        showLearnerDashboardIconsIfPossible: '&showLearnerDashboardIconsIfPossible'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -46,6 +46,7 @@ oppia.directive('collectionSummaryTile', [
         'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function($scope,
           oppiaDatetimeFormatter, COLLECTION_VIEWER_URL,
           COLLECTION_EDITOR_URL) {
+          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
           $scope.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;
 

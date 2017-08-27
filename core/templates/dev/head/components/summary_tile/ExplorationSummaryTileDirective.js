@@ -45,7 +45,7 @@ oppia.directive('explorationSummaryTile', [
         // desktop version of the summary tile is always displayed.
         mobileCutoffPx: '@mobileCutoffPx',
         isPlaylistMode: '&playlistMode',
-        showLearnerDashboardIcons: '&showLearnerDashboardIcons'
+        showLearnerDashboardIconsIfPossible: '&showLearnerDashboardIconsIfPossible'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -84,6 +84,7 @@ oppia.directive('explorationSummaryTile', [
           $scope, $http,
           oppiaDatetimeFormatter, RatingComputationService,
           windowDimensionsService) {
+          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);
           var contributorsSummary = $scope.getContributorsSummary() || {};

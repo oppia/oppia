@@ -41,7 +41,6 @@ oppia.controller('Library', [
       LearnerDashboardIdsBackendApiService,
       LearnerDashboardActivityIdsObjectFactory, LearnerPlaylistService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
-    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
     $scope.bannerImageFilename = possibleBannerFilenames[
