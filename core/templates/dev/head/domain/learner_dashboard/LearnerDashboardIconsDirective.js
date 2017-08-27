@@ -33,13 +33,15 @@ oppia.directive('learnerDashboardIcons', [
         '$scope', 'LearnerDashboardIdsBackendApiService',
         'LearnerDashboardActivityIdsObjectFactory',
         'LearnerPlaylistService',
-        function($scope, LearnerDashboardIdsBackendApiService,
-                 LearnerDashboardActivityIdsObjectFactory,
-                 LearnerPlaylistService) {
-          $scope.activityIsActive = true;
+        function(
+          $scope, LearnerDashboardIdsBackendApiService,
+          LearnerDashboardActivityIdsObjectFactory,
+          LearnerPlaylistService) {
+          $scope.activityIsCurrentlyHoveredOver = true;
 
           $scope.$watch('activityActive', function(value) {
-            $scope.activityIsActive = !$scope.activityIsActive;
+            $scope.activityIsCurrentlyHoveredOver = (
+              !$scope.activityIsCurrentlyHoveredOver);
           });
 
           LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
@@ -50,8 +52,8 @@ oppia.directive('learnerDashboardIcons', [
             }
           );
 
-          $scope.toggleActivityIsActive = function(activityId) {
-            $scope.activityIsActive = !$scope.activityIsActive;
+          $scope.setHoverState = function(hoverState) {
+            $scope.activityIsCurrentlyHoveredOver = hoverState;
           };
 
           $scope.canActivityBeAddedToLearnerPlaylist = function(activityId) {
@@ -60,8 +62,59 @@ oppia.directive('learnerDashboardIcons', [
                 activityId)) {
                 return false;
               } else {
-                return $scope.activityIsActive;
+                return $scope.activityIsCurrentlyHoveredOver;
               }
+            }
+          };
+
+          $scope.belongsToLearnerPlaylist = function() {
+            var activityType = $scope.getActivityType();
+            if ($scope.learnerDashboardActivityIds) {
+              /* eslint-disable max-len */
+              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+                return (
+                  $scope.learnerDashboardActivityIds.belongsToExplorationPlaylist(
+                    $scope.getActivityId()));
+              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+                return (
+                  $scope.learnerDashboardActivityIds.belongsToCollectionPlaylist(
+                    $scope.getActivityId()));
+              }
+              /* eslint-enable max-len */
+            }
+          };
+
+          $scope.belongsToCompletedActivities = function() {
+            var activityType = $scope.getActivityType();
+            if ($scope.learnerDashboardActivityIds) {
+              /* eslint-disable max-len */
+              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+                return (
+                  $scope.learnerDashboardActivityIds.belongsToCompletedExplorations(
+                    $scope.getActivityId()));
+              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+                return (
+                  $scope.learnerDashboardActivityIds.belongsToCompletedCollections(
+                    $scope.getActivityId()));
+              }
+              /* eslint-enable max-len */
+            }
+          };
+
+          $scope.belongsToIncompleteActivities = function() {
+            var activityType = $scope.getActivityType();
+            if ($scope.learnerDashboardActivityIds) {
+              /* eslint-disable max-len */
+              if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+                return (
+                  $scope.learnerDashboardActivityIds.belongsToIncompleteExplorations(
+                    $scope.getActivityId()));
+              } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+                return (
+                  $scope.learnerDashboardActivityIds.belongsToIncompleteCollections(
+                    $scope.getActivityId()));
+              }
+              /* eslint-enable max-len */
             }
           };
 
@@ -88,8 +141,7 @@ oppia.directive('learnerDashboardIcons', [
             activityId, activityTitle, activityType) {
             var isSuccessfullyRemoved = (
               LearnerPlaylistService.removeFromLearnerPlaylist(
-                activityId, activityTitle,
-                activityType,
+                activityId, activityTitle, activityType,
                 $scope.learnerDashboardActivityIds));
           };
         }

@@ -960,10 +960,10 @@ def get_activity_progress(user_id):
         user_id: str. The id of the learner.
 
     Returns:
-        LearnerProgress. The learner progress domain object corresponding to the
-            particular learner.
-        dict. The numbers of the activities that are no longer present. It
-            contains four keys:
+        (LearnerProgress, dict, list(str)). The first return value is the
+            learner progress domain object corresponding to the particular
+            learner. The second return value is the numbers of the activities
+            that are no longer present. It contains four keys:
             - incomplete_explorations: int. The number of incomplete
                 explorations no longer present.
             - incomplete_collections: int. The number of incomplete collections
@@ -972,9 +972,8 @@ def get_activity_progress(user_id):
                 no longer present.
             - completed_collections: int. The number of completed collections no
                 longer present.
-        list(str). The titles of the collections to which new explorations have
-            been added.
-
+            The third return valus is the titles of the collections to which new
+            explorations have been added.
     """
     activity_ids_in_learner_dashboard = (
         get_learner_dashboard_activities(user_id))

@@ -40,7 +40,61 @@ oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
           this.explorationPlaylistIds.indexOf(activityId) !== -1) {
         return true;
       } else {
-        false;
+        return false;
+      }
+    });
+
+  LearnerDashboardActivityIds.prototype.belongsToExplorationPlaylist = (
+    function(explorationId) {
+      if (this.explorationPlaylistIds.indexOf(explorationId) !== -1) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+  LearnerDashboardActivityIds.prototype.belongsToCollectionPlaylist = (
+    function(collectionId) {
+      if (this.collectionPlaylistIds.indexOf(collectionId) !== -1) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+  LearnerDashboardActivityIds.prototype.belongsToCompletedExplorations = (
+    function(explorationId) {
+      if (this.completedExplorationIds.indexOf(explorationId) !== -1) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+  LearnerDashboardActivityIds.prototype.belongsToCompletedCollections = (
+    function(collectionId) {
+      if (this.completedCollectionIds.indexOf(collectionId) !== -1) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+  LearnerDashboardActivityIds.prototype.belongsToIncompleteExplorations = (
+    function(explorationId) {
+      if (this.incompleteExplorationIds.indexOf(explorationId) !== -1) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+  LearnerDashboardActivityIds.prototype.belongsToIncompleteCollections = (
+    function(collectionId) {
+      if (this.incompleteCollectionIds.indexOf(collectionId) !== -1) {
+        return true;
+      } else {
+        return false;
       }
     });
 

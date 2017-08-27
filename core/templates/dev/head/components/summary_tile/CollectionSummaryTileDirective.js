@@ -35,7 +35,7 @@ oppia.directive('collectionSummaryTile', [
         getThumbnailBgColor: '&thumbnailBgColor',
         isLinkedToEditorPage: '=?isLinkedToEditorPage',
         getCategory: '&category',
-        isPlaylistMode: '&playlistMode',
+        isPlaylistTile: '&playlistTile',
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible')
       },
@@ -44,9 +44,9 @@ oppia.directive('collectionSummaryTile', [
         'collection_summary_tile_directive.html'),
       controller: [
         '$scope', 'oppiaDatetimeFormatter',
-        'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function($scope,
-          oppiaDatetimeFormatter, COLLECTION_VIEWER_URL,
-          COLLECTION_EDITOR_URL) {
+        'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function(
+          $scope, oppiaDatetimeFormatter,
+          COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
           $scope.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;
@@ -76,9 +76,8 @@ oppia.directive('collectionSummaryTile', [
             return UrlInterpolationService.getStaticImageUrl(url);
           };
 
-          $scope.collectionIsActive = false;
-          $scope.toggleCollectionIsActive = function() {
-            $scope.collectionIsActive = !$scope.collectionIsActive;
+          $scope.setHoverState = function(hoverState) {
+            $scope.collectionIsCurrentlyHoveredOver = hoverState;
           };
         }
       ]

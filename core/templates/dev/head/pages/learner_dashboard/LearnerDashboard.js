@@ -252,21 +252,18 @@ oppia.controller('LearnerDashboard', [
     };
 
     var getPlaylistSortableOptions = function(activityType) {
-      var windowScrollTop = '';
-      var startSort = false;
       return {
         'ui-floating': 'auto',
         start: function(e, ui) {
-          if(startSort){
-            windowScrollTop = $(window).scrollTop();
-          }
-          startSort = true;
           ui.placeholder.height(ui.item.height());
           $scope.$apply();
         },
         sort: function (e, ui) {
           /* eslint-disable quote-props */
-          ui.helper.css({'top': ui.position.top + windowScrollTop + 'px'});
+          // Reset the position of the window on scrolling. This keeps the mouse
+          // position and elements in sync.
+          ui.helper.css(
+            {'top': ui.position.top + $(window).scrollTop() + 'px'});
           /* eslint-enable quote-props */
         },
         update: function(e, ui) {
@@ -412,8 +409,9 @@ oppia.controller('LearnerDashboard', [
         },
         controller: [
           '$scope', '$modalInstance', '$http', 'sectionNameI18nId',
-          'subsectionName', function($scope, $modalInstance, $http,
-            sectionNameI18nId, subsectionName) {
+          'subsectionName', function(
+            $scope, $modalInstance, $http, sectionNameI18nId,
+            subsectionName) {
             $scope.sectionNameI18nId = sectionNameI18nId;
             $scope.subsectionName = subsectionName;
             $scope.activityTitle = activity.title;
@@ -425,6 +423,8 @@ oppia.controller('LearnerDashboard', [
               } else if (subsectionName ===
                          LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
                 activityType = constants.ACTIVITY_TYPE_COLLECTION;
+              } else {
+                throw new Error('Subsection name is not valid.');
               }
 
               var removeActivityUrlPrefix = '';
@@ -434,6 +434,8 @@ oppia.controller('LearnerDashboard', [
               } else if (sectionNameI18nId ===
                          LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
                 removeActivityUrlPrefix = '/learnerincompleteactivityhandler/';
+              } else {
+                throw new Error('Section name is not valid.');
               }
 
               removeActivityUrl = (

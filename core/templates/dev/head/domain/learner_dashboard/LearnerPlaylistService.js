@@ -55,8 +55,8 @@
       return successfullyAdded;
     };
 
-    var _removeFromLearnerPlaylist = function(activityId, activityTitle,
-      activityType, learnerDashboardActivityIds) {
+    var _removeFromLearnerPlaylist = function(
+      activityId, activityTitle, activityType, learnerDashboardActivityIds) {
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner_dashboard/' +
@@ -71,9 +71,8 @@
           }
         },
         controller: [
-          '$scope', '$modalInstance', '$http',
-          'UrlInterpolationService', function($scope, $modalInstance,
-            $http, UrlInterpolationService) {
+          '$scope', '$modalInstance', '$http', 'UrlInterpolationService',
+          function($scope, $modalInstance, $http, UrlInterpolationService) {
             $scope.sectionNameI18nId = (
               'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
             $scope.activityTitle = activityTitle;

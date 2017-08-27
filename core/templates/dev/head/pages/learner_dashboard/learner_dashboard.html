@@ -359,19 +359,18 @@
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                    tooltip="Remove"
                    tooltip-placement="top"></i>
-                <exploration-summary-tile
-                                        style="height: 145px; display: block;"
-                                        exploration-id="tile.id"
-                                        exploration-title="tile.title"
-                                        last-updated-msec="tile.last_updated_msec"
-                                        objective="tile.objective"
-                                        category="tile.category"
-                                        ratings="tile.ratings"
-                                        num-views="tile.num_views"
-                                        thumbnail-icon-url="tile.thumbnail_icon_url"
-                                        thumbnail-bg-color="tile.thumbnail_bg_color"
-                                        class="protractor-test-exp-summary-tile"
-                                        playlist-mode="true">
+                <exploration-summary-tile style="height: 145px; display: block;"
+                                          exploration-id="tile.id"
+                                          exploration-title="tile.title"
+                                          last-updated-msec="tile.last_updated_msec"
+                                          objective="tile.objective"
+                                          category="tile.category"
+                                          ratings="tile.ratings"
+                                          num-views="tile.num_views"
+                                          thumbnail-icon-url="tile.thumbnail_icon_url"
+                                          thumbnail-bg-color="tile.thumbnail_bg_color"
+                                          class="protractor-test-exp-summary-tile"
+                                          playlist-tile="true">
                 </exploration-summary-tile>
               </div>
             </div>
@@ -470,8 +469,7 @@
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                    tooltip="Remove"
                    tooltip-placement="top"></i>
-                <collection-summary-tile
-                                         style="height: 145px; display: block;"
+                <collection-summary-tile style="height: 145px; display: block;"
                                          collection-id="tile.id"
                                          collection-title="tile.title"
                                          last-updated-msec="tile.last_updated_msec"
@@ -480,7 +478,7 @@
                                          category="tile.category"
                                          thumbnail-icon-url="tile.thumbnail_icon_url"
                                          thumbnail-bg-color="tile.thumbnail_bg_color"
-                                         playlist-mode="true">
+                                         playlist-tile="true">
                 </collection-summary-tile>
               </div>
             </div>
