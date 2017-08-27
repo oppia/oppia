@@ -18,10 +18,10 @@
 
 oppia.directive('adminRolesTab', [
   '$http', 'ADMIN_ROLE_HANDLER_URL', 'AdminTaskManagerService',
-  'UrlInterpolationService', 'ADMIN_SHOW_UPDATE_ROLE',
+  'UrlInterpolationService',
   function(
     $http, ADMIN_ROLE_HANDLER_URL, AdminTaskManagerService,
-    UrlInterpolationService, ADMIN_SHOW_UPDATE_ROLE) {
+    UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -36,7 +36,6 @@ oppia.directive('adminRolesTab', [
         $scope.resultRolesVisible = false;
         $scope.result = {};
         $scope.setStatusMessage('');
-        $scope.isUpdateFormVisible = ADMIN_SHOW_UPDATE_ROLE;
         $scope.viewFormValues = {};
         $scope.updateFormValues = {};
         $scope.viewFormValues.method = 'role';

@@ -14,6 +14,8 @@
 
 """Models for storing the classification data models."""
 
+import datetime
+
 from core.platform import models
 
 import feconf
@@ -56,6 +58,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The list contains dicts where each dict represents a single training
     # data group.
     training_data = ndb.JsonProperty(default=None)
+    # The time when the job's status should next be checked.
+    # It is incremented by TTL when a job with status NEW is picked up by VM.
+    next_scheduled_check_time = ndb.DateTimeProperty(required=True,
+                                                     indexed=True)
     # The classifier data which will be populated when storing the results of
     # the job.
     classifier_data = ndb.JsonProperty(default=None)
@@ -94,8 +100,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, algorithm_id, interaction_id, exp_id, exp_version,
-            training_data, state_name, status, classifier_data,
-            data_schema_version):
+            next_scheduled_check_time, training_data, state_name, status,
+            classifier_data, data_schema_version):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -105,6 +111,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
             exp_version: int. The exploration version at the time
                 this training job was created.
+            next_scheduled_check_time: datetime.datetime. The next scheduled
+                time to check the job.
             state_name: str. The name of the state to which the classifier
                 belongs.
             status: str. The status of the training job.
@@ -125,13 +133,36 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             interaction_id=interaction_id,
             exp_id=exp_id,
             exp_version=exp_version,
-            state_name=state_name, status=status, training_data=training_data,
+            next_scheduled_check_time=next_scheduled_check_time,
+            state_name=state_name, status=status,
+            training_data=training_data,
             classifier_data=classifier_data,
             data_schema_version=data_schema_version
             )
 
         training_job_instance.put()
         return instance_id
+
+    @classmethod
+    def query_new_and_pending_training_jobs(cls, cursor=None):
+        """Gets the next 10 jobs which are either in status "new" or "pending",
+        ordered by their next_scheduled_check_time attribute.
+
+        Args:
+            cursor: str or None. The list of returned entities starts from this
+                datastore cursor.
+        Returns:
+            List of the ClassifierTrainingJobModels with status new or pending.
+        """
+        query = cls.query(cls.status.IN([
+            feconf.TRAINING_JOB_STATUS_NEW,
+            feconf.TRAINING_JOB_STATUS_PENDING])).filter(
+                cls.next_scheduled_check_time <= (
+                    datetime.datetime.utcnow())).order(
+                        cls.next_scheduled_check_time, cls._key)
+
+        job_models, cursor, more = query.fetch_page(10, start_cursor=cursor)
+        return job_models, cursor, more
 
     @classmethod
     def create_multi(cls, job_dicts_list):
@@ -153,6 +184,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 interaction_id=job_dict['interaction_id'],
                 exp_id=job_dict['exp_id'],
                 exp_version=job_dict['exp_version'],
+                next_scheduled_check_time=job_dict['next_scheduled_check_time'],
                 state_name=job_dict['state_name'], status=job_dict['status'],
                 training_data=job_dict['training_data'],
                 classifier_data=job_dict['classifier_data'],

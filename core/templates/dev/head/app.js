@@ -44,8 +44,12 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_ML_CLASSIFIERS', false);
 // Feature still in development.
-oppia.constant('ENABLE_HINT_EDITOR', true);
-oppia.constant('ENABLE_FALLBACK_EDITOR', false);
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'The current solution does not lead to another card.');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+  'The solution is now valid!');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'The current solution is no longer valid.');
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
@@ -470,8 +474,11 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-        // The replace function removes 'seconds' from the time returned.
-        return date.toLocaleTimeString().replace(/:\d\d /, ' ');
+        return date.toLocaleTimeString([], {
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true
+        });
       } else if (date.getFullYear() === new Date().getFullYear()) {
         return $filter('date')(date, 'MMM d');
       } else {
@@ -1086,7 +1093,7 @@ oppia.factory('currentLocationService', ['$window', function($window) {
   };
 }]);
 
-// Service for assembling extension tags (for gadgets and interactions).
+// Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
   '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
     return {

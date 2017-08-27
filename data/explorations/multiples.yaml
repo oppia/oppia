@@ -6,15 +6,13 @@ language_code: en
 objective: solve Problem 1 on the Project Euler site
 param_changes: []
 param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   After First Question:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Yes, 23 is correct. There are four numbers below 10 that are multiples
+      audio_translations: {}
+      html: Yes, 23 is correct. There are four numbers below 10 that are multiples
         of 3 or 5. These numbers are 3, 5, 6, and 9, and if we add all of them, we
         get 23. Well done!
     interaction:
@@ -27,13 +25,15 @@ states:
         dest: Second Question
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -41,17 +41,20 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   First Question:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<div><b>Question:</b>\_What is the sum of the multiples of 3 or 5 that\
+      audio_translations: {}
+      html: "<div><b>Question:</b>\_What is the sum of the multiples of 3 or 5 that\
         \ are less than 10?<br></div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: After First Question
           feedback: []
           param_changes: []
@@ -59,7 +62,8 @@ states:
         - inputs:
             x: 23.0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: First Question
           feedback:
           - That seems slightly off. Please check your addition.
@@ -71,7 +75,8 @@ states:
             a: 22.0
             b: 24.0
           rule_type: IsInclusivelyBetween
-      - outcome:
+      - correct: false
+        outcome:
           dest: First Question
           feedback:
           - 'Yes, 8 is the sum of 3 and 5 but this is not what we want in this problem.
@@ -90,14 +95,16 @@ states:
         feedback:
         - OK. To check our work, let's have a quick look at what we're adding up!
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Intro:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<div>The aim of this exercise is to explain how to solve Problem #1\
-        \ on Project Euler (<oppia-noninteractive-link url-with-value=\"&amp;quot;http://projecteuler.net/problems&amp;quot;\"\
+      audio_translations: {}
+      html: "<div>The aim of this exercise is to explain how to solve Problem #1 on\
+        \ Project Euler (<oppia-noninteractive-link url-with-value=\"&amp;quot;http://projecteuler.net/problems&amp;quot;\"\
         ></oppia-noninteractive-link>). Here is the problem:</div><div><br></div><div><i>\_\
         \ \_ \_Find the sum of all multiples of 3 or 5 below 1000.</i></div><div><br></div><div>We\
         \ can tackle this directly, or we could also try to check that we understand\
@@ -105,7 +112,8 @@ states:
         \ would you prefer?</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question
           feedback: []
           param_changes: []
@@ -123,16 +131,19 @@ states:
         dest: First Question
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Numbers for first question:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<b>Question:\_</b>List all the multiples of 3 or 5 below 10."
+      audio_translations: {}
+      html: "<b>Question:\_</b>List all the multiples of 3 or 5 below 10."
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numbers for first question
           feedback:
           - Hmm. The question asks for the numbers that are below 10. But 10 is not
@@ -144,7 +155,8 @@ states:
             x:
             - '10'
           rule_type: HasElementsIn
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numbers for first question
           feedback:
           - It does differ by country, but in this problem we use the traditional
@@ -158,7 +170,8 @@ states:
             x:
             - '0'
           rule_type: HasElementsIn
-      - outcome:
+      - correct: false
+        outcome:
           dest: First Question
           feedback:
           - That's right! Now that you know what the numbers are, let's return to
@@ -172,7 +185,8 @@ states:
             - '6'
             - '9'
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numbers for first question
           feedback:
           - I think you missed a multiple of 5. Remember that 1 times 5 is 5.
@@ -182,7 +196,8 @@ states:
             x:
             - '5'
           rule_type: OmitsElementsIn
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numbers for first question
           feedback:
           - I think you've missed some multiples of 3? Have a check and make sure
@@ -195,7 +210,8 @@ states:
             - '6'
             - '9'
           rule_type: OmitsElementsIn
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numbers for first question
           feedback:
           - It looks like your list contains numbers that are not multiples of 3 or
@@ -221,20 +237,23 @@ states:
         - Remember, the question asked only for numbers less than 10. (Also, the 'multiples'
           here should be positive integers.)
         param_changes: []
-      fallbacks: []
+      hints: []
       id: SetInput
+      solution: null
     param_changes: []
   Second Question:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "OK, let's try the actual Project Euler problem.<div><br></div><div><b>Question:</b>\_\
+      audio_translations: {}
+      html: "OK, let's try the actual Project Euler problem.<div><br></div><div><b>Question:</b>\_\
         What is the sum of all the multiples of 3 or 5 below 1000?</div><div><br></div><div>1000\
         \ is a big number. Would you prefer to give an answer directly, or would you\
         \ instead like to write a small program allowing the computer to do the computational\
         \ work for you?</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Straight Answer
           feedback: []
           param_changes: []
@@ -252,13 +271,15 @@ states:
         dest: Second Question Coding
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Second Question Coding:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Let's write a small program in Python that prints out the answer to the
+      audio_translations: {}
+      html: Let's write a small program in Python that prints out the answer to the
         question.<div><br></div><div>Here are some useful constructs that you might
         like to know. They are all based on the number 7, but feel free to substitute
         7 with any other number of your choice:</div><div><br><div><ul><li>range(7)
@@ -267,7 +288,8 @@ states:
         print the value of a variable x by typing 'print x'.</li></ul></div></div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Coding
           feedback:
           - <p>Oops, it looks like the code has an error! Have a look at the error
@@ -276,7 +298,8 @@ states:
         rule_specs:
         - inputs: {}
           rule_type: ResultsInError
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Sample Answer
           feedback:
           - That is correct! Well done.
@@ -285,7 +308,8 @@ states:
         - inputs:
             x: '233168'
           rule_type: OutputEquals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Coding
           feedback:
           - Careful with your definition of range() (or similar). You don't want to
@@ -296,7 +320,8 @@ states:
         - inputs:
             x: '234168'
           rule_type: OutputEquals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Coding
           feedback:
           - "It looks like you've counted some numbers twice. Notice that 15 is a\
@@ -311,7 +336,8 @@ states:
         - inputs:
             x: '266333'
           rule_type: OutputEquals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Coding
           feedback:
           - Yep, that's the correct answer for the case when we were looking at numbers
@@ -322,7 +348,8 @@ states:
         - inputs:
             x: '23'
           rule_type: OutputEquals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Coding
           feedback:
           - "That's quite small. I think you might only be counting numbers that are\
@@ -333,7 +360,8 @@ states:
         - inputs:
             x: '33165'
           rule_type: OutputEquals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Coding
           feedback:
           - Ooh, that's really big. I think you might actually just be adding every
@@ -344,7 +372,8 @@ states:
         - inputs:
             x: '499500'
           rule_type: OutputEquals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Coding
           feedback:
           - Sorry, it doesn't look like your program prints any output. Could you
@@ -394,13 +423,15 @@ states:
           replacing the number 1000 in your program with 10, and seeing if that gives
           you 23, as before?
         param_changes: []
-      fallbacks: []
+      hints: []
       id: CodeRepl
+      solution: null
     param_changes: []
   Second Question Sample Answer:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "In case you're interested, here is a sample answer:<div><br></div><div>\_\
+      audio_translations: {}
+      html: "In case you're interested, here is a sample answer:<div><br></div><div>\_\
         \ \_ sum = 0</div><div>\_ \_ for num in range(1000):</div><div>\_ \_ \_ \_\
         \ if num % 3 == 0 or num % 5 == 0:</div><div>\_ \_ \_ \_ \_ \_ sum += num<br></div><div><br></div><div>\_\
         \ \_ print sum</div><div><br></div><div><br></div><div>This code loops through\
@@ -418,16 +449,19 @@ states:
         dest: END
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   Second Question Straight Answer:
+    classifier_model_id: null
     content:
-    - type: text
-      value: All right, go for it! What is the answer?
+      audio_translations: {}
+      html: All right, go for it! What is the answer?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Why
           feedback: []
           param_changes: []
@@ -435,7 +469,8 @@ states:
         - inputs:
             x: 233168.0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Straight Answer
           feedback:
           - You probably figured that, since the answer for 10 is 23, the answer for
@@ -453,7 +488,8 @@ states:
         - inputs:
             x: 2300.0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Second Question Straight Answer
           feedback:
           - Um... that does not make sense, does it? The answer for numbers less than
@@ -473,13 +509,15 @@ states:
           numbers together, so sometimes it might be easier to let the computer do
           it instead.<br>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Second Question Why:
+    classifier_model_id: null
     content:
-    - type: text
-      value: That is correct!<div><br></div><div>Can you explain how you got to this
+      audio_translations: {}
+      html: That is correct!<div><br></div><div>Can you explain how you got to this
         answer?</div>
     interaction:
       answer_groups: []
@@ -493,9 +531,10 @@ states:
         dest: END
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Project Euler Problem 1

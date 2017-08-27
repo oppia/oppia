@@ -22,6 +22,7 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -85,8 +86,9 @@ class ExpCopiesMRJobManager(
                 exp_id, 'Copy', 'Copies', stringified_exp)
             exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)
+            system_user = user_services.get_system_user()
             rights_manager.publish_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id)
+                system_user, exp_id)
 
 
 # Job to delete all copied explorations.

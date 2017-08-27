@@ -28,6 +28,10 @@ class ImageClickInput(base.BaseInteraction):
     instructions = 'Click on the image'
     narrow_instructions = 'View image'
     needs_summary = False
+    # It is required to show which region is being clicked on while specifying
+    # a solution. Once this issue is fixed, ImageClickInput interaction can be
+    # supported by the solution feature.
+    can_have_solution = False
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',

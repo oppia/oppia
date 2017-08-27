@@ -65,11 +65,6 @@
   </div>
 </div>
 
-<oppia-gadget-panel ng-if="activeCard" current-state-name="activeCard.stateName"
-                    panel-contents="getExplorationGadgetPanelsContents().bottom"
-                    class="conversation-skin-bottom-gadget-panel">
-</oppia-gadget-panel>
-
 <div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
      class="conversation-skin-final-summary">
   <div ng-if="isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
@@ -174,23 +169,11 @@ otherwise they will interfere with the iframed conversation skin directive.
     width: 36px;
     z-index: 1;
   }
-  .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar { 
+  .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
     height: 100px;
     left: -87px;
     top: -20px;
     width: 100px;
-  }
-
-  .conversation-skin-bottom-gadget-panel {
-    bottom: 4px;
-    left: 0;
-    margin: 0 auto;
-    max-height: 135px;
-    max-width: 400px;
-    min-width: 150px;
-    position: fixed;
-    right: 0;
-    width: 360px;
   }
 
   .conversation-skin-cards-container {

@@ -12,18 +12,17 @@ param_specs:
     obj_type: UnicodeString
   c:
     obj_type: UnicodeString
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   Code REPL:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Write a program the prints 12.<br>
+      audio_translations: {}
+      html: Write a program the prints 12.<br>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Music notes input
           feedback: []
           param_changes: []
@@ -46,13 +45,15 @@ states:
         feedback:
         - Wrong.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: CodeRepl
+      solution: null
     param_changes: []
   Continue:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Click continue.<br><div><br></div><div><b>Parameters</b></div><div>{{a}}\
+      audio_translations: {}
+      html: "Click continue.<br><div><br></div><div><b>Parameters</b></div><div>{{a}}\
         \ should be 1.</div><div><div>{{c}} should be 2.</div></div><div><span>{{b}}\
         \ should be 0.5.</span><br></div><div>{{a*b}} should be 0.5.</div><div><span>{{-a*b}}\
         \ should be -0.5.</span><br></div><div><span>{{a \_ * b \_}} should be 0.5.</span></div><div>{{abs(-a*b)}}\
@@ -75,8 +76,9 @@ states:
         dest: Multiple choice input
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes:
     - customization_args:
         parse_with_jinja: false
@@ -99,9 +101,10 @@ states:
       generator_id: Copier
       name: b
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -109,18 +112,21 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Multiple choice input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Choose option B.<br><div><br></div><div><b>Parameters</b></div><div><div>{{a}}
+      audio_translations: {}
+      html: Choose option B.<br><div><br></div><div><b>Parameters</b></div><div><div>{{a}}
         should be 1.</div><div><span>{{b}} should be 3.</span><br></div><div><div>{{c}}
         should be 2.</div></div><div><span>{{a*b}} should be 3.</span></div></div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Text input
           feedback: []
           param_changes: []
@@ -134,14 +140,15 @@ states:
           value:
           - <oppia-noninteractive-image filepath-with-value="&amp;quot;A.png&amp;quot;"></oppia-noninteractive-image><br>
           - Option B<br>
-          - <span class=""></span><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math><br>
+          - <span></span><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math><br>
       default_outcome:
         dest: Multiple choice input
         feedback:
         - Wrong.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -149,12 +156,14 @@ states:
       generator_id: Copier
       name: b
   Music notes input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Enter two E4 notes (bottom line).<br>
+      audio_translations: {}
+      html: Enter two E4 notes (bottom line).<br>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: World map
           feedback: []
           param_changes: []
@@ -189,18 +198,21 @@ states:
         feedback:
         - Wrong.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Network Graph:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Do the following step by step:<br><br>1. Delete Node labelled B<span></span><div>2.
+      audio_translations: {}
+      html: Do the following step by step:<br><br>1. Delete Node labelled B<span></span><div>2.
         Add Node labelled Z</div><div>3. Add Edge of weight 150 connecting A to Z</div><div>4.
         Delete Edge between A and F</div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Code REPL
           feedback:
           - Correct
@@ -253,29 +265,32 @@ states:
             isWeighted: true
             vertices:
             - label: A
-              x: 212
-              y: 45
+              x: 212.0
+              y: 45.0
             - label: B
-              x: 379
-              y: 44
+              x: 379.0
+              y: 44.0
             - label: F
-              x: 215
+              x: 215.0
               y: 155.5
       default_outcome:
         dest: Network Graph
         feedback:
         - Incorrect
         param_changes: []
-      fallbacks: []
+      hints: []
       id: GraphInput
+      solution: null
     param_changes: []
   Numeric input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Enter a number larger than 6.<br>
+      audio_translations: {}
+      html: Enter a number larger than 6.<br>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Set input
           feedback: []
           param_changes: []
@@ -290,16 +305,19 @@ states:
         feedback:
         - Wrong.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Set input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Enter the set {abc, xyz}<br>
+      audio_translations: {}
+      html: Enter the set {abc, xyz}<br>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Network Graph
           feedback: []
           param_changes: []
@@ -316,16 +334,19 @@ states:
         feedback:
         - Wrong.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: SetInput
+      solution: null
     param_changes: []
   Text Area Input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Please type hello.
+      audio_translations: {}
+      html: Please type hello.
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numeric input
           feedback:
           - Correct
@@ -345,16 +366,19 @@ states:
         feedback:
         - Wrong
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   Text input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Enter the string rrrrr<br>
+      audio_translations: {}
+      html: Enter the string rrrrr<br>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Text Area Input
           feedback: []
           param_changes: []
@@ -373,16 +397,19 @@ states:
         feedback:
         - Wrong.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   World map:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Click on the USA.<br>
+      audio_translations: {}
+      html: Click on the USA.<br>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback: []
           param_changes: []
@@ -396,19 +423,20 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         latitude:
-          value: 0
+          value: 0.0
         longitude:
-          value: 0
+          value: 0.0
         zoom:
-          value: 0
+          value: 0.0
       default_outcome:
         dest: World map
         feedback:
         - Wrong.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: InteractiveMap
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Test of expressions and interactions

@@ -16,7 +16,12 @@
 
 """Provides app identity services."""
 
+import feconf
+
 from google.appengine.api import app_identity
+
+
+_GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
 
 def get_application_id():
@@ -29,3 +34,17 @@ def get_application_id():
         str. The application ID.
     """
     return app_identity.get_application_id()
+
+
+def get_gcs_resource_bucket_name():
+    """Returns the application's bucket name for GCS resources, which depends
+    on the application ID.
+
+    Returns:
+        str or None. The bucket name for the application's GCS resources, in
+        production mode.
+    """
+    if feconf.DEV_MODE:
+        return None
+    else:
+        return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX

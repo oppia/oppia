@@ -438,6 +438,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_PUBLISH_PREFIX,
+        collection_editor.CollectionPublishHandler),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_UNPUBLISH_PREFIX,
+        collection_editor.CollectionUnpublishHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
@@ -464,7 +470,8 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
-
+    get_redirect_route(
+        r'/ml/nextjobhandler', classifier.NextJobHandler),
     get_redirect_route(
         r'/.well-known/acme-challenge/<challenge>',
         admin.SslChallengeHandler),

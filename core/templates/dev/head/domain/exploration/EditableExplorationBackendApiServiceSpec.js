@@ -51,7 +51,6 @@ describe('Editable exploration backend API service', function() {
           unresolved_answers: {},
           interaction: {
             customization_args: {},
-            fallbacks: [],
             answer_groups: [],
             default_outcome: {
               param_changes: [],

@@ -41,12 +41,7 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-reload-all-explorations-button')).first().click();
     general.acceptAlert();
     browser.waitForAngular();
-    admin.editConfigProperty(
-      'Names of users allowed to use the collection editor',
-      'List', function(listEditor) {
-        listEditor.addItem('Unicode').setValue(USERNAME);
-      }
-    );
+    admin.updateRole(USERNAME, 'collection editor');
     browser.get(general.SERVER_URL_PREFIX);
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();
