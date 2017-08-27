@@ -254,14 +254,6 @@ describe('URL Interpolation Service', function() {
       GLOBALS.ASSET_DIR_PREFIX + '/assets/images/hash_test.' +
       hashes['/images/hash_test.png'] + '.png');
 
-    expect(uis.getGadgetImgUrl('ScoreBar')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/extensions/gadgets/ScoreBar' +
-        '/static/images/ScoreBar.png');
-    expect(uis.getGadgetImgUrl('testType')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/extensions/gadgets/testType' +
-        '/static/images/testType.' +
-        hashes['/gadgets/testType/static/images/testType.png'] + '.png');
-
     expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/LogicProof' +
       '/static/LogicProof.png');
@@ -302,13 +294,6 @@ describe('URL Interpolation Service', function() {
     expect(uis.getStaticImageUrl.bind(null, '')).toThrow(
       new Error(
         'Empty path passed in method.'));
-
-    expect(uis.getGadgetImgUrl.bind(null, null)).toThrow(
-      new Error(
-        'Empty gadgetType passed in getGadgetImgUrl.'));
-    expect(uis.getGadgetImgUrl.bind(null, '')).toThrow(
-      new Error(
-        'Empty gadgetType passed in getGadgetImgUrl.'));
 
     expect(uis.getInteractionThumbnailImageUrl.bind(null, null)).toThrow(
       new Error(

@@ -546,7 +546,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             category='Architecture', language_code='en')
 
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.owner_id, title='Welcome to Gadgets',
+            self.EXP_ID_1, self.owner_id, title='Welcome',
             category='Architecture', language_code='fi')
 
         self.save_new_valid_exploration(

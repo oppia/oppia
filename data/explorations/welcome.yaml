@@ -6,15 +6,13 @@ language_code: en
 objective: become familiar with Oppia's capabilities
 param_changes: []
 param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -22,16 +20,19 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Estimate 100:
+    classifier_model_id: null
     content:
-    - type: text
-      value: What is 10 times 10?
+      audio_translations: {}
+      html: What is 10 times 10?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numeric input
           feedback:
           - Yes! So 11 times 11 must be bigger. Let's try again.
@@ -48,20 +49,23 @@ states:
         - No; try again. Remember, multiplication by ten can be done by just adding
           a zero at the end.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Finding Helsinki:
+    classifier_model_id: null
     content:
-    - type: text
-      value: You might want to build something more complicated than that, though.
+      audio_translations: {}
+      html: You might want to build something more complicated than that, though.
         The good news is that you can integrate your own interactive questions into
         Oppia!<div><br>Where would people say the word 'Oppia'? Well, in Finland,
         and probably in its capital, Helsinki. Can you find Helsinki on a map of the
         world?</div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Things you can do
           feedback:
           - Hooray, you found it!
@@ -73,7 +77,8 @@ states:
             - 60.1708
             - 24.9375
           rule_type: Within
-      - outcome:
+      - correct: false
+        outcome:
           dest: Finding Helsinki
           feedback:
           - Close, but not quite. Helsinki is on the south coast of Finland; try looking
@@ -95,24 +100,27 @@ states:
         longitude:
           value: 24.9375
         zoom:
-          value: 2
+          value: 2.0
       default_outcome:
         dest: Finding Helsinki
         feedback:
         - That is rather far away! Try zooming into Finland.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: InteractiveMap
+      solution: null
     param_changes: []
   Numeric input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<div>Let\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x=11&amp;quot;\"\
+      audio_translations: {}
+      html: "<div>Let\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x=11&amp;quot;\"\
         ></oppia-noninteractive-math>. What is the value of\_<oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;x^2&amp;quot;\"></oppia-noninteractive-math>?</div><div><br></div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Finding Helsinki
           feedback:
           - 'Yes, that''s correct: 11 times 11 is 121.'
@@ -121,7 +129,8 @@ states:
         - inputs:
             x: 121.0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Estimate 100
           feedback:
           - Nope. Let's make a quick estimate.
@@ -130,7 +139,8 @@ states:
         - inputs:
             x: 121.0
           rule_type: IsLessThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numeric input
           feedback:
           - You are actually very close. Think about the last digit of the answer;
@@ -142,7 +152,8 @@ states:
             tol: 9.0
             x: 121.0
           rule_type: IsWithinTolerance
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numeric input
           feedback:
           - That's too high! Try guessing lower.
@@ -151,7 +162,8 @@ states:
         - inputs:
             x: 121.0
           rule_type: IsGreaterThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numeric input
           feedback:
           - That's not large enough. Try guessing higher?
@@ -168,18 +180,20 @@ states:
         - If you got here, something's gone a bit wrong with this exploration. Sorry
           about that. If you're wondering, the answer is 121.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Things you can do:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>That's a very quick sample of Oppia. For more sample explorations,
+      audio_translations: {}
+      html: <p>That's a very quick sample of Oppia. For more sample explorations,
         check out the Library. You can also create new explorations, like this one,
         by clicking on the "Create" button in the top right of the page.</p><br><div>We
         hope you enjoy using Oppia. If you have feedback, please let us know at our
-        <oppia-noninteractive-link open_link_in_same_window-with-value="false" text-with-value="&amp;quot;discussion
-        forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-link>!</div><p></p>
+        <oppia-noninteractive-link text-with-value="&amp;quot;discussion forum&amp;quot;"
+        url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-link>!</div><p></p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -190,20 +204,23 @@ states:
         dest: END
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   Welcome!:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Hi, welcome to Oppia! <oppia-noninteractive-link open_link_in_same_window-with-value="false"
-        text-with-value="&amp;quot;Oppia&amp;quot;" url-with-value="&amp;quot;https://oppia.github.io&amp;quot;"></oppia-noninteractive-link>
+      audio_translations: {}
+      html: <p>Hi, welcome to Oppia! <oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;"
+        url-with-value="&amp;quot;https://oppia.github.io&amp;quot;"></oppia-noninteractive-link>
         is a tool that helps you create interactive learning activities that can be
         continually improved over time.<br><br>Incidentally, do you know where the
         name 'Oppia' comes from?<br></p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - Yes!
@@ -212,7 +229,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Welcome!
           feedback:
           - Actually, I don't know of any such characters, so I must confess to making
@@ -235,13 +253,15 @@ states:
         - Hm, it certainly looks like it! But it's actually a word from a different
           language.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   What language:
+    classifier_model_id: null
     content:
-    - type: text
-      value: In fact, the word Oppia means 'learn'. Can you guess which language it
+      audio_translations: {}
+      html: In fact, the word Oppia means 'learn'. Can you guess which language it
         comes from?<br><br><oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:&amp;quot;Here
         are some hints. The first hint narrows down the continent, the second tells
         you the geographical region, and the last gives away the answer.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hints&amp;quot;},{&amp;quot;content&amp;quot;:&amp;quot;This
@@ -252,7 +272,8 @@ states:
         3&amp;quot;}]"></oppia-noninteractive-tabs><br>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - That's a pretty good guess. Several Greek words end with 'ia', such as
@@ -263,7 +284,8 @@ states:
         - inputs:
             x: greek
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - There is indeed an ancient Roman law named Lex Oppia, which was instituted
@@ -277,7 +299,8 @@ states:
         - inputs:
             x: roman
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - There is indeed an ancient Roman law named Lex Oppia, which was instituted
@@ -291,7 +314,8 @@ states:
         - inputs:
             x: latin
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - That's not it, alas. But you're very close! Oppia is indeed a Nordic word,
@@ -301,7 +325,8 @@ states:
         - inputs:
             x: Swedish
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - 'Oops, I was unclear, sorry. I meant: type ''translate oppia'' into a
@@ -311,7 +336,8 @@ states:
         - inputs:
             x: translate oppia
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - Not quite; that's actually the opposite of 'start'. Check your spelling!
@@ -320,7 +346,8 @@ states:
         - inputs:
             x: finish
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numeric input
           feedback:
           - 'Yes! Oppia is the Finnish word for learn. As you can see, you''re not
@@ -333,7 +360,8 @@ states:
         - inputs:
             x: finnish
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - I think your spelling isn't quite right; you might want to check it.
@@ -342,7 +370,8 @@ states:
         - inputs:
             x: finnish
           rule_type: FuzzyEquals
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - Great, glad to hear that. Which language is it?
@@ -351,7 +380,8 @@ states:
         - inputs:
             x: 'yes'
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - Nein! Ahem... no, it's not German. But it's a European language. From
@@ -361,7 +391,8 @@ states:
         - inputs:
             x: German
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - 'Mais non! Well, no, it''s not French. But it''s pretty close. Here, I''ll
@@ -372,7 +403,8 @@ states:
         - inputs:
             x: French
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Numeric input
           feedback:
           - 'Yes! Suomi is Finnish for Finnish and Oppia is the Finnish word for learn.
@@ -385,7 +417,8 @@ states:
         - inputs:
             x: suomi
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - Finland is a country. But what language do they speak there?<br>
@@ -396,7 +429,8 @@ states:
         - inputs:
             x: Finland
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - You're close! Try heading east...<br>
@@ -406,7 +440,8 @@ states:
         - inputs:
             x: Norway
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: What language
           feedback:
           - <span><span><span>That's not it, alas. But you're very close! Oppia is
@@ -433,9 +468,10 @@ states:
         - Sorry, nope, we didn't get it from {{answer}}. Here's a hint, though. It's
           a European language you're looking for.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Welcome to Oppia!

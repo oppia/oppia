@@ -72,8 +72,6 @@ var GLOBALS = {
       narrow_instructions: null
     }
   },
-  GADGET_SPECS: {},
-  PANEL_SPECS: {},
   SUPPORTED_SITE_LANGUAGES: [{
     id: 'id',
     text: 'Bahasa Indonesia'
@@ -96,7 +94,6 @@ var hashes = {
   '/assets_test/hash_test.json': '987654321',
   '/pages_test/hash_test.html': 'abcd12345',
   '/images/hash_test.png': '98765fghij',
-  '/gadgets/testType/static/images/testType.png': 'lmnopqrst',
   '/interactions/interTest/static/interTest.png' : '123654789'
 };
 
