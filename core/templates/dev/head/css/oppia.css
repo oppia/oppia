@@ -2864,6 +2864,10 @@ div#ng-curtain {
   color: #fff;
 }
 
+.oppia-navbar-nav > li > a {
+  padding: 10px 5px;
+}
+
 .oppia-navbar-nav > li > a:hover,
 .oppia-navbar-nav > li > a:focus,
 .oppia-navbar-nav .open > a,
@@ -2893,6 +2897,10 @@ div#ng-curtain {
 .oppia-navbar-profile-picture-container {
   margin-left: 10px;
   text-align: right;
+}
+.oppia-navbar-profile-picture-container .caret {
+  margin: 4px;
+  margin-left: 10px;
 }
 .oppia-navbar-profile-picture {
   height: 32px;
