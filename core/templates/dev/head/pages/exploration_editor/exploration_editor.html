@@ -11,7 +11,6 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.ALLOWED_GADGETS = JSON.parse('{{ALLOWED_GADGETS|js_string}}');
     GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
       '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
@@ -19,13 +18,11 @@
       '{{DEFAULT_OBJECT_VALUES|js_string}}');
     GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
       '{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
-    GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse(
       '{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
-    GLOBALS.PANEL_SPECS = JSON.parse('{{PANEL_SPECS|js_string}}');
     GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
       '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
@@ -48,7 +45,6 @@
     }
   </style>
 
-  {{dependencies_html}}
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
@@ -184,8 +180,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/HtmlSelectDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetPanelDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkTextDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 
@@ -222,14 +216,12 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationTitleEditorDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParamChangesEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParameterMetadataService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ValueGeneratorEditorDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/ExplorationGraph.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/GadgetEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SidebarStateName.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateContentEditorDirective.js"></script>
@@ -306,6 +298,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioTranslationManagerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioControlsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioPreloaderService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
@@ -316,5 +309,5 @@
 
   {{ interaction_templates }}
   {{ visualizations_html }}
-  {{ gadget_templates }}
+  {{ dependencies_html }}
 {% endblock footer_js %}

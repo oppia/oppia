@@ -19,32 +19,17 @@
 
 oppia.factory('explorationAdvancedFeaturesService', [function() {
   var _settings = {
-    areGadgetsEnabled: false,
     areParametersEnabled: false
   };
 
   return {
-    areGadgetsEnabled: function() {
-      return _settings.areGadgetsEnabled;
-    },
     areParametersEnabled: function() {
       return _settings.areParametersEnabled;
-    },
-    enableGadgets: function() {
-      _settings.areGadgetsEnabled = true;
     },
     enableParameters: function() {
       _settings.areParametersEnabled = true;
     },
     init: function(explorationData) {
-      var skinCustomizations = explorationData.skin_customizations;
-      for (var panel in skinCustomizations.panels_contents) {
-        if (skinCustomizations.panels_contents[panel].length > 0) {
-          this.enableGadgets();
-          break;
-        }
-      }
-
       if (explorationData.param_changes.length > 0) {
         this.enableParameters();
       } else {

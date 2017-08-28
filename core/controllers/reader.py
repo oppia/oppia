@@ -31,7 +31,6 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
@@ -40,6 +39,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
+from core.domain import user_services
 import feconf
 import utils
 
@@ -75,7 +75,6 @@ def _get_exploration_player_data(
     version = exploration.version
 
     # TODO(sll): Cache these computations.
-    gadget_types = exploration.get_gadget_types()
     interaction_ids = exploration.get_interaction_ids()
     dependency_ids = (
         interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -84,15 +83,12 @@ def _get_exploration_player_data(
         dependency_registry.Registry.get_deps_html_and_angular_modules(
             dependency_ids))
 
-    gadget_templates = (
-        gadget_registry.Registry.get_gadget_html(gadget_types))
     interaction_templates = (
         rte_component_registry.Registry.get_html_for_all_components() +
         interaction_registry.Registry.get_interaction_html(
             interaction_ids))
 
     return {
-        'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
         'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
             DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
@@ -104,7 +100,6 @@ def _get_exploration_player_data(
         'exploration_version': version,
         'collection_id': collection_id,
         'collection_title': collection_title,
-        'gadget_templates': jinja2.utils.Markup(gadget_templates),
         'interaction_templates': jinja2.utils.Markup(
             interaction_templates),
         'is_private': rights_manager.is_exploration_private(
@@ -211,6 +206,12 @@ class ExplorationHandler(base.BaseHandler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+        user_settings = user_services.get_user_settings(self.user_id)
+
+        preferred_audio_language_code = None
+        if user_settings is not None:
+            preferred_audio_language_code = (
+                user_settings.preferred_audio_language_code)
 
         # Retrieve all classifiers for the exploration.
         state_classifier_mapping = {}
@@ -239,6 +240,7 @@ class ExplorationHandler(base.BaseHandler):
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
+            'preferred_audio_language_code': preferred_audio_language_code,
             'state_classifier_mapping': state_classifier_mapping
         })
         self.render_json(self.values)

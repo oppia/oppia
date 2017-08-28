@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for gadget panels.
+ * @fileoverview Backend services related to fetching the ids of the
+ * activities present in the learner dashboard.
  */
 
-oppia.directive('oppiaGadgetPanel', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        panelContents: '&',
-        currentStateName: '&'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/gadget/' +
-        'gadget_panel_directive.html')
+oppia.factory('LearnerDashboardIdsBackendApiService',[
+  '$http',function($http) {
+    var _fetchLearnerDashboardIds = function() {
+      return $http.get('/learnerdashboardidshandler/data');
     };
-  }]);
+
+    return {
+      fetchLearnerDashboardIds: _fetchLearnerDashboardIds
+    };
+  }
+]);

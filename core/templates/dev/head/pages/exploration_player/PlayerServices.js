@@ -16,7 +16,6 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 // A service that provides a number of utility functions for JS used by
@@ -25,10 +24,6 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-//
-// TODO(sll): Make this read from a local client-side copy of the exploration
-// and audit it to ensure it behaves differently for learner mode and editor
-// mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
   'alertsService', 'AnswerClassificationService', 'explorationContextService',
@@ -225,9 +220,10 @@ oppia.factory('oppiaPlayerService', [
             StatsReportingService.initSession(
               _explorationId, version, data.session_id,
               GLOBALS.collectionId);
-
             AudioTranslationManagerService.init(
-              exploration.getAllAudioLanguageCodes());
+              exploration.getAllAudioLanguageCodes(),
+              data.preferred_audio_language_code,
+              exploration.getLanguageCode());
 
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
