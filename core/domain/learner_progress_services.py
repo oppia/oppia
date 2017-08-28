@@ -972,7 +972,7 @@ def get_activity_progress(user_id):
                 no longer present.
             - completed_collections: int. The number of completed collections no
                 longer present.
-            The third return valus is the titles of the collections to which new
+            The third return value is the titles of the collections to which new
             explorations have been added.
     """
     activity_ids_in_learner_dashboard = (

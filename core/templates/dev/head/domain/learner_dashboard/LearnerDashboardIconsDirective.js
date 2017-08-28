@@ -34,14 +34,13 @@ oppia.directive('learnerDashboardIcons', [
         'LearnerDashboardActivityIdsObjectFactory',
         'LearnerPlaylistService',
         function(
-          $scope, LearnerDashboardIdsBackendApiService,
-          LearnerDashboardActivityIdsObjectFactory,
-          LearnerPlaylistService) {
+            $scope, LearnerDashboardIdsBackendApiService,
+            LearnerDashboardActivityIdsObjectFactory,
+            LearnerPlaylistService) {
           $scope.activityIsCurrentlyHoveredOver = true;
 
           $scope.$watch('activityActive', function(value) {
-            $scope.activityIsCurrentlyHoveredOver = (
-              !$scope.activityIsCurrentlyHoveredOver);
+            $scope.activityIsCurrentlyHoveredOver = $scope.activityActive;
           });
 
           LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(

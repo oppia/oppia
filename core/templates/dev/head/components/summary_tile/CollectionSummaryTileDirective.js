@@ -35,7 +35,7 @@ oppia.directive('collectionSummaryTile', [
         getThumbnailBgColor: '&thumbnailBgColor',
         isLinkedToEditorPage: '=?isLinkedToEditorPage',
         getCategory: '&category',
-        isPlaylistTile: '&playlistTile',
+        isPlaylistTile: '&isPlaylistTile',
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible')
       },
