@@ -168,30 +168,28 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
             secret, self.payload['message'])
 
     def test_next_job_handler(self):
-        json_response = self.post_json('/ml/nextjobhandler',
-                                       self.payload, expect_errors=False,
-                                       expected_status_int=200)
+        json_response = self.get_json(
+            '/ml/nextjobhandler', self.payload, expect_errors=False)
         self.assertEqual(json_response, self.expected_response)
         classifier_services.mark_training_jobs_failed([self.job_id])
-        json_response = self.post_json('/ml/nextjobhandler',
-                                       self.payload, expect_errors=False,
-                                       expected_status_int=200)
+        json_response = self.post_json(
+            '/ml/nextjobhandler', self.payload, expect_errors=False)
         self.assertEqual(json_response, {})
 
     def test_error_on_prod_mode_and_default_vm_id(self):
         # Turn off DEV_MODE.
         with self.swap(feconf, 'DEV_MODE', False):
-            self.post_json('/ml/nextjobhandler', self.payload,
-                           expect_errors=True, expected_status_int=401)
+            self.get_json(
+                '/ml/nextjobhandler', self.payload, expect_errors=True)
 
     def test_error_on_modified_message(self):
         # Altering data to result in different signatures.
         self.payload['message'] = 'different'
-        self.post_json('/ml/nextjobhandler', self.payload,
-                       expect_errors=True, expected_status_int=401)
+        self.get_json(
+            '/ml/nextjobhandler', self.payload, expect_errors=True)
 
     def test_error_on_invalid_vm_id(self):
         # Altering vm_id to result in invalid signature.
         self.payload['vm_id'] = 1
-        self.post_json('/ml/nextjobhandler', self.payload,
-                       expect_errors=True, expected_status_int=401)
+        self.get_json(
+            '/ml/nextjobhandler', self.payload, expect_errors=True)

@@ -96,9 +96,11 @@ class TrainedClassifierHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self):
         """Handles POST requests."""
-        signature = self.payload.get('signature')
-        message = self.payload.get('message')
-        vm_id = self.payload.get('vm_id')
+        payload = json.loads(self.request.body)
+        signature = payload.get('signature')
+        message = payload.get('message')
+        vm_id = payload.get('vm_id')
+
         if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
             raise self.UnauthorizedUserException
 
@@ -133,11 +135,11 @@ class NextJobHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.open_access
-    def post(self):
-        """Handles POST requests. """
-        signature = self.payload.get('signature')
-        vm_id = self.payload.get('vm_id')
-        message = self.payload.get('message')
+    def get(self):
+        """Handles GET requests. """
+        signature = self.request.get('signature')
+        vm_id = self.request.get('vm_id')
+        message = self.request.get('message')
 
         if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
             raise self.UnauthorizedUserException
