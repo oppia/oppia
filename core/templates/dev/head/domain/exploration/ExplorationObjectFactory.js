@@ -19,19 +19,15 @@
 
 oppia.factory('ExplorationObjectFactory', [
   'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StateObjectFactory',
-  'StatesObjectFactory', 'ParamChangesObjectFactory',
-  'UrlInterpolationService',
+  'StatesObjectFactory', 'ParamChangesObjectFactory', 'UrlInterpolationService',
   function(
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
-      StatesObjectFactory, ParamChangesObjectFactory,
-      UrlInterpolationService) {
+      StatesObjectFactory, ParamChangesObjectFactory, UrlInterpolationService) {
     var Exploration = function(
-        initStateName, paramChanges, paramSpecs, skinCustomizations,
-        states, title, languageCode) {
+        initStateName, paramChanges, paramSpecs, states, title, languageCode) {
       this.initStateName = initStateName;
       this.paramChanges = paramChanges;
       this.paramSpecs = paramSpecs;
-      this.skinCustomizations = skinCustomizations;
       this.states = states;
       this.title = title;
       this.languageCode = languageCode;
@@ -102,10 +98,6 @@ oppia.factory('ExplorationObjectFactory', [
           INTERACTION_DISPLAY_MODE_INLINE);
     };
 
-    Exploration.prototype.getGadgetPanelsContents = function() {
-      return this.skinCustomizations.panels_contents;
-    };
-
     Exploration.prototype.getState = function(stateName) {
       return this.states.getState(stateName);
     };
@@ -122,6 +114,39 @@ oppia.factory('ExplorationObjectFactory', [
       return this.getState(stateName).content.getHtml();
     };
 
+    Exploration.prototype.getAudioTranslations = function(stateName) {
+      return this.getState(stateName).content.getBindableAudioTranslations();
+    };
+
+    Exploration.prototype.getAudioTranslation = function(
+        stateName, languageCode) {
+      return this.getState(stateName).content.getAudioTranslation(
+        languageCode);
+    };
+
+    Exploration.prototype.getAllAudioTranslations = function(languageCode) {
+      return this.states.getAllAudioTranslations(languageCode);
+    };
+
+    Exploration.prototype.getAllAudioTranslationsFileSizeMB =
+      function(languageCode) {
+        var totalFileSizeMB = 0;
+        var allAudioTranslations =
+          this.states.getAllAudioTranslations(languageCode);
+        allAudioTranslations.map(function(audioTranslation) {
+          totalFileSizeMB += audioTranslation.getFileSizeMB();
+        });
+        return totalFileSizeMB;
+      };
+
+    Exploration.prototype.getLanguageCode = function() {
+      return this.languageCode;
+    };
+
+    Exploration.prototype.getAllAudioLanguageCodes = function() {
+      return this.states.getAllAudioLanguageCodes();
+    };
+
     // Static class methods. Note that "this" is not available in
     // static contexts.
     Exploration.createFromBackendDict = function(explorationBackendDict) {
@@ -130,7 +155,6 @@ oppia.factory('ExplorationObjectFactory', [
         ParamChangesObjectFactory.createFromBackendList(
           explorationBackendDict.param_changes),
         explorationBackendDict.param_specs,
-        explorationBackendDict.skin_customizations,
         StatesObjectFactory.createFromBackendDict(
           explorationBackendDict.states),
         explorationBackendDict.title,

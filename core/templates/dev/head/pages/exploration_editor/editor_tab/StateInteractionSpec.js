@@ -69,7 +69,7 @@ describe('State Interaction controller', function() {
         'First State': {
           content: {
             html: 'First State Content',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'TextInput',
@@ -83,7 +83,6 @@ describe('State Interaction controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -91,7 +90,7 @@ describe('State Interaction controller', function() {
         'End State': {
           content: {
             html: '',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'TextInput',
@@ -105,7 +104,6 @@ describe('State Interaction controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []

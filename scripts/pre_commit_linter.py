@@ -122,7 +122,7 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'scripts/pre_commit_linter.py', 'integrations/*',
     'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
-    '*.min.js', 'assets/scripts/*')
+    '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -159,6 +159,8 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.6.0'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
+    os.path.join('third_party', 'mutagen-1.38'),
+    os.path.join('third_party', 'gae-cloud-storage-1.9.15.0'),
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)

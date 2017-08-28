@@ -137,7 +137,7 @@ def get_collection_search_rank(collection_id):
     rights = rights_manager.get_collection_rights(collection_id)
     rank = _DEFAULT_RANK + (_STATUS_PUBLICIZED_BONUS if
                             rights.status == rights_manager
-                            .ACTIVITY_STATUS_PUBLICIZED else 0)
+                            .ACTIVITY_STATUS_PUBLIC else 0)
     return max(rank, 0)
 
 
@@ -156,7 +156,7 @@ def _exp_rights_to_search_dict(rights):
         returns an empty dict.
     """
     doc = {}
-    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
         doc['is'] = 'featured'
     return doc
 
@@ -169,7 +169,7 @@ def _collection_rights_to_search_dict(rights):
         rights: ActivityRights. Rights object for a collection.
     """
     doc = {}
-    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
         doc['is'] = 'featured'
     return doc
 

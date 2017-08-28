@@ -19,6 +19,7 @@
 import ast
 import logging
 
+from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -33,16 +34,15 @@ import utils
 _COMMIT_TYPE_REVERT = 'revert'
 
 
-class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
+class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that calculates summaries of explorations. For every
     ExplorationModel entity, create a ExpSummaryModel entity containing
     information described in ExpSummariesAggregator.
 
     The summaries store the following information:
-        title, category, objective, language_code, tags,
-        last_updated, created_on, status (private, public or
-        publicized), community_owned, owner_ids, editor_ids,
-        viewer_ids, version.
+        title, category, objective, language_code, tags, last_updated,
+        created_on, status (private, public), community_owned, owner_ids,
+        editor_ids, viewer_ids, version.
 
         Note: contributor_ids field populated by
         ExpSummariesContributorsOneOffJob.
@@ -62,7 +62,7 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
         pass
 
 
-class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
+class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that finds the user ids of the contributors
     (defined as any human who has made a 'positive' -- i.e.
     non-revert-- commit) for each exploration.
@@ -88,7 +88,8 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
         exp_summary_model.put()
 
 
-class ExplorationContributorsSummaryOneOffJob(jobs.BaseMapReduceJobManager):
+class ExplorationContributorsSummaryOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """One-off job that computes the number of commits
     done by contributors for each Exploration
     """
@@ -111,7 +112,7 @@ class ExplorationContributorsSummaryOneOffJob(jobs.BaseMapReduceJobManager):
         pass
 
 
-class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
+class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that finds first published time in milliseconds for all
     explorations.
     """
@@ -139,7 +140,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
             commit_time_string in stringified_commit_times_msecs]
         first_published_msec = min(commit_times_msecs)
         rights_manager.update_activity_first_published_msec(
-            feconf.ACTIVITY_TYPE_EXPLORATION, exp_id,
+            constants.ACTIVITY_TYPE_EXPLORATION, exp_id,
             first_published_msec)
 
 
@@ -173,7 +174,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
+class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
     versions. This job will load all existing explorations from the data store
     and immediately store them back into the data store. The loading process of
@@ -225,7 +226,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
+class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs, grouped by the
     interaction they use.
 
@@ -252,7 +253,7 @@ class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceJobManager):
+class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs that use the item
     selection interaction and that have rules that do not match the answer
     choices. These probably need to be fixed manually.
@@ -287,7 +288,7 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class ViewableExplorationsAuditJob(jobs.BaseMapReduceJobManager):
+class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that outputs a list of private explorations which are viewable."""
 
     @classmethod
@@ -307,41 +308,6 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceJobManager):
         if (exploration_rights.status == feconf.ACTIVITY_STATUS_PRIVATE
                 and exploration_rights.viewable_if_private):
             yield (item.id, item.title.encode('utf-8'))
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
-class FallbackOneOffJob(jobs.BaseMapReduceJobManager):
-    """Job that outputs a list of fallbacks."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_services.get_exploration_from_model(item)
-        exp_rights = rights_manager.get_exploration_rights(item.id)
-        if exp_rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
-            for state_name, state in exploration.states.iteritems():
-                for fallback in state.interaction.fallbacks:
-                    num_submits = (
-                        fallback.trigger.customization_args['num_submits'])
-                    feedback = (
-                        fallback.outcome.feedback[0]
-                        if len(fallback.outcome.feedback) > 0 else 'ERROR')
-                    yield (
-                        '%s: %s' % (
-                            item.id,
-                            state_name.encode('utf-8')),
-                        '%s: %s' % (
-                            num_submits['value'],
-                            feedback.encode('utf-8')))
 
     @staticmethod
     def reduce(key, values):

@@ -3,6 +3,7 @@
 
 <script type="text/ng-template" id="interaction/NumericInput">
   <div class="row numeric-input-container">
+    <!-- This ng-form is needed for submitting answer on hitting enter. -->
     <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <ng-form name="numericInputForm">
@@ -10,9 +11,10 @@
           </schema-based-editor>
         </ng-form>
 
-        <button class="btn btn-default" style="margin-top: 15px;">
+        <!-- This ng-click is needed for specifying solutions in the solution editor -->
+        <md-button class="oppia-learner-continue-button" ng-click="submitAnswer(answer)" style="margin-top: 15px;">
           Submit
-        </button>
+        </md-button>
       </div>
     </form>
   </div>

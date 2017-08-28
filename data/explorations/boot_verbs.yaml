@@ -6,15 +6,13 @@ language_code: en
 objective: master the conjugation of Spanish boot verbs
 param_changes: []
 param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -22,19 +20,22 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Sentence:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<i>This is a brief exploration about conjugations in Spanish.</i><br><br>Consider\
+      audio_translations: {}
+      html: "<i>This is a brief exploration about conjugations in Spanish.</i><br><br>Consider\
         \ the following sentence:<br><br>\_\_\_ <i>Yo __________ (jugar) al f\xFA\
         tbol con amigos los domingos.<br><br></i>What verb conjugation goes in the\
         \ blank?"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - That is correct! Great job!
@@ -43,7 +44,8 @@ states:
         - inputs:
             x: juego
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: boot verb
           feedback:
           - No, remember jugo means 'juice'. It sounds about right, but it isn't quite
@@ -63,17 +65,20 @@ states:
         dest: subject
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   So...:
+    classifier_model_id: null
     content:
-    - type: text
-      value: OK, now you can join that stem together with the ending. What answer
-        do you get?
+      audio_translations: {}
+      html: OK, now you can join that stem together with the ending. What answer do
+        you get?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback: []
           param_changes: []
@@ -92,24 +97,27 @@ states:
         feedback:
         - Try that again. Put jueg- together with -o and you get...?
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   boot verb:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Boot verbs can also be called stem-changing verbs.<br><br>\nWhat is\
-        \ it that makes it a boot verb? Well, if you use the normal way of writing\
-        \ out verb conjugations, it looks like this:<br><br>\nyo                 \
-        \         nosotros<br>\nt\xFA                          vosotros<br>\n\xE9\
-        l/ella/usted               ustedes<br>\n\n<br>\nAnd in a boot verb the stem\
-        \ changes only in the yo, t\xFA, \xE9l/ella/usted and ustedes forms. If you\
-        \ draw a line around these, it looks like a boot.<br>\n<br>\nIn the case of\
-        \ jugar, since it is a verb ending in -gar, it uses the u &gt; ue stem, so\
-        \ what does the stem become?"
+      audio_translations: {}
+      html: "Boot verbs can also be called stem-changing verbs.<br><br>\nWhat is it\
+        \ that makes it a boot verb? Well, if you use the normal way of writing out\
+        \ verb conjugations, it looks like this:<br><br>\nyo                     \
+        \     nosotros<br>\nt\xFA                          vosotros<br>\n\xE9l/ella/usted\
+        \               ustedes<br>\n\n<br>\nAnd in a boot verb the stem changes only\
+        \ in the yo, t\xFA, \xE9l/ella/usted and ustedes forms. If you draw a line\
+        \ around these, it looks like a boot.<br>\n<br>\nIn the case of jugar, since\
+        \ it is a verb ending in -gar, it uses the u &gt; ue stem, so what does the\
+        \ stem become?"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: So...
           feedback: []
           param_changes: []
@@ -117,7 +125,8 @@ states:
         - inputs:
             x: jueg
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - "That was quick! I was asking just for the stem, which is <b>jueg-</b>.\
@@ -139,17 +148,20 @@ states:
         feedback:
         - Not quite. Just change the <b>u</b> to a <b>ue</b> and you get <b>jueg-.</b>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   subject:
+    classifier_model_id: null
     content:
-    - type: text
-      value: In order to figure out how to conjugate the verb properly, we should
-        look at the subject of the sentence. Can you identify what the subject is?
+      audio_translations: {}
+      html: In order to figure out how to conjugate the verb properly, we should look
+        at the subject of the sentence. Can you identify what the subject is?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: verb endings
           feedback: []
           param_changes: []
@@ -169,16 +181,19 @@ states:
         - Remember, the subject of the sentence is the noun in the sentence that is
           doing the action. It is usually near the beginning of the sentence.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   verb endings:
+    classifier_model_id: null
     content:
-    - type: text
-      value: So what is the correct verb ending for yo?
+      audio_translations: {}
+      html: So what is the correct verb ending for yo?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: boot verb
           feedback:
           - But if you just drop the -ar and at -o, you get jugo which means juice,
@@ -188,7 +203,8 @@ states:
         - inputs:
             x: -o
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: boot verb
           feedback:
           - But if you just drop the -ar and at -o, you get jugo which means juice,
@@ -212,9 +228,10 @@ states:
           \ habl\xE1is, ustedes/ellos/ellas hablan. From this list, what do you think\
           \ the corresponding ending for 'yo' is?"
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Boot Verbs

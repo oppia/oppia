@@ -31,7 +31,9 @@ import pprint
 import StringIO
 import zipfile
 
+from constants import constants
 from core.domain import activity_services
+from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import feedback_services
@@ -59,12 +61,6 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # The maximum number of iterations allowed for populating the results of a
 # search query.
 MAX_ITERATIONS = 10
-
-# Constants used for search ranking.
-_STATUS_PUBLICIZED_BONUS = 30
-# This is done to prevent the rank hitting 0 too easily. Note that
-# negative ranks are disallowed in the Search API.
-_DEFAULT_RANK = 20
 
 
 def _migrate_states_schema(versioned_exploration_states):
@@ -167,7 +163,6 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
         exploration_model.blurb, exploration_model.author_notes,
-        exploration_model.skin_customizations,
         versioned_exploration_states['states_schema_version'],
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
@@ -683,34 +678,12 @@ def apply_change_list(exploration_id, change_list):
                         change.new_value)
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS):
-                    state.update_interaction_fallbacks(change.new_value)
-                elif (
-                        change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     state.update_interaction_hints(change.new_value)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     state.update_interaction_solution(change.new_value)
-            elif change.cmd == exp_domain.CMD_ADD_GADGET:
-                exploration.add_gadget(change.gadget_dict, change.panel)
-            elif change.cmd == exp_domain.CMD_RENAME_GADGET:
-                exploration.rename_gadget(
-                    change.old_gadget_name, change.new_gadget_name)
-            elif change.cmd == exp_domain.CMD_DELETE_GADGET:
-                exploration.delete_gadget(change.gadget_name)
-            elif change.cmd == exp_domain.CMD_EDIT_GADGET_PROPERTY:
-                gadget_instance = exploration.get_gadget_instance_by_name(
-                    change.gadget_name)
-                if (change.property_name ==
-                        exp_domain.GADGET_PROPERTY_VISIBILITY):
-                    gadget_instance.update_visible_in_states(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.GADGET_PROPERTY_CUST_ARGS):
-                    gadget_instance.update_customization_args(
-                        change.new_value)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -793,6 +766,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
 
+    old_states = get_exploration_from_model(exploration_model).states
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
@@ -800,8 +774,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.tags = exploration.tags
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
-    exploration_model.skin_customizations = (
-        exploration.skin_instance.to_dict()['skin_customizations'])
 
     exploration_model.states_schema_version = exploration.states_schema_version
     exploration_model.init_state_name = exploration.init_state_name
@@ -816,6 +788,23 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
+
+    if feconf.ENABLE_ML_CLASSIFIERS:
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        trainable_states_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        state_names_with_changed_answer_groups = trainable_states_dict[
+            'state_names_with_changed_answer_groups']
+        state_names_with_unchanged_answer_groups = trainable_states_dict[
+            'state_names_with_unchanged_answer_groups']
+        if state_names_with_changed_answer_groups:
+            classifier_services.handle_trainable_states(
+                exploration, state_names_with_changed_answer_groups)
+        if state_names_with_unchanged_answer_groups:
+            classifier_services.handle_non_retrainable_states(
+                exploration, state_names_with_unchanged_answer_groups,
+                new_to_old_state_names)
 
 
 def _create_exploration(
@@ -839,6 +828,7 @@ def _create_exploration(
     # but the creation of an exploration object will fail.
     exploration.validate()
     rights_manager.create_new_exploration_rights(exploration.id, committer_id)
+
     model = exp_models.ExplorationModel(
         id=exploration.id,
         category=exploration.category,
@@ -848,8 +838,6 @@ def _create_exploration(
         tags=exploration.tags,
         blurb=exploration.blurb,
         author_notes=exploration.author_notes,
-        skin_customizations=exploration.skin_instance.to_dict(
-            )['skin_customizations'],
         states_schema_version=exploration.states_schema_version,
         init_state_name=exploration.init_state_name,
         states={
@@ -860,6 +848,19 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
+
+    if feconf.ENABLE_ML_CLASSIFIERS:
+        # Find out all states that need a classifier to be trained.
+        state_names_to_train = []
+        for state_name in exploration.states:
+            state = exploration.states[state_name]
+            if state.can_undergo_classification():
+                state_names_to_train.append(state_name)
+
+        if state_names_to_train:
+            classifier_services.handle_trainable_states(
+                exploration, state_names_to_train)
+
     create_exploration_summary(exploration.id, committer_id)
 
 
@@ -928,7 +929,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # Remove the exploration from the featured activity references, if
     # necessary.
     activity_services.remove_featured_activity(
-        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+        constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
 
 # Operations on exploration snapshots.
@@ -979,7 +980,7 @@ def _get_last_updated_by_human_ms(exp_id):
     return last_human_update_ms
 
 
-def publish_exploration_and_update_user_profiles(committer_id, exp_id):
+def publish_exploration_and_update_user_profiles(committer, exp_id):
     """Publishes the exploration with publish_exploration() function in
     rights_manager.py, as well as updates first_contribution_msec. Sends an
     email to the subscribers of the commiter informing them that an exploration
@@ -989,13 +990,14 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
     valid prior to publication.
 
     Args:
-        committer_id: str. The id of the user who made the commit.
+        committer: UserActionsInfo. UserActionsInfo object for the user who
+            made the commit.
         exp_id: str. The id of the exploration to be published.
     """
-    rights_manager.publish_exploration(committer_id, exp_id)
+    rights_manager.publish_exploration(committer, exp_id)
     exp_title = get_exploration_by_id(exp_id).title
     email_subscription_services.inform_subscribers(
-        committer_id, exp_id, exp_title)
+        committer.user_id, exp_id, exp_title)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
     for contributor in contributor_ids:
@@ -1425,7 +1427,7 @@ def load_demo(exploration_id):
         assets_list)
 
     publish_exploration_and_update_user_profiles(
-        feconf.SYSTEM_COMMITTER_ID, exploration_id)
+        user_services.get_system_user(), exploration_id)
 
     index_explorations_given_ids([exploration_id])
 
@@ -1527,7 +1529,7 @@ def _exp_rights_to_search_dict(rights):
         returns an empty dict.
     """
     doc = {}
-    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLIC:
         doc['is'] = 'featured'
     return doc
 
@@ -1638,8 +1640,7 @@ def update_exploration_status_in_search(exp_id):
     if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([exp_id])
     else:
-        patch_exploration_search_document(
-            rights.id, _exp_rights_to_search_dict(rights))
+        patch_exploration_search_document(rights.id, {})
 
 
 def delete_documents_from_search_index(exploration_ids):
@@ -1724,11 +1725,16 @@ def _is_suggestion_handled(thread_id, exploration_id):
             feedback_models.STATUS_CHOICES_IGNORED])
 
 
-def _create_change_list_from_suggestion(suggestion):
+def _create_change_list_from_suggestion(
+        suggestion, old_content, audio_update_required):
     """Creates a change list from a suggestion object.
 
     Args:
         suggestion: Suggestion. The given Suggestion domain object.
+        old_content: SubtitledHtml. A SubtitledHtml domain object representing
+            the content of the old state.
+        audio_update_required: bool. Whether the audio for the state content
+            should be marked as needing an update.
 
     Returns:
         list(dict). A dict containing a single change that represents an edit to
@@ -1742,6 +1748,10 @@ def _create_change_list_from_suggestion(suggestion):
             new_value: list(str). List of the state content of the suggestion
                 object.
     """
+    audio_translations = old_content.audio_translations
+    if audio_update_required:
+        for _, translation in audio_translations.iteritems():
+            translation.needs_update = True
 
     return [{
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1749,7 +1759,10 @@ def _create_change_list_from_suggestion(suggestion):
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'new_value': {
             'html': suggestion.suggestion_html,
-            'audio_translations': []
+            'audio_translations': {
+                language_code: translation.to_dict()
+                for language_code, translation in audio_translations.iteritems()
+            }
         }
     }]
 
@@ -1776,7 +1789,9 @@ def _get_commit_message_for_suggestion(
         suggestion_author_username, commit_message)
 
 
-def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
+def accept_suggestion(
+        editor_id, thread_id, exploration_id, commit_message,
+        audio_update_required):
     """If the suggestion is valid, accepts it by updating the exploration.
     Raises an exception if the suggestion is not valid.
 
@@ -1786,6 +1801,8 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         exploration_id: str. The id of the exploration that the suggestion is
             for.
         commit_message: str. The commit message.
+        audio_update_required: bool. Whether the audio subtitles for the
+            content need to be updated.
 
     Raises:
         Exception: The suggestion is not valid.
@@ -1804,7 +1821,10 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         suggestion = feedback_services.get_suggestion(
             exploration_id, thread_id)
         suggestion_author_username = suggestion.get_author_name()
-        change_list = _create_change_list_from_suggestion(suggestion)
+        exploration = get_exploration_by_id(exploration_id)
+        old_content = exploration.states[suggestion.state_name].content
+        change_list = _create_change_list_from_suggestion(
+            suggestion, old_content, audio_update_required)
         update_exploration(
             editor_id, exploration_id, change_list,
             _get_commit_message_for_suggestion(

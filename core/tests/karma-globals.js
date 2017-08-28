@@ -17,9 +17,61 @@
  */
 
 var GLOBALS = {
-  INTERACTION_SPECS: {},
-  GADGET_SPECS: {},
-  PANEL_SPECS: {},
+  INTERACTION_SPECS: {
+    TextInput: {
+      is_terminal: false,
+      description: 'Allows learners to enter arbitrary text strings.',
+      display_mode: 'inline',
+      name: 'Text Input',
+      is_linear: false,
+      customization_arg_specs:  [
+        {
+          default_value: '',
+          name: 'placeholder',
+          schema: {
+            type: 'unicode'
+          },
+          description: 'Placeholder text (optional)'
+        },
+        {
+          default_value: 1,
+          name: 'rows',
+          schema: {
+            validators: [
+              {
+                id: 'is_at_least',
+                min_value: 1
+              },
+              {
+                id: 'is_at_most',
+                max_value: 200
+              }
+            ],
+            type: 'int'
+          },
+          description: 'Height (in rows)'
+        }
+      ],
+      id: 'TextInput',
+      default_outcome_heading: null,
+      instructions: null,
+      needs_summary: false,
+      rule_descriptions: {
+        StartsWith: 'starts with {{x|NormalizedString}}',
+        FuzzyMatches: 'is similar to {{training_data|SetOfNormalizedString}}',
+        FuzzyEquals:
+          'is equal to {{x|NormalizedString}}, ' +
+          'misspelled by at most one character',
+        Contains: 'contains {{x|NormalizedString}}',
+        CaseSensitiveEquals:
+          'is equal to {{x|NormalizedString}}, taking case into account',
+        Equals: 'is equal to {{x|NormalizedString}}'
+      },
+      is_interaction_trainable: true,
+      is_trainable: true,
+      narrow_instructions: null
+    }
+  },
   SUPPORTED_SITE_LANGUAGES: [{
     id: 'id',
     text: 'Bahasa Indonesia'
@@ -27,16 +79,32 @@ var GLOBALS = {
     id: 'en',
     text: 'English'
   }],
-  ASSET_DIR_PREFIX: ''
+  ASSET_DIR_PREFIX: '',
+  GCS_RESOURCE_BUCKET_NAME: null,
+  // This prefix is needed to correctly interpolate directive template URLs in
+  // Karma tests. It is referenced by UrlInterpolationService.
+  TEMPLATE_DIR_PREFIX: 'core/templates/dev/head'
 };
+
+/* hashes for UrlInterpolationService tests */
+var hashes = {
+  '/hash_test.html': 'ijklmopq',
+  '/path_test/hash_test.html': '123456789',
+  '/hash_test.min.js': 'zyx12345',
+  '/assets_test/hash_test.json': '987654321',
+  '/pages_test/hash_test.html': 'abcd12345',
+  '/images/hash_test.png': '98765fghij',
+  '/interactions/interTest/static/interTest.png' : '123654789'
+};
+
 
 /* This function overwrites the translationProvider for a dummy function
  * (customLoader). This is necessary to prevent the js test warnings about an
- * "unexpected GET request" when the translationProvider tries to load the
+ * 'unexpected GET request' when the translationProvider tries to load the
  * translation files.
  * More info in the angular-translate documentation:
  *   http://angular-translate.github.io/docs/#/guide
- * (see the "Unit Testing" section).
+ * (see the 'Unit Testing' section).
  */
 GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS = function($provide, $translateProvider) {
   $provide.factory('customLoader', function($q) {

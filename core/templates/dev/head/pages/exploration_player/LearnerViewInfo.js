@@ -19,9 +19,9 @@
 
 oppia.controller('LearnerViewInfo', [
   '$scope', '$modal', '$http', '$log', 'explorationContextService',
-  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($scope, $modal, $http, $log, explorationContextService,
-    EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+    EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var explorationId = explorationContextService.getExplorationId();
     var expInfo = null;
 
@@ -46,7 +46,8 @@ oppia.controller('LearnerViewInfo', [
     var openInformationCardModal = function() {
       $modal.open({
         animation: true,
-        templateUrl: 'modal/informationCard',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_player/information_card_modal_directive.html'),
         windowClass: 'oppia-modal-information-card',
         resolve: {
           expInfo: function() {
@@ -55,9 +56,9 @@ oppia.controller('LearnerViewInfo', [
         },
         controller: [
           '$scope', '$window', '$modalInstance', 'oppiaDatetimeFormatter',
-          'RatingComputationService', 'expInfo',
+          'RatingComputationService', 'expInfo', 'UrlInterpolationService',
           function($scope, $window, $modalInstance, oppiaDatetimeFormatter,
-                   RatingComputationService, expInfo) {
+                   RatingComputationService, expInfo, UrlInterpolationService) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
               var tagsInTooltip = [];
@@ -107,6 +108,8 @@ oppia.controller('LearnerViewInfo', [
               'background-color': expInfo.thumbnail_bg_color
             };
             $scope.infoCardBackgroundImageUrl = expInfo.thumbnail_icon_url;
+            $scope.getStaticImageUrl = (
+              UrlInterpolationService.getStaticImageUrl);
             $scope.lastUpdatedString = getLastUpdatedString(
               expInfo.last_updated_msec);
             $scope.numViews = expInfo.num_views;

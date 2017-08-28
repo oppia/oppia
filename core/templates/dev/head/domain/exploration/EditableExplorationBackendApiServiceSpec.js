@@ -46,12 +46,11 @@ describe('Editable exploration backend API service', function() {
           param_changes: [],
           content: {
             html: '',
-            audio_translations: []
+            audio_translations: {}
           },
           unresolved_answers: {},
           interaction: {
             customization_args: {},
-            fallbacks: [],
             answer_groups: [],
             default_outcome: {
               param_changes: [],

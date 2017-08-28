@@ -28,6 +28,7 @@ import datetime
 import logging
 import os
 
+from constants import constants
 from core.domain import activity_services
 from core.domain import collection_domain
 from core.domain import exp_services
@@ -53,11 +54,6 @@ SEARCH_INDEX_COLLECTIONS = 'collections'
 # search query.
 MAX_ITERATIONS = 10
 
-# TODO(bhenning): Improve the ranking calculation. Some possible suggestions
-# for a better ranking include using an average of the search ranks of each
-# exploration referenced in the collection and/or demoting collections
-# for any validation errors from explorations referenced in the collection.
-_STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
@@ -162,7 +158,14 @@ def get_collection_from_model(collection_model, run_conversion=True):
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in
             versioned_collection_contents['collection_contents']['nodes']
-        ],
+        ], {
+            skill_id: collection_domain.CollectionSkill.from_dict(
+                skill_id, skill_dict)
+            for skill_id, skill_dict in
+            versioned_collection_contents[
+                'collection_contents']['skills'].iteritems()
+        },
+        versioned_collection_contents['collection_contents']['next_skill_id'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
@@ -594,12 +597,12 @@ def apply_change_list(collection_id, change_list):
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
                 collection_node = collection.get_node(change.exploration_id)
                 if (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS): # pylint: disable=line-too-long
-                    collection_node.update_prerequisite_skills(
+                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS): # pylint: disable=line-too-long
+                    collection_node.update_prerequisite_skill_ids(
                         change.new_value)
                 elif (change.property_name ==
-                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS): # pylint: disable=line-too-long
-                    collection_node.update_acquired_skills(change.new_value)
+                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS): # pylint: disable=line-too-long
+                    collection_node.update_acquired_skill_ids(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if (change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):
@@ -624,6 +627,10 @@ def apply_change_list(collection_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
                 continue
+            elif change.cmd == collection_domain.CMD_ADD_COLLECTION_SKILL:
+                collection.add_skill(change.name)
+            elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_SKILL:
+                collection.delete_skill(change.skill_id)
         return collection
 
     except Exception as e:
@@ -728,7 +735,12 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.collection_contents = {
         'nodes': [
             collection_node.to_dict() for collection_node in collection.nodes
-        ]
+        ],
+        'skills': {
+            skill_id: skill.to_dict()
+            for skill_id, skill in collection.skills.iteritems()
+        },
+        'next_skill_id': collection.next_skill_id
     }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
@@ -766,8 +778,13 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
             'nodes': [
                 collection_node.to_dict()
                 for collection_node in collection.nodes
-            ]
-        }
+            ],
+            'skills': {
+                skill_id: skill.to_dict()
+                for skill_id, skill in collection.skills.iteritems()
+            },
+            'next_skill_id': collection.next_skill_id
+        },
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
@@ -829,7 +846,7 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
 
     # Remove the collection from the featured activity list, if necessary.
     activity_services.remove_featured_activity(
-        feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
+        constants.ACTIVITY_TYPE_COLLECTION, collection_id)
 
 
 def get_collection_snapshots_metadata(collection_id):
@@ -853,7 +870,7 @@ def get_collection_snapshots_metadata(collection_id):
         collection_id, version_nums)
 
 
-def publish_collection_and_update_user_profiles(committer_id, collection_id):
+def publish_collection_and_update_user_profiles(committer, collection_id):
     """Publishes the collection with publish_collection() function in
     rights_manager.py, as well as updates first_contribution_msec.
 
@@ -861,10 +878,10 @@ def publish_collection_and_update_user_profiles(committer_id, collection_id):
     valid prior to publication.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         collection_id: str. ID of the collection to be published.
     """
-    rights_manager.publish_collection(committer_id, collection_id)
+    rights_manager.publish_collection(committer, collection_id)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     collection_summary = get_collection_summary_by_id(collection_id)
     contributor_ids = collection_summary.contributor_ids
@@ -896,6 +913,7 @@ def update_collection(
             'received none.')
 
     collection = apply_change_list(collection_id, change_list)
+
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
 
@@ -1134,8 +1152,8 @@ def load_demo(collection_id):
     collection = save_new_collection_from_yaml(
         feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
-    publish_collection_and_update_user_profiles(
-        feconf.SYSTEM_COMMITTER_ID, collection_id)
+    system_user = user_services.get_system_user()
+    publish_collection_and_update_user_profiles(system_user, collection_id)
 
     index_collections_given_ids([collection_id])
 
@@ -1285,8 +1303,7 @@ def update_collection_status_in_search(collection_id):
     if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([collection_id])
     else:
-        patch_collection_search_document(
-            rights.id, _collection_rights_to_search_dict(rights))
+        patch_collection_search_document(rights.id, {})
 
 
 def delete_documents_from_search_index(collection_ids):
@@ -1309,8 +1326,9 @@ def search_collections(query, limit, sort=None, cursor=None):
             of space separated values. Each value should start with a '+' or a
             '-' character indicating whether to sort in ascending or descending
             order respectively. This character should be followed by a field
-            name to sort on. When this is None, results are based on 'rank'. See
-            _get_search_rank to see how rank is determined.
+            name to sort on. When this is None, results are returned based on
+            their ranking (which is currently set to the same default value
+            for all collections).
         limit: int. the maximum number of results to return.
         cursor: str. A cursor, used to get the next page of results.
             If there are more documents that match the query than 'limit', this

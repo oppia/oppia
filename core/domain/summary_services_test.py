@@ -83,6 +83,9 @@ class ExplorationDisplayableSummariesTest(
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
+
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
         exp_services.update_exploration(
@@ -113,12 +116,12 @@ class ExplorationDisplayableSummariesTest(
         with self.assertRaisesRegexp(
             Exception, 'This exploration cannot be published'
             ):
-            rights_manager.publish_exploration(self.bob_id, self.EXP_ID_2)
+            rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
@@ -190,8 +193,7 @@ class ExplorationDisplayableSummariesTest(
             'status': 'public',
             'tags': [],
             'thumbnail_bg_color': '#a33f40',
-            'thumbnail_icon_url': self.get_static_asset_url(
-                '/images/subjects/Lightbulb.svg'),
+            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
             'title': u'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
@@ -204,7 +206,7 @@ class ExplorationDisplayableSummariesTest(
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
-                editor_user_id=self.albert_id))
+                user=self.albert))
 
         self.assertEqual(len(displayable_summaries), 2)
         self.assertEqual(displayable_summaries[0]['id'], self.EXP_ID_1)
@@ -213,13 +215,13 @@ class ExplorationDisplayableSummariesTest(
         # However, if Albert is granted editor access to Bob's exploration,
         # then Albert has access to the corresponding summary.
         rights_manager.assign_role_for_exploration(
-            self.bob_id, self.EXP_ID_5, self.albert_id,
+            self.bob, self.EXP_ID_5, self.albert_id,
             rights_manager.ROLE_EDITOR)
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
-                editor_user_id=self.albert_id))
+                user=self.albert))
 
         self.assertEqual(len(displayable_summaries), 3)
         self.assertEqual(displayable_summaries[0]['status'], 'private')
@@ -273,8 +275,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'tags': [],
             'title':  u'The Lazy Magician',
             'thumbnail_bg_color': '#d0982a',
-            'thumbnail_icon_url': self.get_static_asset_url(
-                '/images/subjects/Algorithms.svg'),
+            'thumbnail_icon_url': '/subjects/Algorithms.svg',
         }
         expected_group = {
             'categories': ['Algorithms', 'Computing', 'Programming'],
@@ -321,13 +322,14 @@ class FeaturedExplorationDisplayableSummariesTest(
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.albert_id, language_code=self.LANGUAGE_CODE_ES)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         self.set_admins([self.ADMIN_USERNAME])
 
@@ -338,7 +340,7 @@ class FeaturedExplorationDisplayableSummariesTest(
         """
         activity_services.update_featured_activity_references([
             activity_domain.ActivityReference(
-                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2)
+                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2)
         ])
 
         featured_activity_summaries = (
@@ -350,8 +352,7 @@ class FeaturedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': self.get_static_asset_url(
-                '/images/subjects/Lightbulb.svg'),
+            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': 'A category',
@@ -365,9 +366,9 @@ class FeaturedExplorationDisplayableSummariesTest(
         """Note that both EXP_ID_1 is in Spanish and EXP_ID_2 is in English."""
         activity_services.update_featured_activity_references([
             activity_domain.ActivityReference(
-                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_1),
+                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_1),
             activity_domain.ActivityReference(
-                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2)
+                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2)
         ])
 
         featured_activity_summaries = (
@@ -429,12 +430,14 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
     def test_get_learner_dict_with_deleted_exp_fails_validation(self):
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id)
+            self.COLLECTION_ID, self.owner)
 
         exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
@@ -443,7 +446,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
             summary_services.get_learner_collection_dict_by_id(
-                self.COLLECTION_ID, self.owner_id)
+                self.COLLECTION_ID, self.owner)
 
     def test_get_learner_dict_when_referencing_inaccessible_explorations(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
@@ -455,18 +458,18 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             }], 'Added another creator\'s private exploration')
 
         # A collection cannot access someone else's private exploration.
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
             summary_services.get_learner_collection_dict_by_id(
-                self.COLLECTION_ID, self.owner_id)
+                self.COLLECTION_ID, self.owner)
 
         # After the exploration is published, the dict can now be created.
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id)
+            self.COLLECTION_ID, self.owner)
 
     def test_get_learner_dict_with_private_exp_fails_validation(self):
         self.save_new_valid_collection(
@@ -475,22 +478,22 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         # Since both the collection and exploration are private, the learner
         # dict can be created.
         summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id)
+            self.COLLECTION_ID, self.owner)
 
         # A public collection referencing a private exploration is bad, however.
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Cannot reference a private exploration within a public '
             'collection, exploration ID: exploration_id'):
             summary_services.get_learner_collection_dict_by_id(
-                self.COLLECTION_ID, self.owner_id)
+                self.COLLECTION_ID, self.owner)
 
         # After the exploration is published, the learner dict can be crated
         # again.
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id)
+            self.COLLECTION_ID, self.owner)
 
     def test_get_learner_dict_with_allowed_private_exps(self):
         self.save_new_valid_collection(
@@ -502,10 +505,11 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
                 'exploration_id': self.EXP_ID_1
             }], 'Added another creator\'s private exploration')
 
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         collection_dict = summary_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id, allow_invalid_explorations=True)
+            self.COLLECTION_ID, self.owner,
+            allow_invalid_explorations=True)
 
         # The author's private exploration will be contained in the public
         # collection since invalid explorations are being allowed, but the
@@ -576,6 +580,7 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
@@ -587,15 +592,15 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.save_new_valid_exploration(self.EXP_ID_8, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_9, self.albert_id)
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_4)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_5)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_6)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_7)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_8)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_9)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_4)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_5)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_6)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_7)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_8)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_9)
 
         self.set_admins([self.ADMIN_USERNAME])
 
@@ -638,9 +643,8 @@ class TopRatedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': self.get_static_asset_url(
-                '/images/subjects/Lightbulb.svg'),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
             'id': self.EXP_ID_3,
             'category': u'A category',
             'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
@@ -677,8 +681,7 @@ class TopRatedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': self.get_static_asset_url(
-                '/images/subjects/Lightbulb.svg'),
+            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',
@@ -731,6 +734,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.albert_id,
@@ -742,9 +746,9 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             self.EXP_ID_3, self.albert_id,
             end_state_name='End')
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
 
         self.set_admins([self.ADMIN_USERNAME])
 
@@ -760,8 +764,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': self.get_static_asset_url(
-                '/images/subjects/Lightbulb.svg'),
+            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_1,
             'category': u'A category',
@@ -775,8 +778,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': self.get_static_asset_url(
-                '/images/subjects/Lightbulb.svg'),
+            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',
@@ -790,8 +792,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': self.get_static_asset_url(
-                '/images/subjects/Lightbulb.svg'),
+            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
             'category': u'A category',
@@ -837,16 +838,17 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         super(ActivityReferenceAccessCheckerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
     def test_requiring_nonexistent_activities_be_public_raises_exception(self):
         with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, 'fake')])
+                    constants.ACTIVITY_TYPE_EXPLORATION, 'fake')])
         with self.assertRaisesRegexp(Exception, 'non-existent collection'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
-                    feconf.ACTIVITY_TYPE_COLLECTION, 'fake')])
+                    constants.ACTIVITY_TYPE_COLLECTION, 'fake')])
 
     def test_requiring_private_activities_to_be_public_raises_exception(self):
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
@@ -857,26 +859,26 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'private exploration'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0)])
+                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0)])
         with self.assertRaisesRegexp(Exception, 'private collection'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
-                    feconf.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
+                    constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
 
     def test_requiring_public_activities_to_be_public_succeeds(self):
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
 
         # There are no validation errors.
         summary_services.require_activities_to_be_public([
             activity_domain.ActivityReference(
-                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
+                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
             activity_domain.ActivityReference(
-                feconf.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
+                constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
 
 
 class CollectionNodeMetadataDictsTest(
@@ -904,6 +906,9 @@ class CollectionNodeMetadataDictsTest(
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
+
         self.save_new_valid_exploration(self.EXP_ID1, self.albert_id,
                                         title='Exploration 1 Albert title',
                                         objective='An objective 1')
@@ -924,10 +929,10 @@ class CollectionNodeMetadataDictsTest(
                                         title='Exploration 5 Albert title',
                                         objective='An objective 5')
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID1)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID2)
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID3)
-        rights_manager.publish_exploration(self.bob_id, self.EXP_ID4)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID3)
+        rights_manager.publish_exploration(self.bob, self.EXP_ID4)
 
         exp_services.index_explorations_given_ids([
             self.EXP_ID1, self.EXP_ID2, self.EXP_ID3,
@@ -935,7 +940,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_get_exploration_metadata_dicts(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert_id))
+            [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID1,
@@ -954,7 +959,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_private_exps_of_another_user_are_not_returned(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID5, self.EXP_ID4], self.bob_id))
+            [self.EXP_ID5, self.EXP_ID4], self.bob))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID4,
@@ -965,7 +970,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_public_exps_of_another_user_are_returned(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
+            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID2,
@@ -986,7 +991,7 @@ class CollectionNodeMetadataDictsTest(
         exp_services.delete_exploration(self.albert_id, self.EXP_ID2)
 
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
+            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID3,
@@ -1002,7 +1007,7 @@ class CollectionNodeMetadataDictsTest(
     def test_exp_metadata_dicts_matching_query(self):
         metadata_dicts, _ = (
             summary_services.get_exp_metadata_dicts_matching_query(
-                'Exploration 1', None, self.albert_id))
+                'Exploration 1', None, self.albert))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID1,
@@ -1013,7 +1018,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_invalid_exp_ids(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID3, self.INVALID_EXP_ID], self.albert_id))
+            [self.EXP_ID3, self.INVALID_EXP_ID], self.albert))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID3,

@@ -5,18 +5,11 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-if="editabilityService.isEditable()">
           <div role="form" class="form-horizontal">
-            <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
-              <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40" ng-trim="false">
-                <span class="help-block" style="font-size: smaller">
-                  <em>Please use at most 40 characters, so that this fits in the summary card.</em>
-                  <span ng-if="explorationTitleService.displayed.length > 0">
-                    <em>Characters used: <[(explorationTitleService.displayed.length)]>/40</em>
-                  </span>
-                </span>
-              </div>
-            </div>
+            <exploration-title-editor label-text="Title"
+                                      focus-label="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
+                                      form-style="{display:'table-cell', width:'16.66666667%'}"
+                                      on-input-field-blur="saveExplorationTitle()">
+            </exploration-title-editor>
             <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed || ((explorationObjectiveService.displayed.length < 15) || (explorationObjectiveService.displayed.length > 100))}">
               <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
@@ -24,7 +17,7 @@
                        class="form-control protractor-test-exploration-objective-input"
                        ng-model="explorationObjectiveService.displayed"
                        ng-blur="saveExplorationObjective()" placeholder="Learn how to..." ng-trim="false">
-                <span class="help-block" style="font-size: smaller"> 
+                <span class="help-block" style="font-size: smaller">
                   <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
                   <span ng-if="explorationObjectiveService.displayed.length > 0">
                     <em>Characters used: <[(explorationObjectiveService.displayed.length)]>/100</em>
@@ -79,10 +72,12 @@
                 <div ng-if="hasPageLoaded">
                   <select2-dropdown
                     item="$parent.explorationTagsService.displayed"
-                    tag-mode="true" allow-multiple-choices="true"
+                    choices="$parent.explorationTagsService.displayed"
+                    allow-multiple-choices="true"
                     invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
-                    new-choice-regex="<[::TAG_REGEX]>" width="100%"
-                    placeholder="Skills, concepts, topics, ..."
+                    new-choice-regex="<[::TAG_REGEX]>"
+                    width="100%"
+                    placeholder="Skills, concepts, topics..."
                     on-selection-change="saveExplorationTags()">
                   </select2-dropdown>
                 </div>
@@ -166,48 +161,6 @@
   <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
     <h3>Advanced Features</h3>
     <div class="row">
-      <div ng-if="fallbackEditorIsEnabled" class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <div role="form" class="form-horizontal">
-            <label for="enableFallbacks" class="col-lg-2 col-md-2 col-sm-2">
-              Fallbacks
-            </label>
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              <button type="button" class="btn btn-default protractor-test-enable-fallbacks" ng-click="enableFallbacks()" ng-if="!areFallbacksEnabled()">
-                Enable
-              </button>
-              <span ng-if="areFallbacksEnabled()">
-                Enabled
-              </span>
-            </span>
-            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Special conditions you can trigger if a learner looks stuck, e.g. if they get a question wrong many times.
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <div role="form" class="form-horizontal">
-            <label for="enableGadgets" class="col-lg-2 col-md-2 col-sm-2">
-              Gadgets
-            </label>
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              <button type="button" class="btn btn-default protractor-test-enable-gadgets" ng-click="enableGadgets()" ng-if="!areGadgetsEnabled()">
-                Enable
-              </button>
-              <span ng-if="areGadgetsEnabled()">
-                Enabled
-              </span>
-            </span>
-            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Customizable components that persist throughout an exploration.
-            </span>
-          </div>
-        </div>
-      </div>
-
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div role="form" class="form-horizontal">
@@ -440,26 +393,6 @@
       <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
         <h3>Admin Controls</h3>
 
-        {% if can_publicize %}
-          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublic()">
-            <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
-              Boost search ranking
-              <span ng-if="currentUserIsAdmin">(as admin)</span>
-              <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-            </button>
-          </p>
-        {% endif %}
-
-        {% if can_unpublicize %}
-          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublicized()">
-            <button type="button" class="btn btn-default" ng-click="unpublicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
-              Remove search ranking boost
-              <span ng-if="currentUserIsAdmin">(as admin)</span>
-              <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-            </button>
-          </p>
-        {% endif %}
-
         {% if can_unpublish %}
           <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublic()">
             <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
@@ -471,7 +404,7 @@
         {% endif %}
 
         <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
-          <button type="button" class="btn btn-danger"
+          <button type="button" class="btn btn-danger protractor-test-delete-exploration-button"
                   ng-click="deleteExploration()">
             Delete Exploration
             <span ng-if="currentUserIsAdmin">(as admin)</span>
@@ -550,15 +483,11 @@
 <script type="text/ng-template" id="modals/takeModeratorAction">
   <div class="modal-header">
     <h3 ng-if="action === 'unpublish_exploration'">Unpublish exploration (as moderator)</h3>
-    <h3 ng-if="action === 'publicize_exploration'">Boost exploration ranking (as moderator)</h3>
   </div>
 
   <div class="modal-body">
     <p ng-if="action === 'unpublish_exploration'">
       You are about to unpublish this exploration.
-    </p>
-    <p ng-if="action === 'publicize_exploration'">
-      You are about to give this exploration a ranking boost in the Oppia library search results.
     </p>
 
     <div ng-if="willEmailBeSent">
@@ -579,7 +508,6 @@
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success" ng-click="reallyTakeAction()">
       <span ng-if="action === 'unpublish_exploration'">Unpublish Exploration</span>
-      <span ng-if="action === 'publicize_exploration'" class="protractor-test-feature-exploration-button">Boost Exploration Ranking</span>
     </button>
   </div>
 </script>
@@ -595,7 +523,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
+    <button class="btn btn-danger protractor-test-really-delete-exploration-button" ng-click="reallyDelete()">Delete Exploration</button>
   </div>
 </script>
 

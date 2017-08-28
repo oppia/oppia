@@ -2,6 +2,162 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+
+v2.5.3 (15 Aug 2017)
+--------------------
+Learner dashboard:
+* Learner dashboard project milestone 2.1 (#3591)
+* Introduce the learner dashboard partially. (#3654)
+* Milestone 2.3 of the learner dashboard project. (#3670)
+* The fourth milestone of the Learner Dashboard project. (#3659)
+* The sixth milestone of the learner dashboard. (#3680)
+
+Site-Wide ACL refactor (new roles/permissions system):
+* Site Wide ACL: Milestone 2.1 (#3582)
+* Removed super admin role from admin interface. (#3621)
+* SiteWide ACL Refactor: Milestone 2.2 (#3641)
+* SiteWide ACL: Milestone 2.3 (#3661)
+* SiteWide ACL Refactor: implemented test to check that all handlers have decorators. (#3679)
+* SiteWide ACL Refactor: Milestone 3.1 (#3682)
+* Fix #3698: Shift exception handling for NotLoggedInException so that it does not generate log errors. (#3714)
+* Fix #3688: refactoring ExplorationStatusHandler to remove unpublish and publicize functionality as it is not called from frontend. (#3715)
+
+Hints:
+* Fix #3595: Hint button should not show for card which do not have hints specified. (#3596)
+* Fix #3615: Hint Editor should not allow blank hints. (#3616)
+* Fix #3644: Handles empty hint in hint editor by showing a message and deleting it (#3648)
+* Move hint button to left corner for supplemental cards (#3702)
+
+Machine learning:
+* Storage, Domain classes and helper functions for ClassifierExplorationMapping (#3583)
+* Fix #3467: Introduce re-training and add_to_training_queue methods (#3650)
+
+Audio:
+* Add audio file upload handler (#3624)
+* Create shared audio frontend services (#3647)
+* Refactor AudioTranslations so that they are stored as a dict keyed by language code, rather than a list. (#3673)
+* Learner view audio translations (#3681)
+* Add editor for audio translations (#3692)
+* Audio fixes: make audio download URL safe; don't show flagging modal if all translations are flagged; use templateUrl for modals. (#3709)
+* Learner audio updates (#3705)
+
+Learner view:
+* Fix #3585: Corrected arrows in exploration progress nav (#3605)
+* Change 'style' to 'ng-attr-style' in an attempt to fix IE bug in collection viewer. (#3636)
+* Fix #3618: stop user icons in learner view from overlapping (#3642)
+* Standardize button colors and styles in the learner view (#3662)
+* Make the representation of the learner's 'Continue' answer more conversational. (#3675)
+
+Editor:
+* Adding warning about license terms of images (#3603)
+* Fix #3505: Implement crop on filepath editor (#3597)
+* Fix #3446: Text Input Validation (#3580)
+* Close customize interaction modal window if user clicks outside (#3623)
+* Minor changes to editor text (#3627)
+* Improve image uploader warning message. (#3674)
+* Refactor state content editor into a directive. Establish pattern for testing directives. (#3683)
+
+Collections:
+* Introduce Skills in collections (#3376)
+* Deprecate SkillListObjectFactory. Remove unneeded skill methods from the frontend. Use skill IDs throughout where possible. (#3676)
+
+Misc:
+* Fix translations on creator dashboard page (#3625)
+* Fix #3249: Bio in the profile page has to be limited to certain length (#3639)
+* Fix #3665: select2 placeholder width (#3667)
+* Fix #3551: Manually set cookie value during language change (#3622)
+* Fix #3686: fixed text overflow for contributors list (#3697)
+ Fix #3701: Fixed inconsistent Continue button name in exploration learner view (#3711)
+
+Infrastructure:
+* Add config property to admin page for SSL config. (#3600)
+* Fix user bios job in the case that user_bio is None (#3632)
+* Fix #2639: Updated Google chart/visualization Library loader code and use async to load the library (#3614)
+* Add backend functionality to correctly handle needs_update part of subtitled HTML. (#3620)
+* Part of #2447: Upgrade select2 library (#3626)
+* Remove erroneous clause in app.yaml. (#3643)
+* Fix #3515: Implement StoreJobResult controller, a preliminary handler for storing job results. (#3559)
+* Introduce output list formatting method to core.jobs.BaseJobManager (#3671)
+* Fix #2394: Clean up core.jobs documentation (#3519)
+* Fix #2447: Caching should be done on a per-file basis (#3454)
+
+Code health:
+* Fix #2394: Add docstring to core.domain.user_jobs_continous.py (#3569)
+* Fix part of #2394: Added docstrings in exp_domain.py (#3578)
+* Pull exceptions classes out of base handler class in base.py. (#3651)
+* Fix #2394: update docstring for core.domain.stats_services (#3586)
+
+Dev tools:
+* Fix #2508: Automatically generate dummy explorations  (#3568)
+* Fix #3655: Dummy explorations are published but not indexed in library page (#3656)
+
+
+v2.5.2 (9 Jul 2017)
+-------------------
+Fallbacks/hints:
+* Fix #3537: Handles empty feedbacks for fallback outcomes (#3538)
+* Fix #3532: Implement back-end for Hints and Solution feature (#3533)
+* Fix #3554: Migration of Fallbacks to Hints (#3555)
+* Fix #3571: Introduce first version of Hints UI for learners  (#3577)
+
+Learner Dashboard:
+* Fixed a part of the second milestone of the learner dashboard project. (#3482)
+* Fetch all entities for the learner dashboard in a single RPC call. (#3536)
+
+Permissions:
+* Milestone 1 of sitewide ACL refactor (PRs #3493, #3517, #3543)
+* Default role added to role field in user settings model. (#3587)
+
+Machine Learning:
+* Fix #3465: Updated and renamed to ClassifierDataModel (#3504)
+* Fix #3466: Add storage, domain classes and tests for TrainClassifierJobModel. (#3511)
+* Fix #3528: Add helper functions for ClassifierTrainingJobModel (#3529)
+
+Explorations and Interactions:
+* Fix a bug in the LogicProof interaction where operators were not being included in the student language, causing operators like 'A(x)' to be rejected even if they occur in the question. (#3545)
+* Remove warning sign in interaction save button; make some warnings more user-friendly. (#3525)
+* Fix #3446: Numeric input validator (#3470)
+* Fix #3295 Add backend support for draft change list id (#3560)
+* Fix #3295 Integrate draft change list id with front-end (#3565)
+
+Answers:
+* Add a function for getting some sample answers for a given state. (#3530)
+* Implement data extraction query controller and form. (#3581)
+
+Collections:
+* Fix #3438: Alternative to indicate next lesson in collection (#3523)
+* Fix a couple of UI issues in the collection editor. (#3524)
+* Add "back to collection" link to reduce potential confusion for users (#3544)
+
+UI tweaks:
+* Add two new splash page variants; update which splash pages users see (#3589)
+* Fix part of #3505: Improve image upload interface (#3552)
+* Allow user to resize images before uploading them in filepath editor (#3574)
+* Fix responsiveness of feedback button in navbar. (#3527)
+* Fix part of last tile showing in library (#3539)
+* Fix bugs related to feedback button visibility. (#3540)
+
+Utilities and infrastructure:
+* Fix #3249: Create MR Job to calculate length of User bio (#3510)
+* Allow list type schema value to be empty (#3542)
+* Fix #3502: Extract components from HTML string (#3549)
+* Fix #3521 Moved constants to improve rendering performance  (#3570)
+* Add a test to prevent HTML errors in translations, and fix existing errors. (#3579)
+* Refactor content property to include audio translations. (#3590)
+* Fix issue with files being converted to wrong type; re-harden backend validation. (#3593)
+
+Dev tools:
+* Fix #3557: make http://localhost:8181 open in default browser (#3566)
+* Remove .jscsrc (#3561)
+
+Code health:
+* Fix #2394: docstring for rights_manager domain (#3500)
+* Remove hybrid get_or_create_user() function. (#3513)
+* Fix #2254: Move embedded scripts into controllers, use ng-click (#3534)
+* Fix #2394: added docstrings to core.domain.value_generators_domain (#3564)
+* Move embedding tests to a separate file to avoid contention. (#3594)
+
+
 v2.5.1 (11 Jun 2017)
 --------------------
 Editor:

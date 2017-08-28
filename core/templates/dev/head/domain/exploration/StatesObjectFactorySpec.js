@@ -20,16 +20,17 @@ describe('States object factory', function() {
   beforeEach(module('oppia'));
 
   describe('StatesObjectFactory', function() {
-    var scope, sof, statesDict;
+    var scope, sof, statesDict, statesWithAudioDict, atof;
     beforeEach(inject(function($injector) {
       ssof = $injector.get('StatesObjectFactory');
       sof = $injector.get('StateObjectFactory');
+      atof = $injector.get('AudioTranslationObjectFactory');
 
       GLOBALS.NEW_STATE_TEMPLATE = {
         classifier_model_id: null,
         content: {
           html: '',
-          audio_translations: []
+          audio_translations: {}
         },
         interaction: {
           answer_groups: [],
@@ -47,7 +48,6 @@ describe('States object factory', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: [],
           id: 'TextInput'
         },
@@ -58,7 +58,7 @@ describe('States object factory', function() {
         'first state': {
           content: {
             html: 'content',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'RuleTest',
@@ -81,12 +81,71 @@ describe('States object factory', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
         }
       };
+
+      statesWithAudioDict = {
+        'first state': {
+          content: {
+            html: 'content',
+            audio_translations: {
+              en: {
+                filename: 'myfile1.mp3',
+                file_size_bytes: 0.5,
+                needs_update: false
+              },
+              'hi-en': {
+                filename: 'myfile3.mp3',
+                file_size_bytes: 0.8,
+                needs_update: false
+              }
+            }
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            default_outcome: {
+              dest: 'new state',
+              feedback: [],
+              param_changes: []
+            },
+            hints: [],
+            id: 'TextInput'
+          },
+          hints: [],
+          param_changes: []
+        },
+        'second state': {
+          content: {
+            html: 'more content',
+            audio_translations: {
+              'hi-en': {
+                filename: 'myfile2.mp3',
+                file_size_bytes: 0.8,
+                needs_update: false
+              }
+            }
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            default_outcome: {
+              dest: 'new state',
+              feedback: [],
+              param_changes: []
+            },
+            hints: [],
+            id: 'TextInput'
+          },
+          hints: [],
+          param_changes: []
+        }
+      }
     }));
 
     it('should create a new state given a state name', function() {
@@ -97,7 +156,7 @@ describe('States object factory', function() {
           classifier_model_id: null,
           content: {
             html: '',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             answer_groups: [],
@@ -115,12 +174,34 @@ describe('States object factory', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: [],
             id: 'TextInput'
           },
           param_changes: []
         }));
+    });
+
+    it('should correctly get all audio language codes in states', function() {
+      var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
+      expect(statesWithAudio.getAllAudioLanguageCodes())
+        .toEqual(['en', 'hi-en']);
+    });
+
+    it('should correctly get all audio translations in states', function() {
+      var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
+      expect(statesWithAudio.getAllAudioTranslations('hi-en'))
+        .toEqual([
+          atof.createFromBackendDict({
+            filename: 'myfile3.mp3',
+            file_size_bytes: 0.8,
+            needs_update: false
+          }), 
+          atof.createFromBackendDict({
+            filename: 'myfile2.mp3',
+            file_size_bytes: 0.8,
+            needs_update: false
+          })
+        ]);
     });
   });
 });

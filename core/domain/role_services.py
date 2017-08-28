@@ -29,13 +29,33 @@ import feconf
 (audit_models,) = models.Registry.import_models([models.NAMES.audit])
 
 # Actions that can be performed in the system.
-ACTION_PLAY_ANY_PRIVATE_COLLECTION = 'PLAY_ANY_PRIVATE_COLLECTION'
-ACTION_PLAY_ANY_PUBLIC_COLLECTION = 'PLAY_ANY_PUBLIC_COLLECTION'
-ACTION_PLAY_ANY_PRIVATE_EXPLORATION = 'PLAY_ANY_PRIVATE_EXPLORATION'
-ACTION_PLAY_ANY_PUBLIC_EXPLORATION = 'PLAY_ANY_PUBLIC_EXPLORATION'
+ACTION_ACCESS_CREATOR_DASHBOARD = 'ACCESS_CREATOR_DASHBOARD'
+ACTION_ACCESS_LEARNER_DASHBOARD = 'ACCESS_LEARNER_DASHBOARD'
+ACTION_ACCESS_MODERATOR_PAGE = 'ACCESS_MODERATOR_PAGE'
+ACTION_CREATE_COLLECTION = 'CREATE_COLLECTION'
+ACTION_CREATE_EXPLORATION = 'CREATE_EXPLORATION'
+ACTION_DELETE_ANY_PUBLIC_ACTIVITY = 'DELETE_ANY_PUBLIC_ACTIVITY'
+ACTION_DELETE_OWNED_PRIVATE_ACTIVITY = 'DELETE_OWNED_PRIVATE_ACTIVITY'
+ACTION_EDIT_ANY_ACTIVITY = 'EDIT_ANY_ACTIVITY'
+ACTION_EDIT_ANY_PUBLIC_ACTIVITY = 'EDIT_ANY_PUBLIC_ACTIVITY'
+ACTION_EDIT_OWNED_ACTIVITY = 'EDIT_OWNED_ACTIVITY'
+ACTION_FLAG_EXPLORATION = 'FLAG_EXPLORATION'
+ACTION_MANAGE_EMAIL_DASHBOARD = 'MANAGE_EMAIL_DASHBOARD'
+ACTION_MANAGE_PROFILE = 'MANAGE_PROFILE'
+ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY = 'MODIFY_ROLES_FOR_ANY_ACTIVITY'
+ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY = 'MODIFY_ROLES_FOR_OWNED_ACTIVITY'
+ACTION_PLAY_ANY_PRIVATE_ACTIVITY = 'PLAY_ANY_PRIVATE_ACTIVITY'
+ACTION_PLAY_ANY_PUBLIC_ACTIVITY = 'PLAY_ANY_PUBLIC_ACTIVITY'
+ACTION_PUBLISH_ANY_ACTIVITY = 'PUBLISH_ANY_ACTIVITY'
+ACTION_PUBLISH_OWNED_ACTIVITY = 'PUBLISH_OWNED_ACTIVITY'
+ACTION_RATE_ANY_PUBLIC_EXPLORATION = 'RATE_ANY_PUBLIC_EXPLORATION'
+ACTION_SEND_MODERATOR_EMAILS = 'SEND_MODERATOR_EMAILS'
+ACTION_SUBSCRIBE_TO_USERS = 'SUBSCRIBE_TO_USERS'
+ACTION_SUGGEST_CHANGES_TO_EXPLORATION = 'SUGGEST_CHANGES_TO_EXPLORATION'
+ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY = 'UNPUBLISH_ANY_PUBLIC_ACTIVITY'
 
 
-# Users can be updated to the following list of role Ids via admin interface.
+# Users can be updated to the following list of role IDs via admin interface.
 UPDATABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
@@ -44,16 +64,15 @@ UPDATABLE_ROLES = [
     feconf.ROLE_ID_MODERATOR
 ]
 
-# Users can be viewed by following list of role Ids via admin interface.
+# Users can be viewed by following list of role IDs via admin interface.
 VIEWABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
     feconf.ROLE_ID_COLLECTION_EDITOR,
     feconf.ROLE_ID_MODERATOR,
-    feconf.ROLE_ID_SUPER_ADMIN
 ]
 
-# The string corresponding to role Ids that should be visible to admin.
+# The string corresponding to role IDs that should be visible to admin.
 HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_ADMIN: 'admin',
     feconf.ROLE_ID_BANNED_USER: 'banned user',
@@ -61,33 +80,6 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_EXPLORATION_EDITOR: 'exploration editor',
     feconf.ROLE_ID_GUEST: 'guest',
     feconf.ROLE_ID_MODERATOR: 'moderator',
-    feconf.ROLE_ID_SUPER_ADMIN: 'super admin'
-}
-
-# This dict maps the roles in current authorization system to roles in new
-# authorization.
-# TODO (1995YogeshSharma): Remove this once new system takes over.
-ROLE_SYNC_DICT = {
-    'WHITELISTED_EMAIL_SENDERS': {
-        'name': 'whitelisted_email_senders',
-        'role': feconf.ROLE_ID_ADMIN
-    },
-    'ADMIN_USERNAMES': {
-        'name': 'admin_usernames',
-        'role': feconf.ROLE_ID_ADMIN
-    },
-    'COLLECTION_EDITOR_WHITELIST': {
-        'name': 'collection_editor_whitelist',
-        'role': feconf.ROLE_ID_COLLECTION_EDITOR
-    },
-    'BANNED_USERNAMES': {
-        'name': 'banned_usernames',
-        'role': feconf.ROLE_ID_BANNED_USER
-    },
-    'MODERATOR_USERNAMES': {
-        'name': 'moderator_usernames',
-        'role': feconf.ROLE_ID_MODERATOR
-    }
 }
 
 # This dict gives the priority number (an integer value to chose for looking
@@ -129,7 +121,6 @@ PARENT_ROLES = {
     feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_GUEST],
     feconf.ROLE_ID_GUEST: [],
     feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_COLLECTION_EDITOR],
-    feconf.ROLE_ID_SUPER_ADMIN: [feconf.ROLE_ID_ADMIN]
 }
 
 # This dict represents the unique actions that belong to a particular role.
@@ -144,23 +135,41 @@ PARENT_ROLES = {
 #   this dict.
 ROLE_ACTIONS = {
     feconf.ROLE_ID_ADMIN: [
+        ACTION_EDIT_ANY_ACTIVITY,
+        ACTION_MANAGE_EMAIL_DASHBOARD,
+        ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY,
+        ACTION_PUBLISH_ANY_ACTIVITY,
     ],
     feconf.ROLE_ID_BANNED_USER: [
     ],
     feconf.ROLE_ID_COLLECTION_EDITOR: [
+        ACTION_CREATE_COLLECTION,
     ],
     feconf.ROLE_ID_EXPLORATION_EDITOR: [
+        ACTION_ACCESS_CREATOR_DASHBOARD,
+        ACTION_ACCESS_LEARNER_DASHBOARD,
+        ACTION_CREATE_EXPLORATION,
+        ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
+        ACTION_EDIT_OWNED_ACTIVITY,
+        ACTION_FLAG_EXPLORATION,
+        ACTION_SUBSCRIBE_TO_USERS,
+        ACTION_MANAGE_PROFILE,
+        ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY,
+        ACTION_PUBLISH_OWNED_ACTIVITY,
+        ACTION_RATE_ANY_PUBLIC_EXPLORATION,
+        ACTION_SUGGEST_CHANGES_TO_EXPLORATION,
     ],
     feconf.ROLE_ID_GUEST: [
-        ACTION_PLAY_ANY_PUBLIC_COLLECTION,
-        ACTION_PLAY_ANY_PUBLIC_EXPLORATION,
+        ACTION_PLAY_ANY_PUBLIC_ACTIVITY,
     ],
     feconf.ROLE_ID_MODERATOR: [
-        ACTION_PLAY_ANY_PRIVATE_COLLECTION,
-        ACTION_PLAY_ANY_PRIVATE_EXPLORATION,
+        ACTION_ACCESS_MODERATOR_PAGE,
+        ACTION_DELETE_ANY_PUBLIC_ACTIVITY,
+        ACTION_EDIT_ANY_PUBLIC_ACTIVITY,
+        ACTION_PLAY_ANY_PRIVATE_ACTIVITY,
+        ACTION_SEND_MODERATOR_EMAILS,
+        ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY,
     ],
-    feconf.ROLE_ID_SUPER_ADMIN: [
-    ]
 }
 
 
@@ -201,7 +210,7 @@ def get_role_graph_data():
                         source: Role Id from which edge is going out.
                         target: Role Id to which edge is incoming.
                     }
-            nodes: dict(str:str). Mapping of role Id to its human readable
+            nodes: dict(str:str). Mapping of role ID to its human readable
                 format.
         }
     """
@@ -224,62 +233,3 @@ def log_role_query(user_id, intent, role=None, username=None):
     audit_models.RoleQueryAuditModel(
         id=model_id, user_id=user_id, intent=intent,
         role=role, username=username).put()
-
-
-def get_max_priority_role(role_list):
-    """Returns the role with maximum priority among the given list
-    of roles.
-
-    Args:
-        role_list: list(str). List of roles.
-
-    Returns:
-        str. Role with highest priority among given roles.
-    """
-    priority_num = -1
-    resultant_role = None
-    for role in role_list:
-        if PRIORITY_NUMBER_DICT[role] > priority_num:
-            resultant_role = role
-            priority_num = PRIORITY_NUMBER_DICT[role]
-    return resultant_role
-
-
-def get_role_changes(old_config_properties, new_config_properties):
-    """This function takes old and new versions of config property values
-    and returns the resultant roles for users in terms of new system.
-
-    Args:
-        old_config_properties: dict(str:list). Dict mapping config property ids
-            to their values.
-        new_config_properties: dict(str:list). Dict mapping config property ids
-            to their values.
-
-    Returns:
-        dict(str:str). Dict mapping usernames to roles in terms of new system.
-    """
-    changed_user_roles = {}
-    resultant_changed_roles = {}
-
-    for key in ROLE_SYNC_DICT:
-        if ROLE_SYNC_DICT[key]['name'] in new_config_properties:
-            new_config_values = (
-                new_config_properties[ROLE_SYNC_DICT[key]['name']])
-            old_config_values = (
-                old_config_properties[ROLE_SYNC_DICT[key]['name']])
-            for username in new_config_values:
-                if username not in changed_user_roles:
-                    changed_user_roles[username] = []
-                changed_user_roles[username].append(
-                    ROLE_SYNC_DICT[key]['role'])
-            for username in old_config_values:
-                if username not in changed_user_roles:
-                    changed_user_roles[username] = []
-                changed_user_roles[username].append(
-                    feconf.ROLE_ID_EXPLORATION_EDITOR)
-
-    for username in changed_user_roles:
-        resultant_changed_roles[username] = get_max_priority_role(
-            changed_user_roles[username])
-
-    return resultant_changed_roles

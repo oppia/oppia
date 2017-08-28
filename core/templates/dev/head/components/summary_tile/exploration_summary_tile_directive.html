@@ -1,7 +1,7 @@
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}]">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
-      <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>" alt="<[getCategory()]>">
+      <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>">
       <h3 class="activity-title protractor-test-exp-summary-tile-title">
         <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
         <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="title-section-mask"></div>
-    <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">  
+    <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
       <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
         <[getObjective() | truncateAndCapitalize: 95]>
       </div>

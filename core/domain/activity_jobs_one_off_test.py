@@ -23,7 +23,9 @@ from core.domain import exp_services
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 
 gae_search_services = models.Registry.import_search_services()
@@ -36,10 +38,11 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
     def setUp(self):
         super(OneOffReindexActivitiesJobTest, self).setUp()
 
-        # Setup explorations
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_a = user_services.UserActionsInfo(self.owner_id)
 
+        # Setup explorations
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
@@ -48,7 +51,7 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
-            rights_manager.publish_exploration(self.owner_id, exp.id)
+            rights_manager.publish_exploration(self.owner_a, exp.id)
 
         # Setup collections
         collections = [collection_domain.Collection.create_default_collection(
@@ -59,7 +62,7 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
 
         for collection in collections:
             collection_services.save_new_collection(self.owner_id, collection)
-            rights_manager.publish_collection(self.owner_id, collection.id)
+            rights_manager.publish_collection(self.owner_a, collection.id)
 
         self.process_and_flush_pending_tasks()
 
@@ -69,7 +72,8 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
                   .create_new())
         activity_jobs_one_off.IndexAllActivitiesJobManager.enqueue(job_id)
 
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         indexed_docs = []
 

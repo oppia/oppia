@@ -23,7 +23,7 @@ from core.domain import search_services
 (base_models, exp_models, collection_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.collection])
 
-class IndexAllActivitiesJobManager(jobs.BaseMapReduceJobManager):
+class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that indexes all explorations and collections and
     computes their ranks
     """

@@ -44,7 +44,7 @@ import shutil
 import subprocess
 # pylint: enable=wrong-import-order
 
-import common
+import common # pylint: disable=relative-import
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(

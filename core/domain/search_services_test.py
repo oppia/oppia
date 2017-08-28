@@ -49,6 +49,8 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
+        self.owner_a = user_services.UserActionsInfo(self.owner_id)
+
     def test_get_search_rank_from_exp_summary(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
@@ -59,7 +61,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank)
 
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner_a, self.EXP_ID)
         self.assertEqual(
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank)
@@ -117,9 +119,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             search_services.get_collection_search_rank(collection_summary.id),
             base_search_rank)
 
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        rights_manager.publicize_collection(self.user_id_admin,
-                                            self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner_a, self.COLLECTION_ID)
 
         self.assertEqual(
             search_services.get_collection_search_rank(collection_summary.id),
@@ -157,7 +157,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         all_exploration_summaries = [exp_services.get_exploration_summary_by_id(
             exp_id) for exp_id in all_exploration_ids]
         for ind in xrange(4):
-            rights_manager.publish_exploration(self.owner_id,
+            rights_manager.publish_exploration(self.owner_a,
                                                expected_exploration_ids[ind])
         with add_docs_swap:
             search_services.index_exploration_summaries(
@@ -198,7 +198,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
                                     get_collection_summary_by_id(exp_id) for
                                     exp_id in all_collection_ids]
         for ind in xrange(4):
-            rights_manager.publish_collection(self.owner_id,
+            rights_manager.publish_collection(self.owner_a,
                                               expected_collection_ids[ind])
         with add_docs_swap:
             search_services.index_collection_summaries(all_collection_summaries)

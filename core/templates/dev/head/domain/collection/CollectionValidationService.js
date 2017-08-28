@@ -20,8 +20,8 @@
  */
 
 oppia.factory('CollectionValidationService', [
-  'CollectionLinearizerService', 'SkillListObjectFactory',
-  function(CollectionLinearizerService, SkillListObjectFactory) {
+  'CollectionLinearizerService',
+  function(CollectionLinearizerService) {
     var _getStartingExplorationIds = function(collection) {
       var startingCollectionNodes = collection.getStartingCollectionNodes();
       return startingCollectionNodes.map(function(collectionNode) {
@@ -29,16 +29,16 @@ oppia.factory('CollectionValidationService', [
       });
     };
 
-    var _getOverlappingPrerequisiteAcquiredSkills = function(collectionNode) {
-      var prerequisiteSkillList = collectionNode.getPrerequisiteSkillList();
-      var acquiredSkillList = collectionNode.getAcquiredSkillList();
-      var overlappingSkillList = SkillListObjectFactory.create([]);
-      prerequisiteSkillList.getSkills().forEach(function(skill) {
-        if (acquiredSkillList.containsSkill(skill)) {
-          overlappingSkillList.addSkill(skill);
+    var _getOverlappingPrerequisiteAcquiredSkillIds = function(collectionNode) {
+      var prerequisiteSkillIds = collectionNode.getPrerequisiteSkillIds();
+      var acquiredSkillIds = collectionNode.getAcquiredSkillIds();
+      var overlappingSkillIds = [];
+      collectionNode.getPrerequisiteSkillIds().forEach(function(skillId) {
+        if (collectionNode.containsAcquiredSkillId(skillId)) {
+          overlappingSkillIds.push(skillId);
         }
       });
-      return overlappingSkillList.getSkills();
+      return overlappingSkillIds;
     };
 
     var _getUnreachableExplorationIds = function(collection) {
@@ -117,13 +117,30 @@ oppia.factory('CollectionValidationService', [
           'learner.');
       }
 
+      var collectionSkills = collection.getCollectionSkills();
+      var skillNames = [];
+      for (var skillId in collectionSkills) {
+        if (collectionSkills.hasOwnProperty(skillId)) {
+          skillNames.push(collectionSkills[skillId].getName());
+        }
+      }
+      skillNames.forEach(function(skillName, index) {
+        if (skillNames.indexOf(skillName) !== index) {
+          issues.push('Skill name \'' + skillName + '\' is not unique.');
+        }
+      });
+
       collection.getCollectionNodes().forEach(function(collectionNode) {
-        var overlappingSkills = _getOverlappingPrerequisiteAcquiredSkills(
+        var overlappingSkillIds = _getOverlappingPrerequisiteAcquiredSkillIds(
           collectionNode);
-        if (overlappingSkills.length > 0) {
+        if (overlappingSkillIds.length > 0) {
+          var overlappingSkillNames = overlappingSkillIds.map(
+            function(skillId) {
+              return collectionSkills[skillId].getName();
+            });
           issues.push('Exploration ' + collectionNode.getExplorationId() +
             ' has skills which are both required for playing it and acquired ' +
-            'after playing it: ' + overlappingSkills.join(', '));
+            'after playing it: ' + overlappingSkillNames.join(', '));
         }
       });
 

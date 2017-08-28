@@ -11,7 +11,6 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.ALLOWED_GADGETS = JSON.parse('{{ALLOWED_GADGETS|js_string}}');
     GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
       '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
@@ -19,22 +18,22 @@
       '{{DEFAULT_OBJECT_VALUES|js_string}}');
     GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
       '{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
-    GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse(
       '{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
-    GLOBALS.PANEL_SPECS = JSON.parse('{{PANEL_SPECS|js_string}}');
     GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
       '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
   </script>
 
-  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <!-- Updated previous version to current version of google charts
+  https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
+  <script type="text/javascript"  src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
-    if (window.google && window.google.load) {
-      google.load('visualization', '1', {packages: ['corechart']});
+    if (window.google && window.google.charts) {
+      google.charts.load('current', {packages: ['corechart']});
     } else {
       throw 'error: Could not load google visualization library. Are you offline?';
     }
@@ -151,6 +150,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ImageUploaderDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/AudioTranslationsEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/AudioFileUploaderDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
 
@@ -180,14 +181,11 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/HtmlSelectDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetPanelDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkTextDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/AnswerGroupEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/CodemirrorMergeviewDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/FallbackEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/ClassifierRulePanelDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeEditorDirective.js"></script>
@@ -196,6 +194,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/ResponseHeaderDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RuleEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RuleTypeSelectorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SolutionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SolutionExplanationEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/StateGraphLayoutService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/VersionDiffVisualizationDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/autoplayedVideosService.js"></script>
@@ -204,6 +204,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AudioPlayerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AssetsBackendApiService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavigationDirective.js"></script>
@@ -214,22 +216,24 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditorAdvancedFeaturesService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationTitleEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParamChangesEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParameterMetadataService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ValueGeneratorEditorDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/ExplorationGraph.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/GadgetEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SidebarStateName.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateEditor.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateFallbacks.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateContentEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateHints.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateGraphVisualizationDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateInteraction.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateParameterChanges.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateResponses.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateSolution.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionVerificationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionValidityService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateStatistics.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
@@ -248,6 +252,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/classifier/AnswerClassificationResultObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/classifier/ClassifierObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
@@ -255,22 +261,26 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StatesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/HintObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SolutionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AudioTranslationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/LanguageUtilService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/TutorCardDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SupplementalCardDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayerStateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerConstants.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StateClassifierMappingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PredictionAlgorithmRegistryService.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/InputResponsePairDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
@@ -283,8 +293,13 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SolutionButtonDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SolutionManagerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioTranslationManagerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioControlsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioPreloaderService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
@@ -295,5 +310,4 @@
 
   {{ interaction_templates }}
   {{ visualizations_html }}
-  {{ gadget_templates }}
 {% endblock footer_js %}

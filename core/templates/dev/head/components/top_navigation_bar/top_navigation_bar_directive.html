@@ -59,7 +59,7 @@
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
     <li ng-if="username" class="dropdown protractor-test-profile-dropdown">
-      <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown"
+      <a class="dropdown-toggle oppia-navbar-dropdown-toggle"
          ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
          ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
          role="menuitem"
@@ -111,6 +111,12 @@
           <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/creator_dashboard"
              class="protractor-test-dashboard-link">
             <span translate="I18N_TOPNAV_CREATOR_DASHBOARD"></span>
+          </a>
+        </li>
+        <li>
+          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/learner_dashboard"
+             class="protractor-test-dashboard-link">
+            <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
           </a>
         </li>
         <li>

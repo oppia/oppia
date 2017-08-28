@@ -21,6 +21,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -55,53 +56,17 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
         'title': 'Title 5'
     }]
 
-    def test_all_exps_publicized(self):
-        """Test exploration summary batch job if all explorations are
-        publicized.
-        """
-        self._run_batch_job_once_and_verify_output(
-            self.EXP_SPECS,
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED)
-
     def test_all_exps_public(self):
-        """Test summary batch job if all explorations are public
-        but not publicized."""
+        """Test summary batch job if all explorations are public."""
         self._run_batch_job_once_and_verify_output(
             self.EXP_SPECS,
             default_status=rights_manager.ACTIVITY_STATUS_PUBLIC)
-
-    def test_exps_some_publicized(self):
-        """Test summary batch job if some explorations are publicized."""
-
-        exp_specs = [{
-            'category': 'Category A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-            'title': 'Title 1'
-        }, {
-            'category': 'Category B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 2'
-        }, {
-            'category': 'Category C',
-            'status': rights_manager.ACTIVITY_STATUS_PRIVATE,
-            'title': 'Title 3'
-        }, {
-            'category': 'Category A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 4'
-        }, {
-            'category': 'Category C',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 5'
-        }]
-
-        self._run_batch_job_once_and_verify_output(exp_specs)
 
     def _run_batch_job_once_and_verify_output(
             self, exp_specs,
             default_title='A title',
             default_category='A category',
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED):
+            default_status=rights_manager.ACTIVITY_STATUS_PUBLIC):
         """Run batch job for creating exploration summaries once and verify its
         output. exp_specs is a list of dicts with exploration specifications.
         Allowed keys are category, status, title. If a key is not specified,
@@ -122,6 +87,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.login(self.ADMIN_EMAIL)
             admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
             self.set_admins([self.ADMIN_USERNAME])
+            admin = user_services.UserActionsInfo(admin_id)
 
             # Create and delete an exploration (to make sure job handles
             # deleted explorations correctly).
@@ -149,14 +115,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     category=spec['category'])
                 exploration = exp_services.get_exploration_by_id(exp_id)
 
-                # Publish or publicize exploration.
+                # Publish exploration.
                 if spec['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
-                    rights_manager.publish_exploration(admin_id, exp_id)
-                elif (
-                        spec['status'] ==
-                        rights_manager.ACTIVITY_STATUS_PUBLICIZED):
-                    rights_manager.publish_exploration(admin_id, exp_id)
-                    rights_manager.publicize_exploration(admin_id, exp_id)
+                    rights_manager.publish_exploration(admin, exp_id)
 
                 # Do not include user_id here, so all explorations are not
                 # editable for now (will be updated depending on user_id
@@ -255,10 +216,12 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner = user_services.UserActionsInfo(owner_id)
+        admin = user_services.UserActionsInfo(admin_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID, owner_id, end_state_name='End')
-        rights_manager.publish_exploration(owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(owner, self.EXP_ID)
         job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
@@ -273,8 +236,8 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         self.assertLess(
             exp_first_published, last_updated_time_msec)
 
-        rights_manager.unpublish_exploration(admin_id, self.EXP_ID)
-        rights_manager.publish_exploration(owner_id, self.EXP_ID)
+        rights_manager.unpublish_exploration(admin, self.EXP_ID)
+        rights_manager.publish_exploration(owner, self.EXP_ID)
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -687,82 +650,3 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
-
-
-class FallbackOneOffJobTest(test_utils.GenericTestBase):
-
-    EXP_IDS = ['exp_id0', 'exp_id1']
-    FALLBACK = [{
-        'trigger': {
-            'customization_args': {
-                'num_submits': {
-                    'value': i + 3
-                }
-            },
-            'trigger_type': 'NthResubmission'
-        },
-        'outcome': {
-            'feedback': [
-                '<p>feedback %d</p>' % i
-            ],
-            'param_changes': [],
-            'dest': 'Introduction'
-        }
-    } for i in xrange(3)]
-    STATE_NAMES = ['Introduction', 'state 1']
-
-    def setUp(self):
-        super(FallbackOneOffJobTest, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def test_fallbacks_are_listed(self):
-        """Tests that fallbacks are listed."""
-        explorations = [self.save_new_valid_exploration(
-            EXP_ID, self.owner_id, objective='The objective',
-            end_state_name='end') for EXP_ID in self.EXP_IDS]
-        for exploration in explorations:
-            init_state = exploration.states[exploration.init_state_name]
-            init_interaction = init_state.interaction
-            init_interaction.default_outcome.dest = 'state 1'
-            init_state.update_interaction_fallbacks(self.FALLBACK)
-            exploration.add_states(['state 1'])
-            new_state = exploration.states['state 1']
-            new_state.interaction.default_outcome.dest = 'end'
-            new_state.update_interaction_fallbacks(self.FALLBACK)
-            exploration.states['end'].update_interaction_id('EndExploration')
-
-            exp_services._save_exploration(self.owner_id, exploration, '', []) # pylint: disable=protected-access
-            rights_manager.publish_exploration(self.owner_id, exploration.id)
-
-        job_id = exp_jobs_one_off.FallbackOneOffJob.create_new()
-        exp_jobs_one_off.FallbackOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_values = exp_jobs_one_off.FallbackOneOffJob.get_output(job_id)
-
-        expected_values = [[
-            u'exp_id0: Introduction',
-            [u'3: <p>feedback 0</p>',
-             u'4: <p>feedback 1</p>',
-             u'5: <p>feedback 2</p>']
-        ], [
-            u'exp_id0: state 1',
-            [u'3: <p>feedback 0</p>',
-             u'4: <p>feedback 1</p>',
-             u'5: <p>feedback 2</p>']
-        ], [
-            u'exp_id1: Introduction',
-            [u'3: <p>feedback 0</p>',
-             u'4: <p>feedback 1</p>',
-             u'5: <p>feedback 2</p>']
-        ], [u'exp_id1: state 1',
-            [u'3: <p>feedback 0</p>',
-             u'4: <p>feedback 1</p>',
-             u'5: <p>feedback 2</p>']]]
-
-        actual_values.sort()
-        for index, actual_value in enumerate(actual_values):
-            self.assertEqual(actual_value.encode('ascii'),
-                             str(expected_values[index]))
