@@ -449,7 +449,7 @@ states:
       html: 'When mathematicians talk about graph theory, they usually aren''t referring
         to curve sketching!<div><br></div><div>A graph is a mathematical object that
         consists of "vertices" and "edges". Does this sound complicated? Actually,
-        it isn''t: in simple terms, graphs just dots joined by lines! The dots are
+        it isn''t: in simple terms, graphs are just dots joined by lines! The dots are
         called "vertices" and the lines are called "edges". An example of a graph
         is shown below:</div><div><br></div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;A
         simple graph.png&amp;quot;"></oppia-noninteractive-image><br></div><div><br></div><div>Despite
