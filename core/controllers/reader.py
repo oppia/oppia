@@ -200,7 +200,7 @@ class ExplorationHandler(base.BaseHandler):
 
         (exploration, exploration_rights) = (
             exp_services.get_exploration_and_exploration_rights_by_id(
-                exploration_id, version=version))
+                exploration_id))
         if exploration is None:
             raise self.PageNotFoundException
 

@@ -40,9 +40,9 @@ import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
-datastore_services = models.Registry.import_datastore_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -313,48 +313,35 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     return result
 
 
-def get_collection_and_collection_rights_by_id(collection_id, version=None):
+def get_collection_and_collection_rights_by_id(collection_id):
     """Returns a tuple for collection domain object and collection rights
         object.
 
     Args:
         collection_id: str. Id of the collection.
-        version: str. Version of the collection.
 
     Returns:
-        Tuple(collection object or None, collection rights object or None).
+        tuple(collection object or None, collection rights object or None).
     """
-    collection_memcache_key = _get_collection_memcache_key(
-        collection_id, version=version)
-    memcached_collection = memcache_services.get_multi(
-        [collection_memcache_key]).get(collection_memcache_key)
-
-    if memcached_collection is not None:
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
-        return (memcached_collection, collection_rights)
+    collection_and_rights = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [
+                ('CollectionModel', [collection_id]),
+                ('CollectionRightsModel', [collection_id])
+            ]))
+    if collection_and_rights[0][0] is not None:
+        collection = get_collection_from_model(
+            collection_and_rights[0][0])
     else:
-        collection_and_rights = (
-            datastore_services.fetch_multiple_entities_by_ids_and_models(
-                [
-                    ('CollectionModel', [collection_id]),
-                    ('CollectionRightsModel', [collection_id])
-                ]))
-        if collection_and_rights[0][0]:
-            collection = get_collection_from_model(
-                collection_and_rights[0][0])
-            memcache_services.set_multi({
-                collection_memcache_key: collection})
-        else:
-            collection = None
+        collection = None
 
-        if collection_and_rights[1][0]:
-            collection_rights = (
-                rights_manager.get_activity_rights_from_model(
-                    collection_and_rights[1][0],
-                    constants.ACTIVITY_TYPE_COLLECTION))
-        else:
-            collection_rights = None
+    if collection_and_rights[1][0] is not None:
+        collection_rights = (
+            rights_manager.get_activity_rights_from_model(
+                collection_and_rights[1][0],
+                constants.ACTIVITY_TYPE_COLLECTION))
+    else:
+        collection_rights = None
     return (collection, collection_rights)
 
 

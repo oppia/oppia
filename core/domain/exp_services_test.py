@@ -2867,12 +2867,12 @@ class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
 
         (exp, exp_rights) = (
             exp_services.get_exploration_and_exploration_rights_by_id(
-                exploration_id, version=1))
+                exploration_id))
         self.assertEqual(exp.id, exploration_id)
         self.assertEqual(exp_rights.id, exploration_id)
 
         (exp, exp_rights) = (
             exp_services.get_exploration_and_exploration_rights_by_id(
-                'fake_id', version=1))
+                'fake_id'))
         self.assertIsNone(exp)
         self.assertIsNone(exp_rights)

@@ -44,13 +44,13 @@ from core.platform import models
 import feconf
 import utils
 
+datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
-datastore_services = models.Registry.import_datastore_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -317,49 +317,35 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     return result
 
 
-def get_exploration_and_exploration_rights_by_id(exploration_id, version=None):
+def get_exploration_and_exploration_rights_by_id(exploration_id):
     """Returns a tuple for exploration domain object and exploration rights
         object.
 
     Args:
         exploration_id: str. Id of the exploration.
-        version: str. Version of the exploration.
 
     Returns:
-        Tuple(exploration object or None, exploration rights object or None).
+        tuple(exploration object or None, exploration rights object or None).
     """
-    exploration_memcache_key = _get_exploration_memcache_key(
-        exploration_id, version=version)
-    memcached_exploration = memcache_services.get_multi(
-        [exploration_memcache_key]).get(exploration_memcache_key)
-
-    if memcached_exploration is not None:
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
-        return (memcached_exploration, exploration_rights)
+    exploration_and_rights = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [
+                ('ExplorationModel', [exploration_id]),
+                ('ExplorationRightsModel', [exploration_id])
+            ]))
+    if exploration_and_rights[0][0] is not None:
+        exploration = get_exploration_from_model(
+            exploration_and_rights[0][0])
     else:
-        exploration_and_rights = (
-            datastore_services.fetch_multiple_entities_by_ids_and_models(
-                [
-                    ('ExplorationModel', [exploration_id]),
-                    ('ExplorationRightsModel', [exploration_id])
-                ]))
-        print exploration_and_rights
-        if exploration_and_rights[0][0]:
-            exploration = get_exploration_from_model(
-                exploration_and_rights[0][0])
-            memcache_services.set_multi({
-                exploration_memcache_key: exploration})
-        else:
-            exploration = None
+        exploration = None
 
-        if exploration_and_rights[1][0]:
-            exploration_rights = (
-                rights_manager.get_activity_rights_from_model(
-                    exploration_and_rights[1][0],
-                    constants.ACTIVITY_TYPE_EXPLORATION))
-        else:
-            exploration_rights = None
+    if exploration_and_rights[1][0] is not None:
+        exploration_rights = (
+            rights_manager.get_activity_rights_from_model(
+                exploration_and_rights[1][0],
+                constants.ACTIVITY_TYPE_EXPLORATION))
+    else:
+        exploration_rights = None
     return (exploration, exploration_rights)
 
 

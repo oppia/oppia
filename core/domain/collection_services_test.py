@@ -1855,12 +1855,12 @@ class GetCollectionAndCollectionRightsTest(CollectionServicesUnitTests):
 
         (collection, collection_rights) = (
             collection_services.get_collection_and_collection_rights_by_id(
-                collection_id, version=1))
+                collection_id))
         self.assertEqual(collection.id, collection_id)
         self.assertEqual(collection_rights.id, collection_id)
 
         (collection, collection_rights) = (
             collection_services.get_collection_and_collection_rights_by_id(
-                'fake_id', version=1))
+                'fake_id'))
         self.assertIsNone(collection)
         self.assertIsNone(collection_rights)

@@ -122,6 +122,7 @@ class ExplorationPage(EditorHandler):
         (exploration, exploration_rights) = (
             exp_services.get_exploration_and_exploration_rights_by_id(
                 exploration_id))
+        print '*****', exploration
 
         visualizations_html = visualization_registry.Registry.get_full_html()
 
