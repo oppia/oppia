@@ -39,7 +39,8 @@
        },
 
        getClassifier: function(stateName) {
-         if (stateClassifierMapping.hasOwnProperty(stateName)) {
+         if (stateClassifierMapping &&
+             stateClassifierMapping.hasOwnProperty(stateName)) {
            return stateClassifierMapping[stateName];
          } else {
            return null;

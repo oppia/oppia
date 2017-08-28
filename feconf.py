@@ -82,6 +82,10 @@ INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'LDAStringClassifier',
         'current_data_schema_version': 1
+    },
+    'CodeRepl': {
+        'algorithm_id': 'CodeClassifier',
+        'current_data_schema_version': 1
     }
 }
 # Classifier job time to live (in mins).
@@ -619,7 +623,7 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with base.js
+# NOTE TO DEVELOPERS: This should be synchronized with app.js
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
