@@ -24,7 +24,10 @@ oppia.constant('STATS_REPORTING_URLS', {
     '/explorehandler/exploration_maybe_leave_event/<exploration_id>'),
   EXPLORATION_STARTED: (
     '/explorehandler/exploration_start_event/<exploration_id>'),
-  STATE_HIT: '/explorehandler/state_hit_event/<exploration_id>'
+  STATE_HIT: '/explorehandler/state_hit_event/<exploration_id>',
+  HINT_REQUEST: '/explorehandler/hint_request_event/<exploration_id>',
+  HINT_SUCCESS: '/explorehandler/hint_success_event/<exploration_id>',
+  SOLUTION_REQUEST: '/explorehandler/solution_request_event/<exploration_id>'
 });
 
 oppia.factory('StatsReportingService', [
@@ -113,6 +116,29 @@ oppia.factory('StatsReportingService', [
         }
 
         stopwatch.reset();
+      },
+      recordHintRequest: function (stateName, index) {
+        $http.post(getFullStatsUrl('HINT_REQUEST'), {
+          exploration_version: explorationVersion,
+          state_name: stateName,
+          session_id: sessionId,
+          hint_index: index
+        });
+      },
+      recordHintSuccess: function (stateName, index) {
+        $http.post(getFullStatsUrl('HINT_SUCCESS'), {
+          exploration_version: explorationVersion,
+          state_name: stateName,
+          session_id: sessionId,
+          hint_index: index
+        });
+      },
+      recordSolutionRequest: function (stateName) {
+        $http.post(getFullStatsUrl('SOLUTION_REQUEST'), {
+          exploration_version: explorationVersion,
+          state_name: stateName,
+          session_id: sessionId
+        });
       },
       recordExplorationCompleted: function(stateName, params) {
         $http.post(getFullStatsUrl('EXPLORATION_COMPLETED'), {

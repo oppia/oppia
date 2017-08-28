@@ -264,3 +264,33 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
     return [
         stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict).answer
         for submitted_answer_dict in sample_answers]
+
+def get_hint_views_info(exploration_id, exploration_version, state_name):
+    """Returns a dict containing hint views for all hints and solution in
+       a state. This is required to populate the progress bars in the
+       hint editor.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration.
+        state_name: str. The name of the state.
+
+    Returns:
+        dict. Contains a list representing:
+        - 'num_views': int. The number of views for a hint.
+        - 'num_succeeds': int. The number of successful answer attempts after
+          viewing a hint.
+        and
+        - 'num_solutions': int. The number of solution requests.
+
+        An example of the returned value may be:
+            { 'hints': [{'num_views': 5, 'num_succeeds': 3},
+                        {'num_views': 2, 'num_succeeds': 1}],
+              'solution_views': 0}
+    """
+    hintViewsModel = stats_models.HintViewsModel.get_or_create(
+        exploration_id, state_name, exploration_version)
+    return {
+        'hints': hintViewsModel.viewed_hints_list,
+        'solution_views': hintViewsModel.solution_views
+    }

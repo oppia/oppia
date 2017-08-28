@@ -17,21 +17,24 @@
  */
 
 oppia.controller('StateHints', [
-  '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
+  '$scope', '$http', '$rootScope', '$modal', '$filter', 'editorContextService',
   'alertsService', 'INTERACTION_SPECS', 'stateHintsService',
   'explorationStatesService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory', 'oppiaPlayerService',
-  'stateSolutionService',
+  'stateSolutionService', 'explorationContextService', 'explorationData',
   function(
-    $scope, $rootScope, $modal, $filter, editorContextService,
+    $scope, $http, $rootScope, $modal, $filter, editorContextService,
     alertsService, INTERACTION_SPECS, stateHintsService,
     explorationStatesService, stateInteractionIdService,
     UrlInterpolationService, HintObjectFactory, oppiaPlayerService,
-    stateSolutionService) {
+    stateSolutionService, explorationContextService, explorationData) {
     $scope.editorContextService = editorContextService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
     $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+    $scope.hintViewsStats = null;
+    $scope.hintSuccessPercents = null;
+    $scope.hintQuittersPercents = null;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/drag_dots.png');
@@ -40,7 +43,28 @@ oppia.controller('StateHints', [
       stateHintsService.init(
         editorContextService.getActiveStateName(),
           stateData.interaction.hints);
-
+      if (stateData.interaction.hints.length > 0) {
+        $http.get('/createhandler/hint_stats/' +
+          explorationContextService.getExplorationId() + '/' +
+          explorationData.data.version + '/' +
+          encodeURIComponent(stateData.name)).then(
+          function(response) {
+            $scope.hintViewsStats = response.data;
+            var hintSuccessPercents = [];
+            var hintQuittersPercents = [];
+            for (var i = 0; i < $scope.hintViewsStats.hints.length; i++) {
+              hintSuccessPercents.push($scope.getSuccessPercent(i));
+              hintQuittersPercents.push($scope.getQuittersPercent(i));
+            }
+            $scope.hintSuccessPercents = hintSuccessPercents;
+            $scope.hintQuittersPercents = hintQuittersPercents;
+          },
+          function() {
+            alertsService.addWarning(
+              'There was an error while fetching the hint statistics.');
+          }
+        );
+      }
       $scope.activeHintIndex = null;
     });
 
@@ -49,6 +73,40 @@ oppia.controller('StateHints', [
         hint.hintText.length ?
           $filter('convertToPlainText')(hint.hintText) : '');
       return hintAsPlainText;
+    };
+
+    $scope.getQuittersPercent = function(currentHintIndex) {
+      var currentHintStats = null;
+      var nextHintStats = null;
+      if (currentHintIndex < stateHintsService.savedMemento.length - 1) {
+        currentHintStats = $scope.hintViewsStats.hints[currentHintIndex];
+        if ($scope.hintViewsStats.hints[currentHintIndex + 1]) {
+          nextHintStats = $scope.hintViewsStats.hints[currentHintIndex + 1];
+        } else {
+          return 0;
+        }
+        return (
+          (currentHintStats.num_views - currentHintStats.num_succeeds - (
+            nextHintStats.num_views)) / currentHintStats.num_views) * 100;
+      } else {
+        currentHintStats = $scope.hintViewsStats.hints[currentHintIndex];
+        if (stateSolutionService.savedMemento !== null) {
+          var numOfQuitters = (
+          currentHintStats.num_views - currentHintStats.num_succeeds - (
+            $scope.hintViewsStats.solution_views));
+          return (numOfQuitters / currentHintStats.num_views) * 100;
+        }
+        return 0;
+      }
+    };
+
+    $scope.getSuccessPercent = function(currentHintIndex) {
+      var currentHintStats = null;
+      if (currentHintIndex < stateHintsService.savedMemento.length) {
+        currentHintStats = $scope.hintViewsStats.hints[currentHintIndex];
+        return (
+          (currentHintStats.num_succeeds / currentHintStats.num_views) * 100)
+      }
     };
 
     $scope.changeActiveHintIndex = function(newIndex) {

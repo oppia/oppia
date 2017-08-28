@@ -303,6 +303,15 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
     get_redirect_route(
+        r'/explorehandler/hint_request_event/<exploration_id>',
+        reader.HintRequestEventHandler),
+    get_redirect_route(
+        r'/explorehandler/hint_success_event/<exploration_id>',
+        reader.HintSuccessEventHandler),
+    get_redirect_route(
+        r'/explorehandler/solution_request_event/<exploration_id>',
+        reader.SolutionRequestEventHandler),
+    get_redirect_route(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
     get_redirect_route(
@@ -370,6 +379,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/statistics/<exploration_id>/<exploration_version>',
         editor.ExplorationStatisticsHandler),
+    get_redirect_route(
+        r'/createhandler/hint_stats/<exploration_id>/<exploration_version>/<escaped_state_name>',  # pylint: disable=line-too-long
+        editor.HintStatisticsHandler),
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
         editor.StateRulesStatsHandler),

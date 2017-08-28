@@ -632,6 +632,9 @@ NAV_MODE_THANKS = 'thanks'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
+EVENT_TYPE_HINT_REQUEST = 'hint_request'
+EVENT_TYPE_HINT_SUCCESS = 'hint_success'
+EVENT_TYPE_SOLUTION_REQUEST = 'solution_request'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'

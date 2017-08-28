@@ -55,6 +55,9 @@ oppia.factory('HintManagerService', [
       areAllHintsExhausted: function() {
         return numHintsConsumed === hints.length;
       },
+      getNumHintsConsumed: function() {
+        return numHintsConsumed;
+      },
       reset: function(newHints) {
         numHintsConsumed = 0;
         currentHintIsAvailable = false;
