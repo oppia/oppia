@@ -99,7 +99,6 @@ class TrainedClassifierHandler(base.BaseHandler):
         signature = self.payload.get('signature')
         message = self.payload.get('message')
         vm_id = self.payload.get('vm_id')
-
         if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
             raise self.UnauthorizedUserException
 
