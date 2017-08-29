@@ -169,11 +169,11 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
 
     def test_next_job_handler(self):
         json_response = self.post_json(
-            r'/ml/nextjobhandler', self.payload, expect_errors=False)
+            '/ml/nextjobhandler', self.payload, expect_errors=False)
         self.assertEqual(json_response, self.expected_response)
         classifier_services.mark_training_jobs_failed([self.job_id])
         json_response = self.post_json(
-            r'/ml/nextjobhandler', self.payload, expect_errors=False)
+            '/ml/nextjobhandler', self.payload, expect_errors=False)
         self.assertEqual(json_response, {})
 
     def test_error_on_prod_mode_and_default_vm_id(self):
