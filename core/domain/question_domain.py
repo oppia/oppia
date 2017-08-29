@@ -37,8 +37,8 @@ class Question(object):
             question is written in.
     """
 
-    def __init__(self, question_id, title, question_data, question_data_schema_version,
-                 collection_id, language_code):
+    def __init__(self, question_id, title, question_data,
+                 question_data_schema_version, collection_id, language_code):
         """Constructs a Question domain object.
 
         Args:
@@ -46,7 +46,8 @@ class Question(object):
             title: str. The title of the question.
             question_data: dict. A dict representing the question data.
             question_data_schema_version: int. The schema version for the data.
-            collection_id: str. The ID of the collection containing the question.
+            collection_id: str. The ID of the collection containing the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
@@ -90,8 +91,8 @@ class Question(object):
 
         if not isinstance(self.question_data_schema_version, int):
             raise utils.ValidationError(
-                'Expected question_data_schema_version to be a integer, received %s' %
-                self.question_data_schema_version)
+                'Expected question_data_schema_version to be a integer,' + 
+                'received %s' % self.question_data_schema_version)
 
         if not isinstance(self.collection_id, basestring):
             raise utils.ValidationError(
@@ -132,7 +133,8 @@ class Question(object):
 
         Args:
             question_id: str. The unique ID of the question.
-            collection_id: str. The ID of the collection containing the question.
+            collection_id: str. The ID of the collection containing the
+                question.
             title: str. The title of the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.

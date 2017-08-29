@@ -47,7 +47,8 @@ class QuestionModel(base_models.VersionedModel):
     # A dict representing the question data.
     question_data = ndb.JsonProperty(indexed=False)
     # The schema version for the data.
-    question_data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    question_data_schema_version = (
+        ndb.IntegerProperty(required=True, indexed=True))
     # The ID of collection containing the question.
     collection_id = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
@@ -84,15 +85,16 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, title, question_data, question_data_schema_version, collection_id,
-            language_code):
+            cls, title, question_data, question_data_schema_version,
+            collection_id, language_code):
         """Creates a new QuestionModel entry.
 
         Args:
             title: str. The title of the question.
             question_data: dict. A dict representing the question data.
             question_data_schema_version: int. The schema version for the data.
-            collection_id: str. The ID of the collection containing the question.
+            collection_id: str. The ID of the collection containing the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 

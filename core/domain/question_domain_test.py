@@ -56,7 +56,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question = question_domain.Question(
             test_object['question_id'], test_object['title'],
-            test_object['question_data'], test_object['question_data_schema_version'],
+            test_object['question_data'],
+            test_object['question_data_schema_version'],
             test_object['collection_id'], test_object['language_code'])
 
         question.question_id = 123
