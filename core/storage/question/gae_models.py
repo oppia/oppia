@@ -35,7 +35,7 @@ class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
-    The id of instances of this class has the form
+    The ID of instances of this class has the form
     {{collection_id}}.{{random_hash_of_16_chars}}
     """
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
@@ -44,28 +44,28 @@ class QuestionModel(base_models.VersionedModel):
 
     # The title of the question.
     title = ndb.StringProperty(required=True, indexed=True)
-    # The data for the question data.
-    question_data = ndb.JsonProperty(default={}, indexed=False)
+    # A dict representing the question data.
+    question_data = ndb.JsonProperty(indexed=False)
     # The schema version for the data.
-    data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
-    # The ID of collection to which the question belongs.
+    question_data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    # The ID of collection containing the question.
     collection_id = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
     def _get_new_id(cls, collection_id):
-        """Generates a unique id for the question of the form
+        """Generates a unique ID for the question of the form
         {{collection_id}}.{{random_hash_of_16_chars}}
 
         Args:
-            collection_id: str. ID of the collection.
+            collection_id: str. The ID of collection containing the question.
 
         Returns:
            new_id: int. ID of the new QuestionModel instance.
 
         Raises:
-            Exception: The id generator for QuestionModel is
+            Exception: The ID generator for QuestionModel is
             producing too many collisions.
         """
 
@@ -84,31 +84,30 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, title, question_data, data_schema_version, collection_id,
+            cls, title, question_data, question_data_schema_version, collection_id,
             language_code):
         """Creates a new QuestionModel entry.
 
         Args:
             title: str. The title of the question.
-            question_data: dict. The data for the question data.
-            data_schema_version: int. The schema version for the data.
-            collection_id: str. ID of the collection.
+            question_data: dict. A dict representing the question data.
+            question_data_schema_version: int. The schema version for the data.
+            collection_id: str. The ID of the collection containing the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
         Returns:
-            question_instance: QuestionModel. Instance of the new QuestionModel
-                entry.
+            QuestionModel. Instance of the new QuestionModel entry.
 
         Raises:
             Exception: A model with the same ID already exists.
         """
         instance_id = cls._get_new_id(collection_id)
-        question_instance = cls(
+        question_model_instance = cls(
             id=instance_id, title=title,
             question_data=question_data,
-            data_schema_version=data_schema_version,
+            question_data_schema_version=question_data_schema_version,
             collection_id=collection_id,
             language_code=language_code)
 
-        return question_instance
+        return question_model_instance

@@ -22,28 +22,25 @@ import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
-# This takes additional 'title' parameters.
-CMD_CREATE_NEW = 'create_new'
 
-def _create_question(committer_id, question, commit_message, commit_cmds):
+def _create_question(committer_id, question, commit_message):
     """Creates a new question.
 
     Args:
         committer_id: str. ID of the committer.
         question: Question. question domain object.
         commit_message: str. A description of changes made to the question.
-        commit_cmds: list(dict). A list of change commands made to the given
-            question.
+    TODO: implement commit_cmds.
     """
     model = question_models.QuestionModel.create(
         title=question.title,
         question_data=question.question_data,
-        data_schema_version=question.data_schema_version,
+        question_data_schema_version=question.question_data_schema_version,
         collection_id=question.collection_id,
         language_code=question.language_code,
     )
 
-    model.commit(committer_id, commit_message, commit_cmds)
+    model.commit(committer_id, commit_message, [{'cmd': ''}])
     return model
 
 
@@ -51,16 +48,14 @@ def add_question(committer_id, question):
     """Saves a new question.
     Args:
         committer_id: str. ID of the committer.
-        question: Question. QUuestion to be saved.
+        question: Question. Question to be saved.
     """
     commit_message = (
         'New question created with title \'%s\'.' % question.title)
-    question_model = _create_question(committer_id, question, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': question.title,
-    }])
+    question_model = _create_question(committer_id, question, commit_message)
 
     return question_model
+
 
 def delete_question(committer_id, question_id, force_deletion=False):
     """Deletes the question with the given question_id.

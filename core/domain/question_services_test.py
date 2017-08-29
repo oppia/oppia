@@ -23,6 +23,7 @@ from core.tests import test_utils
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 memcache_services = models.Registry.import_memcache_services()
 
+
 class QuestionServicesUnitTest(test_utils.GenericTestBase):
     """Test the question services module."""
 
@@ -31,20 +32,18 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         super(QuestionServicesUnitTest, self).setUp()
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
-
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_save_new_question(self):
         question_data = {}
         question_id = 'dummy'
         title = 'A Question'
-        data_schema_version = 1
+        question_data_schema_version = 1
         collection_id = 'col1'
         language_code = 'en'
         question = question_domain.Question(
-            question_id, title, question_data, data_schema_version,
+            question_id, title, question_data, question_data_schema_version,
             collection_id, language_code)
         question.validate()
 
@@ -53,7 +52,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(model.title, title)
         self.assertEqual(model.question_data, question_data)
-        self.assertEqual(model.data_schema_version, data_schema_version)
+        self.assertEqual(model.question_data_schema_version,
+            question_data_schema_version)
         self.assertEqual(model.collection_id, collection_id)
         self.assertEqual(model.language_code, language_code)
 
@@ -61,11 +61,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_data = {}
         question_id = 'dummy'
         title = 'A Question'
-        data_schema_version = 1
+        question_data_schema_version = 1
         collection_id = 'col1'
         language_code = 'en'
         question = question_domain.Question(
-            question_id, title, question_data, data_schema_version,
+            question_id, title, question_data, question_data_schema_version,
             collection_id, language_code)
         question.validate()
 

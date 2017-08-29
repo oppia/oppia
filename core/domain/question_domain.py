@@ -23,36 +23,37 @@ import feconf
 import utils
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
+
 class Question(object):
-    """Domain object for a question.
+    """Domain object for a questions.
 
     Attributes:
-        question_id: str. The unique id of the question.
+        question_id: str. The unique ID of the question.
         title: str. The title of the question.
-        question_data: dict. The data for the question data.
-        data_schema_version: int. The schema version for the data.
-        collection_id: str. ID of the collection.
+        question_data: dict. A dict representing the question data.
+        question_data_schema_version: int. The schema version for the data.
+        collection_id: str. The ID of the collection containing the question.
         language_code: str. The ISO 639-1 code for the language this
-           question is written in.
+            question is written in.
     """
 
-    def __init__(self, question_id, title, question_data, data_schema_version,
+    def __init__(self, question_id, title, question_data, question_data_schema_version,
                  collection_id, language_code):
         """Constructs a Question domain object.
 
         Args:
-            question_id: str. The unique id of the question.
+            question_id: str. The unique ID of the question.
             title: str. The title of the question.
-            question_data: dict. The data for the question data.
-            data_schema_version: int. The schema version for the data.
-            collection_id: str. ID of the collection.
+            question_data: dict. A dict representing the question data.
+            question_data_schema_version: int. The schema version for the data.
+            collection_id: str. The ID of the collection containing the question.
             language_code: str. The ISO 639-1 code for the language this
-               question is written in.
+                question is written in.
         """
         self.question_id = question_id
         self.title = title
         self.question_data = question_data
-        self.data_schema_version = data_schema_version
+        self.question_data_schema_version = question_data_schema_version
         self.collection_id = collection_id
         self.language_code = language_code
 
@@ -60,13 +61,13 @@ class Question(object):
         """Returns a dict representing this Question domain object.
 
         Returns:
-            A dict, mapping all instance of fields of Question instance.
+            dict. A dict representation of the Question instance.
         """
         return {
             'question_id': self.question_id,
             'title': self.title,
             'question_data': self.question_data,
-            'data_schema_version': self.data_schema_version,
+            'question_data_schema_version': self.question_data_schema_version,
             'collection_id': self.collection_id,
             'language_code': self.language_code
         }
@@ -76,7 +77,7 @@ class Question(object):
 
         if not isinstance(self.question_id, basestring):
             raise utils.ValidationError(
-                'Expected id to be a string, received %s' % self.question_id)
+                'Expected ID to be a string, received %s' % self.question_id)
 
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
@@ -87,10 +88,10 @@ class Question(object):
                 'Expected question_data to be a dict, received %s' %
                 self.question_data)
 
-        if not isinstance(self.data_schema_version, int):
+        if not isinstance(self.question_data_schema_version, int):
             raise utils.ValidationError(
-                'Expected data_schema_version to be a integer, received %s' %
-                self.data_schema_version)
+                'Expected question_data_schema_version to be a integer, received %s' %
+                self.question_data_schema_version)
 
         if not isinstance(self.collection_id, basestring):
             raise utils.ValidationError(
@@ -117,7 +118,7 @@ class Question(object):
         question = cls(
             question_dict['question_id'], question_dict['title'],
             question_dict['question_data'],
-            question_dict['data_schema_version'],
+            question_dict['question_data_schema_version'],
             question_dict['collection_id'], question_dict['language_code'])
 
         return question
@@ -130,8 +131,8 @@ class Question(object):
         """Returns a Question domain object with default values.
 
         Args:
-            question_id: str. The unique id of the question.
-            collection_id: str. ID of the collection.
+            question_id: str. The unique ID of the question.
+            collection_id: str. The ID of the collection containing the question.
             title: str. The title of the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.

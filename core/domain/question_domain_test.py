@@ -23,14 +23,14 @@ import utils
 
 
 class QuestionDomainTest(test_utils.GenericTestBase):
-    """Tests for Quetion domain object."""
+    """Tests for Question domain object."""
 
     def test_to_dict(self):
         expected_object = {
             'question_id': 'col1.random',
             'title': 'abc',
             'question_data': {},
-            'data_schema_version': 1,
+            'question_data_schema_version': 1,
             'collection_id': 'col1',
             'language_code': 'en'
         }
@@ -38,7 +38,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         observed_object = question_domain.Question(
             expected_object['question_id'], expected_object['title'],
             expected_object['question_data'],
-            expected_object['data_schema_version'],
+            expected_object['question_data_schema_version'],
             expected_object['collection_id'], expected_object['language_code'])
         self.assertDictEqual(expected_object, observed_object.to_dict())
 
@@ -49,19 +49,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'question_id': 'col1.random',
             'title': 'abc',
             'question_data': {},
-            'data_schema_version': 1,
+            'question_data_schema_version': 1,
             'collection_id': 'col1',
             'language_code': 'en'
         }
 
         question = question_domain.Question(
             test_object['question_id'], test_object['title'],
-            test_object['question_data'], test_object['data_schema_version'],
+            test_object['question_data'], test_object['question_data_schema_version'],
             test_object['collection_id'], test_object['language_code'])
 
         question.question_id = 123
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected id to be a string')):
+            'Expected ID to be a string')):
             question.validate()
 
         question.question_id = 'col1.random'
@@ -77,12 +77,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             question.validate()
 
         question.question_data = {}
-        question.data_schema_version = 'abc'
+        question.question_data_schema_version = 'abc'
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected data_schema_version to be a integer')):
+            'Expected question_data_schema_version to be a integer')):
             question.validate()
 
-        question.data_schema_version = 1
+        question.question_data_schema_version = 1
         question.collection_id = 123
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected collection_id to be a string')):
@@ -104,7 +104,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'question_id': 'col1.random',
             'title': 'abc',
             'question_data': {},
-            'data_schema_version': 1,
+            'question_data_schema_version': 1,
             'collection_id': 'col1',
             'language_code': 'en'
         }
@@ -123,7 +123,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(question.question_id, question_id)
         self.assertEqual(question.collection_id, collection_id)
-        self.assertEqual(question.data_schema_version, 1)
+        self.assertEqual(question.question_data_schema_version, 1)
         self.assertEqual(question.question_data, {})
         self.assertEqual(question.title, '')
         self.assertEqual(question.language_code, 'en')
