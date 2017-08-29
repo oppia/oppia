@@ -91,7 +91,7 @@ class Question(object):
 
         if not isinstance(self.question_data_schema_version, int):
             raise utils.ValidationError(
-                'Expected question_data_schema_version to be a integer,' + 
+                'Expected question_data_schema_version to be a integer,' +
                 'received %s' % self.question_data_schema_version)
 
         if not isinstance(self.collection_id, basestring):
