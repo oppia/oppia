@@ -39,14 +39,14 @@
      }));
 
      it('should determine if the draft is valid', function() {
-       expect(draft.isDraftValid(
+       expect(draft.isValid(
          draftChangeListId)).toBeTruthy();
-       expect(draft.isDraftValid(
+       expect(draft.isValid(
          draftChangeListId + 1)).toBeFalsy();
      });
 
      it('should return the correct changeList', function() {
-       expect(draft.getDraftChanges()).toEqual(changeList);
+       expect(draft.getChanges()).toEqual(changeList);
      });
    });
  });
