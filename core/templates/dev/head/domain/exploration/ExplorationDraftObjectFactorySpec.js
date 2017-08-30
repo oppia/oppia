@@ -48,5 +48,10 @@
      it('should return the correct changeList', function() {
        expect(draft.getChanges()).toEqual(changeList);
      });
+
+     it('should create a valid local storage dict', function() {
+       expect(ExplorationDraftObjectFactory.toLocalStorageDict(
+         changeList, draftChangeListId)).toEqual(draftDict);
+     });
    });
  });
