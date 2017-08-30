@@ -36,6 +36,7 @@
          return result && localStorage;
        } catch (exception) {}
      }());
+
      /**
      * Create the key to access the changeList in localStorage
      * @param {String} explorationId - The exploration id of the changeList
@@ -43,7 +44,8 @@
      */
      var _createExplorationDraftKey = function(explorationId) {
        return 'draft_' + explorationId;
-     }
+     };
+
      return {
        /**
        * Check that localStorage is available to the client.
@@ -60,15 +62,13 @@
        * @param {List} changeList - The exploration change list to be saved.
        * @param {Integer} draftChangeListId - The id of the draft to be saved.
        */
-       saveExplorationDraft: function(explorationId, changeList,
-         draftChangeListId) {
-         var localSaveKey = _createExplorationDraftKey(explorationId);
+       saveExplorationDraft: function(
+         explorationId, changeList, draftChangeListId) {
+           var localSaveKey = _createExplorationDraftKey(explorationId);
          if (storage) {
-           var draftDict = {
-             draftChanges: changeList,
-             draftChangeListId: draftChangeListId
-           };
-           storage.setItem(localSaveKey, JSON.stringify(draftDict));
+           var draftDict = ExplorationDraftObjectFactory.toLocalStorageDict(
+             changeList, draftChangeListId);
+             storage.setItem(localSaveKey, JSON.stringify(draftDict));
          }
        },
        /**

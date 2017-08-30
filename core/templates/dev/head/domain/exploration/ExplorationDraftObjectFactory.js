@@ -34,11 +34,11 @@
      * @returns {Boolean} - True iff the currentDraftId is the same as the
      * draftChangeListId corresponding to this draft.
      */
-     ExplorationDraft.prototype.isDraftValid = function(currentDraftId) {
+     ExplorationDraft.prototype.isValid = function(currentDraftId) {
        return (currentDraftId === this.draftChangeListId);
      };
 
-     ExplorationDraft.prototype.getDraftChanges = function() {
+     ExplorationDraft.prototype.getChanges = function() {
        return this.draftChanges;
      };
 
@@ -48,6 +48,15 @@
          explorationDraftDict.draftChanges,
          explorationDraftDict.draftChangeListId);
      };
+
+     ExplorationDraft.toLocalStorageDict = function(
+       changeList, draftChangeListId) {
+       return {
+         draftChanges: changeList,
+         draftChangeListId: draftChangeListId
+       };
+     };
+
      return ExplorationDraft;
    }
  ]);

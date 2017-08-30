@@ -108,8 +108,8 @@ oppia.factory('explorationData', [
               var draft = LocalStorageService.getExplorationDraft(
                 explorationId);
               if (draft) {
-                if (draft.isDraftValid(draftChangeListId)) {
-                  var changeList = draft.getDraftChanges();
+                if (draft.isValid(draftChangeListId)) {
+                  var changeList = draft.getChanges();
                   explorationData.autosaveChangeList(changeList, function() {
                     // A reload is needed so that the changelist just saved is
                     // loaded as opposed to the exploration returned by this
@@ -117,7 +117,7 @@ oppia.factory('explorationData', [
                     $window.location.reload();
                   });
                 } else {
-                  errorCallback(explorationId, draft.getDraftChanges());
+                  errorCallback(explorationId, draft.getChanges());
                 }
               }
               return response;

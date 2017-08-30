@@ -34,8 +34,8 @@
        ExplorationDraftObjectFactory = $injector.get(
          'ExplorationDraftObjectFactory');
        draft =
-       ExplorationDraftObjectFactory.createFromLocalStorageDict(
-         draftDict);
+         ExplorationDraftObjectFactory.createFromLocalStorageDict(
+           draftDict);
      }));
 
      it('should determine if the draft is valid', function() {
