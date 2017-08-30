@@ -34,6 +34,7 @@ from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import search_services as activity_search_services
 from core.platform import models
 import feconf
 import utils
@@ -46,7 +47,7 @@ search_services = models.Registry.import_search_services()
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
 
-# Name for the collection search index.
+# Name for collection search index.
 SEARCH_INDEX_COLLECTIONS = 'collections'
 
 # The maximum number of iterations allowed for populating the results of a
@@ -952,7 +953,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     object and return it.
 
     Args:
-        collection_id: str. ID of the collection.
+        collection: Collection. The domain object represting the collection.
         contributor_id_to_add: str. ID of the contributor to be added to the
             collection summary.
 
@@ -1243,34 +1244,17 @@ def get_next_page_of_all_non_private_commits(
     ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-def _should_index(collection):
-    """Checks if a particular collection should be indexed.
+def _collection_rights_to_search_dict(rights):
+    """Returns a search dict with information about the collection rights. This
+    allows searches like "is:featured".
 
     Args:
-        collection: Collection.
+        rights: ActivityRights. Rights object for a collection.
     """
-    rights = rights_manager.get_collection_rights(collection.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
-
-def _collection_to_search_dict(collection):
-    """Converts a collection domain object to a search dict.
-
-    Args:
-        collection: Collection. The collection domain object to be converted.
-
-    Returns:
-        The search dict of the collection domain object.
-    """
-    doc = {
-        'id': collection.id,
-        'title': collection.title,
-        'category': collection.category,
-        'objective': collection.objective,
-        'language_code': collection.language_code,
-        'tags': collection.tags,
-        'rank': _DEFAULT_RANK,
-    }
+    doc = {}
+    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
+        doc['is'] = 'featured'
     return doc
 
 
@@ -1287,17 +1271,12 @@ def index_collections_given_ids(collection_ids):
     """Adds the given collections to the search index.
 
     Args:
-        collection_ids: list(str). List of collection ids whose collections are
-            to be indexed.
+        collection_ids: list(str). List of collection ids whose collections
+        are to be indexed.
     """
-    # We pass 'strict=False' so as not to index deleted collections.
-    collection_list = get_multiple_collections_by_id(
-        collection_ids, strict=False).values()
-    search_services.add_documents_to_index([
-        _collection_to_search_dict(collection)
-        for collection in collection_list
-        if _should_index(collection)
-    ], SEARCH_INDEX_COLLECTIONS)
+    activity_search_services.index_collection_summaries([
+        get_collection_summary_by_id(collection_id) for
+        collection_id in collection_ids])
 
 
 def patch_collection_search_document(collection_id, update):

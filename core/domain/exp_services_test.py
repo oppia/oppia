@@ -2000,51 +2000,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             2.056191454757, places=4)
 
 
-    def test_get_search_rank(self):
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-
-        base_search_rank = 20
-
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
-
-        rights_manager.publish_exploration(self.owner, self.EXP_ID)
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
-
-        rating_services.assign_rating_to_exploration(
-            self.owner_id, self.EXP_ID, 5)
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 10)
-
-        rating_services.assign_rating_to_exploration(
-            self.user_id_admin, self.EXP_ID, 2)
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 8)
-
-    def test_search_ranks_cannot_be_negative(self):
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-
-        base_search_rank = 20
-
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
-
-        # A user can (down-)rate an exploration at most once.
-        for i in xrange(50):
-            rating_services.assign_rating_to_exploration(
-                'user_id_1', self.EXP_ID, 1)
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank - 5)
-
-        for i in xrange(50):
-            rating_services.assign_rating_to_exploration(
-                'user_id_%s' % i, self.EXP_ID, 1)
-
-        # The rank will be at least 0.
-        self.assertEqual(exp_services.get_search_rank(self.EXP_ID), 0)
-
-
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
     """Test exploration summaries."""
     ALBERT_EMAIL = 'albert@example.com'
@@ -2444,7 +2399,6 @@ title: Old Title
         exploration_model.title = 'New title'
         exploration_model.commit(
             self.albert_id, 'Changed title.', [])
-
         # In version 3, a new state is added.
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=True, version=None)
@@ -2452,6 +2406,7 @@ title: Old Title
             self.VERSION_0_STATES_DICT[feconf.DEFAULT_INIT_STATE_NAME])
         new_state['interaction']['id'] = 'TextInput'
         exploration_model.states['New state'] = new_state
+
 
         # Properly link in the new state to avoid an invalid exploration.
         init_state = exploration_model.states[feconf.DEFAULT_INIT_STATE_NAME]
