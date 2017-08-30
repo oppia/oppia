@@ -64,11 +64,11 @@
        */
        saveExplorationDraft: function(
          explorationId, changeList, draftChangeListId) {
-           var localSaveKey = _createExplorationDraftKey(explorationId);
+         var localSaveKey = _createExplorationDraftKey(explorationId);
          if (storage) {
            var draftDict = ExplorationDraftObjectFactory.toLocalStorageDict(
              changeList, draftChangeListId);
-             storage.setItem(localSaveKey, JSON.stringify(draftDict));
+           storage.setItem(localSaveKey, JSON.stringify(draftDict));
          }
        },
        /**
