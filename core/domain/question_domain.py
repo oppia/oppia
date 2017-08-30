@@ -38,7 +38,7 @@ CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
 class QuestionChange(object):
     """Domain object for changes made to question object"""
     QUESTION_PROPERTIES = (
-        QUESTION_PROPERTY_TITLE, QUESTION_PROPERTY_COLLECTION_ID,
+        QUESTION_PROPERTY_TITLE, QUESTION_PROPERTY_QUESTION_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE)
 
     def __init__(self, change_dict):
@@ -56,7 +56,7 @@ class QuestionChange(object):
 
         if self.cmd == CMD_UPDATE_QUESTION_PROPERTY:
             if (change_dict['property_name'] not in
-                self.QUESTION_PROPERTIES):
+                    self.QUESTION_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']

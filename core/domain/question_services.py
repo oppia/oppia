@@ -16,12 +16,17 @@
 
 """Services for questions data model."""
 
+import logging
+
 from core.domain import question_domain
 from core.platform import models
 
 import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
+
+# This takes additional 'title' parameters.
+CMD_CREATE_NEW = 'create_new'
 
 
 def _create_question(committer_id, question, commit_message):
@@ -196,5 +201,5 @@ def update_question(committer_id, question_id, change_list, commit_message):
         commit_message: str or None. A description of changes made to the
             question.
     """
-    question = apply_change_list(change_list)
+    question = apply_change_list(question_id, change_list)
     _save_collection(committer_id, question, commit_message, change_list)
