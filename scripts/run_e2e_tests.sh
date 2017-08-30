@@ -99,18 +99,18 @@ trap cleanup EXIT
 
 
 # Argument passed to gulpfile.js to help build with minification.
-MINIFICATION=false
+DEV_MODE=true
 for arg in "$@"; do
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
-    MINIFICATION=true
+    DEV_MODE=false
     echo "  Generating files for production mode..."
     $PYTHON_CMD scripts/build.py
   fi
 done
 
-yaml_env_variable="MINIFICATION: $MINIFICATION"
-sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
+yaml_env_variable="DEV_MODE: $DEV_MODE"
+sed -i.bak -e s/"DEV_MODE: .*"/"$yaml_env_variable"/ app.yaml
 # Delete the modified yaml file(-i.bak)
 rm app.yaml.bak
 

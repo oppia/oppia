@@ -65,20 +65,20 @@ fi
 # clear the datastore.
 CLEAR_DATASTORE_ARG="--clear_datastore=true"
 # Argument passed to gulpfile.js to help build with minification.
-MINIFICATION=false
+DEV_MODE=true
 for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
     CLEAR_DATASTORE_ARG=""
   fi
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
-    MINIFICATION=true
+    DEV_MODE=false
     $PYTHON_CMD scripts/build.py
   fi
 done
 
-yaml_env_variable="MINIFICATION: $MINIFICATION"
-sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
+yaml_env_variable="DEV_MODE: $DEV_MODE"
+sed -i.bak -e s/"DEV_MODE: .*"/"$yaml_env_variable"/ app.yaml
 # Delete the modified yaml file(-i.bak)
 rm app.yaml.bak
 
@@ -112,7 +112,7 @@ echo Starting GAE development server
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
 
-if [[ "$MINIFICATION" == "true" ]]; then
+if [[ "$DEV_MODE" == "false" ]]; then
   # This starts up a dev server which uses minified resources.
   $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=True --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG
 else

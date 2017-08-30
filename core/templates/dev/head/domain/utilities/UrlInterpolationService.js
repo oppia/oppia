@@ -37,7 +37,7 @@ oppia.factory('UrlInterpolationService', [
      * returns resource path with cache slug.
      */
     var getUrlWithSlug = function(resourcePath) {
-      if (GLOBALS.MINIFICATION || !GLOBALS.DEV_MODE) {
+      if (!GLOBALS.DEV_MODE) {
         if (hashes[resourcePath]) {
           var index = resourcePath.lastIndexOf('.');
           return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +

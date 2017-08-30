@@ -112,9 +112,9 @@ BAD_PATTERNS_JS_REGEXP = [
 ]
 
 BAD_PATTERNS_APP_YAML = {
-    'MINIFICATION: true': {
-        'message': 'Please set the MINIFICATION env variable in app.yaml'
-                   'to False before committing.',
+    'DEV_MODE: false': {
+        'message': 'Please set the DEV_MODE env variable in app.yaml '
+                   'to true before committing.',
         'excluded_files': ()}
 }
 
