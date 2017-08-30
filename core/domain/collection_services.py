@@ -33,6 +33,7 @@ from core.domain import activity_services
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -41,7 +42,7 @@ import utils
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
 memcache_services = models.Registry.import_memcache_services()
-search_services = models.Registry.import_search_services()
+gae_search_services = models.Registry.import_search_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -52,10 +53,6 @@ SEARCH_INDEX_COLLECTIONS = 'collections'
 # The maximum number of iterations allowed for populating the results of a
 # search query.
 MAX_ITERATIONS = 10
-
-# This is done to prevent the rank hitting 0 too easily. Note that
-# negative ranks are disallowed in the Search API.
-_DEFAULT_RANK = 20
 
 
 def _migrate_collection_contents_to_latest_schema(
@@ -1243,44 +1240,13 @@ def get_next_page_of_all_non_private_commits(
     ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-def _should_index(collection):
-    """Checks if a particular collection should be indexed.
-
-    Args:
-        collection: Collection.
-    """
-    rights = rights_manager.get_collection_rights(collection.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
-
-
-def _collection_to_search_dict(collection):
-    """Converts a collection domain object to a search dict.
-
-    Args:
-        collection: Collection. The collection domain object to be converted.
-
-    Returns:
-        The search dict of the collection domain object.
-    """
-    doc = {
-        'id': collection.id,
-        'title': collection.title,
-        'category': collection.category,
-        'objective': collection.objective,
-        'language_code': collection.language_code,
-        'tags': collection.tags,
-        'rank': _DEFAULT_RANK,
-    }
-    return doc
-
-
 def clear_search_index():
     """Clears the search index.
 
     WARNING: This runs in-request, and may therefore fail if there are too
     many entries in the index.
     """
-    search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
+    gae_search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
 
 
 def index_collections_given_ids(collection_ids):
@@ -1290,14 +1256,8 @@ def index_collections_given_ids(collection_ids):
         collection_ids: list(str). List of collection ids whose collections are
             to be indexed.
     """
-    # We pass 'strict=False' so as not to index deleted collections.
-    collection_list = get_multiple_collections_by_id(
-        collection_ids, strict=False).values()
-    search_services.add_documents_to_index([
-        _collection_to_search_dict(collection)
-        for collection in collection_list
-        if _should_index(collection)
-    ], SEARCH_INDEX_COLLECTIONS)
+    collection_summaries = get_collection_summaries_matching_ids(collection_ids)
+    search_services.index_collection_summaries(collection_summaries)
 
 
 def patch_collection_search_document(collection_id, update):
@@ -1308,10 +1268,10 @@ def patch_collection_search_document(collection_id, update):
         collection_id: str. ID of the collection to be patched.
         update: dict. Key-value pairs to patch the current search document with.
     """
-    doc = search_services.get_document_from_index(
+    doc = gae_search_services.get_document_from_index(
         collection_id, SEARCH_INDEX_COLLECTIONS)
     doc.update(update)
-    search_services.add_documents_to_index([doc], SEARCH_INDEX_COLLECTIONS)
+    gae_search_services.add_documents_to_index([doc], SEARCH_INDEX_COLLECTIONS)
 
 
 def update_collection_status_in_search(collection_id):
@@ -1334,7 +1294,7 @@ def delete_documents_from_search_index(collection_ids):
         collection_ids: list(str). List of IDs of the collections to be removed
             from the search index.
     """
-    search_services.delete_documents_from_index(
+    gae_search_services.delete_documents_from_index(
         collection_ids, SEARCH_INDEX_COLLECTIONS)
 
 
@@ -1362,5 +1322,5 @@ def search_collections(query, limit, sort=None, cursor=None):
               otherwise. If a cursor is returned, it will be a web-safe string
               that can be used in URLs.
     """
-    return search_services.search(
+    return gae_search_services.search(
         query, SEARCH_INDEX_COLLECTIONS, cursor, limit, sort, ids_only=True)
