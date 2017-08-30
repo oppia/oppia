@@ -322,7 +322,7 @@
 
       </div>
 
-      <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">
+      <div ng-if="collection && collectionSummary" class="oppia-card-preview-panel hidden-sm hidden-xs">
         <md-card class="oppia-activity-summary-tile md-default-theme">
           <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
             <img ng-src="<[getStaticImageUrl(collectionSummary.thumbnail_icon_url)]>" class="thumbnail-image">
