@@ -35,7 +35,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-    def test_save_new_question(self):
+    def test_add_question(self):
         question_data = {}
         question_id = 'dummy'
         title = 'A Question'

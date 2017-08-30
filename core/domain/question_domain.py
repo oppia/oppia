@@ -24,6 +24,44 @@ import utils
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
+# Do not modify the values of these constants. This is to preserve backwards
+# compatibility with previous change dicts.
+QUESTION_PROPERTY_TITLE = 'title'
+QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code'
+QUESTION_PROPERTY_QUESTION_DATA = 'question_data'
+
+# This takes additional 'property_name' and 'new_value' parameters and,
+# optionally, 'old_value'.
+CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
+
+
+class QuestionChange(object):
+    """Domain object for changes made to question object"""
+    QUESTION_PROPERTIES = (
+        QUESTION_PROPERTY_TITLE, QUESTION_PROPERTY_COLLECTION_ID,
+        QUESTION_PROPERTY_LANGUAGE_CODE)
+
+    def __init__(self, change_dict):
+        """Initialize a QuestoinChange object from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+        """
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_UPDATE_QUESTION_PROPERTY:
+            if (change_dict['property_name'] not in
+                self.QUESTION_PROPERTIES):
+                raise Exception('Invalid change_dict: %s' % change_dict)
+            self.property_name = change_dict['property_name']
+            self.new_value = change_dict['new_value']
+            self.old_value = change_dict.get('old_value')
+
 class Question(object):
     """Domain object for a questions.
 
@@ -146,3 +184,28 @@ class Question(object):
             question_id, title, {},
             feconf.CURRENT_QUESTION_SCHEMA_VERSION,
             collection_id, language_code)
+
+    def update_title(self, title):
+        """Updates the title of the question.
+
+        Args:
+            title: str. The title of the question.
+        """
+        self.title = title
+
+    def update_language_code(self, language_code):
+        """Updates the language code of the question.
+
+        Args:
+            language_code: str. The ISO 639-1 code for the language this
+            question is written in.
+        """
+        self.language_code = language_code
+
+    def update_question_data(self, question_data):
+        """Updates the question data of the question.
+
+        Args:
+            question_data: dict. A dict representing the question data.
+        """
+        self.question_data = question_data
