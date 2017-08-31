@@ -134,13 +134,14 @@ oppia.factory('AnswerClassificationService', [
         var ruleBasedOutcomeIsDefault = (
           answerClassificationResult.outcome === defaultOutcome);
         var interactionIsTrainable = INTERACTION_SPECS[
-          oldState.interaction.id].is_interaction_trainable;
+          oldState.interaction.id].is_trainable;
+
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
           var classifier = StateClassifierMappingService.getClassifier(
             stateName);
-          if (classifier.classifierData && classifier.algorithmId && (
-            classifier.dataSchemaVersion)) {
+          if (classifier && classifier.classifierData && (
+            classifier.algorithmId && classifier.dataSchemaVersion)) {
             var predictionService = (
               PredictionAlgorithmRegistryService.getPredictionService(
                 classifier.algorithmId, classifier.dataSchemaVersion));

@@ -14,7 +14,6 @@
 
 """Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
 
-import random
 import urllib
 import urlparse
 
@@ -48,11 +47,7 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            random_number = random.choice([0, 5, 6])
-            if random_number == 0:
-                self.render_template('pages/splash/splash.html')
-            else:
-                self.redirect('/splash?c=nv%d' % random_number)
+            self.render_template('pages/splash/splash.html')
         else:
             try:
                 self.render_template('pages/splash/splash_%s.html' % c_value)

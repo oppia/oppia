@@ -49,7 +49,7 @@ describe('Feedback message object factory', function() {
       created_on: 1000
     };
 
-    feedbackMessageSummary = (
+    var feedbackMessageSummary = (
       FeedbackMessageSummaryObjectFactory.createFromBackendDict(
         messageSummary));
 
