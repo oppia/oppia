@@ -97,7 +97,7 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
 
 
 class CronActivitySearchRankHandler(base.BaseHandler):
-    """Handler for computing exploration search ranks."""
+    """Handler for computing activity search ranks."""
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):

@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 """Commands for operating on the search status of activities."""
 
-from core.platform import models
 from core.domain import rights_manager
+from core.platform import models
 
 search_services = models.Registry.import_search_services()
 
@@ -50,7 +50,7 @@ def _exp_summary_to_search_dict(exp_summary):
     be indexed for further queries or not.
 
     Args:
-        exp: Exploration. Exploration domain object.
+        exp: ExpSummaryModel. ExplorationSummary domain object.
 
     Returns:
         dict. The representation of the given exploration, in a form that can
@@ -73,7 +73,7 @@ def _should_index_exploration(exp_summary):
     search queries.
 
     Args:
-        exp_summary: ExpSummaryModel.
+        exp_summary: ExpSummaryModel. ExplorationSummary domain object.
     """
     rights = rights_manager.get_exploration_rights(exp_summary.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
@@ -142,7 +142,7 @@ def _collection_summary_to_search_dict(collection_summary):
             summary object to be converted.
 
     Returns:
-        The search dict of the collection domain object.
+        dict. The search dict of the collection domain object.
     """
     doc = {
         'id': collection_summary.id,
@@ -170,7 +170,7 @@ def search_explorations(query, limit, sort=None, cursor=None):
     """Searches through the available explorations.
 
     Args:
-        query_string: str. The query string to search for.
+        query_string: str or None. The query string to search for.
         limit: int. The maximum number of results to return.
         sort: str. A string indicating how to sort results. This should be a
             string of space separated values. Each value should start with a
@@ -231,7 +231,8 @@ def search_collections(query, limit, sort=None, cursor=None):
     """Searches through the available collections.
 
     Args:
-        query_string: str. the query string to search for.
+        query_string: str or None. the query string to search for.
+        limit: int. the maximum number of results to return.
         sort: str. This indicates how to sort results. This should be a string
             of space separated values. Each value should start with a '+' or a
             '-' character indicating whether to sort in ascending or descending
@@ -239,8 +240,7 @@ def search_collections(query, limit, sort=None, cursor=None):
             name to sort on. When this is None, results are returned based on
             their ranking (which is currently set to the same default value
             for all collections).
-        limit: int. the maximum number of results to return.
-        cursor: str. A cursor, used to get the next page of results.
+        cursor: str or None. A cursor, used to get the next page of results.
             If there are more documents that match the query than 'limit', this
             function will return a cursor to get the next page.
 
