@@ -310,7 +310,7 @@
 	"I18N_SPLASH_JAVASCRIPT_ERROR_TITLE": "è necessario JavaScript nel tuo browser",
 	"I18N_SPLASH_PAGE_TITLE": "Oppia: Insegna, Apprendi, Esplora",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia ti permette di <a href=\"/creator_dashboard?mode=create\">creare</a> e <a href=\"/library\">condividere</a> esplorazioni su una vasta gamma di argomenti, limitati solo dalla tua immaginazione.",
-	"I18N_START_HERE": "Inizia qui!",
+	"I18N_START_HERE": "Clicca qui per iniziare!",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "Iscriviti",
 	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_HEADING": "Linee guida della comunità",
 	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_TEXT": "Se hai bisogno di chiarimenti su queste linee guida, perfavore rivolgiti al nostro <a href=\"/forum\" class=\"inline-links\">forum</a>.",
