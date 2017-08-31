@@ -46,7 +46,6 @@ import feconf
 import utils
 
 memcache_services = models.Registry.import_memcache_services()
-gae_search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
@@ -438,7 +437,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
-        exp_ids, search_cursor = search_explorations(
+        exp_ids, search_cursor = search_services.search_explorations(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
         invalid_exp_ids = []
@@ -920,7 +919,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     memcache_services.delete(exploration_memcache_key)
 
     # Delete the exploration from search.
-    delete_documents_from_search_index([exploration_id])
+    search_services.delete_explorations_from_search_index([exploration_id])
 
     # Delete the exploration summary, regardless of whether or not
     # force_deletion is True.
@@ -1590,13 +1589,6 @@ def get_exploration_search_rank(exp_id):
     return search_services.get_search_rank_from_exp_summary(exp_summary)
 
 
-def clear_search_index():
-    """WARNING: This runs in-request, and may therefore fail if there are too
-    many entries in the index.
-    """
-    gae_search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
-
-
 def index_explorations_given_ids(exp_ids):
     """Indexes the explorations corresponding to the given exploration ids.
 
@@ -1604,76 +1596,9 @@ def index_explorations_given_ids(exp_ids):
         exp_ids: list(str). List of ids of the explorations to be indexed.
     """
     exploration_summaries = get_exploration_summaries_matching_ids(exp_ids)
-    search_services.index_exploration_summaries(exploration_summaries)
-
-
-def patch_exploration_search_document(exp_id, update):
-    """Patches an exploration's current search document, with the values
-    from the 'update' dictionary.
-
-    Args:
-        exp_id: str. The id of the exploration to be patched.
-        update: dict. Key-value pairs to patch the exploration's search
-            document with.
-    """
-    doc = gae_search_services.get_document_from_index(
-        exp_id, SEARCH_INDEX_EXPLORATIONS)
-    doc.update(update)
-    gae_search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
-
-
-def update_exploration_status_in_search(exp_id):
-    """Updates the exploration status in its search doc.
-
-    Args:
-        exp_id: str. The id of the exploration whose status is to be
-            updated.
-    """
-    rights = rights_manager.get_exploration_rights(exp_id)
-    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-        delete_documents_from_search_index([exp_id])
-    else:
-        patch_exploration_search_document(rights.id, {})
-
-
-def delete_documents_from_search_index(exploration_ids):
-    """Deletes the documents corresponding to these exploration_ids from the
-    search index.
-
-    Args:
-        exploration_ids: list(str). A list of exploration ids whose
-            documents are to be deleted from the search index.
-    """
-    gae_search_services.delete_documents_from_index(
-        exploration_ids, SEARCH_INDEX_EXPLORATIONS)
-
-
-def search_explorations(query, limit, sort=None, cursor=None):
-    """Searches through the available explorations.
-
-    Args:
-        query_string: str. The query string to search for.
-        limit: int. The maximum number of results to return.
-        sort: str. A string indicating how to sort results. This should be a
-            string of space separated values. Each value should start with a
-            '+' or a '-' character indicating whether to sort in ascending or
-            descending order respectively. This character should be followed by
-            a field name to sort on. When this is None, results are based on
-            'rank'. See core.domain.search_services.get_search_rank to see how
-            rank is determined.
-        cursor: str or None. A cursor, used to get the next page of results. If
-            there are more documents that match the query than 'limit', this
-            function will return a cursor to get the next page.
-
-    Returns:
-        tuple. A 2-tuple consisting of:
-            - list(str). A list of exploration ids that match the query.
-            - str or None. A cursor if there are more matching explorations to
-              fetch, None otherwise. If a cursor is returned, it will be a
-              web-safe string that can be used in URLs.
-    """
-    return gae_search_services.search(
-        query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
+    search_services.index_exploration_summaries([
+        exploration_summary for exploration_summary in exploration_summaries
+        if exploration_summary is not None])
 
 
 def _is_suggestion_valid(thread_id, exploration_id):

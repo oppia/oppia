@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands for manipulating search rank"""
+"""Commands for operating on the search status of activities."""
 
 from core.platform import models
 from core.domain import rights_manager
@@ -120,6 +120,20 @@ def index_collection_summaries(collection_summaries):
     ], SEARCH_INDEX_COLLECTIONS)
 
 
+def update_exploration_status_in_search(exp_id):
+    """Updates the exploration status in its search doc.
+
+    Args:
+        exp_id: str. The id of the exploration whose status is to be
+            updated.
+    """
+    rights = rights_manager.get_exploration_rights(exp_id)
+    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+        delete_explorations_from_search_index([exp_id])
+    else:
+        patch_exploration_search_document(rights.id, {})
+
+
 def _collection_summary_to_search_dict(collection_summary):
     """Converts a collection domain object to a search dict.
 
@@ -150,3 +164,138 @@ def _should_index_collection(collection):
     """
     rights = rights_manager.get_collection_rights(collection.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
+
+
+def search_explorations(query, limit, sort=None, cursor=None):
+    """Searches through the available explorations.
+
+    Args:
+        query_string: str. The query string to search for.
+        limit: int. The maximum number of results to return.
+        sort: str. A string indicating how to sort results. This should be a
+            string of space separated values. Each value should start with a
+            '+' or a '-' character indicating whether to sort in ascending or
+            descending order respectively. This character should be followed by
+            a field name to sort on. When this is None, results are based on
+            'rank'. get_search_rank_from_exp_summary to see how
+            rank is determined.
+        cursor: str or None. A cursor, used to get the next page of results. If
+            there are more documents that match the query than 'limit', this
+            function will return a cursor to get the next page.
+
+    Returns:
+        tuple. A 2-tuple consisting of:
+            - list(str). A list of exploration ids that match the query.
+            - str or None. A cursor if there are more matching explorations to
+              fetch, None otherwise. If a cursor is returned, it will be a
+              web-safe string that can be used in URLs.
+    """
+    return search_services.search(
+        query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
+
+
+def delete_explorations_from_search_index(exploration_ids):
+    """Deletes the documents corresponding to these exploration_ids from the
+    search index.
+
+    Args:
+        exploration_ids: list(str). A list of exploration ids whose
+            documents are to be deleted from the search index.
+    """
+    search_services.delete_documents_from_index(
+        exploration_ids, SEARCH_INDEX_EXPLORATIONS)
+
+
+def patch_exploration_search_document(exp_id, update):
+    """Patches an exploration's current search document, with the values
+    from the 'update' dictionary.
+
+    Args:
+        exp_id: str. The id of the exploration to be patched.
+        update: dict. Key-value pairs to patch the exploration's search
+            document with.
+    """
+    doc = search_services.get_document_from_index(
+        exp_id, SEARCH_INDEX_EXPLORATIONS)
+    doc.update(update)
+    search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
+
+
+def clear_exploration_search_index():
+    """WARNING: This runs in-request, and may therefore fail if there are too
+    many entries in the index.
+    """
+    search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
+
+def search_collections(query, limit, sort=None, cursor=None):
+    """Searches through the available collections.
+
+    Args:
+        query_string: str. the query string to search for.
+        sort: str. This indicates how to sort results. This should be a string
+            of space separated values. Each value should start with a '+' or a
+            '-' character indicating whether to sort in ascending or descending
+            order respectively. This character should be followed by a field
+            name to sort on. When this is None, results are returned based on
+            their ranking (which is currently set to the same default value
+            for all collections).
+        limit: int. the maximum number of results to return.
+        cursor: str. A cursor, used to get the next page of results.
+            If there are more documents that match the query than 'limit', this
+            function will return a cursor to get the next page.
+
+    Returns:
+        A 2-tuple with the following elements:
+            - A list of collection ids that match the query.
+            - A cursor if there are more matching collections to fetch, None
+              otherwise. If a cursor is returned, it will be a web-safe string
+              that can be used in URLs.
+    """
+    return search_services.search(
+        query, SEARCH_INDEX_COLLECTIONS, cursor, limit, sort, ids_only=True)
+
+
+def delete_collections_from_search_index(collection_ids):
+    """Removes the given collections from the search index.
+
+    Args:
+        collection_ids: list(str). List of IDs of the collections to be removed
+            from the search index.
+    """
+    search_services.delete_documents_from_index(
+        collection_ids, SEARCH_INDEX_COLLECTIONS)
+
+
+def patch_collection_search_document(collection_id, update):
+    """Patches an collection's current search document, with the values
+    from the 'update' dictionary.
+
+    Args:
+        collection_id: str. ID of the collection to be patched.
+        update: dict. Key-value pairs to patch the current search document with.
+    """
+    doc = search_services.get_document_from_index(
+        collection_id, SEARCH_INDEX_COLLECTIONS)
+    doc.update(update)
+    search_services.add_documents_to_index([doc], SEARCH_INDEX_COLLECTIONS)
+
+
+def clear_collection_search_index():
+    """Clears the search index.
+
+    WARNING: This runs in-request, and may therefore fail if there are too
+    many entries in the index.
+    """
+    search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
+
+def update_collection_status_in_search(collection_id):
+    """Updates the status field of a collection in the search index.
+
+    Args:
+        collection_id: str. ID of the collection.
+    """
+    rights = rights_manager.get_collection_rights(collection_id)
+    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+        delete_collections_from_search_index([collection_id])
+    else:
+        patch_collection_search_document(rights.id, {})

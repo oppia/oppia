@@ -42,7 +42,6 @@ import utils
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
 memcache_services = models.Registry.import_memcache_services()
-gae_search_services = models.Registry.import_search_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -536,7 +535,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
-        collection_ids, search_cursor = search_collections(
+        collection_ids, search_cursor = search_services.search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
         invalid_collection_ids = []
@@ -834,7 +833,7 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
     memcache_services.delete(collection_memcache_key)
 
     # Delete the collection from search.
-    delete_documents_from_search_index([collection_id])
+    search_services.delete_collections_from_search_index([collection_id])
 
     # Delete the summary of the collection (regardless of whether
     # force_deletion is True or not).
@@ -1240,15 +1239,6 @@ def get_next_page_of_all_non_private_commits(
     ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-def clear_search_index():
-    """Clears the search index.
-
-    WARNING: This runs in-request, and may therefore fail if there are too
-    many entries in the index.
-    """
-    gae_search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
-
-
 def index_collections_given_ids(collection_ids):
     """Adds the given collections to the search index.
 
@@ -1257,70 +1247,6 @@ def index_collections_given_ids(collection_ids):
             to be indexed.
     """
     collection_summaries = get_collection_summaries_matching_ids(collection_ids)
-    search_services.index_collection_summaries(collection_summaries)
-
-
-def patch_collection_search_document(collection_id, update):
-    """Patches an collection's current search document, with the values
-    from the 'update' dictionary.
-
-    Args:
-        collection_id: str. ID of the collection to be patched.
-        update: dict. Key-value pairs to patch the current search document with.
-    """
-    doc = gae_search_services.get_document_from_index(
-        collection_id, SEARCH_INDEX_COLLECTIONS)
-    doc.update(update)
-    gae_search_services.add_documents_to_index([doc], SEARCH_INDEX_COLLECTIONS)
-
-
-def update_collection_status_in_search(collection_id):
-    """Updates the status field of a collection in the search index.
-
-    Args:
-        collection_id: str. ID of the collection.
-    """
-    rights = rights_manager.get_collection_rights(collection_id)
-    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-        delete_documents_from_search_index([collection_id])
-    else:
-        patch_collection_search_document(rights.id, {})
-
-
-def delete_documents_from_search_index(collection_ids):
-    """Removes the given collections from the search index.
-
-    Args:
-        collection_ids: list(str). List of IDs of the collections to be removed
-            from the search index.
-    """
-    gae_search_services.delete_documents_from_index(
-        collection_ids, SEARCH_INDEX_COLLECTIONS)
-
-
-def search_collections(query, limit, sort=None, cursor=None):
-    """Searches through the available collections.
-
-    Args:
-        query_string: str. the query string to search for.
-        sort: str. This indicates how to sort results. This should be a string
-            of space separated values. Each value should start with a '+' or a
-            '-' character indicating whether to sort in ascending or descending
-            order respectively. This character should be followed by a field
-            name to sort on. When this is None, results are returned based on
-            their ranking (which is currently set to the same default value
-            for all collections).
-        limit: int. the maximum number of results to return.
-        cursor: str. A cursor, used to get the next page of results.
-            If there are more documents that match the query than 'limit', this
-            function will return a cursor to get the next page.
-
-    Returns:
-        A 2-tuple with the following elements:
-            - A list of collection ids that match the query.
-            - A cursor if there are more matching collections to fetch, None
-              otherwise. If a cursor is returned, it will be a web-safe string
-              that can be used in URLs.
-    """
-    return gae_search_services.search(
-        query, SEARCH_INDEX_COLLECTIONS, cursor, limit, sort, ids_only=True)
+    search_services.index_collection_summaries([
+        collection_summary for collection_summary in collection_summaries
+        if collection_summary is not None])
