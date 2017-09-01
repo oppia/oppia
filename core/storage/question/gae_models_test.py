@@ -15,9 +15,9 @@
 from core.domain import exp_domain
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
+
 
 class QuestionModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionModel class."""
