@@ -842,7 +842,6 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-        #print reader_dict
         init_state_name = reader_dict['exploration']['init_state_name']
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
@@ -857,8 +856,8 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         init_state_data = (
             reader_dict['exploration']['states'][init_state_name])
         init_content = init_state_data['content']['html']
-        #self.assertIn('Hi, welcome to Oppia!', init_content)
-        #self.assertNotIn('ABC', init_content)
+        self.assertIn('Hi, welcome to Oppia!', init_content)
+        self.assertNotIn('ABC', init_content)
 
         # v2 contains 'ABC'.
         reader_dict = self.get_json(
