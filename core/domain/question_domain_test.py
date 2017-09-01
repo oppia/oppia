@@ -16,9 +16,9 @@
 
 """Tests for question domain objects."""
 
+from core.domain import exp_domain
 from core.domain import question_domain
 from core.tests import test_utils
-
 import utils
 
 
@@ -45,10 +45,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_validation(self):
         """Test to verify validate method of Question domain object."""
 
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
+
         test_object = {
             'question_id': 'col1.random',
             'title': 'abc',
-            'question_data': {},
+            'question_data': question_data,
             'question_data_schema_version': 1,
             'collection_id': 'col1',
             'language_code': 'en'
@@ -66,18 +69,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             question.validate()
 
         question.question_id = 'col1.random'
-        question.title = 1
+        question.update_title(1)
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected title to be a string')):
             question.validate()
 
-        question.title = 'ABC'
-        question.question_data = []
+        question.update_title('ABC')
+        question.update_question_data([])
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected question_data to be a dict')):
             question.validate()
 
-        question.question_data = {}
+        question.update_question_data(question_data)
         question.question_data_schema_version = 'abc'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected question_data_schema_version to be a integer')):
@@ -95,16 +98,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'Expected language_code to be a string')):
             question.validate()
 
-        question.language_code = 'abc'
+        question.update_language_code('abc')
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Invalid language code')):
             question.validate()
 
     def test_from_dict(self):
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
+
         expected_object = {
             'question_id': 'col1.random',
             'title': 'abc',
-            'question_data': {},
+            'question_data': question_data,
             'question_data_schema_version': 1,
             'collection_id': 'col1',
             'language_code': 'en'
@@ -128,3 +134,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(question.question_data, {})
         self.assertEqual(question.title, '')
         self.assertEqual(question.language_code, 'en')
+
+    def test_update_methods(self):
+        """Tests update_title, update_question_data and update_language_code
+        methods of the question domain object."""
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
+
+        test_object = {
+            'question_id': 'col1.random',
+            'title': 'abc',
+            'question_data': question_data,
+            'question_data_schema_version': 1,
+            'collection_id': 'col1',
+            'language_code': 'en'
+        }
+
+        question = question_domain.Question.from_dict(test_object)
+        question.update_title('hello')
+        self.assertEqual(question.title, 'hello')
+
+        question.update_question_data({})
+        self.assertEqual(question.question_data, {})
+
+        question.update_language_code('es')
+        self.assertEqual(question.language_code, 'es')

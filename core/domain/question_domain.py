@@ -16,11 +16,12 @@
 
 """Domain objects relating to question."""
 
-from constants import constants
+from core.domain import exp_domain
 from core.platform import models
-
+from constants import constants
 import feconf
 import utils
+
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
@@ -36,13 +37,13 @@ CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
 
 
 class QuestionChange(object):
-    """Domain object for changes made to question object"""
+    """Domain object for changes made to question object."""
     QUESTION_PROPERTIES = (
         QUESTION_PROPERTY_TITLE, QUESTION_PROPERTY_QUESTION_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE)
 
     def __init__(self, change_dict):
-        """Initialize a QuestoinChange object from a dict.
+        """Initialize a QuestionChange object from a dict.
 
         Args:
             change_dict: dict. Represents a command. It should have a 'cmd'
@@ -61,6 +62,7 @@ class QuestionChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
+
 
 class Question(object):
     """Domain object for a questions.
@@ -126,6 +128,8 @@ class Question(object):
             raise utils.ValidationError(
                 'Expected question_data to be a dict, received %s' %
                 self.question_data)
+        question_data = exp_domain.State.from_dict(self.question_data)
+        question_data.validate('', True)
 
         if not isinstance(self.question_data_schema_version, int):
             raise utils.ValidationError(
@@ -165,8 +169,8 @@ class Question(object):
     @classmethod
     def create_default_question(
             cls, question_id, collection_id,
-            title=feconf.DEFAULT_QUESTION_TITLE,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            title='',
+            language_code='en'):
         """Returns a Question domain object with default values.
 
         Args:
@@ -198,7 +202,7 @@ class Question(object):
 
         Args:
             language_code: str. The ISO 639-1 code for the language this
-            question is written in.
+                question is written in.
         """
         self.language_code = language_code
 

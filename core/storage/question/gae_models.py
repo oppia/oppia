@@ -15,12 +15,12 @@
 """Models for storing the question data models."""
 
 from core.platform import models
+import utils
 
 from google.appengine.ext import ndb
 
-import utils
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question snapshot."""

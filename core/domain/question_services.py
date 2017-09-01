@@ -20,7 +20,6 @@ import logging
 
 from core.domain import question_domain
 from core.platform import models
-
 import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
@@ -49,12 +48,13 @@ def _create_question(committer_id, question, commit_message):
     model.commit(committer_id, commit_message, [{
         'cmd': CMD_CREATE_NEW,
         'title': question.title
-        }])
+    }])
     return model
 
 
 def add_question(committer_id, question):
     """Saves a new question.
+
     Args:
         committer_id: str. ID of the committer.
         question: Question. Question to be saved.
@@ -68,6 +68,7 @@ def add_question(committer_id, question):
 
 def delete_question(committer_id, question_id, force_deletion=False):
     """Deletes the question with the given question_id.
+
     Args:
         committer_id: str. ID of the committer.
         question_id: str. ID of the question.
@@ -135,7 +136,7 @@ def apply_change_list(question_id, change_list):
                    for change_dict in change_list]
 
         for change in changes:
-            if change.cmd == question_domain.CMD_EDIT_QUESTION_PROPERTY:
+            if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
                 if (change.property_name ==
                         question_domain.QUESTION_PROPERTY_TITLE):
                     question.update_title(change.new_value)
@@ -155,7 +156,7 @@ def apply_change_list(question_id, change_list):
         raise
 
 
-def _save_collection(committer_id, question, commit_message, change_list):
+def _save_question(committer_id, question, change_list, commit_message):
     """Validates a question and commits it to persistent storage.
 
     Args:
@@ -178,7 +179,7 @@ def _save_collection(committer_id, question, commit_message, change_list):
 
     question.validate()
 
-    question_model = question_models.QuestionModel.get(question.id)
+    question_model = question_models.QuestionModel.get(question.question_id)
     question_model.title = question.title
     question_model.question_data = question.question_data
     question_model.question_data_schema_version = (
@@ -202,4 +203,4 @@ def update_question(committer_id, question_id, change_list, commit_message):
             question.
     """
     question = apply_change_list(question_id, change_list)
-    _save_collection(committer_id, question, commit_message, change_list)
+    _save_question(committer_id, question, change_list, commit_message)

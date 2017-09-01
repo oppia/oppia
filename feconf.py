@@ -197,9 +197,6 @@ DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
 
-# Default title for a new question.
-DEFAULT_QUESTION_TITLE = ''
-
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
 # Shared secret key for default VM.

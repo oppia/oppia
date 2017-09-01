@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core.domain import exp_domain
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import user_services
@@ -36,7 +37,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_add_question(self):
-        question_data = {}
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
         question_id = 'dummy'
         title = 'A Question'
         question_data_schema_version = 1
@@ -58,7 +60,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(model.language_code, language_code)
 
     def test_delete_question(self):
-        question_data = {}
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
         question_id = 'dummy'
         title = 'A Question'
         question_data_schema_version = 1
@@ -76,3 +79,32 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'Entity for class QuestionModel with id %s not found' %(
                 question_model.id))):
             question_models.QuestionModel.get(question_model.id)
+
+    def test_update_question(self):
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
+        question_id = 'dummy'
+        title = 'A Question'
+        question_data_schema_version = 1
+        collection_id = 'col1'
+        language_code = 'en'
+        question = question_domain.Question(
+            question_id, title, question_data, question_data_schema_version,
+            collection_id, language_code)
+        question.validate()
+
+        question_model = question_services.add_question(self.owner_id, question)
+        change_list = [{'cmd': 'update_question_property',
+                        'property_name': 'title',
+                        'new_value': 'ABC',
+                        'old_value': 'A Question'}]
+        question_services.update_question(
+            self.owner_id, question_model.id, change_list, 'updated title')
+
+        model = question_models.QuestionModel.get(question_model.id)
+        self.assertEqual(model.title, 'ABC')
+        self.assertEqual(model.question_data, question_data)
+        self.assertEqual(model.question_data_schema_version,
+                         question_data_schema_version)
+        self.assertEqual(model.collection_id, collection_id)
+        self.assertEqual(model.language_code, language_code)
