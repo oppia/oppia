@@ -50,7 +50,7 @@ def _exp_summary_to_search_dict(exp_summary):
     be indexed for further queries or not.
 
     Args:
-        exp: ExpSummaryModel. ExplorationSummary domain object.
+        exp_summary: ExpSummaryModel. ExplorationSummary domain object.
 
     Returns:
         dict. The representation of the given exploration, in a form that can
