@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for validating things and (optionally) displaying warning messages
- * if the validation fails.
+ * @fileoverview Service for validating things and (optionally) displaying warning
+ * messages if the validation fails.
  */
 
 oppia.factory('ValidatorsService', [
