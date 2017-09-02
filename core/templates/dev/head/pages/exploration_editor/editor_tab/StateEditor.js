@@ -19,17 +19,13 @@
 oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'explorationStatesService',
   'INTERACTION_SPECS', 'explorationAdvancedFeaturesService',
-  'UrlInterpolationService', 'ENABLE_FALLBACK_EDITOR', 'stateContentService',
+  'UrlInterpolationService', 'stateContentService',
   function(
       $scope, $rootScope, editorContextService, explorationStatesService,
       INTERACTION_SPECS, explorationAdvancedFeaturesService,
-      UrlInterpolationService, ENABLE_FALLBACK_EDITOR, stateContentService) {
+      UrlInterpolationService, stateContentService) {
     $scope.areParametersEnabled = (
       explorationAdvancedFeaturesService.areParametersEnabled);
-    $scope.areFallbacksEnabled = (
-      explorationAdvancedFeaturesService.areFallbacksEnabled);
-
-    $scope.fallbackEditorIsEnabled = ENABLE_FALLBACK_EDITOR;
 
     $scope.currentStateIsTerminal = false;
     $scope.interactionIdIsSet = false;
@@ -44,7 +40,10 @@ oppia.controller('StateEditor', [
 
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
       $scope.interactionIdIsSet = Boolean(newInteractionId);
-      $scope.currentStateIsTerminal = (
+      $scope.currentInteractionCanHaveSolution = Boolean(
+        $scope.interactionIdIsSet &&
+        INTERACTION_SPECS[newInteractionId].can_have_solution);
+      $scope.currentStateIsTerminal = Boolean(
         $scope.interactionIdIsSet && INTERACTION_SPECS[
           newInteractionId].is_terminal);
     });
@@ -60,7 +59,10 @@ oppia.controller('StateEditor', [
         var interactionId = explorationStatesService.getInteractionIdMemento(
           stateName);
         $scope.interactionIdIsSet = Boolean(interactionId);
-        $scope.currentStateIsTerminal = (
+        $scope.currentInteractionCanHaveSolution = Boolean(
+          $scope.interactionIdIsSet &&
+          INTERACTION_SPECS[interactionId].can_have_solution);
+        $scope.currentStateIsTerminal = Boolean(
           $scope.interactionIdIsSet &&
           INTERACTION_SPECS[interactionId].is_terminal);
 

@@ -869,7 +869,7 @@ def get_collection_snapshots_metadata(collection_id):
         collection_id, version_nums)
 
 
-def publish_collection_and_update_user_profiles(committer_id, collection_id):
+def publish_collection_and_update_user_profiles(committer, collection_id):
     """Publishes the collection with publish_collection() function in
     rights_manager.py, as well as updates first_contribution_msec.
 
@@ -877,10 +877,10 @@ def publish_collection_and_update_user_profiles(committer_id, collection_id):
     valid prior to publication.
 
     Args:
-        committer_id: str. ID of the committer.
+        committer: UserActionsInfo. UserActionsInfo object for the committer.
         collection_id: str. ID of the collection to be published.
     """
-    rights_manager.publish_collection(committer_id, collection_id)
+    rights_manager.publish_collection(committer, collection_id)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     collection_summary = get_collection_summary_by_id(collection_id)
     contributor_ids = collection_summary.contributor_ids
@@ -1151,8 +1151,8 @@ def load_demo(collection_id):
     collection = save_new_collection_from_yaml(
         feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
-    publish_collection_and_update_user_profiles(
-        feconf.SYSTEM_COMMITTER_ID, collection_id)
+    system_user = user_services.get_system_user()
+    publish_collection_and_update_user_profiles(system_user, collection_id)
 
     index_collections_given_ids([collection_id])
 

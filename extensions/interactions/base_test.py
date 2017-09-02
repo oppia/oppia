@@ -147,10 +147,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         interaction_dict = interaction.to_dict()
         self.assertItemsEqual(interaction_dict.keys(), [
             'id', 'name', 'description', 'display_mode',
-            'customization_arg_specs', 'is_trainable',
-            'is_interaction_trainable', 'is_terminal', 'is_linear',
-            'rule_descriptions', 'instructions', 'narrow_instructions',
-            'needs_summary', 'default_outcome_heading'])
+            'customization_arg_specs', 'is_trainable', 'is_terminal',
+            'is_linear', 'rule_descriptions', 'instructions',
+            'narrow_instructions', 'needs_summary',
+            'default_outcome_heading', 'can_have_solution'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
@@ -408,6 +408,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             else:
                 self.assertIsNone(interaction.default_outcome_heading)
 
+            # Check that interactions that can have solution cannot be linear.
+            if interaction.can_have_solution:
+                self.assertFalse(interaction.is_linear)
+
             default_object_values = obj_services.get_default_object_values()
 
             # Check that the rules for this interaction have object editor
@@ -418,8 +422,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 for (_, param_obj_cls) in param_list:
                     # TODO(sll): Get rid of these special cases.
                     if param_obj_cls.__name__ in [
-                            'NonnegativeInt', 'ListOfGraph',
-                            'ListOfCoordTwoDim', 'SetOfNormalizedString']:
+                            'NonnegativeInt', 'ListOfCodeEvaluation',
+                            'ListOfCoordTwoDim', 'ListOfGraph',
+                            'SetOfNormalizedString']:
                         continue
 
                     # Check that the rule has an object editor template.

@@ -166,7 +166,6 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
         exploration_model.blurb, exploration_model.author_notes,
-        exploration_model.skin_customizations,
         versioned_exploration_states['states_schema_version'],
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
@@ -682,34 +681,12 @@ def apply_change_list(exploration_id, change_list):
                         change.new_value)
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS):
-                    state.update_interaction_fallbacks(change.new_value)
-                elif (
-                        change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     state.update_interaction_hints(change.new_value)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     state.update_interaction_solution(change.new_value)
-            elif change.cmd == exp_domain.CMD_ADD_GADGET:
-                exploration.add_gadget(change.gadget_dict, change.panel)
-            elif change.cmd == exp_domain.CMD_RENAME_GADGET:
-                exploration.rename_gadget(
-                    change.old_gadget_name, change.new_gadget_name)
-            elif change.cmd == exp_domain.CMD_DELETE_GADGET:
-                exploration.delete_gadget(change.gadget_name)
-            elif change.cmd == exp_domain.CMD_EDIT_GADGET_PROPERTY:
-                gadget_instance = exploration.get_gadget_instance_by_name(
-                    change.gadget_name)
-                if (change.property_name ==
-                        exp_domain.GADGET_PROPERTY_VISIBILITY):
-                    gadget_instance.update_visible_in_states(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.GADGET_PROPERTY_CUST_ARGS):
-                    gadget_instance.update_customization_args(
-                        change.new_value)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -800,8 +777,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.tags = exploration.tags
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
-    exploration_model.skin_customizations = (
-        exploration.skin_instance.to_dict()['skin_customizations'])
 
     exploration_model.states_schema_version = exploration.states_schema_version
     exploration_model.init_state_name = exploration.init_state_name
@@ -866,8 +841,6 @@ def _create_exploration(
         tags=exploration.tags,
         blurb=exploration.blurb,
         author_notes=exploration.author_notes,
-        skin_customizations=exploration.skin_instance.to_dict(
-            )['skin_customizations'],
         states_schema_version=exploration.states_schema_version,
         init_state_name=exploration.init_state_name,
         states={
@@ -1010,7 +983,7 @@ def _get_last_updated_by_human_ms(exp_id):
     return last_human_update_ms
 
 
-def publish_exploration_and_update_user_profiles(committer_id, exp_id):
+def publish_exploration_and_update_user_profiles(committer, exp_id):
     """Publishes the exploration with publish_exploration() function in
     rights_manager.py, as well as updates first_contribution_msec. Sends an
     email to the subscribers of the commiter informing them that an exploration
@@ -1020,13 +993,14 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
     valid prior to publication.
 
     Args:
-        committer_id: str. The id of the user who made the commit.
+        committer: UserActionsInfo. UserActionsInfo object for the user who
+            made the commit.
         exp_id: str. The id of the exploration to be published.
     """
-    rights_manager.publish_exploration(committer_id, exp_id)
+    rights_manager.publish_exploration(committer, exp_id)
     exp_title = get_exploration_by_id(exp_id).title
     email_subscription_services.inform_subscribers(
-        committer_id, exp_id, exp_title)
+        committer.user_id, exp_id, exp_title)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
     for contributor in contributor_ids:
@@ -1456,7 +1430,7 @@ def load_demo(exploration_id):
         assets_list)
 
     publish_exploration_and_update_user_profiles(
-        feconf.SYSTEM_COMMITTER_ID, exploration_id)
+        user_services.get_system_user(), exploration_id)
 
     index_explorations_given_ids([exploration_id])
 

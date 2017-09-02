@@ -25,6 +25,7 @@ from core.platform import models
 import feconf
 import utils
 
+app_identity_services = models.Registry.import_app_identity_services()
 (file_models,) = models.Registry.import_models([
     models.NAMES.file
 ])
@@ -268,7 +269,7 @@ class GcsFileSystem(object):
         raise NotImplementedError
 
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
-        bucket_name = feconf.GCS_RESOURCE_BUCKET_NAME
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
 
         # Upload to GCS bucket with filepath
         # "<bucket>/<exploration-id>/assets/<filepath>".

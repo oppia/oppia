@@ -50,7 +50,6 @@ describe('State Editor controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -76,7 +75,6 @@ describe('State Editor controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -102,7 +100,6 @@ describe('State Editor controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: [{
@@ -203,7 +200,6 @@ describe('State Editor controller', function() {
               dest: 'State',
               param_changes: []
             },
-            fallbacks: [],
             hints: [],
             confirmed_unclassified_answers: []
           },

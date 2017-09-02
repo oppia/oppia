@@ -67,6 +67,8 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
 
 class CollectionQueriesUnitTests(CollectionServicesUnitTests):
     """Tests query methods."""
@@ -304,7 +306,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     COL_ID_0 = '0_arch_bridges_in_england'
     COL_ID_1 = '1_welcome_introduce_oppia'
     COL_ID_2 = '2_welcome_introduce_oppia_interactions'
-    COL_ID_3 = '3_welcome_gadgets'
+    COL_ID_3 = '3_welcome'
     COL_ID_4 = '4_languages_learning_basic_verbs_in_spanish'
     COL_ID_5 = '5_languages_private_collection_in_spanish'
 
@@ -323,8 +325,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             self.COL_ID_2, self.owner_id,
             title='Introduce Interactions in Oppia', category='Welcome')
         self.save_new_default_collection(
-            self.COL_ID_3, self.owner_id, title='Welcome to Gadgets',
-            category='Welcome')
+            self.COL_ID_3, self.owner_id, title='Welcome', category='Welcome')
         self.save_new_default_collection(
             self.COL_ID_4, self.owner_id,
             title='Learning basic verbs in Spanish', category='Languages')
@@ -334,11 +335,11 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
 
         # Publish collections 0-4. Private collections should not show up in
         # a search query, even if they're indexed.
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_0)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_1)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_3)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_4)
+        rights_manager.publish_collection(self.owner, self.COL_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_1)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
+        rights_manager.publish_collection(self.owner, self.COL_ID_3)
+        rights_manager.publish_collection(self.owner, self.COL_ID_4)
 
         # Add the collections to the search index.
         collection_services.index_collections_given_ids([
@@ -650,8 +651,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         exp_id = 'exp_id'
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=exp_id)
-        rights_manager.publish_exploration(self.owner_id, exp_id)
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         # This should not give an error.
         collection_services.update_collection(
@@ -753,7 +754,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         private_exp_id = 'private_exp_id0'
         self.save_new_valid_exploration(private_exp_id, self.owner_id)
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.assertTrue(
             rights_manager.is_collection_public(self.COLLECTION_ID))
@@ -776,7 +777,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         private_exp_id = 'private_exp_id0'
         self.save_new_valid_exploration(public_exp_id, self.owner_id)
         self.save_new_valid_exploration(private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(self.owner_id, public_exp_id)
+        rights_manager.publish_exploration(self.owner, public_exp_id)
 
         self.assertTrue(
             rights_manager.is_collection_private(self.COLLECTION_ID))
@@ -1089,8 +1090,8 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 
     def test_record_commit_message(self):
         """Check published collections record commit messages."""
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
@@ -1104,7 +1105,7 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 
     def test_demand_commit_message(self):
         """Check published collections demand commit messages."""
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         with self.assertRaisesRegexp(
             ValueError,
@@ -1169,8 +1170,8 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
         # Publish the collection and any explorations contained within it. This
         # does not affect the collection version history.
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        rights_manager.publish_exploration(self.owner_id, exp_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+        rights_manager.publish_exploration(self.owner, exp_id)
 
         snapshots_metadata = (
             collection_services.get_collection_snapshots_metadata(
@@ -1464,6 +1465,8 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert = user_services.UserActionsInfo(self.albert_id)
+        self.bob = user_services.UserActionsInfo(self.bob_id)
 
         # This needs to be done in a toplevel wrapper because the datastore
         # puts to the event log are asynchronous.
@@ -1501,10 +1504,10 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
                 Exception, 'This collection cannot be published'
                 ):
                 rights_manager.publish_collection(
-                    self.bob_id, self.COLLECTION_ID_2)
+                    self.bob, self.COLLECTION_ID_2)
 
             rights_manager.publish_collection(
-                self.albert_id, self.COLLECTION_ID_2)
+                self.albert, self.COLLECTION_ID_2)
 
         populate_datastore()
 
@@ -1628,8 +1631,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         # expecting the last collection to be indexed.
         for ind in xrange(4):
             rights_manager.publish_collection(
-                self.owner_id,
-                expected_collection_ids[ind])
+                self.owner, expected_collection_ids[ind])
 
         with add_docs_swap:
             collection_services.index_collections_given_ids(all_collection_ids)
@@ -1750,10 +1752,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
 
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_collection(
-            self.owner_id, self.COLLECTION_ID, self.viewer_id,
+            self.owner, self.COLLECTION_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         rights_manager.assign_role_for_collection(
-            self.owner_id, self.COLLECTION_ID, self.editor_id,
+            self.owner, self.COLLECTION_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
         # Check that owner and editor may edit, but not viewer.
@@ -1772,6 +1774,8 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        albert = user_services.UserActionsInfo(albert_id)
+
         # Have Albert create a collection.
         self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
         # Have Bob edit the collection.
@@ -1785,10 +1789,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             'Changed title to Bob title.')
         # Albert adds an owner and an editor.
         rights_manager.assign_role_for_collection(
-            albert_id, self.COLLECTION_ID, self.viewer_id,
+            albert, self.COLLECTION_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         rights_manager.assign_role_for_collection(
-            albert_id, self.COLLECTION_ID, self.editor_id,
+            albert, self.COLLECTION_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
         # Verify that only Albert and Bob are listed as contributors for the
         # collection.
