@@ -10,7 +10,7 @@
   <i class="fa audio-controls-button-icon"
      style="min-width: 24px; text-align: left;"
      ng-click="onSpeakerIconClicked()"
-     ng-class="{'fa-volume-off': showSpeakerSilentIcon(), 'fa-volume-up': showSpeakerPlayingIcon(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage()}"
+     ng-class="{'fa-volume-off': !isAudioPlaying(), 'fa-volume-up': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage()}"
      tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
      tooltip-append-to-body="true"></i>
 </div>

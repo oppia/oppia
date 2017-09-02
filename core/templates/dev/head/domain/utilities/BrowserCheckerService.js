@@ -25,15 +25,15 @@ oppia.factory('BrowserCheckerService', function() {
   var isIOSChrome = winNav.userAgent.match('CriOS');
 
   var _isChrome = function() {
-    // For details on the reliabiltiy of this check, see
+    // For details on the reliability of this check, see
     // https://stackoverflow.com/questions/4565112/
     // javascript-how-to-find-out-if-the-user-browser-is-chrome
     if (isIOSChrome ||
-        isChromium !== null &&
+        (isChromium !== null &&
         isChromium !== undefined &&
         vendorName === 'Google Inc.' &&
         isOpera == false &&
-        isIEedge == false) {
+        isIEedge == false)) {
       return true;
     } else {
       return false;
