@@ -86,7 +86,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     # ID of current student's session
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
-    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    client_time_spent_in_secs = ndb.FloatProperty()
     # Whether the submitted answer received useful feedback
     is_feedback_useful = ndb.BooleanProperty(indexed=True)
     # Whether the submitted answer is the correct answer.
@@ -94,6 +94,8 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -149,10 +151,12 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec). This
     # should be equal to the MIN_TIME defined for recording this event.
-    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    client_time_spent_in_secs = ndb.FloatProperty()
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -204,13 +208,15 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     # ID of current student's session
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
-    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    client_time_spent_in_secs = ndb.FloatProperty()
     # Whether the solution was triggered before the student submitted a correct
     # answer to the same state.
     is_solution_preceding_answer = ndb.BooleanProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
