@@ -21,7 +21,7 @@ var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
 
-describe('Collections', function() {
+fdescribe('Collections', function() {
   beforeAll(function() {
     var USERNAME = 'aliceCollections';
     users.createUser('alice@collections.com', USERNAME);
