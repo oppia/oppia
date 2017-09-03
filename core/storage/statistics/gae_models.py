@@ -161,7 +161,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs):
+               client_time_spent_in_secs):
         """Creates a new actual exploration start event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
