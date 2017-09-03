@@ -805,7 +805,7 @@ md-content.oppia-profile-portfolio-container {
   angular-material has been upgraded.
 */
 html p, body p {
-  margin-top: -5px;
+  margin-top: 15px;
 }
 
 h1, h2 {
