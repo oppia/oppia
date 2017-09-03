@@ -87,10 +87,16 @@ oppia.directive('schemaBasedUnicodeEditor', [
             }
           };
 
+          var defaultPlaceholderTextForMobile = "Tap here to respond!";
           $scope.getPlaceholder = function() {
             if (!$scope.uiConfig()) {
               return '';
             } else {
+              if (!$scope.uiConfig().placeholder) {
+                if (deviceInfoService.hasTouchEvents()) {
+                  return defaultPlaceholderTextForMobile;
+                }
+              }
               return $scope.uiConfig().placeholder;
             }
           };
