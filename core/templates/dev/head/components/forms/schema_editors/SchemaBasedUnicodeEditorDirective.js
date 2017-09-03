@@ -33,7 +33,8 @@ oppia.directive('schemaBasedUnicodeEditor', [
         'schema_based_unicode_editor_directive.html'),
       restrict: 'E',
       controller: [
-        '$scope', '$filter', '$sce', function($scope, $filter, $sce) {
+        '$scope', '$filter', '$sce', '$translate', 'deviceInfoService',
+        function($scope, $filter, $sce, $translate, deviceInfoService) {
           if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
             // Flag that is flipped each time the codemirror view is
             // shown. (The codemirror instance needs to be refreshed
@@ -87,15 +88,16 @@ oppia.directive('schemaBasedUnicodeEditor', [
             }
           };
 
-          var defaultPlaceholderTextForMobile = "Tap here to respond!";
           $scope.getPlaceholder = function() {
             if (!$scope.uiConfig()) {
               return '';
             } else {
-              if (!$scope.uiConfig().placeholder) {
-                if (deviceInfoService.hasTouchEvents()) {
-                  return defaultPlaceholderTextForMobile;
-                }
+              if (!$scope.uiConfig().placeholder && (
+                  deviceInfoService.hasTouchEvents())) {
+                $translate('I18N_DEFAULT_MOBILE_PLACEHOLDER')
+                  .then(function(translatedValue) {
+                    return translatedValue;
+                  });
               }
               return $scope.uiConfig().placeholder;
             }
