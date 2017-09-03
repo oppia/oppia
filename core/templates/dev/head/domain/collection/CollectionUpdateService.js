@@ -22,6 +22,8 @@
 // These should match the constants defined in core.domain.collection_domain.
 // TODO(bhenning): The values of these constants should be provided by the
 // backend.
+// NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
+// 'acquired_skills' are deprecated. Do not use them.
 oppia.constant('CMD_ADD_COLLECTION_NODE', 'add_collection_node');
 oppia.constant('CMD_DELETE_COLLECTION_NODE', 'delete_collection_node');
 oppia.constant('CMD_EDIT_COLLECTION_PROPERTY', 'edit_collection_property');
@@ -38,11 +40,6 @@ oppia.constant(
   'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS', 'prerequisite_skill_ids');
 oppia.constant(
   'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS', 'acquired_skill_ids');
-// Note: these properties are deprecated.
-oppia.constant(
-  'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS', 'prerequisite_skills');
-oppia.constant(
-  'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS', 'acquired_skills');
 
 oppia.factory('CollectionUpdateService', [
   'CollectionNodeObjectFactory', 'CollectionSkillObjectFactory',
@@ -120,39 +117,51 @@ oppia.factory('CollectionUpdateService', [
     };
 
     // A mutator object which provides generic apply() and reverse() functions
-    // for changing the skills of a collection. The skillListGetterCallback()
-    // takes a CollectionNode domain object and needs to return a SkillList
-    // domain object whose skills can be updated. The oldSkills parameter must
-    // be a copy of the current skills stored in the SkillList domain object.
-    var SetSkillsMutator = function(oldSkills, skillListGetterCallback) {
+    // for changing the skill IDs of a collection. The skillIdsGetterCallback()
+    // takes a CollectionNode domain object and needs to return a list of skill
+    // IDs whose elements can be updated. The oldSkillIds parameter must be a
+    // copy of the current skill IDs.
+    var SetSkillIdsMutator = function(oldSkillIds, skillIdsGetterCallback) {
       var _getCollectionNode = function(changeDict, collection) {
         var explorationId = _getExplorationIdFromChangeDict(changeDict);
         return collection.getCollectionNodeByExplorationId(explorationId);
       };
       this.apply = function(changeDict, collection) {
-        var skills = _getNewPropertyValueFromChangeDict(changeDict);
+        var newSkillIds = _getNewPropertyValueFromChangeDict(changeDict);
         var collectionNode = _getCollectionNode(changeDict, collection);
-        skillListGetterCallback(collectionNode).setSkills(skills);
+        var skillIds = skillIdsGetterCallback(collectionNode);
+        // Empty the list.
+        skillIds.length = 0;
+        // Add new skill IDs to the list without changing its binding.
+        newSkillIds.forEach(function(newSkillId) {
+          skillIds.push(newSkillId);
+        });
       };
       this.reverse = function(changeDict, collection) {
         var collectionNode = _getCollectionNode(changeDict, collection);
-        skillListGetterCallback(collectionNode).setSkills(oldSkills);
+        var skillIds = skillIdsGetterCallback(collectionNode);
+        // Empty the list.
+        skillIds.length = 0;
+        // Add new skill IDs to the list without changing its binding.
+        oldSkillIds.forEach(function(oldSkillId) {
+          skillIds.push(oldSkillId);
+        });
       };
     };
 
-    // An instance of SetSkillsMutator with apply() and reverse() functions
-    // which affect the prerequisite skills of a collecton node.
-    var SetPrerequisiteSkillsMutator = function(oldSkills) {
-      return new SetSkillsMutator(oldSkills, function(collectionNode) {
-        return collectionNode.getPrerequisiteSkillList();
+    // An instance of SetSkillIdsMutator with apply() and reverse() functions
+    // which affect the prerequisite skill IDs of a collecton node.
+    var SetPrerequisiteSkillIdsMutator = function(oldSkillIds) {
+      return new SetSkillIdsMutator(oldSkillIds, function(collectionNode) {
+        return collectionNode.getPrerequisiteSkillIds();
       });
     };
 
-    // An instance of SetSkillsMutator with apply() and reverse() functions
-    // which affect the acquired skills of a collecton node.
-    var SetAcquiredSkillsMutator = function(oldSkills) {
-      return new SetSkillsMutator(oldSkills, function(collectionNode) {
-        return collectionNode.getAcquiredSkillList();
+    // An instance of SetSkillIdsMutator with apply() and reverse() functions
+    // which affect the acquired skill IDs of a collecton node.
+    var SetAcquiredSkillIdsMutator = function(oldSkillIds) {
+      return new SetSkillIdsMutator(oldSkillIds, function(collectionNode) {
+        return collectionNode.getAcquiredSkillIds();
       });
     };
 
@@ -343,28 +352,28 @@ oppia.factory('CollectionUpdateService', [
        * Changes the prerequisite skill ids of an exploration within a
        * collection and records the change in the undo/redo service.
        */
-      setPrerequisiteSkills: function(collection, explorationId, skills) {
+      setPrerequisiteSkillIds: function(collection, explorationId, skillIds) {
         var collectionNode = collection.getCollectionNodeByExplorationId(
           explorationId);
-        var oldSkills = collectionNode.getPrerequisiteSkillList().getSkills();
-        var mutator = new SetPrerequisiteSkillsMutator(oldSkills);
+        var oldSkillIds = collectionNode.getPrerequisiteSkillIds();
+        var mutator = new SetPrerequisiteSkillIdsMutator(oldSkillIds);
         _applyNodePropertyChange(
           collection, COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
-          explorationId, skills, oldSkills, mutator.apply, mutator.reverse);
+          explorationId, skillIds, oldSkillIds, mutator.apply, mutator.reverse);
       },
 
       /**
        * Changes the acquired skill ids of an exploration within a collection
        * and records the change in the undo/redo service.
        */
-      setAcquiredSkills: function(collection, explorationId, skills) {
+      setAcquiredSkillIds: function(collection, explorationId, skillIds) {
         var collectionNode = collection.getCollectionNodeByExplorationId(
           explorationId);
-        var oldSkills = collectionNode.getAcquiredSkillList().getSkills();
-        var mutator = new SetAcquiredSkillsMutator(oldSkills);
+        var oldSkillIds = collectionNode.getAcquiredSkillIds();
+        var mutator = new SetAcquiredSkillIdsMutator(oldSkillIds);
         _applyNodePropertyChange(
           collection, COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
-          explorationId, skills, oldSkills, mutator.apply, mutator.reverse);
+          explorationId, skillIds, oldSkillIds, mutator.apply, mutator.reverse);
       },
 
       /**

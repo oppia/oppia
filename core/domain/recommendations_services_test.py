@@ -250,12 +250,14 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         for exp_id, exp in self.EXP_DATA.iteritems():
             self.save_new_valid_exploration(
                 exp_id, exp['owner_id'], category=exp['category'])
-            rights_manager.publish_exploration(exp['owner_id'], exp_id)
+            owner = user_services.UserActionsInfo(exp['owner_id'])
+            rights_manager.publish_exploration(owner, exp_id)
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         user_services.create_new_user(self.admin_id, self.ADMIN_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
 
     def test_recommendation_categories_and_matrix_headers_match(self):
         topic_similarities_lines = (
@@ -288,19 +290,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             exp_summaries['exp_id_4'].owner_ids,
             exp_summaries['exp_id_4'].status), 9.0)
 
-        rights_manager.publicize_exploration(self.admin_id, 'exp_id_4')
-        exp_summaries = exp_services.get_all_exploration_summaries()
-        self.assertEqual(recommendations_services.get_item_similarity(
-            exp_summaries['exp_id_4'].category,
-            exp_summaries['exp_id_4'].language_code,
-            exp_summaries['exp_id_4'].owner_ids,
-            exp_summaries['exp_id_4'].category,
-            exp_summaries['exp_id_4'].language_code,
-            exp_summaries['exp_id_4'].exploration_model_last_updated,
-            exp_summaries['exp_id_4'].owner_ids,
-            exp_summaries['exp_id_4'].status), 10.0)
-
-        rights_manager.unpublish_exploration(self.admin_id, 'exp_id_2')
+        rights_manager.unpublish_exploration(self.admin, 'exp_id_2')
         exp_summaries = exp_services.get_all_exploration_summaries()
         self.assertEqual(recommendations_services.get_item_similarity(
             exp_summaries['exp_id_1'].category,

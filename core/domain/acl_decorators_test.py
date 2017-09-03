@@ -17,6 +17,7 @@
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import webapp2
@@ -26,7 +27,7 @@ import webtest
 class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
     """Tests for play exploration decorator."""
     user_email = 'user@example.com'
-    user_name = 'user'
+    username = 'user'
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
@@ -39,9 +40,10 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
         super(PlayExplorationDecoratorTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -50,8 +52,7 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_guest_can_access_published_exploration(self):
         response = self.get_json('/mock/%s' % self.published_exp_id)
@@ -85,7 +86,7 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
 class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
     """Tests for play collection decorator."""
     user_email = 'user@example.com'
-    user_name = 'user'
+    username = 'user'
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
     published_col_id = 'col_id_1'
@@ -100,9 +101,10 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
         super(PlayCollectionDecoratorTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -117,10 +119,8 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.private_col_id, self.owner_id,
             exploration_id=self.private_col_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
-        rights_manager.publish_collection(
-            self.owner_id, self.published_col_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+        rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_guest_can_access_published_collection(self):
         response = self.get_json('/mock/%s' % self.published_col_id)
@@ -154,7 +154,7 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
 class EditCollectionDecoratorTest(test_utils.GenericTestBase):
     """Tests for can_edit_collection decorator."""
     user_email = 'user@example.com'
-    user_name = 'user'
+    username = 'user'
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
     published_col_id = 'col_id_1'
@@ -170,11 +170,12 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -189,10 +190,8 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.private_col_id, self.owner_id,
             exploration_id=self.private_col_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
-        rights_manager.publish_collection(
-            self.owner_id, self.published_col_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+        rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_guest_is_redirected_to_login_page(self):
         response = self.testapp.get(
@@ -237,7 +236,7 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
 
 class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
     """Tests for can_create_exploration decorator."""
-    user_name = 'banneduser'
+    username = 'banneduser'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -248,8 +247,8 @@ class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
     def setUp(self):
         super(CreateExplorationDecoratorTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.user_email, self.user_name)
-        self.set_banned_users([self.user_name])
+        self.signup(self.user_email, self.username)
+        self.set_banned_users([self.username])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/create', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -275,7 +274,7 @@ class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
 
 class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
     """Tests for can_create_collection decorator."""
-    user_name = 'collectioneditor'
+    username = 'collectioneditor'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -286,9 +285,9 @@ class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
     def setUp(self):
         super(CreateCollectionDecoratorTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_collection_editors([self.user_name])
+        self.set_collection_editors([self.username])
         self.set_admins([self.ADMIN_USERNAME])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/create', self.MockHandler)],
@@ -320,7 +319,7 @@ class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
 
 class AccessCreatorDashboardTest(test_utils.GenericTestBase):
     """Tests for can_access_creator_dashboard decorator."""
-    user_name = 'banneduser'
+    username = 'banneduser'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -332,8 +331,8 @@ class AccessCreatorDashboardTest(test_utils.GenericTestBase):
     def setUp(self):
         super(AccessCreatorDashboardTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.user_email, self.user_name)
-        self.set_banned_users([self.user_name])
+        self.signup(self.user_email, self.username)
+        self.set_banned_users([self.username])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/access', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -351,24 +350,25 @@ class AccessCreatorDashboardTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
 
-class ViewExplorationFeedbackTest(test_utils.GenericTestBase):
-    """Tests for can_view_exploration_feedback decorator."""
+class CommentOnFeedbackTest(test_utils.GenericTestBase):
+    """Tests for can_comment_on_exploration_feedback decorator."""
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
 
     class MockHandler(base.BaseHandler):
-        @acl_decorators.can_view_exploration_feedback
+        @acl_decorators.can_comment_on_feedback_thread
         def get(self, exploration_id):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(ViewExplorationFeedbackTest, self).setUp()
+        super(CommentOnFeedbackTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -378,29 +378,28 @@ class ViewExplorationFeedbackTest(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
 
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_guest_cannot_view_feedback_threads(self):
+    def test_guest_cannot_comment_on_feedback_threads(self):
         response = self.testapp.get(
             '/mock/%s' % self.private_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
-    def test_owner_can_view_feedback_for_private_exploration(self):
+    def test_owner_can_comment_on_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.private_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_moderator_can_view_feeback_public_exploration(self):
+    def test_moderator_can_comment_on_feeback_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.published_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_admin_can_view_feeback_private_exploration(self):
+    def test_admin_can_comment_on_feeback_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.private_exp_id, expect_errors=True)
@@ -451,7 +450,7 @@ class ManageEmailDashboardTest(test_utils.GenericTestBase):
 
 class RateExplorationTest(test_utils.GenericTestBase):
     """Tests for can_rate_exploration decorator."""
-    user_name = 'user'
+    username = 'user'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -461,7 +460,7 @@ class RateExplorationTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RateExplorationTest, self).setUp()
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -479,7 +478,7 @@ class RateExplorationTest(test_utils.GenericTestBase):
 
 
 class AccessModeratorPageTest(test_utils.GenericTestBase):
-    user_name = 'user'
+    username = 'user'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -490,7 +489,7 @@ class AccessModeratorPageTest(test_utils.GenericTestBase):
     def setUp(self):
         super(AccessModeratorPageTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.set_admins([self.ADMIN_USERNAME])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -512,7 +511,7 @@ class AccessModeratorPageTest(test_utils.GenericTestBase):
 
 class FlagExplorationTest(test_utils.GenericTestBase):
     """Tests for can_flag_exploration decorator."""
-    user_name = 'user'
+    username = 'user'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -522,7 +521,7 @@ class FlagExplorationTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FlagExplorationTest, self).setUp()
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -541,7 +540,7 @@ class FlagExplorationTest(test_utils.GenericTestBase):
 
 class SubscriptionToUsersTest(test_utils.GenericTestBase):
     """Tests for can_subscribe_to_users decorator."""
-    user_name = 'user'
+    username = 'user'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -551,7 +550,7 @@ class SubscriptionToUsersTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SubscriptionToUsersTest, self).setUp()
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -570,7 +569,7 @@ class SubscriptionToUsersTest(test_utils.GenericTestBase):
 
 class SendModeratorEmailsTest(test_utils.GenericTestBase):
 
-    user_name = 'user'
+    username = 'user'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -581,7 +580,7 @@ class SendModeratorEmailsTest(test_utils.GenericTestBase):
     def setUp(self):
         super(SendModeratorEmailsTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.set_admins([self.ADMIN_USERNAME])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -603,7 +602,7 @@ class SendModeratorEmailsTest(test_utils.GenericTestBase):
 
 class EditExplorationTest(test_utils.GenericTestBase):
     """Tests for can_edit_exploration decorator."""
-    user_name = 'banneduser'
+    username = 'banneduser'
     user_email = 'user@example.com'
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
@@ -618,11 +617,12 @@ class EditExplorationTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.user_name])
+        self.set_banned_users([self.username])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -631,8 +631,7 @@ class EditExplorationTest(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_banned_user_cannot_edit_exploration(self):
         self.login(self.user_email)
@@ -675,7 +674,7 @@ class ManageOwnProfileTest(test_utils.GenericTestBase):
 
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
-    user_name = 'user'
+    username = 'user'
     user_email = 'user@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -686,7 +685,7 @@ class ManageOwnProfileTest(test_utils.GenericTestBase):
     def setUp(self):
         super(ManageOwnProfileTest, self).setUp()
         self.signup(self.banned_user_email, self.banned_user)
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.set_banned_users([self.banned_user])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -721,6 +720,7 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -729,8 +729,7 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_owner_can_delete_owned_private_exploration(self):
         self.login(self.OWNER_EMAIL)
@@ -746,7 +745,7 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_owner_cannot_delete_published_exploratin(self):
+    def test_owner_cannot_delete_published_exploration(self):
         self.login(self.OWNER_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.published_exp_id, expect_errors=True)
@@ -763,9 +762,9 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
 
 class SuggestChangesTest(test_utils.GenericTestBase):
     """Tests for can_suggest_changes_to_exploration decorator."""
-    user_name = 'user'
+    username = 'user'
     user_email = 'user@example.com'
-    banned_user_name = 'banneduser'
+    banned_username = 'banneduser'
     banned_user_email = 'banned@example.com'
 
     class MockHandler(base.BaseHandler):
@@ -775,9 +774,9 @@ class SuggestChangesTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SuggestChangesTest, self).setUp()
-        self.signup(self.user_email, self.user_name)
-        self.signup(self.banned_user_email, self.banned_user_name)
-        self.set_banned_users([self.banned_user_name])
+        self.signup(self.user_email, self.username)
+        self.signup(self.banned_user_email, self.banned_username)
+        self.set_banned_users([self.banned_username])
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -814,6 +813,7 @@ class PublishExplorationTest(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -822,8 +822,7 @@ class PublishExplorationTest(test_utils.GenericTestBase):
             self.public_exp_id, self.owner_id)
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.public_exp_id)
+        rights_manager.publish_exploration(self.owner, self.public_exp_id)
 
     def test_owner_can_publish_owned_exploration(self):
         self.login(self.OWNER_EMAIL)
@@ -832,11 +831,11 @@ class PublishExplorationTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_moderator_can_publicize_public_exploration(self):
-        self.login(self.MODERATOR_EMAIL)
+    def test_already_published_exploration_cannot_be_published(self):
+        self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '/mock/%s' % self.public_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.status_int, 401)
         self.logout()
 
     def test_moderator_cannot_publish_private_exploration(self):
@@ -847,10 +846,6 @@ class PublishExplorationTest(test_utils.GenericTestBase):
 
     def test_admin_can_publish_any_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.testapp.get(
-            '/mock/%s' % self.public_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
-
         response = self.testapp.get(
             '/mock/%s' % self.private_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
@@ -903,33 +898,45 @@ class ModifyExplorationRolesTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
-    """Tests can_manage_collection_publish_status decorator."""
+class CollectionPublishStatusTest(test_utils.GenericTestBase):
+    """Tests can_publish_collection and can_unpublish_collection decorators."""
 
     user_email = 'user@example.com'
-    user_name = 'user'
+    username = 'user'
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
     published_col_id = 'col_id_1'
     private_col_id = 'col_id_2'
 
-    class MockHandler(base.BaseHandler):
-        @acl_decorators.can_manage_collection_publish_status
+    class MockPublishHandler(base.BaseHandler):
+        @acl_decorators.can_publish_collection
+        def get(self, collection_id):
+            return self.render_json({'collection_id': collection_id})
+
+    class MockUnpublishHandler(base.BaseHandler):
+        @acl_decorators.can_unpublish_collection
         def get(self, collection_id):
             return self.render_json({'collection_id': collection_id})
 
     def setUp(self):
-        super(ManageCollectionPublishStatusTest, self).setUp()
+        super(CollectionPublishStatusTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.user_email, self.user_name)
+        self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
+            [
+                webapp2.Route(
+                    '/mock_publish/<collection_id>', self.MockPublishHandler),
+                webapp2.Route(
+                    '/mock_unpublish/<collection_id>',
+                    self.MockUnpublishHandler)
+            ],
             debug=feconf.DEBUG,
         ))
         self.save_new_valid_exploration(
@@ -942,35 +949,77 @@ class ManageCollectionPublishStatusTest(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.private_col_id, self.owner_id,
             exploration_id=self.private_col_id)
-        rights_manager.publish_exploration(
-            self.owner_id, self.published_exp_id)
-        rights_manager.publish_collection(
-            self.owner_id, self.published_col_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+        rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_owner_can_publish_collection(self):
         self.login(self.OWNER_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.private_col_id, expect_errors=True)
+            '/mock_publish/%s' % self.private_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_owner_cannot_unpublish_public_collection(self):
         self.login(self.OWNER_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.published_col_id, expect_errors=True)
+            '/mock_unpublish/%s' % self.published_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
     def test_moderator_can_unpublish_public_collection(self):
         self.login(self.MODERATOR_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.published_col_id, expect_errors=True)
+            '/mock_unpublish/%s' % self.published_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_admin_can_publish_any_collection(self):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.private_col_id, expect_errors=True)
+            '/mock_publish/%s' % self.private_col_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_admin_cannot_publish_already_published_collection(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '/mock_publish/%s' % self.published_col_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+
+class AccessLearnerDashboardDecoratorTest(test_utils.GenericTestBase):
+    """Tests the decorator can_access_learner_dashboard."""
+
+    user = 'user'
+    user_email = 'user@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+
+        @acl_decorators.can_access_learner_dashboard
+        def get(self):
+            return self.render_json({})
+
+    def setUp(self):
+        super(AccessLearnerDashboardDecoratorTest, self).setUp()
+        self.signup(self.user_email, self.user)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.set_banned_users([self.banned_user])
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_is_redirected(self):
+        self.login(self.banned_user_email)
+        response = self.testapp.get('/mock/', expect_errors=True)
+        self.assertEqual(response.status_int, 302)
+        self.logout()
+
+    def test_exploration_editor_can_access_learner_dashboard(self):
+        self.login(self.user_email)
+        response = self.testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()

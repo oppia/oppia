@@ -19,6 +19,8 @@ var constants = {
     "Mathematics", "Medicine", "Music", "Philosophy", "Physics", "Poetry",
     "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
     "Statistics", "Trigonometry", "Welcome"],
+  "ACTIVITY_TYPE_EXPLORATION": "exploration",
+  "ACTIVITY_TYPE_COLLECTION": "collection",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -262,13 +264,18 @@ var constants = {
     "text": "中文(繁體)"
   }],
 
+  "//" : [
+    "Related languages are used to prioritize an exploration's language when ",
+    "setting the default audio language."
+  ],
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
-    "text": "English"
+    "text": "English",
+    "related_languages": ["en"]
   }, {
     "id": "hi-en",
-    "text": "Hinglish"
-  }],
+    "text": "Hinglish",
+    "related_languages": ["hi", "en"]
+  }]
 
-  "GCS_RESOURCE_BUCKET_NAME": "oppia.resources"
 };

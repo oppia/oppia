@@ -33,7 +33,6 @@ from google.appengine.api import users
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -41,6 +40,7 @@ import feconf
 import jinja_utils
 import utils
 
+app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -58,64 +58,6 @@ BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
         },
     },
     'Code to insert just before the closing </head> tag in all pages.', '')
-
-
-def require_user(handler):
-    """Decorator that checks if a user is associated to the current session."""
-
-    def test_login(self, **kwargs):
-        """Checks if the user for the current session is logged in."""
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-        return handler(self, **kwargs)
-
-    return test_login
-
-
-def require_moderator(handler):
-    """Decorator that checks whether the current user is a moderator."""
-
-    def test_is_moderator(self, **kwargs):
-        """Check that the user is a moderator.
-
-        Raises:
-            UnauthorizedUserException: The user is not a moderator.
-        """
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if not rights_manager.Actor(self.user_id).is_moderator():
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        return handler(self, **kwargs)
-    return test_is_moderator
-
-
-def require_fully_signed_up(handler):
-    """Decorator that checks if the user is logged in and has completed the
-    signup process.
-    """
-
-    def test_registered_as_editor(self, **kwargs):
-        """Check that the user has registered as an editor.
-
-        Raises:
-            UnauthorizedUserException: The user has insufficient credentials.
-        """
-        if (not self.user_id
-                or self.username in config_domain.BANNED_USERNAMES.value
-                or not user_services.has_fully_registered(self.user_id)):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        return handler(self, **kwargs)
-
-    return test_registered_as_editor
 
 
 def _clear_login_cookies(response_headers):
@@ -201,9 +143,7 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user = current_user_services.get_current_user()
-        self.user_id = current_user_services.get_user_id(
-            self.user) if self.user else None
+        self.user_id = current_user_services.get_current_user_id()
         self.username = None
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
@@ -214,7 +154,7 @@ class BaseHandler(webapp2.RequestHandler):
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
             if user_settings is None:
-                email = current_user_services.get_user_email(self.user)
+                email = current_user_services.get_current_user_email()
                 user_settings = user_services.create_new_user(
                     self.user_id, email)
             self.values['user_email'] = user_settings.email
@@ -245,16 +185,14 @@ class BaseHandler(webapp2.RequestHandler):
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
-        self.actions = role_services.get_all_actions(self.role)
+        self.user = user_services.UserActionsInfo(self.user_id)
 
-        rights_mgr_user = rights_manager.Actor(self.user_id)
-        self.is_moderator = rights_mgr_user.is_moderator()
-        self.is_admin = rights_mgr_user.is_admin()
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
-        self.values['is_moderator'] = self.is_moderator
-        self.values['is_admin'] = self.is_admin
+        self.values['is_moderator'] = user_services.is_at_least_moderator(
+            self.user_id)
+        self.values['is_admin'] = user_services.is_admin(self.user_id)
         self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):
@@ -367,8 +305,8 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
             'ACTIVITY_STATUS_PUBLIC': (
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
-            'ACTIVITY_STATUS_PUBLICIZED': (
-                rights_manager.ACTIVITY_STATUS_PUBLICIZED),
+            'GCS_RESOURCE_BUCKET_NAME': (
+                app_identity_services.get_gcs_resource_bucket_name()),
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
@@ -379,14 +317,13 @@ class BaseHandler(webapp2.RequestHandler):
 
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
-            'can_create_collections': (
-                self.username and self.username in
-                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
-            ),
+            'can_create_collections': bool(
+                self.role == feconf.ROLE_ID_COLLECTION_EDITOR),
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
-            'preferred_site_language_code': self.preferred_site_language_code
+            'preferred_site_language_code': self.preferred_site_language_code,
+            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
         })
         if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
@@ -493,6 +430,11 @@ class BaseHandler(webapp2.RequestHandler):
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
+        if isinstance(exception, self.NotLoggedInException):
+            self.redirect(
+                current_user_services.create_login_url(self.request.uri))
+            return
+
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
         logging.error('Exception raised: %s', exception)
 
@@ -501,11 +443,6 @@ class BaseHandler(webapp2.RequestHandler):
             self.error(404)
             self._render_exception(404, {
                 'error': 'Could not find the page %s.' % self.request.uri})
-            return
-
-        if isinstance(exception, self.NotLoggedInException):
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
             return
 
         if isinstance(exception, self.UnauthorizedUserException):

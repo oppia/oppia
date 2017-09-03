@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,6 +79,12 @@ def mark_exploration_to_be_played_later(
         position_to_be_inserted: int|None. If this is specified the exploration
             gets inserted at the given position. Otherwise it gets added at the
             end.
+
+    Returns:
+        (bool, bool). The first boolean indicates whether the playlist limit
+            of the user has been exceeded, and the second boolean indicates
+            whether the exploration is among one of the created or
+            edited explorations of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
@@ -92,22 +98,32 @@ def mark_exploration_to_be_played_later(
     learner_playlist = get_learner_playlist_from_model(
         learner_playlist_model)
 
+    playlist_limit_exceeded = False
+    exp_belongs_to_subscribed_explorations = False
     if exploration_id not in subscribed_exploration_ids:
         exploration_ids_count = len(learner_playlist.exploration_ids)
         if position_to_be_inserted is None:
             if exploration_id not in learner_playlist.exploration_ids:
                 if exploration_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.add_exploration_id_to_list(exploration_id)
+                else:
+                    playlist_limit_exceeded = True
         else:
             if exploration_id not in learner_playlist.exploration_ids:
                 if exploration_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.insert_exploration_id_at_given_position(
                         exploration_id, position_to_be_inserted)
+                else:
+                    playlist_limit_exceeded = True
             else:
                 learner_playlist.remove_exploration_id(exploration_id)
                 learner_playlist.insert_exploration_id_at_given_position(
                     exploration_id, position_to_be_inserted)
         save_learner_playlist(learner_playlist)
+    else:
+        exp_belongs_to_subscribed_explorations = True
+
+    return playlist_limit_exceeded, exp_belongs_to_subscribed_explorations
 
 
 def mark_collection_to_be_played_later(
@@ -127,6 +143,12 @@ def mark_collection_to_be_played_later(
         position_to_be_inserted: int|None. If this is specified the collection
             gets inserted at the given position. Otherwise it gets added at
             the end.
+
+    Returns:
+        (bool, bool). The first boolean indicates whether the playlist limit of
+            the user has been exceeded, and the second boolean indicates whether
+            the collection is among one of the created or edited collections of
+            the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
@@ -140,22 +162,32 @@ def mark_collection_to_be_played_later(
     learner_playlist = get_learner_playlist_from_model(
         learner_playlist_model)
 
+    playlist_limit_exceeded = False
+    collection_belongs_to_subscribed_collections = False
     if collection_id not in subscribed_collection_ids:
         collection_ids_count = len(learner_playlist.collection_ids)
         if position_to_be_inserted is None:
             if collection_id not in learner_playlist.collection_ids:
                 if collection_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.add_collection_id_to_list(collection_id)
+                else:
+                    playlist_limit_exceeded = True
         else:
             if collection_id not in learner_playlist.collection_ids:
                 if collection_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.insert_collection_id_at_given_position(
                         collection_id, position_to_be_inserted)
+                else:
+                    playlist_limit_exceeded = True
             else:
                 learner_playlist.remove_collection_id(collection_id)
                 learner_playlist.insert_collection_id_at_given_position(
                     collection_id, position_to_be_inserted)
         save_learner_playlist(learner_playlist)
+    else:
+        collection_belongs_to_subscribed_collections = True
+
+    return playlist_limit_exceeded, collection_belongs_to_subscribed_collections
 
 
 def remove_exploration_from_learner_playlist(user_id, exploration_id):

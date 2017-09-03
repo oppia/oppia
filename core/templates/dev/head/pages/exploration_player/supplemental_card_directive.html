@@ -14,18 +14,26 @@
                ng-click="onClickContinueButton()"
                ng-if="helpCardHasContinueButton"
                style="margin-top: 12px;"
-               translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
+               aria-label="Continue">
+      <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
+      <i class="fa fa-arrow-right"
+         style="font-size: 19px; padding-top: 1.5px;"></i>
     </md-button>
   </div>
 
   <div class="protractor-test-conversation-input"
        angular-html-bind="activeCard.interactionHtml">
   </div>
-  <div ng-if="hintsExist" style="text-align: right; padding: 8px">
-    <hint-button on-click-hint-button="consumeHint()"
+  <div ng-if="hintsExist" style="text-align: left; padding: 8px">
+    <hint-button ng-if="!areAllHintsExhausted()"
+                 on-click-hint-button="consumeHint()"
                  current-hint-is-available="isHintAvailable()"
                  all-hints-are-exhausted="areAllHintsExhausted()">
     </hint-button>
+    <solution-button ng-if="areAllHintsExhausted()"
+                     on-click-solution-button="viewSolution()"
+                     solution-is-available="isCurrentSolutionAvailable()">
+    </solution-button>
   </div>
 </div>
 
@@ -94,8 +102,19 @@
     color: #ffffff;
   }
 
+  .conversation-skin-supplemental-card .solution-button {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    color: #fff;
+  }
+
   .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:focus,
   .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:hover {
     background-color: #115FD4;
+  }
+
+  .conversation-skin-supplemental-card button.md-button.md-default-theme.solution-button:focus,
+  .conversation-skin-supplemental-card button.md-button.md-default-theme.solution-button:hover {
+    background-color: #da190b;
   }
 </style>

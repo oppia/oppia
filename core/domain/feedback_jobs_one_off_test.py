@@ -67,8 +67,7 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
             job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
             feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob.get_output( # pylint: disable=line-too-long

@@ -18,8 +18,6 @@
  */
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
-oppia.constant('PANEL_SPECS', GLOBALS.PANEL_SPECS);
 oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   'explorationTitleInputFocusLabel');
@@ -39,11 +37,11 @@ oppia.constant(
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
   'explorationData', 'editorContextService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationGadgetsService',
-  'explorationObjectiveService', 'explorationLanguageCodeService',
-  'explorationRightsService', 'explorationInitStateNameService',
-  'explorationTagsService', 'editabilityService', 'explorationStatesService',
-  'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
+  'explorationCategoryService', 'explorationObjectiveService',
+  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationInitStateNameService', 'explorationTagsService',
+  'editabilityService', 'explorationStatesService', 'routerService',
+  'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
@@ -53,11 +51,11 @@ oppia.controller('ExplorationEditor', [
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
-      explorationCategoryService, explorationGadgetsService,
-      explorationObjectiveService, explorationLanguageCodeService,
-      explorationRightsService, explorationInitStateNameService,
-      explorationTagsService, editabilityService, explorationStatesService,
-      routerService, graphDataService, stateEditorTutorialFirstTimeService,
+      explorationCategoryService, explorationObjectiveService,
+      explorationLanguageCodeService, explorationRightsService,
+      explorationInitStateNameService, explorationTagsService,
+      editabilityService, explorationStatesService, routerService,
+      graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
@@ -66,9 +64,6 @@ oppia.controller('ExplorationEditor', [
       UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
-
-    $scope.areGadgetsEnabled = (
-      explorationAdvancedFeaturesService.areGadgetsEnabled);
 
     /**********************************************************
      * Called on initial load of the exploration editor page.
@@ -115,7 +110,6 @@ oppia.controller('ExplorationEditor', [
 
         explorationTitleService.init(data.title);
         explorationCategoryService.init(data.category);
-        explorationGadgetsService.init(data.skin_customizations);
         explorationObjectiveService.init(data.objective);
         explorationLanguageCodeService.init(data.language_code);
         explorationInitStateNameService.init(data.init_state_name);
@@ -126,7 +120,6 @@ oppia.controller('ExplorationEditor', [
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
-        $scope.explorationGadgetsService = explorationGadgetsService;
         $scope.explorationObjectiveService = explorationObjectiveService;
         $scope.explorationRightsService = explorationRightsService;
         $scope.explorationInitStateNameService = (

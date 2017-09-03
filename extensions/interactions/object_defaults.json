@@ -10,6 +10,7 @@
     },
     "GraphProperty": "strongly_connected",
     "Int": 0,
+    "ListOfCodeEvaluation": [],
     "ListOfCoordTwoDim": [],
     "ListOfGraph": [],
     "LogicErrorCategory": "mistake",

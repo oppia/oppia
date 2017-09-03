@@ -29,7 +29,6 @@ import webtest
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -340,31 +339,61 @@ class TestBase(unittest.TestCase):
 
         self._restore_stashed_user_env()
 
+    def set_user_role(self, username, user_role):
+        """Sets the given role for this user.
+
+        Args:
+            username: str. Username of the given user.
+            user_role: str. Role of the given user.
+        """
+        self._stash_current_user_env()
+
+        self.login('tmpsuperadmin@example.com', is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminrolehandler', {
+            'username': username,
+            'role': user_role
+        }, csrf_token)
+        self.logout()
+
+        self._restore_stashed_user_env()
+
     def set_admins(self, admin_usernames):
-        """Set the ADMIN_USERNAMES property."""
-        self.set_config_property(
-            config_domain.ADMIN_USERNAMES, admin_usernames)
+        """Sets role of given users as ADMIN.
+
+        Args:
+            admin_usernames: list(str). List of usernames.
+        """
+        for name in admin_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_ADMIN)
 
     def set_moderators(self, moderator_usernames):
-        """Set the MODERATOR_USERNAMES property."""
-        self.set_config_property(
-            config_domain.MODERATOR_USERNAMES, moderator_usernames)
+        """Sets role of given users as MODERATOR.
+
+        Args:
+            moderator_usernames: list(str). List of usernames.
+        """
+        for name in moderator_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
 
     def set_banned_users(self, banned_usernames):
-        """Set the BANNED_USERNAMES property."""
-        self.set_config_property(
-            config_domain.BANNED_USERNAMES, banned_usernames)
+        """Sets role of given users as BANNED_USER.
+
+        Args:
+            banned_usernames: list(str). List of usernames.
+        """
+        for name in banned_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_BANNED_USER)
 
     def set_collection_editors(self, collection_editor_usernames):
-        """Set the WHITELISTED_COLLECTION_EDITOR_USERNAMES property."""
-        self.set_config_property(
-            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
-            collection_editor_usernames)
+        """Sets role of given users as COLLECTION_EDITOR.
 
-    def set_email_senders(self, email_sender_usernames):
-        """Set the WHITELISTED_EMAIL_SENDERS property."""
-        self.set_config_property(
-            config_domain.WHITELISTED_EMAIL_SENDERS, email_sender_usernames)
+        Args:
+            collection_editor_usernames: list(str). List of usernames.
+        """
+        for name in collection_editor_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_current_logged_in_user_id(self):
         return os.environ['USER_ID']
@@ -437,7 +466,6 @@ class TestBase(unittest.TestCase):
             tags=[],
             blurb='',
             author_notes='',
-            skin_customizations={'panels_contents': {}},
             states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=self.VERSION_0_STATES_DICT,
@@ -638,17 +666,15 @@ class AppEngineTestBase(TestBase):
             # Enables the testbed urlfetch mock
             self.testbed.init_urlfetch_stub()
 
-    def count_jobs_in_taskqueue(self, queue_name=None):
-        """Counts the jobs in the given queue. If queue_name is None,
-        defaults to counting the jobs in all queues available.
-        """
+    def count_jobs_in_taskqueue(self, queue_name):
+        """Counts the jobs in the given queue."""
         return len(self.get_pending_tasks(queue_name))
 
     def get_pending_tasks(self, queue_name=None):
-        """Returns the jobs in the given queue. If queue_name is None,
-        defaults to returning the jobs in all queues available.
+        """Returns the jobs in the given queue. If queue_name is None, defaults
+        to returning the jobs in all available queues.
         """
-        if queue_name:
+        if queue_name is not None:
             return self.taskqueue_stub.get_filtered_tasks(
                 queue_names=[queue_name])
         else:

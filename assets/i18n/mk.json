@@ -1,4 +1,6 @@
 {
+	"I18N_ABOUT_PAGE_TABS_ABOUT": "За нас",
+	"I18N_ABOUT_PAGE_TABS_CREDITS": "Признанија",
 	"I18N_ABOUT_PAGE_TITLE": "За нас — Опија",
 	"I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "Пријавете се за „Teach With Oppia“",
 	"I18N_ACTION_BROWSE_EXPLORATIONS": "Прелистајте по нашите истражувања",
@@ -187,7 +189,6 @@
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Картичка бр.",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Уредливо од заедницата",
 	"I18N_PLAYER_CONTINUE_BUTTON": "Продолжи",
-	"I18N_PLAYER_CONTINUE_NEXT_CARD": "Прејди на следната картичка",
 	"I18N_PLAYER_CONTRIBUTORS_TOOLTIP": "Учесници",
 	"I18N_PLAYER_EDIT_TOOLTIP": "Уреди",
 	"I18N_PLAYER_EMBED_TOOLTIP": "Вметни",

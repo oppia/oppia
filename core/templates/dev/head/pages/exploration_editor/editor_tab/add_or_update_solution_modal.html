@@ -1,0 +1,38 @@
+<div class="modal-header">
+  <h3><[stateSolutionService.savedMemento !== null ? 'Update Solution' : 'Add Solution']></h3>
+</div>
+
+<div class="modal-body">
+  <form name="addSolutionForm.answer"
+        class="form-inline">
+    <div class="oppia-rule-details-header">
+      <select class="protractor-test-answer-is-exclusive-select"
+              ng-model="data.answerIsExclusive"
+              ng-options="(item ? 'The only' : 'One') for item in [true, false]">
+      </select> <strong>solution is...</strong>
+      <br>
+      <br>
+      <div class="protractor-test-interaction-html"
+           angular-html-bind="correctAnswerEditorHtml">
+      </div>
+      <br>
+      <div ng-show="data.correctAnswer !== null">
+        <strong>Explanation:</strong>
+        <schema-based-editor class="protractor-test-explanation-textarea"
+                             schema="EXPLANATION_FORM_SCHEMA"
+                             local-value="data.explanation">
+        </schema-based-editor>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success protractor-test-submit-solution-button"
+          ng-click="saveSolution()"
+          ng-disabled="data.correctAnswer === null ||
+                       !data.explanation">
+    Check and Save Solution
+  </button>
+</div>

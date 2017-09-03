@@ -132,6 +132,24 @@
             <span translate="<[LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK]>"></span>
             <span ng-if="numberOfUnreadThreads !== 0">(<[numberOfUnreadThreads]>)</span>
           </h4>
+          <h4 class="oppia-learner-dashboard-menu"
+              ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST}"
+              ng-click="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
+            <span translate="<[LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST]>"></span>
+            <span class="caret"></span>
+          </h4>
+          <div ng-show="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST" class="menu-sub-section">
+            <div class="oppia-learner-dashboard-submenu"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
+                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
+                 translate="I18N_DASHBOARD_EXPLORATIONS">
+            </div>
+            <div class="oppia-learner-dashboard-submenu protractor-test-playlist-collection-section"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
+                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
+                 translate="I18N_DASHBOARD_COLLECTIONS">
+            </div>
+          </div>
         </md-card>
       </div>
 
@@ -202,12 +220,9 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteExplorations !== 0">
-              <span ng-if="numberDeletedIncompleteExplorations === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATION"
-                    translate-values="{numberDeleted: numberDeletedIncompleteExplorations}"></span>
-              <span ng-if="numberDeletedIncompleteExplorations > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATIONS"
-                    translate-values="{numberDeleted: numberDeletedIncompleteExplorations}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATIONS"
+                    translate-values="{numberDeleted: <[numberDeletedIncompleteExplorations]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
@@ -231,7 +246,7 @@
               <i class="remove-icon fa fa-times"
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
-                 ng-click="openRemoveEntityModal(activeSection, activeSubsection, tile)"
+                 ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                  tooltip="Remove"
                  tooltip-placement="top"></i>
               <exploration-summary-tile
@@ -260,12 +275,9 @@
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCompletedExplorations !== 0">
-              <span ng-if="numberDeletedCompletedExplorations === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATION"
-                    translate-values="{numberDeleted: numberDeletedCompletedExplorations}"></span>
-              <span ng-if="numberDeletedCompletedExplorations > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATIONS"
-                    translate-values="{numberDeleted: numberDeletedCompletedExplorations}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATIONS"
+                    translate-values="{numberDeleted: <[numberDeletedCompletedExplorations]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
@@ -308,15 +320,69 @@
             </div>
           </div>
 
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="explorationPlaylist.length > 0">
+              <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
+            </span>
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="numberDeletedExplorationPlaylist !== 0">
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_EXPLORATIONS_FROM_PLAYLIST"
+                    translate-values="{numberDeleted: <[numberDeletedExplorationPlaylist]>}"
+                    translate-interpolation="messageformat"></span>
+              &#9785
+            </span>
+
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="explorationPlaylist.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
+            <div ui-sortable="explorationPlaylistSortableOptions" ng-model="explorationPlaylist">
+              <div class="oppia-learner-playlist-tiles"
+                   ng-repeat="tile in explorationPlaylist track by $index"
+                   ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false"
+                   style="height: 145px;">
+                <i class="remove-icon fa fa-times"
+                   ng-show="showRemoveIcon"
+                   aria-hidden="true"
+                   style="color: black;" 
+                   ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+                   tooltip="Remove"
+                   tooltip-placement="top"></i>
+                <exploration-summary-tile style="height: 145px; display: block;"
+                                          exploration-id="tile.id"
+                                          exploration-title="tile.title"
+                                          last-updated-msec="tile.last_updated_msec"
+                                          objective="tile.objective"
+                                          category="tile.category"
+                                          ratings="tile.ratings"
+                                          num-views="tile.num_views"
+                                          thumbnail-icon-url="tile.thumbnail_icon_url"
+                                          thumbnail-bg-color="tile.thumbnail_bg_color"
+                                          class="protractor-test-exp-summary-tile"
+                                          is-playlist-tile="true">
+                </exploration-summary-tile>
+              </div>
+            </div>
+
+          </div>
+
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedIncompleteCollections !== 0">
-              <span ng-if="numberDeletedIncompleteCollections === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTION"
-                    translate-values="{numberDeleted: numberDeletedIncompleteCollections}"></span>
-              <span ng-if="numberDeletedIncompleteCollections > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTIONS"
-                    translate-values="{numberDeleted: numberDeletedIncompleteCollections}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTIONS"
+                    translate-values="{numberDeleted: <[numberDeletedIncompleteCollections]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
@@ -340,7 +406,7 @@
               <i class="remove-icon fa fa-times"
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
-                 ng-click="openRemoveEntityModal(activeSection, activeSubsection, tile)"
+                 ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                  tooltip="Remove"
                  tooltip-placement="top"></i>
               <collection-summary-tile
@@ -363,6 +429,61 @@
               <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C8;</i>
             </div>
           </div>
+
+          <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="collectionPlaylist.length > 0">
+              <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
+            </span>
+            <span style="display: block; padding: 5px 7.5px;"
+                  ng-if="numberDeletedCollectionPlaylist !== 0">
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COLLECTIONS_FROM_PLAYLIST"
+                    translate-values="{numberDeleted: <[numberDeletedCollectionPlaylist]>}"
+                    translate-interpolation="messageformat"></span>
+              &#9785
+            </span>
+
+            <md-card layout="row"
+                     class="oppia-learner-dashboard-no-activity-card"
+                     ng-if="collectionPlaylist.length === 0">
+              <div>
+                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_COLLECTION_PLAYLIST"></p>
+
+                <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+                   translate="I18N_ACTION_BROWSE_LESSONS"
+                   ng-href="/library"
+                   style="width: 230px; margin-top: 13px;">
+                </a>
+              </div>
+            </md-card>
+
+            <div ui-sortable="collectionPlaylistSortableOptions" ng-model="collectionPlaylist">
+              <div class="oppia-learner-playlist-tiles"
+                   ng-repeat="tile in collectionPlaylist track by $index"
+                   style="display: inline-block; margin-left: 1px; height: 145px;"
+                   ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
+                <i class="remove-icon fa fa-times"
+                   ng-show="showRemoveIcon"
+                   style="color: black;"
+                   aria-hidden="true"
+                   ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+                   tooltip="Remove"
+                   tooltip-placement="top"></i>
+                <collection-summary-tile style="height: 145px; display: block;"
+                                         collection-id="tile.id"
+                                         collection-title="tile.title"
+                                         last-updated-msec="tile.last_updated_msec"
+                                         objective="tile.objective"
+                                         node-count="tile.node_count"
+                                         category="tile.category"
+                                         thumbnail-icon-url="tile.thumbnail_icon_url"
+                                         thumbnail-bg-color="tile.thumbnail_bg_color"
+                                         is-playlist-tile="true">
+                </collection-summary-tile>
+              </div>
+            </div>
+          </div>
+
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="completedToIncompleteCollections.length !== 0">
@@ -378,12 +499,9 @@
 
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberDeletedCompletedCollections !== 0">
-              <span ng-if="numberDeletedCompletedCollections === 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTION"
-                    translate-values="{numberDeleted: numberDeletedCompletedCollections}"></span>
-              <span ng-if="numberDeletedCompletedCollections > 1"
-                    translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTIONS"
-                    translate-values="{numberDeleted: numberDeletedCompletedCollections}"></span>
+              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTIONS"
+                    translate-values="{numberDeleted: <[numberDeletedCompletedCollections]>}"
+                    translate-interpolation="messageformat"></span>
               &#9785
             </span>
 
@@ -485,15 +603,27 @@
                   <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
                 </td>
                 <td class="col-lg-3 col-md-3 col-sm-3" style="width: 21%;">
-                  <span ng-if="thread.authorSecondLastMessage">
-                    <span ng-if="thread.secondLastMessageRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
-                    <span ng-if="!thread.secondLastMessageRead">
-                      <strong><[thread.authorSecondLastMessage | truncate:7]>, </strong>
+                  <span ng-if="thread.totalMessageCount > 1">
+                    <span ng-if="thread.authorSecondLastMessage">
+                      <span ng-if="thread.secondLastMessageRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
+                      <span ng-if="!thread.secondLastMessageRead">
+                        <strong><[thread.authorSecondLastMessage | truncate:7]>, </strong>
+                      </span>
+                    </span>
+                    <span ng-if="!thread.authorSecondLastMessage">
+                      <span ng-if="thread.totalMessageCount > 1">
+                        <span translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>, 
+                      </span>
                     </span>
                   </span>
-                  <span ng-if="thread.lastMessageRead"><[thread.authorLastMessage | truncate:7]></span>
-                  <span ng-if="!thread.lastMessageRead">
-                    <strong><[thread.authorLastMessage | truncate:7]></strong>
+                  <span ng-if="thread.authorLastMessage">
+                    <span ng-if="thread.lastMessageRead"><[thread.authorLastMessage | truncate:7]></span>
+                    <span ng-if="!thread.lastMessageRead">
+                      <strong><[thread.authorLastMessage | truncate:7]></strong>
+                    </span>
+                  </span>
+                  <span ng-if="!thread.authorLastMessage">
+                    <span translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>
                   </span>
                   <span class="feedback-thread-message-count">(<[thread.totalMessageCount]>)</span>
                 </td>
@@ -535,15 +665,20 @@
                   <div class="row">
                     <div class="col-sm-12">
                       <span class="feedback-message-header">
-                        <span style="display: inline-block;">
+                        <span ng-if="message.authorPictureDataUrl" style="display: inline-block;">
                           <img ng-src="<[message.authorPictureDataUrl]>"
                                class="oppia-navbar-profile-picture img-circle"
                                alt="User Avatar"
                                style="margin-top: 4px; min-width: 32px;">
                         </span>
+
+                        <span ng-if="!message.authorPictureDataUrl" style="display: inline-block;">
+                          <i class="material-icons md-40" style="margin-top: 4px; min-width: 32px;">&#xE853;</i>
+                        </span>
                       </span>
 
-                      <span class="feedback-message-author-name"><strong><[message.authorUsername]></strong></span>
+                      <span ng-if="message.authorUsername" class="feedback-message-author-name"><strong><[message.authorUsername]></strong></span>
+                      <span ng-if="!message.authorUsername" class="feedback-message-author-name"><strong translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></strong></span>
                       <span style="float: right; margin-right: 15px;"
                             ng-if="message.messageId !== 0 && message.updatedStatus">
                         <em translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
@@ -616,23 +751,6 @@
       </div>
     </div>
   </div>
-
-  <script type="text/ng-template" id="modals/removeEntity">
-    <div class="modal-header">
-      <h3 translate="I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER" translate-values="{sectionName: sectionName}"></h3>
-    </div>
-
-    <div class="modal-body">
-      <p translate="I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY" translate-values="{entityTitle: entityTitle, sectionName: sectionName}"></p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
-      <button class="btn btn-danger protractor-test-confirm-delete-interaction"
-              ng-click="remove()" translate="I18N_LEARNER_DASHBOARD_REMOVE_BUTTON">
-      </button>
-    </div>
-  </script>
 
   <script type="text/ng-template" id="modals/learnerViewSuggestion">
     <div class="modal-header">

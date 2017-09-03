@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 """Controllers for the learner dashboard."""
 
 from core.controllers import base
-from core.domain import config_domain
+from core.domain import acl_decorators
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
@@ -25,24 +25,18 @@ from core.domain import user_services
 import feconf
 import utils
 
+
 class LearnerDashboardPage(base.BaseHandler):
     """Page showing the user's learner dashboard."""
 
-    @base.require_user
+    @acl_decorators.can_access_learner_dashboard
     def get(self):
-        if self.username in config_domain.BANNED_USERNAMES.value:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-        elif user_services.has_fully_registered(self.user_id):
-            self.values.update({
-                'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
-            })
-            self.render_template(
-                'pages/learner_dashboard/learner_dashboard.html',
-                redirect_url_on_logout='/')
-        else:
-            self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', feconf.LEARNER_DASHBOARD_URL))
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
+        })
+        self.render_template(
+            'pages/learner_dashboard/learner_dashboard.html',
+            redirect_url_on_logout='/')
 
 
 class LearnerDashboardHandler(base.BaseHandler):
@@ -50,11 +44,9 @@ class LearnerDashboardHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        if self.user_id is None:
-            raise self.PageNotFoundException
-
         (learner_progress, number_of_deleted_activities,
          completed_to_incomplete_collections) = (
              learner_progress_services.get_activity_progress(self.user_id))
@@ -73,6 +65,13 @@ class LearnerDashboardHandler(base.BaseHandler):
         incomplete_collection_summary_dicts = (
             learner_progress_services.get_collection_summary_dicts(
                 learner_progress.incomplete_collection_summaries))
+
+        exploration_playlist_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts(
+                learner_progress.exploration_playlist_summaries))
+        collection_playlist_summary_dicts = (
+            learner_progress_services.get_collection_summary_dicts(
+                learner_progress.collection_playlist_summaries))
 
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
@@ -106,6 +105,8 @@ class LearnerDashboardHandler(base.BaseHandler):
             'completed_collections_list': completed_collection_summary_dicts,
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
             'incomplete_collections_list': incomplete_collection_summary_dicts,
+            'exploration_playlist': exploration_playlist_summary_dicts,
+            'collection_playlist': collection_playlist_summary_dicts,
             'number_of_deleted_activities': number_of_deleted_activities,
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
@@ -116,14 +117,30 @@ class LearnerDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class LearnerDashboardIdsHandler(base.BaseHandler):
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        # Get the progress of the learner - the ids of the explorations and
+        # collections completed by the user, the activities currently being
+        # completed and the ones present in the playlist of the user.
+        learner_dashboard_activities = (
+            learner_progress_services.get_learner_dashboard_activities( # pylint: disable=line-too-long
+                self.user_id))
+
+        self.values.update({
+            'learner_dashboard_activity_ids': (
+                learner_dashboard_activities.to_dict())
+        })
+        self.render_json(self.values)
+
+
 class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
 
+    @acl_decorators.can_access_learner_dashboard
     def get(self, exploration_id, thread_id):
         """Handles GET requests."""
-        if self.user_id is None:
-            raise self.PageNotFoundException
-
         messages = feedback_services.get_messages(
             exploration_id, thread_id)
         author_ids = [m.author_id for m in messages]
@@ -154,13 +171,21 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             authors_settings.pop(0)
 
         for m, author_settings in zip(messages, authors_settings):
+
+            if author_settings is None:
+                author_username = None
+                author_picture_data_url = None
+            else:
+                author_username = author_settings.username
+                author_picture_data_url = (
+                    author_settings.profile_picture_data_url)
+
             message_summary = {
                 'message_id': m.message_id,
                 'text': m.text,
                 'updated_status': m.updated_status,
-                'author_username': author_settings.username,
-                'author_picture_data_url': (
-                    author_settings.profile_picture_data_url),
+                'author_username': author_username,
+                'author_picture_data_url': author_picture_data_url,
                 'created_on': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)

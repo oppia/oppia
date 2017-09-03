@@ -1,0 +1,23 @@
+<i class="oppia-learner-dashboard-icon fa fa-clock-o"
+   ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId())"
+   ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())"
+   ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"
+   aria-hidden="true"
+   tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
+   tooltip-placement="left"></i>
+<i class="oppia-learner-dashboard-icon fa fa-clock-o"
+   ng-if="belongsToLearnerPlaylist()"
+   ng-click="removeFromLearnerPlaylist(getActivityId(), getActivityTitle(), getActivityType())"
+   aria-hidden="true"
+   tooltip="<['I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate]>"
+   tooltip-placement="left"></i>
+<i class="oppia-learner-dashboard-icon fa fa-check-circle-o"
+   ng-if="belongsToCompletedActivities()"
+   aria-hidden="true"
+   tooltip="<['I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate]>"
+   tooltip-placement="left"></i>
+<i class="oppia-learner-dashboard-icon fa fa-spinner"
+   ng-if="belongsToIncompleteActivities()"
+   aria-hidden="true"
+   tooltip="<['I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate]>"
+   tooltip-placement="left"></i>

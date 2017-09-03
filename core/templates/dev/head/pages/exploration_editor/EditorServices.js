@@ -266,11 +266,6 @@ oppia.factory('changeListService', [
     var CMD_DELETE_STATE = 'delete_state';
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
     var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-    // All gadget commands
-    var CMD_ADD_GADGET = 'add_gadget';
-    var CMD_RENAME_GADGET = 'rename_gadget';
-    var CMD_DELETE_GADGET = 'delete_gadget';
-    var CMD_EDIT_GADGET_PROPERTY = 'edit_gadget_property';
 
     var ALLOWED_EXPLORATION_BACKEND_NAMES = {
       category: true,
@@ -288,17 +283,12 @@ oppia.factory('changeListService', [
       confirmed_unclassified_answers: true,
       content: true,
       default_outcome: true,
-      fallbacks: true,
       hints: true,
       param_changes: true,
+      solution: true,
       state_name: true,
       widget_customization_args: true,
       widget_id: true
-    };
-
-    var ALLOWED_GADGET_BACKEND_NAMES = {
-      gadget_customization_args: true,
-      gadget_visibility: true
     };
 
     var autosaveChangeListOnChange = function(explorationChangeList) {
@@ -342,21 +332,6 @@ oppia.factory('changeListService', [
 
     return {
       /**
-       * Saves a gadget dict that represents a new gadget.
-       *
-       * It is the responsbility of the caller to check that the gadget dict
-       * is correctly formed
-       *
-       * @param {object} gadgetData - The dict containing new gadget info.
-       */
-      addGadget: function(gadgetData) {
-        addChange({
-          cmd: CMD_ADD_GADGET,
-          gadget_dict: gadgetData,
-          panel: gadgetData.panel
-        });
-      },
-      /**
        * Saves a change dict that represents adding a new state. It is the
        * responsbility of the caller to check that the new state name is valid.
        *
@@ -366,17 +341,6 @@ oppia.factory('changeListService', [
         addChange({
           cmd: CMD_ADD_STATE,
           state_name: stateName
-        });
-      },
-      /**
-       * Deletes the gadget with the specified name.
-       *
-       * @param {string} gadgetName - Unique name of the gadget to delete.
-       */
-      deleteGadget: function(gadgetName) {
-        addChange({
-          cmd: CMD_DELETE_GADGET,
-          gadget_name: gadgetName
         });
       },
       /**
@@ -421,31 +385,6 @@ oppia.factory('changeListService', [
         });
       },
       /**
-       * Saves a change dict that represents a change to a gadget property.
-       *
-       * It is the responsibility of the caller to check that the old and new
-       * values are not equal.
-       *
-       * @param {string} gadgetName - The name of the gadget being edited
-       * @param {string} backendName - The backend name of the edited property
-       * @param {string} newValue - The new value of the property
-       * @param {string} oldValue - The previous value of the property
-       */
-      editGadgetProperty: function(
-          gadgetName, backendName, newValue, oldValue) {
-        if (!ALLOWED_GADGET_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          alertsService.addWarning('Invalid gadget property: ' + backendName);
-          return;
-        }
-        addChange({
-          cmd: CMD_EDIT_GADGET_PROPERTY,
-          gadget_name: gadgetName,
-          new_value: angular.copy(newValue),
-          old_value: angular.copy(oldValue),
-          property_name: backendName
-        });
-      },
-      /**
        * Saves a change dict that represents a change to a state property. It
        * is the responsibility of the caller to check that the old and new
        * values are not equal.
@@ -482,22 +421,6 @@ oppia.factory('changeListService', [
        */
       loadAutosavedChangeList: function(changeList) {
         explorationChangeList = changeList;
-      },
-      /**
-       * Saves a change dict that represents the renaming of a gadget.
-       *
-       * It is the responsibility of the caller to check that the two names
-       * are not equal.
-       *
-       * @param {string} oldGadgetName - The previous name of the gadget
-       * @param {string} newGadgetName - The new name of the gadget
-       */
-      renameGadget: function(oldGadgetName, newGadgetName) {
-        addChange({
-          cmd: CMD_RENAME_GADGET,
-          new_gadget_name: newGadgetName,
-          old_gadget_name: oldGadgetName
-        });
       },
       /**
        * Saves a change dict that represents the renaming of a state. This
@@ -555,9 +478,6 @@ oppia.factory('explorationRightsService', [
       },
       isPublic: function() {
         return this._status === GLOBALS.ACTIVITY_STATUS_PUBLIC;
-      },
-      isPublicized: function() {
-        return this._status === GLOBALS.ACTIVITY_STATUS_PUBLICIZED;
       },
       isCloned: function() {
         return Boolean(this._clonedFrom);
@@ -632,14 +552,14 @@ oppia.factory('explorationRightsService', [
         });
         return whenRolesSaved.promise;
       },
-      makePublic: function(makePublic) {
+      publish: function() {
         var whenPublishStatusChanged = $q.defer();
         var that = this;
 
         var requestUrl = (
           '/createhandler/status/' + explorationData.explorationId);
         $http.put(requestUrl, {
-          make_public: makePublic
+          make_public: true
         }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
@@ -651,26 +571,6 @@ oppia.factory('explorationRightsService', [
           whenPublishStatusChanged.resolve();
         });
         return whenPublishStatusChanged.promise;
-      },
-      makePublicized: function(makePublicized) {
-        var whenPublicizedStatusChanged = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-          '/createhandler/status/' + explorationData.explorationId);
-        $http.put(requestUrl, {
-          make_publicized: makePublicized
-        }).then(function(response) {
-          var data = response.data;
-          alertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenPublicizedStatusChanged.resolve();
-        });
-        return whenPublicizedStatusChanged.promise;
       },
       saveModeratorChangeToBackend: function(action, emailBody) {
         var that = this;
@@ -930,15 +830,17 @@ oppia.factory('explorationParamChangesService', [
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope',
+  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
-  'editorContextService', 'validatorsService', 'explorationGadgetsService',
-  'StatesObjectFactory',
+  'editorContextService', 'validatorsService', 'StatesObjectFactory',
+  'SolutionValidityService', 'angularNameService',
+  'AnswerClassificationService', 'explorationContextService',
   function(
-      $log, $modal, $filter, $location, $rootScope,
+      $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, alertsService, changeListService,
-      editorContextService, validatorsService, explorationGadgetsService,
-      StatesObjectFactory) {
+      editorContextService, validatorsService, StatesObjectFactory,
+      SolutionValidityService, angularNameService,
+      AnswerClassificationService, explorationContextService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -959,11 +861,6 @@ oppia.factory('explorationStatesService', [
           return null;
         }
       },
-      fallbacks: function(fallbacks) {
-        return fallbacks.map(function(fallback) {
-          return fallback.toBackendDict();
-        });
-      },
       hints: function(hints) {
         return hints.map(function(hint) {
           return hint.toBackendDict();
@@ -973,6 +870,13 @@ oppia.factory('explorationStatesService', [
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
         });
+      },
+      solution: function(solution) {
+        if (solution) {
+          return solution.toBackendDict();
+        } else {
+          return null;
+        }
       }
     };
 
@@ -984,8 +888,8 @@ oppia.factory('explorationStatesService', [
       content: ['content'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
-      fallbacks: ['interaction', 'fallbacks'],
       hints: ['interaction', 'hints'],
+      solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs']
     };
@@ -1051,6 +955,26 @@ oppia.factory('explorationStatesService', [
     return {
       init: function(statesBackendDict) {
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
+        // Initialize the solutionValidityService.
+        SolutionValidityService.init(_states.getStateNames());
+        _states.getStateNames().forEach(function(stateName) {
+          var solution = _states.getState(stateName).interaction.solution;
+          if (solution) {
+            var result = (
+              AnswerClassificationService.getMatchingClassificationResult(
+                explorationContextService.getExplorationId(),
+              stateName,
+              _states.getState(stateName),
+              solution.correctAnswer,
+              true,
+              $injector.get(
+                angularNameService.getNameOfInteractionRulesService(
+                  _states.getState(stateName).interaction.id))));
+            var solutionIsValid = stateName !== result.outcome.dest;
+            SolutionValidityService.updateValidity(
+              stateName, solutionIsValid);
+          }
+        });
       },
       getStates: function() {
         return angular.copy(_states);
@@ -1076,6 +1000,15 @@ oppia.factory('explorationStatesService', [
         }
         return (
           validatorsService.isValidStateName(newStateName, showWarnings));
+      },
+      isSolutionValid: function(stateName) {
+        return SolutionValidityService.isSolutionValid(stateName);
+      },
+      updateSolutionValidity: function(stateName, solutionIsValid) {
+        SolutionValidityService.updateValidity(stateName, solutionIsValid);
+      },
+      deleteSolutionValidity: function(stateName) {
+        SolutionValidityService.deleteSolutionValidity(stateName);
       },
       getStateContentMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'content');
@@ -1123,17 +1056,17 @@ oppia.factory('explorationStatesService', [
       saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
       },
-      getFallbacksMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'fallbacks');
-      },
-      saveFallbacks: function(stateName, newFallbacks) {
-        saveStateProperty(stateName, 'fallbacks', newFallbacks);
-      },
       getHintsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'hints')
       },
       saveHints: function(stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);
+      },
+      getSolutionMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'solution');
+      },
+      saveSolution: function(stateName, newSolution) {
+        saveStateProperty(stateName, 'solution', newSolution);
       },
       isInitialized: function() {
         return _states != null;
@@ -1179,38 +1112,14 @@ oppia.factory('explorationStatesService', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'explorationGadgetsService',
-            'deleteStateName',
-            function(
-                $scope, $modalInstance, explorationGadgetsService,
-                deleteStateName) {
+            '$scope', '$modalInstance', 'deleteStateName',
+            function($scope, $modalInstance, deleteStateName) {
               $scope.deleteStateWarningText = (
                 'Are you sure you want to delete the card "' +
                 deleteStateName + '"?');
 
-              // Get all the gadgets that are only visible in this state.
-              var gadgetNamesUniqueToThisState = (
-                explorationGadgetsService.getGadgetNamesUniqueToState(
-                  deleteStateName));
-              if (gadgetNamesUniqueToThisState.length) {
-                // Update message to show that the gadgets unique to this state
-                // will be deleted too.
-                $scope.deleteStateWarningText = $scope.deleteStateWarningText +
-                  ' This will also delete the following gadget' +
-                  (gadgetNamesUniqueToThisState.length > 1 ? 's: ' : ': ') +
-                  gadgetNamesUniqueToThisState.join(', ') + '.';
-              }
-
               $scope.reallyDelete = function() {
                 $modalInstance.close(deleteStateName);
-                // Delete the gadgets without additional dialog when confirmed.
-                for (var i = 0; i < gadgetNamesUniqueToThisState.length; i++) {
-                  // Note that explorationGadgetsService will update the data
-                  // and add additional 'delete gadget' cmds to
-                  // changeListService.
-                  explorationGadgetsService.deleteGadget(
-                    gadgetNamesUniqueToThisState[i], false);
-                }
               };
 
               $scope.cancel = function() {
@@ -1234,8 +1143,6 @@ oppia.factory('explorationStatesService', [
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
           $rootScope.$broadcast('refreshStateEditor');
-          // This state name is removed from gadget's visibilty settings.
-          explorationGadgetsService.handleStateDeletion(deleteStateName);
         });
       },
       renameState: function(oldStateName, newStateName) {
@@ -1265,10 +1172,6 @@ oppia.factory('explorationStatesService', [
           explorationInitStateNameService.saveDisplayedValue(newStateName);
         }
         $rootScope.$broadcast('refreshGraph');
-        // The state name is updated in gadget's visibilty settings to the new
-        // name.
-        explorationGadgetsService.handleStateRenaming(
-          oldStateName, newStateName);
       }
     };
   }
@@ -1349,6 +1252,16 @@ oppia.factory('statePropertyService', [
   }
 ]);
 
+// A data service that stores the current state content.
+// TODO(sll): Add validation.
+oppia.factory('stateContentService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveStateContent';
+    return child;
+  }
+]);
+
 // A data service that stores the current list of state parameter changes.
 // TODO(sll): Add validation.
 oppia.factory('stateParamChangesService', [
@@ -1381,15 +1294,6 @@ oppia.factory('stateCustomizationArgsService', [
   }
 ]);
 
-// A data service that stores the current interaction fallbacks.
-oppia.factory('stateFallbacksService', [
-  'statePropertyService', function(statePropertyService) {
-    var child = Object.create(statePropertyService);
-    child.setterMethodKey = 'saveFallbacks';
-    return child;
-  }
-]);
-
 // A data service that stores the current interaction hints.
 oppia.factory('stateHintsService', [
   'statePropertyService', function(statePropertyService) {
@@ -1399,396 +1303,15 @@ oppia.factory('stateHintsService', [
   }
 ]);
 
-// Data service for keeping track of gadget data and location across panels.
-oppia.factory('explorationGadgetsService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope',
-  'changeListService', 'editorContextService', 'alertsService',
-  'gadgetValidationService', 'GADGET_SPECS',
-  function($log, $modal, $filter, $location, $rootScope,
-           changeListService, editorContextService, alertsService,
-           gadgetValidationService, GADGET_SPECS) {
-    // _gadgets is a JS object with gadget_instance.name strings as keys
-    // and each gadget_instance's data as values.
-    var _gadgets = null;
-    // _panels is a JS object with skin panel names as keys and lists of
-    // gadget_instance.name strings as values. Lists are sorted in order
-    // that gadgets are displayed in panels that contain multiple gadgets.
-    var _panels = null;
-
-    var _getPanelNameFromGadgetName = function(gadgetName) {
-      for (var panel in _panels) {
-        if (_panels[panel].indexOf(gadgetName) !== -1) {
-          return panel;
-        }
-      }
-      $log.info(gadgetName + ' gadget does not exist in any panel.');
-    };
-
-    var _generateUniqueGadgetName = function(gadgetType) {
-      var baseGadgetName = GADGET_SPECS[gadgetType].short_description;
-      if (!_gadgets.hasOwnProperty(baseGadgetName)) {
-        return baseGadgetName;
-      } else {
-        var uniqueInteger = 2;
-        var generatedGadgetName = baseGadgetName + uniqueInteger;
-        while (_gadgets.hasOwnProperty(generatedGadgetName)) {
-          uniqueInteger++;
-          generatedGadgetName = baseGadgetName + uniqueInteger;
-        }
-        return generatedGadgetName;
-      }
-    };
-
-    var _getAllGadgetsInstancesForPanel = function(panel) {
-      var panelGadgets = [];
-      var gadgetsInCurrentPanel = _panels[panel];
-      for (var i = 0; i < gadgetsInCurrentPanel.length; i++) {
-        panelGadgets.push(_gadgets[gadgetsInCurrentPanel[i]]);
-      }
-      return panelGadgets;
-    };
-
-    /**
-     * Returns a JS object whose keys are state names, and whose corresponding
-     * values are lists of gadget instances representing the gadgets visible in
-     * that state for the given panel.
-     */
-    var _getGadgetsVisibilityMap = function(panel) {
-      var gadgetInstanceList = _getAllGadgetsInstancesForPanel(panel);
-      var visibilityMap = {};
-      for (var i = 0; i < gadgetInstanceList.length; i++) {
-        var gadgetInstance = angular.copy(gadgetInstanceList[i]);
-        for (var j = 0; j < gadgetInstance.visible_in_states.length; j++) {
-          var stateName = gadgetInstance.visible_in_states[j];
-          if (visibilityMap[stateName]) {
-            visibilityMap[stateName].push(gadgetInstance);
-          } else {
-            visibilityMap[stateName] = [gadgetInstance];
-          }
-        }
-      }
-      return visibilityMap;
-    };
-
-    var _isNewGadgetNameValid = function(newGadgetName) {
-      if (_gadgets.hasOwnProperty(newGadgetName)) {
-        alertsService.addWarning('A gadget with this name already exists.');
-        return false;
-      }
-      return (
-        gadgetValidationService.isValidGadgetName(newGadgetName));
-    };
-
-    /**
-     * Convert the backend representation of the skin's panel contents to a
-     * panel and a gadget dict. The panel dict has keys that are panel names
-     * and the values are list of gadget names present in that panel. The
-     * gadget dict has keys that are gadget names and the values are dicts
-     * representing the data for the gadget.
-     */
-    var _initGadgetsAndPanelsData = function(panelsContents) {
-      _panels = {};
-      _gadgets = {};
-      for (var panel in panelsContents) {
-        _panels[panel] = [];
-        // Append the name of each gadget instance in the panel.
-        for (var i = 0; i < panelsContents[panel].length; i++) {
-          _panels[panel].push(
-            panelsContents[panel][i].gadget_name
-          );
-          var gadgetName = panelsContents[panel][i].gadget_name;
-          _gadgets[gadgetName] = angular.copy(panelsContents[panel][i]);
-        }
-      }
-    };
-
-    return {
-      init: function(skinCustomizationsData) {
-        // Data structure initialization.
-        if (!skinCustomizationsData.hasOwnProperty('panels_contents')) {
-          alertsService.addWarning(
-            'Gadget Initialization failed. Panel contents were not provided');
-          return;
-        }
-        _initGadgetsAndPanelsData(skinCustomizationsData.panels_contents);
-        var isValid = false;
-        for (var panel in _panels) {
-          var visibilityMap = _getGadgetsVisibilityMap(panel);
-          isValid = gadgetValidationService.validatePanel(
-            panel, visibilityMap);
-          // The validatePanel(...) method should have added the warning to
-          // alertsService.
-          if (!isValid) {
-            return;
-          }
-        }
-        $rootScope.$broadcast('gadgetsChangedOrInitialized');
-      },
-      /**
-       * Confirms if a panel can accept a new gadget considering its capacity
-       * and the gadget's size requirements given its customization arguments.
-       */
-      canAddGadgetToItsPanel: function(gadgetData) {
-        var visibilityMap = _getGadgetsVisibilityMap(gadgetData.panel);
-        return (
-          _isNewGadgetNameValid(gadgetData.gadget_name) &&
-          gadgetValidationService.canAddGadget(gadgetData, visibilityMap));
-      },
-      getNewUniqueGadgetName: function(gadgetType) {
-        return _generateUniqueGadgetName(gadgetType);
-      },
-      getGadgets: function() {
-        return angular.copy(_gadgets);
-      },
-      // Returns a JS object mapping panel names to lists of gadget names.
-      getPanels: function() {
-        return angular.copy(_panels);
-      },
-      getPanelsContents: function() {
-        var panelsContents = {};
-        for (var panel in _panels) {
-          panelsContents[panel] = _panels[panel].map(function(gadgetName) {
-            return angular.copy(_gadgets[gadgetName]);
-          });
-        }
-        return panelsContents;
-      },
-      /**
-       * Function that returns list of gadget names only visible in the state
-       * name provided. Gadgets visible in multiple states would not be
-       * included.
-       */
-      getGadgetNamesUniqueToState: function(stateName) {
-        var gadgetNameList = [];
-        for (var gadgetName in _gadgets) {
-          var gadgetStateVisibilityList = (
-            _gadgets[gadgetName].visible_in_states);
-          if (gadgetStateVisibilityList.length === 1 &&
-              gadgetStateVisibilityList[0] === stateName) {
-            gadgetNameList.push(gadgetName);
-          }
-        }
-        return gadgetNameList;
-      },
-      /**
-       * Function that updates the old state name to the new state name in
-       * gadget's visibility settings.
-       */
-      handleStateRenaming: function(oldStateName, newStateName) {
-        for (var gadgetName in _gadgets) {
-          var gadgetStateVisibilityList = angular.copy(
-            _gadgets[gadgetName].visible_in_states);
-          var stateNameIndex = gadgetStateVisibilityList.indexOf(oldStateName);
-          if (stateNameIndex > -1) {
-            gadgetStateVisibilityList[stateNameIndex] = newStateName;
-            changeListService.editGadgetProperty(
-              gadgetName,
-              'gadget_visibility',
-              gadgetStateVisibilityList,
-              _gadgets[gadgetName].visible_in_states
-            );
-            _gadgets[gadgetName].visible_in_states = gadgetStateVisibilityList;
-            $rootScope.$broadcast('gadgetsChangedOrInitialized');
-          }
-        }
-      },
-      /**
-       * Function that deletes the state name in gadget's visibility settings.
-       */
-      handleStateDeletion: function(stateName) {
-        for (var gadgetName in _gadgets) {
-          var gadgetStateVisibilityList = angular.copy(
-            _gadgets[gadgetName].visible_in_states);
-          var stateNameIndex = gadgetStateVisibilityList.indexOf(stateName);
-          if (stateNameIndex > -1) {
-            gadgetStateVisibilityList.splice(stateNameIndex, 1);
-            changeListService.editGadgetProperty(
-              gadgetName,
-              'gadget_visibility',
-              gadgetStateVisibilityList,
-              _gadgets[gadgetName].visible_in_states
-            );
-            _gadgets[gadgetName].visible_in_states = gadgetStateVisibilityList;
-            $rootScope.$broadcast('gadgetsChangedOrInitialized');
-          }
-        }
-      },
-      /**
-       * Updates a gadget's visibility and/or customization args using
-       * the new data provided.
-       *
-       * This method does not update a gadget's name or panel position.
-       * Use this method in conjunction with renameGadget and
-       * moveGadgetBetweenPanels if those aspects need to be changed as well.
-       *
-       * @param {string} gadgetName - The name of gadget being updated.
-       * @param {object} newCustomizationArgs - New customization data for the
-       *   gadget.
-       * @param {array} newVisibleInStates - New state visibility list for the
-       *   gadget.
-       */
-      updateGadget: function(
-          gadgetName, newCustomizationArgs, newVisibleInStates) {
-        if (!_gadgets.hasOwnProperty(gadgetName)) {
-          alertsService.addWarning(
-            'Attempted to update a non-existent gadget: ' + gadgetName);
-          return;
-        }
-
-        // Check if new gadget data is valid.
-        // Warning will be displayed by isGadgetDataValid(...)
-        if (!gadgetValidationService.isGadgetDataValid(
-          gadgetName, newCustomizationArgs, newVisibleInStates)) {
-          return;
-        }
-
-        var currentGadgetData = _gadgets[gadgetName];
-
-        if (!angular.equals(currentGadgetData.customization_args,
-            newCustomizationArgs)) {
-          $log.info('Updating customization args for gadget: ' + gadgetName);
-          changeListService.editGadgetProperty(
-            gadgetName,
-            'gadget_customization_args',
-            newCustomizationArgs,
-            currentGadgetData.customization_args
-          );
-        }
-        if (!angular.equals(currentGadgetData.visible_in_states,
-            newVisibleInStates)) {
-          $log.info('Updating visibility for gadget: ' + gadgetName);
-          changeListService.editGadgetProperty(
-            gadgetName,
-            'gadget_visibility',
-            newVisibleInStates,
-            currentGadgetData.visible_in_states
-          );
-        }
-
-        // Updating the _gadgets dict.
-        currentGadgetData.customization_args = angular.copy(
-          newCustomizationArgs);
-        currentGadgetData.visible_in_states = angular.copy(newVisibleInStates);
-        $rootScope.$broadcast('gadgetsChangedOrInitialized');
-      },
-      addGadget: function(gadgetData) {
-        // Defense-in-depth: This warning should never happen with panel names
-        // hard coded and validated on the backend.
-        if (!_panels.hasOwnProperty(gadgetData.panel)) {
-          alertsService.addWarning(
-            'Attempted add to a non-existent panel: ' + gadgetData.panel);
-          return;
-        }
-
-        if (_gadgets.hasOwnProperty(gadgetData.gadget_name)) {
-          alertsService.addWarning('A gadget with this name already exists.');
-          return;
-        }
-
-        _gadgets[gadgetData.gadget_name] = gadgetData;
-        _panels[gadgetData.panel].push(gadgetData.gadget_name);
-        $rootScope.$broadcast('gadgetsChangedOrInitialized');
-        changeListService.addGadget(gadgetData);
-      },
-      /**
-       * Function that opens a modal to confirm gadget delete.
-       * @param {string} deleteGadgetName - The name of the gadget to be
-       *   deleted.
-       * @param {bool} showConfirmationDialog - To disable the confirmation
-       *   dialog, pass false, true otherwise.
-       */
-      deleteGadget: function(deleteGadgetName, showConfirmationDialog) {
-        alertsService.clearWarnings();
-
-        if (showConfirmationDialog === null ||
-            showConfirmationDialog === undefined) {
-          alertsService.addWarning(
-            'Missing param: No info was passed to show or hide the dialog.');
-          return;
-        }
-
-        if (!_gadgets.hasOwnProperty(deleteGadgetName)) {
-          // This warning can't be triggered in current UI.
-          // Keeping as defense-in-depth for future UI changes.
-          alertsService.addWarning(
-            'No gadget with name ' + deleteGadgetName + ' exists.'
-          );
-          return;
-        }
-
-        var _actuallyDeleteGadget = function(deleteGadgetName) {
-          // Update _gadgets.
-          delete _gadgets[deleteGadgetName];
-          // Update _panels.
-          var hostPanel = _getPanelNameFromGadgetName(deleteGadgetName);
-          var gadgetIndex = _panels[hostPanel].indexOf(deleteGadgetName);
-          _panels[hostPanel].splice(gadgetIndex, 1);
-
-          $rootScope.$broadcast('gadgetsChangedOrInitialized');
-          // Update changeListService
-          changeListService.deleteGadget(deleteGadgetName);
-        };
-
-        if (!showConfirmationDialog) {
-          _actuallyDeleteGadget(deleteGadgetName);
-          return;
-        }
-
-        $modal.open({
-          templateUrl: 'modals/deleteGadget',
-          backdrop: true,
-          resolve: {
-            deleteGadgetName: function() {
-              return deleteGadgetName;
-            }
-          },
-          controller: [
-            '$scope', '$modalInstance', 'deleteGadgetName',
-            function($scope, $modalInstance, deleteGadgetName) {
-              $scope.deleteGadgetName = deleteGadgetName;
-
-              $scope.reallyDelete = function() {
-                $modalInstance.close(deleteGadgetName);
-              };
-
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
-              };
-            }
-          ]
-        }).result.then(function(deleteGadgetName) {
-          _actuallyDeleteGadget(deleteGadgetName);
-        });
-      },
-      renameGadget: function(oldGadgetName, newGadgetName) {
-        newGadgetName = $filter('normalizeWhitespace')(newGadgetName);
-        if (!_isNewGadgetNameValid(newGadgetName)) {
-          return;
-        }
-        if (_gadgets.hasOwnProperty(newGadgetName)) {
-          alertsService.addWarning('A gadget with this name already exists.');
-          return;
-        }
-        alertsService.clearWarnings();
-
-        // Update _gadgets
-        gadgetData = angular.copy(_gadgets[oldGadgetName]);
-        gadgetData.gadget_name = newGadgetName;
-        _gadgets[newGadgetName] = gadgetData;
-        delete _gadgets[oldGadgetName];
-
-        // Update _panels
-        var hostPanel = _getPanelNameFromGadgetName(oldGadgetName);
-        var gadgetIndex = _panels[hostPanel].indexOf(oldGadgetName);
-        _panels[hostPanel].splice(gadgetIndex, 1, newGadgetName);
-        $rootScope.$broadcast('gadgetsChangedOrInitialized');
-
-        changeListService.renameGadget(oldGadgetName, newGadgetName);
-      }
-    };
+// A data service that stores the current interaction solution.
+oppia.factory('stateSolutionService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveSolution';
+    return child;
   }
 ]);
+
 
 oppia.factory('computeGraphService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {
@@ -1806,7 +1329,6 @@ oppia.factory('computeGraphService', [
             links.push({
               source: stateName,
               target: groups[h].outcome.dest,
-              isFallback: false
             });
           }
 
@@ -1814,16 +1336,6 @@ oppia.factory('computeGraphService', [
             links.push({
               source: stateName,
               target: interaction.defaultOutcome.dest,
-              isFallback: false
-            });
-          }
-
-          var fallbacks = interaction.fallbacks;
-          for (var h = 0; h < fallbacks.length; h++) {
-            links.push({
-              source: stateName,
-              target: fallbacks[h].outcome.dest,
-              isFallback: true
             });
           }
         }
@@ -1903,9 +1415,10 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
         if (_currentlyInFirstVisit) {
           $rootScope.$broadcast('enterEditorForTheFirstTime');
           editorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_TUTORIAL_EVENT_URL).error(function() {
-            console.error('Warning: could not record tutorial start event.');
-          });
+          $http.post(STARTED_TUTORIAL_EVENT_URL + '/' + expId).error(
+            function() {
+              console.error('Warning: could not record tutorial start event.');
+            });
         }
       },
       markTutorialFinished: function() {
@@ -1932,20 +1445,22 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   ADD_INTERACTION: 'Please add an interaction to this card.',
   STATE_UNREACHABLE: 'This card is unreachable.',
   UNABLE_TO_END_EXPLORATION: (
-    'There\'s no way to complete the exploration starting from this card.')
+    'There\'s no way to complete the exploration starting from this card.'),
+  INCORRECT_SOLUTION: (
+    'The current solution does not lead to another card.')
 });
 
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
+  'parameterMetadataService', 'INTERACTION_SPECS',
+  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
+      parameterMetadataService, INTERACTION_SPECS,
+      WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1964,6 +1479,19 @@ oppia.factory('explorationWarningsService', [
       return statesWithoutInteractionIds;
     };
 
+    var _getStatesWithIncorrectSolution = function() {
+      var statesWithIncorrectSolution = [];
+
+      var states = explorationStatesService.getStates();
+      states.getStateNames().forEach(function(stateName) {
+        if (states.getState(stateName).interaction.solution &&
+            !explorationStatesService.isSolutionValid(stateName)) {
+          statesWithIncorrectSolution.push(stateName);
+        }
+      });
+      return statesWithIncorrectSolution;
+    };
+
     // Returns a list of names of all nodes which are unreachable from the
     // initial node.
     //
@@ -1972,11 +1500,9 @@ oppia.factory('explorationWarningsService', [
     // - nodes: an object whose keys are node ids, and whose values are node
     //     names
     // - edges: a list of edges, each of which is an object with keys 'source',
-    //     'target', and 'isFallback'
-    // - allowFallbackEdges: a boolean specifying whether to treat fallback
-    //     edges as valid edges for the purposes of this computation.
+    //     and 'target'.
     var _getUnreachableNodeNames = function(
-        initNodeIds, nodes, edges, allowFallbackEdges) {
+        initNodeIds, nodes, edges) {
       var queue = initNodeIds;
       var seen = {};
       for (var i = 0; i < initNodeIds.length; i++) {
@@ -1985,8 +1511,7 @@ oppia.factory('explorationWarningsService', [
       while (queue.length > 0) {
         var currNodeId = queue.shift();
         edges.forEach(function(edge) {
-          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target) &&
-              (allowFallbackEdges || !edge.isFallback)) {
+          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
             seen[edge.target] = true;
             queue.push(edge.target);
           }
@@ -2012,7 +1537,6 @@ oppia.factory('explorationWarningsService', [
         return {
           source: link.target,
           target: link.source,
-          isFallback: link.isFallback
         };
       });
     };
@@ -2130,9 +1654,16 @@ oppia.factory('explorationWarningsService', [
         }
       });
 
+      var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
+      angular.forEach(statesWithIncorrectSolution, function(state) {
+        if (stateWarnings.hasOwnProperty(state)) {
+          stateWarnings[state].push(STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
+        } else {
+          stateWarnings[state] = [STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
+        }
+      });
+
       if (_graphData) {
-        // Note that it is fine for states to be reachable by means of fallback
-        // edges only.
         var unreachableStateNames = _getUnreachableNodeNames(
           [_graphData.initStateId], _graphData.nodes, _graphData.links, true);
 
@@ -2148,8 +1679,7 @@ oppia.factory('explorationWarningsService', [
             }
           });
         } else {
-          // Only perform this check if all states are reachable. There must be
-          // a non-fallback path from each state to the END state.
+          // Only perform this check if all states are reachable.
           var deadEndStates = _getUnreachableNodeNames(
             _graphData.finalStateIds, _graphData.nodes,
             _getReversedLinks(_graphData.links), false);

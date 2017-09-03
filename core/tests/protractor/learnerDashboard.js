@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,12 +41,7 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-reload-all-explorations-button')).first().click();
     general.acceptAlert();
     browser.waitForAngular();
-    admin.editConfigProperty(
-      'Names of users allowed to use the collection editor',
-      'List', function(listEditor) {
-        listEditor.addItem('Unicode').setValue(USERNAME);
-      }
-    );
+    admin.updateRole(USERNAME, 'collection editor');
     browser.get(general.SERVER_URL_PREFIX);
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();

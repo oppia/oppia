@@ -6,9 +6,16 @@
     <div class="conversation-skin-tutor-card-top-section">
       <img class="conversation-skin-oppia-avatar"
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
-      <div class="conversation-skin-tutor-card-top-content protractor-test-conversation-content"
-           angular-html-bind="activeCard.contentHtml"
+      <div class="conversation-skin-tutor-card-top-content"
            focus-on="<[getContentFocusLabel($index)]>">
+        <div class="protractor-test-conversation-content"
+             angular-html-bind="activeCard.contentHtml">
+        </div>
+        <div ng-if="isContentAudioTranslationAvailable()"
+             class="conversation-skin-audio-controls">
+          <audio-controls audio-translations="contentAudioTranslations">
+          </audio-controls>
+        </div>
       </div>
     </div>
 
@@ -75,10 +82,15 @@
                angular-html-bind="activeCard.interactionHtml">
           </div>
           <div ng-if="hintsExist" style="text-align: right">
-            <hint-button on-click-hint-button="consumeHint()"
+            <hint-button ng-if="!areAllHintsExhausted()"
+                         on-click-hint-button="consumeHint()"
                          current-hint-is-available="isHintAvailable()"
                          all-hints-are-exhausted="areAllHintsExhausted()">
             </hint-button>
+            <solution-button ng-if="areAllHintsExhausted()"
+                             on-click-solution-button="viewSolution()"
+                             solution-is-available="isCurrentSolutionAvailable()">
+            </solution-button>
           </div>
         </div>
       </div>
@@ -110,6 +122,7 @@
 <style>
   .conversation-skin-tutor-card {
     max-width: 100vw;
+    padding-bottom: 18px;
   }
 
   .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
@@ -135,9 +148,20 @@
     color: #ffffff;
   }
 
+  .conversation-skin-tutor-card .solution-button {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    color: #fff;
+  }
+
   .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
   .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
     background-color: #115FD4;
+  }
+
+  .conversation-skin-tutor-card button.md-button.md-default-theme.solution-button:focus,
+  .conversation-skin-tutor-card button.md-button.md-default-theme.solution-button:hover {
+    background-color: #da190b;
   }
 
   .conversation-skin-tutor-card.animate-card-width {
@@ -153,10 +177,9 @@
     padding: 0 20px;
   }
 
-  .conversation-skin-tutor-card-top-content > p {
+  .conversation-skin-tutor-card-top-content p:not(:last-child) {
     line-height: 28px;
     margin-bottom: 18px;
-    margin-top: 18px;
   }
 
   .conversation-skin-tutor-card-top-content {
@@ -229,7 +252,7 @@
   .conversation-skin-inline-interaction {
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
-    padding: 8px 20px 16px;
+    padding: 8px 20px 0;
     position: relative;
   }
 
@@ -251,6 +274,13 @@
       padding: 6px 12px;
     }
 
+    .conversation-skin-tutor-card .solution-button {
+      background-color: #d9534f;
+      border-color: #d43f3a;
+      color: #fff;
+      padding: 6px 12px;
+    }
+
     .has-shadow {
       box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
     }
@@ -260,6 +290,10 @@
     .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
     .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
       background-color: #115FD4;
+    }
+    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
+    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
+      background-color: #da190b;
     }
   }
 </style>

@@ -124,7 +124,7 @@ oppia.factory('explorationSaveService', [
           onStartSaveCallback();
         }
 
-        explorationRightsService.makePublic(true).then(
+        explorationRightsService.publish().then(
           function() {
             if (onSaveDoneCallback) {
               onSaveDoneCallback();
@@ -500,7 +500,8 @@ oppia.factory('explorationSaveService', [
             windowClass: 'oppia-save-exploration-modal',
             controller: [
               '$scope', '$modalInstance', 'isExplorationPrivate',
-              function($scope, $modalInstance, isExplorationPrivate) {
+              function(
+                $scope, $modalInstance, isExplorationPrivate) {
                 $scope.showDiff = false;
                 $scope.onClickToggleDiffButton = function() {
                   $scope.showDiff = !$scope.showDiff;
