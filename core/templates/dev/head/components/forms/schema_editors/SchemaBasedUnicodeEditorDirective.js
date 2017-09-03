@@ -94,7 +94,8 @@ oppia.directive('schemaBasedUnicodeEditor', [
             } else {
               if (!$scope.uiConfig().placeholder && (
                   deviceInfoService.hasTouchEvents())) {
-                return $translate.instant('I18N_DEFAULT_MOBILE_PLACEHOLDER');
+                return $translate.instant(
+                  'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
               }
               return $scope.uiConfig().placeholder;
             }
