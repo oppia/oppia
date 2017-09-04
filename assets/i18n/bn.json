@@ -128,7 +128,7 @@
 	"I18N_INTERACTIONS_GRAPH_RESPONSE_VERTEX": "ও <[vertices]>টি শীর্ষবিন্দু",
 	"I18N_INTERACTIONS_GRAPH_RESPONSE_VERTICES": "ও <[vertices]>টি শীর্ষবিন্দু",
 	"I18N_INTERACTIONS_GRAPH_SUBMIT_BUTTON": "জমা দিন",
-	"I18N_INTERACTIONS_GRAPH_UPDATE_LABEL": "লেভেল হালনাগাদ করুন",
+	"I18N_INTERACTIONS_GRAPH_UPDATE_LABEL": "লেবেল হালনাগাদ করুন",
 	"I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT": "ওজন হালনাগাদ করুন",
 	"I18N_INTERACTIONS_IMAGE_CLICK_SELECT": "[প্রদর্শন করার জন্য একটি চিত্র নির্বাচন করুন]",
 	"I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH": "{minChoiceNumber, plural, one{দয়া করে অন্তত একটি বিকল্প নির্বাচন করুন।} other{দয়া করে অন্তত #টি বিকল্প নির্বাচন করুন।}}",

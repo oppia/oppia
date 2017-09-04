@@ -330,6 +330,8 @@
 	"I18N_PLAYER_EMBED_TOOLTIP": "Incorporé",
 	"I18N_PLAYER_FEEDBACK_TOOLTIP": "Commentaires",
 	"I18N_PLAYER_FORWARD": "Suivant",
+	"I18N_PLAYER_GIVE_UP": "Abandonner ?",
+	"I18N_PLAYER_GIVE_UP_TOOLTIP": "Cliquer ici pour la réponse.",
 	"I18N_PLAYER_GO_TO_LIBRARY": "Aller à la bibliothèque",
 	"I18N_PLAYER_HINT": "Indice",
 	"I18N_PLAYER_HINTS_EXHAUSTED": "Désolé, je n'ai plus d'indices !",
