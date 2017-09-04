@@ -330,6 +330,8 @@
     "I18N_PLAYER_EMBED_TOOLTIP": "Embed",
     "I18N_PLAYER_FEEDBACK_TOOLTIP": "Feedback",
     "I18N_PLAYER_FORWARD": "Forward",
+    "I18N_PLAYER_GIVE_UP": "Give Up?",
+    "I18N_PLAYER_GIVE_UP_TOOLTIP": "Click here for the answer.",
     "I18N_PLAYER_GO_TO_LIBRARY": "Go to library",
     "I18N_PLAYER_HINT": "Hint",
     "I18N_PLAYER_HINTS_EXHAUSTED": "Sorry, I'm out of hints!",
