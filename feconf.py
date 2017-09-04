@@ -29,13 +29,9 @@ DEBUG = False
 PLATFORM = 'gae'
 
 # Whether we should serve the development or production experience.
-# DEV_MODE should only be changed to False in the production environment.
-# Or if you want to use minified resources in the development environment,
-# by changing the DEV_MODE env variable in app.yaml to False.
-# When DEV_MODE is True, this indicates that we are not running in
-# the production App Engine environment, which affects things like
-# login/logout URLs,as well as third-party libraries
-# that App Engine normally provides.
+# DEV_MODE should only be changed to False in the production environment,
+# or if you want to use minified resources in the dev env.
+
 if PLATFORM == 'gae':
     DEV_MODE = ((
         not os.environ.get('SERVER_SOFTWARE')
