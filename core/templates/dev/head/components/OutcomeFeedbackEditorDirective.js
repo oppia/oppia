@@ -45,7 +45,7 @@ oppia.directive('outcomeFeedbackEditor', [
               // 'g' finds all occurrences of '<p' not just the first one
               var searchTag = new RegExp('<p', 'g');
               feedbackStr = feedbackStr.replace(
-                  searchTag, "<p class=\"paragraph-spacing\"");
+                  searchTag, '<p class="paragraph-spacing"');
               feedbackStr = feedbackStr.trim();
               nonemptyFeedback.push(feedbackStr);
             }
