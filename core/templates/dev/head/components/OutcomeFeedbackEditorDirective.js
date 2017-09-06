@@ -41,6 +41,10 @@ oppia.directive('outcomeFeedbackEditor', [
           for (var i = 0; i < $scope.outcome.feedback.length; i++) {
             var feedbackStr = $scope.outcome.feedback[i];
             if (feedbackStr) {
+              // find the '<p>' tag and concatenate the css class to it
+              // 'g' stands for global search, we want to find all occurrences of '<p' not just the first one
+              var searchTag = new RegExp('<p', 'g');
+              feedbackStr = feedbackStr.replace(searchTag, "<p class=\"paragraph-spacing\"");
               feedbackStr = feedbackStr.trim();
             }
             if (feedbackStr) {

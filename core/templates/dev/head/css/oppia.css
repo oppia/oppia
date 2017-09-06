@@ -804,7 +804,8 @@ md-content.oppia-profile-portfolio-container {
   TODO(sll): This is ugly. We should try not to have it, perhaps after
   angular-material has been upgraded.
 */
-html p, body p {
+
+.paragraph-spacing {
   margin-top: 15px;
 }
 
