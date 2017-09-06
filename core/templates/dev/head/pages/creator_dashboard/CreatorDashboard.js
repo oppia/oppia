@@ -98,7 +98,6 @@ oppia.controller('CreatorDashboard', [
       return '/collection_editor/create/' + collectionId;
     };
 
-    //$scope.myExplorationsView = 'list'; TODO Delete
     $scope.setMyExplorationsView = function(viewType) {
       $scope.myExplorationsView = viewType;
     };

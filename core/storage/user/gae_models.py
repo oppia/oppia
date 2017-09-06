@@ -63,6 +63,13 @@ class UserSettingsModel(base_models.BaseModel):
         choices=[
             constants.DASHBOARD_TYPE_LEARNER,
             constants.DASHBOARD_TYPE_CREATOR])
+    # The preferred dashboard display preference.
+    creator_dashboard_display = ndb.StringProperty(
+        default=feconf.CREATOR_DASHBOARD_DISPLAY_PREF_CARD,
+        indexed=False,
+        choices=[
+            feconf.CREATOR_DASHBOARD_DISPLAY_PREF_CARD,
+            feconf.CREATOR_DASHBOARD_DISPLAY_PREF_LIST])
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
     # Subject interests specified by the user.

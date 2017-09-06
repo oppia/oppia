@@ -235,10 +235,7 @@ class CreatorDashboardHandler(base.BaseHandler):
 
         user_settings = user_services.get_user_settings(
             self.user_id, strict=False)
-        if user_settings.creator_dashboard_display:
-            display_preference = user_settings.creator_dashboard_display
-        else:
-            display_preference = 'card'
+        display_preference = user_settings.creator_dashboard_display
 
         self.values.update({
             'explorations_list': exp_summary_dicts,
