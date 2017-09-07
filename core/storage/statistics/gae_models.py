@@ -76,7 +76,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         is_answer_correct: Whether the answer is correct
     """
     # Which specific type of event this is
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = ndb.StringProperty()
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -140,7 +140,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         session_id: ID of current student's session
     """
     # Which specific type of event this is
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = ndb.StringProperty()
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -198,7 +198,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             a correct answer was submitted.
     """
     # Which specific type of event this is
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = ndb.StringProperty()
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
