@@ -480,6 +480,23 @@ class TestBase(unittest.TestCase):
             'title': 'title',
             'category': 'category',
         }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title=title,
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
 
     def save_new_default_collection(
             self, collection_id, owner_id, title='A title',

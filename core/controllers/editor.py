@@ -38,6 +38,7 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
+from core.domain import search_services
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -409,7 +410,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         # Perform the moderator action.
         if action == 'unpublish_exploration':
             rights_manager.unpublish_exploration(self.user, exploration_id)
-            exp_services.delete_documents_from_search_index([
+            search_services.delete_explorations_from_search_index([
                 exploration_id])
         else:
             raise self.InvalidInputException(
