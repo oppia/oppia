@@ -41,7 +41,6 @@ describe('rich-text components', function() {
       // and click on them.
       richTextEditor.addRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
-      general.scrollToTop();
       richTextEditor.addRteComponent('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
