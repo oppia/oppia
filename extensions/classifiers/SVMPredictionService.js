@@ -42,8 +42,17 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
           }
           kvalues.push(Math.exp(-gamma * sum));
         }
-        return kvalues;
+      } else if (kernel == 'linear') {
+        var vectorLength = input.length;
+        for (var i = 0; i < supportVectors.length; i++) {
+          var sum = 0;
+          for (var j = 0; j < input.length; j++) {
+            sum += supportVectors[i][j] * input[j];
+          }
+          kvalues.push(sum);
+        }
       }
+      return kvalues;
     },
 
     predict: function(classifierData, input) {
