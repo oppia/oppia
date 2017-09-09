@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import summary_services
 from core.platform import models
 import feconf
@@ -203,7 +204,7 @@ class CollectionUnpublishHandler(base.BaseHandler):
         _require_valid_version(version, collection.version)
 
         rights_manager.unpublish_collection(self.user, collection_id)
-        collection_services.delete_documents_from_search_index([
+        search_services.delete_collections_from_search_index([
             collection_id])
 
         collection_rights = rights_manager.get_collection_rights(

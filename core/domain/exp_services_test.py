@@ -28,6 +28,7 @@ from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -1803,14 +1804,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
     USER_ID_1 = 'user_1'
     USER_ID_2 = 'user_2'
 
-    def test_demo_explorations_are_added_to_search_index(self):
-        results, _ = exp_services.search_explorations('Welcome', 2)
-        self.assertEqual(results, [])
-
-        exp_services.load_demo('0')
-        results, _ = exp_services.search_explorations('Welcome', 2)
-        self.assertEqual(results, ['0'])
-
     def test_index_explorations_given_ids(self):
         all_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
         expected_exp_ids = all_exp_ids[:-1]
@@ -1852,87 +1845,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             exp_services.index_explorations_given_ids(all_exp_ids)
 
         self.assertEqual(add_docs_counter.times_called, 1)
-
-    def test_patch_exploration_search_document(self):
-
-        def mock_get_doc(doc_id, index):
-            self.assertEqual(doc_id, self.EXP_ID)
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            return {'a': 'b', 'c': 'd'}
-
-        def mock_add_docs(docs, index):
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(docs, [{'a': 'b', 'c': 'e', 'f': 'g'}])
-
-        get_doc_swap = self.swap(
-            search_services, 'get_document_from_index', mock_get_doc)
-
-        add_docs_counter = test_utils.CallCounter(mock_add_docs)
-        add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter)
-
-        with get_doc_swap, add_docs_swap:
-            patch = {'c': 'e', 'f': 'g'}
-            exp_services.patch_exploration_search_document(self.EXP_ID, patch)
-
-        self.assertEqual(add_docs_counter.times_called, 1)
-
-    def test_update_private_exploration_status_in_search(self):
-
-        def mock_delete_docs(ids, index):
-            self.assertEqual(ids, [self.EXP_ID])
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-
-        def mock_get_rights(unused_exp_id):
-            return rights_manager.ActivityRights(
-                self.EXP_ID,
-                [self.owner_id], [self.editor_id], [self.viewer_id],
-                status=rights_manager.ACTIVITY_STATUS_PRIVATE
-            )
-
-        delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
-
-        delete_docs_swap = self.swap(
-            search_services, 'delete_documents_from_index',
-            delete_docs_counter)
-        get_rights_swap = self.swap(
-            rights_manager, 'get_exploration_rights', mock_get_rights)
-
-        with get_rights_swap, delete_docs_swap:
-            exp_services.update_exploration_status_in_search(self.EXP_ID)
-
-        self.assertEqual(delete_docs_counter.times_called, 1)
-
-    def test_search_explorations(self):
-        expected_query_string = 'a query string'
-        expected_cursor = 'cursor'
-        expected_sort = 'title'
-        expected_limit = 30
-        expected_result_cursor = 'rcursor'
-        doc_ids = ['id1', 'id2']
-
-        def mock_search(query_string, index, cursor=None, limit=20, sort='',
-                        ids_only=False, retries=3):
-            self.assertEqual(query_string, expected_query_string)
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(cursor, expected_cursor)
-            self.assertEqual(limit, expected_limit)
-            self.assertEqual(sort, expected_sort)
-            self.assertEqual(ids_only, True)
-            self.assertEqual(retries, 3)
-
-            return doc_ids, expected_result_cursor
-
-        with self.swap(search_services, 'search', mock_search):
-            result, cursor = exp_services.search_explorations(
-                expected_query_string,
-                expected_limit,
-                sort=expected_sort,
-                cursor=expected_cursor,
-            )
-
-        self.assertEqual(cursor, expected_result_cursor)
-        self.assertEqual(result, doc_ids)
 
     def test_get_number_of_ratings(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -1998,51 +1910,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertAlmostEqual(
             exp_services.get_scaled_average_rating(exp.ratings),
             2.056191454757, places=4)
-
-
-    def test_get_search_rank(self):
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-
-        base_search_rank = 20
-
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
-
-        rights_manager.publish_exploration(self.owner, self.EXP_ID)
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
-
-        rating_services.assign_rating_to_exploration(
-            self.owner_id, self.EXP_ID, 5)
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 10)
-
-        rating_services.assign_rating_to_exploration(
-            self.user_id_admin, self.EXP_ID, 2)
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 8)
-
-    def test_search_ranks_cannot_be_negative(self):
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-
-        base_search_rank = 20
-
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
-
-        # A user can (down-)rate an exploration at most once.
-        for i in xrange(50):
-            rating_services.assign_rating_to_exploration(
-                'user_id_1', self.EXP_ID, 1)
-        self.assertEqual(
-            exp_services.get_search_rank(self.EXP_ID), base_search_rank - 5)
-
-        for i in xrange(50):
-            rating_services.assign_rating_to_exploration(
-                'user_id_%s' % i, self.EXP_ID, 1)
-
-        # The rank will be at least 0.
-        self.assertEqual(exp_services.get_search_rank(self.EXP_ID), 0)
 
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
