@@ -24,7 +24,8 @@ import re
 import subprocess
 import sys
 
-GIT_CMD_GET_CURRENT_VERSION = 'git describe --abbrev=0'
+GIT_CMD_GET_TAGS = 'git tag'
+GIT_CMD_GET_LCA_WITH_DEVELOP = 'git merge-base develop %s'
 GIT_CMD_GET_LOGS_FORMAT_STRING = (
     'git log -z --no-color --pretty=format:%H{0}%aN{0}%aE{0}%B {1}..{2}')
 GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
@@ -72,6 +73,29 @@ def _run_cmd(cmd_str):
 
     """
     return subprocess.check_output(cmd_str.split(' ')).strip()
+
+
+def _get_current_version_tag():
+    """Retrieves the most recent version tag.
+
+    Returns:
+        (str): The most recent version tag.
+    """
+    tags = _run_cmd(GIT_CMD_GET_TAGS).splitlines()
+    return tags[-1]
+
+
+def _get_base_commit_with_develop(reference):
+    """Retrieves the commit hash common between the develop branch and the
+    specified reference commit.
+
+    Args:
+        reference (str): Tag, Branch, or commit hash of reference commit.
+
+    Returns:
+        (str): The common commit hash.
+    """
+    return _run_cmd(GIT_CMD_GET_LCA_WITH_DEVELOP % reference)
 
 
 def _gather_logs(start, stop='HEAD'):
@@ -191,8 +215,9 @@ def _check_storage_models(current_release):
 def main():
     """Collects necessary info and dumps it to disk."""
     with ChangedBranch('develop'):
-        current_release = _run_cmd(GIT_CMD_GET_CURRENT_VERSION)
-        logs = _gather_logs(current_release)
+        current_release = _get_current_version_tag()
+        base_commit = _get_base_commit_with_develop(current_release)
+        logs = _gather_logs(base_commit)
         issue_links = _extract_issues(logs)
         feconf_version_changes = _check_versions(current_release)
         setup_changes = _check_setup_scripts(current_release)

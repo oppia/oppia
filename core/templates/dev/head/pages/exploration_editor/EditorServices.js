@@ -668,16 +668,16 @@ oppia.factory('explorationPropertyService', [
 // A data service that stores the current exploration title so that it can be
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationTitleService', [
-  'explorationPropertyService', '$filter', 'validatorsService',
+  'explorationPropertyService', '$filter', 'ValidatorsService',
   'explorationRightsService',
   function(
-    explorationPropertyService, $filter, validatorsService,
+    explorationPropertyService, $filter, ValidatorsService,
     explorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'title';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
-      return validatorsService.isValidEntityName(
+      return ValidatorsService.isValidEntityName(
         value, true, explorationRightsService.isPrivate());
     };
     return child;
@@ -687,16 +687,16 @@ oppia.factory('explorationTitleService', [
 // A data service that stores the current exploration category so that it can be
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationCategoryService', [
-  'explorationPropertyService', '$filter', 'validatorsService',
+  'explorationPropertyService', '$filter', 'ValidatorsService',
   'explorationRightsService',
   function(
-    explorationPropertyService, $filter, validatorsService,
+    explorationPropertyService, $filter, ValidatorsService,
     explorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'category';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
-      return validatorsService.isValidEntityName(
+      return ValidatorsService.isValidEntityName(
         value, true, explorationRightsService.isPrivate());
     };
     return child;
@@ -706,10 +706,10 @@ oppia.factory('explorationCategoryService', [
 // A data service that stores the current exploration objective so that it can
 // be displayed and edited in multiple places in the UI.
 oppia.factory('explorationObjectiveService', [
-  'explorationPropertyService', '$filter', 'validatorsService',
+  'explorationPropertyService', '$filter', 'ValidatorsService',
   'explorationRightsService',
   function(
-    explorationPropertyService, $filter, validatorsService,
+    explorationPropertyService, $filter, ValidatorsService,
     explorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'objective';
@@ -717,7 +717,7 @@ oppia.factory('explorationObjectiveService', [
     child._isValid = function(value) {
       return (
         explorationRightsService.isPrivate() ||
-        validatorsService.isNonempty(value, false));
+        ValidatorsService.isNonempty(value, false));
     };
     return child;
   }
@@ -809,13 +809,13 @@ oppia.factory('explorationParamChangesService', [
 oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
-  'editorContextService', 'validatorsService', 'StatesObjectFactory',
+  'editorContextService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'angularNameService',
   'AnswerClassificationService', 'explorationContextService',
   function(
       $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, alertsService, changeListService,
-      editorContextService, validatorsService, StatesObjectFactory,
+      editorContextService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, angularNameService,
       AnswerClassificationService, explorationContextService) {
     var _states = null;
@@ -976,7 +976,7 @@ oppia.factory('explorationStatesService', [
           return false;
         }
         return (
-          validatorsService.isValidStateName(newStateName, showWarnings));
+          ValidatorsService.isValidStateName(newStateName, showWarnings));
       },
       isSolutionValid: function(stateName) {
         return SolutionValidityService.isSolutionValid(stateName);
@@ -1050,7 +1050,7 @@ oppia.factory('explorationStatesService', [
       },
       addState: function(newStateName, successCallback) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
-        if (!validatorsService.isValidStateName(newStateName, true)) {
+        if (!ValidatorsService.isValidStateName(newStateName, true)) {
           return;
         }
         if (_states.hasState(newStateName)) {
@@ -1124,7 +1124,7 @@ oppia.factory('explorationStatesService', [
       },
       renameState: function(oldStateName, newStateName) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
-        if (!validatorsService.isValidStateName(newStateName, true)) {
+        if (!ValidatorsService.isValidStateName(newStateName, true)) {
           return;
         }
         if (_states.hasState(newStateName)) {

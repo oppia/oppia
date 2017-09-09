@@ -25,13 +25,13 @@ oppia.directive('collectionNodeCreator', [
         'collection_node_creator_directive.html'),
       controller: [
         '$scope', '$http', '$window', '$filter', 'alertsService',
-        'validatorsService', 'CollectionEditorStateService',
+        'ValidatorsService', 'CollectionEditorStateService',
         'CollectionLinearizerService', 'CollectionUpdateService',
         'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'siteAnalyticsService',
         function(
             $scope, $http, $window, $filter, alertsService,
-            validatorsService, CollectionEditorStateService,
+            ValidatorsService, CollectionEditorStateService,
             CollectionLinearizerService, CollectionUpdateService,
             CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, siteAnalyticsService) {
@@ -127,7 +127,7 @@ oppia.directive('collectionNodeCreator', [
             var title = $filter('normalizeWhitespace')(
               $scope.newExplorationTitle);
 
-            if (!validatorsService.isValidExplorationTitle(title, true)) {
+            if (!ValidatorsService.isValidExplorationTitle(title, true)) {
               return;
             }
 
