@@ -16,8 +16,6 @@
  * @fileoverview Controllers for a state's interaction editor.
  */
 
-
-
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
   'alertsService', 'editorContextService', 'oppiaHtmlEscaper',
