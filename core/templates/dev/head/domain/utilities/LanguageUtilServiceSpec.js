@@ -26,23 +26,24 @@ describe('Language util service', function() {
   }));
 
   it('should get the correct language count', function() {
-    expect(lus.getAudioLanguagesCount()).toEqual(2);
+    expect(lus.getAudioLanguagesCount()).toEqual(3);
   });
 
   it('should get the correct description given an audio language code',
     function() {
       expect(lus.getAudioLanguageDescription('en')).toEqual('English');
       expect(lus.getAudioLanguageDescription('hi-en')).toEqual('Hinglish');
+      expect(lus.getAudioLanguageDescription('es').toEqual('Spanish'));
     }
   );
 
   it('should correctly compute the complement languages', function() {
-    expect(lus.getComplementAudioLanguageCodes([])).toEqual(['en', 'hi-en']);
-    expect(lus.getComplementAudioLanguageCodes(['en'])).toEqual(['hi-en']);
-    expect(lus.getComplementAudioLanguageCodes(['hi-en'])).toEqual(['en']);
-    expect(lus.getComplementAudioLanguageCodes(['hi-en', 'en'])).toEqual([]);
+    expect(lus.getComplementAudioLanguageCodes([])).toEqual(['en', 'hi-en', 'es']);
+    expect(lus.getComplementAudioLanguageCodes(['en'])).toEqual(['hi-en', 'es']);
+    expect(lus.getComplementAudioLanguageCodes(['hi-en'])).toEqual(['en', 'es']);
+    expect(lus.getComplementAudioLanguageCodes(['hi-en', 'en'])).toEqual(['es']);
 
     expect(lus.getComplementAudioLanguageCodes(['abcdefg'])).toEqual([
-      'en', 'hi-en']);
+      'en', 'hi-en', 'es']);
   });
 });
