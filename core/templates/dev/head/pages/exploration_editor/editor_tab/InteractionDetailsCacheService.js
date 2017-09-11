@@ -14,7 +14,8 @@
 
 
 /** 
-  * @fileoverview service to provide  state-specific cache for interaction details. 
+  * @fileoverview service to provide 
+  * state-specific cache for interaction details. 
   * It stores customization args
   * corresponding to an interaction id so that they can be restored if the
   * interaction is changed back while the user is still in this state. This
