@@ -615,6 +615,72 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
 
+class ExplorationStatsModel(base_models.BaseModel):
+    """Model for storing analytics data for an exploration.
+
+    The ID of instances of this class has the form {{exp_id}}.{{exp_version}}.
+    """
+    # ID of exploration.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Number of students who attempted the exploration.
+    num_actual_starts = ndb.IntegerProperty(indexed=False)
+    # Number of students who completed the exploration.
+    num_completions = ndb.IntegerProperty(indexed=False)
+    # Keyed by state name that describes the analytics for that state.
+    # {state_name: {
+    #   'total_answers_count': ...,
+    #   'useful_feedback_count': ...,
+    #   'learners_answered_correctly': ...,
+    #   'total_hit_count': ...,
+    #   'first_hit_count': ...,
+    #   'total_solutions_triggered_count': ...}}
+    state_stats_mapping = ndb.JsonProperty(indexed=False)
+
+    @classmethod
+    def get_entity_id(cls, exp_id, exp_version):
+        """Generates an ID for the instance of the form
+        {{exp_id}}.{{exp_version}}.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            ID of the new ExplorationStatsModel instance.
+        """
+        return '%s.%s' % (exp_id, exp_version)
+
+    @classmethod
+    def create(cls, exp_id, exp_version, num_actual_starts, num_completions,
+               state_stats_mapping):
+        """Creates a ExplorationStatsModel instance and writes it to the
+        datastore.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+            num_actual_starts: int. Number of learners who attempted the
+                exploration.
+            num_completions: int. Number of learners who completed the
+                exploration.
+            state_stats_mapping: dict. Mapping from state names to state stats
+                dicts.
+
+        Returns:
+            ID of the new ExplorationStatsModel instance.
+        """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
+        stats_instance = cls(
+            id=instance_id, exp_id=exp_id, exp_version=exp_version,
+            num_actual_starts=num_actual_starts,
+            num_completions=num_completions,
+            state_stats_mapping=state_stats_mapping)
+        stats_instance.put()
+        return instance_id
+
+
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
