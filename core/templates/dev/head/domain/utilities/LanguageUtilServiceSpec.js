@@ -38,12 +38,14 @@ describe('Language util service', function() {
   );
 
   it('should correctly compute the complement languages', function() {
-    expect(lus.getComplementAudioLanguageCodes([])).toEqual(
-      ['en', 'hi-en', 'es']);
-    expect(lus.getComplementAudioLanguageCodes(['en'])).toEqual(['hi-en', 'es']);
-    expect(lus.getComplementAudioLanguageCodes(['hi-en'])).toEqual(['en', 'es']);
-    expect(lus.getComplementAudioLanguageCodes(['hi-en', 'en'])).toEqual(['es']);
-
+    expect(lus.getComplementAudioLanguageCodes([]))
+      .toEqual(['en', 'hi-en', 'es']);
+    expect(lus.getComplementAudioLanguageCodes(['en']))
+      .toEqual(['hi-en', 'es']);
+    expect(lus.getComplementAudioLanguageCodes(['hi-en']))
+      .toEqual(['en', 'es']);
+    expect(lus.getComplementAudioLanguageCodes(['hi-en', 'en']))
+      .toEqual(['es']);
     expect(lus.getComplementAudioLanguageCodes(['abcdefg'])).toEqual([
       'en', 'hi-en', 'es']);
   });
