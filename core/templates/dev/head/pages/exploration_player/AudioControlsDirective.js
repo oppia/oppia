@@ -53,6 +53,8 @@ oppia.directive('audioControls', [
               AudioTranslationManagerService.getCurrentAudioLanguageCode()];
           };
 
+          $scope.isAudioLoading = false;
+
           $scope.AudioPlayerService = AudioPlayerService;
 
           $scope.IMAGE_URL_REWIND_AUDIO_BUTTON = (
@@ -68,24 +70,26 @@ oppia.directive('audioControls', [
           };
 
           $scope.onSpeakerIconClicked = function() {
-            var audioTranslation = getAudioTranslationInCurrentLanguage();
-            if (audioTranslation) {
-              // If this language hasn't been preloaded for the exploration,
-              // and this audio translation hasn't been loaded, then ask to
-              // preload all audio translations for the current language.
-              if (!AudioPreloaderService.hasPreloadedLanguage(
-                    getCurrentAudioLanguageCode()) &&
-                    !isCached(audioTranslation)) {
-                AudioPreloaderService.showBandwidthConfirmationModal(
-                  $scope.getAudioTranslations(), getCurrentAudioLanguageCode(),
-                  playPauseAudioTranslation);
+            if (!$scope.isAudioLoading) {
+              var audioTranslation = getAudioTranslationInCurrentLanguage();
+              if (audioTranslation) {
+                // If this language hasn't been preloaded for the exploration,
+                // and this audio translation hasn't been loaded, then ask to
+                // preload all audio translations for the current language.
+                if (!AudioPreloaderService.hasPreloadedLanguage(
+                      getCurrentAudioLanguageCode()) &&
+                      !isCached(audioTranslation)) {
+                  AudioPreloaderService.showBandwidthConfirmationModal(
+                    $scope.getAudioTranslations(), getCurrentAudioLanguageCode(),
+                    playPauseAudioTranslation);
+                } else {
+                  playPauseAudioTranslation(getCurrentAudioLanguageCode());
+                }
               } else {
-                playPauseAudioTranslation(getCurrentAudioLanguageCode());
+                // If the audio translation isn't available in the current
+                // language, then open the settings modal.
+                $scope.openAudioTranslationSettings();
               }
-            } else {
-              // If the audio translation isn't available in the current
-              // language, then open the settings modal.
-              $scope.openAudioTranslationSettings();
             }
           };
 
@@ -119,10 +123,12 @@ oppia.directive('audioControls', [
           };
 
           var loadAndPlayAudioTranslation = function() {
+            $scope.isAudioLoading = true;
             var audioTranslation = getAudioTranslationInCurrentLanguage();
             if (audioTranslation) {
               AudioPlayerService.load(
                 audioTranslation.filename, directiveId).then(function() {
+                  $scope.isAudioLoading = false;
                   AudioPlayerService.play();
                 });
             }
