@@ -80,7 +80,8 @@ oppia.directive('audioControls', [
                       getCurrentAudioLanguageCode()) &&
                       !isCached(audioTranslation)) {
                   AudioPreloaderService.showBandwidthConfirmationModal(
-                    $scope.getAudioTranslations(), getCurrentAudioLanguageCode(),
+                    $scope.getAudioTranslations(),
+                    getCurrentAudioLanguageCode(),
                     playPauseAudioTranslation);
                 } else {
                   playPauseAudioTranslation(getCurrentAudioLanguageCode());
