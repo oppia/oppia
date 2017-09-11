@@ -33,7 +33,7 @@ describe('Language util service', function() {
     function() {
       expect(lus.getAudioLanguageDescription('en')).toEqual('English');
       expect(lus.getAudioLanguageDescription('hi-en')).toEqual('Hinglish');
-      expect(lus.getAudioLanguageDescription('es').toEqual('Spanish'));
+      expect(lus.getAudioLanguageDescription('es')).toEqual('Spanish');
     }
   );
 
