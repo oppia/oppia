@@ -46,7 +46,7 @@ class ExplorationStats(object):
 
     def __init__(self, exp_id, exp_version, num_actual_starts, num_completions,
                  state_stats_mapping):
-        """Constructs a ExplorationStats domain object.
+        """Constructs an ExplorationStats domain object.
 
         Args:
             exp_id: str. ID of the exploration.

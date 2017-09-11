@@ -655,7 +655,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, num_actual_starts, num_completions,
                state_stats_mapping):
-        """Creates a ExplorationStatsModel instance and writes it to the
+        """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
 
         Args:
