@@ -24,12 +24,10 @@ describe('Text Input tokenizer', function() {
     beforeEach(inject(function($injector) {
       tokenizer = $injector.get('TextInputTokenizer');
     }));
-
     it('should generate correct tokens for a text', function() {
       var textInput = 'I don\'t know the answer to this question';
-
       var expectedTokens = [
-        "don", "know", "the", "answer", "to", "this", "question"];
+        'don', 'know', 'the', 'answer', 'to', 'this', 'question'];
 
       var tokens = tokenizer.generateTokens(textInput);
       expect(tokens.length).toEqual(expectedTokens.length);
