@@ -106,6 +106,8 @@ oppia.directive('audioTranslationsEditor', [
 
                   // Whether there was an error uploading the audio file.
                   $scope.errorMessage = null;
+                  $scope.saveButtonText = 'Save';
+                  $scope.saveInProgress = false;
 
                   $scope.languageCode = allowedAudioLanguageCodes[0];
                   var uploadedFile = null;
@@ -137,6 +139,8 @@ oppia.directive('audioTranslationsEditor', [
 
                   $scope.save = function() {
                     if ($scope.isAudioTranslationValid()) {
+                      $scope.saveButtonText = 'Saving...'
+                      $scope.saveInProgress = true;
                       var generatedFilename = generateNewFilename();
                       var explorationId = (
                         explorationContextService.getExplorationId());
@@ -152,6 +156,8 @@ oppia.directive('audioTranslationsEditor', [
                         $scope.errorMessage = (
                           errorResponse.error || ERROR_MESSAGE_BAD_FILE_UPLOAD);
                         uploadedFile = null;
+                        $scope.saveButtonText = 'Save';
+                        $scope.saveInProgress = false;
                       });
                     }
                   };
