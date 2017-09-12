@@ -412,7 +412,7 @@
               <collection-summary-tile
                                        collection-id="tile.id"
                                        collection-title="tile.title"
-                                       last-updated-msec="tile.last_updated_msec"
+                                       last-updated-msec="tile.last_updated"
                                        objective="tile.objective"
                                        node-count="tile.node_count"
                                        category="tile.category"
@@ -524,7 +524,7 @@
               <collection-summary-tile
                                        collection-id="tile.id"
                                        collection-title="tile.title"
-                                       last-updated-msec="tile.last_updated_msec"
+                                       last-updated-msec="tile.last_updated"
                                        objective="tile.objective"
                                        node-count="tile.node_count"
                                        category="tile.category"
@@ -611,9 +611,7 @@
                       </span>
                     </span>
                     <span ng-if="!thread.authorSecondLastMessage">
-                      <span ng-if="thread.totalMessageCount > 1">
-                        <span translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>, 
-                      </span>
+                      <span translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>, 
                     </span>
                   </span>
                   <span ng-if="thread.authorLastMessage">
