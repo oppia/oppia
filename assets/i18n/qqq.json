@@ -314,6 +314,7 @@
 	"I18N_MODAL_CONTINUE_BUTTON": "Text that is displayed in a button of a modal. On clicking it the user confirms to continue with the action.\n{{Identical|Continue}}",
 	"I18N_ONE_SUBSCRIBER_TEXT": "Text displayed under the subscribers tab in creator dashboard. If the creator has one subscriber, this text is displayed which informs him/her about the same.",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Text displayed in the audio translation settings modal, asking the learner to pick what language they want to listen to audio translations in.\n{{Identical|Language}}",
+	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Text displayed under the audio controls to the learner while audio is being downloaded from the server.",
 	"I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT": "Text displayed under the audio controls to the learner when the audio translation for the current language is flagged as needing an update by the creator.",
 	"I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "Text displayed in a tooltip over the speaker icon to play audio when there is no audio available in the selected language.",
 	"I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Title displayed at the top of the audio translation settings modal in the learner view.",
