@@ -139,7 +139,11 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
     @acl_decorators.can_edit_collection
     def get(self, collection_id):
-        """Gets the editing rights for the given collection."""
+        """Gets the editing rights for the given collection.
+
+        Args:
+            collection_id: str. ID for the collection.
+        """
         (collection, collection_rights) = (
             collection_services.get_collection_and_collection_rights_by_id(
                 collection_id))

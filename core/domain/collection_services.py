@@ -329,11 +329,11 @@ def get_collection_and_collection_rights_by_id(collection_id):
                 ('CollectionModel', [collection_id]),
                 ('CollectionRightsModel', [collection_id])
             ]))
+
+    collection = None
     if collection_and_rights[0][0] is not None:
         collection = get_collection_from_model(
             collection_and_rights[0][0])
-    else:
-        collection = None
 
     if collection_and_rights[1][0] is not None:
         collection_rights = (

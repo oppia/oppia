@@ -333,11 +333,11 @@ def get_exploration_and_exploration_rights_by_id(exploration_id):
                 ('ExplorationModel', [exploration_id]),
                 ('ExplorationRightsModel', [exploration_id])
             ]))
+
+    exploration = None
     if exploration_and_rights[0][0] is not None:
         exploration = get_exploration_from_model(
             exploration_and_rights[0][0])
-    else:
-        exploration = None
 
     if exploration_and_rights[1][0] is not None:
         exploration_rights = (
