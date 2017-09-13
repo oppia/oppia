@@ -257,123 +257,6 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'actual_start'
-        exp_id: id of exploration currently being played
-        exp_version: version of exploration
-        state_name: Name of current state
-        client_time_spent_in_secs: Time since start of the exploration when
-            this event was recorded (MIN_TIME to record this event)
-        session_id: ID of current student's session
-    """
-    # Which specific type of event this is
-    event_type = ndb.StringProperty()
-    # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
-    # Current version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
-    # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
-    session_id = ndb.StringProperty(indexed=True)
-    # Time since start of this state before this event occurred (in sec). This
-    # should be equal to the MIN_TIME defined for recording this event.
-    client_time_spent_in_secs = ndb.FloatProperty()
-
-    @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
-        timestamp = datetime.datetime.utcnow()
-        return cls.get_new_id('%s:%s:%s' % (
-            utils.get_time_in_millisecs(timestamp),
-            exp_id,
-            session_id))
-
-    @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               client_time_spent_in_secs):
-        """Creates a new actual exploration start event."""
-        entity_id = cls.get_new_event_entity_id(
-            exp_id, session_id)
-        actual_start_event_entity = cls(
-            id=entity_id,
-            event_type=feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
-            exp_id=exp_id,
-            exp_version=exp_version,
-            state_name=state_name,
-            session_id=session_id,
-            client_time_spent_in_secs=client_time_spent_in_secs)
-        actual_start_event_entity.put()
-        return entity_id
-
-
-class SolutionHitEventLogEntryModel(base_models.BaseModel):
-    """An event triggered by a student triggering the solution.
-
-    Event schema documentation
-    --------------------------
-    V1:
-        event_type: 'solution'
-        exp_id: id of exploration currently being played
-        exp_version: version of exploration
-        state_name: Name of current state
-        client_time_spent_in_secs: Time since start of this state when this
-            event was recorded
-        session_id: ID of current student's session
-        is_solution_preceding_answer: Whether the solution was triggered before
-            a correct answer was submitted.
-    """
-    # Which specific type of event this is
-    event_type = ndb.StringProperty()
-    # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
-    # Current version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
-    # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
-    session_id = ndb.StringProperty(indexed=True)
-    # Time since start of this state before this event occurred (in sec).
-    client_time_spent_in_secs = ndb.FloatProperty()
-    # Whether the solution was triggered before the student submitted a correct
-    # answer to the same state.
-    is_solution_preceding_answer = ndb.BooleanProperty(indexed=True)
-
-    @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
-        """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
-        timestamp = datetime.datetime.utcnow()
-        return cls.get_new_id('%s:%s:%s' % (
-            utils.get_time_in_millisecs(timestamp),
-            exp_id,
-            session_id))
-
-    @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               client_time_spent_in_secs, is_solution_preceding_answer):
-        """Creates a new answer submitted event."""
-        entity_id = cls.get_new_event_entity_id(
-            exp_id, session_id)
-        solution_hit_event_entity = cls(
-            id=entity_id,
-            event_type=feconf.EVENT_TYPE_SOLUTION,
-            exp_id=exp_id,
-            exp_version=exp_version,
-            state_name=state_name,
-            session_id=session_id,
-            client_time_spent_in_secs=client_time_spent_in_secs,
-            is_solution_preceding_answer=is_solution_preceding_answer)
-        solution_hit_event_entity.put()
-        return entity_id
-
-
-class StartExplorationEventLogEntryModel(base_models.BaseModel):
-    """An event triggered by a student starting the exploration.
-
-    Event schema documentation
-    --------------------------
-    V1:
         event_type: 'start'.
         exploration_id: ID of exploration currently being played.
         exploration_version: Version of exploration.
@@ -738,8 +621,8 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id: str. ID of the exploration currently being played.
             user_id: str. ID of the user.
             rating: int. Value of rating assigned to exploration.
-            old_rating: int or None. Will be None if the user rates an exploration
-                for the first time.
+            old_rating: int or None. Will be None if the user rates an
+                exploration for the first time.
         """
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)
