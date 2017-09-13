@@ -100,10 +100,10 @@ oppia.controller('CreatorDashboard', [
 
     $scope.setMyExplorationsView = function(viewType) {
       $http.post('/creatordashboardhandler/data', {
-            display_preference: viewType,
-          }).then(function() {
-            $scope.myExplorationsView = viewType;
-	  });
+        display_preference: viewType,
+      }).then(function() {
+        $scope.myExplorationsView = viewType;
+      });
     };
 
     $scope.checkMobileView = function() {
