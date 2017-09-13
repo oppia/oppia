@@ -47,14 +47,14 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
+  '$scope', '$rootScope', '$http', '$window', 'oppiaDatetimeFormatter', 'alertsService',
   'CreatorDashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
+      $scope, $rootScope, $http, $window, oppiaDatetimeFormatter, alertsService,
       CreatorDashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
@@ -99,7 +99,11 @@ oppia.controller('CreatorDashboard', [
     };
 
     $scope.setMyExplorationsView = function(viewType) {
-      $scope.myExplorationsView = viewType;
+      $http.post('/creatordashboardhandler/data', {
+            display_preference: viewType,
+          }).then(function() {
+            $scope.myExplorationsView = viewType;
+	  });
     };
 
     $scope.checkMobileView = function() {

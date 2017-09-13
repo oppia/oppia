@@ -247,6 +247,11 @@ class CreatorDashboardHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
+    def post(self):
+        user_creator_dashboard_display = self.payload.get('display_preference')
+        user_services.update_user_creator_dashboard_display(self.user_id,
+            user_creator_dashboard_display)
+
 
 class NotificationsHandler(base.BaseHandler):
     """Provides data about unseen notifications."""
