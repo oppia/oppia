@@ -339,13 +339,13 @@ def get_exploration_and_exploration_rights_by_id(exploration_id):
         exploration = get_exploration_from_model(
             exploration_and_rights[0][0])
 
+    exploration_rights = None
     if exploration_and_rights[1][0] is not None:
         exploration_rights = (
             rights_manager.get_activity_rights_from_model(
                 exploration_and_rights[1][0],
                 constants.ACTIVITY_TYPE_EXPLORATION))
-    else:
-        exploration_rights = None
+
     return (exploration, exploration_rights)
 
 

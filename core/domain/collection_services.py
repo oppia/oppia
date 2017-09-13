@@ -335,13 +335,13 @@ def get_collection_and_collection_rights_by_id(collection_id):
         collection = get_collection_from_model(
             collection_and_rights[0][0])
 
+    collection_rights = None
     if collection_and_rights[1][0] is not None:
         collection_rights = (
             rights_manager.get_activity_rights_from_model(
                 collection_and_rights[1][0],
                 constants.ACTIVITY_TYPE_COLLECTION))
-    else:
-        collection_rights = None
+
     return (collection, collection_rights)
 
 
