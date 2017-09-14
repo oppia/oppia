@@ -18,22 +18,22 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService',
-  'EditableExplorationBackendApiService',
-  'ReadOnlyExplorationBackendApiService','$q',
-  function($http, $log, alertsService, EditableExplorationBackendApiService,
-    ReadOnlyExplorationBackendApiService,$q) {
+  '$http', '$log', '$window', '$q', 'alertsService',
+  'EditableExplorationBackendApiService', 'LocalStorageService',
+  'ReadOnlyExplorationBackendApiService', 'urlService',
+  function($http, $log, $window, $q, alertsService,
+    EditableExplorationBackendApiService, LocalStorageService,
+    ReadOnlyExplorationBackendApiService, urlService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
-    var pathnameArray = window.location.pathname.split('/');
+    var pathnameArray = urlService.getPathname().split('/');
     for (var i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create') {
         var explorationId = pathnameArray[i + 1];
         break;
       }
     }
-
     if (!explorationId) {
       $log.error(
         'Unexpected call to explorationData for pathname ', pathnameArray[i]);
@@ -49,13 +49,21 @@ oppia.factory('explorationData', [
     // Put exploration variables here.
     var explorationData = {
       explorationId: explorationId,
+      // Note that the changeList is the full changeList since the last
+      // committed version (as opposed to the most recent autosave).
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
+        // First save locally to be retrieved later if save is unsuccessful.
+        LocalStorageService.saveExplorationDraft(
+          explorationId, changeList, draftChangeListId);
         $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
         }).then(function(response) {
+          draftChangeListId = response.data.draft_change_list_id;
+          // We can safely remove the locally saved draft copy if it was saved
+          // to the backend.
+          LocalStorageService.removeExplorationDraft(explorationId);
           if (successCallback) {
-            draftChangeListId = response.data.draft_change_list_id;
             successCallback(response);
           }
         }, function() {
@@ -66,6 +74,7 @@ oppia.factory('explorationData', [
       },
       discardDraft: function(successCallback, errorCallback) {
         $http.post(explorationDraftAutosaveUrl, {}).then(function() {
+          LocalStorageService.removeExplorationDraft(explorationId);
           if (successCallback) {
             successCallback();
           }
@@ -76,7 +85,7 @@ oppia.factory('explorationData', [
         });
       },
       // Returns a promise that supplies the data for the current exploration.
-      getData: function() {
+      getData: function(errorCallback) {
         if (explorationData.data) {
           $log.info('Found exploration data in cache.');
 
@@ -96,7 +105,21 @@ oppia.factory('explorationData', [
               $log.info(response);
               draftChangeListId = response.draft_change_list_id;
               explorationData.data = response;
-
+              var draft = LocalStorageService.getExplorationDraft(
+                explorationId);
+              if (draft) {
+                if (draft.isValid(draftChangeListId)) {
+                  var changeList = draft.getChanges();
+                  explorationData.autosaveChangeList(changeList, function() {
+                    // A reload is needed so that the changelist just saved is
+                    // loaded as opposed to the exploration returned by this
+                    // response.
+                    $window.location.reload();
+                  });
+                } else {
+                  errorCallback(explorationId, draft.getChanges());
+                }
+              }
               return response;
             })
           );
@@ -1995,11 +2018,13 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$log', '$modal', '$timeout', '$window', 'lostChangesService',
-  'explorationData', 'UrlInterpolationService',
+  '$log', '$modal', '$timeout', '$window',
+  'explorationData', 'LocalStorageService', 'lostChangesService',
+  'UrlInterpolationService',
   function(
-      $log, $modal, $timeout, $window, lostChangesService,
-      explorationData, UrlInterpolationService) {
+      $log, $modal, $timeout, $window,
+      explorationData, LocalStorageService, lostChangesService,
+      UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
       $timeout(function() {
@@ -2060,6 +2085,35 @@ oppia.factory('autosaveInfoModalsService', [
             }
           }],
           windowClass: 'oppia-autosave-version-mismatch-modal'
+        }).result.then(function() {
+          _isModalOpen = false;
+        }, function() {
+          _isModalOpen = false;
+        });
+
+        _isModalOpen = true;
+      },
+      showLostChangesModal: function(lostChanges, explorationId) {
+        $modal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'lost_changes_modal.html'),
+          // Prevent modal from closing when the user clicks outside it.
+          backdrop: 'static',
+          controller: ['$scope', '$modalInstance', function(
+            $scope, $modalInstance) {
+            // When the user clicks on discard changes button, signal backend
+            // to discard the draft and reload the page thereafter.
+            $scope.close = function() {
+              LocalStorageService.removeExplorationDraft(explorationId);
+              $modalInstance.dismiss('cancel');
+            };
+
+            $scope.lostChangesHtml = (
+              lostChangesService.makeHumanReadable(lostChanges).html());
+            $log.error('Lost changes: ' + JSON.stringify(lostChanges));
+          }],
+          windowClass: 'oppia-lost-changes-modal'
         }).result.then(function() {
           _isModalOpen = false;
         }, function() {
