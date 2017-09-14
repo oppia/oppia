@@ -103,7 +103,7 @@
         <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
       </div>
       <div ng-if="isViewportNarrow()">
-        <md-button class="instructions-button" style="white-space:normal" ng-click="onDismiss()">
+        <md-button class="instructions-button"  ng-click="onDismiss()">
           <[interactionInstructions]>
         </md-button>
       </div>
@@ -140,6 +140,7 @@
   .conversation-skin-tutor-card .instructions-button {
     background: inherit;
     border: none;
+    white-space:normal;
   }
 
   .conversation-skin-tutor-card .hint-button {
@@ -266,6 +267,7 @@
       background-color: #0D48A1;
       color: #ffffff;
       padding: 6px 12px;
+      white-space:normal;
     }
 
     .conversation-skin-tutor-card .hint-button {
