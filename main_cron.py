@@ -36,7 +36,7 @@ URLS = [
         cron.CronExplorationRecommendationsHandler),
     main.get_redirect_route(
         r'/cron/explorations/search_rank',
-        cron.CronExplorationSearchRankHandler),
+        cron.CronActivitySearchRankHandler),
     main.get_redirect_route(
         r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler),
 ]
