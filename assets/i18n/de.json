@@ -314,6 +314,7 @@
 	"I18N_MODAL_CONTINUE_BUTTON": "Fortfahren",
 	"I18N_ONE_SUBSCRIBER_TEXT": "Du hast einen Abonnenten.",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Sprache",
+	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Lade Audio …",
 	"I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT": "Audio könnte nicht vollständig dem Text entsprechen",
 	"I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "Nicht verfügbar auf <[languageDescription]>",
 	"I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Audio-Übersetzungssprache",

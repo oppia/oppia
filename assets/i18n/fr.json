@@ -314,6 +314,7 @@
 	"I18N_MODAL_CONTINUE_BUTTON": "Poursuivre",
 	"I18N_ONE_SUBSCRIBER_TEXT": "Vous avez 1 abonné.",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Langue",
+	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Chargement de l’audio…",
 	"I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT": "Le son peut ne pas correspondre tout à fait au texte",
 	"I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "Non disponible en <[languageDescription]>",
 	"I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Paramètres de traduction audio",
