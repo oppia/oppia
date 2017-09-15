@@ -120,11 +120,9 @@ class ExplorationPage(EditorHandler):
                 iframe_restriction=None)
             return
 
-        exploration = exp_services.get_exploration_by_id(
-            exploration_id, strict=False)
-
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
+        (exploration, exploration_rights) = (
+            exp_services.get_exploration_and_exploration_rights_by_id(
+                exploration_id))
 
         visualizations_html = visualization_registry.Registry.get_full_html()
 
