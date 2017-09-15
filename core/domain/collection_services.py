@@ -315,13 +315,14 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
 
 def get_collection_and_collection_rights_by_id(collection_id):
     """Returns a tuple for collection domain object and collection rights
-        object.
+    object.
 
     Args:
         collection_id: str. Id of the collection.
 
     Returns:
-        tuple(collection object or None, collection rights object or None).
+        tuple(Collection|None, CollectionRights|None). The collection and
+        collection rights domain object, respectively.
     """
     collection_and_rights = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(

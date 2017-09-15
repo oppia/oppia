@@ -319,13 +319,14 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 
 def get_exploration_and_exploration_rights_by_id(exploration_id):
     """Returns a tuple for exploration domain object and exploration rights
-        object.
+    object.
 
     Args:
         exploration_id: str. Id of the exploration.
 
     Returns:
-        tuple(exploration object or None, exploration rights object or None).
+        tuple(Exploration|None, ExplorationRights|None). The exploration and
+        exploration rights object, respectively.
     """
     exploration_and_rights = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
