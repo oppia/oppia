@@ -44,8 +44,9 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         }
         observed_exploration_stats = self._get_exploration_stats_from_dict(
             expected_exploration_stats_dict)
-        self.assertDictEqual(expected_exploration_stats_dict,
-                             observed_exploration_stats.to_dict())
+        self.assertDictEqual(
+            expected_exploration_stats_dict,
+            observed_exploration_stats.to_dict())
 
     def test_validate(self):
         exploration_stats_dict = {
@@ -97,18 +98,22 @@ class StateStatsTests(test_utils.GenericTestBase):
         state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
         expected_state_stats = stats_domain.StateStats.from_dict(
             state_stats_dict)
-        self.assertEqual(state_stats.total_answers_count,
-                         expected_state_stats.total_answers_count)
-        self.assertEqual(state_stats.useful_feedback_count,
-                         expected_state_stats.useful_feedback_count)
-        self.assertEqual(state_stats.learners_answered_correctly,
-                         expected_state_stats.learners_answered_correctly)
-        self.assertEqual(state_stats.total_hit_count,
-                         expected_state_stats.total_hit_count)
-        self.assertEqual(state_stats.first_hit_count,
-                         expected_state_stats.first_hit_count)
-        self.assertEqual(state_stats.total_solutions_triggered_count,
-                         expected_state_stats.total_solutions_triggered_count)
+        self.assertEqual(
+            state_stats.total_answers_count,
+            expected_state_stats.total_answers_count)
+        self.assertEqual(
+            state_stats.useful_feedback_count,
+            expected_state_stats.useful_feedback_count)
+        self.assertEqual(
+            state_stats.learners_answered_correctly,
+            expected_state_stats.learners_answered_correctly)
+        self.assertEqual(
+            state_stats.total_hit_count, expected_state_stats.total_hit_count)
+        self.assertEqual(
+            state_stats.first_hit_count, expected_state_stats.first_hit_count)
+        self.assertEqual(
+            state_stats.total_solutions_triggered_count,
+            expected_state_stats.total_solutions_triggered_count)
 
     def test_to_dict(self):
         state_stats_dict = {

@@ -648,13 +648,14 @@ class ExplorationStatsModel(base_models.BaseModel):
             exp_version: int. Version of the exploration.
 
         Returns:
-            ID of the new ExplorationStatsModel instance.
+            str. ID of the new ExplorationStatsModel instance.
         """
         return '%s.%s' % (exp_id, exp_version)
 
     @classmethod
-    def create(cls, exp_id, exp_version, num_actual_starts, num_completions,
-               state_stats_mapping):
+    def create(
+        cls, exp_id, exp_version, num_actual_starts, num_completions,
+        state_stats_mapping):
         """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
 
@@ -669,7 +670,7 @@ class ExplorationStatsModel(base_models.BaseModel):
                 dicts.
 
         Returns:
-            ID of the new ExplorationStatsModel instance.
+            str. ID of the new ExplorationStatsModel instance.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         stats_instance = cls(

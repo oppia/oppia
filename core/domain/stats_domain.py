@@ -44,15 +44,17 @@ MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 class ExplorationStats(object):
     """Domain object representing analytics data for an exploration."""
 
-    def __init__(self, exp_id, exp_version, num_actual_starts, num_completions,
-                 state_stats_mapping):
+    def __init__(
+            self, exp_id, exp_version, num_actual_starts, num_completions,
+            state_stats_mapping):
         """Constructs an ExplorationStats domain object.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
             num_actual_starts: int. Number of learners who actually attempted
-                the exploration.
+                the exploration. Theses are the learners who spent some
+                minimum fixed time on the exploration.
             num_completions: int. Number of learners who completed the
                 exploration.
             state_stats_mapping: dict. A dictionary mapping the state names of
@@ -106,9 +108,10 @@ class ExplorationStats(object):
 class StateStats(object):
     """Domain object representing analytics data for an exploration's state."""
 
-    def __init__(self, total_answers_count, useful_feedback_count,
-                 learners_answered_correctly, total_hit_count, first_hit_count,
-                 total_solutions_triggered_count):
+    def __init__(
+            self, total_answers_count, useful_feedback_count,
+            learners_answered_correctly, total_hit_count, first_hit_count,
+            total_solutions_triggered_count):
         """Constructs a StateStats domain object.
 
         Args:
