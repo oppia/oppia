@@ -38,7 +38,7 @@ module.exports = function(config) {
       },
       {
         pattern: 'core/tests/data/**/*.json',
-        watched: true,
+        watched: false,
         served: true,
         included: false
       }

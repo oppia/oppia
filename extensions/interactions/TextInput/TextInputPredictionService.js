@@ -33,10 +33,14 @@ oppia.factory('TextInputPredictionService', [
         // Tokenize the text input
         var textInputTokens = TextInputTokenizer.generateTokens(textInput);
 
-        var textVector = CountVectorizerService.vectorize(
-          textInputTokens, cvVocabulary);
-
-        prediction = SVMPredictionService.predict(svmData, textVector);
+        if(textInputTokens != null) {
+          var textVector = CountVectorizerService.vectorize(
+            textInputTokens, cvVocabulary);
+          prediction = SVMPredictionService.predict(svmData, textVector);
+        }
+        else {
+          prediction = -1;
+        }
         return prediction;
       }
     };
