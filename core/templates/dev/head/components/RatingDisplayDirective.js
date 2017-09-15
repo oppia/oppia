@@ -16,7 +16,8 @@
  * @fileoverview Directive for displaying summary rating information.
  */
 
-oppia.directive('ratingDisplay', [function() {
+oppia.directive('ratingDisplay', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     // This will display a star-rating based on the given data. The attributes
     // passed in are as follows:
@@ -30,7 +31,8 @@ oppia.directive('ratingDisplay', [function() {
       onEdit: '=',
       ratingValue: '='
     },
-    templateUrl: 'components/ratingSummary',
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/components/rating_display.html'),
     link: function(scope, element) {
       // This is needed in order for the scope to be retrievable during Karma
       // unit testing. See http://stackoverflow.com/a/29833832 for more
