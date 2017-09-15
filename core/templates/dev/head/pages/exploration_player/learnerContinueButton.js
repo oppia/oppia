@@ -26,6 +26,6 @@ oppia.directive('continueButton', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
-        'learner_continue_button_directive.html')
+        'continue_button_directive.html')
     };
   }]);
