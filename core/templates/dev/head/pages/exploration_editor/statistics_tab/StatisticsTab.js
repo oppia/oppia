@@ -150,9 +150,9 @@ oppia.controller('StatisticsTab', [
           },
           controller: [
             '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
-            'improvementType', 'visualizationsInfo', 'oppiaHtmlEscaper',
+            'improvementType', 'visualizationsInfo', 'OppiaHtmlEscaperService',
             function($scope, $modalInstance, $filter, stateName, stateStats,
-                improvementType, visualizationsInfo, oppiaHtmlEscaper) {
+                improvementType, visualizationsInfo, OppiaHtmlEscaperService) {
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
@@ -165,9 +165,9 @@ oppia.controller('StatisticsTab', [
                     '<oppia-visualization-' +
                     $filter('camelCaseToHyphens')(visualizationsInfo[i].id) +
                     '/>');
-                  el.attr('data', oppiaHtmlEscaper.objToEscapedJson(
+                  el.attr('data', OppiaHtmlEscaperService.objToEscapedJson(
                     visualizationsInfo[i].data));
-                  el.attr('options', oppiaHtmlEscaper.objToEscapedJson(
+                  el.attr('options', OppiaHtmlEscaperService.objToEscapedJson(
                     visualizationsInfo[i].options));
                   htmlSnippets.push(el.get(0).outerHTML);
                 }

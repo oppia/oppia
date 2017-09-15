@@ -32,10 +32,10 @@ oppia.directive('sharingLinks', [
         '/components/share/' +
         'sharing_links_directive.html'),
       controller: [
-        '$scope', '$window', 'oppiaHtmlEscaper',
+        '$scope', '$window', 'OppiaHtmlEscaperService',
         'ExplorationEmbedButtonService', 'siteAnalyticsService',
         function(
-            $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
+            $scope, $window, OppiaHtmlEscaperService, ExplorationEmbedButtonService,
             siteAnalyticsService) {
           $scope.registerShareEvent = null;
 
@@ -68,7 +68,7 @@ oppia.directive('sharingLinks', [
             $window.location.protocol + '//' + $window.location.host);
 
           $scope.escapedTwitterText = (
-            oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
+            OppiaHtmlEscaperService.unescapedStrToEscapedStr($scope.getTwitterText()));
 
           $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/gplus.png');

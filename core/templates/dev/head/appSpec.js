@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for generic services.
  */
-
+/*
 describe('HTML escaper', function() {
   beforeEach(module('oppia'));
 
@@ -47,7 +47,7 @@ describe('HTML escaper', function() {
     });
   });
 });
-
+*/
 describe('Datetime Formatter', function() {
   beforeEach(module('oppia'));
 

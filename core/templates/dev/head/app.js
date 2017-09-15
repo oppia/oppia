@@ -430,6 +430,7 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
+/*
 // Service for HTML serialization and escaping.
 oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
   var htmlEscaper = {
@@ -462,7 +463,7 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
   };
   return htmlEscaper;
 }]);
-
+*/
 // Service for converting dates in milliseconds since the Epoch to
 // human-readable dates.
 oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
@@ -509,9 +510,9 @@ oppia.factory('IdGenerationService', [function() {
 
 oppia.factory('rteHelperService', [
   '$filter', '$log', '$interpolate', 'explorationContextService',
-  'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
+  'RTE_COMPONENT_SPECS', 'OppiaHtmlEscaperService',
   function($filter, $log, $interpolate, explorationContextService,
-           RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+           RTE_COMPONENT_SPECS, OppiaHtmlEscaperService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -544,7 +545,7 @@ oppia.factory('rteHelperService', [
           continue;
         }
         var argName = attr.name.substring(0, separatorLocation);
-        customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(
+        customizationArgsDict[argName] = OppiaHtmlEscaperService.escapedJsonToObj(
           attr.value);
       }
       return customizationArgsDict;
@@ -591,7 +592,7 @@ oppia.factory('rteHelperService', [
         for (var attrName in customizationArgsDict) {
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
-            oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+            OppiaHtmlEscaperService.objToEscapedJson(customizationArgsDict[attrName]));
         }
 
         return el.get(0);
@@ -1002,14 +1003,14 @@ oppia.factory('currentLocationService', ['$window', function($window) {
 
 // Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
-  '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
+  '$filter', 'OppiaHtmlEscaperService', function($filter, OppiaHtmlEscaperService) {
     return {
       formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
         for (var caSpecName in customizationArgSpecs) {
           var caSpecValue = customizationArgSpecs[caSpecName].value;
           element.attr(
             $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-            oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+            OppiaHtmlEscaperService.objToEscapedJson(caSpecValue));
         }
         return element;
       }
