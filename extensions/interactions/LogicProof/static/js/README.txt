@@ -1,10 +1,10 @@
 The code is contained in the following files:
- - generatedParser.js: this is a parser automatically generated using PEG.js,
+ - generatedExpressionParserService.js: this is a parser automatically generated using PEG.js,
  that is responsible for parsing logical expressions. To change it, make updates
  to static/js/tools/input_to_PEG.txt and then paste the contents of this file
  into http://pegjs.majda.cz/online. Call the parser variable 'logicProofParser'
  and check "use results cache". Then download the code and paste it into the
- generatedParser.js file.
+ generatedExpressionParserService.js file.
  - shared.js: this contains code used by both the teacher and student parts of
  the website. The most important functions are parseLine() and
  assignTypesToExpression().
