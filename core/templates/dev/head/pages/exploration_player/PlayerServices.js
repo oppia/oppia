@@ -29,7 +29,7 @@ oppia.factory('oppiaPlayerService', [
   'alertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
-  'expressionInterpolationService', 'StateClassifierMappingService',
+  'ExpressionInterpolationService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
@@ -38,7 +38,7 @@ oppia.factory('oppiaPlayerService', [
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
-      expressionInterpolationService, StateClassifierMappingService,
+      ExpressionInterpolationService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService) {
@@ -62,7 +62,7 @@ oppia.factory('oppiaPlayerService', [
     // Evaluate feedback.
     var makeFeedback = function(feedbacks, envs) {
       var feedbackHtml = feedbacks.length > 0 ? feedbacks[0] : '';
-      return expressionInterpolationService.processHtml(feedbackHtml, envs);
+      return ExpressionInterpolationService.processHtml(feedbackHtml, envs);
     };
 
     // Evaluate parameters. Returns null if any evaluation fails.
@@ -73,7 +73,7 @@ oppia.factory('oppiaPlayerService', [
           if (!pc.customizationArgs.parse_with_jinja) {
             newParams[pc.name] = pc.customizationArgs.value;
           } else {
-            var paramValue = expressionInterpolationService.processUnicode(
+            var paramValue = ExpressionInterpolationService.processUnicode(
               pc.customizationArgs.value, [newParams].concat(envs));
             if (paramValue === null) {
               return false;
@@ -96,7 +96,7 @@ oppia.factory('oppiaPlayerService', [
 
     // Evaluate question string.
     var makeQuestion = function(newState, envs) {
-      return expressionInterpolationService.processHtml(
+      return ExpressionInterpolationService.processHtml(
         newState.content.getHtml(), envs);
     };
 
