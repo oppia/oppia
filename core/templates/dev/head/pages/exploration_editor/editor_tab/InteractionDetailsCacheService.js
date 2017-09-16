@@ -13,12 +13,11 @@
 // limitations under the License.
 
 /** 
- * @fileoverview service to provide 
- * state-specific cache for interaction details. 
- * It stores customization args
- * corresponding to an interaction id so that they can be restored if the 
- * interaction is changed back while the user is still in this state. This
- * cache should be reset each time the state editor is initialized.
+ * @fileoverview service to provide state-specific cache for interaction
+ * details.It stores customization argscorresponding to an interaction id so
+ * that they can be restored if the interaction is changed back while
+ * the user is still in this state. This cache should be reset each time
+ * the state editor is initialized.
  */
 
 oppia.factory('InteractionDetailsCacheService', [function() {
