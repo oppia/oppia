@@ -111,9 +111,9 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
-BAD_PATTERNS_APP_YAML = {
-    'DEV_MODE: false': {
-        'message': 'Please set the DEV_MODE env variable in app.yaml '
+BAD_PATTERNS_APP_FECONF = {
+    'FORCE_DEV_MODE = False': {
+        'message': 'Please set the FORCE_DEV_MODE variable in feconf.py '
                    'to true before committing.',
         'excluded_files': ()}
 }
@@ -539,13 +539,13 @@ def _check_bad_patterns(all_files):
                                 filename,
                                 regexp['message'])
                             total_error_count += 1
-            if filename == 'app.yaml':
-                for pattern in BAD_PATTERNS_APP_YAML:
+            if filename == 'feconf.py':
+                for pattern in BAD_PATTERNS_APP_FECONF:
                     if pattern in content:
                         failed = True
                         print '%s --> %s' % (
                             filename,
-                            BAD_PATTERNS_APP_YAML[pattern]['message'])
+                            BAD_PATTERNS_APP_FECONF[pattern]['message'])
                         total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED

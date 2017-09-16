@@ -28,6 +28,11 @@ DEBUG = False
 # code in core/platform.
 PLATFORM = 'gae'
 
+# This variable is for serving minified resources
+# when set to false. It allows minified resources to be used when
+# running the server in the dev environment.
+FORCE_DEV_MODE = False
+
 # Whether we should serve the development or production experience.
 # DEV_MODE should only be changed to False in the production environment,
 # or if you want to use minified resources in the dev env.
@@ -36,7 +41,7 @@ if PLATFORM == 'gae':
     DEV_MODE = ((
         not os.environ.get('SERVER_SOFTWARE')
         or os.environ['SERVER_SOFTWARE'].startswith('Development'))
-                and os.environ.get('DEV_MODE') == 'True')
+                and FORCE_DEV_MODE)
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 

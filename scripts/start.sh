@@ -65,22 +65,22 @@ fi
 # clear the datastore.
 CLEAR_DATASTORE_ARG="--clear_datastore=true"
 # Argument passed to gulpfile.js to help build with minification.
-DEV_MODE=true
+FORCE_DEV_MODE=True
 for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
     CLEAR_DATASTORE_ARG=""
   fi
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
-    DEV_MODE=false
+    FORCE_DEV_MODE=False
     $PYTHON_CMD scripts/build.py
   fi
 done
 
-yaml_env_variable="DEV_MODE: $DEV_MODE"
-sed -i.bak -e s/"DEV_MODE: .*"/"$yaml_env_variable"/ app.yaml
+feaconf_env_variable="FORCE_DEV_MODE = $DEV_MODE"
+sed -i.bak -e s/"FORCE_DEV_MODE = .*"/"$feaconf_env_variable"/ feconf.py
 # Delete the modified yaml file(-i.bak)
-rm app.yaml.bak
+rm feconf.py.bak
 
 # Launch a browser window.
 if [ ${OS} == "Linux" ]; then
