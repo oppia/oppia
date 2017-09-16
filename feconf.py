@@ -31,7 +31,7 @@ PLATFORM = 'gae'
 # This variable is for serving minified resources
 # when set to false. It allows minified resources to be used when
 # running the server in the dev environment.
-FORCE_DEV_MODE = False
+FORCE_DEV_MODE = True
 
 # Whether we should serve the development or production experience.
 # DEV_MODE should only be changed to False in the production environment,
