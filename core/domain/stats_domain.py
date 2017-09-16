@@ -94,10 +94,18 @@ class ExplorationStats(object):
                 'Expected num_actual_starts to be an int, received %s' % (
                     self.num_actual_starts))
 
+        if self.num_actual_starts < 0:
+            raise utils.ValidationError(
+                '%s cannot have negative values' % ('num_actual_starts'))
+
         if not isinstance(self.num_completions, int):
             raise utils.ValidationError(
                 'Expected num_completions to be an int, received %s' % (
                     self.num_completions))
+
+        if self.num_completions < 0:
+            raise utils.ValidationError(
+                '%s cannot have negative values' % ('num_completions'))
 
         if not isinstance(self.state_stats_mapping, dict):
             raise utils.ValidationError(
@@ -162,38 +170,26 @@ class StateStats(object):
     def validate(self):
         """Validates the StateStats domain object."""
 
-        if not isinstance(self.total_answers_count, int):
-            raise utils.ValidationError(
-                'Expected total_answers_count to be an int, received %s' % (
-                    self.total_answers_count))
+        state_stats_properties = [
+            'total_answers_count',
+            'useful_feedback_count',
+            'learners_answered_correctly',
+            'total_hit_count',
+            'first_hit_count',
+            'total_solutions_triggered_count'
+        ]
 
-        if not isinstance(self.useful_feedback_count, int):
-            raise utils.ValidationError(
-                'Expected useful_feedback_count to be an int, '
-                'received %s' % (
-                    self.useful_feedback_count))
+        state_stats_dict = self.to_dict()
 
-        if not isinstance(self.learners_answered_correctly, int):
-            raise utils.ValidationError(
-                'Expected learners_answered_correctly to be an int, '
-                'received %s' % (
-                    self.learners_answered_correctly))
+        for stat_property in state_stats_properties:
+            if not isinstance(state_stats_dict[stat_property], int):
+                raise utils.ValidationError(
+                    'Expected %s to be an int, received %s' % (
+                        stat_property, state_stats_dict[stat_property]))
 
-        if not isinstance(self.total_hit_count, int):
-            raise utils.ValidationError(
-                'Expected total_hit_count to be an int, received %s' % (
-                    self.total_hit_count))
-
-        if not isinstance(self.first_hit_count, int):
-            raise utils.ValidationError(
-                'Expected first_hit_count to be an int, received %s' % (
-                    self.first_hit_count))
-
-        if not isinstance(self.total_solutions_triggered_count, int):
-            raise utils.ValidationError(
-                'Expected total_solutions_triggered_count to be an int, '
-                'received %s' % (
-                    self.total_solutions_triggered_count))
+            if state_stats_dict[stat_property] < 0:
+                raise utils.ValidationError(
+                    '%s cannot have negative values' % (stat_property))
 
 
 # TODO(bhenning): Monitor sizes (lengths of submitted_answer_list) of these

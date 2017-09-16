@@ -82,6 +82,13 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             'Expected state_stats_mapping to be a dict')):
             exploration_stats.validate()
 
+        # Make the num_completions negative.
+        exploration_stats.state_stats_mapping = {}
+        exploration_stats.num_completions = -5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            '%s cannot have negative values' % ('num_completions'))):
+            exploration_stats.validate()
+
 
 class StateStatsTests(test_utils.GenericTestBase):
     """Tests the StateStats domain object."""
@@ -135,6 +142,12 @@ class StateStatsTests(test_utils.GenericTestBase):
         state_stats.total_answers_count = '10'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected total_answers_count to be an int')):
+            state_stats.validate()
+
+        # Make the total_answers_count negative.
+        state_stats.total_answers_count = -5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            '%s cannot have negative values' % ('total_answers_count'))):
             state_stats.validate()
 
 

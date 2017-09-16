@@ -624,7 +624,9 @@ class ExplorationStatsModel(base_models.BaseModel):
     exp_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
-    # Number of students who attempted the exploration.
+    # Number of students who actually attempted the exploration. Only learners
+    # who spent a minimum time on the exploration are considered to have
+    # actually started the exploration.
     num_actual_starts = ndb.IntegerProperty(indexed=False)
     # Number of students who completed the exploration.
     num_completions = ndb.IntegerProperty(indexed=False)
@@ -654,8 +656,8 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-        cls, exp_id, exp_version, num_actual_starts, num_completions,
-        state_stats_mapping):
+            cls, exp_id, exp_version, num_actual_starts, num_completions,
+            state_stats_mapping):
         """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
 
