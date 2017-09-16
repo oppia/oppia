@@ -29,8 +29,8 @@ DEBUG = False
 PLATFORM = 'gae'
 
 # This variable is for serving minified resources
-# when set to false. It allows minified resources to be used when
-# running the server in the dev environment.
+# when set to false. It reflects if we are running the server in the dev
+# environment.
 FORCE_DEV_MODE = True
 
 # Whether we should serve the development or production experience.
@@ -59,8 +59,7 @@ RTE_EXTENSIONS_DIR = (
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
-# Choose production templates folder if minification flag is used or
-# if in production mode
+# Choose production templates folder when we are in production mode.
 if not DEV_MODE:
     FRONTEND_TEMPLATES_DIR = (
         os.path.join('backend_prod_files', 'templates', 'head'))
