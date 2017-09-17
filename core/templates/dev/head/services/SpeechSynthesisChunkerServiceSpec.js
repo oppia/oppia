@@ -111,5 +111,4 @@ describe('Speech Synthesis Chunker Service', function() {
       expect(speakableLatex3).toEqual('the tangent of u v');
     }
   );
-
 });
