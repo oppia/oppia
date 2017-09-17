@@ -105,7 +105,6 @@ oppia.factory('SpeechSynthesisChunkerService', [
 
     var _convertToSpeakableText = function(html) {
       elt = $('<div>' + html + '</div>');
-
       // Convert links into speakable text by extracting the readable value.
       elt.find('oppia-noninteractive-' + RTE_COMPONENT_NAMES.Link)
         .replaceWith(function() {
@@ -120,26 +119,8 @@ oppia.factory('SpeechSynthesisChunkerService', [
       elt.find('oppia-noninteractive-' + RTE_COMPONENT_NAMES.Math)
         .replaceWith(function() {
           if (this.attributes['raw_latex-with-value'] !== undefined) {
-            return this.attributes['raw_latex-with-value'].textContent
-              .replace(/&quot;/g, '')
-              // Separate consecutive characters with spaces so that 'ab'
-              // is pronounced 'a' followed by 'b'.
-              .split('').join(' ')
-              .replace(/\s*(\d+)\s*/g, '$1')
-              // Replace dashes with 'minus'.
-              .replace(/-/g, 'minus')
-              // Ensure that 'x^2' is pronounced 'x squared' rather than
-              // 'x karat 2'.
-              .replace(/\s\^\s/g, '^')
-              // Handle simple fractions.
-              .replace(/\\\sf\sr\sa\sc\s\{\s*(.+)\s*\}\s\{\s*(.+)\s*\}/g,
-                '$1 / $2')
-              // Handle basic trigonometric functions.
-              .replace(/t\sa\sn/g, 'the tangent of')
-              .replace(/s\si\sn/g, 'the sine of')
-              .replace(/c\so\ss/g, 'the cosine of')
-              // Handle square roots.
-              .replace(/s\sq\sr\st\s\{\s*(.+)\s*\}/g, 'the square root of $1');
+            return _formatLatexToSpeakableText(
+              this.attributes['raw_latex-with-value'].textContent);
           }
         }
       );
@@ -151,7 +132,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
       // it off to avoid blank chunks.
       html = html.replace(new RegExp('</li>', 'g'), '.').trim();
       // Strip away HTML tags.
-      var tmp = $('<div></div>')
+      var tmp = $('<div></div>');
       tmp.html(html);
       var textToSpeakWithoutPauses = tmp.text();
       var textToSpeak = '';
@@ -173,6 +154,43 @@ oppia.factory('SpeechSynthesisChunkerService', [
       return textToSpeak;
     };
 
+    var _formatLatexToSpeakableText = function(latex) {
+      return latex
+        .replace(/&quot;/g, '')
+        .replace(/\\/g, '')
+        .replace(/\s+/, ' ')
+        // Separate consecutive characters with spaces so that 'ab'
+        // is pronounced 'a' followed by 'b'.
+        .split('').join(' ')
+        .replace(/\s*(\d+)\s*/g, '$1')
+        // Replace dashes with 'minus'.
+        .replace(/-/g, ' minus ')
+        // Ensure that 'x^2' is pronounced 'x squared' rather than
+        // 'x caret 2'.
+        .replace(/\s*\^\s*/g, '^')
+        // Speak 'x^y' as 'x to the power of y' unless the exponent is two or
+        // three, in which case Web Speech will read 'squared' and 'cubed'
+        // respectively.
+        .replace(/(.*)\^(\{*[0-9].+|[0-14-9]\}*)/g, '$1 to the power of $2')
+        // Handle simple fractions.
+        .replace(/f\sr\sa\sc\s\{\s*(.+)\s*\}\s\{\s*(.+)\s*\}/g,
+          '$1/$2')
+        // If a fraction contains a variable, then say (numerator) 'over'
+        // (denominator).
+        .replace(/(\d*\D+)\/(\d*\D*)|(\d*\D*)\/(\d*\D+)/g, '$1 over $2')
+        // Handle basic trigonometric functions.
+        .replace(/t\sa\sn/g, 'the tangent of')
+        .replace(/s\si\sn/g, 'the sine of')
+        .replace(/c\so\ss/g, 'the cosine of')
+        // Handle square roots.
+        .replace(/s\sq\sr\st\s\{\s*(.+)\s*\}/g, 'the square root of $1')
+        // Remove brackets.
+        .replace(/[\}\{]/g, '')
+        // Replace multiple spaces with single space.
+        .replace(/\s\s+/g, ' ')
+        .trim();
+    };
+
     return {
       speak: function(utterance, callback) {
         _speechUtteranceChunker.cancel = false;
@@ -184,6 +202,9 @@ oppia.factory('SpeechSynthesisChunkerService', [
       },
       convertToSpeakableText: function(html) {
         return _convertToSpeakableText(html);
+      },
+      formatLatexToSpeakableText: function(latex) {
+        return _formatLatexToSpeakableText(latex);
       }
     }
   }

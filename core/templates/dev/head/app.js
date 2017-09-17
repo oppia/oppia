@@ -703,7 +703,6 @@ oppia.factory('rteHelperService', [
         var that = this;
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          console.log(componentDefn);
           elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(
             function() {
               return that.createRteElement(

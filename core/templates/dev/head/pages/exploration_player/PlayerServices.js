@@ -193,11 +193,12 @@ oppia.factory('oppiaPlayerService', [
             _explorationId).then(function(data) {
               exploration = ExplorationObjectFactory.createFromBackendDict(
                 data);
-
               exploration.setInitialStateName(initStateName);
               initParams(manualParamChanges);
               AudioTranslationManagerService.init(
-                exploration.getAllAudioLanguageCodes());
+                exploration.getAllAudioLanguageCodes(),
+                null,
+                exploration.getLanguageCode());
               _loadInitialState(successCallback);
             });
         } else {
