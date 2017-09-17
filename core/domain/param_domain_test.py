@@ -35,7 +35,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         param_spec.obj_type = 'Real'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Real is not among the supported object '
-            'types for parameters: UnicodeString.'
+            'types for parameters: {UnicodeString}.'
             ):
             param_spec.validate()
 
