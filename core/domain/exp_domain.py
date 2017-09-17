@@ -1240,10 +1240,10 @@ class State(object):
         """Validates various properties of the State.
 
         Args:
-            exp_param_specs_dict: dict or none. A dict of specified parameters
+            exp_param_specs_dict: dict or None. A dict of specified parameters
                 used in this exploration. Keys are parameter names and values
                 are ParamSpec value objects with an object type
-                property(obj_type). It is none if the state belongs to a
+                property(obj_type). It is None if the state belongs to a
                 question.
             allow_null_interaction. bool. Whether this state's interaction is
                 allowed to be unspecified.
