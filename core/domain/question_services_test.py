@@ -95,9 +95,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_model = question_services.add_question(self.owner_id, question)
         change_dict = {'cmd': 'update_question_property',
-                        'property_name': 'title',
-                        'new_value': 'ABC',
-                        'old_value': 'A Question'}
+                       'property_name': 'title',
+                       'new_value': 'ABC',
+                       'old_value': 'A Question'}
         change_list = [question_domain.QuestionChange(change_dict)]
         question_services.update_question(
             self.owner_id, question_model.id, change_list, 'updated title')
