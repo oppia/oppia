@@ -78,13 +78,13 @@
           '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
         ACTIVITY_STATUS_PUBLIC: JSON.parse(
           '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
-        AUDIO_URL_TEMPLATE: JSON.parse('{{AUDIO_URL_TEMPLATE|js_string}}'),
         ADDITIONAL_ANGULAR_MODULES: [],
         ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
         can_create_collections: JSON.parse(
           '{{can_create_collections|js_string}}'),
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
+        GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
         MINIFICATION: JSON.parse('{{MINIFICATION|js_string}}'),
         NAV_MODE: JSON.parse('{{nav_mode|js_string}}'),
@@ -210,6 +210,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ValidatorsService.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/alerts/AlertMessageDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/create_button/CreateActivityButtonDirective.js"></script>

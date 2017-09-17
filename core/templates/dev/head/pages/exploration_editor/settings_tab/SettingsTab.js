@@ -165,12 +165,8 @@ oppia.controller('SettingsTab', [
     ********************************************/
     $scope.areParametersEnabled = (
       explorationAdvancedFeaturesService.areParametersEnabled);
-    $scope.areGadgetsEnabled = (
-      explorationAdvancedFeaturesService.areGadgetsEnabled);
     $scope.enableParameters = (
       explorationAdvancedFeaturesService.enableParameters);
-    $scope.enableGadgets = (
-      explorationAdvancedFeaturesService.enableGadgets);
 
     /********************************************
     * Methods for rights management.

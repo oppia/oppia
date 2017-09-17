@@ -21,6 +21,7 @@ from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import stats_jobs_continuous
 from core.domain import user_services
 import utils
@@ -497,7 +498,7 @@ def get_library_groups(language_codes):
     all_collection_ids = []
     header_id_to_collection_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
-        collection_ids = collection_services.search_collections(
+        collection_ids = search_services.search_collections(
             _generate_query(group['search_categories']), 8)[0]
         header_id_to_collection_ids[group['header_i18n_id']] = collection_ids
         all_collection_ids += collection_ids
@@ -518,7 +519,7 @@ def get_library_groups(language_codes):
     all_exp_ids = []
     header_to_exp_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
-        exp_ids = exp_services.search_explorations(
+        exp_ids = search_services.search_explorations(
             _generate_query(group['search_categories']), 8)[0]
         header_to_exp_ids[group['header_i18n_id']] = exp_ids
         all_exp_ids += exp_ids

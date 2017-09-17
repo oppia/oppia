@@ -16,67 +16,6 @@
  * @fileoverview Unit tests for generic services.
  */
 
-describe('Validators service', function() {
-  beforeEach(module('oppia'));
-
-  describe('validators service', function() {
-    var vs = null;
-
-    beforeEach(inject(function($injector) {
-      vs = $injector.get('validatorsService');
-    }));
-
-    it('should correctly validate entity names', function() {
-      GLOBALS.INVALID_NAME_CHARS = 'xyz';
-
-      expect(vs.isValidEntityName('b')).toBe(true);
-      expect(vs.isValidEntityName('b   ')).toBe(true);
-      expect(vs.isValidEntityName('   b')).toBe(true);
-      expect(vs.isValidEntityName('bd')).toBe(true);
-
-      expect(vs.isValidEntityName('')).toBe(false);
-      expect(vs.isValidEntityName('   ')).toBe(false);
-      expect(vs.isValidEntityName('x')).toBe(false);
-      expect(vs.isValidEntityName('y')).toBe(false);
-      expect(vs.isValidEntityName('bx')).toBe(false);
-    });
-
-    it('should correctly validate exploration titles', function() {
-      GLOBALS.INVALID_NAME_CHARS = '#';
-
-      expect(vs.isValidExplorationTitle('b')).toBe(true);
-      expect(vs.isValidExplorationTitle('abc def')).toBe(true);
-
-      expect(vs.isValidExplorationTitle('')).toBe(false);
-      expect(vs.isValidExplorationTitle(null)).toBe(false);
-      expect(vs.isValidExplorationTitle(undefined)).toBe(false);
-      expect(vs.isValidExplorationTitle(
-        'A title with invalid characters #')).toBe(false);
-      expect(vs.isValidExplorationTitle(
-        'A title that is way way way way way way way too long.')).toBe(false);
-    });
-
-    it('should correctly validate non-emptiness', function() {
-      expect(vs.isNonempty('b')).toBe(true);
-      expect(vs.isNonempty('abc def')).toBe(true);
-
-      expect(vs.isNonempty('')).toBe(false);
-      expect(vs.isNonempty(null)).toBe(false);
-      expect(vs.isNonempty(undefined)).toBe(false);
-    });
-
-    it('should correctly validate exploration IDs', function() {
-      expect(vs.isValidExplorationId('b')).toBe(true);
-      expect(vs.isValidExplorationId('2')).toBe(true);
-      expect(vs.isValidExplorationId('asbfjkdAFS-_')).toBe(true);
-
-      expect(vs.isValidExplorationId('abc def')).toBe(false);
-      expect(vs.isValidExplorationId('')).toBe(false);
-      expect(vs.isValidExplorationId('abcd;')).toBe(false);
-    });
-  });
-});
-
 describe('HTML escaper', function() {
   beforeEach(module('oppia'));
 

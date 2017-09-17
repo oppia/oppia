@@ -311,29 +311,6 @@ def mark_collection_as_incomplete(user_id, collection_id):
         _save_incomplete_activities(incomplete_activities)
 
 
-def add_exp_to_learner_playlist(
-        user_id, exploration_id, position_to_be_inserted=None):
-    """This function checks if the exploration exists in the completed list or
-    the incomplete list. If it does not exist we call the function in learner
-    playlist services to add the exploration to the play later list.
-
-    Args:
-        user_id: str. The id of the user.
-        exploration_id: str. The id of the exploration to be added to the
-            learner playlist.
-        position_to_be_inserted: int|None. If this is specified the exploration
-            gets inserted at the given position. Otherwise it gets added at the
-            end.
-    """
-    completed_exploration_ids = get_all_completed_exp_ids(user_id)
-    incomplete_exploration_ids = get_all_incomplete_exp_ids(user_id)
-
-    if (exploration_id not in completed_exploration_ids and
-            exploration_id not in incomplete_exploration_ids):
-        learner_playlist_services.mark_exploration_to_be_played_later(
-            user_id, exploration_id, position_to_be_inserted)
-
-
 def add_collection_to_learner_playlist(
         user_id, collection_id, position_to_be_inserted=None):
     """This function checks if the collection exists in the completed list or
@@ -347,14 +324,80 @@ def add_collection_to_learner_playlist(
         position_to_be_inserted: int|None. If this is specified the collection
             gets inserted at the given position. Otherwise it gets added at the
             end.
+
+    Returns:
+        (bool, bool, bool). The first boolean indicates whether the collection
+            already exists in either of the "completed collections" or
+            "incomplete collections" lists, the second boolean indicates
+            whether the playlist limit of the user has been
+            exceeded, and the third boolean indicates whether the collection
+            belongs to the created or edited collections of the user.
     """
     completed_collection_ids = get_all_completed_collection_ids(user_id)
     incomplete_collection_ids = get_all_incomplete_collection_ids(user_id)
+    playlist_limit_exceeded = False
+    belongs_to_subscribed_activities = False
+    belongs_to_completed_or_incomplete_list = False
 
     if (collection_id not in completed_collection_ids and
             collection_id not in incomplete_collection_ids):
-        learner_playlist_services.mark_collection_to_be_played_later(
-            user_id, collection_id, position_to_be_inserted)
+
+        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
+            learner_playlist_services.mark_collection_to_be_played_later(
+                user_id, collection_id, position_to_be_inserted))
+
+        belongs_to_completed_or_incomplete_list = False
+    else:
+        belongs_to_completed_or_incomplete_list = True
+
+    return (belongs_to_completed_or_incomplete_list,
+            playlist_limit_exceeded,
+            belongs_to_subscribed_activities)
+
+
+def add_exp_to_learner_playlist(
+        user_id, exploration_id, position_to_be_inserted=None):
+    """This function checks if the exploration exists in the completed list or
+    the incomplete list. If it does not exist we call the function in learner
+    playlist services to add the exploration to the play later list.
+
+    Args:
+        user_id: str. The id of the user.
+        exploration_id: str. The id of the exploration to be added to the
+            learner playlist.
+        position_to_be_inserted: int|None. If this is specified the exploration
+            gets inserted at the given position. Otherwise it gets added at the
+            end.
+
+    Returns:
+        (bool, bool, bool). The first boolean indicates whether the exploration
+            already exists in either of the "completed explorations" or
+            "incomplete explorations" lists, the second boolean indicates
+            whether the playlist limit of the user has been
+            exceeded, and the third boolean indicates whether the exploration
+            belongs to the created or edited explorations of the user.
+    """
+    completed_exploration_ids = get_all_completed_exp_ids(user_id)
+    incomplete_exploration_ids = get_all_incomplete_exp_ids(user_id)
+    playlist_limit_exceeded = False
+    belongs_to_subscribed_activities = False
+    belongs_to_completed_or_incomplete_list = False
+
+    if (exploration_id not in completed_exploration_ids and
+            exploration_id not in incomplete_exploration_ids):
+
+        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
+            learner_playlist_services.mark_exploration_to_be_played_later(
+                user_id, exploration_id, position_to_be_inserted))
+
+        belongs_to_completed_or_incomplete_list = False
+
+    else:
+        belongs_to_completed_or_incomplete_list = True
+
+    return (belongs_to_completed_or_incomplete_list,
+            playlist_limit_exceeded,
+            belongs_to_subscribed_activities)
 
 
 def _remove_activity_ids_from_playlist(user_id, exploration_ids,
@@ -850,29 +893,17 @@ def get_collection_summary_dicts(collection_summaries):
     return summary_dicts
 
 
-def get_activity_progress(user_id):
-    """Returns the progress of the learners - the explorations and collections
-    completed by the user and those in progress.
+def get_learner_dashboard_activities(user_id):
+    """Returns the ids of each of the activities that are present in the various
+    sections of the learner dashboard, namely the completed section, the
+    incomplete section and the playlist section.
 
     Args:
         user_id: str. The id of the learner.
 
     Returns:
-        LearnerProgress. The learner progress domain object corresponding to the
-            particular learner.
-        dict. The numbers of the activities that are no longer present. It
-            contains four keys:
-            - incomplete_explorations: int. The number of incomplete
-                explorations no longer present.
-            - incomplete_collections: int. The number of incomplete collections
-                no longer present.
-            - completed_explorations: int. The number of completed explorations
-                no longer present.
-            - completed_collections: int. The number of completed collections no
-                longer present.
-        list(str). The titles of the collections to which new explorations have
-            been added.
-
+        ActivityIdsInLearnerDashboard. The domain object containing the ids of
+            all activities in the learner dashboard.
     """
     learner_progress_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
@@ -912,6 +943,52 @@ def get_activity_progress(user_id):
     else:
         exploration_playlist_ids = []
         collection_playlist_ids = []
+
+    activity_ids = learner_progress_domain.ActivityIdsInLearnerDashboard(
+        completed_exploration_ids, completed_collection_ids,
+        incomplete_exploration_ids, incomplete_collection_ids,
+        exploration_playlist_ids, collection_playlist_ids)
+
+    return activity_ids
+
+
+def get_activity_progress(user_id):
+    """Returns the progress of the learners - the explorations and collections
+    completed by the user and those in progress.
+
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        (LearnerProgress, dict, list(str)). The first return value is the
+            learner progress domain object corresponding to the particular
+            learner. The second return value is the numbers of the activities
+            that are no longer present. It contains four keys:
+            - incomplete_explorations: int. The number of incomplete
+                explorations no longer present.
+            - incomplete_collections: int. The number of incomplete collections
+                no longer present.
+            - completed_explorations: int. The number of completed explorations
+                no longer present.
+            - completed_collections: int. The number of completed collections no
+                longer present.
+            The third return value is the titles of the collections to which new
+            explorations have been added.
+    """
+    activity_ids_in_learner_dashboard = (
+        get_learner_dashboard_activities(user_id))
+    completed_exploration_ids = (
+        activity_ids_in_learner_dashboard.completed_exploration_ids)
+    completed_collection_ids = (
+        activity_ids_in_learner_dashboard.completed_collection_ids)
+    incomplete_exploration_ids = (
+        activity_ids_in_learner_dashboard.incomplete_exploration_ids)
+    incomplete_collection_ids = (
+        activity_ids_in_learner_dashboard.incomplete_collection_ids)
+    exploration_playlist_ids = (
+        activity_ids_in_learner_dashboard.exploration_playlist_ids)
+    collection_playlist_ids = (
+        activity_ids_in_learner_dashboard.collection_playlist_ids)
 
     activity_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(

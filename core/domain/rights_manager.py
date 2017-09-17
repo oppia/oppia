@@ -193,7 +193,7 @@ class ActivityRights(object):
         return bool(self.status == ACTIVITY_STATUS_PRIVATE)
 
 
-def _get_activity_rights_from_model(activity_rights_model, activity_type):
+def get_activity_rights_from_model(activity_rights_model, activity_type):
     """Constructs an ActivityRights object from the given activity rights model.
 
     Args:
@@ -380,7 +380,7 @@ def get_exploration_rights(exploration_id, strict=True):
         exploration_id, strict=strict)
     if model is None:
         return None
-    return _get_activity_rights_from_model(
+    return get_activity_rights_from_model(
         model, constants.ACTIVITY_TYPE_EXPLORATION)
 
 
@@ -403,7 +403,7 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
             exp_models_list.append(None)
         else:
             exp_models_list.append(
-                _get_activity_rights_from_model(
+                get_activity_rights_from_model(
                     model, constants.ACTIVITY_TYPE_EXPLORATION))
 
     return exp_models_list
@@ -491,7 +491,7 @@ def get_collection_rights(collection_id, strict=True):
         collection_id, strict=strict)
     if model is None:
         return None
-    return _get_activity_rights_from_model(
+    return get_activity_rights_from_model(
         model, constants.ACTIVITY_TYPE_COLLECTION)
 
 

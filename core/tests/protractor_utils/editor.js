@@ -18,7 +18,6 @@
  */
 
 var forms = require('./forms.js');
-var gadgets = require('../../../extensions/gadgets/protractor.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
@@ -258,129 +257,6 @@ var expectInteractionToMatch = function(interactionId) {
 var expectCannotDeleteInteraction = function() {
   expect(element(by.css(
     '.protractor-test-delete-interaction')).isPresent()).toBeFalsy();
-};
-
-// GADGETS
-
-// Additional arguments may be sent to this function, and they will be
-// passed on to the relevant gadget editor.
-var addGadget = function(gadgetType, gadgetName) {
-  // Bring up the gadget insertion modal.
-  element(
-    by.css('.protractor-test-add-gadget-button'))
-    .click();
-
-  general.waitForSystem(2000);
-
-  // Select the desired gadgetType from the modal.
-  element(
-    by.css('.protractor-test-' + gadgetType + '-gadget-selection-modal'))
-    .click();
-
-  var gadgetNameInput = element(by.css('.protractor-test-gadget-name-input'));
-  gadgetNameInput.clear().then(function() {
-    gadgetNameInput.sendKeys(gadgetName);
-  });
-
-  // Locate the customization section and apply any customizations.
-  var elem = element(by.css('.protractor-test-gadget-customization-editor'));
-  var customizationArgs = [elem];
-
-  if (arguments.length > 2) {
-    for (var i = 2; i < arguments.length; i++) {
-      customizationArgs.push(arguments[i]);
-    }
-    gadgets.getGadget(gadgetType).customizeGadget.apply(
-      null, customizationArgs);
-  }
-
-  element(by.css('.protractor-test-save-gadget-button')).click();
-
-  // Wait for the customization modal to close.
-  general.waitForSystem(2000);
-};
-
-// Callers should ensure that a gadget with currentName exists.
-var renameGadget = function(currentName, newName) {
-  openGadgetEditorModal(currentName);
-  element(by.css('.protractor-test-open-gadget-name-editor'))
-    .click();
-  var gadgetNameInput = element(
-    by.css('.protractor-test-gadget-rename-text-input'));
-  gadgetNameInput.clear().then(function() {
-    gadgetNameInput.sendKeys(newName);
-  });
-  element(
-    by.css('.protractor-test-gadget-rename-confirmation-button')).click();
-  saveAndCloseGadgetEditorModal();
-};
-
-// Callers should ensure that a gadget with gadgetName exists.
-var deleteGadget = function(gadgetName) {
-  element(by.css('.protractor-test-delete-' + gadgetName + '-gadget-icon'))
-    .click();
-  // Wait for the modal popup to appear.
-  general.waitForSystem(2000);
-  element(by.css('.protractor-test-delete-gadget-button')).click();
-};
-
-var openGadgetEditorModal = function(gadgetName) {
-  element(by.css('.protractor-test-edit-' + gadgetName + '-gadget')).click();
-};
-
-var saveAndCloseGadgetEditorModal = function() {
-  element(by.css('.protractor-test-save-gadget-button')).click();
-  general.waitForSystem();
-};
-
-// Enables visibility for a given state.
-// openGadgetEditorModal must be called before this method.
-// Note: cssContainingText must be used as state names can contain spaces.
-var enableGadgetVisibilityForState = function(stateName) {
-  element(by.cssContainingText(
-    '.protractor-test-state-visibility-checkbox-label',
-    stateName)).all(by.css('.protractor-test-gadget-visibility-checkbox'))
-    .then(function(items) {
-      items[0].isSelected().then(function(selected) {
-        if (!selected) {
-          items[0].click();
-        }
-      });
-    });
-};
-
-// Disables visibility for a given state.
-// openGadgetEditorModal must be called before this method.
-var disableGadgetVisibilityForState = function(stateName) {
-  element(by.cssContainingText(
-    '.protractor-test-state-visibility-checkbox-label',
-    stateName)).all(by.css('.protractor-test-gadget-visibility-checkbox'))
-    .then(function(items) {
-      items[0].isSelected().then(function(selected) {
-        if (selected) {
-          items[0].click();
-        }
-      });
-    });
-};
-
-// Verifies a gadget's short description and name show up as expected
-// in the gadgets sidebar.
-var expectGadgetListNameToMatch = function(
-    gadgetType, gadgetShortDescription, gadgetName) {
-  var expectedListName;
-  if (gadgetShortDescription === gadgetName) {
-    expectedListName = gadgetName;
-  } else {
-    expectedListName = gadgetShortDescription + ' (' + gadgetName + ')';
-  }
-  expect(element(by.css('.protractor-test-' + gadgetType + '-list-item'))
-    .getText()).toBe(expectedListName);
-};
-
-var expectGadgetWithTypeDoesNotExist = function(gadgetType) {
-  expect(element.all(by.css('.protractor-test-' + gadgetType + '-list-item'))
-    .count()).toBe(0);
 };
 
 // PARAMETERS
@@ -943,12 +819,6 @@ var enableParameters = function() {
   });
 };
 
-var enableGadgets = function() {
-  runFromSettingsTab(function() {
-    element(by.css('.protractor-test-enable-gadgets')).click();
-  });
-};
-
 var openAndClosePreviewSummaryTile = function() {
   runFromSettingsTab(function() {
     element(by.css('.protractor-test-open-preview-summary-modal')).click();
@@ -1406,19 +1276,6 @@ exports.setRuleParametersInAddResponseModal = (
   setRuleParametersInAddResponseModal);
 exports.expectRuleParametersToBe = expectRuleParametersToBe;
 
-exports.addGadget = addGadget;
-exports.renameGadget = renameGadget;
-exports.deleteGadget = deleteGadget;
-
-exports.expectGadgetListNameToMatch = expectGadgetListNameToMatch;
-exports.expectGadgetWithTypeDoesNotExist = expectGadgetWithTypeDoesNotExist;
-
-exports.openGadgetEditorModal = openGadgetEditorModal;
-exports.saveAndCloseGadgetEditorModal = saveAndCloseGadgetEditorModal;
-
-exports.enableGadgetVisibilityForState = enableGadgetVisibilityForState;
-exports.disableGadgetVisibilityForState = disableGadgetVisibilityForState;
-
 exports.addParameterChange = addParameterChange;
 exports.addExplorationLevelParameterChange = addExplorationLevelParameterChange;
 
@@ -1445,7 +1302,6 @@ exports.setLanguage = setLanguage;
 exports.expectAvailableFirstStatesToBe = expectAvailableFirstStatesToBe;
 exports.setFirstState = setFirstState;
 exports.enableParameters = enableParameters;
-exports.enableGadgets = enableGadgets;
 exports.openAndClosePreviewSummaryTile = openAndClosePreviewSummaryTile;
 
 exports.saveChanges = saveChanges;

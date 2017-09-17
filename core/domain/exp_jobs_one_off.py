@@ -144,23 +144,6 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             first_published_msec)
 
 
-class IndexAllExplorationsJobManager(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that indexes all explorations and computes their ranks."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if not item.deleted:
-            exp_services.index_explorations_given_ids([item.id])
-
-    @staticmethod
-    def reduce(key, values):
-        pass
-
-
 class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks that all explorations have appropriate validation
     statuses.
@@ -325,29 +308,6 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
         if (exploration_rights.status == feconf.ACTIVITY_STATUS_PRIVATE
                 and exploration_rights.viewable_if_private):
             yield (item.id, item.title.encode('utf-8'))
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
-class GadgetsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that outputs a list of explorations that use gadgets."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_services.get_exploration_from_model(item)
-        panel_contents_dict = exploration.skin_instance.panel_contents_dict
-        for panel_name, gadget_list in panel_contents_dict.iteritems():
-            if gadget_list:
-                yield (item.id, panel_name)
 
     @staticmethod
     def reduce(key, values):

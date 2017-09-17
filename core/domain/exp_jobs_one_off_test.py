@@ -23,7 +23,6 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -550,59 +549,6 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
                 exploration_summary.contributors_summary)
 
 
-class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
-
-    EXP_ID = 'exp_id'
-
-    def setUp(self):
-        super(OneOffReindexExplorationsJobTest, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s%s' % (self.EXP_ID, i),
-            title='title %d' % i,
-            category='category%d' % i
-        ) for i in xrange(5)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-            rights_manager.publish_exploration(self.owner, exp.id)
-
-        self.process_and_flush_pending_tasks()
-
-    def test_standard_operation(self):
-        job_id = (exp_jobs_one_off.IndexAllExplorationsJobManager.create_new())
-        exp_jobs_one_off.IndexAllExplorationsJobManager.enqueue(job_id)
-
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-
-        indexed_docs = []
-
-        def add_docs_mock(docs, index):
-            indexed_docs.extend(docs)
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-
-        add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_mock)
-
-        with add_docs_swap:
-            self.process_and_flush_pending_tasks()
-
-        ids = [doc['id'] for doc in indexed_docs]
-        titles = [doc['title'] for doc in indexed_docs]
-        categories = [doc['category'] for doc in indexed_docs]
-
-        for index in xrange(5):
-            self.assertIn("%s%s" % (self.EXP_ID, index), ids)
-            self.assertIn('title %d' % index, titles)
-            self.assertIn('category%d' % index, categories)
-
-
 class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -704,53 +650,3 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
-
-
-class GadgetsOneOffJobTest(test_utils.GenericTestBase):
-
-    REGULAR_EXP_ID = '0'
-    GADGET_EXP_ID = '1'
-
-    def setUp(self):
-        super(GadgetsOneOffJobTest, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        exp_services.load_demo(self.REGULAR_EXP_ID)
-
-        exp_services.load_demo(self.GADGET_EXP_ID)
-        exploration = exp_services.get_exploration_by_id(self.GADGET_EXP_ID)
-        exp_services.update_exploration(self.owner_id, self.GADGET_EXP_ID, [{
-            'cmd': exp_domain.CMD_ADD_GADGET,
-            'panel': 'bottom',
-            'gadget_dict' : {
-                'gadget_type': 'ScoreBar',
-                'gadget_name': 'NewGadget',
-                'customization_args': {
-                    'adviceObjects': {
-                        'value': [{
-                            'adviceTitle': 'b',
-                            'adviceHtml': '<p>c</p>'
-                        }]
-                    }
-                },
-                'visible_in_states': [exploration.init_state_name]
-            }
-        }], 'add a new gadget')
-
-    def test_explorations_with_gadgets_are_listed(self):
-        """Tests that explorations with gadgets are listed."""
-        job_id = exp_jobs_one_off.GadgetsOneOffJob.create_new()
-        exp_jobs_one_off.GadgetsOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_values = [
-            value.encode('ascii')
-            for value in exp_jobs_one_off.GadgetsOneOffJob.get_output(job_id)
-        ]
-        expected_values = [
-            str([u'1', [u'bottom']]),
-        ]
-
-        self.assertEqual(actual_values, expected_values)
