@@ -53,7 +53,7 @@ oppia.directive('paramChangesEditor', [
           });
 
           var generateParamNameChoices = function() {
-            return explorationParamSpecsService.displayed.paramNames().sort()
+            return explorationParamSpecsService.displayed.getParamNames().sort()
               .map(function(paramName) {
                 return {
                   id: paramName,

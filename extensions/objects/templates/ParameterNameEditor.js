@@ -32,7 +32,7 @@ oppia.directive('parameterNameEditor', [
         '$scope', '$attrs', 'explorationParamSpecsService',
         function($scope, $attrs, explorationParamSpecsService) {
           $scope.availableParamNames =
-            explorationParamSpecsService.savedMemento.paramNames();
+            explorationParamSpecsService.savedMemento.getParamNames();
 
           if ($scope.availableParamNames.length === 0) {
             $scope.localValue = null;

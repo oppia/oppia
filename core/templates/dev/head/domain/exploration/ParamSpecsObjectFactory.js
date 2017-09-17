@@ -25,7 +25,7 @@ oppia.factory('ParamSpecsObjectFactory', [
       this.paramSpecs = paramSpecs;
     };
 
-    ParamSpecs.prototype.paramNames = function() {
+    ParamSpecs.prototype.getParamNames = function() {
       return Object.keys(this.paramSpecs);
     };
 
@@ -41,7 +41,7 @@ oppia.factory('ParamSpecsObjectFactory', [
     ParamSpecs.prototype.toBackendDict = function() {
       paramSpecsBackendDict = {};
       that = this;
-      this.paramNames().map(function(paramName) {
+      this.getParamNames().forEach(function(paramName) {
         paramSpecsBackendDict[paramName] =
           that.paramSpecs[paramName].toBackendDict();
       });
