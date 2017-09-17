@@ -103,4 +103,5 @@ oppia.directive('ratingDisplay', [
         };
       }]
     };
-  }]);
+  }
+]);
