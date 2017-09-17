@@ -55,11 +55,11 @@ oppia.directive('paramChangesEditor', [
           var generateParamNameChoices = function() {
             return explorationParamSpecsService.displayed.paramNames()
               .sort().map(function(paramName) {
-              return {
-                id: paramName,
-                text: paramName
-              };
-            });
+                return {
+                  id: paramName,
+                  text: paramName
+                };
+              });
           };
 
           // This is a local variable that is used by the select2 dropdowns for
