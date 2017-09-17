@@ -14,28 +14,45 @@
 
 /**
  * @fileoverview Factory for creating new frontend instances of ParamSpecs
- * domain objects.
+ * domain objects. ParamSpecs map parameter names to the specifications
+ * which defines them (represented as ParamSpec objects).
  */
 
-oppia.factory('ParamSpecsObjectFactory', [function() {
-  var ParamSpecs = function(objType) {
-    this.objType = objType;
-  };
-
-  ParamSpecs.prototype.toBackendDict = function() {
-    return {
-      obj_type: this.objType,
+oppia.factory('ParamSpecsObjectFactory', [
+  'ParamSpecObjectFactory',
+  function(ParamSpecObjectFactory) {
+    var ParamSpecs = function(paramSpecs) {
+      this.paramSpecs = paramSpecs;
     };
-  };
 
-  ParamSpecs.createFromBackendDict = function(paramChangeBackendDict) {
-    return new ParamSpecs(paramChangeBackendDict.obj_type);
-  };
+    ParamSpecs.prototype.paramNames = function() {
+      return Object.keys(this.paramSpecs);
+    };
 
-  ParamSpecs.createDefault = function(paramName) {
-    return new ParamSpecs("UnicodeString");
-  };
+    ParamSpecs.prototype.toBackendDict = function() {
+      paramSpecsBackendDict = {};
+      that = this;
+      that.paramNames().map(function(paramName, unused_index) {
+        paramSpecsBackendDict[paramName] =
+          that.paramSpecs[paramName].toBackendDict();
+      });
+      return paramSpecsBackendDict;
+    };
 
-  return ParamSpecs;
-}]);
+    ParamSpecs.createFromBackendDict = function(paramSpecsBackendDict) {
+      paramSpecs = {};
+      Object.keys(paramSpecsBackendDict).map(function(paramName, unused_index) {
+        paramSpecs[paramName] = ParamSpecObjectFactory.createFromBackendDict(
+          paramSpecsBackendDict[paramName]);
+      });
+      return new ParamSpecs(paramSpecs);
+    };
+
+    ParamSpecs.createEmpty = function() {
+      return new ParamSpecs({});
+    };
+
+    return ParamSpecs;
+  }
+]);
 
