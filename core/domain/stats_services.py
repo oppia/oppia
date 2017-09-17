@@ -18,6 +18,7 @@
 
 import itertools
 
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_registry
 from core.domain import stats_domain
@@ -25,6 +26,112 @@ from core.domain import stats_jobs_continuous
 from core.platform import models
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+
+
+def handle_stats_creation(exploration, change_list):
+    """Retrieves the ExplorationStatsModel for the old exp_version and makes
+    any required changes to the structure of the model. Then, a new
+    ExplorationStatsModel is created for the new exp_version.
+
+    Args:
+        exploration: Exploration. The exploration domain object after the
+            commit.
+        change_list: list(dict). A list of changes introduced in this commit.
+    """
+
+    old_exp_version = exploration.version - 1
+    new_exp_version = exploration.version
+    exploration_stats = get_exploration_stats(exploration.id, old_exp_version)
+
+    # This mapping from new state names to old ones account for circular
+    # renames and multiple renames within a commit. We will use this mapping
+    # to handle state renames in the statistics model.
+    new_to_old_state_names = exploration.get_state_names_mapping(change_list)
+
+    # Handling state renames.
+    for state_name in exploration_stats.state_stats_mapping:
+        exploration_stats.state_stats_mapping[state_name] = (
+            exploration_stats.state_stats_mapping.pop(new_to_old_state_names[
+                state_name]))
+
+    # Handling state additions and deletions.
+    for change_dict in change_list:
+        if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
+            exploration_stats.state_stats_mapping[change_dict['state_name']] = (
+                stats_domain.StateStats.create_default())
+
+        if change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
+            exploration_stats.state_stats_mapping.pop(change_dict['state_name'])
+
+    exploration_stats.exp_version = new_exp_version
+
+    # Create new statistics model.
+    create_stats_model(exploration_stats)
+
+
+def get_exploration_stats(exp_id, exp_version):
+    """Retrieves the ExplorationStats domain object.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+
+    Returns:
+        ExplorationStats. The domain object for exploration statistics.
+
+    Raises:
+        Exception: Entity for class ExplorationStatsModel with id not found.
+    """
+    model_id = exp_id + '.' + str(exp_version)
+    exploration_stats_model = stats_models.ExplorationStatsModel.get(
+        model_id)
+    exploration_stats = get_exploration_stats_from_model(
+        exploration_stats_model)
+    return exploration_stats
+
+
+def get_exploration_stats_from_model(exploration_stats_model):
+    """Gets an ExplorationStats domain object from an ExplorationStatsModel
+    instance.
+
+    Args:
+        exploration_stats_model: ExplorationStatsModel. Exploration statistics
+            model in datastore.
+
+    Returns:
+        ExplorationStats. The domain object for exploration statistics.
+    """
+    new_state_stats_mapping = {}
+    for state_name in exploration_stats_model.state_stats_mapping:
+        new_state_stats_mapping[state_name] = stats_domain.StateStats.from_dict(
+            state_stats_mapping[state_name])
+    return stats_domain.ExplorationStats(
+        exploration_stats_model.exp_id,
+        exploration_stats_model.exp_version,
+        exploration_stats_model.num_actual_starts,
+        exploration_stats_model.num_completions,
+        new_state_stats_mapping)
+
+
+def create_stats_model(exploration_stats):
+    """Creates an ExplorationStatsModel in datastore given an ExplorationStats
+    domain object.
+
+    Args:
+        exploration_stats: ExplorationStats. The domain object for exploration
+            statistics.
+    """
+    new_state_stats_mapping = {}
+    for state_name in exploration_stats.state_stats_mapping:
+        new_state_stats_mapping[state_name] = (
+            exploration_stats.state_stats_mapping[state_name].to_dict())
+    stats_models.ExplorationStatsModel.create(
+        exploration_stats.exp_id,
+        exploration_stats.exp_version,
+        exploration_stats.num_actual_starts,
+        exploration_stats.num_completions,
+        new_state_stats_mapping
+    )
 
 
 # TODO(bhenning): Test.
