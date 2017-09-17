@@ -82,7 +82,7 @@ class ParamSpec(object):
         if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
             raise utils.ValidationError(
                 ('%s is not among the supported object types for parameters: '
-                    '{%s}.') %
+                 '{%s}.') %
                 (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
 
 
