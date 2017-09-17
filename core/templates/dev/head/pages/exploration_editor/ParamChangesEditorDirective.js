@@ -53,8 +53,8 @@ oppia.directive('paramChangesEditor', [
           });
 
           var generateParamNameChoices = function() {
-            return explorationParamSpecsService.displayed.paramNames()
-              .sort().map(function(paramName) {
+            return explorationParamSpecsService.displayed.paramNames().sort()
+              .map(function(paramName) {
                 return {
                   id: paramName,
                   text: paramName
@@ -77,11 +77,8 @@ oppia.directive('paramChangesEditor', [
               newParamName);
             // Add the new param name to $scope.paramNameChoices, if necessary,
             // so that it shows up in the dropdown.
-            if (!$scope.paramNameChoices.hasOwnProperty(newParamChange.name)) {
-              var paramSpecs =
-                explorationParamSpecsService.displayed.paramSpecs;
-              paramSpecs[newParamChange.name] =
-                ParamSpecObjectFactory.createDefault();
+            if (explorationParamSpecsService.displayed.addParamIfNew(
+              newParamName)) {
               $scope.paramNameChoices = generateParamNameChoices();
             }
             $scope.paramChangesService.displayed.push(newParamChange);
@@ -178,12 +175,8 @@ oppia.directive('paramChangesEditor', [
             // Update paramSpecs manually with newly-added param names.
             explorationParamSpecsService.restoreFromMemento();
             $scope.paramChangesService.displayed.forEach(function(paramChange) {
-              var paramName = paramChange.name;
-              var paramSpecs =
-                explorationParamSpecsService.displayed.paramSpecs;
-              if (!paramSpecs.hasOwnProperty(paramName)) {
-                paramSpecs[paramName] = ParamSpecObjectFactory.createDefault();
-              }
+              explorationParamSpecsService.displayed.addParamIfNew(
+                paramChange.name);
             });
 
             explorationParamSpecsService.saveDisplayedValue();
@@ -206,12 +199,8 @@ oppia.directive('paramChangesEditor', [
             // the select2 dropdowns. Otherwise, after the deletion, the
             // dropdowns may turn blank.
             $scope.paramChangesService.displayed.forEach(function(paramChange) {
-              var paramSpecs =
-                explorationParamSpecsService.displayed.paramSpecs;
-              if (!paramSpecs.hasOwnProperty(paramChange.name)) {
-                paramSpecs[paramChange.name] =
-                  ParamSpecObjectFactory.createDefault();
-              }
+              explorationParamSpecsService.displayed.addParamIfNew(
+                paramChange.name);
             });
             $scope.paramNameChoices = generateParamNameChoices();
 
@@ -236,12 +225,8 @@ oppia.directive('paramChangesEditor', [
               // turn blank.
               $scope.paramChangesService.displayed.forEach(
                 function(paramChange) {
-                  var paramSpecs =
-                    explorationParamSpecsService.displayed.paramSpecs;
-                  if (!paramSpecs.hasOwnProperty(paramChange.name)) {
-                    paramSpecs[paramChange.name] =
-                      ParamSpecObjectFactory.createDefault();
-                  }
+                  explorationParamSpecsService.displayed.addParamIfNew(
+                    paramChange.name);
                 }
               );
               $scope.paramNameChoices = generateParamNameChoices();
