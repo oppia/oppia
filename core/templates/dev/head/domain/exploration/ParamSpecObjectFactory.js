@@ -33,7 +33,7 @@ oppia.factory('ParamSpecObjectFactory', [function() {
   };
 
   ParamSpec.createDefault = function(paramName) {
-    return new ParamSpec("UnicodeString");
+    return new ParamSpec('UnicodeString');
   };
 
   return ParamSpec;
