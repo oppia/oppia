@@ -20,7 +20,8 @@ oppia.constant('LEARNER_DASHBOARD_SECTION_I18N_IDS', {
   INCOMPLETE: 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION',
   COMPLETED: 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION',
   SUBSCRIPTIONS: 'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION',
-  FEEDBACK: 'I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION'
+  FEEDBACK: 'I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION',
+  PLAYLIST: 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION'
 });
 
 oppia.constant('LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', {
@@ -250,6 +251,47 @@ oppia.controller('LearnerDashboard', [
       return feedbackThread[$scope.currentFeedbackThreadsSortType];
     };
 
+    var getPlaylistSortableOptions = function(activityType) {
+      return {
+        'ui-floating': 'auto',
+        start: function(e, ui) {
+          ui.placeholder.height(ui.item.height());
+          $scope.$apply();
+        },
+        sort: function (e, ui) {
+          /* eslint-disable quote-props */
+          // Reset the position of the window on scrolling. This keeps the mouse
+          // position and elements in sync.
+          ui.helper.css(
+            {'top': ui.position.top + $(window).scrollTop() + 'px'});
+          /* eslint-enable quote-props */
+        },
+        update: function(e, ui) {
+          var insertExpInLearnerPlaylistUrl = (
+            UrlInterpolationService.interpolateUrl(
+              '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                activityType: activityType,
+                activityId: (
+                  $scope.explorationPlaylist[ui.item.sortable.index].id)
+              }));
+
+          $http.post(insertExpInLearnerPlaylistUrl, {
+            index: ui.item.sortable.dropindex
+          });
+          $scope.$apply();
+        },
+        stop: function(e, ui) {
+          $scope.$apply();
+        },
+        axis: 'y'
+      };
+    };
+
+    $scope.collectionPlaylistSortableOptions = getPlaylistSortableOptions(
+      constants.ACTIVITY_TYPE_COLLECTION);
+    $scope.explorationPlaylistSortableOptions = getPlaylistSortableOptions(
+      constants.ACTIVITY_TYPE_EXPLORATION);
+
     $scope.onClickThread = function(
       threadStatus, explorationId, threadId, explorationTitle) {
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
@@ -350,7 +392,9 @@ oppia.controller('LearnerDashboard', [
     $scope.openRemoveActivityModal = function(
       sectionNameI18nId, subsectionName, activity) {
       $modal.open({
-        templateUrl: 'modals/removeActivity',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/learner_dashboard/' +
+          'remove_activity_from_learner_dashboard_modal_directive.html'),
         backdrop: true,
         resolve: {
           sectionNameI18nId: function() {
@@ -365,32 +409,43 @@ oppia.controller('LearnerDashboard', [
         },
         controller: [
           '$scope', '$modalInstance', '$http', 'sectionNameI18nId',
-          'subsectionName', function($scope, $modalInstance, $http,
-            sectionNameI18nId, subsectionName) {
+          'subsectionName', function(
+              $scope, $modalInstance, $http, sectionNameI18nId,
+              subsectionName) {
             $scope.sectionNameI18nId = sectionNameI18nId;
             $scope.subsectionName = subsectionName;
             $scope.activityTitle = activity.title;
             $scope.remove = function() {
+              var activityType = '';
               if (subsectionName ===
-                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                var removeExpUrl = UrlInterpolationService.interpolateUrl(
-                  '/learnerincompleteactivityhandler/<activityType>' +
-                  '/<activityId>', {
-                    activityType: constants.ACTIVITY_TYPE_EXPLORATION,
-                    activityId: activity.id
-                  });
-                $http['delete'](removeExpUrl);
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+                activityType = constants.ACTIVITY_TYPE_EXPLORATION;
               } else if (subsectionName ===
                          LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-                var removeCollectionUrl = (
-                  UrlInterpolationService.interpolateUrl(
-                  '/learnerincompleteactivityhandler/<activityType>' +
-                  '/<activityId>', {
-                    activityType: constants.ACTIVITY_TYPE_COLLECTION,
+                activityType = constants.ACTIVITY_TYPE_COLLECTION;
+              } else {
+                throw new Error('Subsection name is not valid.');
+              }
+
+              var removeActivityUrlPrefix = '';
+              if (sectionNameI18nId ===
+                  LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
+                removeActivityUrlPrefix = '/learnerplaylistactivityhandler/';
+              } else if (sectionNameI18nId ===
+                         LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+                removeActivityUrlPrefix = '/learnerincompleteactivityhandler/';
+              } else {
+                throw new Error('Section name is not valid.');
+              }
+
+              removeActivityUrl = (
+                UrlInterpolationService.interpolateUrl(
+                  removeActivityUrlPrefix + '<activityType>/<activityId>', {
+                    activityType: activityType,
                     activityId: activity.id
                   }));
-                $http['delete'](removeCollectionUrl);
-              }
+
+              $http['delete'](removeActivityUrl);
               $modalInstance.close();
             };
 
@@ -400,21 +455,39 @@ oppia.controller('LearnerDashboard', [
           }
         ]
       }).result.then(function() {
-        if (subsectionName ===
-            LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-          var index = $scope.incompleteExplorationsList.indexOf(activity);
-          if (index !== -1) {
-            $scope.incompleteExplorationsList.splice(index, 1);
+        if (sectionNameI18nId ===
+            LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+          if (subsectionName ===
+              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+            var index = $scope.incompleteExplorationsList.indexOf(activity);
+            if (index !== -1) {
+              $scope.incompleteExplorationsList.splice(index, 1);
+            }
+          } else if (subsectionName ===
+                     LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+            var index = $scope.incompleteCollectionsList.indexOf(activity);
+            if (index !== -1) {
+              $scope.incompleteCollectionsList.splice(index, 1);
+            }
           }
-        } else if (subsectionName ===
-                   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-          var index = $scope.incompleteCollectionsList.indexOf(activity);
-          if (index !== -1) {
-            $scope.incompleteCollectionsList.splice(index, 1);
+        } else if (sectionNameI18nId ===
+                   LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
+          if (subsectionName ===
+              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+            var index = $scope.explorationPlaylist.indexOf(activity);
+            if (index !== -1) {
+              $scope.explorationPlaylist.splice(index, 1);
+            }
+          } else if (subsectionName ===
+                     LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+            var index = $scope.collectionPlaylist.indexOf(activity);
+            if (index !== -1) {
+              $scope.collectionPlaylist.splice(index, 1);
+            }
           }
         }
       });
-    }
+    };
 
     $rootScope.loadingMessage = 'Loading';
     LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
@@ -460,6 +533,12 @@ oppia.controller('LearnerDashboard', [
         $scope.numberDeletedCompletedCollections = (
           responseData.number_of_deleted_activities.completed_collections
         );
+        $scope.numberDeletedExplorationPlaylist = (
+          responseData.number_of_deleted_activities.exploration_playlist
+        );
+        $scope.numberDeletedCollectionPlaylist = (
+          responseData.number_of_deleted_activities.collection_playlist
+        );
         $scope.completedToIncompleteCollections = (
           responseData.completed_to_incomplete_collections
         );
@@ -471,7 +550,8 @@ oppia.controller('LearnerDashboard', [
               threadSummaryDicts[index]));
         }
         $scope.numberOfUnreadThreads = responseData.number_of_unread_threads;
-
+        $scope.explorationPlaylist = responseData.exploration_playlist;
+        $scope.collectionPlaylist = responseData.collection_playlist;
         $scope.activeSection = LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE;
         $scope.activeSubsection = (
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
@@ -481,7 +561,9 @@ oppia.controller('LearnerDashboard', [
           ($scope.completedExplorationsList.length === 0) &&
           ($scope.completedCollectionsList.length === 0) &&
           ($scope.incompleteExplorationsList.length === 0) &&
-          ($scope.incompleteCollectionsList.length === 0));
+          ($scope.incompleteCollectionsList.length === 0) &&
+          ($scope.explorationPlaylist.length === 0) &&
+          ($scope.collectionPlaylist.length === 0));
         $rootScope.loadingMessage = '';
       },
       function(errorResponse) {

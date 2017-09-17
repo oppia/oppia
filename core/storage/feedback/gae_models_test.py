@@ -28,6 +28,23 @@ FIELDS_NOT_REQUIRED = [CREATED_ON_FIELD, LAST_UPDATED_FIELD, DELETED_FIELD]
 class FeedbackThreadModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadModel class."""
 
+    def test_put_function(self):
+        feedback_thread_model = feedback_models.FeedbackThreadModel(
+            exploration_id='exp_id_1')
+        feedback_thread_model.put()
+
+        last_updated = feedback_thread_model.last_updated
+
+        # If we do not wish to update the last_updated time, we should set
+        # the update_last_updated_time argument to False in the put function.
+        feedback_thread_model.put(update_last_updated_time=False)
+        self.assertEqual(feedback_thread_model.last_updated, last_updated)
+
+        # If we do wish to change it however, we can simply use the put function
+        # as the default value of update_last_updated_time is True.
+        feedback_thread_model.put()
+        self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
+
     def test_get_exploration_and_thread_ids(self):
         # Generate some full thread ids.
         full_thread_id_1 = (

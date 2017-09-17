@@ -264,12 +264,21 @@ var constants = {
     "text": "中文(繁體)"
   }],
 
+  "//" : [
+    "Related languages are used to prioritize an exploration's language when ",
+    "setting the default audio language."
+  ],
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
-    "text": "English"
+    "text": "English",
+    "related_languages": ["en"]
   }, {
     "id": "hi-en",
-    "text": "Hinglish"
+    "text": "Hinglish",
+    "related_languages": ["hi", "en"]
+  }, {
+    "id": "es",
+    "text": "Spanish",
+    "related_languages": ["es"]
   }]
-
 };

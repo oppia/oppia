@@ -6,15 +6,13 @@ language_code: en
 objective: Learn about the planets of the solar system
 param_changes: []
 param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -22,16 +20,19 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Exit:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Do you want to quit?
+      audio_translations: {}
+      html: Do you want to quit?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - Thank you for exploring the Solar System!
@@ -40,7 +41,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - Let's learn more about the planets then!
@@ -60,19 +62,22 @@ states:
         feedback:
         - Try again.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   First State:
+    classifier_model_id: null
     content:
-    - type: text
-      value: 'Our Solar System consists of nine planets orbiting around our sun: Mercury,
+      audio_translations: {}
+      html: 'Our Solar System consists of nine planets orbiting around our sun: Mercury,
         Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune and Pluto. They range
         from huge gas giants to small icy dwarf planets.<div><br></div><div>Click
         on the planets below to find out more about each one!</div>'
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - This is Mercury, a small metallic planet closest to the sun. Since it
@@ -83,7 +88,8 @@ states:
         - inputs:
             x: '1'
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - This is Venus, the second planet from the sun. It is the brightest planet
@@ -96,7 +102,8 @@ states:
         - inputs:
             x: '2'
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - Earth! Our home planet is the third planet from the sun. Despite the vastness
@@ -108,7 +115,8 @@ states:
         - inputs:
             x: '3'
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - Mars is the fourth planet from the sun. It is often dubbed the "red planet"
@@ -121,7 +129,8 @@ states:
         - inputs:
             x: '4'
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - Jupiter, the fifth planet from the sun, is a huge planet that is 2.5 times
@@ -135,7 +144,8 @@ states:
         - inputs:
             x: '5'
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - "Saturn, the sixth planet from the sun, is most well known for its beautiful\
@@ -147,7 +157,8 @@ states:
         - inputs:
             x: '6'
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - Uranus is the seventh planet from the sun. It was the first planet that
@@ -159,7 +170,8 @@ states:
         - inputs:
             x: '7'
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - Neptune is the eighth planet from the sun. It is an "ice giant", like
@@ -172,7 +184,8 @@ states:
         - inputs:
             x: '8'
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: First State
           feedback:
           - Pluto was once considered the ninth planet from the sun, but has now been
@@ -269,9 +282,10 @@ states:
         feedback:
         - Do you want to exit the exploration?
         param_changes: []
-      fallbacks: []
+      hints: []
       id: ImageClickInput
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: The Solar System

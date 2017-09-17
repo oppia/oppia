@@ -32,6 +32,7 @@ app_identity_services = models.Registry.import_app_identity_services()
 email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
+
 # Stub for logging.error(), so that it can be swapped out in tests.
 def log_new_error(*args, **kwargs):
     logging.error(*args, **kwargs)
@@ -119,7 +120,7 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-        lambda x: rights_manager.Actor(x).is_moderator()),
+        user_services.is_at_least_moderator),
     feconf.EMAIL_INTENT_DAILY_BATCH: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
@@ -132,30 +133,17 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_MARKETING: (
-        lambda x: rights_manager.Actor(x).is_admin()),
+    feconf.EMAIL_INTENT_MARKETING: user_services.is_admin,
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-        lambda x: rights_manager.Actor(x).is_moderator()),
+        user_services.is_at_least_moderator),
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_MARKETING: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_TEST: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value)
+    feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_TEST: user_services.is_admin
 }
 
 
@@ -833,7 +821,8 @@ def send_flag_exploration_email(
         exploration_title, report_text, exploration_id,
         EMAIL_FOOTER.value)
 
-    recipient_list = config_domain.MODERATOR_IDS.value
+    recipient_list = user_services.get_user_ids_by_role(
+        feconf.ROLE_ID_MODERATOR)
     for recipient_id in recipient_list:
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,

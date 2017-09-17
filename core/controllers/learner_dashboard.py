@@ -117,6 +117,24 @@ class LearnerDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class LearnerDashboardIdsHandler(base.BaseHandler):
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        # Get the progress of the learner - the ids of the explorations and
+        # collections completed by the user, the activities currently being
+        # completed and the ones present in the playlist of the user.
+        learner_dashboard_activities = (
+            learner_progress_services.get_learner_dashboard_activities( # pylint: disable=line-too-long
+                self.user_id))
+
+        self.values.update({
+            'learner_dashboard_activity_ids': (
+                learner_dashboard_activities.to_dict())
+        })
+        self.render_json(self.values)
+
+
 class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
 
@@ -153,13 +171,21 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             authors_settings.pop(0)
 
         for m, author_settings in zip(messages, authors_settings):
+
+            if author_settings is None:
+                author_username = None
+                author_picture_data_url = None
+            else:
+                author_username = author_settings.username
+                author_picture_data_url = (
+                    author_settings.profile_picture_data_url)
+
             message_summary = {
                 'message_id': m.message_id,
                 'text': m.text,
                 'updated_status': m.updated_status,
-                'author_username': author_settings.username,
-                'author_picture_data_url': (
-                    author_settings.profile_picture_data_url),
+                'author_username': author_username,
+                'author_picture_data_url': author_picture_data_url,
                 'created_on': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)

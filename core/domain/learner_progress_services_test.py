@@ -514,6 +514,45 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
+    def test_get_ids_of_activities_in_learner_dashboard(self):
+        # Add activities to the completed section.
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_0)
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_0)
+
+        # Add activities to the incomplete section.
+        state_name = 'state name'
+        version = 1
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+        learner_progress_services.mark_collection_as_incomplete(
+            self.user_id, self.COL_ID_1)
+
+        # Add activities to the playlist section.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_3)
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_3)
+
+        # Get the ids of all the activities.
+        activity_ids = (
+            learner_progress_services.get_learner_dashboard_activities( # pylint: disable=line-too-long
+                self.user_id))
+
+        self.assertEqual(
+            activity_ids.completed_exploration_ids, [self.EXP_ID_0])
+        self.assertEqual(
+            activity_ids.completed_collection_ids, [self.COL_ID_0])
+        self.assertEqual(
+            activity_ids.incomplete_exploration_ids, [self.EXP_ID_1])
+        self.assertEqual(
+            activity_ids.incomplete_collection_ids, [self.COL_ID_1])
+        self.assertEqual(
+            activity_ids.exploration_playlist_ids, [self.EXP_ID_3])
+        self.assertEqual(
+            activity_ids.collection_playlist_ids, [self.COL_ID_3])
+
     def test_get_activity_progress(self):
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(

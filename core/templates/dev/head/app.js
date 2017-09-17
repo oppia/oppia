@@ -44,8 +44,12 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_ML_CLASSIFIERS', false);
 // Feature still in development.
-oppia.constant('ENABLE_HINT_EDITOR', true);
-oppia.constant('ENABLE_FALLBACK_EDITOR', false);
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'The current solution does not lead to another card.');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+  'The solution is now valid!');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'The current solution is no longer valid.');
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
@@ -470,8 +474,11 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-        // The replace function removes 'seconds' from the time returned.
-        return date.toLocaleTimeString().replace(/:\d\d /, ' ');
+        return date.toLocaleTimeString([], {
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true
+        });
       } else if (date.getFullYear() === new Date().getFullYear()) {
         return $filter('date')(date, 'MMM d');
       } else {
@@ -490,99 +497,6 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
     }
   };
 }]);
-
-// Service for validating things and (optionally) displaying warning messages
-// if the validation fails.
-oppia.factory('validatorsService', [
-  '$filter', 'alertsService', function($filter, alertsService) {
-    return {
-      /**
-       * Checks whether an entity name is valid, and displays a warning message
-       * if it isn't.
-       * @param {string} input - The input to be checked.
-       * @param {boolean} showWarnings - Whether to show warnings in the
-       *   butterbar.
-       * @return {boolean} True if the entity name is valid, false otherwise.
-       */
-      isValidEntityName: function(input, showWarnings, allowEmpty) {
-        input = $filter('normalizeWhitespace')(input);
-        if (!input && !allowEmpty) {
-          if (showWarnings) {
-            alertsService.addWarning('Please enter a non-empty name.');
-          }
-          return false;
-        }
-
-        for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
-          if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
-            if (showWarnings) {
-              alertsService.addWarning(
-               'Invalid input. Please use a non-empty description consisting ' +
-               'of alphanumeric characters, spaces and/or hyphens.'
-              );
-            }
-            return false;
-          }
-        }
-        return true;
-      },
-      isValidExplorationTitle: function(input, showWarnings) {
-        if (!this.isValidEntityName(input, showWarnings)) {
-          return false;
-        }
-
-        if (input.length > 40) {
-          if (showWarnings) {
-            alertsService.addWarning(
-              'Exploration titles should be at most 40 characters long.');
-          }
-          return false;
-        }
-
-        return true;
-      },
-      // NB: this does not check whether the card name already exists in the
-      // states dict.
-      isValidStateName: function(input, showWarnings) {
-        if (!this.isValidEntityName(input, showWarnings)) {
-          return false;
-        }
-
-        if (input.length > 50) {
-          if (showWarnings) {
-            alertsService.addWarning(
-              'Card names should be at most 50 characters long.');
-          }
-          return false;
-        }
-
-        return true;
-      },
-      isNonempty: function(input, showWarnings) {
-        if (!input) {
-          if (showWarnings) {
-            // TODO(sll): Allow this warning to be more specific in terms of
-            // what needs to be entered.
-            alertsService.addWarning('Please enter a non-empty value.');
-          }
-          return false;
-        }
-        return true;
-      },
-      isValidExplorationId: function(input, showWarnings) {
-        // Exploration IDs are urlsafe base64-encoded.
-        var VALID_ID_CHARS_REGEX = /^[a-zA-Z0-9_\-]+$/g;
-        if (!input || !VALID_ID_CHARS_REGEX.test(input)) {
-          if (showWarnings) {
-            alertsService.addWarning('Please enter a valid exploration ID.');
-          }
-          return false;
-        }
-        return true;
-      }
-    };
-  }
-]);
 
 // Service for generating random IDs.
 oppia.factory('IdGenerationService', [function() {
@@ -1086,7 +1000,7 @@ oppia.factory('currentLocationService', ['$window', function($window) {
   };
 }]);
 
-// Service for assembling extension tags (for gadgets and interactions).
+// Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
   '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
     return {

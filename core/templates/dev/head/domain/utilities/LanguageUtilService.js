@@ -30,6 +30,12 @@ oppia.factory('LanguageUtilService', [function() {
     audioLanguageCodesToDescriptions[audioLanguage.id] = audioLanguage.text;
   });
 
+  var audioLanguageCodesToRelatedLanguageCodes = {};
+  supportedAudioLanguages.forEach(function(audioLanguage) {
+    audioLanguageCodesToRelatedLanguageCodes[audioLanguage.id] =
+      audioLanguage.related_languages;
+  });
+
   return {
     getAudioLanguagesCount: function() {
       return audioLanguagesCount;
@@ -43,6 +49,9 @@ oppia.factory('LanguageUtilService', [function() {
       return allAudioLanguageCodes.filter(function(languageCode) {
         return audioLanguageCodes.indexOf(languageCode) === -1;
       });
+    },
+    getLanguageCodesRelatedToAudioLanguageCode: function(audioLanguageCode) {
+      return audioLanguageCodesToRelatedLanguageCodes[audioLanguageCode];
     }
   }
 }]);

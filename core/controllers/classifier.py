@@ -124,3 +124,32 @@ class TrainedClassifierHandler(base.BaseHandler):
         classifier_services.mark_training_job_complete(job_id)
 
         return self.render_json({})
+
+
+class NextJobHandler(base.BaseHandler):
+    """This handler fetches next job to be processed according to the time
+    and sends back job_id, algorithm_id and training data to the VM.
+    """
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.open_access
+    def post(self):
+        """Handles POST requests. """
+        signature = self.payload.get('signature')
+        vm_id = self.payload.get('vm_id')
+        message = self.payload.get('message')
+
+        if vm_id == feconf.DEFAULT_VM_ID and not feconf.DEV_MODE:
+            raise self.UnauthorizedUserException
+        if not verify_signature(message, vm_id, signature):
+            raise self.UnauthorizedUserException
+
+        response = {}
+        next_job = classifier_services.fetch_next_job()
+        if next_job is not None:
+            classifier_services.mark_training_job_pending(next_job.job_id)
+            response['job_id'] = next_job.job_id
+            response['algorithm_id'] = next_job.algorithm_id
+            response['training_data'] = next_job.training_data
+
+        return self.render_json(response)

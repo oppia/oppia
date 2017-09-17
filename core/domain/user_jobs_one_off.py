@@ -15,17 +15,14 @@
 """Jobs for queries personalized to individual users."""
 
 import ast
-import logging
 
+from constants import constants
 from core import jobs
-from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-import feconf
 import utils
 
 (exp_models, collection_models, feedback_models, user_models) = (
@@ -71,6 +68,32 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
 
+
+class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for populating the default dashboard field for users.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        user_contributions = user_services.get_user_contributions(item.id)
+        user_is_creator = user_contributions and (
+            user_contributions.created_exploration_ids or
+            user_contributions.edited_exploration_ids)
+
+        if user_is_creator:
+            user_services.update_user_default_dashboard(
+                item.id, constants.DASHBOARD_TYPE_CREATOR)
+        else:
+            user_services.update_user_default_dashboard(
+                item.id, constants.DASHBOARD_TYPE_LEARNER)
+
+    @staticmethod
+    def reduce(item):
+        pass
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for calculating the distribution of username lengths."""
@@ -333,50 +356,3 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, stringified_values):
         pass
-
-
-class UserRolesMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one time job to attach a new field (representing role of user) to the
-    UserSettingsModel. The job will load all existing users from the datastore,
-    look for the role to assign them and then store them back thus updating the
-    table schema and adding appropiate roles to users.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(user_model):
-        admin_usernames = config_domain.Registry.get_config_property(
-            'admin_usernames')
-        moderator_usernames = config_domain.Registry.get_config_property(
-            'moderator_usernames')
-        banned_usernames = config_domain.Registry.get_config_property(
-            'banned_usernames')
-        collection_editors = config_domain.Registry.get_config_property(
-            'collection_editor_whitelist')
-
-        user_roles = [feconf.ROLE_ID_EXPLORATION_EDITOR]
-        if user_model.username in admin_usernames.value:
-            user_roles.append(feconf.ROLE_ID_ADMIN)
-        if user_model.username in moderator_usernames.value:
-            user_roles.append(feconf.ROLE_ID_MODERATOR)
-        if user_model.username in banned_usernames.value:
-            user_roles.append(feconf.ROLE_ID_BANNED_USER)
-        if user_model.username in collection_editors.value:
-            user_roles.append(feconf.ROLE_ID_COLLECTION_EDITOR)
-        user_role = role_services.get_max_priority_role(user_roles)
-
-        try:
-            user_services.update_user_role(user_model.id, user_role)
-            yield ('success', 1)
-        except Exception as e:
-            logging.error('Exception raised: %s' % e)
-            yield (user_model.username, unicode(e))
-
-    @staticmethod
-    def reduce(key, value):
-        if key == 'success':
-            yield(key, len(value))
-        else:
-            yield(key, value)

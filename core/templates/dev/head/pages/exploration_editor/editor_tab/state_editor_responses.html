@@ -99,10 +99,8 @@
       </button>
     </div>
   </md-card>
-  <md-card style="margin: 20px 0px; padding: 0px;" ng-if="!isCurrentInteractionTrainable()">
-{% else %}
-  <md-card style="margin: 0px; padding: 0px;">
 {% endif %}
+  <md-card style="margin: 0px; padding: 0px;">
     <div ng-if="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
       <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
         + Add New Oppia Response

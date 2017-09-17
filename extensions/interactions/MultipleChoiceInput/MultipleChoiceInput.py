@@ -29,6 +29,9 @@ class MultipleChoiceInput(base.BaseInteraction):
     instructions = None
     narrow_instructions = None
     needs_summary = False
+    # Radio buttons get unselected when specifying a solution. This needs to be
+    # fixed before solution feature can support this interaction.
+    can_have_solution = False
 
     _customization_arg_specs = [{
         'name': 'choices',

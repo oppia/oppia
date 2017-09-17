@@ -19,46 +19,17 @@
 
 oppia.factory('explorationAdvancedFeaturesService', [function() {
   var _settings = {
-    areFallbacksEnabled: false,
-    areGadgetsEnabled: false,
     areParametersEnabled: false
   };
 
   return {
-    areFallbacksEnabled: function() {
-      return _settings.areFallbacksEnabled;
-    },
-    areGadgetsEnabled: function() {
-      return _settings.areGadgetsEnabled;
-    },
     areParametersEnabled: function() {
       return _settings.areParametersEnabled;
-    },
-    enableFallbacks: function() {
-      _settings.areFallbacksEnabled = true;
-    },
-    enableGadgets: function() {
-      _settings.areGadgetsEnabled = true;
     },
     enableParameters: function() {
       _settings.areParametersEnabled = true;
     },
     init: function(explorationData) {
-      for (var state in explorationData.states) {
-        if (explorationData.states[state].interaction.fallbacks.length > 0) {
-          this.enableFallbacks();
-          break;
-        }
-      }
-
-      var skinCustomizations = explorationData.skin_customizations;
-      for (var panel in skinCustomizations.panels_contents) {
-        if (skinCustomizations.panels_contents[panel].length > 0) {
-          this.enableGadgets();
-          break;
-        }
-      }
-
       if (explorationData.param_changes.length > 0) {
         this.enableParameters();
       } else {

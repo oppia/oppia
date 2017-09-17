@@ -217,7 +217,6 @@ class LearnerPlaylist(object):
                 play later list.
             position_to_be_inserted: The position at which it is to be inserted.
         """
-        print "ello", position_to_be_inserted
         self.exploration_ids.insert(position_to_be_inserted, exploration_id)
 
     def add_exploration_id_to_list(self, exploration_id):

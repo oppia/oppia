@@ -17,6 +17,7 @@
 from core.domain import collection_services
 from core.domain import collection_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
@@ -38,6 +39,9 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
         self.json_dict = {
             'version' : 1,
             'commit_message' : 'changed title',
@@ -48,15 +52,17 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
             }]
         }
 
+
 class CollectionEditorTest(BaseCollectionEditorControllerTest):
     COLLECTION_ID = '0'
 
     def setUp(self):
         super(CollectionEditorTest, self).setUp()
+        system_user = user_services.get_system_user()
 
         collection_services.load_demo(self.COLLECTION_ID)
         rights_manager.release_ownership_of_collection(
-            feconf.SYSTEM_COMMITTER_ID, self.COLLECTION_ID)
+            system_user, self.COLLECTION_ID)
 
     def test_access_collection_editor_page(self):
         """Test access to editor pages for the sample collection."""
@@ -119,9 +125,9 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COLLECTION_ID, self.viewer_id,
+            self.admin, self.COLLECTION_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.VIEWER_EMAIL)
 
@@ -149,9 +155,9 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COLLECTION_ID, self.editor_id,
+            self.admin, self.COLLECTION_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.EDITOR_EMAIL)
 
@@ -178,20 +184,20 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         # Check that collection is published correctly.
         rights_manager.assign_role_for_collection(
-            self.owner_id, collection_id, self.editor_id,
+            self.owner, collection_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
-        rights_manager.publish_collection(self.owner_id, collection_id)
+        rights_manager.publish_collection(self.owner, collection_id)
 
         # Check that collection cannot be unpublished by non admin.
         with self.assertRaisesRegexp(
             Exception, 'This collection cannot be unpublished.'):
-            rights_manager.unpublish_collection(self.owner_id, collection_id)
+            rights_manager.unpublish_collection(self.owner, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(collection_rights.status,
                          rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         # Check that collection can be unpublished by admin.
-        rights_manager.unpublish_collection(self.admin_id, collection_id)
+        rights_manager.unpublish_collection(self.admin, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(collection_rights.status,
                          rights_manager.ACTIVITY_STATUS_PRIVATE)
@@ -208,7 +214,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         collection_services.save_new_collection(self.owner_id, collection)
 
         # Check that collection is published correctly.
-        rights_manager.publish_collection(self.owner_id, collection_id)
+        rights_manager.publish_collection(self.owner, collection_id)
 
         json_response = self.get_json(
             '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, self.COLLECTION_ID))
@@ -217,4 +223,41 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.assertFalse(json_response['can_unpublish'])
         self.assertEqual(self.COLLECTION_ID, json_response['collection_id'])
         self.assertFalse(json_response['is_private'])
+        self.logout()
+
+    def test_publish_unpublish_collection(self):
+        self.set_collection_editors([self.OWNER_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+
+        # Login as owner and publish a collection with a public exploration.
+        self.login(self.OWNER_EMAIL)
+        collection_id = 'collection_id'
+        exploration_id = 'exp_id'
+        self.save_new_valid_exploration(exploration_id, self.owner_id)
+        self.save_new_valid_collection(
+            collection_id, self.owner_id, exploration_id=exploration_id)
+        rights_manager.publish_exploration(self.owner, exploration_id)
+        collection = collection_services.get_collection_by_id(collection_id)
+        response = self.testapp.get(
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX,
+                       self.COLLECTION_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+        response_dict = self.put_json(
+            '/collection_editor_handler/publish/%s' % collection_id,
+            {'version': collection.version},
+            csrf_token)
+        self.assertFalse(response_dict['is_private'])
+        self.logout()
+
+        # Login as admin and unpublish the collection.
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX,
+                       self.COLLECTION_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+        response_dict = self.put_json(
+            '/collection_editor_handler/unpublish/%s' % collection_id,
+            {'version': collection.version},
+            csrf_token)
+        self.assertTrue(response_dict['is_private'])
         self.logout()
