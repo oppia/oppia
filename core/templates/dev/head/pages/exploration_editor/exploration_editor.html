@@ -45,7 +45,6 @@
     }
   </style>
 
-  {{dependencies_html}}
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
@@ -219,6 +218,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationTitleEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationObjectiveEditorDirective.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParamChangesEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParameterMetadataService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
@@ -258,6 +259,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/classifier/ClassifierObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationDraftObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StatesObjectFactory.js"></script>
@@ -313,6 +315,9 @@
 
   <script src="{{ASSET_DIR_PREFIX}}/extensions/interactions/baseValidator.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/LocalStorageService.js"></script>
+
   {{ interaction_templates }}
   {{ visualizations_html }}
+  {{ dependencies_html }}
 {% endblock footer_js %}

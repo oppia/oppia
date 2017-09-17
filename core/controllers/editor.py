@@ -38,6 +38,7 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
+from core.domain import search_services
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -119,11 +120,9 @@ class ExplorationPage(EditorHandler):
                 iframe_restriction=None)
             return
 
-        exploration = exp_services.get_exploration_by_id(
-            exploration_id, strict=False)
-
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
+        (exploration, exploration_rights) = (
+            exp_services.get_exploration_and_exploration_rights_by_id(
+                exploration_id))
 
         visualizations_html = visualization_registry.Registry.get_full_html()
 
@@ -409,7 +408,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         # Perform the moderator action.
         if action == 'unpublish_exploration':
             rights_manager.unpublish_exploration(self.user, exploration_id)
-            exp_services.delete_documents_from_search_index([
+            search_services.delete_explorations_from_search_index([
                 exploration_id])
         else:
             raise self.InvalidInputException(

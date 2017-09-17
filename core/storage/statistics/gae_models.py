@@ -59,6 +59,189 @@ class StateCounterModel(base_models.BaseModel):
         return counter
 
 
+class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student submitting an answer.
+
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'answer_submit'
+        exp_id: id of exploration currently being played
+        exp_version: version of exploration
+        state_name: Name of current state
+        client_time_spent_in_secs: Time since start of this state when this
+            event was recorded
+        session_id: ID of current student's session
+        is_feedback_useful: Whether the answer received useful feedback
+        is_answer_correct: Whether the answer is correct
+    """
+    # Which specific type of event this is
+    event_type = ndb.StringProperty()
+    # Id of exploration currently being played.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    client_time_spent_in_secs = ndb.FloatProperty()
+    # Whether the submitted answer received useful feedback
+    is_feedback_useful = ndb.BooleanProperty(indexed=True)
+    # Whether the submitted answer is the correct answer.
+    is_answer_correct = ndb.BooleanProperty(indexed=True)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               client_time_spent_in_secs, is_feedback_useful,
+               is_answer_correct):
+        """Creates a new answer submitted event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        answer_submitted_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_ANSWER_SUBMITTED,
+            exp_id=exp_id,
+            exp_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=client_time_spent_in_secs,
+            is_feedback_useful=is_feedback_useful,
+            is_answer_correct=is_answer_correct)
+        answer_submitted_event_entity.put()
+        return entity_id
+
+
+class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student entering an exploration. In this context,
+    'actually' entering an exploration means the student has spent a defined
+    MIN_TIME on the exploration.
+
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'actual_start'
+        exp_id: id of exploration currently being played
+        exp_version: version of exploration
+        state_name: Name of current state
+        client_time_spent_in_secs: Time since start of the exploration when
+            this event was recorded (MIN_TIME to record this event)
+        session_id: ID of current student's session
+    """
+    # Which specific type of event this is
+    event_type = ndb.StringProperty()
+    # Id of exploration currently being played.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec). This
+    # should be equal to the MIN_TIME defined for recording this event.
+    client_time_spent_in_secs = ndb.FloatProperty()
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               client_time_spent_in_secs):
+        """Creates a new actual exploration start event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        actual_start_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+            exp_id=exp_id,
+            exp_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=client_time_spent_in_secs)
+        actual_start_event_entity.put()
+        return entity_id
+
+
+class SolutionHitEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student triggering the solution.
+
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'solution'
+        exp_id: id of exploration currently being played
+        exp_version: version of exploration
+        state_name: Name of current state
+        client_time_spent_in_secs: Time since start of this state when this
+            event was recorded
+        session_id: ID of current student's session
+        is_solution_preceding_answer: Whether the solution was triggered before
+            a correct answer was submitted.
+    """
+    # Which specific type of event this is
+    event_type = ndb.StringProperty()
+    # Id of exploration currently being played.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    client_time_spent_in_secs = ndb.FloatProperty()
+    # Whether the solution was triggered before the student submitted a correct
+    # answer to the same state.
+    is_solution_preceding_answer = ndb.BooleanProperty(indexed=True)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               client_time_spent_in_secs, is_solution_preceding_answer):
+        """Creates a new answer submitted event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        solution_hit_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_SOLUTION,
+            exp_id=exp_id,
+            exp_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=client_time_spent_in_secs,
+            is_solution_preceding_answer=is_solution_preceding_answer)
+        solution_hit_event_entity.put()
+        return entity_id
+
+
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student starting the exploration.
 
@@ -307,6 +490,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type)
         complete_event_entity.put()
+        return entity_id
 
 
 class RateExplorationEventLogEntryModel(base_models.BaseModel):
@@ -428,6 +612,76 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type)
         state_event_entity.put()
+        return entity_id
+
+
+class ExplorationStatsModel(base_models.BaseModel):
+    """Model for storing analytics data for an exploration.
+
+    The ID of instances of this class has the form {{exp_id}}.{{exp_version}}.
+    """
+    # ID of exploration.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Number of students who actually attempted the exploration. Only learners
+    # who spent a minimum time on the exploration are considered to have
+    # actually started the exploration.
+    num_actual_starts = ndb.IntegerProperty(indexed=False)
+    # Number of students who completed the exploration.
+    num_completions = ndb.IntegerProperty(indexed=False)
+    # Keyed by state name that describes the analytics for that state.
+    # {state_name: {
+    #   'total_answers_count': ...,
+    #   'useful_feedback_count': ...,
+    #   'learners_answered_correctly': ...,
+    #   'total_hit_count': ...,
+    #   'first_hit_count': ...,
+    #   'total_solutions_triggered_count': ...}}
+    state_stats_mapping = ndb.JsonProperty(indexed=False)
+
+    @classmethod
+    def get_entity_id(cls, exp_id, exp_version):
+        """Generates an ID for the instance of the form
+        {{exp_id}}.{{exp_version}}.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            str. ID of the new ExplorationStatsModel instance.
+        """
+        return '%s.%s' % (exp_id, exp_version)
+
+    @classmethod
+    def create(
+            cls, exp_id, exp_version, num_actual_starts, num_completions,
+            state_stats_mapping):
+        """Creates an ExplorationStatsModel instance and writes it to the
+        datastore.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+            num_actual_starts: int. Number of learners who attempted the
+                exploration.
+            num_completions: int. Number of learners who completed the
+                exploration.
+            state_stats_mapping: dict. Mapping from state names to state stats
+                dicts.
+
+        Returns:
+            str. ID of the new ExplorationStatsModel instance.
+        """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
+        stats_instance = cls(
+            id=instance_id, exp_id=exp_id, exp_version=exp_version,
+            num_actual_starts=num_actual_starts,
+            num_completions=num_completions,
+            state_stats_mapping=state_stats_mapping)
+        stats_instance.put()
+        return instance_id
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):

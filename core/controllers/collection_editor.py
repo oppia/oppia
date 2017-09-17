@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import summary_services
 from core.platform import models
 import feconf
@@ -139,10 +140,14 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
     @acl_decorators.can_edit_collection
     def get(self, collection_id):
-        """Gets the editing rights for the given collection."""
-        collection = collection_services.get_collection_by_id(collection_id)
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
+        """Gets the editing rights for the given collection.
+
+        Args:
+            collection_id: str. ID for the collection.
+        """
+        (collection, collection_rights) = (
+            collection_services.get_collection_and_collection_rights_by_id(
+                collection_id))
 
         self.values.update({
             'can_edit': True,
@@ -203,7 +208,7 @@ class CollectionUnpublishHandler(base.BaseHandler):
         _require_valid_version(version, collection.version)
 
         rights_manager.unpublish_collection(self.user, collection_id)
-        collection_services.delete_documents_from_search_index([
+        search_services.delete_collections_from_search_index([
             collection_id])
 
         collection_rights = rights_manager.get_collection_rights(

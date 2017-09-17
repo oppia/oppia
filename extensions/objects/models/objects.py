@@ -224,6 +224,7 @@ class ListOfCodeEvaluation(BaseObject):
     """Class for lists of CodeEvaluations."""
 
     description = 'A list of code and its evaluation results.'
+    default_value = []
 
     SCHEMA = {
         'type': 'list',

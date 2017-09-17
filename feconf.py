@@ -82,6 +82,10 @@ INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'LDAStringClassifier',
         'current_data_schema_version': 1
+    },
+    'CodeRepl': {
+        'algorithm_id': 'CodeClassifier',
+        'current_data_schema_version': 1
     }
 }
 # Classifier job time to live (in mins).
@@ -157,6 +161,9 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 4
+
+# The current version of the question schema.
+CURRENT_QUESTION_SCHEMA_VERSION = 1
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -480,6 +487,7 @@ DEMO_EXPLORATIONS = {
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
     u'17': 'audio_test',
+    u'18': 'code_classifier_test.yaml',
 }
 
 DEMO_COLLECTIONS = {
@@ -541,6 +549,7 @@ FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
+LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
@@ -595,9 +604,11 @@ EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
+EVENT_TYPE_SOLUTION = 'solution'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
+EVENT_TYPE_ACTUAL_START_EXPLORATION = 'actual_start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
@@ -611,6 +622,7 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
+COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
@@ -619,7 +631,7 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with base.js
+# NOTE TO DEVELOPERS: This should be synchronized with app.js
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
@@ -676,8 +688,6 @@ LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
 # The i18n id for the header of the "Recently Published" category in the
 # library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
-# group_name param for GET request in Splash.js
-LIBRARY_CATEGORY_SPLASH_PAGE_FEATURED = 'splash_page_featured'
 
 # The group name that appears at the end of the url for the recently published
 # page.

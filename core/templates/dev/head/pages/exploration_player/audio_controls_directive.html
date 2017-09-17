@@ -10,10 +10,12 @@
   <i class="fa audio-controls-button-icon"
      style="min-width: 24px; text-align: left;"
      ng-click="onSpeakerIconClicked()"
-     ng-class="{'fa-volume-off': !isAudioPlaying(), 'fa-volume-up': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage()}"
+
+     ng-class="{'fa-volume-off': !isAudioPlaying(), 'fa-volume-up': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || isAudioLoading}"
      tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
      tooltip-append-to-body="true"></i>
 </div>
+<span ng-if="isAudioLoading" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
 <span ng-if="audioSettingsButtonIsShown && isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
 
 <style>
@@ -42,6 +44,7 @@
   }
 
   .audio-controls-message {
+    clear: right;
     float: right;
     font-size: 12px;
     font-style: italic;
