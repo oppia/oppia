@@ -48,10 +48,6 @@ oppia.factory('ParamSpecsObjectFactory', [
       return new ParamSpecs(paramSpecs);
     };
 
-    ParamSpecs.createEmpty = function() {
-      return new ParamSpecs({});
-    };
-
     return ParamSpecs;
   }
 ]);

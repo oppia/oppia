@@ -54,7 +54,7 @@ oppia.directive('paramChangesEditor', [
 
           var generateParamNameChoices = function() {
             return Object.keys(
-              explorationParamSpecsService.displayed
+              explorationParamSpecsService.displayed.paramSpecs
             ).sort().map(function(paramName) {
               return {
                 id: paramName,
@@ -79,8 +79,8 @@ oppia.directive('paramChangesEditor', [
             // Add the new param name to $scope.paramNameChoices, if necessary,
             // so that it shows up in the dropdown.
             if (!$scope.paramNameChoices.hasOwnProperty(newParamChange.name)) {
-              explorationParamSpecsService.displayed[newParamChange.name] = (
-                ParamSpecObjectFactory.createDefault());
+              explorationParamSpecsService.displayed.paramSpecs[
+                newParamChange.name] = ParamSpecObjectFactory.createDefault();
               $scope.paramNameChoices = generateParamNameChoices();
             }
             $scope.paramChangesService.displayed.push(newParamChange);
@@ -178,9 +178,9 @@ oppia.directive('paramChangesEditor', [
             explorationParamSpecsService.restoreFromMemento();
             $scope.paramChangesService.displayed.forEach(function(paramChange) {
               var paramName = paramChange.name;
-              if (!explorationParamSpecsService.displayed.hasOwnProperty(
-                    paramName)) {
-                explorationParamSpecsService.displayed[paramName] =
+              if (!explorationParamSpecsService.displayed.paramSpecs
+                  .hasOwnProperty(paramName)) {
+                explorationParamSpecsService.displayed.paramSpecs[paramName] =
                  ParamSpecObjectFactory.createDefault();
               }
             });
@@ -205,10 +205,10 @@ oppia.directive('paramChangesEditor', [
             // the select2 dropdowns. Otherwise, after the deletion, the
             // dropdowns may turn blank.
             $scope.paramChangesService.displayed.forEach(function(paramChange) {
-              if (!explorationParamSpecsService.displayed.hasOwnProperty(
-                  paramChange.name)) {
-                explorationParamSpecsService.displayed[paramChange.name] = (
-                  ParamSpecObjectFactory.createDefault());
+              if (!explorationParamSpecsService.displayed.paramSpecs
+                  .hasOwnProperty(paramChange.name)) {
+                explorationParamSpecsService.displayed.paramSpecs[
+                  paramChange.name] = ParamSpecObjectFactory.createDefault();
               }
             });
             $scope.paramNameChoices = generateParamNameChoices();
@@ -234,10 +234,10 @@ oppia.directive('paramChangesEditor', [
               // turn blank.
               $scope.paramChangesService.displayed.forEach(
                 function(paramChange) {
-                  if (!explorationParamSpecsService.displayed.hasOwnProperty(
-                      paramChange.name)) {
-                    explorationParamSpecsService.displayed[paramChange.name] = (
-                      ParamSpecObjectFactory.createDefault());
+                  if (!explorationParamSpecsService.displayed.paramSpecs
+                      .hasOwnProperty(paramChange.name)) {
+                    explorationParamSpecsService.displayed.paramSpecs[
+                      paramChange.name] = ParamSpecObjectFactory.createDefault();
                   }
                 }
               );
