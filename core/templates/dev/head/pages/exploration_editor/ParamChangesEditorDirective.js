@@ -179,7 +179,7 @@ oppia.directive('paramChangesEditor', [
             $scope.paramChangesService.displayed.forEach(function(paramChange) {
               var paramName = paramChange.name;
               if (!explorationParamSpecsService.displayed.paramSpecs
-                  .hasOwnProperty(paramName)) {
+                .hasOwnProperty(paramName)) {
                 explorationParamSpecsService.displayed.paramSpecs[paramName] =
                  ParamSpecObjectFactory.createDefault();
               }
@@ -206,7 +206,7 @@ oppia.directive('paramChangesEditor', [
             // dropdowns may turn blank.
             $scope.paramChangesService.displayed.forEach(function(paramChange) {
               if (!explorationParamSpecsService.displayed.paramSpecs
-                  .hasOwnProperty(paramChange.name)) {
+                .hasOwnProperty(paramChange.name)) {
                 explorationParamSpecsService.displayed.paramSpecs[
                   paramChange.name] = ParamSpecObjectFactory.createDefault();
               }
@@ -235,9 +235,10 @@ oppia.directive('paramChangesEditor', [
               $scope.paramChangesService.displayed.forEach(
                 function(paramChange) {
                   if (!explorationParamSpecsService.displayed.paramSpecs
-                      .hasOwnProperty(paramChange.name)) {
+                    .hasOwnProperty(paramChange.name)) {
                     explorationParamSpecsService.displayed.paramSpecs[
-                      paramChange.name] = ParamSpecObjectFactory.createDefault();
+                      paramChange.name] =
+                      ParamSpecObjectFactory.createDefault();
                   }
                 }
               );
