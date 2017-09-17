@@ -41,7 +41,8 @@ def handle_stats_creation(exploration, change_list):
 
     old_exp_version = exploration.version - 1
     new_exp_version = exploration.version
-    exploration_stats = get_exploration_stats(exploration.id, old_exp_version)
+    exploration_stats = get_exploration_stats_by_id(
+        exploration.id, old_exp_version)
 
     # This mapping from new state names to old ones account for circular
     # renames and multiple renames within a commit. We will use this mapping
@@ -69,7 +70,7 @@ def handle_stats_creation(exploration, change_list):
     create_stats_model(exploration_stats)
 
 
-def get_exploration_stats(exp_id, exp_version):
+def get_exploration_stats_by_id(exp_id, exp_version):
     """Retrieves the ExplorationStats domain object.
 
     Args:
@@ -120,18 +121,22 @@ def create_stats_model(exploration_stats):
     Args:
         exploration_stats: ExplorationStats. The domain object for exploration
             statistics.
+
+    Returns:
+        str. ID of the datastore instance for ExplorationStatsModel.
     """
     new_state_stats_mapping = {}
     for state_name in exploration_stats.state_stats_mapping:
         new_state_stats_mapping[state_name] = (
             exploration_stats.state_stats_mapping[state_name].to_dict())
-    stats_models.ExplorationStatsModel.create(
+    instance_id = stats_models.ExplorationStatsModel.create(
         exploration_stats.exp_id,
         exploration_stats.exp_version,
         exploration_stats.num_actual_starts,
         exploration_stats.num_completions,
         new_state_stats_mapping
     )
+    return instance_id
 
 
 # TODO(bhenning): Test.

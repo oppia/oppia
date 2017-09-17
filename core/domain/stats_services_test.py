@@ -28,6 +28,73 @@ import feconf
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
+class StatisticsServicesTest(test_utils.GenericTestBase):
+    """Test the helper functions and methods defined in the stats_services
+    module.
+    """
+    def setUp(self):
+        super(StatisticsServicesTest, self).setUp()
+        self.exp_id = 'exp_id1'
+        self.exp_version = 1
+        self.stats_model_id = (
+            stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
+
+    def test_get_exploration_stats_from_model(self):
+        model = stats_models.ExplorationStatsModel.get(self.stats_model_id)
+        exploration_stats = stats_services.get_exploration_stats_from_model(
+            model)
+        self.assertEqual(exploration_stats.exp_id, 'exp_id1')
+        self.assertEqual(exploration_stats.exp_version, 1)
+        self.assertEqual(exploration_stats.num_actual_starts, 0)
+        self.assertEqual(exploration_stats.num_completions, 0)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+    def test_get_exploration_stats(self):
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version)
+        self.assertEqual(exploration_stats.exp_id, 'exp_id1')
+        self.assertEqual(exploration_stats.exp_version, 1)
+        self.assertEqual(exploration_stats.num_actual_starts, 0)
+        self.assertEqual(exploration_stats.num_completions, 0)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+    def test_create_stats_model(self):
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version)
+        exploration_stats.exp_version += 1
+        model_id = stats_services.create_stats_model(exploration_stats)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version+1)
+        self.assertEqual(exploration_stats.exp_id, 'exp_id1')
+        self.assertEqual(exploration_stats.exp_version, 2)
+        self.assertEqual(exploration_stats.num_actual_starts, 0)
+        self.assertEqual(exploration_stats.num_completions, 0)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+        # Test create method with different state_stats_mapping.
+        exploration_stats.state_stats_mapping = {
+            'Home': stats_domain.StateStats.create_default()
+        }
+        exploration_stats.exp_version += 1
+        model_id = stats_services.create_stats_model(exploration_stats)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        self.assertEqual(model.exp_id, 'exp_id1')
+        self.assertEqual(model.exp_version, 3)
+        self.assertEqual(model.num_actual_starts, 0)
+        self.assertEqual(model.num_completions, 0)
+        self.assertEqual(
+            model.state_stats_mapping, {
+                'Home': {
+                    'total_answers_count': 0,
+                    'useful_feedback_count': 0,
+                    'learners_answered_correctly': 0,
+                    'total_hit_count': 0,
+                    'first_hit_count': 0,
+                    'total_solutions_triggered_count': 0
+                }
+            })
+
+
 class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
     """A modified StatisticsAggregator that does not start a new batch
     job when the previous one has finished.
