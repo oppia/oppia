@@ -31,11 +31,11 @@ oppia.directive('paramChangesEditor', [
       controller: [
         '$scope', '$rootScope', 'editabilityService',
         'explorationParamSpecsService', 'alertsService',
-        'ParamChangeObjectFactory',
+        'ParamChangeObjectFactory', 'ParamSpecObjectFactory',
         function(
             $scope, $rootScope, editabilityService,
             explorationParamSpecsService, alertsService,
-            ParamChangeObjectFactory) {
+            ParamChangeObjectFactory, ParamSpecObjectFactory) {
           $scope.editabilityService = editabilityService;
           $scope.isParamChangesEditorOpen = false;
           $scope.warningText = '';
@@ -45,9 +45,6 @@ oppia.directive('paramChangesEditor', [
           };
 
           var INVALID_PARAMETER_NAMES = GLOBALS.INVALID_PARAMETER_NAMES;
-          var DEFAULT_PARAM_SPEC = {
-            obj_type: 'UnicodeString'
-          };
 
           $scope.$on('externalSave', function() {
             if ($scope.isParamChangesEditorOpen) {
@@ -83,7 +80,7 @@ oppia.directive('paramChangesEditor', [
             // so that it shows up in the dropdown.
             if (!$scope.paramNameChoices.hasOwnProperty(newParamChange.name)) {
               explorationParamSpecsService.displayed[newParamChange.name] = (
-                angular.copy(DEFAULT_PARAM_SPEC));
+                ParamSpecObjectFactory.createDefault());
               $scope.paramNameChoices = generateParamNameChoices();
             }
             $scope.paramChangesService.displayed.push(newParamChange);
@@ -184,7 +181,7 @@ oppia.directive('paramChangesEditor', [
               if (!explorationParamSpecsService.displayed.hasOwnProperty(
                     paramName)) {
                 explorationParamSpecsService.displayed[paramName] =
-                 angular.copy(DEFAULT_PARAM_SPEC);
+                 ParamSpecObjectFactory.createDefault();
               }
             });
 
@@ -211,7 +208,7 @@ oppia.directive('paramChangesEditor', [
               if (!explorationParamSpecsService.displayed.hasOwnProperty(
                   paramChange.name)) {
                 explorationParamSpecsService.displayed[paramChange.name] = (
-                  angular.copy(DEFAULT_PARAM_SPEC));
+                  ParamSpecObjectFactory.createDefault());
               }
             });
             $scope.paramNameChoices = generateParamNameChoices();
@@ -240,7 +237,7 @@ oppia.directive('paramChangesEditor', [
                   if (!explorationParamSpecsService.displayed.hasOwnProperty(
                       paramChange.name)) {
                     explorationParamSpecsService.displayed[paramChange.name] = (
-                      angular.copy(DEFAULT_PARAM_SPEC));
+                      ParamSpecObjectFactory.createDefault());
                   }
                 }
               );
