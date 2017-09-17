@@ -78,7 +78,7 @@ oppia.directive('paramChangesEditor', [
             // Add the new param name to $scope.paramNameChoices, if necessary,
             // so that it shows up in the dropdown.
             if (explorationParamSpecsService.displayed.addParamIfNew(
-              newParamName)) {
+              newParamChange.name)) {
               $scope.paramNameChoices = generateParamNameChoices();
             }
             $scope.paramChangesService.displayed.push(newParamChange);
