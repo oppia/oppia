@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects relating to question."""
+"""Domain objects relating to questions."""
 
 from core.domain import exp_domain
 from core.platform import models
@@ -50,22 +50,40 @@ class QuestionChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
+                - 'update question property' (with property_name, new_value
+                and old_value)
+
+        Raises:
+            Exception: The given change dict is not valid.
         """
         if 'cmd' not in change_dict:
             raise Exception('Invalid change_dict: %s' % change_dict)
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_UPDATE_QUESTION_PROPERTY:
-            if (change_dict['property_name'] not in
+            if (change_dict['property_name'] in
                     self.QUESTION_PROPERTIES):
+                self.property_name = change_dict['property_name']
+                self.new_value = change_dict['new_value']
+                self.old_value = change_dict.get('old_value')
+            else:
                 raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
+
+    def to_dict(self):
+        """Returns a dict representing QuestionChange domain object.
+
+        Returns:
+            dict. A dict representing QuestionChange instance."""
+        return {
+            'cmd': self.cmd,
+            'property_name': self.property_name,
+            'new_value': self.new_value,
+            'old_value': self.old_value
+        }
 
 
 class Question(object):
-    """Domain object for a questions.
+    """Domain object for a question.
 
     Attributes:
         question_id: str. The unique ID of the question.
@@ -129,7 +147,7 @@ class Question(object):
                 'Expected question_data to be a dict, received %s' %
                 self.question_data)
         question_data = exp_domain.State.from_dict(self.question_data)
-        question_data.validate('', True)
+        question_data.validate(None, True)
 
         if not isinstance(self.question_data_schema_version, int):
             raise utils.ValidationError(
@@ -168,9 +186,7 @@ class Question(object):
 
     @classmethod
     def create_default_question(
-            cls, question_id, collection_id,
-            title='',
-            language_code='en'):
+            cls, question_id, collection_id, title, language_code):
         """Returns a Question domain object with default values.
 
         Args:

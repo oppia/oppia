@@ -35,7 +35,6 @@ def _create_question(committer_id, question, commit_message):
         committer_id: str. ID of the committer.
         question: Question. question domain object.
         commit_message: str. A description of changes made to the question.
-    TODO: implement commit_cmds.
     """
     model = question_models.QuestionModel.create(
         title=question.title,
@@ -123,19 +122,16 @@ def apply_change_list(question_id, change_list):
 
     Args:
         question_id: str. ID of the given question.
-        change_list: list(dict). A change list to be applied to the given
-            question. Each entry in change_list is a dict that represents an
-            QuestionChange object.
+        change_list: list(QuestionChange). A change list to be applied to the
+            given question. Each entry in change_list is a QuestionChange
+            object.
 
     Returns:
       Question. The resulting question domain object.
     """
     question = get_question_by_id(question_id)
     try:
-        changes = [question_domain.QuestionChange(change_dict)
-                   for change_dict in change_list]
-
-        for change in changes:
+        for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
                 if (change.property_name ==
                         question_domain.QUESTION_PROPERTY_TITLE):
@@ -163,7 +159,7 @@ def _save_question(committer_id, question, change_list, commit_message):
         committer_id: str. The id of the user who is performing the update
             action.
         question: Question. The domain object representing a question.
-        change_list: list of dicts, each representing a QuestionChange object.
+        change_list: list(QuestionChange). A list of QuestionChange objects.
             These changes are applied in sequence to produce the resulting
             question.
         commit_message: str or None. A description of changes made to the
@@ -186,7 +182,8 @@ def _save_question(committer_id, question, change_list, commit_message):
         question.question_data_schema_version)
     question_model.collection_id = question.collection_id
     question_model.language_code = question.language_code
-    question_model.commit(committer_id, commit_message, change_list)
+    change_list_dict = [change.to_dict() for change in change_list]
+    question_model.commit(committer_id, commit_message, change_list_dict)
 
 
 def update_question(committer_id, question_id, change_list, commit_message):
@@ -196,7 +193,7 @@ def update_question(committer_id, question_id, change_list, commit_message):
         committer_id: str. The id of the user who is performing the update
             action.
         question_id: str. The question ID.
-        change_list: list of dicts, each representing a QuestionChange object.
+        change_list: list(QuestionChange). A list of QuestionChange objects.
             These changes are applied in sequence to produce the resulting
             question.
         commit_message: str or None. A description of changes made to the

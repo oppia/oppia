@@ -125,8 +125,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_id = 'col1.random'
         collection_id = 'col1'
+        title = ''
+        language_code = 'en'
         question = question_domain.Question.create_default_question(
-            question_id, collection_id)
+            question_id, collection_id, title, language_code)
 
         self.assertEqual(question.question_id, question_id)
         self.assertEqual(question.collection_id, collection_id)
