@@ -50,7 +50,7 @@ oppia.factory('ParamSpecsObjectFactory', [
 
     ParamSpecs.createFromBackendDict = function(paramSpecsBackendDict) {
       paramSpecs = {};
-      Object.keys(paramSpecsBackendDict).map(function(paramName) {
+      Object.keys(paramSpecsBackendDict).forEach(function(paramName) {
         paramSpecs[paramName] = ParamSpecObjectFactory.createFromBackendDict(
           paramSpecsBackendDict[paramName]);
       });
