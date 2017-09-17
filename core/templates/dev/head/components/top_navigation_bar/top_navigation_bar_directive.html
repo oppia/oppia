@@ -30,7 +30,8 @@
            role="menuitem"
            aria-haspopup="true"
            aria-expanded="false"
-           tabindex="0">
+           tabindex="0"
+           ng-mouseleave="onMouseoutDropdownMenuAbout($event)">
           <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
           <span class="caret"></span>
         </a>
@@ -70,7 +71,7 @@
         <div class="oppia-navbar-profile-picture-container">
           <span ng-if="profilePictureDataUrl">
             <img ng-src="<[profilePictureDataUrl]>" class="oppia-navbar-profile-picture img-circle" alt="User Avatar">
-            <span class="caret" style="margin-top: 10px;"></span>
+            <span class="caret"></span>
           </span>
           <span ng-if="!profilePictureDataUrl">
             <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>

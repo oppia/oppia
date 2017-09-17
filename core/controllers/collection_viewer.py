@@ -32,13 +32,12 @@ class CollectionPage(base.BaseHandler):
     @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Handles GET requests."""
-        try:
-            collection = collection_services.get_collection_by_id(
-                collection_id)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
+        (collection, collection_rights) = (
+            collection_services.get_collection_and_collection_rights_by_id(
+                collection_id))
+        if collection is None:
+            raise self.PageNotFoundException
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_COLLECTION,
             'can_edit': rights_manager.check_can_edit_activity(

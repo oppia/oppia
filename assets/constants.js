@@ -276,6 +276,9 @@ var constants = {
     "id": "hi-en",
     "text": "Hinglish",
     "related_languages": ["hi", "en"]
+  }, {
+    "id": "es",
+    "text": "Spanish",
+    "related_languages": ["es"]
   }]
-
 };
