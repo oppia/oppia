@@ -17,7 +17,7 @@ describe('Expression parser service', function() {
 
   var eps = null;
   beforeEach(inject(function($injector) {
-    eps = $injector.get('expressionParserService');
+    eps = $injector.get('ExpressionParserService');
   }));
 
   it('should parse to a correct tree', function() {
