@@ -46,7 +46,17 @@
     </span>
     <span ng-if="isActive()">&nbsp;</span>
   </div>
-
+  <div ng-if="!getOutcome() && getHintStats()" class="pull-right" style="width: 115px; margin-top: -8px;">
+    <span style="font-size: 10px"><[getHintStats().num_succeeds]> out of <[getHintStats().num_views]> succeeded</span>
+    <div class="progress" style="height: 10px; margin: 0;">
+      <div class="progress-bar progress-bar-success" role="progressbar" tooltip="<[getHintSuccessPercent()]>%" style="width:<[getHintSuccessPercent()]>%">
+      </div>
+      <div class="progress-bar" role="progressbar" tooltip="<[100 - getHintSuccessPercent() - getQuittersPercent()]>%" style="background-color: white; width:<[100 - getHintSuccessPercent() - getQuittersPercent()]>%">
+      </div>
+      <div class="progress-bar" role="progressbar" tooltip="<[getQuittersPercent()]>%" style="background-color: gray; width:<[getQuittersPercent()]>%">
+      </div>
+    </div>
+  </div>
   <span ng-if="getOutcome()">→</span>
   <span ng-if="getOutcome() && !isOutcomeLooping() && !isCreatingNewState()"
         ng-click="navigateToState(getOutcome().dest)" class="oppia-nested-link">

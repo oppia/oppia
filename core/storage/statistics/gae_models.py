@@ -684,6 +684,172 @@ class ExplorationStatsModel(base_models.BaseModel):
         return instance_id
 
 
+class HintRequestEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student when requesting for a hint. The
+    definitions of the fields are as follows:
+    - event_type: 'hint_request'
+    - exploration_id: id of exploration currently being played
+    - exploration_version: version of exploration
+    - state_name: Name of current state
+    - play_type: 'normal'
+    - hint_index: index of the hint that was requested
+    - created_on date
+    - session_id: ID of current student's session
+    """
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration currently being played.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exploration_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Which type of play-through this is (editor preview, or learner view).
+    # Note that the 'playtest' option is legacy, since editor preview
+    # playthroughs no longer emit events.
+    play_type = ndb.StringProperty(indexed=True,
+                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
+                                            feconf.PLAY_TYPE_NORMAL])
+    # Index of the requested hint.
+    hint_index = ndb.IntegerProperty(indexed=False)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            play_type, hint_index):
+        """Creates a new hint request event."""
+        entity_id = cls.get_new_event_entity_id(exp_id, session_id)
+        hint_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_STATE_HIT,
+            exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            play_type=play_type,
+            hint_index=hint_index)
+        hint_event_entity.put()
+
+
+class HintSuccessEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student when reaching a new state after viewing
+    a hint. The definitions of the fields are as follows:
+    - event_type: 'hint_success'
+    - exploration_id: id of exploration currently being played
+    - exploration_version: version of exploration
+    - state_name: Name of current state
+    - play_type: 'normal'
+    - hint_index: index of the hint that was requested
+    - created_on date
+    - session_id: ID of current student's session
+    """
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration currently being played.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exploration_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Which type of play-through this is (editor preview, or learner view).
+    # Note that the 'playtest' option is legacy, since editor preview
+    # playthroughs no longer emit events.
+    play_type = ndb.StringProperty(indexed=True,
+                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
+                                            feconf.PLAY_TYPE_NORMAL])
+    # Index of the requested hint.
+    hint_index = ndb.IntegerProperty(indexed=False)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            play_type, hint_index):
+        """Creates a new hint success event."""
+        entity_id = cls.get_new_event_entity_id(exp_id, session_id)
+        hint_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_STATE_HIT,
+            exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            play_type=play_type,
+            hint_index=hint_index)
+        hint_event_entity.put()
+
+
+class SolutionRequestEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student when requesting for a solution.
+    The definitions of the fields are as follows:
+    - event_type: 'solution_request'
+    - exploration_id: id of exploration currently being played
+    - exploration_version: version of exploration
+    - state_name: Name of current state
+    - play_type: 'normal'
+    - created_on date
+    - session_id: ID of current student's session
+    """
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration currently being played.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exploration_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Which type of play-through this is (editor preview, or learner view).
+    # Note that the 'playtest' option is legacy, since editor preview
+    # playthroughs no longer emit events.
+    play_type = ndb.StringProperty(indexed=True,
+                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
+                                            feconf.PLAY_TYPE_NORMAL])
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(
+            cls, exp_id, exp_version, state_name, session_id, play_type):
+        """Creates a new solution request event."""
+        entity_id = cls.get_new_event_entity_id(exp_id, session_id)
+        solution_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_STATE_HIT,
+            exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            play_type=play_type)
+        solution_event_entity.put()
+
+
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
@@ -726,6 +892,44 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             annotations.version for annotations in cls.get_all().filter(
                 cls.exploration_id == exploration_id
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
+
+
+class HintViewsModel(base_models.BaseModel):
+    """Stores Hint Statistics information for an exploration.
+
+    The id/key of instanced of this class has the form
+        [EXPLORATION_ID]:[STATE_NAME]:[EXPLORATION_VERSION]
+    """
+    # Explicitly store exploration id, exploration version and state name
+    # so we can easily do queries on them.
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    exploration_version = ndb.IntegerProperty(indexed=True, required=True)
+    state_name = ndb.StringProperty(indexed=True, required=True)
+    # List of viewed hints dicts, each of which is stored as JSON blob.
+    # Keyed by state_name[hint_index] that describes the number of views
+    # and number of successful answer attempts on viewing a hint.
+    # {num_views: ..., num_succeeds: ...}
+    viewed_hints_list = ndb.JsonProperty(repeated=True, indexed=True)
+    # Stores the number of solution views for state.
+    solution_views = ndb.IntegerProperty(indexed=True, required=False)
+    # When the statistics was reset last.
+    last_reset = ndb.DateTimeProperty(indexed=True, required=True)
+
+    @classmethod
+    def get_or_create(cls, exploration_id, state_name, exploration_version):
+        instance_id = '.'.join(
+            [exploration_id, state_name, str(exploration_version)])
+        instance = cls.get(instance_id, strict=False)
+        if not instance:
+            instance = cls(
+                id=instance_id,
+                exploration_id=exploration_id,
+                state_name=state_name,
+                exploration_version=int(exploration_version),
+                last_reset=datetime.datetime.utcnow(),
+                solution_views=0)
+            instance.put()
+        return instance
 
 
 class StateAnswersModel(base_models.BaseModel):

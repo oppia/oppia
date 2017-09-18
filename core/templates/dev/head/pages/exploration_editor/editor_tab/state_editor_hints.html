@@ -31,7 +31,10 @@
                                  summary="getHintSummary(hint)"
                                  short-summary="getHintSummary(hint)"
                                  is-active="$index === activeHintIndex"
-                                 on-delete-fn="deleteHint">
+                                 on-delete-fn="deleteHint"
+                                 hint-stats="hintViewsStats.hints[$index]"
+                                 hint-success-percent="hintSuccessPercents[$index]"
+                                 quitters-percent="hintQuittersPercents[$index]">
                 </response-header>
               </a>
 
@@ -92,7 +95,7 @@
 
   <div class="modal-body">
     <p>
-      Are you sure you want to delete this hint?
+      Are you sure you want to delete this hint? Please note, statistics for the entire series of hints will be reset.
     </p>
   </div>
 

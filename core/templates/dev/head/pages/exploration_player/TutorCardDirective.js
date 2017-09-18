@@ -52,20 +52,20 @@ oppia.directive('tutorCard', [
         '$scope', '$timeout', 'oppiaPlayerService', 'HintManagerService',
         'playerPositionService', 'playerTranscriptService',
         'ExplorationPlayerStateService', 'windowDimensionsService',
-        'urlService', 'AudioPlayerService',
+        'urlService', 'AudioPlayerService', 'explorationContextService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'HINT_REQUEST_STRING_I18N_IDS', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
-        'SolutionManagerService', 'oppiaExplorationHtmlFormatterService',
+        'SolutionManagerService', 'StatsReportingService',
         function(
           $scope, $timeout, oppiaPlayerService, HintManagerService,
           playerPositionService, playerTranscriptService,
           ExplorationPlayerStateService, windowDimensionsService,
-          urlService, AudioPlayerService,
+          urlService, AudioPlayerService, explorationContextService,
           TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
           CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
           HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC,
-          SolutionManagerService, oppiaExplorationHtmlFormatterService) {
+          SolutionManagerService, StatsReportingService) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -107,6 +107,11 @@ oppia.directive('tutorCard', [
 
           $scope.consumeHint = function() {
             if (!HintManagerService.areAllHintsExhausted()) {
+              if (explorationContextService.getPageContext() === 'learner') {
+                StatsReportingService.recordHintRequest(
+                  playerPositionService.getCurrentStateName(),
+                  HintManagerService.getNumHintsConsumed());
+              }
               playerTranscriptService.addNewInput(
                 HINT_REQUEST_STRING_I18N_IDS[Math.floor(
                   Math.random() * HINT_REQUEST_STRING_I18N_IDS.length)], true);
@@ -118,6 +123,11 @@ oppia.directive('tutorCard', [
           };
 
           $scope.viewSolution = function() {
+            if (explorationContextService.getPageContext() === 'learner' &&
+                !SolutionManagerService.hasSolutionBeenViewed()) {
+              StatsReportingService.recordSolutionRequest(
+                $scope.activeCard.stateName);
+            }
             playerTranscriptService.addNewInput(
               'Please show me the answer.', true);
             var solution = SolutionManagerService.viewSolution();
@@ -196,6 +206,13 @@ oppia.directive('tutorCard', [
           };
 
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
+            if (HintManagerService.getNumHintsConsumed() > 0 &&
+                explorationContextService.getPageContext() === 'learner' &&
+                !SolutionManagerService.hasSolutionBeenViewed()) {
+              StatsReportingService.recordHintSuccess(
+                $scope.activeCard.stateName,
+                HintManagerService.getNumHintsConsumed() - 1);
+            }
             updateActiveCard();
           });
 

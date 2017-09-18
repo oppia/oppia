@@ -162,6 +162,75 @@ class StateHitEventHandler(BaseEventHandler):
             params, play_type)
 
 
+class HintRequestEventHandler(BaseEventHandler):
+    """Event handler for recording hint request events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_HINT_REQUEST
+
+    @classmethod
+    def increment_hint_views(cls, hint_views_model, index):
+        if len(hint_views_model.viewed_hints_list) < index + 1:
+            hint_views_model.viewed_hints_list.append({
+                'num_views': 1,
+                'num_succeeds': 0
+            })
+        else:
+            hint_views_model.viewed_hints_list[index]['num_views'] += 1
+        hint_views_model.put()
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id,
+            play_type, hint_index):
+        stats_models.HintRequestEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id,
+            play_type, hint_index)
+        cls.increment_hint_views(stats_models.HintViewsModel.get_or_create(
+            exp_id, state_name, exp_version), hint_index)
+
+
+class HintSuccessEventHandler(BaseEventHandler):
+    """Event handler for recording a successful answer attempt after viewing
+       a hint.
+    """
+
+    EVENT_TYPE = feconf.EVENT_TYPE_HINT_SUCCESS
+
+    @classmethod
+    def increment_hint_succeeds(cls, hint_views_model, index):
+        hint_views_model.viewed_hints_list[index]['num_succeeds'] += 1
+        hint_views_model.put()
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id,
+            play_type, hint_index):
+        stats_models.HintSuccessEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id,
+            play_type, hint_index)
+        cls.increment_hint_succeeds(stats_models.HintViewsModel.get_or_create(
+            exp_id, state_name, exp_version), hint_index)
+
+
+class SolutionRequestEventHandler(BaseEventHandler):
+    """Event handler for recording solution request events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_SOLUTION_REQUEST
+
+    @classmethod
+    def increment_solution_views(cls, solution_views_model):
+        solution_views_model.solution_views += 1
+        solution_views_model.put()
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id, play_type):
+        stats_models.SolutionRequestEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, play_type)
+        cls.increment_solution_views(stats_models.HintViewsModel.get_or_create(
+            exp_id, state_name, exp_version))
+
+
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):
     """Event handler for recording new feedback thread creation events."""
 

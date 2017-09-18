@@ -705,6 +705,30 @@ class ExplorationStatisticsHandler(EditorHandler):
             exploration_id, exploration_version))
 
 
+class HintStatisticsHandler(EditorHandler):
+    """Returns statistics for hints in a state."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, exploration_id, exploration_version, escaped_state_name):
+        """Handles GET requests."""
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
+        if state_name not in exploration.states:
+            logging.error('Could not find state: %s' % state_name)
+            logging.error(
+                'Available states: %s' % exploration.states.keys())
+            raise self.PageNotFoundException
+
+        self.render_json(stats_services.get_hint_views_info(
+            exploration_id, exploration_version, state_name))
+
+
 class ExplorationStatsVersionsHandler(EditorHandler):
     """Returns statistics versions for an exploration."""
 

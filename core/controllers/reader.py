@@ -314,6 +314,59 @@ class StateHitEventHandler(base.BaseHandler):
             logging.error('Unexpected StateHit event for the END state.')
 
 
+class HintRequestEventHandler(base.BaseHandler):
+    """Tracks a learner requesting for a hint."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        state_name = self.payload.get('state_name')
+        exploration_version = self.payload.get('exploration_version')
+        session_id = self.payload.get('session_id')
+        hint_index = self.payload.get('hint_index')
+
+        event_services.HintRequestEventHandler.record(
+            exploration_id, exploration_version, state_name,
+            session_id, feconf.PLAY_TYPE_NORMAL, hint_index)
+
+
+class HintSuccessEventHandler(base.BaseHandler):
+    """Tracks a learner entering a new state after viewing a hint."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        state_name = self.payload.get('state_name')
+        exploration_version = self.payload.get('exploration_version')
+        session_id = self.payload.get('session_id')
+        hint_index = self.payload.get('hint_index')
+
+        event_services.HintSuccessEventHandler.record(
+            exploration_id, exploration_version, state_name,
+            session_id, feconf.PLAY_TYPE_NORMAL, hint_index)
+
+
+class SolutionRequestEventHandler(base.BaseHandler):
+    """Tracks a learner requesting for a solution."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        state_name = self.payload.get('state_name')
+        exploration_version = self.payload.get('exploration_version')
+        session_id = self.payload.get('session_id')
+
+        event_services.SolutionRequestEventHandler.record(
+            exploration_id, exploration_version, state_name,
+            session_id, feconf.PLAY_TYPE_NORMAL)
+
+
 class ClassifyHandler(base.BaseHandler):
     """Stateless handler that performs a classify() operation server-side and
     returns the corresponding classification result, which is a dict containing
