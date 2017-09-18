@@ -123,7 +123,8 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         model_id = (
             stat_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
 
-        model = stat_models.ExplorationStatsModel.get(model_id)
+        model = stat_models.ExplorationStatsModel.get_model(
+            'exp_id1', 1)
 
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')

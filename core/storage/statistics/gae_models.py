@@ -655,6 +655,22 @@ class ExplorationStatsModel(base_models.BaseModel):
         return '%s.%s' % (exp_id, exp_version)
 
     @classmethod
+    def get_model(cls, exp_id, exp_version):
+        """Retrieves ExplorationStatsModel given exploration ID and version.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            ExplorationStatsModel. Exploration analytics model instance in
+                datastore.
+        """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
+        exploration_stats_model = cls.get(instance_id)
+        return exploration_stats_model
+
+    @classmethod
     def create(
             cls, exp_id, exp_version, num_actual_starts, num_completions,
             state_stats_mapping):

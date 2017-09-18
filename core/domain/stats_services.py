@@ -100,9 +100,8 @@ def get_exploration_stats_by_id(exp_id, exp_version):
     Raises:
         Exception: Entity for class ExplorationStatsModel with id not found.
     """
-    model_id = exp_id + '.' + str(exp_version)
-    exploration_stats_model = stats_models.ExplorationStatsModel.get(
-        model_id)
+    exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
+        exp_id, exp_version)
     exploration_stats = get_exploration_stats_from_model(
         exploration_stats_model)
     return exploration_stats
@@ -119,10 +118,11 @@ def get_exploration_stats_from_model(exploration_stats_model):
     Returns:
         ExplorationStats. The domain object for exploration statistics.
     """
-    new_state_stats_mapping = {}
-    for state_name in exploration_stats_model.state_stats_mapping:
-        new_state_stats_mapping[state_name] = stats_domain.StateStats.from_dict(
+    new_state_stats_mapping = {
+        state_name: stats_domain.StateStats.from_dict(
             exploration_stats_model.state_stats_mapping[state_name])
+        for state_name in exploration_stats_model.state_stats_mapping
+    }
     return stats_domain.ExplorationStats(
         exploration_stats_model.exp_id,
         exploration_stats_model.exp_version,
@@ -142,10 +142,10 @@ def create_stats_model(exploration_stats):
     Returns:
         str. ID of the datastore instance for ExplorationStatsModel.
     """
-    new_state_stats_mapping = {}
-    for state_name in exploration_stats.state_stats_mapping:
-        new_state_stats_mapping[state_name] = (
-            exploration_stats.state_stats_mapping[state_name].to_dict())
+    new_state_stats_mapping = {
+        state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
+        for state_name in exploration_stats.state_stats_mapping
+    }
     instance_id = stats_models.ExplorationStatsModel.create(
         exploration_stats.exp_id,
         exploration_stats.exp_version,
