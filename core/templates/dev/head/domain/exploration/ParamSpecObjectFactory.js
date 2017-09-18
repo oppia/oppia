@@ -20,7 +20,7 @@
 oppia.factory('ParamSpecObjectFactory', [function() {
   /**
    * @constructor
-   * @param {String} objType - The type of the parameter.
+   * @param {!String} objType - The type of the parameter.
    */
   var ParamSpec = function(objType) {
     /** @var {String} */
@@ -35,7 +35,8 @@ oppia.factory('ParamSpecObjectFactory', [function() {
   };
 
   /**
-   * @param {{obj_type: String}} paramSpecBackendDict - Basic dict from backend.
+   * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
+   *    backend.
    * @returns {ParamSpec} - A new ParamSpec instance.
    */
   ParamSpec.createFromBackendDict = function(paramSpecBackendDict) {
