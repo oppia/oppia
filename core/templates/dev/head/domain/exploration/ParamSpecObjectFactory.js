@@ -18,21 +18,32 @@
  */
 
 oppia.factory('ParamSpecObjectFactory', [function() {
+  /**
+   * @constructor
+   * @param {String} objType - The type of the parameter.
+   */
   var ParamSpec = function(objType) {
+    /** @var {String} */
     this.objType = objType;
   };
 
+  /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
   ParamSpec.prototype.toBackendDict = function() {
     return {
       obj_type: this.objType,
     };
   };
 
+  /**
+   * @param {{obj_type: String}} paramSpecBackendDict - Basic dict from backend.
+   * @returns {ParamSpec} - A new ParamSpec instance.
+   */
   ParamSpec.createFromBackendDict = function(paramSpecBackendDict) {
     return new ParamSpec(paramSpecBackendDict.obj_type);
   };
 
-  ParamSpec.createDefault = function(paramName) {
+  /** @returns {ParamSpec} - A default instance for ParamSpec. */
+  ParamSpec.createDefault = function() {
     return new ParamSpec('UnicodeString');
   };
 
