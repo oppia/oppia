@@ -413,8 +413,8 @@
           <em>No parameters used.</em>
         </div>
         <ol>
-          <li ng-repeat="(paramName, paramSpecValue) in explorationParamSpecsService.savedMemento.getParamDict()">
-            <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
+          <li ng-repeat="(paramName, paramSpec) in explorationParamSpecsService.savedMemento.getParamDict()">
+            <b><[paramName]></b> (<[paramSpec.objType]>)
           </li>
         </ol>
       </div>
