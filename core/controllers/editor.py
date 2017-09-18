@@ -39,7 +39,7 @@ from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import search_services
-from core.domain import stats_services
+from core.domain import stats_services_old
 from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import visualization_registry
@@ -701,7 +701,7 @@ class ExplorationStatisticsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        self.render_json(stats_services.get_exploration_stats(
+        self.render_json(stats_services_old.get_exploration_stats(
             exploration_id, exploration_version))
 
 
@@ -719,7 +719,7 @@ class ExplorationStatsVersionsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'versions': stats_services.get_versions_for_exploration_stats(
+            'versions': stats_services_old.get_versions_for_exploration_stats(
                 exploration_id)})
 
 
@@ -743,7 +743,7 @@ class StateRulesStatsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'visualizations_info': stats_services.get_visualizations_info(
+            'visualizations_info': stats_services_old.get_visualizations_info(
                 exploration_id, state_name),
         })
 

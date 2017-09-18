@@ -22,6 +22,7 @@ from core.domain import exp_services
 from core.domain import stats_jobs_continuous
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import stats_services_old
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -270,7 +271,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
         exp_version = exp.version
 
         for state_name in [first_state_name, second_state_name]:
-            state_answers = stats_services.get_state_answers(
+            state_answers = stats_services_old.get_state_answers(
                 'eid', exp_version, state_name)
             self.assertEqual(state_answers, None)
 
@@ -356,19 +357,19 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'session_id': 'sid5', 'interaction_id': 'Continue', 'params': {}
         }]
 
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             'eid', exp_version, first_state_name)
         self.assertEqual(
             state_answers.get_submitted_answer_dict_list(),
             expected_submitted_answer_list1)
 
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             'eid', exp_version, second_state_name)
         self.assertEqual(
             state_answers.get_submitted_answer_dict_list(),
             expected_submitted_answer_list2)
 
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             'eid', exp_version, third_state_name)
         self.assertEqual(
             state_answers.get_submitted_answer_dict_list(),
@@ -389,7 +390,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, end_state_name='End')
 
     def test_record_answer_without_retrieving_it_first(self):
-        stats_services.record_answer(
+        stats_services_old.record_answer(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
@@ -397,7 +398,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
                 'a_session_id_val', 1.0))
 
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
@@ -412,12 +413,12 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         }])
 
     def test_record_and_retrieve_single_answer(self):
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertIsNone(state_answers)
 
-        stats_services.record_answer(
+        stats_services_old.record_answer(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
@@ -425,7 +426,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 1, exp_domain.EXPLICIT_CLASSIFICATION, {},
                 'a_session_id_val', 10.0))
 
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
@@ -445,7 +446,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         }])
 
     def test_record_and_retrieve_single_answer_with_preexisting_entry(self):
-        stats_services.record_answer(
+        stats_services_old.record_answer(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
@@ -453,7 +454,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
                 'a_session_id_val', 1.0))
 
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
@@ -467,7 +468,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'params': {}
         }])
 
-        stats_services.record_answer(
+        stats_services_old.record_answer(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
@@ -475,7 +476,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 1, exp_domain.EXPLICIT_CLASSIFICATION, {},
                 'a_session_id_val', 10.0))
 
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
@@ -504,7 +505,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         }])
 
     def test_record_many_answers(self):
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertIsNone(state_answers)
@@ -520,13 +521,13 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 'answer bbbbb', 'TextInput', 1, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
         ]
-        stats_services.record_answers(
+        stats_services_old.record_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             submitted_answer_list)
 
         # The order of the answers returned depends on the size of the answers.
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
@@ -569,7 +570,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         with self.swap(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
             100000):
-            state_answers = stats_services.get_state_answers(
+            state_answers = stats_services_old.get_state_answers(
                 self.EXP_ID, self.exploration.version,
                 self.exploration.init_state_name)
             self.assertIsNone(state_answers)
@@ -588,7 +589,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                     exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v',
                     7.5),
             ]
-            stats_services.record_answers(
+            stats_services_old.record_answers(
                 self.EXP_ID, self.exploration.version,
                 self.exploration.init_state_name, 'TextInput',
                 submitted_answer_list * 200)
@@ -602,7 +603,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
 
             # The order of the answers returned depends on the size of the
             # answers.
-            state_answers = stats_services.get_state_answers(
+            state_answers = stats_services_old.get_state_answers(
                 self.EXP_ID, self.exploration.version,
                 self.exploration.init_state_name)
             self.assertEqual(state_answers.exploration_id, 'exp_id0')
@@ -614,7 +615,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 len(state_answers.get_submitted_answer_dict_list()), 600)
 
     def test_record_many_answers_with_preexisting_entry(self):
-        stats_services.record_answer(
+        stats_services_old.record_answer(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
@@ -622,7 +623,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
                 'a_session_id_val', 1.0))
 
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
@@ -647,13 +648,13 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 'answer bbbbbbb', 'TextInput', 1, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
         ]
-        stats_services.record_answers(
+        stats_services_old.record_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             submitted_answer_list)
 
         # The order of the answers returned depends on the size of the answers.
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
@@ -726,12 +727,12 @@ class SampleAnswerTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
         ]
         # Record 600 answers.
-        stats_services.record_answers(
+        stats_services_old.record_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             submitted_answer_list * 200)
 
-        sample_answers = stats_services.get_sample_answers(
+        sample_answers = stats_services_old.get_sample_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(len(sample_answers), 100)
@@ -743,12 +744,12 @@ class SampleAnswerTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0)
         ]
         # Record 100 answers.
-        stats_services.record_answers(
+        stats_services_old.record_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             submitted_answer_list * 100)
 
-        sample_answers = stats_services.get_sample_answers(
+        sample_answers = stats_services_old.get_sample_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(sample_answers, ['answer a'] * 100)
@@ -763,12 +764,12 @@ class SampleAnswerTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
         ]
         # Record 2 answers.
-        stats_services.record_answers(
+        stats_services_old.record_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             submitted_answer_list)
 
-        sample_answers = stats_services.get_sample_answers(
+        sample_answers = stats_services_old.get_sample_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(sample_answers, ['answer a', 'answer bbbbb'])
@@ -779,7 +780,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         with self.swap(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
             15000):
-            state_answers = stats_services.get_state_answers(
+            state_answers = stats_services_old.get_state_answers(
                 self.EXP_ID, self.exploration.version,
                 self.exploration.init_state_name)
             self.assertIsNone(state_answers)
@@ -790,7 +791,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
                     exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v',
                     3.0),
             ]
-            stats_services.record_answers(
+            stats_services_old.record_answers(
                 self.EXP_ID, self.exploration.version,
                 self.exploration.init_state_name, 'TextInput',
                 submitted_answer_list * 100)
@@ -806,7 +807,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
 
         # Verify that the list of sample answers returned contains fewer than
         # 100 answers, although a total of 100 answers were submitted.
-        sample_answers = stats_services.get_sample_answers(
+        sample_answers = stats_services_old.get_sample_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertLess(len(sample_answers), 100)

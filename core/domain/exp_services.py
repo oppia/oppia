@@ -40,6 +40,7 @@ from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
