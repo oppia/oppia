@@ -82,4 +82,5 @@ oppia.factory('ParamSpecsObjectFactory', [
     };
 
     return ParamSpecs;
-}]);
+  }
+]);
