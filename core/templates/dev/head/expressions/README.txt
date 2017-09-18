@@ -24,9 +24,9 @@ ExpressionParserService.js
 ExpressionEvaluatorService.js
   Implementation of the expression evaluator. Includes the evaluation engine
   as well as the system operators.
-parserSpec.js
+ExpressionParserServiceSpec.js
   Tests for the parser.
-evaluatorSpec.js
+ExpressionEvaluatorServiceSpec.js
   Tests for the evaluator.
 
 How to update the parser:
@@ -40,8 +40,8 @@ How to update the parser:
 
       bash scripts/run_frontend_tests.sh
 
-   to ensure that the new grammar passes the tests in parserSpec.js and
-   evaluatorSpec.js.
+   to ensure that the new grammar passes the tests in ExpressionParserServiceSpec.js and
+   ExpressionEvaluatorServiceSpec.js.
 4. Repeat 1-3 until the desired grammar is written and tested.
 5. Check the changes. You need to check in parser.pegjs as well as ExpressionParserService.js
-  (and probably parserSpec.js and evaluatorSpec.js).
+  (and probably ExpressionParserServiceSpec.js and ExpressionEvaluatorServiceSpec.js).
