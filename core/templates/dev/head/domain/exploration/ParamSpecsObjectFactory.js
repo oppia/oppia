@@ -21,21 +21,17 @@
 oppia.factory('ParamSpecsObjectFactory', [
   'ParamSpecObjectFactory',
   function(ParamSpecObjectFactory) {
-    var ParamSpecs = function(paramSpecs) {
-      this.paramSpecsObjectDict = paramSpecs;
+    var ParamSpecs = function(paramSpecsDict) {
+      this.paramSpecsDict = paramSpecsDict;
     };
 
     ParamSpecs.prototype.getParamNames = function() {
-      return Object.keys(this.paramSpecsObjectDict);
-    };
-
-    ParamSpecs.prototype.getParamDict = function() {
-      return this.paramSpecsObjectDict;
+      return Object.keys(this.paramSpecsDict);
     };
 
     ParamSpecs.prototype.addParamIfNew = function(paramName, paramSpec) {
-      if (!this.paramSpecsObjectDict.hasOwnProperty(paramName)) {
-        this.paramSpecsObjectDict[paramName] =
+      if (!this.paramSpecsDict.hasOwnProperty(paramName)) {
+        this.paramSpecsDict[paramName] =
           paramSpec || ParamSpecObjectFactory.createDefault();
         return true;
       }
@@ -47,18 +43,19 @@ oppia.factory('ParamSpecsObjectFactory', [
       that = this;
       this.getParamNames().forEach(function(paramName) {
         paramSpecsBackendDict[paramName] =
-          that.paramSpecsObjectDict[paramName].toBackendDict();
+          that.paramSpecsDict[paramName].toBackendDict();
       });
       return paramSpecsBackendDict;
     };
 
     ParamSpecs.createFromBackendDict = function(paramSpecsBackendDict) {
-      var paramSpecs = {};
+      var paramSpecsDict = {};
       Object.keys(paramSpecsBackendDict).forEach(function(paramName) {
-        paramSpecs[paramName] = ParamSpecObjectFactory.createFromBackendDict(
-          paramSpecsBackendDict[paramName]);
+        paramSpecsDict[paramName] =
+          ParamSpecObjectFactory.createFromBackendDict(
+            paramSpecsBackendDict[paramName]);
       });
-      return new ParamSpecs(paramSpecs);
+      return new ParamSpecs(paramSpecsDict);
     };
 
     return ParamSpecs;
