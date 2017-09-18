@@ -35,8 +35,12 @@ oppia.factory('ParamTypeObjectFactory', [function() {
       throw "Error!";
     }
 
+    /** @member {?} */
     this.defaultValue = defaultValue;
+    /** @member {Function.<?, Boolean>} */
     this.validateFunction = validateFunction;
+    /** @member {String} */
+    this.name = null;
   };
 
 
@@ -89,8 +93,9 @@ oppia.factory('ParamTypeObjectFactory', [function() {
   // To finalize type registration, we encode the name of each type into their
   // definition, then freeze them from modifications.
   Object.keys(ParamType.registry).forEach(function(paramTypeName) {
-    ParamType.registry[paramTypeName].name = paramTypeName;
-    Object.freeze(ParamType.registry[paramTypeName]);
+    var paramType = ParamType.registry[paramTypeName];
+    paramType.name = paramTypeName;
+    Object.freeze(paramType);
   }
   // Finally, we freeze the registry itself.
   Object.freeze(ParamType.registry);
