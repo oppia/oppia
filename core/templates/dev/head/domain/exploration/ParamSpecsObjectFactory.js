@@ -29,6 +29,10 @@ oppia.factory('ParamSpecsObjectFactory', [
       return Object.keys(this.paramSpecsObjectDict);
     };
 
+    ParamSpecs.prototype.getParamDict = function() {
+      return this.paramSpecsObjectDict;
+    };
+
     ParamSpecs.prototype.addParamIfNew = function(paramName, paramSpec) {
       if (!this.paramSpecsObjectDict.hasOwnProperty(paramName)) {
         this.paramSpecsObjectDict[paramName] =
