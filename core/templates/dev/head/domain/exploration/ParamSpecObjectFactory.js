@@ -28,8 +28,8 @@ oppia.factory('ParamSpecObjectFactory', [function() {
     };
   };
 
-  ParamSpec.createFromBackendDict = function(paramChangeBackendDict) {
-    return new ParamSpec(paramChangeBackendDict.obj_type);
+  ParamSpec.createFromBackendDict = function(paramSpecBackendDict) {
+    return new ParamSpec(paramSpecBackendDict.obj_type);
   };
 
   ParamSpec.createDefault = function(paramName) {
