@@ -1,0 +1,65 @@
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the Param Specs object factory.
+ */
+
+describe('ParamSpecs object factory', function() {
+  beforeEach(module('oppia'));
+
+  describe('ParamSpecsObjectFactory', function() {
+    var ParamSpecsObjectFactory = null;
+    var ParamSpecObjectFactory = null;
+    var paramName = 'x';
+    var emptyParamSpecs = null;
+
+    beforeEach(inject(function($injector) {
+      ParamSpecsObjectFactory = $injector.get('ParamSpecsObjectFactory');
+      ParamSpecObjectFactory = $injector.get('ParamSpecObjectFactory');
+      emptyParamSpecs = ParamSpecsObjectFactory.createFromBackendDict({});
+    }));
+
+    it('should be undefined for missing param names',
+      inject(function($injector) {
+        expect(emptyParamSpecs.paramSpecsObjectDict[paramName])
+          .not.toBeDefined();
+      }));
+
+    it('should add param when missing', inject(function($injector) {
+      var paramSpec = ParamSpecObjectFactory.createDefault();
+
+      expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBeTruthy();
+      // No longer empty.
+      expect(emptyParamSpecs.paramSpecsObjectDict[paramName]).toBe(paramSpec);
+    }));
+
+    it('should not overwrite existing params', inject(function($injector) {
+      var oldParamSpec = ParamSpecObjectFactory.createDefault();
+      var newParamSpec = ParamSpecObjectFactory.createDefault();
+      expect(oldParamSpec).not.toBe(newParamSpec);
+
+      expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec))
+        .toBeTruthy();
+      // No longer empty.
+      expect(emptyParamSpecs.paramSpecsObjectDict[paramName])
+        .toBe(oldParamSpec);
+
+      expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec))
+        .toBeFalsy();
+      expect(emptyParamSpecs.paramSpecsObjectDict[paramName])
+        .toBe(oldParamSpec);
+    }));
+  });
+});
