@@ -19,7 +19,7 @@ from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
-from core.domain import stats_services_old
+from core.domain import stats_services
 from core.tests import test_utils
 
 import feconf
@@ -236,7 +236,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, end_state_name='End')
 
-        stats_services_old.record_answer(
+        stats_services.record_answer(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
@@ -244,7 +244,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
                 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
                 'a_session_id_val', 1.0))
 
-        stats_services_old.record_answer(
+        stats_services.record_answer(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
