@@ -31,6 +31,13 @@ oppia.factory('ParamSpecsObjectFactory', [
       this.paramDict = paramDict;
     };
 
+    /**
+     * @returns {Object.<String, ParamSpec>} the map of params to their specs.
+     */
+    ParamSpecs.prototype.getParamDict = function() {
+      return this.paramDict;
+    };
+
     /** @returns {Array.<String>} - The names of the current parameter specs. */
     ParamSpecs.prototype.getParamNames = function() {
       return Object.keys(this.paramDict);

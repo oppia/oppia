@@ -409,11 +409,11 @@
 
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div ng-show="isEmpty(explorationParamSpecsService.savedMemento.paramDict)">
+        <div ng-show="isEmpty(explorationParamSpecsService.savedMemento.getParamDict())">
           <em>No parameters used.</em>
         </div>
         <ol>
-          <li ng-repeat="(paramName, paramSpecValue) in explorationParamSpecsService.savedMemento.paramDict">
+          <li ng-repeat="(paramName, paramSpecValue) in explorationParamSpecsService.savedMemento.getParamDict()">
             <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
           </li>
         </ol>

@@ -33,7 +33,7 @@ describe('ParamSpecs object factory', function() {
 
     it('should be undefined for missing param names',
       inject(function($injector) {
-        expect(emptyParamSpecs.paramDict[paramName]).not.toBeDefined();
+        expect(emptyParamSpecs.getParamDict()[paramName]).not.toBeDefined();
       }));
 
     it('should add param when missing', inject(function($injector) {
@@ -41,7 +41,7 @@ describe('ParamSpecs object factory', function() {
 
       expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBeTruthy();
       // No longer empty.
-      expect(emptyParamSpecs.paramDict[paramName]).toBe(paramSpec);
+      expect(emptyParamSpecs.getParamDict()[paramName]).toBe(paramSpec);
     }));
 
     it('should not overwrite existing params', inject(function($injector) {
@@ -52,11 +52,11 @@ describe('ParamSpecs object factory', function() {
       expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec))
         .toBeTruthy();
       // No longer empty.
-      expect(emptyParamSpecs.paramDict[paramName]).toBe(oldParamSpec);
+      expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
 
       expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec))
         .toBeFalsy();
-      expect(emptyParamSpecs.paramDict[paramName]).not.toBe(newParamSpec);
+      expect(emptyParamSpecs.getParamDict()[paramName]).not.toBe(newParamSpec);
     }));
   });
 });
