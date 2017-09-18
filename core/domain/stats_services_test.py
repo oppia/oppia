@@ -29,7 +29,6 @@ import feconf
 import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class StatisticsServicesTest(test_utils.GenericTestBase):
@@ -123,10 +122,6 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
                 assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
-
-        # Create default statistics analytics model. This processes the async
-        # method that creates statistics model on creation.
-        self.process_and_flush_pending_tasks()
 
         # Test addition of states.
         exploration.add_states(['New state', 'New state 2'])

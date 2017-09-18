@@ -34,10 +34,10 @@ def handle_new_exp_stats_creation(exploration):
     Args:
         exploration: Exploration. The exploration domain object.
     """
-    state_stats_mapping = {}
-    for state_name in exploration.states:
-        state_stats_mapping[state_name] = (
-            stats_domain.StateStats.create_default())
+    state_stats_mapping = {
+        state_name: stats_domain.StateStats.create_default()
+        for state_name in exploration.states
+    }
 
     exploration_stats = stats_domain.ExplorationStats(
         exploration.id, exploration.version, 0, 0, state_stats_mapping)
