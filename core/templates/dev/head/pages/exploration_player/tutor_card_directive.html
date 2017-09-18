@@ -13,7 +13,8 @@
         </div>
         <div ng-if="isContentAudioTranslationAvailable()"
              class="conversation-skin-audio-controls">
-          <audio-controls audio-translations="contentAudioTranslations">
+          <audio-controls audio-translations="contentAudioTranslations"
+                          content-html="activeCard.contentHtml">
           </audio-controls>
         </div>
       </div>
