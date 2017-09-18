@@ -27,7 +27,7 @@ describe('ParamType objects', function() {
 
   it('should use UnicodeString as default type', inject(function($injector) {
     expect(ParamTypeObjectFactory.getDefaultType())
-        .toBe(ParamTypeObjectFactory.registry.UnicodeString);
+      .toBe(ParamTypeObjectFactory.registry.UnicodeString);
   }));
 
   describe('UnicodeString', function() {
