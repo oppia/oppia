@@ -96,7 +96,7 @@ oppia.factory('ParamTypeObjectFactory', [function() {
     var paramType = ParamType.registry[paramTypeName];
     paramType.name = paramTypeName;
     Object.freeze(paramType);
-  }
+  });
   // Finally, we freeze the registry itself.
   Object.freeze(ParamType.registry);
 
