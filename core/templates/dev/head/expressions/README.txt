@@ -12,21 +12,21 @@ Example boolean expressions:
 
 See comments in parser.pegjs for the description of input expression grammar.
 Also see parser.pegjs for the parser output (i.e. parse tree) data format.
-See evaluator.js for the operator contracts.
+See ExpressionEvaluatorService.js for the operator contracts.
 
 Files:
 parser.pegjs
-  This is the parser definition which is used to generate the parser.js file
+  This is the parser definition which is used to generate the ExpressionParserService.js file
   that will be used at runtime to parse user-entered expressions.
-parser.js
+ExpressionParserService.js
   This is the JavaScript parser file produced by PEGJS and the input file
   parser.pegjs.
-evaluator.js
+ExpressionEvaluatorService.js
   Implementation of the expression evaluator. Includes the evaluation engine
   as well as the system operators.
-parserSpec.js
+ExpressionParserServiceSpec.js
   Tests for the parser.
-evaluatorSpec.js
+ExpressionEvaluatorServiceSpec.js
   Tests for the evaluator.
 
 How to update the parser:
@@ -36,12 +36,12 @@ How to update the parser:
 
       bash scripts/create_expression_parser.sh
 
-   which updates parser.js. Then run the frontend unit tests using
+   which updates ExpressionParserService.js. Then run the frontend unit tests using
 
       bash scripts/run_frontend_tests.sh
 
-   to ensure that the new grammar passes the tests in parserSpec.js and
-   evaluatorSpec.js.
+   to ensure that the new grammar passes the tests in ExpressionParserServiceSpec.js and
+   ExpressionEvaluatorServiceSpec.js.
 4. Repeat 1-3 until the desired grammar is written and tested.
-5. Check the changes. You need to check in parser.pegjs as well as parser.js
-  (and probably parserSpec.js and evaluatorSpec.js).
+5. Check the changes. You need to check in parser.pegjs as well as ExpressionParserService.js
+  (and probably ExpressionParserServiceSpec.js and ExpressionEvaluatorServiceSpec.js).

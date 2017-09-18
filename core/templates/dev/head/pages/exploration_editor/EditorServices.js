@@ -1461,12 +1461,12 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
-  'expressionInterpolationService', 'explorationParamChangesService',
+  'ExpressionInterpolationService', 'explorationParamChangesService',
   'parameterMetadataService', 'INTERACTION_SPECS',
   'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
-      expressionInterpolationService, explorationParamChangesService,
+      ExpressionInterpolationService, explorationParamChangesService,
       parameterMetadataService, INTERACTION_SPECS,
       WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];

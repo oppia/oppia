@@ -11,9 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-oppia.factory('expressionSyntaxTreeService', [
-  '$log', 'expressionParserService', 'PARAMETER_TYPES',
-  function($log, expressionParserService, PARAMETER_TYPES) {
+oppia.factory('ExpressionSyntaxTreeService', [
+  '$log', 'ExpressionParserService', 'PARAMETER_TYPES',
+  function($log, ExpressionParserService, PARAMETER_TYPES) {
     // Exceptions that can be thrown from the evaluation of expressions.
     var ExpressionError = function() {
     };
@@ -85,7 +85,7 @@ oppia.factory('expressionSyntaxTreeService', [
         return uniqueParams.sort();
       };
 
-      var parsed = expressionParserService.parse(expression);
+      var parsed = ExpressionParserService.parse(expression);
       return _findParams(parsed);
     };
 
