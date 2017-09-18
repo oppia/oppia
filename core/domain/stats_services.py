@@ -150,3 +150,23 @@ def create_stats_model(exploration_stats):
         new_state_stats_mapping
     )
     return instance_id
+
+# TODO(pranav): Implement this method and update all references to
+# stats_services_old.get_state_answers to point to this method.
+def get_state_answers():
+    pass
+
+# TODO(pranav): Implement this method and update all references to
+# stats_services_old.record_answer to point to this method.
+def record_answer():
+    pass
+
+# TODO(pranav): Implement this method and update all references to
+# stats_services_old.record_answers to point to this method.
+def record_answers():
+    pass
+
+# TODO(pranav): Implement this method and update all references to
+# stats_services_old.get_visualizations_info to point to this method.
+def get_visualizations_info():
+    pass
