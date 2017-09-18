@@ -50,10 +50,11 @@ def handle_stats_creation(exploration, change_list):
     new_to_old_state_names = exploration.get_state_names_mapping(change_list)
 
     # Handling state renames.
-    for state_name in exploration_stats.state_stats_mapping:
-        exploration_stats.state_stats_mapping[state_name] = (
-            exploration_stats.state_stats_mapping.pop(new_to_old_state_names[
-                state_name]))
+    for state_name in exploration.states:
+        if state_name not in new_to_old_state_names.values():
+            exploration_stats.state_stats_mapping[state_name] = (
+                exploration_stats.state_stats_mapping.pop(
+                    new_to_old_state_names[state_name]))
 
     # Handling state additions and deletions.
     for change_dict in change_list:
@@ -105,7 +106,7 @@ def get_exploration_stats_from_model(exploration_stats_model):
     new_state_stats_mapping = {}
     for state_name in exploration_stats_model.state_stats_mapping:
         new_state_stats_mapping[state_name] = stats_domain.StateStats.from_dict(
-            state_stats_mapping[state_name])
+            exploration_stats_model.state_stats_mapping[state_name])
     return stats_domain.ExplorationStats(
         exploration_stats_model.exp_id,
         exploration_stats_model.exp_version,

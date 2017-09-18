@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -24,6 +26,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -38,6 +41,83 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.exp_version = 1
         self.stats_model_id = (
             stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
+
+    def test_handle_stats_creation(self):
+        # Create exploration object in datastore.
+        exp_id = 'exp_id'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+                assets_list)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Create default statistics analytics model.
+        initial_state_stats_mapping = {
+            'Home': stats_domain.StateStats.create_default().to_dict(),
+            'End': stats_domain.StateStats.create_default().to_dict()
+        }
+        stats_model_id = (
+            stats_models.ExplorationStatsModel.create(
+                exp_id, exploration.version, 0, 0, initial_state_stats_mapping))
+
+        # Test addition of states.
+        exploration.add_states(['New state', 'New state 2'])
+        exploration.version += 1
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'add_state',
+            'state_name': 'New state 2'
+        }]
+        stats_services.handle_stats_creation(exploration, change_list)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping.keys(), [
+                'Home', 'End', 'New state 2', 'New state'])
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['New state'].to_dict(),
+            stats_domain.StateStats.create_default().to_dict())
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['New state 2'].to_dict(),
+            stats_domain.StateStats.create_default().to_dict())
+
+        # Test renaming of states.
+        exploration.rename_state('New state 2', 'Renamed state')
+        exploration.version += 1
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 2',
+            'new_state_name': 'Renamed state'
+        }]
+        stats_services.handle_stats_creation(exploration, change_list)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping.keys(), [
+                'Home', 'Renamed state', 'End', 'New state'])
+
+        # Test deletion of states.
+        exploration.delete_state('New state')
+        exploration.version += 1
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        }]
+        stats_services.handle_stats_creation(exploration, change_list)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping.keys(), [
+                'Home', 'End', 'Renamed state'])
 
     def test_get_exploration_stats_from_model(self):
         model = stats_models.ExplorationStatsModel.get(self.stats_model_id)
