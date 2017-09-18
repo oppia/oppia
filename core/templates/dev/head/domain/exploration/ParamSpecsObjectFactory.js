@@ -53,7 +53,7 @@ oppia.factory('ParamSpecsObjectFactory', [
     };
 
     /**
-     * @returns {Object.<String, {{obj_type: String}}>} - Basic dict for backend
+     * @returns {Object.<String, {obj_type: String}>} - Basic dict for backend
      *    consumption.
      */
     ParamSpecs.prototype.toBackendDict = function() {
@@ -67,7 +67,7 @@ oppia.factory('ParamSpecsObjectFactory', [
     };
 
     /**
-     * @param Object.<String, {{obj_type: String}}> paramSpecsBackendDict -
+     * @param {!Object.<String, {obj_type: String}>} paramSpecsBackendDict -
      *    Basic dict of backend representation.
      * @returns {ParamSpecs} - An instance with properties from the backend
      *    dict.
