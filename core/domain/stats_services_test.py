@@ -30,6 +30,7 @@ import feconf
 import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class StatisticsServicesTest(test_utils.GenericTestBase):
@@ -42,6 +43,94 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.exp_version = 1
         self.stats_model_id = (
             stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
+
+    def test_async_call_to_stats_methods(self):
+        # Create exploration object in datastore.
+        exp_id = 'exp_id'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+                assets_list)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Now, there is one async call to handle_new_exp_stats_creation in the
+        # queue.
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationStatsModel with id %s not found' % (
+                exploration.id + '.' + str(exploration.version))):
+            stats_services.get_exploration_stats_by_id(
+                exploration.id, exploration.version)
+
+        # Process the task to create stats model.
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            0)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping.keys(), ['Home', 'End'])
+
+        # Update exploration by adding a state.
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state'
+        }]
+        exploration.add_states(['New state'])
+        exploration.version += 1
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
+
+        # Now, there should be one async call to handle_stats_creation in the
+        # queue.
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationStatsModel with id %s not found' % (
+                exploration.id + '.' + str(exploration.version))):
+            stats_services.get_exploration_stats_by_id(
+                exploration.id, exploration.version)
+
+        # Process the task to create stats model.
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            0)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping.keys(), [
+                'Home', 'End', 'New state'])
+
+    def test_handle_new_exp_stats_creation(self):
+        # Create exploration object in datastore.
+        exp_id = 'exp_id'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+                assets_list)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        stats_services.handle_new_exp_stats_creation(exploration)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping.keys(), ['Home', 'End'])
 
     def test_handle_stats_creation(self):
         # Create exploration object in datastore.
@@ -56,14 +145,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                 assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
-        # Create default statistics analytics model.
-        initial_state_stats_mapping = {
-            'Home': stats_domain.StateStats.create_default().to_dict(),
-            'End': stats_domain.StateStats.create_default().to_dict()
-        }
-        stats_model_id = (
-            stats_models.ExplorationStatsModel.create(
-                exp_id, exploration.version, 0, 0, initial_state_stats_mapping))
+        # Create default statistics analytics model. This processes the async
+        # method that creates statistics model on creation.
+        self.process_and_flush_pending_tasks()
 
         # Test addition of states.
         exploration.add_states(['New state', 'New state 2'])

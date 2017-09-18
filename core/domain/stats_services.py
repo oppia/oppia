@@ -16,13 +16,28 @@
 
 """Services for exploration-related statistics."""
 
-import itertools
-
 from core.domain import exp_domain
 from core.domain import stats_domain
 from core.platform import models
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+
+
+def handle_new_exp_stats_creation(exploration):
+    """Creates ExplorationStatsModel for the freshly created exploration and
+    sets all initial values to zero.
+
+    Args:
+        exploration: Exploration. The exploration domain object.
+    """
+    state_stats_mapping = {}
+    for state_name in exploration.states:
+        state_stats_mapping[state_name] = (
+            stats_domain.StateStats.create_default())
+
+    exploration_stats = stats_domain.ExplorationStats(
+        exploration.id, exploration.version, 0, 0, state_stats_mapping)
+    create_stats_model(exploration_stats)
 
 
 def handle_stats_creation(exploration, change_list):

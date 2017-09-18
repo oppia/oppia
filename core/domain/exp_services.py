@@ -823,6 +823,11 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
+    # Trigger statistics model update.
+    taskqueue_services.defer(
+        stats_services.handle_stats_creation,
+        taskqueue_services.QUEUE_NAME_DEFAULT, exploration, change_list)
+
     if feconf.ENABLE_ML_CLASSIFIERS:
         new_to_old_state_names = exploration.get_state_names_mapping(
             change_list)
@@ -882,6 +887,12 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
+
+    # Trigger statistics model creation.
+    taskqueue_services.defer(
+        stats_services.handle_new_exp_stats_creation,
+        taskqueue_services.QUEUE_NAME_DEFAULT,
+        exploration)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
