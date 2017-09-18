@@ -21,14 +21,28 @@
 oppia.factory('ParamSpecsObjectFactory', [
   'ParamSpecObjectFactory',
   function(ParamSpecObjectFactory) {
+    /**
+     * @constructor
+     * @param {Object.<String, ParamSpec>} paramDict - params and their specs
+     *    for this object will hold.
+     */
     var ParamSpecs = function(paramDict) {
+      /** @var {Object.<String, ParamSpec>} */
       this.paramDict = paramDict;
     };
 
+    /** @returns {Array.<String>} - The names of the current parameter specs. */
     ParamSpecs.prototype.getParamNames = function() {
       return Object.keys(this.paramDict);
     };
 
+    /**
+     * Adds a new parameter only if it didn't exist already. Does nothing
+     * otherwise.
+     * @param {!String} paramName - The parameter to add a spec for.
+     * @param {ParamSpec=} paramSpec - The specification of the parameter.
+     * @returns {Boolean} - True when the parameter was newly added.
+     */
     ParamSpecs.prototype.addParamIfNew = function(paramName, paramSpec) {
       if (!this.paramDict.hasOwnProperty(paramName)) {
         this.paramDict[paramName] =
@@ -38,6 +52,10 @@ oppia.factory('ParamSpecsObjectFactory', [
       return false;
     };
 
+    /**
+     * @returns {Object.<String, {{obj_type: String}}>} - Basic dict for backend
+     *    consumption.
+     */
     ParamSpecs.prototype.toBackendDict = function() {
       var paramSpecsBackendDict = {};
       var that = this;
@@ -48,6 +66,12 @@ oppia.factory('ParamSpecsObjectFactory', [
       return paramSpecsBackendDict;
     };
 
+    /**
+     * @param Object.<String, {{obj_type: String}}> paramSpecsBackendDict -
+     *    Basic dict of backend representation.
+     * @returns {ParamSpecs} - An instance with properties from the backend
+     *    dict.
+     */
     ParamSpecs.createFromBackendDict = function(paramSpecsBackendDict) {
       var paramDict = {};
       Object.keys(paramSpecsBackendDict).forEach(function(paramName) {
@@ -58,5 +82,4 @@ oppia.factory('ParamSpecsObjectFactory', [
     };
 
     return ParamSpecs;
-  }
-]);
+}]);
