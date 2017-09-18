@@ -27,7 +27,7 @@ oppia.factory('ParamSpecsObjectFactory', [
      *    for this object will hold.
      */
     var ParamSpecs = function(paramDict) {
-      /** @var {Object.<String, ParamSpec>} */
+      /** @member {Object.<String, ParamSpec>} */
       this.paramDict = paramDict;
     };
 

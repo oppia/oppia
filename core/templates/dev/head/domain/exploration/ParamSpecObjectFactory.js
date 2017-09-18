@@ -24,7 +24,7 @@ oppia.factory('ParamSpecObjectFactory', [
      * @param {!ParamType} objType - The type of the parameter.
      */
     var ParamSpec = function(objType) {
-      /** @var {ParamType} */
+      /** @member {ParamType} */
       this.objType = objType;
     };
 
