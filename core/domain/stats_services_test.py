@@ -45,6 +45,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
 
     def test_async_call_to_stats_methods(self):
+        """Test that async calls are being made to the handle_stats_creation and
+        handle_new_exp_stats_creation methods.
+        """
         # Create exploration object in datastore.
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -113,6 +116,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                 'Home', 'End', 'New state'])
 
     def test_handle_new_exp_stats_creation(self):
+        """Test the handle_new_exp_stats_creation method."""
         # Create exploration object in datastore.
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -133,6 +137,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping.keys(), ['Home', 'End'])
 
     def test_handle_stats_creation(self):
+        """Test the handle_stats_creation method."""
         # Create exploration object in datastore.
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -205,6 +210,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                 'Home', 'End', 'Renamed state'])
 
     def test_get_exploration_stats_from_model(self):
+        """Test the get_exploration_stats_from_model method."""
         model = stats_models.ExplorationStatsModel.get(self.stats_model_id)
         exploration_stats = stats_services.get_exploration_stats_from_model(
             model)
@@ -214,7 +220,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_completions, 0)
         self.assertEqual(exploration_stats.state_stats_mapping, {})
 
-    def test_get_exploration_stats(self):
+    def test_get_exploration_stats_by_id(self):
+        """Test the get_exploration_stats_by_id method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
         self.assertEqual(exploration_stats.exp_id, 'exp_id1')
@@ -224,6 +231,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.state_stats_mapping, {})
 
     def test_create_stats_model(self):
+        """Test the create_stats_model method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
         exploration_stats.exp_version += 1
