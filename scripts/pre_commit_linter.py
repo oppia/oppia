@@ -111,10 +111,10 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
-BAD_PATTERNS_APP_FECONF = {
-    'FORCE_DEV_MODE = False': {
-        'message': 'Please set the FORCE_DEV_MODE variable in feconf.py '
-                   'to true before committing.',
+BAD_PATTERNS_FECONF = {
+    'FORCE_DEV_MODE = True': {
+        'message': 'Please set the FORCE_PROD_MODE variable in feconf.py '
+                   'to False before committing.',
         'excluded_files': ()}
 }
 
@@ -540,12 +540,12 @@ def _check_bad_patterns(all_files):
                                 regexp['message'])
                             total_error_count += 1
             if filename == 'feconf.py':
-                for pattern in BAD_PATTERNS_APP_FECONF:
+                for pattern in BAD_PATTERNS_FECONF:
                     if pattern in content:
                         failed = True
                         print '%s --> %s' % (
                             filename,
-                            BAD_PATTERNS_APP_FECONF[pattern]['message'])
+                            BAD_PATTERNS_FECONF[pattern]['message'])
                         total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED

@@ -65,20 +65,20 @@ fi
 # clear the datastore.
 CLEAR_DATASTORE_ARG="--clear_datastore=true"
 # Argument passed to gulpfile.js to help build with minification.
-FORCE_DEV_MODE=True
+FORCE_PROD_MODE=False
 for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
     CLEAR_DATASTORE_ARG=""
   fi
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
-    FORCE_DEV_MODE=False
+    FORCE_PROD_MODE=True
     $PYTHON_CMD scripts/build.py
   fi
 done
 
-feaconf_env_variable="FORCE_DEV_MODE = $DEV_MODE"
-sed -i.bak -e s/"FORCE_DEV_MODE = .*"/"$feaconf_env_variable"/ feconf.py
+feconf_env_variable="FORCE_PROD_MODE = $FORCE_PROD_MODE"
+sed -i.bak -e s/"FORCE_PROD_MODE = .*"/"$feconf_env_variable"/ feconf.py
 # Delete the modified yaml file(-i.bak)
 rm feconf.py.bak
 
@@ -112,7 +112,7 @@ echo Starting GAE development server
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
 
-if [[ "$DEV_MODE" == "false" ]]; then
+if [[ "$FORCE_PROD_MODE" == "True" ]]; then
   # This starts up a dev server which uses minified resources.
   $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=True --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG
 else
