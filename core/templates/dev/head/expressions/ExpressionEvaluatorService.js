@@ -59,12 +59,12 @@
 // constraints) as well as the output value and type should be documented.
 
 // Service for expression evaluation.
-oppia.factory('expressionEvaluatorService', [
-  '$log', 'expressionParserService', 'expressionSyntaxTreeService',
-  function($log, expressionParserService, expressionSyntaxTreeService) {
+oppia.factory('ExpressionEvaluatorService', [
+  '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',
+  function($log, ExpressionParserService, ExpressionSyntaxTreeService) {
     var evaluateExpression = function(expression, envs) {
-      return expressionSyntaxTreeService.applyFunctionToParseTree(
-        expressionParserService.parse(expression), envs, evaluate);
+      return ExpressionSyntaxTreeService.applyFunctionToParseTree(
+        ExpressionParserService.parse(expression), envs, evaluate);
     };
 
     /**
@@ -84,7 +84,7 @@ oppia.factory('expressionEvaluatorService', [
         }
 
         if (parsed[0] === '#') {
-          return expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
+          return ExpressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
         }
 
         // Evaluate rest of the elements, i.e. the arguments.
@@ -92,7 +92,7 @@ oppia.factory('expressionEvaluatorService', [
           return evaluate(item, envs);
         });
         // The first element should be a function name.
-        return expressionSyntaxTreeService.lookupEnvs(
+        return ExpressionSyntaxTreeService.lookupEnvs(
           parsed[0], envs).eval(args);
       }
 
@@ -102,7 +102,7 @@ oppia.factory('expressionEvaluatorService', [
 
     var validateExpression = function(expression, envs) {
       try {
-        return validate(expressionParserService.parse(expression),
+        return validate(ExpressionParserService.parse(expression),
           envs.concat(system));
       } catch (err) {
         return false;
@@ -128,7 +128,7 @@ oppia.factory('expressionEvaluatorService', [
       }
 
       // Make sure we can find the operator.
-      expressionSyntaxTreeService.lookupEnvs(parsed[0], envs);
+      ExpressionSyntaxTreeService.lookupEnvs(parsed[0], envs);
 
       // Evaluate rest of the elements, i.e. the arguments.
       var args = parsed.slice(1).map(function(item) {
@@ -138,7 +138,7 @@ oppia.factory('expressionEvaluatorService', [
       // If it is a name look up, make sure the name exists.
       // TODO: Validate args for other operators.
       if (parsed[0] === '#') {
-        expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
+        ExpressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
       }
       return true;
     };

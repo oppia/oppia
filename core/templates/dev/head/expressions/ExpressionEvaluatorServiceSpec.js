@@ -20,9 +20,9 @@ describe('Expression evaluator service', function() {
   var ests = null;
   var isString = null;
   beforeEach(inject(function($injector) {
-    ees = $injector.get('expressionEvaluatorService');
-    eps = $injector.get('expressionParserService');
-    ests = $injector.get('expressionSyntaxTreeService');
+    ees = $injector.get('ExpressionEvaluatorService');
+    eps = $injector.get('ExpressionParserService');
+    ests = $injector.get('ExpressionSyntaxTreeService');
     isString = $injector.get('utilsService').isString;
   }));
 
