@@ -32,7 +32,7 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    */
   var ParamType = function(defaultValue, validateFunction) {
     if (!validateFunction(defaultValue)) {
-      throw "Error!";
+      throw 'Error!';
     }
 
     /** @member {?} */
@@ -74,7 +74,7 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    */
   ParamType.getTypeFromBackendName = function(backendName) {
     if (!ParamType.registry.hasOwnProperty(backendName)) {
-      throw "Error!";
+      throw 'Error!';
     }
     return ParamType.registry[backendName];
   };
@@ -90,9 +90,9 @@ oppia.factory('ParamTypeObjectFactory', [function() {
   /** @type {Object.<String, ParamType>} */
   ParamType.registry = {};
 
-  ParamType.registry.UnicodeString = new ParamType("", function(value) {
+  ParamType.registry.UnicodeString = new ParamType('', function(value) {
     // Valid only for string values.
-    return (typeof value === "string" || value instanceof String);
+    return (typeof value === 'string' || value instanceof String);
   });
 
   // To finalize type registration, we encode the name of each type into their
