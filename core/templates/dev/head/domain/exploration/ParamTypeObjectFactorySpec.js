@@ -25,11 +25,20 @@ describe('ParamType objects', function() {
     ParamTypeObjectFactory = $injector.get('ParamTypeObjectFactory');
   }));
 
+  it('should use UnicodeString as default type', inject(function($injector) {
+    expect(ParamTypeObjectFactory.getDefaultType())
+        .toBe(ParamTypeObjectFactory.registry.UnicodeString);
+  }));
+
   describe('UnicodeString', function() {
     var UnicodeString = null;
 
     beforeEach(inject(function($injector) {
       UnicodeString = ParamTypeObjectFactory.registry.UnicodeString;
+    }));
+
+    it('should give an empty string by default', inject(function($injector) {
+      expect(UnicodeString.createDefaultValue()).toEqual('');
     }));
 
     it('should be named correctly', inject(function($injector) {
