@@ -135,7 +135,7 @@ oppia.factory('oppiaPlayerService', [
       var baseParams = {};
       exploration.paramSpecs.getParamNames().forEach(function(paramName) {
         var paramSpec = exploration.paramSpecs.getParamDict()[paramName];
-        baseParams[paramName] = paramSpec.getObjectType().createDefaultValue();
+        baseParams[paramName] = paramSpec.getType().createDefaultValue();
       });
 
       var startingParams = makeParams(
