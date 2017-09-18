@@ -17,44 +17,45 @@
  * domain objects.
  */
 
-oppia.factory('ParamSpecObjectFactory', [function() {
-  /**
-   * @constructor
-   * @param {!String} objType - The type of the parameter.
-   */
-  var ParamSpec = function(objType) {
-    // TODO(brianrodri): objType could benefit from being its own class. This
-    // will make it easy to eventually extend the types of objects we support
-    // from just "UnicodeString" to others.
-    /** @var {String} */
-    this.objType = objType;
-  };
-
-  /** @returns {String} - The type name of the parameter. */
-  ParamSpec.prototype.getObjectType = function() {
-    return this.objType;
-  };
-
-  /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
-  ParamSpec.prototype.toBackendDict = function() {
-    return {
-      obj_type: this.objType,
+oppia.factory('ParamSpecObjectFactory', [
+  'ParamTypeObjectFactory', function(ParamTypeObjectFactory) {
+    /**
+     * @constructor
+     * @param {!ParamType} objType - The type of the parameter.
+     */
+    var ParamSpec = function(objType) {
+      /** @var {ParamType} */
+      this.objType = objType;
     };
-  };
 
-  /**
-   * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
-   *    backend.
-   * @returns {ParamSpec} - A new ParamSpec instance.
-   */
-  ParamSpec.createFromBackendDict = function(paramSpecBackendDict) {
-    return new ParamSpec(paramSpecBackendDict.obj_type);
-  };
+    /** @returns {ParamType} - The type name of the parameter. */
+    ParamSpec.prototype.getObjectType = function() {
+      return this.objType;
+    };
 
-  /** @returns {ParamSpec} - A default instance for ParamSpec. */
-  ParamSpec.createDefault = function() {
-    return new ParamSpec('UnicodeString');
-  };
+    /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
+    ParamSpec.prototype.toBackendDict = function() {
+      return {
+        obj_type: this.objType.getName(),
+      };
+    };
 
-  return ParamSpec;
-}]);
+    /**
+     * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
+     *    backend.
+     * @returns {ParamSpec} - A new ParamSpec instance.
+     */
+    ParamSpec.createFromBackendDict = function(paramSpecBackendDict) {
+      return new ParamSpec(
+        ParamTypeObjectFactory.getTypeFromBackendName(
+          paramSpecBackendDict.obj_type));
+    };
+
+    /** @returns {ParamSpec} - A default instance for ParamSpec. */
+    ParamSpec.createDefault = function() {
+      return new ParamSpec(ParamTypeObjectFactory.UnicodeString);
+    };
+
+    return ParamSpec;
+  }
+]);

@@ -134,10 +134,8 @@ oppia.factory('oppiaPlayerService', [
     var initParams = function(manualParamChanges) {
       var baseParams = {};
       exploration.paramSpecs.getParamNames().forEach(function(paramName) {
-        // TODO(sll): This assumes all parameters are of type
-        // UnicodeString. We should generalize this to other default values
-        // for different types of parameters.
-        baseParams[paramName] = '';
+        var paramSpec = exploration.paramSpecs.getParamDict()[paramName];
+        baseParams[paramName] = paramSpec.getObjectType().createDefaultValue();
       });
 
       var startingParams = makeParams(

@@ -414,7 +414,7 @@
         </div>
         <ol>
           <li ng-repeat="(paramName, paramSpec) in explorationParamSpecsService.savedMemento.getParamDict()">
-            <b><[paramName]></b> (<[paramSpec.getObjectType()]>)
+            <b><[paramName]></b> (<[paramSpec.getObjectType().getName()]>)
           </li>
         </ol>
       </div>
