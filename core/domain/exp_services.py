@@ -824,7 +824,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration.version += 1
 
     # Trigger statistics model update.
-    stats_services.handle_stats_creation(exploration, change_list)
+    stats_services.handle_stats_creation_for_new_exp_version(
+        exploration, change_list)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         new_to_old_state_names = exploration.get_state_names_mapping(
@@ -887,7 +888,7 @@ def _create_exploration(
     exploration.version += 1
 
     # Trigger statistics model creation.
-    stats_services.handle_new_exp_stats_creation(exploration)
+    stats_services.handle_stats_creation_for_new_exploration(exploration)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.

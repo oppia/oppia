@@ -33,7 +33,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import rte_component_registry
-from core.domain import stats_services
+from core.domain import stats_services_old
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -382,7 +382,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
                 'Exploration \'%s\' does not have \'%s\' state.'
                 % (exp_id, state_name))
 
-        state_answers = stats_services.get_state_answers(
+        state_answers = stats_services_old.get_state_answers(
             exp_id, exp_version, state_name)
         extracted_answers = state_answers.get_submitted_answer_dict_list()
 

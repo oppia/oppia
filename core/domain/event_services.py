@@ -20,7 +20,7 @@ import inspect
 
 from core import jobs_registry
 from core.domain import stats_domain
-from core.domain import stats_services
+from core.domain import stats_services_old
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
@@ -86,7 +86,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         user.
         """
         # TODO(sll): Escape these args?
-        stats_services.record_answer(
+        stats_services_old.record_answer(
             exploration_id, exploration_version, state_name, interaction_id,
             stats_domain.SubmittedAnswer(
                 normalized_answer, interaction_id, answer_group_index,
