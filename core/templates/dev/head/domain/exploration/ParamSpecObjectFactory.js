@@ -23,11 +23,14 @@ oppia.factory('ParamSpecObjectFactory', [function() {
    * @param {!String} objType - The type of the parameter.
    */
   var ParamSpec = function(objType) {
+    // TODO(brianrodri): objType could benefit from being its own class. This
+    // will make it easy to eventually extend the types of objects we support
+    // from just "UnicodeString" to others.
     /** @var {String} */
     this.objType = objType;
   };
 
-  /** @returns {String} - The type of the parameter. */
+  /** @returns {String} - The type name of the parameter. */
   ParamSpec.prototype.getObjectType = function() {
     return this.objType;
   };
