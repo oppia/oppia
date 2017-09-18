@@ -79,6 +79,11 @@ oppia.factory('ParamTypeObjectFactory', [function() {
     return ParamType.registry[backendName];
   };
 
+  /** @returns {ParamType} - Implementation-defined default parameter type. */
+  ParamType.getDefaultType = function() {
+    return ParamType.registry.UnicodeString;
+  };
+
 
   // Type registration.
 

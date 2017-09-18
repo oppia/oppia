@@ -29,7 +29,7 @@ oppia.factory('ParamSpecObjectFactory', [
     };
 
     /** @returns {ParamType} - The type name of the parameter. */
-    ParamSpec.prototype.getObjectType = function() {
+    ParamSpec.prototype.getType = function() {
       return this.objType;
     };
 
@@ -53,7 +53,7 @@ oppia.factory('ParamSpecObjectFactory', [
 
     /** @returns {ParamSpec} - A default instance for ParamSpec. */
     ParamSpec.createDefault = function() {
-      return new ParamSpec(ParamTypeObjectFactory.registry.UnicodeString);
+      return new ParamSpec(ParamTypeObjectFactory.getDefaultType());
     };
 
     return ParamSpec;
