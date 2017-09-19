@@ -37,6 +37,19 @@ transaction_services = models.Registry.import_transaction_services()
 def log_new_error(*args, **kwargs):
     logging.error(*args, **kwargs)
 
+EMAIL_LIST_SCHEMA = {
+    'type': 'list',
+    'items': {
+        'type': 'unicode'
+    },
+    'validators': [{
+        'id': 'has_length_at_most',
+        'max_value': 5
+    }#, {
+     #   'id': 'is_valid_email',
+    #}
+    ]
+}
 
 EMAIL_HTML_BODY_SCHEMA = {
     'type': 'unicode',
@@ -116,6 +129,13 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'sent.',
     'I\'m writing to inform you that I have unpublished the above '
     'exploration.')
+
+NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
+    'notification_emails_for_failed_tasks',
+    EMAIL_LIST_SCHEMA,
+    'Email(s) to notify if a training task fails',
+    ['moderator@example.com']
+)
 
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
