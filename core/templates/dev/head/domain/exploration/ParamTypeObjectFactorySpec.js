@@ -38,7 +38,7 @@ describe('ParamType objects', function() {
     });
 
     it('should be frozen', function() {
-      expect(Object.isFrozen(UnicodeString)).toBeTruthy();
+      expect(Object.isFrozen(UnicodeString)).toBe(true);
     });
 
     it('should give an empty string by default', function() {
@@ -50,7 +50,7 @@ describe('ParamType objects', function() {
     });
 
     it('should be able to tell whether or not values are strings', function() {
-      expect(UnicodeString.validateValue('abc')).toBeTruthy();
+      expect(UnicodeString.validateValue('abc')).toBe(true);
       expect(UnicodeString.validateValue(3)).toBeFalsy();
       expect(UnicodeString.validateValue([1,2])).toBeFalsy();
     });
