@@ -38,7 +38,7 @@ describe('ParamType objects', function() {
   });
 
   it('should not allow invalid default values', function() {
-    expect(function() { new ParamType(function(v) { return v >= 0; }, -1/12); })
+    expect(function() { new ParamType(function(v) { return v >= 0; }, -1); })
       .toThrowError(/default value is invalid/);
   });
 
