@@ -36,23 +36,20 @@ describe('ParamSpecs', function() {
   it('should add param when missing', function() {
     var paramSpec = ParamSpecObjectFactory.createDefault();
 
-    expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBeTruthy();
+    expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBe(true);
     // No longer empty.
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(paramSpec);
   });
 
   it('should not overwrite existing params', function() {
     var oldParamSpec = ParamSpecObjectFactory.createDefault();
-    var newParamSpec = ParamSpecObjectFactory.createDefault();
-    expect(oldParamSpec).not.toBe(newParamSpec);
-
-    expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec))
-      .toBeTruthy();
+    expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec)).toBe(true);
     // No longer empty.
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
 
-    expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec))
-      .toBeFalsy();
+    var newParamSpec = ParamSpecObjectFactory.createDefault();
+    expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec)).toBe(false);
     expect(emptyParamSpecs.getParamDict()[paramName]).not.toBe(newParamSpec);
+    expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
   });
 });
