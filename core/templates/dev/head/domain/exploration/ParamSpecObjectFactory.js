@@ -18,7 +18,8 @@
  */
 
 oppia.factory('ParamSpecObjectFactory', [
-  'ParamTypeObjectFactory', function(ParamTypeObjectFactory) {
+  'ParamTypeObjectFactory',
+  function(ParamTypeObjectFactory) {
     /**
      * @constructor
      * @param {!ParamType} objType - The type of the parameter.
