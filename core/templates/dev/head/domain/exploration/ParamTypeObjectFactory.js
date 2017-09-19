@@ -32,7 +32,8 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    */
   var ParamType = function(validateFunction, defaultValue) {
     if (!validateFunction(defaultValue)) {
-      throw 'Error!';
+      throw new Error(
+        'Default value wasn\'t valid according to validation function');
     }
 
     /** @member {String} */
@@ -74,7 +75,7 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    */
   ParamType.getTypeFromBackendName = function(backendName) {
     if (!ParamType.registry.hasOwnProperty(backendName)) {
-      throw 'Error!';
+      throw new Error(backendName + ' is not a registered parameter type.');
     }
     return ParamType.registry[backendName];
   };
