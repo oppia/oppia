@@ -24,6 +24,10 @@ describe('ParamType objects', function() {
     ParamTypeObjectFactory = $injector.get('ParamTypeObjectFactory');
   }));
 
+  it('should have its registry frozen', function() {
+    expect(Object.isFrozen(ParamTypeObjectFactory.registry)).toBe(true);
+  });
+
   it('should use UnicodeString as default type', function() {
     expect(ParamTypeObjectFactory.getDefaultType())
       .toBe(ParamTypeObjectFactory.registry.UnicodeString);
