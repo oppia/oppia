@@ -69,7 +69,7 @@ oppia.factory('ParamTypeObjectFactory', [function() {
   // Class methods.
 
   /**
-   * @param {String} typeName - the name of the type to fetch.
+   * @param {String} backendName - the name of the type to fetch.
    * @returns {ParamType} - The associated type, if any.
    * @throws {Error} - When the given type name isn't registered.
    */
