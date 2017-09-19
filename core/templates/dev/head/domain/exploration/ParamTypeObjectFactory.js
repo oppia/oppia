@@ -26,11 +26,11 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    * {@link ParamType.registry}. See {@link ParamType.registry.UnicodeString}
    * for an example.
    *
-   * @param {?} defaultValue - simple value any parameter of this type can take.
    * @param {Function.<?, Boolean>} validateFunction - Returns true when a value
    *    is valid.
+   * @param {?} defaultValue - simple value any parameter of this type can take.
    */
-  var ParamType = function(defaultValue, validateFunction) {
+  var ParamType = function(validateFunction, defaultValue) {
     if (!validateFunction(defaultValue)) {
       throw 'Error!';
     }
@@ -48,7 +48,7 @@ oppia.factory('ParamTypeObjectFactory', [function() {
 
   /** @returns {?} A valid default value for this particular type. */
   ParamType.prototype.createDefaultValue = function() {
-    return this.defaultValue;
+    return angular.copy(this.defaultValue);
   };
 
   /** @returns {String} The display-name of this type. */
@@ -90,10 +90,10 @@ oppia.factory('ParamTypeObjectFactory', [function() {
   /** @type {Object.<String, ParamType>} */
   ParamType.registry = {};
 
-  ParamType.registry.UnicodeString = new ParamType('', function(value) {
+  ParamType.registry.UnicodeString = new ParamType(function(value) {
     // Valid only for string values.
     return (typeof value === 'string' || value instanceof String);
-  });
+  }, '');
 
   // To finalize type registration, we encode the name of each type into their
   // definition, then freeze them from modifications.
