@@ -61,8 +61,8 @@ describe('ParamType objects', function() {
 
     it('should be able to tell whether or not values are strings', function() {
       expect(UnicodeString.validateValue('abc')).toBe(true);
-      expect(UnicodeString.validateValue(3)).toBeFalsy();
-      expect(UnicodeString.validateValue([1,2])).toBeFalsy();
+      expect(UnicodeString.validateValue(3)).toBe(false);
+      expect(UnicodeString.validateValue([1,2])).toBe(false);
     });
   });
 });
