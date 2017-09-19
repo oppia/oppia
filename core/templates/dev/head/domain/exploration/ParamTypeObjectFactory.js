@@ -47,19 +47,19 @@ oppia.factory('ParamTypeObjectFactory', [function() {
 
   // Instance methods.
 
-  /** @returns {?} A valid default value for this particular type. */
+  /** @returns {?} - A valid default value for this particular type. */
   ParamType.prototype.createDefaultValue = function() {
     return angular.copy(this.defaultValue);
   };
 
-  /** @returns {String} The display-name of this type. */
+  /** @returns {String} - The display-name of this type. */
   ParamType.prototype.getName = function() {
     return this.name;
   };
 
   /**
    * @param {?} value - A value that should be of the correct type.
-   * @returns {Boolean} Whether the value is valid for this type.
+   * @returns {Boolean} - Whether the value is valid for this type.
    */
   ParamType.prototype.validateValue = function(value) {
     return this.validateFunction(value);

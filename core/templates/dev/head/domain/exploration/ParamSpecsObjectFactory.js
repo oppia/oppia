@@ -33,14 +33,14 @@ oppia.factory('ParamSpecsObjectFactory', [
 
     /**
      * @param {String} paramName - The parameter to fetch.
-     * @returns {ParamSpec} associated to given parameter name.
+     * @returns {ParamSpec} - associated to given parameter name.
      */
     ParamSpecs.prototype.getParamSpec = function(paramName) {
       return this.paramDict[paramName];
     };
 
     /**
-     * @returns {Object.<String, ParamSpec>} the map of params to their specs.
+     * @returns {Object.<String, ParamSpec>} - the map of params to their specs.
      */
     ParamSpecs.prototype.getParamDict = function() {
       return this.paramDict;
@@ -54,6 +54,7 @@ oppia.factory('ParamSpecsObjectFactory', [
     /**
      * Adds a new parameter only if it didn't exist already. Does nothing
      * otherwise.
+     *
      * @param {!String} paramName - The parameter to add a spec for.
      * @param {ParamSpec=} paramSpec - The specification of the parameter.
      * @returns {Boolean} - True when the parameter was newly added.
