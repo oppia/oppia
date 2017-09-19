@@ -35,12 +35,12 @@ oppia.factory('ParamTypeObjectFactory', [function() {
       throw 'Error!';
     }
 
-    /** @member {?} */
-    this.defaultValue = defaultValue;
-    /** @member {Function.<?, Boolean>} */
-    this.validateFunction = validateFunction;
     /** @member {String} */
     this.name = null;
+    /** @member {Function.<?, Boolean>} */
+    this.validateFunction = validateFunction;
+    /** @member {?} */
+    this.defaultValue = defaultValue;
   };
 
 
