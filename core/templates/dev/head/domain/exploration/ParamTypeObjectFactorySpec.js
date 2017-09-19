@@ -43,7 +43,6 @@ describe('ParamType objects', function() {
   });
 
   describe('UnicodeString', function() {
-    /** @type {ParamType} */
     var UnicodeString = null;
 
     beforeEach(function() {
