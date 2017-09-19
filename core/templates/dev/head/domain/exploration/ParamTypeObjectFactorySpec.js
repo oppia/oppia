@@ -20,36 +20,39 @@ describe('ParamType objects', function() {
   var ParamTypeObjectFactory = null;
 
   beforeEach(module('oppia'));
-
   beforeEach(inject(function($injector) {
     ParamTypeObjectFactory = $injector.get('ParamTypeObjectFactory');
   }));
 
-  it('should use UnicodeString as default type', inject(function($injector) {
+  it('should use UnicodeString as default type', function() {
     expect(ParamTypeObjectFactory.getDefaultType())
       .toBe(ParamTypeObjectFactory.registry.UnicodeString);
-  }));
+  });
 
   describe('UnicodeString', function() {
+    /** @type {ParamType} */
     var UnicodeString = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(function() {
       UnicodeString = ParamTypeObjectFactory.registry.UnicodeString;
-    }));
+    });
 
-    it('should give an empty string by default', inject(function($injector) {
+    it('should be frozen', function() {
+      expect(Object.isFrozen(UnicodeString)).toBeTruthy();
+    });
+
+    it('should give an empty string by default', function() {
       expect(UnicodeString.createDefaultValue()).toEqual('');
-    }));
+    });
 
-    it('should be named correctly', inject(function($injector) {
+    it('should be named correctly', function() {
       expect(UnicodeString.getName()).toEqual('UnicodeString');
-    }));
+    });
 
-    it('should be able to tell whether or not values are strings',
-        inject(function($injector) {
-          expect(UnicodeString.validateValue('abc')).toBeTruthy();
-          expect(UnicodeString.validateValue(3)).toBeFalsy();
-          expect(UnicodeString.validateValue([1,2])).toBeFalsy();
-        }));
+    it('should be able to tell whether or not values are strings', function() {
+      expect(UnicodeString.validateValue('abc')).toBeTruthy();
+      expect(UnicodeString.validateValue(3)).toBeFalsy();
+      expect(UnicodeString.validateValue([1,2])).toBeFalsy();
+    });
   });
 });
