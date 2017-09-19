@@ -16,47 +16,43 @@
  * @fileoverview Unit tests for the Param Specs object factory.
  */
 
-describe('ParamSpecs object factory', function() {
+describe('ParamSpecs', function() {
+  var ParamSpecsObjectFactory = null;
+  var ParamSpecObjectFactory = null;
+  var emptyParamSpecs = null;
+  var paramName = 'x';
+
   beforeEach(module('oppia'));
+  beforeEach(inject(function($injector) {
+    ParamSpecsObjectFactory = $injector.get('ParamSpecsObjectFactory');
+    ParamSpecObjectFactory = $injector.get('ParamSpecObjectFactory');
+    emptyParamSpecs = ParamSpecsObjectFactory.createFromBackendDict({});
+  }));
 
-  describe('ParamSpecsObjectFactory', function() {
-    var ParamSpecsObjectFactory = null;
-    var ParamSpecObjectFactory = null;
-    var paramName = 'x';
-    var emptyParamSpecs = null;
+  it('should be undefined for missing param names', function() {
+    expect(emptyParamSpecs.getParamDict()[paramName]).not.toBeDefined();
+  });
 
-    beforeEach(inject(function($injector) {
-      ParamSpecsObjectFactory = $injector.get('ParamSpecsObjectFactory');
-      ParamSpecObjectFactory = $injector.get('ParamSpecObjectFactory');
-      emptyParamSpecs = ParamSpecsObjectFactory.createFromBackendDict({});
-    }));
+  it('should add param when missing', function() {
+    var paramSpec = ParamSpecObjectFactory.createDefault();
 
-    it('should be undefined for missing param names',
-      inject(function($injector) {
-        expect(emptyParamSpecs.getParamDict()[paramName]).not.toBeDefined();
-      }));
+    expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBeTruthy();
+    // No longer empty.
+    expect(emptyParamSpecs.getParamDict()[paramName]).toBe(paramSpec);
+  });
 
-    it('should add param when missing', inject(function($injector) {
-      var paramSpec = ParamSpecObjectFactory.createDefault();
+  it('should not overwrite existing params', function() {
+    var oldParamSpec = ParamSpecObjectFactory.createDefault();
+    var newParamSpec = ParamSpecObjectFactory.createDefault();
+    expect(oldParamSpec).not.toBe(newParamSpec);
 
-      expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBeTruthy();
-      // No longer empty.
-      expect(emptyParamSpecs.getParamDict()[paramName]).toBe(paramSpec);
-    }));
+    expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec))
+      .toBeTruthy();
+    // No longer empty.
+    expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
 
-    it('should not overwrite existing params', inject(function($injector) {
-      var oldParamSpec = ParamSpecObjectFactory.createDefault();
-      var newParamSpec = ParamSpecObjectFactory.createDefault();
-      expect(oldParamSpec).not.toBe(newParamSpec);
-
-      expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec))
-        .toBeTruthy();
-      // No longer empty.
-      expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
-
-      expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec))
-        .toBeFalsy();
-      expect(emptyParamSpecs.getParamDict()[paramName]).not.toBe(newParamSpec);
-    }));
+    expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec))
+      .toBeFalsy();
+    expect(emptyParamSpecs.getParamDict()[paramName]).not.toBe(newParamSpec);
   });
 });
