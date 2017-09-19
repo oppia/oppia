@@ -32,6 +32,14 @@ oppia.factory('ParamSpecsObjectFactory', [
     };
 
     /**
+     * @param {String} paramName - The parameter to fetch.
+     * @returns {ParamSpec} associated to given parameter name.
+     */
+    ParamSpecs.prototype.getParamSpec = function(paramName) {
+      return this.paramDict[paramName];
+    };
+
+    /**
      * @returns {Object.<String, ParamSpec>} the map of params to their specs.
      */
     ParamSpecs.prototype.getParamDict = function() {
@@ -60,15 +68,24 @@ oppia.factory('ParamSpecsObjectFactory', [
     };
 
     /**
+     * @callback callback - Is passed the name and corresponding ParamSpec of
+     *    each parameter in the specs.
+     */
+    ParamSpecs.prototype.forEach = function(callback) {
+      var that = this;
+      this.getParamNames().forEach(function(paramName) {
+        callback(paramName, that.getParamSpec(paramName));
+      });
+    };
+
+    /**
      * @returns {Object.<String, {obj_type: String}>} - Basic dict for backend
      *    consumption.
      */
     ParamSpecs.prototype.toBackendDict = function() {
       var paramSpecsBackendDict = {};
-      var that = this;
-      this.getParamNames().forEach(function(paramName) {
-        paramSpecsBackendDict[paramName] =
-          that.paramDict[paramName].toBackendDict();
+      this.forEach(function(paramName, paramSpec) {
+        paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
       });
       return paramSpecsBackendDict;
     };

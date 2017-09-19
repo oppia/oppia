@@ -133,8 +133,7 @@ oppia.factory('oppiaPlayerService', [
     // manual parameter changes (in editor preview mode).
     var initParams = function(manualParamChanges) {
       var baseParams = {};
-      exploration.paramSpecs.getParamNames().forEach(function(paramName) {
-        var paramSpec = exploration.paramSpecs.getParamDict()[paramName];
+      exploration.paramSpecs.forEach(function(paramName, paramSpec) {
         baseParams[paramName] = paramSpec.getType().createDefaultValue();
       });
 
