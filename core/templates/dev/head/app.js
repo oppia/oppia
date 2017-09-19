@@ -105,7 +105,7 @@ oppia.config(['$provide', function($provide) {
         $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/forms/customize_rte_component_model.html'),
+            '/components/forms/customize_rte_component_modal_directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
