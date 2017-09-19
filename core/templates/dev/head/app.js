@@ -81,10 +81,12 @@ oppia.config(['$provide', function($provide) {
     '$delegate', '$document', '$modal', '$timeout', 'focusService',
     'taRegisterTool', 'rteHelperService', 'alertsService',
     'explorationContextService', 'PAGE_CONTEXT',
+    'UrlInterpolationService',
     function(
       taOptions, $document, $modal, $timeout, focusService,
       taRegisterTool, rteHelperService, alertsService,
-      explorationContextService, PAGE_CONTEXT) {
+      explorationContextService, PAGE_CONTEXT,
+      UrlInterpolationService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -102,7 +104,8 @@ oppia.config(['$provide', function($provide) {
         onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $modal.open({
-          templateUrl: 'modals/customizeRteComponent',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/customize_rte_component_modal_directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
