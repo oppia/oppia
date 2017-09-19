@@ -33,7 +33,7 @@ oppia.factory('ParamTypeObjectFactory', [function() {
   var ParamType = function(validateFunction, defaultValue) {
     if (!validateFunction(defaultValue)) {
       throw new Error(
-        'Default value wasn\'t valid according to validation function');
+        'The default value is invalid according to validation function');
     }
 
     /** @member {String} */

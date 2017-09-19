@@ -17,26 +17,29 @@
  */
 
 describe('ParamType objects', function() {
-  var ParamTypeObjectFactory = null;
+  var ParamType = null;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
-    ParamTypeObjectFactory = $injector.get('ParamTypeObjectFactory');
+    ParamType = $injector.get('ParamTypeObjectFactory');
   }));
 
   it('should have its registry frozen', function() {
-    expect(Object.isFrozen(ParamTypeObjectFactory.registry)).toBe(true);
+    expect(Object.isFrozen(ParamType.registry)).toBe(true);
   });
 
   it('should use UnicodeString as default type', function() {
-    expect(ParamTypeObjectFactory.getDefaultType())
-      .toBe(ParamTypeObjectFactory.registry.UnicodeString);
+    expect(ParamType.getDefaultType()).toBe(ParamType.registry.UnicodeString);
   });
 
   it('should throw for non-existant types', function() {
-    expect(function() {
-      ParamTypeObjectFactory.getTypeFromBackendName('MissingType');
-    }).toThrowError(/not a registered parameter type/);
+    expect(function() { ParamType.getTypeFromBackendName('MissingType'); })
+      .toThrowError(/not a registered parameter type/);
+  });
+
+  it('should not allow invalid default values', function() {
+    expect(function() { new ParamType(function(v) { return v >= 0; }, -1/12); })
+      .toThrowError(/default value is invalid/);
   });
 
   describe('UnicodeString', function() {
@@ -44,7 +47,7 @@ describe('ParamType objects', function() {
     var UnicodeString = null;
 
     beforeEach(function() {
-      UnicodeString = ParamTypeObjectFactory.registry.UnicodeString;
+      UnicodeString = ParamType.registry.UnicodeString;
     });
 
     it('should be frozen', function() {
