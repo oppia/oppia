@@ -33,6 +33,12 @@ describe('ParamType objects', function() {
       .toBe(ParamTypeObjectFactory.registry.UnicodeString);
   });
 
+  it('should throw for non-existant types', function() {
+    expect(function() {
+      ParamTypeObjectFactory.getTypeFromBackendName('MissingType');
+    }).toThrowError(/not a registered parameter type/);
+  });
+
   describe('UnicodeString', function() {
     /** @type {ParamType} */
     var UnicodeString = null;
