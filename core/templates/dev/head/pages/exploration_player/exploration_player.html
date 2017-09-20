@@ -120,8 +120,6 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/OppiaHtmlEscaperService.js"></script>
-  
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/MathLatexStringEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SanitizedUrlEditor.js"></script>
 
@@ -130,6 +128,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/AudioPlayerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/AssetsBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>

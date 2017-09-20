@@ -16,7 +16,7 @@
  * @fileoverview Service for HTML serialization and escaping.
  */
 
-oppia.factory('OppiaHtmlEscaperService', ['$log', function($log) {
+oppia.factory('HtmlEscaperService', ['$log', function($log) {
   var htmlEscaper = {
     objToEscapedJson: function(obj) {
       return this.unescapedStrToEscapedStr(JSON.stringify(obj));

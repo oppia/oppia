@@ -358,9 +358,7 @@
 {% endblock %}
 
 {% block footer_js %}
-  {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/OppiaHtmlEscaperService.js"></script>
-  
+  {{ super() }}  
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionPlayer.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionNodeListDirective.js"></script>
 
@@ -379,4 +377,6 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
 {% endblock footer_js %}

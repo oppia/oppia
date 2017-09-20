@@ -23,7 +23,7 @@ describe('HTML escaper', function() {
     var ohe = null;
 
     beforeEach(inject(function($injector) {
-      ohe = $injector.get('OppiaHtmlEscaperService');
+      ohe = $injector.get('HtmlEscaperService');
     }));
 
     it('should correctly translate between escaped and unescaped strings',

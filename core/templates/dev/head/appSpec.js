@@ -15,39 +15,7 @@
 /**
  * @fileoverview Unit tests for generic services.
  */
-/*
-describe('HTML escaper', function() {
-  beforeEach(module('oppia'));
 
-  describe('HTML escaper service', function() {
-    var ohe = null;
-
-    beforeEach(inject(function($injector) {
-      ohe = $injector.get('oppiaHtmlEscaper');
-    }));
-
-    it('should correctly translate between escaped and unescaped strings',
-      function() {
-        var strs = ['abc', 'a&b<html>', '&&&&&'];
-        for (var i = 0; i < strs.length; i++) {
-          expect(ohe.escapedStrToUnescapedStr(
-            ohe.unescapedStrToEscapedStr(strs[i]))).toEqual(strs[i]);
-        }
-      }
-    );
-
-    it('should correctly escape and unescape JSON', function() {
-      var objs = [{
-        a: 'b'
-      }, ['a', 'b'], 2, true, 'abc'];
-      for (var i = 0; i < objs.length; i++) {
-        expect(ohe.escapedJsonToObj(
-          ohe.objToEscapedJson(objs[i]))).toEqual(objs[i]);
-      }
-    });
-  });
-});
-*/
 describe('Datetime Formatter', function() {
   beforeEach(module('oppia'));
 

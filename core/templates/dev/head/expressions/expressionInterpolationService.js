@@ -31,10 +31,10 @@
 //     '<button></button>'.
 oppia.factory('expressionInterpolationService', [
   '$filter', 'expressionParserService', 'expressionEvaluatorService',
-  'expressionSyntaxTreeService', 'OppiaHtmlEscaperService',
+  'expressionSyntaxTreeService', 'HtmlEscaperService',
   function(
       $filter, expressionParserService, expressionEvaluatorService,
-      expressionSyntaxTreeService, OppiaHtmlEscaperService) {
+      expressionSyntaxTreeService, HtmlEscaperService) {
     return {
       // This method should only be used if its result would immediately be
       // displayed on the screen without passing through further computation.
@@ -47,7 +47,7 @@ oppia.factory('expressionInterpolationService', [
             // TODO(sll): Remove the call to $filter once we have a
             // custom UI for entering expressions. It is only needed because
             // expressions are currently input inline via the RTE.
-            return OppiaHtmlEscaperService.unescapedStrToEscapedStr(
+            return HtmlEscaperService.unescapedStrToEscapedStr(
               expressionEvaluatorService.evaluateExpression(
                 $filter('convertHtmlToUnicode')(p1), envs));
           } catch (e) {

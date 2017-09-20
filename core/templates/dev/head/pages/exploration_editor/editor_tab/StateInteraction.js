@@ -45,14 +45,14 @@ oppia.factory('interactionDetailsCache', [function() {
 
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
-  'alertsService', 'editorContextService', 'OppiaHtmlEscaperService',
+  'alertsService', 'editorContextService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
-      alertsService, editorContextService, OppiaHtmlEscaperService,
+      alertsService, editorContextService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService, interactionDetailsCache,

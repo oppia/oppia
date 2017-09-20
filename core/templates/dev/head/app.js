@@ -430,40 +430,6 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
-/*
-// Service for HTML serialization and escaping.
-oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
-  var htmlEscaper = {
-    objToEscapedJson: function(obj) {
-      return this.unescapedStrToEscapedStr(JSON.stringify(obj));
-    },
-    escapedJsonToObj: function(json) {
-      if (!json) {
-        $log.error('Empty string was passed to JSON decoder.');
-        return '';
-      }
-      return JSON.parse(this.escapedStrToUnescapedStr(json));
-    },
-    unescapedStrToEscapedStr: function(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    },
-    escapedStrToUnescapedStr: function(value) {
-      return String(value)
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, '\'')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&');
-    }
-  };
-  return htmlEscaper;
-}]);
-*/
 // Service for converting dates in milliseconds since the Epoch to
 // human-readable dates.
 oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
@@ -510,9 +476,9 @@ oppia.factory('IdGenerationService', [function() {
 
 oppia.factory('rteHelperService', [
   '$filter', '$log', '$interpolate', 'explorationContextService',
-  'RTE_COMPONENT_SPECS', 'OppiaHtmlEscaperService',
+  'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
   function($filter, $log, $interpolate, explorationContextService,
-           RTE_COMPONENT_SPECS, OppiaHtmlEscaperService) {
+           RTE_COMPONENT_SPECS, HtmlEscaperService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -545,7 +511,7 @@ oppia.factory('rteHelperService', [
           continue;
         }
         var argName = attr.name.substring(0, separatorLocation);
-        customizationArgsDict[argName] = OppiaHtmlEscaperService.escapedJsonToObj(
+        customizationArgsDict[argName] = HtmlEscaperService.escapedJsonToObj(
           attr.value);
       }
       return customizationArgsDict;
@@ -592,7 +558,7 @@ oppia.factory('rteHelperService', [
         for (var attrName in customizationArgsDict) {
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
-            OppiaHtmlEscaperService.objToEscapedJson(customizationArgsDict[attrName]));
+            HtmlEscaperService.objToEscapedJson(customizationArgsDict[attrName]));
         }
 
         return el.get(0);
@@ -1003,14 +969,14 @@ oppia.factory('currentLocationService', ['$window', function($window) {
 
 // Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
-  '$filter', 'OppiaHtmlEscaperService', function($filter, OppiaHtmlEscaperService) {
+  '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
     return {
       formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
         for (var caSpecName in customizationArgSpecs) {
           var caSpecValue = customizationArgSpecs[caSpecName].value;
           element.attr(
             $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-            OppiaHtmlEscaperService.objToEscapedJson(caSpecValue));
+            HtmlEscaperService.objToEscapedJson(caSpecValue));
         }
         return element;
       }

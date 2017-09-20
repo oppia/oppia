@@ -51,8 +51,6 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/OppiaHtmlEscaperService.js"></script>
-
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
@@ -118,6 +116,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionVerificationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionValidityService.js"></script>
