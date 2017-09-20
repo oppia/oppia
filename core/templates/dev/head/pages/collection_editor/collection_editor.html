@@ -51,6 +51,7 @@
 
 {% block footer_js %}
   {{ super() }}
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
@@ -69,7 +70,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/settings_tab/CollectionPermissionsCardDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/settings_tab/CollectionSettingsTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.js"></script>
-
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
@@ -116,7 +116,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionVerificationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionValidityService.js"></script>

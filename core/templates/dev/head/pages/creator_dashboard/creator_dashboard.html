@@ -383,7 +383,7 @@
 {% endblock %}
 
 {% block footer_js %}
-  {{ super() }}    
+  {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
@@ -392,6 +392,4 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/creator_dashboard/CreatorDashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/creator_dashboard/CreatorDashboard.js"></script>
-
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
 {% endblock footer_js %}

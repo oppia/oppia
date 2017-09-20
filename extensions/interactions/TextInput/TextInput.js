@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveTextInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {
@@ -30,9 +30,9 @@ oppia.directive('oppiaInteractiveTextInput', [
       controller: [
         '$scope', '$attrs', 'focusService', 'textInputRulesService',
         function($scope, $attrs, focusService, textInputRulesService) {
-          $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
+          $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
             $attrs.placeholderWithValue);
-          $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
+          $scope.rows = HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue);
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -64,26 +64,26 @@ oppia.directive('oppiaInteractiveTextInput', [
 ]);
 
 oppia.directive('oppiaResponseTextInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/TextInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }
 ]);
 
 oppia.directive('oppiaShortResponseTextInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/TextInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }
