@@ -17,4 +17,4 @@
 ##########################################################################
 
 export PYTHONPATH=.:$PYTHONPATH
-find core/storage -not -path "core/storage/base_model/*" -name "gae_models.py" | xargs grep -E "class .+?Model" | awk '{print $2}' | cut -d "(" -f 1 | tr '\n' ' ' | xargs python scripts/prepare_automatic_backups.py
+find core/storage -not -path "core/storage/base_model/*" -name "gae_models.py" | xargs grep -E "class .+?Model" | awk '{print $2}' | cut -d "(" -f 1 | tr '\n' ' ' | xargs python scripts/prepare_automatic_backups.py $1

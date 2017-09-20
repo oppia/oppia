@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Contains routines which will update files to prepare Oppia for a deployment
-push to https://oppia.org/.
+"""Contains routines which will add a backup cron job to prepare Oppia for a
+deployment push to https://oppia.org/.
 """
 import sys
 import utils
@@ -42,8 +42,8 @@ def generate_backup_url():
 
 def update_cron_dict(cron_dict):
     backup_url = generate_backup_url()
-    # if len(backup_url) > _MAX_BACKUP_URL_LENGTH:
-    #     raise Exception('Backup URL exceeds app engine limit')
+    if len(backup_url) > _MAX_BACKUP_URL_LENGTH:
+        raise Exception('Backup URL exceeds app engine limit')
     cron_dict['cron'].append({
         'description': 'weekly backup',
         'url': '%s' % backup_url,
