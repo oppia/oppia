@@ -32,7 +32,8 @@ oppia.directive('oppiaInteractiveTextInput', [
         function($scope, $attrs, focusService, textInputRulesService) {
           $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
             $attrs.placeholderWithValue);
-          $scope.rows = HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue);
+          $scope.rows = (
+            HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue));
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 

@@ -33,7 +33,8 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           $scope.coords = [
             HtmlEscaperService.escapedJsonToObj($attrs.latitudeWithValue),
             HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
-          $scope.zoom = HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue);
+          $scope.zoom = (
+            HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
 
           $scope.$on('showInteraction', function() {
             refreshMap();

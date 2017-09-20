@@ -561,7 +561,8 @@ oppia.factory('rteHelperService', [
         for (var attrName in customizationArgsDict) {
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
-            HtmlEscaperService.objToEscapedJson(customizationArgsDict[attrName]));
+            HtmlEscaperService.objToEscapedJson(
+              customizationArgsDict[attrName]));
         }
 
         return el.get(0);

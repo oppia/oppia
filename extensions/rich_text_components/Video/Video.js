@@ -30,7 +30,8 @@ oppia.directive('oppiaNoninteractiveVideo', [
         'autoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
         function($scope, $attrs, explorationContextService, $element,
           autoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
-          var start = HtmlEscaperService.escapedJsonToObj($attrs.startWithValue);
+          var start = (
+            HtmlEscaperService.escapedJsonToObj($attrs.startWithValue));
           var end = HtmlEscaperService.escapedJsonToObj($attrs.endWithValue);
 
           $scope.videoId = HtmlEscaperService.escapedJsonToObj(
