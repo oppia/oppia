@@ -17,10 +17,10 @@
  */
 
 oppia.controller('Signup', [
-  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
+  '$scope', '$http', '$rootScope', '$modal', 'AlertsService', 'urlService',
   'focusService', 'siteAnalyticsService',
   function(
-      $scope, $http, $rootScope, $modal, alertsService, urlService,
+      $scope, $http, $rootScope, $modal, AlertsService, urlService,
       focusService, siteAnalyticsService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
@@ -67,7 +67,7 @@ oppia.controller('Signup', [
       if ($scope.hasUsername) {
         return;
       }
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $scope.blurredAtLeastOnce = true;
       $scope.updateWarningText(username);
       if (!$scope.warningI18nCode) {
@@ -112,7 +112,7 @@ oppia.controller('Signup', [
     $scope.submitPrerequisitesForm = function(
         agreedToTerms, username, canReceiveEmailUpdates) {
       if (!agreedToTerms) {
-        alertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
+        AlertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
         return;
       }
 

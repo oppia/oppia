@@ -19,16 +19,16 @@
 oppia.directive('solutionEditor', [
   '$modal', 'UrlInterpolationService', 'stateSolutionService',
   'editorContextService', 'explorationStatesService',
-  'explorationWarningsService', 'alertsService',
+  'explorationWarningsService', 'AlertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
-  'explorationContextService', 'oppiaExplorationHtmlFormatterService',
+  'ExplorationContextService', 'OppiaExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function($modal, UrlInterpolationService, stateSolutionService,
            editorContextService, explorationStatesService,
-           explorationWarningsService, alertsService,
+           explorationWarningsService, AlertsService,
            SolutionObjectFactory, SolutionVerificationService,
-           explorationContextService, oppiaExplorationHtmlFormatterService,
+           ExplorationContextService, OppiaExplorationHtmlFormatterService,
            stateInteractionIdService, stateCustomizationArgsService,
            INFO_MESSAGE_SOLUTION_IS_INVALID) {
     return {
@@ -50,7 +50,7 @@ oppia.directive('solutionEditor', [
           };
 
           $scope.getAnswerHtml = function () {
-            return oppiaExplorationHtmlFormatterService.getAnswerHtml(
+            return OppiaExplorationHtmlFormatterService.getAnswerHtml(
               stateSolutionService.savedMemento.correctAnswer,
               stateInteractionIdService.savedMemento,
               stateCustomizationArgsService.savedMemento);
@@ -65,17 +65,17 @@ oppia.directive('solutionEditor', [
               controller: [
                 '$scope', '$modalInstance', 'stateInteractionIdService',
                 'stateSolutionService', 'editorContextService',
-                'oppiaExplorationHtmlFormatterService',
+                'OppiaExplorationHtmlFormatterService',
                 'explorationStatesService',
                 function($scope, $modalInstance, stateInteractionIdService,
                          stateSolutionService, editorContextService,
-                         oppiaExplorationHtmlFormatterService,
+                         OppiaExplorationHtmlFormatterService,
                          explorationStatesService) {
                   $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
                     'currentCorrectAnswerEditorHtmlForSolutionEditor');
                   $scope.correctAnswer = null;
                   $scope.correctAnswerEditorHtml = (
-                    oppiaExplorationHtmlFormatterService.getInteractionHtml(
+                    OppiaExplorationHtmlFormatterService.getInteractionHtml(
                       stateInteractionIdService.savedMemento,
                       /* eslint-disable max-len */
                       explorationStatesService.getInteractionCustomizationArgsMemento(
@@ -113,7 +113,7 @@ oppia.directive('solutionEditor', [
 
                   $scope.cancel = function() {
                     $modalInstance.dismiss('cancel');
-                    alertsService.clearWarnings();
+                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -122,7 +122,7 @@ oppia.directive('solutionEditor', [
               var currentStateName = editorContextService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
               SolutionVerificationService.verifySolution(
-                explorationContextService.getExplorationId(),
+                ExplorationContextService.getExplorationId(),
                 state,
                 correctAnswer,
                 function () {
@@ -134,7 +134,7 @@ oppia.directive('solutionEditor', [
                   explorationStatesService.updateSolutionValidity(
                     currentStateName, false);
                   explorationWarningsService.updateWarnings();
-                  alertsService.addInfoMessage(
+                  AlertsService.addInfoMessage(
                     INFO_MESSAGE_SOLUTION_IS_INVALID);
                 }
               );
