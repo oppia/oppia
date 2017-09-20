@@ -29,12 +29,12 @@
 //   processUnicode('abc{{a}}', [{}]) returns null.
 //   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns
 //     '<button></button>'.
-oppia.factory('expressionInterpolationService', [
-  '$filter', 'expressionParserService', 'expressionEvaluatorService',
-  'expressionSyntaxTreeService', 'HtmlEscaperService',
+oppia.factory('ExpressionInterpolationService', [
+  '$filter', 'ExpressionParserService', 'ExpressionEvaluatorService',
+  'ExpressionSyntaxTreeService', 'HtmlEscaperService',
   function(
-      $filter, expressionParserService, expressionEvaluatorService,
-      expressionSyntaxTreeService, HtmlEscaperService) {
+      $filter, ExpressionParserService, ExpressionEvaluatorService,
+      ExpressionSyntaxTreeService, HtmlEscaperService) {
     return {
       // This method should only be used if its result would immediately be
       // displayed on the screen without passing through further computation.
@@ -48,13 +48,13 @@ oppia.factory('expressionInterpolationService', [
             // custom UI for entering expressions. It is only needed because
             // expressions are currently input inline via the RTE.
             return HtmlEscaperService.unescapedStrToEscapedStr(
-              expressionEvaluatorService.evaluateExpression(
+              ExpressionEvaluatorService.evaluateExpression(
                 $filter('convertHtmlToUnicode')(p1), envs));
           } catch (e) {
             var EXPRESSION_ERROR_TAG = (
               '<oppia-expression-error-tag></oppia-expression-error-tag>');
-            if ((e instanceof expressionParserService.SyntaxError) ||
-                (e instanceof expressionSyntaxTreeService.ExpressionError)) {
+            if ((e instanceof ExpressionParserService.SyntaxError) ||
+                (e instanceof ExpressionSyntaxTreeService.ExpressionError)) {
               return EXPRESSION_ERROR_TAG;
             }
             throw e;
@@ -68,12 +68,12 @@ oppia.factory('expressionInterpolationService', [
             // TODO(sll): Remove the call to $filter once we have a
             // custom UI for entering expressions. It is only needed because
             // expressions are currently input inline via the RTE.
-            return expressionEvaluatorService.evaluateExpression(
+            return ExpressionEvaluatorService.evaluateExpression(
               $filter('convertHtmlToUnicode')(p1), envs);
           });
         } catch (e) {
-          if ((e instanceof expressionParserService.SyntaxError) ||
-              (e instanceof expressionSyntaxTreeService.ExpressionError)) {
+          if ((e instanceof ExpressionParserService.SyntaxError) ||
+              (e instanceof ExpressionSyntaxTreeService.ExpressionError)) {
             return null;
           }
           throw e;
@@ -88,7 +88,7 @@ oppia.factory('expressionInterpolationService', [
           // Trim the '{{' and '}}'.
           matches[i] = matches[i].substring(2, matches[i].length - 2);
 
-          var params = expressionSyntaxTreeService.getParamsUsedInExpression(
+          var params = ExpressionSyntaxTreeService.getParamsUsedInExpression(
             $filter('convertHtmlToUnicode')(matches[i]));
 
           for (var j = 0; j < params.length; j++) {

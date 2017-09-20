@@ -56,7 +56,7 @@ describe('Solution Verification Service', function() {
     ess = $injector.get('explorationStatesService');
     siis = $injector.get('stateInteractionIdService');
     scas = $injector.get('stateCustomizationArgsService');
-    idc = $injector.get('interactionDetailsCache');
+    idc = $injector.get('InteractionDetailsCacheService');
     sof = $injector.get('SolutionObjectFactory');
     svs = $injector.get('SolutionVerificationService');
     IS = $injector.get('INTERACTION_SPECS');

@@ -41,6 +41,7 @@ import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
 # This takes additional 'title' and 'category' parameters.
@@ -306,6 +307,39 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
 
     result.update(db_results_dict)
     return result
+
+
+def get_collection_and_collection_rights_by_id(collection_id):
+    """Returns a tuple for collection domain object and collection rights
+    object.
+
+    Args:
+        collection_id: str. Id of the collection.
+
+    Returns:
+        tuple(Collection|None, CollectionRights|None). The collection and
+        collection rights domain object, respectively.
+    """
+    collection_and_rights = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [
+                ('CollectionModel', [collection_id]),
+                ('CollectionRightsModel', [collection_id])
+            ]))
+
+    collection = None
+    if collection_and_rights[0][0] is not None:
+        collection = get_collection_from_model(
+            collection_and_rights[0][0])
+
+    collection_rights = None
+    if collection_and_rights[1][0] is not None:
+        collection_rights = (
+            rights_manager.get_activity_rights_from_model(
+                collection_and_rights[1][0],
+                constants.ACTIVITY_TYPE_COLLECTION))
+
+    return (collection, collection_rights)
 
 
 def get_new_collection_id():

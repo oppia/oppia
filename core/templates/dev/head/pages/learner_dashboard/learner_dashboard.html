@@ -355,7 +355,7 @@
                 <i class="remove-icon fa fa-times"
                    ng-show="showRemoveIcon"
                    aria-hidden="true"
-                   style="color: black;" 
+                   style="color: black;"
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                    tooltip="Remove"
                    tooltip-placement="top"></i>
@@ -612,7 +612,7 @@
                     </span>
                     <span ng-if="!thread.authorSecondLastMessage">
                       <span ng-if="thread.totalMessageCount > 1">
-                        <span translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>, 
+                        <span translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></span>,
                       </span>
                     </span>
                   </span>
@@ -725,7 +725,7 @@
                       <div>
                         <button class="btn btn-success feedback-thread-new-message-send"
                                 ng-click="addNewMessage(explorationId, threadId, newMessage.text)"
-                                ng-disabled="messageSendingInProgress">
+                                ng-disabled="messageSendingInProgress || !newMessage.text">
                           <span ng-if="messageSendingInProgress" translate="I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS"></span>
                           <span class="protractor-test-feedback-send-message"
                                 ng-if="!messageSendingInProgress"

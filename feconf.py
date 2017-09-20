@@ -162,6 +162,9 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 4
 
+# The current version of the question schema.
+CURRENT_QUESTION_SCHEMA_VERSION = 1
+
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
@@ -619,6 +622,7 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
+COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
