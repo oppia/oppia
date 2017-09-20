@@ -59,7 +59,7 @@ class StateCounterModel(base_models.BaseModel):
             state_name: str. Name of the current state.
 
         Returns:
-            StateCounterModel. A model instance of the StateCounterModel.
+            StateCounterModel. An instance of the StateCounterModel.
         """
         instance_id = '.'.join([exploration_id, state_name])
         counter = cls.get(instance_id, strict=False)
@@ -979,7 +979,7 @@ class StateAnswersModel(base_models.BaseModel):
             state_name: str. The name of the state to fetch answers for.
 
         Returns:
-            list(entities)|None. Returns None if no answers have yet
+            list(StateAnswersModel)|None. Returns None if no answers have yet
                 been submitted to the specified exploration state.
         """
         # It's okay if this isn't run in a transaction. When adding new shards,
@@ -1018,7 +1018,7 @@ class StateAnswersModel(base_models.BaseModel):
             state_name: str. Name of current state.
             interaction_id: str. ID of the interaction.
             new_submitted_answer_dict_list: list(dict). List of new submitted
-                answers each of which is stored as a Json blob.
+                answers each of which is stored as a JSON blob.
         """
         # The main shard always needs to be retrieved. At most one other shard
         # needs to be retrieved (the last one).
@@ -1115,8 +1115,8 @@ class StateAnswersModel(base_models.BaseModel):
             exploration_version: int. Version of exploration.
             state_name: str. Name of current state.
             interaction_id: str. ID of the interaction.
-            new_submitted_answer_dict_list:list(dict). List of new submitted
-                answers each of which is stored as a Json blob.
+            new_submitted_answer_dict_list: list(dict). List of new submitted
+                answers each of which is stored as a JSON blob.
         """
         transaction_services.run_in_transaction(
             cls._insert_submitted_answers_unsafe, exploration_id,
@@ -1154,14 +1154,14 @@ class StateAnswersModel(base_models.BaseModel):
 
         Args:
             current_answer_list: list(dict). List of answer dicts each of which
-                is stored as Json blob.
-            current_answer_list_size: list(int). Number of bytes required
+                is stored as JSON blob.
+            current_answer_list_size: int. Number of bytes required
                 to store all the answers in the current_answer_list.
             new_answer_list: list(dict). List of new submitted answers each of
-                which is stored as a Json blob.
+                which is stored as a JSON blob.
 
         Returns:
-            tuple(list(list(dict)),list(int)).
+            tuple(list(list(dict)), list(int)).
             Where:
                 sharded_answer_lists: A sharded answer list
                     containing list of answer dicts.
@@ -1232,7 +1232,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             state_name: str. Name of current state.
             calculation_id: str. ID of the calculation performed.
             calculation_output: dict. Output of the calculation which is to be
-                stored as a Json blob.
+                stored as a JSON blob.
 
         Raises:
             Exception: The calculation_output is too large.
@@ -1293,7 +1293,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             calculation_id: str. ID of the calculation performed.
 
         Returns:
-            str. Returns entity ID corresponding to the given exploration state.
+            str. The entity ID corresponding to the given exploration state.
         """
         return ':'.join([
             exploration_id, str(exploration_version), state_name,
