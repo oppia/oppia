@@ -100,7 +100,12 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      explorationData.getData().then(function(data) {
+      explorationData.getData(function(explorationId, lostChanges) {
+        if (!autosaveInfoModalsService.isModalOpen()) {
+          autosaveInfoModalsService.showLostChangesModal(
+            lostChanges, explorationId);
+        }
+      }).then(function(data) {
         explorationStatesService.init(data.states);
 
         explorationTitleService.init(data.title);

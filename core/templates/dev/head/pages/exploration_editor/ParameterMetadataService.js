@@ -17,10 +17,10 @@
  */
 
 oppia.factory('parameterMetadataService', [
-  'explorationStatesService', 'expressionInterpolationService',
+  'explorationStatesService', 'ExpressionInterpolationService',
   'explorationParamChangesService', 'graphDataService',
   function(
-      explorationStatesService, expressionInterpolationService,
+      explorationStatesService, ExpressionInterpolationService,
       explorationParamChangesService, graphDataService) {
     var PARAM_ACTION_GET = 'get';
     var PARAM_ACTION_SET = 'set';
@@ -44,7 +44,7 @@ oppia.factory('parameterMetadataService', [
             });
           } else {
             var paramsReferenced = (
-              expressionInterpolationService.getParamsFromString(
+              ExpressionInterpolationService.getParamsFromString(
                 pc.customizationArgs.value));
             for (var j = 0; j < paramsReferenced.length; j++) {
               result.push({
@@ -87,7 +87,7 @@ oppia.factory('parameterMetadataService', [
       var result = getMetadataFromParamChanges(state.paramChanges);
 
       // Next, the content is evaluated.
-      expressionInterpolationService.getParamsFromString(
+      ExpressionInterpolationService.getParamsFromString(
           state.content.getHtml()).forEach(
         function(paramName) {
           result.push({
@@ -108,7 +108,7 @@ oppia.factory('parameterMetadataService', [
       // Finally, the rule feedback strings are evaluated.
       state.interaction.answerGroups.forEach(function(group) {
         for (var k = 0; k < group.outcome.feedback.length; k++) {
-          expressionInterpolationService.getParamsFromString(
+          ExpressionInterpolationService.getParamsFromString(
               group.outcome.feedback[k]).forEach(
             function(paramName) {
               result.push({

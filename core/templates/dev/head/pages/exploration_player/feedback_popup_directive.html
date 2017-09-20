@@ -1,46 +1,40 @@
-<script type="text/ng-template" id="popover/feedback">
-  <feedback-popup></feedback-popup>
-</script>
+<style>
+  feedback-popup .oppia-feedback-popover-textarea {
+    border: 1px solid rgba(0,0,0,0.2);
+    margin-top: 4px;
+    padding: 4px;
+    resize: none;
+    width: 200px;
+  }
+</style>
+<div style="min-width: 200px;">
+  <div ng-show="!feedbackSubmitted">
+    <button type="button" class="oppia-close-popover-button" ng-click="closePopover()">
+      <i class="material-icons md-18">&#xE5CD;</i>
+    </button>
+    <br>
 
-<script type="text/ng-template" id="components/feedback">
-  <style>
-    feedback-popup .oppia-feedback-popover-textarea {
-      border: 1px solid rgba(0,0,0,0.2);
-      margin-top: 4px;
-      padding: 4px;
-      resize: none;
-      width: 200px;
-    }
-  </style>
-  <div style="min-width: 200px;">
-    <div ng-show="!feedbackSubmitted">
-      <button type="button" class="oppia-close-popover-button" ng-click="closePopover()">
-        <i class="material-icons md-18">&#xE5CD;</i>
-      </button>
-      <br>
-
-      <div>
-        <textarea ng-model="feedbackText" rows="5" class="protractor-test-exploration-feedback-textarea oppia-feedback-popover-textarea"
-                  placeholder="<['I18N_PLAYER_LEAVE_FEEDBACK' | translate]>" focus-on="<[feedbackPopoverId]>">
-        </textarea>
-      </div>
-
-      <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
-      <md-button class="pull-right protractor-test-exploration-feedback-submit-btn"
-                 ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;"
-                 ng-click="saveFeedback()"
-                 ng-disabled="!feedbackText"
-                 translate="I18N_PLAYER_SUBMIT_BUTTON">
-      </md-button>
-      <div class="checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
-        <label>
-          <input type="checkbox" ng-model="isSubmitterAnonymized">
-          <span translate="I18N_PLAYER_STAY_ANONYMOUS"></span>
-        </label>
-      </div>
+    <div>
+      <textarea ng-model="feedbackText" rows="5" class="protractor-test-exploration-feedback-textarea oppia-feedback-popover-textarea"
+                placeholder="<['I18N_PLAYER_LEAVE_FEEDBACK' | translate]>" focus-on="<[feedbackPopoverId]>">
+      </textarea>
     </div>
 
-    <div ng-show="feedbackSubmitted" class="ng-cloak" translate="I18N_PLAYER_THANK_FEEDBACK">
+    <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
+    <md-button class="pull-right protractor-test-exploration-feedback-submit-btn"
+               ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;"
+               ng-click="saveFeedback()"
+               ng-disabled="!feedbackText"
+               translate="I18N_PLAYER_SUBMIT_BUTTON">
+    </md-button>
+    <div class="checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
+      <label>
+        <input type="checkbox" ng-model="isSubmitterAnonymized">
+        <span translate="I18N_PLAYER_STAY_ANONYMOUS"></span>
+      </label>
     </div>
   </div>
-</script>
+
+  <div ng-show="feedbackSubmitted" class="ng-cloak" translate="I18N_PLAYER_THANK_FEEDBACK">
+  </div>
+</div>

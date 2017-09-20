@@ -1,7 +1,0 @@
-<script type="text/ng-template" id="components/ratingSummary">
-  <span style="<[getCursorStyle()]>" ng-mouseleave="leaveArea()">
-    <span ng-if="ratingValue || isEditable" ng-repeat="star in stars" class="fa <[star.cssClass]> oppia-rating-star protractor-test-rating-star" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)">
-      <span class="oppia-icon-accessibility-label">Rate this <[$index + 1]> stars</span>
-    </span>
-  </span>
-</script>
