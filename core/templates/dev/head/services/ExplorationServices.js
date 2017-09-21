@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility services for explorations which may be shared by both
+ * @fileoverview Utility service for explorations which may be shared by both
  * the learner and editor views.
  */
 
