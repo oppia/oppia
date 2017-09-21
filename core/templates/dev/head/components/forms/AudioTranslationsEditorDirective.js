@@ -34,16 +34,16 @@ oppia.directive('audioTranslationsEditor', [
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
         '$scope', '$modal', '$sce', 'stateContentService', 'editabilityService',
-        'LanguageUtilService', 'alertsService', 'explorationContextService',
+        'LanguageUtilService', 'AlertsService', 'ExplorationContextService',
         'AssetsBackendApiService',
         function(
             $scope, $modal, $sce, stateContentService, editabilityService,
-            LanguageUtilService, alertsService, explorationContextService,
+            LanguageUtilService, AlertsService, ExplorationContextService,
             AssetsBackendApiService) {
           $scope.isEditable = editabilityService.isEditable;
           $scope.audioTranslations = (
             $scope.subtitledHtml.getBindableAudioTranslations());
-          var explorationId = explorationContextService.getExplorationId();
+          var explorationId = ExplorationContextService.getExplorationId();
 
           $scope.getAudioLanguageDescription = (
             LanguageUtilService.getAudioLanguageDescription);
@@ -66,7 +66,7 @@ oppia.directive('audioTranslationsEditor', [
                 $scope.subtitledHtml.getAudioLanguageCodes()));
 
             if (allowedAudioLanguageCodes.length === 0) {
-              alertsService.addWarning(
+              AlertsService.addWarning(
                 'Sorry, there are no more available languages to translate ' +
                 'into.');
               return;
@@ -85,12 +85,12 @@ oppia.directive('audioTranslationsEditor', [
               },
               controller: [
                 '$scope', '$modalInstance', 'LanguageUtilService',
-                'allowedAudioLanguageCodes', 'alertsService',
-                'explorationContextService', 'IdGenerationService',
+                'allowedAudioLanguageCodes', 'AlertsService',
+                'ExplorationContextService', 'IdGenerationService',
                 function(
                     $scope, $modalInstance, LanguageUtilService,
-                    allowedAudioLanguageCodes, alertsService,
-                    explorationContextService, IdGenerationService) {
+                    allowedAudioLanguageCodes, AlertsService,
+                    ExplorationContextService, IdGenerationService) {
                   var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
                     'There was an error uploading the audio file.');
                   var BUTTON_TEXT_SAVE = 'Save';
@@ -145,7 +145,7 @@ oppia.directive('audioTranslationsEditor', [
                       $scope.saveInProgress = true;
                       var generatedFilename = generateNewFilename();
                       var explorationId = (
-                        explorationContextService.getExplorationId());
+                        ExplorationContextService.getExplorationId());
                       AssetsBackendApiService.saveAudio(
                         explorationId, generatedFilename, uploadedFile
                       ).then(function() {
@@ -166,7 +166,7 @@ oppia.directive('audioTranslationsEditor', [
 
                   $scope.cancel = function() {
                     $modalInstance.dismiss('cancel');
-                    alertsService.clearWarnings();
+                    AlertsService.clearWarnings();
                   };
                 }
               ]
@@ -206,7 +206,7 @@ oppia.directive('audioTranslationsEditor', [
 
                   $scope.cancel = function() {
                     $modalInstance.dismiss('cancel');
-                    alertsService.clearWarnings();
+                    AlertsService.clearWarnings();
                   };
                 }
               ]
