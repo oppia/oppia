@@ -22,7 +22,6 @@ import collections
 import os
 import re
 import subprocess
-import sys
 
 GIT_CMD_GET_TAGS = 'git tag'
 GIT_CMD_GET_LCA_WITH_DEVELOP = 'git merge-base develop %s'
@@ -39,27 +38,6 @@ FECONF_VAR_NAMES = ['CURRENT_EXPLORATION_STATES_SCHEMA_VERSION',
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
-
-
-class ChangedBranch(object):
-    def __init__(self, new_branch):
-        get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
-        self.old_branch = subprocess.check_output(get_branch_cmd).strip()
-        self.new_branch = new_branch
-        self.is_same_branch = self.old_branch == self.new_branch
-
-    def __enter__(self):
-        if not self.is_same_branch:
-            try:
-                subprocess.check_output(['git', 'checkout', self.new_branch])
-            except subprocess.CalledProcessError:
-                print ('\nCould not change to %s. This is most probably '
-                       'because you are in a dirty state' % self.new_branch)
-                sys.exit(1)
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if not self.is_same_branch:
-            subprocess.check_output(['git', 'checkout', self.old_branch])
 
 
 def _run_cmd(cmd_str):
@@ -215,15 +193,14 @@ def _check_storage_models(current_release):
 
 def main():
     """Collects necessary info and dumps it to disk."""
-    with ChangedBranch('develop'):
-        current_release = _get_current_version_tag()
-        base_commit = _get_base_commit_with_develop(current_release)
-        new_release_logs = _gather_logs(base_commit)
-        past_logs = _gather_logs(FIRST_OPPIA_COMMIT, base_commit)
-        issue_links = _extract_issues(new_release_logs)
-        feconf_version_changes = _check_versions(current_release)
-        setup_changes = _check_setup_scripts(current_release)
-        storage_changes = _check_storage_models(current_release)
+    current_release = _get_current_version_tag()
+    base_commit = _get_base_commit_with_develop(current_release)
+    new_release_logs = _gather_logs(base_commit)
+    past_logs = _gather_logs(FIRST_OPPIA_COMMIT, base_commit)
+    issue_links = _extract_issues(new_release_logs)
+    feconf_version_changes = _check_versions(current_release)
+    setup_changes = _check_setup_scripts(current_release)
+    storage_changes = _check_storage_models(current_release)
 
     summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
     with open(summary_file, 'w') as out:
