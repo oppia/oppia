@@ -34,7 +34,7 @@ transaction_services = models.Registry.import_transaction_services()
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
 
-    The id/key of instances of this class has the form
+    The ID/key of instances of this class has the form
         [EXPLORATION_ID].[STATE_NAME].
     """
     # Number of times the state was entered for the first time in a reader
@@ -52,6 +52,15 @@ class StateCounterModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(cls, exploration_id, state_name):
+        """Gets or creates an entity by exploration_id and state_name.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            state_name: str. Name of the current state.
+
+        Returns:
+            StateCounterModel. An instance of the StateCounterModel.
+        """
         instance_id = '.'.join([exploration_id, state_name])
         counter = cls.get(instance_id, strict=False)
         if not counter:
@@ -248,17 +257,16 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'start'
-        exploration_id: id of exploration currently being played
-        exploration_version: version of exploration
-        state_name: Name of current state
-        client_time_spent_in_secs: 0
-        play_type: 'normal'
-        created_on date
-        event_schema_version: 1
-        session_id: ID of current student's session
-        params: current parameter values, in the form of a map of parameter
-            name to value
+        event_type: 'start'.
+        exploration_id: ID of exploration currently being played.
+        exploration_version: Version of exploration.
+        state_name: Name of current state.
+        client_time_spent_in_secs: 0.
+        play_type: 'normal'.
+        event_schema_version: 1.
+        session_id: ID of current student's session.
+        params: Current parameter values, in the form of a map of parameter
+            name to value.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -290,6 +298,16 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates entity ID for a new event based on its
+        exploration and session ID.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            session_id: str. ID of current student's session.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -299,8 +317,20 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                params, play_type, unused_version=1):
-        """Creates a new start exploration event."""
-        # TODO(sll): Some events currently do not have an entity id that was
+        """Creates a new start exploration event and then writes it to
+        the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            params: dict. Current parameter values, map of parameter
+                name to value.
+            play_type: str. Type of play-through.
+            unused_version: int. Default is 1.
+        """
+        # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due tg an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(
@@ -324,7 +354,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     Due to complexity on browser end, this event may be logged when user clicks
     close and then cancel. Thus, the real event is the last event of this type
-    logged for the session id.
+    logged for the session ID.
 
     Note: shortly after the release of v2.0.0.rc.2, some of these events
     were migrated from StateHitEventLogEntryModel. These events have their
@@ -336,18 +366,17 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'leave' (there are no 'maybe leave' events in V0)
-        exploration_id: id of exploration currently being played
-        exploration_version: version of exploration
-        state_name: Name of current state
-        play_type: 'normal'
-        created_on date
-        event_schema_version: 1
-        session_id: ID of current student's session
-        params: current parameter values, in the form of a map of parameter
-            name to value
-        client_time_spent_in_secs: time spent in this state before the event
-            was triggered
+        event_type: 'leave' (there are no 'maybe leave' events in V0).
+        exploration_id: ID of exploration currently being played.
+        exploration_version: version of exploration.
+        state_name: Name of current state.
+        play_type: 'normal'.
+        event_schema_version: 1.
+        session_id: ID of current student's session.
+        params: Current parameter values, in the form of a map of parameter
+            name to value.
+        client_time_spent_in_secs: Time spent in this state before the event
+            was triggered.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -382,6 +411,16 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates entity ID for a new event based on its
+        exploration and session ID.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            session_id: str. ID of current student's session.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -391,8 +430,21 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                client_time_spent_in_secs, params, play_type):
-        """Creates a new leave exploration event."""
-        # TODO(sll): Some events currently do not have an entity id that was
+        """Creates a new leave exploration event and then writes it
+        to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            params: dict. Current parameter values, map of parameter name
+                to value.
+            play_type: str. Type of play-through.
+            client_time_spent_in_secs: float. Time since start of this
+                state before this event occurred.
+        """
+        # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(
@@ -417,18 +469,17 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'complete'
-        exploration_id: id of exploration currently being played
-        exploration_version: version of exploration
-        state_name: Name of the terminal state
-        play_type: 'normal'
-        created_on date
-        event_schema_version: 1
-        session_id: ID of current student's session
-        params: current parameter values, in the form of a map of parameter
-            name to value
-        client_time_spent_in_secs: time spent in this state before the event
-            was triggered
+        event_type: 'complete'.
+        exploration_id: ID of exploration currently being played.
+        exploration_version: version of exploration.
+        state_name: Name of the terminal state.
+        play_type: 'normal'.
+        event_schema_version: 1.
+        session_id: ID of current student's session.
+        params: Current parameter values, in the form of a map of parameter
+            name to value.
+        client_time_spent_in_secs: Time spent in this state before the event
+            was triggered.
 
     Note: shortly after the release of v2.0.0.rc.3, some of these events
     were migrated from MaybeLeaveExplorationEventLogEntryModel. These events
@@ -468,6 +519,16 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates entity ID for a new event based on its
+        exploration and session ID.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            session_id: str. ID of current student's session.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -477,7 +538,20 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                client_time_spent_in_secs, params, play_type):
-        """Creates a new exploration completion event."""
+        """Creates a new exploration completion event and then writes it
+        to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            params: dict. Current parameter values, map of parameter name
+                to value.
+            play_type: str. Type of play-through.
+            client_time_spent_in_secs: float. Time since start of this
+                state before this event occurred.
+        """
         entity_id = cls.get_new_event_entity_id(exp_id, session_id)
         complete_event_entity = cls(
             id=entity_id,
@@ -499,9 +573,9 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'rate_exploration'
-        exploration_id: id of exploration which is being rated
-        rating: value of rating assigned to exploration
+        event_type: 'rate_exploration'.
+        exploration_id: ID of exploration which is being rated.
+        rating: Value of rating assigned to exploration.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -522,6 +596,16 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
+        """Generates entity ID for a new rate exploration event based on its
+        exploration_id and user_id of the learner.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            user_id: str. ID of the user.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -530,7 +614,16 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, user_id, rating, old_rating):
-        """Creates a new rate exploration event."""
+        """Creates a new rate exploration event and then writes it to the
+        datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            user_id: str. ID of the user.
+            rating: int. Value of rating assigned to exploration.
+            old_rating: int or None. Will be None if the user rates an
+                exploration for the first time.
+        """
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)
         cls(id=entity_id,
@@ -543,16 +636,15 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 class StateHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student getting to a particular state. The
     definitions of the fields are as follows:
-    - event_type: 'state_hit'
-    - exploration_id: id of exploration currently being played
-    - exploration_version: version of exploration
-    - state_name: Name of current state
-    - play_type: 'normal'
-    - created_on date
-    - event_schema_version: 1
-    - session_id: ID of current student's session
-    - params: current parameter values, in the form of a map of parameter name
-              to its value
+    - event_type: 'state_hit'.
+    - exploration_id: ID of exploration currently being played.
+    - exploration_version: Version of exploration.
+    - state_name: Name of current state.
+    - play_type: 'normal'.
+    - event_schema_version: 1.
+    - session_id: ID of current student's session.
+    - params: Current parameter values, in the form of a map of parameter name
+              to its value.
     NOTE TO DEVELOPERS: Unlike other events, this event does not have a
     client_time_spent_in_secs. Instead, it is the reference event for
     all other client_time_spent_in_secs values, which each represent the
@@ -587,6 +679,16 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates entity ID for a new event based on its
+        exploration and session ID.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            session_id: str. ID of current student's session.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -597,8 +699,19 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     def create(
             cls, exp_id, exp_version, state_name, session_id, params,
             play_type):
-        """Creates a new leave exploration event."""
-        # TODO(sll): Some events currently do not have an entity id that was
+        """Creates a new state hit event entity and then writes
+        it to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            params: dict. Current parameter values, map of parameter name
+                to value.
+            play_type: str. Type of play-through.
+        """
+        # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(exp_id, session_id)
@@ -687,8 +800,10 @@ class ExplorationStatsModel(base_models.BaseModel):
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
+    This model is keyed using a custom ID of the format
+    {[EXPLORATION_ID]:[EXPLORATION_VERSION]}.
     """
-    # Id of exploration.
+    # ID of exploration.
     exploration_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
     version = ndb.StringProperty(indexed=False)
@@ -704,13 +819,34 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_entity_id(cls, exploration_id, exploration_version):
+        """Gets entity_id for a batch model based on given exploration state.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of the exploration currently
+                being played.
+
+        Returns:
+            str. Returns entity_id for a new instance of this class.
+        """
         return '%s:%s' % (exploration_id, exploration_version)
 
     @classmethod
     def create(
             cls, exp_id, version, num_starts, num_completions,
             state_hit_counts):
-        """Creates a new ExplorationAnnotationsModel."""
+        """Creates a new ExplorationAnnotationsModel and
+        then writes it to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            version: int. Version of exploration.
+            num_starts: int. Number of students who started the exploration.
+            num_completions: int. Number of students who have completed
+                the exploration.
+            state_hit_counts: dict. Describes the number of hits
+                for each state.
+        """
         entity_id = cls.get_entity_id(exp_id, version)
         cls(
             id=entity_id,
@@ -722,6 +858,16 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_versions(cls, exploration_id):
+        """This function returns a list containing versions of
+        ExplorationAnnotationsModel for a specific exploration_id.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+
+        Returns:
+            list(int). List of versions corresponding to annotation models
+                with given exp_id.
+        """
         return [
             annotations.version for annotations in cls.get_all().filter(
                 cls.exploration_id == exploration_id
@@ -736,8 +882,8 @@ class StateAnswersModel(base_models.BaseModel):
     information is duplicated across all shards, since they are immutable or are
     local to that shard.
 
-    The id/key of instances of this class has the form
-        [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID].
+    This model is keyed using a custom ID of the format
+        {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID]}.
     """
     # This provides about 124k of padding for the other properties and entity
     # storage overhead (since the max entity size is 1MB). The meta data can
@@ -745,7 +891,7 @@ class StateAnswersModel(base_models.BaseModel):
     # risking overflowing an entity.
     _MAX_ANSWER_LIST_BYTE_SIZE = 900000
 
-    # Explicitly store exploration id, exploration version and state name
+    # Explicitly store exploration ID, exploration version and state name
     # so we can easily do queries on them.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
     exploration_version = ndb.IntegerProperty(indexed=True, required=True)
@@ -782,6 +928,20 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     def _get_model(
             cls, exploration_id, exploration_version, state_name, shard_id):
+        """Gets model instance based on given exploration state and shard_id.
+
+        Args:
+            exploration_id: str. The exploration ID.
+            exploration_version: int. The version of the exploration to
+                fetch answers for.
+            state_name: str. The name of the state to fetch answers for.
+            shard_id: int. The ID of the shard to fetch answers for.
+
+        Returns:
+            StateAnswersModel. The model associated with the specified
+                exploration state and shard ID, or None if no answers
+                have been submitted corresponding to this state.
+        """
         entity_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, shard_id)
         return cls.get(entity_id, strict=False)
@@ -800,8 +960,8 @@ class StateAnswersModel(base_models.BaseModel):
 
         Returns:
             StateAnswersModel|None. The master model associated with the
-            specified exploration state, or None if no answers have been
-            submitted to this state.
+                specified exploration state, or None if no answers have been
+                submitted to this state.
         """
         main_shard = cls._get_model(
             exploration_id, exploration_version, state_name, 0)
@@ -810,8 +970,17 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     def get_all_models(cls, exploration_id, exploration_version, state_name):
         """Retrieves all models and shards associated with the specific
-        exploration state. Returns None if no answers have yet been submitted to
-        the specified exploration state.
+        exploration state.
+
+        Args:
+            exploration_id: str. The exploration ID.
+            exploration_version: int. The version of the exploration to fetch
+                answers for.
+            state_name: str. The name of the state to fetch answers for.
+
+        Returns:
+            list(StateAnswersModel)|None. Returns None if no answers have yet
+                been submitted to the specified exploration state.
         """
         # It's okay if this isn't run in a transaction. When adding new shards,
         # it's guaranteed the master shard will be updated at the same time the
@@ -842,6 +1011,14 @@ class StateAnswersModel(base_models.BaseModel):
         """See the insert_submitted_answers for general documentation of what
         this method does. It's only safe to call this method from within a
         transaction.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            interaction_id: str. ID of the interaction.
+            new_submitted_answer_dict_list: list(dict). List of new submitted
+                answers each of which is stored as a JSON blob.
         """
         # The main shard always needs to be retrieved. At most one other shard
         # needs to be retrieved (the last one).
@@ -867,7 +1044,8 @@ class StateAnswersModel(base_models.BaseModel):
             last_shard.submitted_answer_list,
             last_shard.accumulated_answer_json_size_bytes,
             new_submitted_answer_dict_list)
-        new_shard_count = main_shard.shard_count + len(sharded_answer_lists) - 1
+        new_shard_count = main_shard.shard_count + (
+            len(sharded_answer_lists) - 1)
 
         # Collect all entities to update to efficiently send them as a single
         # update.
@@ -890,9 +1068,12 @@ class StateAnswersModel(base_models.BaseModel):
             entity_id = cls._get_entity_id(
                 exploration_id, exploration_version, state_name, shard_id)
             new_shard = cls(
-                id=entity_id, exploration_id=exploration_id,
-                exploration_version=exploration_version, state_name=state_name,
-                shard_id=shard_id, interaction_id=interaction_id,
+                id=entity_id,
+                exploration_id=exploration_id,
+                exploration_version=exploration_version,
+                state_name=state_name,
+                shard_id=shard_id,
+                interaction_id=interaction_id,
                 submitted_answer_list=sharded_answer_lists[i],
                 accumulated_answer_json_size_bytes=sharded_answer_list_sizes[i])
             entities_to_put.append(new_shard)
@@ -928,6 +1109,14 @@ class StateAnswersModel(base_models.BaseModel):
         is interrupted and retried. Furthermore, this method may fail with a
         DeadlineExceededError if too many answers are attempted for submission
         simultaneously.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            interaction_id: str. ID of the interaction.
+            new_submitted_answer_dict_list: list(dict). List of new submitted
+                answers each of which is stored as a JSON blob.
         """
         transaction_services.run_in_transaction(
             cls._insert_submitted_answers_unsafe, exploration_id,
@@ -937,6 +1126,18 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     def _get_entity_id(
             cls, exploration_id, exploration_version, state_name, shard_id):
+        """Returns the entity_id of a StateAnswersModel based on it's
+        exp_id, state_name, exploration_version and shard_id.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            shard_id: int. ID of shard.
+
+        Returns:
+            str. Entity_id for a StateAnswersModel instance.
+        """
         return ':'.join([
             exploration_id, str(exploration_version), state_name,
             str(shard_id)])
@@ -950,6 +1151,24 @@ class StateAnswersModel(base_models.BaseModel):
         list, shard the answers such that a list of answer lists are returned.
         The first entry is guaranteed to contain all answers of the current
         answer list.
+
+        Args:
+            current_answer_list: list(dict). List of answer dicts each of which
+                is stored as JSON blob.
+            current_answer_list_size: int. Number of bytes required
+                to store all the answers in the current_answer_list.
+            new_answer_list: list(dict). List of new submitted answers each of
+                which is stored as a JSON blob.
+
+        Returns:
+            tuple(list(list(dict)), list(int)).
+            Where:
+                sharded_answer_lists: A sharded answer list
+                    containing list of answer dicts.
+                sharded_answer_list_sizes: List where each element corresponds
+                    to number of bytes required to store all the
+                    answers in the corresponding list of answer dicts
+                    in sharded_answer_lists.
         """
         # Sort the new answers to insert in ascending order of their sizes in
         # bytes.
@@ -975,12 +1194,22 @@ class StateAnswersModel(base_models.BaseModel):
 
     @classmethod
     def _get_answer_dict_size(cls, answer_dict):
-        """Returns a size overestimate (in bytes) of the given answer dict."""
+        """Returns a size overestimate (in bytes) of the given answer dict.
+
+        Args:
+            answer_dict: dict. Answer entered by the user.
+
+        Returns:
+            int. Size of the answer_dict.
+        """
         return sys.getsizeof(json.dumps(answer_dict))
 
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
-    """Store output of calculation performed on StateAnswers."""
+    """Store output of calculation performed on StateAnswers.
+    This model is keyed using a custom ID of the format
+    {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[CALCULATION_ID]}.
+    """
 
     exploration_id = ndb.StringProperty(indexed=True, required=True)
     # May be an integral exploration_version or 'all' if this entity represents
@@ -994,6 +1223,20 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def create_or_update(cls, exploration_id, exploration_version, state_name,
                          calculation_id, calculation_output):
+        """Creates or updates StateAnswersCalcOutputModel and then writes
+        it to the datastore.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            calculation_id: str. ID of the calculation performed.
+            calculation_output: dict. Output of the calculation which is to be
+                stored as a JSON blob.
+
+        Raises:
+            Exception: The calculation_output is too large.
+        """
         instance_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, calculation_id)
         instance = cls.get(instance_id, strict=False)
@@ -1020,6 +1263,18 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def get_model(cls, exploration_id, exploration_version, state_name,
                   calculation_id):
+        """Gets entity instance corresponding to the given exploration state.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            calculation_id: str. ID of the calculation performed.
+
+        Returns:
+            StateAnswersCalcOutputModel. Entity instance associated with the
+                given exploration state.
+        """
         entity_id = cls._get_entity_id(
             exploration_id, str(exploration_version), state_name,
             calculation_id)
@@ -1029,6 +1284,17 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def _get_entity_id(cls, exploration_id, exploration_version, state_name,
                        calculation_id):
+        """Returns entity_id corresponding to the given exploration state.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            calculation_id: str. ID of the calculation performed.
+
+        Returns:
+            str. The entity ID corresponding to the given exploration state.
+        """
         return ':'.join([
             exploration_id, str(exploration_version), state_name,
             calculation_id])
