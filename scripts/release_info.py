@@ -23,6 +23,7 @@ import os
 import re
 import subprocess
 
+GIT_CMD_GET_STATUS = 'git status'
 GIT_CMD_GET_TAGS = 'git tag'
 GIT_CMD_GET_LCA_WITH_DEVELOP = 'git merge-base develop %s'
 GIT_CMD_GET_LOGS_FORMAT_STRING = (
@@ -52,6 +53,16 @@ def _run_cmd(cmd_str):
 
     """
     return subprocess.check_output(cmd_str.split(' ')).strip()
+
+
+def _get_current_branch():
+    """Retrieves the branch Git is currently in.
+
+    Returns:
+        (str): The name of the current Git branch.
+    """
+    branch_name_line = _run_cmd(GIT_CMD_GET_STATUS).splitlines()[0]
+    return branch_name_line.split(' ')[2]
 
 
 def _get_current_version_tag():
@@ -193,6 +204,11 @@ def _check_storage_models(current_release):
 
 def main():
     """Collects necessary info and dumps it to disk."""
+    branch_name = _get_current_branch()
+    if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
+        raise Exception(
+            'This script should only be run from the latest release branch.')
+
     current_release = _get_current_version_tag()
     base_commit = _get_base_commit_with_develop(current_release)
     new_release_logs = _gather_logs(base_commit)
