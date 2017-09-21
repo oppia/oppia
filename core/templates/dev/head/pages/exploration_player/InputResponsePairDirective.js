@@ -30,11 +30,11 @@ oppia.directive('inputResponsePair', [
         'input_response_pair_directive.html'),
       controller: [
         '$scope', 'oppiaPlayerService', 'playerTranscriptService',
-        'oppiaExplorationHtmlFormatterService', 'INTERACTION_SPECS',
+        'OppiaExplorationHtmlFormatterService', 'INTERACTION_SPECS',
         'playerPositionService',
         function(
             $scope, oppiaPlayerService, playerTranscriptService,
-            oppiaExplorationHtmlFormatterService, INTERACTION_SPECS,
+            OppiaExplorationHtmlFormatterService, INTERACTION_SPECS,
             playerPositionService) {
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return playerTranscriptService.isLastCard(
@@ -45,7 +45,7 @@ oppia.directive('inputResponsePair', [
             var interaction = oppiaPlayerService.getInteraction(
               playerPositionService.getCurrentStateName());
             if ($scope.data) {
-              return oppiaExplorationHtmlFormatterService.getAnswerHtml(
+              return OppiaExplorationHtmlFormatterService.getAnswerHtml(
                 $scope.data.learnerInput, interaction.id,
                 interaction.customizationArgs);
             }
@@ -60,7 +60,7 @@ oppia.directive('inputResponsePair', [
             if ($scope.data && interaction.id &&
                 INTERACTION_SPECS[interaction.id].needs_summary) {
               shortAnswerHtml = (
-                oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+                OppiaExplorationHtmlFormatterService.getShortAnswerHtml(
                   $scope.data.learnerInput, interaction.id,
                   interaction.customizationArgs));
             }

@@ -87,11 +87,11 @@ oppia.controller('StateEditor', [
 // A service which handles opening and closing the training modal used for both
 // unresolved answers and answers within the training data of a classifier.
 oppia.factory('trainingModalService', [
-  '$rootScope', '$modal', 'alertsService',
-  function($rootScope, $modal, alertsService) {
+  '$rootScope', '$modal', 'AlertsService',
+  function($rootScope, $modal, AlertsService) {
     return {
       openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
         if (externalSave) {
           $rootScope.$broadcast('externalSave');
         }
@@ -102,11 +102,11 @@ oppia.factory('trainingModalService', [
           controller: [
             '$scope', '$injector', '$modalInstance',
             'explorationStatesService', 'editorContextService',
-            'AnswerClassificationService', 'explorationContextService',
+            'AnswerClassificationService', 'ExplorationContextService',
             'stateInteractionIdService', 'angularNameService',
             function($scope, $injector, $modalInstance,
                 explorationStatesService, editorContextService,
-                AnswerClassificationService, explorationContextService,
+                AnswerClassificationService, ExplorationContextService,
                 stateInteractionIdService, angularNameService) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
@@ -125,7 +125,7 @@ oppia.factory('trainingModalService', [
 
               $scope.init = function() {
                 var explorationId =
-                  explorationContextService.getExplorationId();
+                  ExplorationContextService.getExplorationId();
                 var currentStateName =
                   editorContextService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);
@@ -383,12 +383,12 @@ oppia.directive('trainingPanel', [function() {
     },
     templateUrl: 'teaching/trainingPanel',
     controller: [
-      '$scope', 'oppiaExplorationHtmlFormatterService',
+      '$scope', 'OppiaExplorationHtmlFormatterService',
       'editorContextService', 'explorationStatesService',
       'trainingDataService', 'responsesService', 'stateInteractionIdService',
       'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
       'OutcomeObjectFactory',
-      function($scope, oppiaExplorationHtmlFormatterService,
+      function($scope, OppiaExplorationHtmlFormatterService,
           editorContextService, explorationStatesService,
           trainingDataService, responsesService, stateInteractionIdService,
           stateCustomizationArgsService, AnswerGroupObjectFactory,
@@ -403,7 +403,7 @@ oppia.directive('trainingPanel', [function() {
 
         var _updateAnswerTemplate = function() {
           $scope.answerTemplate = (
-            oppiaExplorationHtmlFormatterService.getAnswerHtml(
+            OppiaExplorationHtmlFormatterService.getAnswerHtml(
               $scope.answer, stateInteractionIdService.savedMemento,
               stateCustomizationArgsService.savedMemento));
         };

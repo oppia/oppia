@@ -31,10 +31,10 @@ oppia.directive('collectionNodeEditor', [
         'collection_node_editor_directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
-        'CollectionUpdateService', 'alertsService',
+        'CollectionUpdateService', 'AlertsService',
         function(
             $scope, CollectionEditorStateService, CollectionLinearizerService,
-            CollectionUpdateService, alertsService) {
+            CollectionUpdateService, AlertsService) {
           $scope.collection = CollectionEditorStateService.getCollection();
 
           // Deletes this collection node from the frontend collection
@@ -43,7 +43,7 @@ oppia.directive('collectionNodeEditor', [
             var explorationId = $scope.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.removeCollectionNode(
                 $scope.collection, explorationId)) {
-              alertsService.fatalWarning(
+              AlertsService.fatalWarning(
                 'Internal collection editor error. Could not delete ' +
                 'exploration by ID: ' + explorationId);
             }
@@ -55,7 +55,7 @@ oppia.directive('collectionNodeEditor', [
             var explorationId = $scope.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.shiftNodeLeft(
                 $scope.collection, explorationId)) {
-              alertsService.fatalWarning(
+              AlertsService.fatalWarning(
                 'Internal collection editor error. Could not shift node left ' +
                 'with ID: ' + explorationId);
             }
@@ -67,7 +67,7 @@ oppia.directive('collectionNodeEditor', [
             var explorationId = $scope.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.shiftNodeRight(
                 $scope.collection, explorationId)) {
-              alertsService.fatalWarning(
+              AlertsService.fatalWarning(
                 'Internal collection editor error. Could not shift node ' +
                 'right with ID: ' + explorationId);
             }
