@@ -26,13 +26,13 @@ oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
-  '$http', 'LearnerParamsService', 'alertsService',
+  '$http', 'LearnerParamsService', 'AlertsService',
   'AnswerClassificationResultObjectFactory',
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
   'RULE_TYPE_CLASSIFIER',
-  function($http, LearnerParamsService, alertsService,
+  function($http, LearnerParamsService, AlertsService,
       AnswerClassificationResultObjectFactory,
       PredictionAlgorithmRegistryService, StateClassifierMappingService,
       INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
@@ -73,7 +73,7 @@ oppia.factory('AnswerClassificationService', [
           defaultOutcome, answerGroups.length, 0, DEFAULT_OUTCOME_CLASSIFICATION
         );
       } else {
-        alertsService.addWarning('Something went wrong with the exploration.');
+        AlertsService.addWarning('Something went wrong with the exploration.');
       }
     };
 
@@ -124,7 +124,7 @@ oppia.factory('AnswerClassificationService', [
           answerClassificationResult = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);
         } else {
-          alertsService.addWarning(
+          AlertsService.addWarning(
             'Something went wrong with the exploration: no ' +
             'interactionRulesService was available.');
           throw Error(

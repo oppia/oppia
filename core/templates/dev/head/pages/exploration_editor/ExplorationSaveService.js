@@ -18,7 +18,7 @@
 
 oppia.factory('explorationSaveService', [
   '$modal', '$timeout', '$rootScope', '$log', '$q',
-  'alertsService', 'explorationData', 'explorationStatesService',
+  'AlertsService', 'explorationData', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
   'explorationLanguageCodeService', 'explorationRightsService',
@@ -28,7 +28,7 @@ oppia.factory('explorationSaveService', [
   'StatesObjectFactory', 'UrlInterpolationService',
   function(
       $modal, $timeout, $rootScope, $log, $q,
-      alertsService, explorationData, explorationStatesService,
+      AlertsService, explorationData, explorationStatesService,
       explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
       explorationLanguageCodeService, explorationRightsService,
@@ -58,15 +58,15 @@ oppia.factory('explorationSaveService', [
 
     var areRequiredFieldsFilled = function() {
       if (!explorationTitleService.displayed) {
-        alertsService.addWarning('Please specify a title');
+        AlertsService.addWarning('Please specify a title');
         return false;
       }
       if (!explorationObjectiveService.displayed) {
-        alertsService.addWarning('Please specify an objective');
+        AlertsService.addWarning('Please specify an objective');
         return false;
       }
       if (!explorationCategoryService.displayed) {
-        alertsService.addWarning('Please specify a category');
+        AlertsService.addWarning('Please specify a category');
         return false;
       }
 
@@ -80,8 +80,8 @@ oppia.factory('explorationSaveService', [
           'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'explorationContextService',
-          function($scope, $modalInstance, explorationContextService) {
+          '$scope', '$modalInstance', 'ExplorationContextService',
+          function($scope, $modalInstance, ExplorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
@@ -90,7 +90,7 @@ oppia.factory('explorationSaveService', [
               $modalInstance.dismiss('cancel');
             };
             $scope.explorationId = (
-              explorationContextService.getExplorationId());
+              ExplorationContextService.getExplorationId());
           }
         ]
       });
@@ -112,7 +112,7 @@ oppia.factory('explorationSaveService', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
               whenModalClosed.resolve();
             };
           }
@@ -176,7 +176,7 @@ oppia.factory('explorationSaveService', [
           $rootScope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
-          alertsService.addSuccessMessage('Changes saved.');
+          AlertsService.addSuccessMessage('Changes saved.');
           saveIsInProgress = false;
           whenSavingDone.resolve();
         }, function() {
@@ -216,7 +216,7 @@ oppia.factory('explorationSaveService', [
             }
           ]
         }).result.then(function() {
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           $rootScope.$broadcast('externalSave');
 
           $modal.open({
@@ -236,7 +236,7 @@ oppia.factory('explorationSaveService', [
           });
 
           changeListService.discardAllChanges();
-          alertsService.addSuccessMessage('Changes discarded.');
+          AlertsService.addSuccessMessage('Changes discarded.');
           $rootScope.$broadcast('initExplorationPage');
 
           // The reload is necessary because, otherwise, the
@@ -254,7 +254,7 @@ oppia.factory('explorationSaveService', [
 
         siteAnalyticsService.registerOpenPublishExplorationModalEvent(
           explorationData.explorationId);
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         // If the metadata has not yet been specified, open the pre-publication
         // 'add exploration metadata' modal.
@@ -387,7 +387,7 @@ oppia.factory('explorationSaveService', [
                   explorationTagsService.restoreFromMemento();
 
                   $modalInstance.dismiss('cancel');
-                  alertsService.clearWarnings();
+                  AlertsService.clearWarnings();
                 };
               }
             ]
@@ -449,7 +449,7 @@ oppia.factory('explorationSaveService', [
             explorationWarningsService.countWarnings() > 0) {
           // If the exploration is not private, warnings should be fixed before
           // it can be saved.
-          alertsService.addWarning(explorationWarningsService.getWarnings()[0]);
+          AlertsService.addWarning(explorationWarningsService.getWarnings()[0]);
           return;
         }
 
@@ -477,7 +477,7 @@ oppia.factory('explorationSaveService', [
           // TODO(wxy): after diff supports exploration metadata, add a check to
           // exit if changes cancel each other out.
 
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
 
           // If the modal is open, do not open another one.
           if (modalIsOpen) {
@@ -525,7 +525,7 @@ oppia.factory('explorationSaveService', [
                 };
                 $scope.cancel = function() {
                   $modalInstance.dismiss('cancel');
-                  alertsService.clearWarnings();
+                  AlertsService.clearWarnings();
                 };
               }
             ]

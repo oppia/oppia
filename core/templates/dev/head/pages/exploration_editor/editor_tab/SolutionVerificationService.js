@@ -17,10 +17,10 @@
  */
 
 oppia.factory('SolutionVerificationService', [
-  '$injector', 'stateInteractionIdService', 'explorationContextService',
+  '$injector', 'stateInteractionIdService', 'ExplorationContextService',
   'editorContextService', 'angularNameService', 'AnswerClassificationService',
   function(
-    $injector, stateInteractionIdService, explorationContextService,
+    $injector, stateInteractionIdService, ExplorationContextService,
     editorContextService, angularNameService, AnswerClassificationService) {
     return {
       verifySolution: function(
