@@ -36,6 +36,7 @@ GROUP_SEP = '\x1D'
 VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
 FECONF_VAR_NAMES = ['CURRENT_EXPLORATION_STATES_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
+FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
 
@@ -217,8 +218,9 @@ def main():
     with ChangedBranch('develop'):
         current_release = _get_current_version_tag()
         base_commit = _get_base_commit_with_develop(current_release)
-        logs = _gather_logs(base_commit)
-        issue_links = _extract_issues(logs)
+        new_release_logs = _gather_logs(base_commit)
+        past_logs = _gather_logs(FIRST_OPPIA_COMMIT, base_commit)
+        issue_links = _extract_issues(new_release_logs)
         feconf_version_changes = _check_versions(current_release)
         setup_changes = _check_setup_scripts(current_release)
         storage_changes = _check_storage_models(current_release)
@@ -243,14 +245,47 @@ def main():
             for item in storage_changes:
                 out.write('* %s  \n' % item)
 
-        out.write('\n### Authors:\n')
+        past_authors = {
+            log.email: log.author for log in past_logs
+        }
+        release_authors = {(log.author, log.email) for log in new_release_logs}
+
+        new_authors = sorted(set(
+            [(name, email) for name, email in release_authors
+             if email not in past_authors]))
+        existing_authors = sorted(set(
+            [(name, email) for name, email in release_authors
+             if email in past_authors]))
+        new_author_names = [name for name, _ in new_authors]
+        existing_author_names = [name for name, _ in existing_authors]
+
         # TODO: duplicate author handling due to email changes
-        for name, email in sorted({(log.author, log.email) for log in logs}):
-            out.write('%s <%s>  \n' % (name, email))
+        out.write('\n### New Authors:\n')
+        for name, email in new_authors:
+            out.write('* %s <%s>\n' % (name, email))
+
+        out.write('\n### Existing Authors:\n')
+        for name, email in existing_authors:
+            out.write('* %s <%s>\n' % (name, email))
+
+        # Generate the author sections of the email.
+        out.write('\n### Email C&P Blurbs about authors:\n')
+        new_author_comma_list = (
+            '%s, and %s' % (', '.join(
+                new_author_names[:-1]), new_author_names[-1]))
+        existing_author_comma_list = (
+            '%s, and %s' % (', '.join(
+                existing_author_names[:-1]), existing_author_names[-1]))
+        out.write(
+            '``Please welcome %s for whom this release marks their first '
+            'contribution to Oppia!``\n\n' % new_author_comma_list)
+        out.write(
+            '``Thanks to %s, our returning contributors who made this release '
+            'possible.``\n' % existing_author_comma_list)
 
         out.write('\n### Commit History:\n')
         for name, title in [(log.author, log.message.split('\n\n')[0])
-                            for log in logs]:
+                            for log in new_release_logs]:
             out.write('* %s\n' % title)
 
         if issue_links:
