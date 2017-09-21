@@ -26,8 +26,7 @@ _BACKUP_EVENT_QUEUE_RATE = '5/s'
 _MAX_BACKUP_URL_LENGTH = 2000
 _CRON_YAML_FILE_NAME = 'cron.yaml'
 _OMITTED_MODELS = [
-    'JobModel', 'ContinuousComputationModel', 'ClassifierTrainingJobModel',
-    'TrainingJobExplorationMappingModel', 'FeedbackAnalyticsModel',
+    'JobModel', 'ContinuousComputationModel', 'FeedbackAnalyticsModel',
     'ExplorationRecommendationsModel', 'TopicSimilaritiesModel',
     'ExplorationAnnotationsModel', 'StateAnswersCalcOutputModel',
     'UserRecentChangesBatchModel', 'UserStatsModel']
