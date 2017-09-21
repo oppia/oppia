@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'oppiaHtmlEscaper', 'explorationContextService',
-  function($rootScope, $sce, oppiaHtmlEscaper, explorationContextService) {
+  '$rootScope', '$sce', 'oppiaHtmlEscaper', 'ExplorationContextService',
+  function($rootScope, $sce, oppiaHtmlEscaper, ExplorationContextService) {
     return {
       restrict: 'E',
       scope: {},
@@ -30,7 +30,7 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.filepathWithValue);
         $scope.imageUrl = $sce.trustAsResourceUrl(
-          '/imagehandler/' + explorationContextService.getExplorationId() +
+          '/imagehandler/' + ExplorationContextService.getExplorationId() +
           '/' + encodeURIComponent($scope.filepath));
         $scope.imageCaption = '';
         if ($attrs.captionWithValue) {
