@@ -18,10 +18,10 @@
 
 oppia.factory('AudioPlayerService', [
   '$q', '$timeout', 'ngAudio', 'AssetsBackendApiService',
-  'explorationContextService',
+  'ExplorationContextService',
   function(
       $q, $timeout, ngAudio, AssetsBackendApiService,
-      explorationContextService) {
+      ExplorationContextService) {
     // The ID of the directive that contains the currently playing
     // audio. This is a unique generated string in each directive.
     var _currentAudioControlsDirectiveId = null;
@@ -32,7 +32,7 @@ oppia.factory('AudioPlayerService', [
         filename, directiveId, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.loadAudio(
-        explorationContextService.getExplorationId(), filename)
+        ExplorationContextService.getExplorationId(), filename)
           .then(function(audioBlob) {
             var blobUrl = URL.createObjectURL(audioBlob);
             _currentTrack = ngAudio.load(blobUrl);

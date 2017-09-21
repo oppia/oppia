@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility services for explorations which may be shared by both
+ * @fileoverview Utility service for explorations which may be shared by both
  * the learner and editor views.
  */
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
-oppia.factory('oppiaExplorationHtmlFormatterService', [
+oppia.factory('ExplorationHtmlFormatterService', [
   '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper',
   function($filter, extensionTagAssemblerService, oppiaHtmlEscaper) {
     return {
