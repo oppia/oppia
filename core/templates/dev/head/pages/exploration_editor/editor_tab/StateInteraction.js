@@ -18,20 +18,20 @@
 
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
-  'alertsService', 'editorContextService', 'oppiaHtmlEscaper',
+  'AlertsService', 'editorContextService', 'oppiaHtmlEscaper',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService', 
   'InteractionDetailsCacheService',
-  'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
+  'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
-      alertsService, editorContextService, oppiaHtmlEscaper,
+      AlertsService, editorContextService, oppiaHtmlEscaper,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService,
       InteractionDetailsCacheService,
-      oppiaExplorationHtmlFormatterService, UrlInterpolationService,
+      ExplorationHtmlFormatterService, UrlInterpolationService,
       SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
@@ -66,7 +66,7 @@ oppia.controller('StateInteraction', [
       if (!stateInteractionIdService.savedMemento) {
         return '';
       }
-      return oppiaExplorationHtmlFormatterService.getInteractionHtml(
+      return ExplorationHtmlFormatterService.getInteractionHtml(
         stateInteractionIdService.savedMemento, interactionCustomizationArgs);
     };
 
@@ -149,7 +149,7 @@ oppia.controller('StateInteraction', [
 
     $scope.openInteractionCustomizerModal = function() {
       if (editabilityService.isEditable()) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         $modal.open({
           templateUrl: 'modals/customizeInteraction',
@@ -323,7 +323,7 @@ oppia.controller('StateInteraction', [
     };
 
     $scope.deleteInteraction = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: 'modals/deleteInteraction',
         backdrop: true,
@@ -335,7 +335,7 @@ oppia.controller('StateInteraction', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]

@@ -15,10 +15,10 @@
 // This directive can only be used in the context of an exploration.
 
 oppia.directive('filepathEditor', [
-  '$compile', '$http', '$sce', 'alertsService', 'explorationContextService',
+  '$compile', '$http', '$sce', 'AlertsService', 'ExplorationContextService',
   'OBJECT_EDITOR_URL_PREFIX',
   function(
-      $compile, $http, $sce, alertsService, explorationContextService,
+      $compile, $http, $sce, AlertsService, ExplorationContextService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       link: function(scope, element) {
@@ -589,7 +589,7 @@ oppia.directive('filepathEditor', [
             }
           };
           if (updateParent) {
-            alertsService.clearWarnings();
+            AlertsService.clearWarnings();
             $scope.$parent.value = filename;
           }
         };
@@ -604,10 +604,10 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.saveUploadedFile = function() {
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
 
           if (!$scope.data.metadata.uploadedFile) {
-            alertsService.addWarning('No image file detected.');
+            AlertsService.addWarning('No image file detected.');
             return;
           }
 
@@ -619,7 +619,7 @@ oppia.directive('filepathEditor', [
 
           var resampledFile = convertImageDataToImageFile(resampledImageData);
           if (resampledFile === null) {
-            alertsService.addWarning('Could not get resampled file.');
+            AlertsService.addWarning('Could not get resampled file.');
             return;
           }
 
@@ -654,7 +654,7 @@ oppia.directive('filepathEditor', [
             // Remove the XSSI prefix.
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);
-            alertsService.addWarning(
+            AlertsService.addWarning(
               parsedResponse.error || 'Error communicating with server.');
             $scope.$apply();
           });
@@ -718,7 +718,7 @@ oppia.directive('filepathEditor', [
         $scope.userIsResizingCropArea = false;
         $scope.cropAreaResizeDirection = null;
 
-        $scope.explorationId = explorationContextService.getExplorationId();
+        $scope.explorationId = ExplorationContextService.getExplorationId();
         $scope.resetFilePathEditor();
 
         window.addEventListener('mouseup', function(e) {

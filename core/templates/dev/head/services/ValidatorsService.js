@@ -18,7 +18,7 @@
  */
 
 oppia.factory('ValidatorsService', [
-  '$filter', 'alertsService', function($filter, alertsService) {
+  '$filter', 'AlertsService', function($filter, AlertsService) {
     return {
       /**
        * Checks whether an entity name is valid, and displays a warning message
@@ -32,7 +32,7 @@ oppia.factory('ValidatorsService', [
         input = $filter('normalizeWhitespace')(input);
         if (!input && !allowEmpty) {
           if (showWarnings) {
-            alertsService.addWarning('Please enter a non-empty name.');
+            AlertsService.addWarning('Please enter a non-empty name.');
           }
           return false;
         }
@@ -40,7 +40,7 @@ oppia.factory('ValidatorsService', [
         for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
           if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
             if (showWarnings) {
-              alertsService.addWarning(
+              AlertsService.addWarning(
                'Invalid input. Please use a non-empty description consisting ' +
                'of alphanumeric characters, spaces and/or hyphens.'
               );
@@ -57,7 +57,7 @@ oppia.factory('ValidatorsService', [
 
         if (input.length > 40) {
           if (showWarnings) {
-            alertsService.addWarning(
+            AlertsService.addWarning(
               'Exploration titles should be at most 40 characters long.');
           }
           return false;
@@ -74,7 +74,7 @@ oppia.factory('ValidatorsService', [
 
         if (input.length > 50) {
           if (showWarnings) {
-            alertsService.addWarning(
+            AlertsService.addWarning(
               'Card names should be at most 50 characters long.');
           }
           return false;
@@ -87,7 +87,7 @@ oppia.factory('ValidatorsService', [
           if (showWarnings) {
             // TODO(sll): Allow this warning to be more specific in terms of
             // what needs to be entered.
-            alertsService.addWarning('Please enter a non-empty value.');
+            AlertsService.addWarning('Please enter a non-empty value.');
           }
           return false;
         }
@@ -98,7 +98,7 @@ oppia.factory('ValidatorsService', [
         var VALID_ID_CHARS_REGEX = /^[a-zA-Z0-9_\-]+$/g;
         if (!input || !VALID_ID_CHARS_REGEX.test(input)) {
           if (showWarnings) {
-            alertsService.addWarning('Please enter a valid exploration ID.');
+            AlertsService.addWarning('Please enter a valid exploration ID.');
           }
           return false;
         }

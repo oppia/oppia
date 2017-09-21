@@ -17,10 +17,10 @@
  */
 
 oppia.factory('AudioPreloaderService', [
-  '$modal', 'explorationContextService', 'AssetsBackendApiService',
+  '$modal', 'ExplorationContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
   'AudioTranslationManagerService', 'LanguageUtilService',
-  function($modal, explorationContextService, AssetsBackendApiService,
+  function($modal, ExplorationContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService,
       AudioTranslationManagerService, LanguageUtilService) {
     // List of languages that have been preloaded in the exploration.
@@ -33,7 +33,7 @@ oppia.factory('AudioPreloaderService', [
 
       allAudioTranslations.map(function(audioTranslation) {
         AssetsBackendApiService.loadAudio(
-          explorationContextService.getExplorationId(),
+          ExplorationContextService.getExplorationId(),
           audioTranslation.filename);
       });
 
