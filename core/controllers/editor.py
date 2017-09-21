@@ -39,6 +39,7 @@ from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import search_services
+from core.domain import stats_services
 from core.domain import stats_services_old
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -743,7 +744,7 @@ class StateRulesStatsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'visualizations_info': stats_services_old.get_visualizations_info(
+            'visualizations_info': stats_services.get_visualizations_info(
                 exploration, state_name),
         })
 

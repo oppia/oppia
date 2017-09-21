@@ -667,7 +667,7 @@ class ExplorationStatsModel(base_models.BaseModel):
                 datastore.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
-        exploration_stats_model = cls.get(instance_id)
+        exploration_stats_model = cls.get(instance_id, strict=False)
         return exploration_stats_model
 
     @classmethod
