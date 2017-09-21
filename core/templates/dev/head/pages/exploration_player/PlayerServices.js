@@ -27,7 +27,7 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.factory('oppiaPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
   'AlertsService', 'AnswerClassificationService', 'ExplorationContextService',
-  'PAGE_CONTEXT', 'OppiaExplorationHtmlFormatterService',
+  'PAGE_CONTEXT', 'ExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService',
@@ -37,7 +37,7 @@ oppia.factory('oppiaPlayerService', [
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
-      PAGE_CONTEXT, OppiaExplorationHtmlFormatterService,
+      PAGE_CONTEXT, ExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
       ExpressionInterpolationService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService,
@@ -269,7 +269,7 @@ oppia.factory('oppiaPlayerService', [
           return null;
         }
 
-        return OppiaExplorationHtmlFormatterService.getInteractionHtml(
+        return ExplorationHtmlFormatterService.getInteractionHtml(
           interactionId,
           exploration.getInteractionCustomizationArgs(stateName),
           labelForFocusTarget);

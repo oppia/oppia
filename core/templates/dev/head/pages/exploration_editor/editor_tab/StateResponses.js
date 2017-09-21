@@ -609,7 +609,7 @@ oppia.controller('StateResponses', [
         backdrop: false,
         controller: [
           '$scope', '$injector', '$modalInstance',
-          'OppiaExplorationHtmlFormatterService',
+          'ExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'ExplorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
@@ -617,7 +617,7 @@ oppia.controller('StateResponses', [
           'angularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $modalInstance,
-              OppiaExplorationHtmlFormatterService,
+              ExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               ExplorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
@@ -629,7 +629,7 @@ oppia.controller('StateResponses', [
 
             $scope.stateContent = _state.content.getHtml();
             $scope.inputTemplate = (
-              OppiaExplorationHtmlFormatterService.getInteractionHtml(
+              ExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento,
                 'testInteractionInput'));
@@ -667,7 +667,7 @@ oppia.controller('StateResponses', [
 
             $scope.submitAnswer = function(answer) {
               $scope.answerTemplate = (
-                OppiaExplorationHtmlFormatterService.getAnswerHtml(
+                ExplorationHtmlFormatterService.getAnswerHtml(
                   answer, stateInteractionIdService.savedMemento,
                   stateCustomizationArgsService.savedMemento));
 

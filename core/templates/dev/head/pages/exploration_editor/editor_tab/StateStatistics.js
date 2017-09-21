@@ -20,12 +20,12 @@
 oppia.controller('StateStatistics', [
   '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
   'explorationStatesService', 'trainingDataService',
-  'stateCustomizationArgsService', 'OppiaExplorationHtmlFormatterService',
+  'stateCustomizationArgsService', 'ExplorationHtmlFormatterService',
   'trainingModalService', 'INTERACTION_SPECS',
   function(
       $rootScope, $scope, $modal, explorationData, editorContextService,
       explorationStatesService, trainingDataService,
-      stateCustomizationArgsService, OppiaExplorationHtmlFormatterService,
+      stateCustomizationArgsService, ExplorationHtmlFormatterService,
       trainingModalService, INTERACTION_SPECS) {
     $scope.isInteractionTrainable = false;
 
@@ -44,7 +44,7 @@ oppia.controller('StateStatistics', [
           trainingDataService.getTrainingDataFrequencies());
         for (var i = 0; i < trainingDataAnswers.length; i++) {
           var answerHtml = (
-            OppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+            ExplorationHtmlFormatterService.getShortAnswerHtml(
               trainingDataAnswers[i], data.interaction.id,
               stateCustomizationArgsService.savedMemento));
           $scope.trainingDataButtonContentsList.push({
