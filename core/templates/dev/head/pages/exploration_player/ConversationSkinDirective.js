@@ -253,7 +253,7 @@ oppia.directive('conversationSkin', [
         'playerPositionService', 'explorationRecommendationsService',
         'StatsReportingService',
         'siteAnalyticsService', 'ExplorationPlayerStateService',
-        'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
+        'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'AlertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'FatigueDetectionService',
         function(
@@ -264,7 +264,7 @@ oppia.directive('conversationSkin', [
             playerPositionService, explorationRecommendationsService,
             StatsReportingService,
             siteAnalyticsService, ExplorationPlayerStateService,
-            TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
+            TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             FatigueDetectionService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
@@ -784,7 +784,7 @@ oppia.directive('conversationSkin', [
                 $scope.collectionSummary = response.data.summaries[0];
               },
               function() {
-                alertsService.addWarning(
+                AlertsService.addWarning(
                   'There was an error while fetching the collection summary.');
               }
             );
