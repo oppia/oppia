@@ -20,13 +20,13 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveMath', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/Math',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.rawLatex = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.rawLatex = HtmlEscaperService.escapedJsonToObj(
           $attrs.rawLatexWithValue);
       }]
     };

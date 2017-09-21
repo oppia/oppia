@@ -21,8 +21,8 @@
  */
 
 oppia.directive('oppiaInteractiveItemSelectionInput', [
-  'oppiaHtmlEscaper', 'itemSelectionInputRulesService', function(
-      oppiaHtmlEscaper, itemSelectionInputRulesService) {
+  'HtmlEscaperService', 'itemSelectionInputRulesService', function(
+      HtmlEscaperService, itemSelectionInputRulesService) {
     return {
       restrict: 'E',
       scope: {
@@ -30,7 +30,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       },
       templateUrl: 'interaction/ItemSelectionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.choices = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.choices = HtmlEscaperService.escapedJsonToObj(
           $attrs.choicesWithValue);
         $scope.maxAllowableSelectionCount = (
           $attrs.maxAllowableSelectionCountWithValue);
@@ -92,26 +92,26 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
 ]);
 
 oppia.directive('oppiaResponseItemSelectionInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/ItemSelectionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }
 ]);
 
 oppia.directive('oppiaShortResponseItemSelectionInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/ItemSelectionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }

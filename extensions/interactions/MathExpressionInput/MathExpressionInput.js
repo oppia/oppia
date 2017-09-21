@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveMathExpressionInput', [
-  'oppiaHtmlEscaper', 'mathExpressionInputRulesService',
-  function(oppiaHtmlEscaper, mathExpressionInputRulesService) {
+  'HtmlEscaperService', 'mathExpressionInputRulesService',
+  function(HtmlEscaperService, mathExpressionInputRulesService) {
     return {
       restrict: 'E',
       scope: {
@@ -198,13 +198,13 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 ]);
 
 oppia.directive('oppiaResponseMathExpressionInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/MathExpressionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.latexAnswer = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).latex;
       }]
     };
@@ -212,13 +212,13 @@ oppia.directive('oppiaResponseMathExpressionInput', [
 ]);
 
 oppia.directive('oppiaShortResponseMathExpressionInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/MathExpressionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.latexAnswer = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).latex;
       }]
     };

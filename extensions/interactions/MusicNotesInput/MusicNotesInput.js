@@ -76,9 +76,9 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 });
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
-  'oppiaHtmlEscaper', 'NOTE_NAMES_TO_MIDI_VALUES',
+  'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
-  function(oppiaHtmlEscaper, NOTE_NAMES_TO_MIDI_VALUES,
+  function(HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService) {
     return {
       restrict: 'E',
@@ -95,9 +95,9 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
-        scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
+        scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
-        scope.initialSequence = oppiaHtmlEscaper.escapedJsonToObj(
+        scope.initialSequence = HtmlEscaperService.escapedJsonToObj(
           attrs.initialSequenceWithValue);
 
         /**
@@ -856,13 +856,13 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 ]);
 
 oppia.directive('oppiaResponseMusicNotesInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/MusicNotesInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         _notes = [];
         for (var i = 0; i < _answer.length; i++) {
           if (_answer[i].readableNoteName) {
@@ -881,13 +881,13 @@ oppia.directive('oppiaResponseMusicNotesInput', [
 ]);
 
 oppia.directive('oppiaShortResponseMusicNotesInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/MusicNotesInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         var _notes = [];
         for (var i = 0; i < _answer.length; i++) {
           if (_answer[i].readableNoteName) {

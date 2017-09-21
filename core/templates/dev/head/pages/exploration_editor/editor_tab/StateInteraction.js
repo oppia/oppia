@@ -18,7 +18,7 @@
 
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
-  'alertsService', 'editorContextService', 'oppiaHtmlEscaper',
+  'alertsService', 'editorContextService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService', 
@@ -26,7 +26,7 @@ oppia.controller('StateInteraction', [
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
-      alertsService, editorContextService, oppiaHtmlEscaper,
+      alertsService, editorContextService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService,
