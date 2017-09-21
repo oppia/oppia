@@ -25,7 +25,7 @@
 // component and use that id instead to determine whether to suppress
 // autoplaying.
 
-oppia.factory('autoplayedVideosService', [function() {
+oppia.factory('AutoplayedVideosService', [function() {
   var autoplayedVideosDict = {};
   return {
     addAutoplayedVideo: function(videoId) {
