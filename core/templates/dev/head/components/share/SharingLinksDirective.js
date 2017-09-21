@@ -68,7 +68,8 @@ oppia.directive('sharingLinks', [
             $window.location.protocol + '//' + $window.location.host);
 
           $scope.escapedTwitterText = (
-            HtmlEscaperService.unescapedStrToEscapedStr($scope.getTwitterText()));
+            HtmlEscaperService.unescapedStrToEscapedStr(
+              $scope.getTwitterText()));
 
           $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/gplus.png');
