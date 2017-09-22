@@ -265,3 +265,11 @@ class _Validators(object):
     def matches_regex(obj, regex):
         """Ensures that `obj` (a string) matches the given regex."""
         raise NotImplementedError
+
+    @staticmethod
+    def is_valid_email_list(obj):
+        def is_valid_email(email):
+            return '@' in email and not email.startswith('@') and \
+                   not email.endswith('@')
+
+        return all([is_valid_email(email) for email in obj])

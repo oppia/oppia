@@ -16,6 +16,7 @@
 
 from core.controllers import admin
 from core.controllers import base
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
@@ -23,6 +24,7 @@ from core.domain import stats_services
 from core.tests import test_utils
 
 import feconf
+import webtest
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -105,6 +107,48 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.testapp.get('/about')
         self.assertIn(new_config_value, response.body)
 
+
+    def test_add_notification_email_for_failed_tasks(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        response_dict = self.get_json('/adminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': ['moderator@example.com'],
+        }, response_config_properties[email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name])
+
+        for emails in [
+            [u'admin@oppia.com'],
+            [u'admin{}@oppia.com'.format(i) for i in xrange(
+                0, email_manager.MAX_NOTIFICATION_EMAILS)]
+        ]:
+            payload = {
+                'action': 'save_config_properties',
+                'new_config_property_values': {
+                    email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name:
+                        emails
+                }
+            }
+            self.post_json('/adminhandler', payload, csrf_token)
+
+        for emails in [
+            [u'adminoppia'],
+            [u'admin{}@oppia.com'.format(i) for i in xrange(
+                0, email_manager.MAX_NOTIFICATION_EMAILS + 1)]
+        ]:
+            payload = {
+                'action': 'save_config_properties',
+                'new_config_property_values': {
+                    email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name:
+                        emails
+                }
+            }
+            with self.assertRaises(webtest.app.AppError):
+                self.post_json('/adminhandler', payload, csrf_token)
+
+        self.logout()
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """ Test the conditions for generation of dummy explorations."""
