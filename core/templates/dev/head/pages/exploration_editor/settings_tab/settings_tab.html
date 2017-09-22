@@ -10,21 +10,10 @@
                                       form-style="{display:'table-cell', width:'16.66666667%'}"
                                       on-input-field-blur="saveExplorationTitle()">
             </exploration-title-editor>
-            <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed || ((explorationObjectiveService.displayed.length < 15) || (explorationObjectiveService.displayed.length > 100))}">
-              <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationObjective" type="text"
-                       class="form-control protractor-test-exploration-objective-input"
-                       ng-model="explorationObjectiveService.displayed"
-                       ng-blur="saveExplorationObjective()" placeholder="Learn how to..." ng-trim="false">
-                <span class="help-block" style="font-size: smaller">
-                  <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
-                  <span ng-if="explorationObjectiveService.displayed.length > 0">
-                    <em>Characters used: <[(explorationObjectiveService.displayed.length)]>/100</em>
-                  </span>
-                </span>
-              </div>
-            </div>
+            <exploration-objective-editor label-text="Goal"
+                                          form-style="{display:'table-cell', width:'16.66666667%'}"
+                                          on-input-field-blur="saveExplorationObjective()">
+            </exploration-objective-editor>
 
             <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
               <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>

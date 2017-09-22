@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.factory('expressionTypeParserService', [
-  '$log', 'expressionParserService', 'expressionSyntaxTreeService',
+oppia.factory('ExpressionTypeParserService', [
+  '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',
   'PARAMETER_TYPES',
   function(
-      $log, expressionParserService, expressionSyntaxTreeService,
+      $log, ExpressionParserService, ExpressionSyntaxTreeService,
       PARAMETER_TYPES) {
     var getExpressionOutputType = function(expression, envs) {
-      return expressionSyntaxTreeService.applyFunctionToParseTree(
-        expressionParserService.parse(expression), envs, getType);
+      return ExpressionSyntaxTreeService.applyFunctionToParseTree(
+        ExpressionParserService.parse(expression), envs, getType);
     };
 
     /**
@@ -42,7 +42,7 @@ oppia.factory('expressionTypeParserService', [
         }
 
         if (parsed[0] === '#') {
-          return expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
+          return ExpressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
         }
 
         // Get the types of the arguments.
@@ -51,7 +51,7 @@ oppia.factory('expressionTypeParserService', [
         });
 
         // The first element should be a function name.
-        return expressionSyntaxTreeService.lookupEnvs(
+        return ExpressionSyntaxTreeService.lookupEnvs(
           parsed[0], envs).getType(args);
       }
 

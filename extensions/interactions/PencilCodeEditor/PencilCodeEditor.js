@@ -21,7 +21,7 @@
  */
 
 oppia.directive('oppiaInteractivePencilCodeEditor', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {
@@ -33,7 +33,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         'focusService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $modal,
           focusService, pencilCodeEditorRulesService) {
-          $scope.initialCode = oppiaHtmlEscaper.escapedJsonToObj(
+          $scope.initialCode = HtmlEscaperService.escapedJsonToObj(
             $attrs.initialCodeWithValue);
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
@@ -166,13 +166,13 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 ]);
 
 oppia.directive('oppiaResponsePencilCodeEditor', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/PencilCodeEditor',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answerCode = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).code;
       }]
     };
@@ -180,13 +180,13 @@ oppia.directive('oppiaResponsePencilCodeEditor', [
 ]);
 
 oppia.directive('oppiaShortResponsePencilCodeEditor', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/PencilCodeEditor',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answerCode = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).code;
       }]
     };

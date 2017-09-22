@@ -194,10 +194,7 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
-    {% include 'components/forms/form_builder_templates.html' %}
     {% include 'components/create_button/create_activity_button_directive.html' %}
-
-    {% include 'components/rating_display.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
@@ -209,6 +206,8 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ValidatorsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/alerts/AlertMessageDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/create_button/CreateActivityButtonDirective.js"></script>

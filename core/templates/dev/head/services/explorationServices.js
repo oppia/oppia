@@ -20,8 +20,8 @@
 // A service that provides a number of utility functions useful to both the
 // editor and player.
 oppia.factory('oppiaExplorationHtmlFormatterService', [
-  '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper',
-  function($filter, extensionTagAssemblerService, oppiaHtmlEscaper) {
+  '$filter', 'extensionTagAssemblerService', 'HtmlEscaperService',
+  function($filter, extensionTagAssemblerService, HtmlEscaperService) {
     return {
       getInteractionHtml: function(
           interactionId, interactionCustomizationArgSpecs,
@@ -51,9 +51,9 @@ oppia.factory('oppiaExplorationHtmlFormatterService', [
         var el = $(
           '<oppia-response-' + $filter('camelCaseToHyphens')(
             interactionId) + '>');
-        el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
+        el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
         if (interactionChoices) {
-          el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(
+          el.attr('choices', HtmlEscaperService.objToEscapedJson(
             interactionChoices));
         }
         return ($('<div>').append(el)).html();
@@ -70,9 +70,9 @@ oppia.factory('oppiaExplorationHtmlFormatterService', [
         var el = $(
           '<oppia-short-response-' + $filter('camelCaseToHyphens')(
             interactionId) + '>');
-        el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
+        el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
         if (interactionChoices) {
-          el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(
+          el.attr('choices', HtmlEscaperService.objToEscapedJson(
             interactionChoices));
         }
         return ($('<span>').append(el)).html();

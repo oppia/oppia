@@ -81,10 +81,12 @@ oppia.config(['$provide', function($provide) {
     '$delegate', '$document', '$modal', '$timeout', 'focusService',
     'taRegisterTool', 'rteHelperService', 'alertsService',
     'explorationContextService', 'PAGE_CONTEXT',
+    'UrlInterpolationService',
     function(
       taOptions, $document, $modal, $timeout, focusService,
       taRegisterTool, rteHelperService, alertsService,
-      explorationContextService, PAGE_CONTEXT) {
+      explorationContextService, PAGE_CONTEXT,
+      UrlInterpolationService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -102,7 +104,8 @@ oppia.config(['$provide', function($provide) {
         onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $modal.open({
-          templateUrl: 'modals/customizeRteComponent',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/customize_rte_component_modal_directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
@@ -430,39 +433,6 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
-// Service for HTML serialization and escaping.
-oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
-  var htmlEscaper = {
-    objToEscapedJson: function(obj) {
-      return this.unescapedStrToEscapedStr(JSON.stringify(obj));
-    },
-    escapedJsonToObj: function(json) {
-      if (!json) {
-        $log.error('Empty string was passed to JSON decoder.');
-        return '';
-      }
-      return JSON.parse(this.escapedStrToUnescapedStr(json));
-    },
-    unescapedStrToEscapedStr: function(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    },
-    escapedStrToUnescapedStr: function(value) {
-      return String(value)
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, '\'')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&');
-    }
-  };
-  return htmlEscaper;
-}]);
-
 // Service for converting dates in milliseconds since the Epoch to
 // human-readable dates.
 oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
@@ -498,99 +468,6 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
   };
 }]);
 
-// Service for validating things and (optionally) displaying warning messages
-// if the validation fails.
-oppia.factory('validatorsService', [
-  '$filter', 'alertsService', function($filter, alertsService) {
-    return {
-      /**
-       * Checks whether an entity name is valid, and displays a warning message
-       * if it isn't.
-       * @param {string} input - The input to be checked.
-       * @param {boolean} showWarnings - Whether to show warnings in the
-       *   butterbar.
-       * @return {boolean} True if the entity name is valid, false otherwise.
-       */
-      isValidEntityName: function(input, showWarnings, allowEmpty) {
-        input = $filter('normalizeWhitespace')(input);
-        if (!input && !allowEmpty) {
-          if (showWarnings) {
-            alertsService.addWarning('Please enter a non-empty name.');
-          }
-          return false;
-        }
-
-        for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
-          if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
-            if (showWarnings) {
-              alertsService.addWarning(
-               'Invalid input. Please use a non-empty description consisting ' +
-               'of alphanumeric characters, spaces and/or hyphens.'
-              );
-            }
-            return false;
-          }
-        }
-        return true;
-      },
-      isValidExplorationTitle: function(input, showWarnings) {
-        if (!this.isValidEntityName(input, showWarnings)) {
-          return false;
-        }
-
-        if (input.length > 40) {
-          if (showWarnings) {
-            alertsService.addWarning(
-              'Exploration titles should be at most 40 characters long.');
-          }
-          return false;
-        }
-
-        return true;
-      },
-      // NB: this does not check whether the card name already exists in the
-      // states dict.
-      isValidStateName: function(input, showWarnings) {
-        if (!this.isValidEntityName(input, showWarnings)) {
-          return false;
-        }
-
-        if (input.length > 50) {
-          if (showWarnings) {
-            alertsService.addWarning(
-              'Card names should be at most 50 characters long.');
-          }
-          return false;
-        }
-
-        return true;
-      },
-      isNonempty: function(input, showWarnings) {
-        if (!input) {
-          if (showWarnings) {
-            // TODO(sll): Allow this warning to be more specific in terms of
-            // what needs to be entered.
-            alertsService.addWarning('Please enter a non-empty value.');
-          }
-          return false;
-        }
-        return true;
-      },
-      isValidExplorationId: function(input, showWarnings) {
-        // Exploration IDs are urlsafe base64-encoded.
-        var VALID_ID_CHARS_REGEX = /^[a-zA-Z0-9_\-]+$/g;
-        if (!input || !VALID_ID_CHARS_REGEX.test(input)) {
-          if (showWarnings) {
-            alertsService.addWarning('Please enter a valid exploration ID.');
-          }
-          return false;
-        }
-        return true;
-      }
-    };
-  }
-]);
-
 // Service for generating random IDs.
 oppia.factory('IdGenerationService', [function() {
   return {
@@ -602,9 +479,9 @@ oppia.factory('IdGenerationService', [function() {
 
 oppia.factory('rteHelperService', [
   '$filter', '$log', '$interpolate', 'explorationContextService',
-  'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
+  'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
   function($filter, $log, $interpolate, explorationContextService,
-           RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+           RTE_COMPONENT_SPECS, HtmlEscaperService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -637,7 +514,7 @@ oppia.factory('rteHelperService', [
           continue;
         }
         var argName = attr.name.substring(0, separatorLocation);
-        customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(
+        customizationArgsDict[argName] = HtmlEscaperService.escapedJsonToObj(
           attr.value);
       }
       return customizationArgsDict;
@@ -684,7 +561,8 @@ oppia.factory('rteHelperService', [
         for (var attrName in customizationArgsDict) {
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
-            oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+            HtmlEscaperService.objToEscapedJson(
+              customizationArgsDict[attrName]));
         }
 
         return el.get(0);
@@ -1095,14 +973,14 @@ oppia.factory('currentLocationService', ['$window', function($window) {
 
 // Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
-  '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
+  '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
     return {
       formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
         for (var caSpecName in customizationArgSpecs) {
           var caSpecValue = customizationArgSpecs[caSpecName].value;
           element.attr(
             $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-            oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+            HtmlEscaperService.objToEscapedJson(caSpecValue));
         }
         return element;
       }

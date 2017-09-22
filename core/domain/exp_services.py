@@ -39,13 +39,14 @@ from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
 
+datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
-search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
@@ -60,10 +61,6 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # The maximum number of iterations allowed for populating the results of a
 # search query.
 MAX_ITERATIONS = 10
-
-# This is done to prevent the rank hitting 0 too easily. Note that
-# negative ranks are disallowed in the Search API.
-_DEFAULT_RANK = 20
 
 
 def _migrate_states_schema(versioned_exploration_states):
@@ -316,6 +313,39 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     return result
 
 
+def get_exploration_and_exploration_rights_by_id(exploration_id):
+    """Returns a tuple for exploration domain object and exploration rights
+    object.
+
+    Args:
+        exploration_id: str. Id of the exploration.
+
+    Returns:
+        tuple(Exploration|None, ExplorationRights|None). The exploration and
+        exploration rights object, respectively.
+    """
+    exploration_and_rights = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [
+                ('ExplorationModel', [exploration_id]),
+                ('ExplorationRightsModel', [exploration_id])
+            ]))
+
+    exploration = None
+    if exploration_and_rights[0][0] is not None:
+        exploration = get_exploration_from_model(
+            exploration_and_rights[0][0])
+
+    exploration_rights = None
+    if exploration_and_rights[1][0] is not None:
+        exploration_rights = (
+            rights_manager.get_activity_rights_from_model(
+                exploration_and_rights[1][0],
+                constants.ACTIVITY_TYPE_EXPLORATION))
+
+    return (exploration, exploration_rights)
+
+
 def get_new_exploration_id():
     """Returns a new exploration id.
 
@@ -441,7 +471,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
-        exp_ids, search_cursor = search_explorations(
+        exp_ids, search_cursor = search_services.search_explorations(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
         invalid_exp_ids = []
@@ -923,7 +953,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     memcache_services.delete(exploration_memcache_key)
 
     # Delete the exploration from search.
-    delete_documents_from_search_index([exploration_id])
+    search_services.delete_explorations_from_search_index([exploration_id])
 
     # Delete the exploration summary, regardless of whether or not
     # force_deletion is True.
@@ -1517,17 +1547,6 @@ def get_next_page_of_all_non_private_commits(
     ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-def _should_index(exp):
-    """Returns whether the given exploration should be indexed for future
-    search queries.
-
-    Args:
-        exp: Exploration domain object.
-    """
-    rights = rights_manager.get_exploration_rights(exp.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
-
-
 def get_number_of_ratings(ratings):
     """Gets the total number of ratings represented by the given ratings
     object.
@@ -1591,35 +1610,7 @@ def get_scaled_average_rating(ratings):
     wilson_score_lower_bound = (a - b)/(1 + z**2/n)
     return 1 + 4 * wilson_score_lower_bound
 
-
-def get_search_rank_from_exp_summary(exp_summary):
-    """Returns an integer determining the document's rank in search.
-
-    Featured explorations get a ranking bump, and so do explorations that
-    have been more recently updated. Good ratings will increase the ranking
-    and bad ones will lower it.
-
-    Args:
-        exp_summary: ExplorationSummary. ExplorationSummary domain object.
-
-    Returns:
-        int. Document's rank in search.
-    """
-    # TODO(sll): Improve this calculation.
-    rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
-
-    rank = _DEFAULT_RANK
-    if exp_summary.ratings:
-        for rating_value in exp_summary.ratings:
-            rank += (
-                exp_summary.ratings[rating_value] *
-                rating_weightings[rating_value])
-
-    # Ranks must be non-negative.
-    return max(rank, 0)
-
-
-def get_search_rank(exp_id):
+def get_exploration_search_rank(exp_id):
     """Returns the search rank.
 
     Args:
@@ -1629,39 +1620,7 @@ def get_search_rank(exp_id):
         int. The rank of the exploration.
     """
     exp_summary = get_exploration_summary_by_id(exp_id)
-    return get_search_rank_from_exp_summary(exp_summary)
-
-
-def _exp_to_search_dict(exp):
-    """Updates the dict to be returned, whether the given exploration is to
-    be indexed for further queries or not.
-
-    Args:
-        exp: Exploration. Exploration domain object.
-
-    Returns:
-        dict. The representation of the given exploration, in a form that can
-        be used by the search index.
-    """
-    doc = {
-        'id': exp.id,
-        'language_code': exp.language_code,
-        'title': exp.title,
-        'category': exp.category,
-        'tags': exp.tags,
-        'blurb': exp.blurb,
-        'objective': exp.objective,
-        'author_notes': exp.author_notes,
-        'rank': get_search_rank(exp.id),
-    }
-    return doc
-
-
-def clear_search_index():
-    """WARNING: This runs in-request, and may therefore fail if there are too
-    many entries in the index.
-    """
-    search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
+    return search_services.get_search_rank_from_exp_summary(exp_summary)
 
 
 def index_explorations_given_ids(exp_ids):
@@ -1670,80 +1629,10 @@ def index_explorations_given_ids(exp_ids):
     Args:
         exp_ids: list(str). List of ids of the explorations to be indexed.
     """
-    # We pass 'strict=False' so as not to index deleted explorations.
-    exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
-    search_services.add_documents_to_index([
-        _exp_to_search_dict(exp) for exp in exploration_models.values()
-        if _should_index(exp)
-    ], SEARCH_INDEX_EXPLORATIONS)
-
-
-def patch_exploration_search_document(exp_id, update):
-    """Patches an exploration's current search document, with the values
-    from the 'update' dictionary.
-
-    Args:
-        exp_id: str. The id of the exploration to be patched.
-        update: dict. Key-value pairs to patch the exploration's search
-            document with.
-    """
-    doc = search_services.get_document_from_index(
-        exp_id, SEARCH_INDEX_EXPLORATIONS)
-    doc.update(update)
-    search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
-
-
-def update_exploration_status_in_search(exp_id):
-    """Updates the exploration status in its search doc.
-
-    Args:
-        exp_id: str. The id of the exploration whose status is to be
-            updated.
-    """
-    rights = rights_manager.get_exploration_rights(exp_id)
-    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-        delete_documents_from_search_index([exp_id])
-    else:
-        patch_exploration_search_document(rights.id, {})
-
-
-def delete_documents_from_search_index(exploration_ids):
-    """Deletes the documents corresponding to these exploration_ids from the
-    search index.
-
-    Args:
-        exploration_ids: list(str). A list of exploration ids whose
-            documents are to be deleted from the search index.
-    """
-    search_services.delete_documents_from_index(
-        exploration_ids, SEARCH_INDEX_EXPLORATIONS)
-
-
-def search_explorations(query, limit, sort=None, cursor=None):
-    """Searches through the available explorations.
-
-    Args:
-        query_string: str. The query string to search for.
-        limit: int. The maximum number of results to return.
-        sort: str. A string indicating how to sort results. This should be a
-            string of space separated values. Each value should start with a
-            '+' or a '-' character indicating whether to sort in ascending or
-            descending order respectively. This character should be followed by
-            a field name to sort on. When this is None, results are based on
-            'rank'. See get_search_rank to see how rank is determined.
-        cursor: str or None. A cursor, used to get the next page of results. If
-            there are more documents that match the query than 'limit', this
-            function will return a cursor to get the next page.
-
-    Returns:
-        tuple. A 2-tuple consisting of:
-            - list(str). A list of exploration ids that match the query.
-            - str or None. A cursor if there are more matching explorations to
-              fetch, None otherwise. If a cursor is returned, it will be a
-              web-safe string that can be used in URLs.
-    """
-    return search_services.search(
-        query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
+    exploration_summaries = get_exploration_summaries_matching_ids(exp_ids)
+    search_services.index_exploration_summaries([
+        exploration_summary for exploration_summary in exploration_summaries
+        if exploration_summary is not None])
 
 
 def _is_suggestion_valid(thread_id, exploration_id):

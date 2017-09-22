@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveVideoMp4', [
-  '$sce', 'oppiaHtmlEscaper',
-  function($sce, oppiaHtmlEscaper) {
+  '$sce', 'HtmlEscaperService',
+  function($sce, HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -30,7 +30,7 @@ oppia.directive('oppiaNoninteractiveVideoMp4', [
         '$scope', '$attrs', 'EVENT_ACTIVE_CARD_CHANGED',
         function($scope, $attrs, EVENT_ACTIVE_CARD_CHANGED) {
           $scope.videoUrl = $sce.trustAsResourceUrl(
-            oppiaHtmlEscaper.escapedJsonToObj($attrs.videoUrlWithValue));
+            HtmlEscaperService.escapedJsonToObj($attrs.videoUrlWithValue));
 
           // Clearing the video URL src after a card leaves the user's view
           // helps browsers clear memory and release resources. Without this,

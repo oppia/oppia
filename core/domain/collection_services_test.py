@@ -27,7 +27,7 @@ import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
-search_services = models.Registry.import_search_services()
+gae_search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -591,7 +591,9 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.assertEqual(doc_ids, [self.COLLECTION_ID])
 
         delete_docs_swap = self.swap(
-            search_services, 'delete_documents_from_index', mock_delete_docs)
+            gae_search_services,
+            'delete_documents_from_index',
+            mock_delete_docs)
 
         with delete_docs_swap:
             collection_services.delete_collection(
@@ -1586,14 +1588,6 @@ class CollectionCommitLogSpecialCasesUnitTests(CollectionServicesUnitTests):
 class CollectionSearchTests(CollectionServicesUnitTests):
     """Test collection search."""
 
-    def test_demo_collections_are_added_to_search_index(self):
-        results = collection_services.search_collections('Welcome', 2)[0]
-        self.assertEqual(results, [])
-
-        collection_services.load_demo('0')
-        results = collection_services.search_collections('Welcome', 2)[0]
-        self.assertEqual(results, ['0'])
-
     def test_index_collections_given_ids(self):
         all_collection_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
         expected_collection_ids = all_collection_ids[:-1]
@@ -1616,7 +1610,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(search_services,
+        add_docs_swap = self.swap(gae_search_services,
                                   'add_documents_to_index',
                                   add_docs_counter)
 
@@ -1637,93 +1631,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             collection_services.index_collections_given_ids(all_collection_ids)
 
         self.assertEqual(add_docs_counter.times_called, 1)
-
-    def test_patch_collection_search_document(self):
-
-        def mock_get_doc(doc_id, index):
-            self.assertEqual(doc_id, self.COLLECTION_ID)
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            return {'a': 'b', 'c': 'd'}
-
-        def mock_add_docs(docs, index):
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            self.assertEqual(docs, [{'a': 'b', 'c': 'e', 'f': 'g'}])
-
-        get_doc_swap = self.swap(
-            search_services, 'get_document_from_index', mock_get_doc)
-
-        add_docs_counter = test_utils.CallCounter(mock_add_docs)
-        add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter)
-
-        with get_doc_swap, add_docs_swap:
-            patch = {'c': 'e', 'f': 'g'}
-            collection_services.patch_collection_search_document(
-                self.COLLECTION_ID, patch)
-
-        self.assertEqual(add_docs_counter.times_called, 1)
-
-    def test_update_private_collection_status_in_search(self):
-
-        def mock_delete_docs(ids, index):
-            self.assertEqual(ids, [self.COLLECTION_ID])
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-
-        def mock_get_rights(unused_collection_id):
-            return rights_manager.ActivityRights(
-                self.COLLECTION_ID,
-                [self.owner_id], [self.editor_id], [self.viewer_id],
-                status=rights_manager.ACTIVITY_STATUS_PRIVATE
-            )
-
-        delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
-
-        delete_docs_swap = self.swap(
-            search_services, 'delete_documents_from_index',
-            delete_docs_counter)
-        get_rights_swap = self.swap(
-            rights_manager, 'get_collection_rights', mock_get_rights)
-
-        with get_rights_swap, delete_docs_swap:
-            collection_services.update_collection_status_in_search(
-                self.COLLECTION_ID)
-
-        self.assertEqual(delete_docs_counter.times_called, 1)
-
-    def test_search_collections(self):
-        expected_query_string = 'a query string'
-        expected_cursor = 'cursor'
-        expected_sort = 'title'
-        expected_limit = 30
-        expected_result_cursor = 'rcursor'
-        doc_ids = ['id1', 'id2']
-
-        def mock_search(query_string, index, cursor=None, limit=20, sort='',
-                        ids_only=False, retries=3):
-            self.assertEqual(query_string, expected_query_string)
-            self.assertEqual(
-                index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            self.assertEqual(cursor, expected_cursor)
-            self.assertEqual(limit, expected_limit)
-            self.assertEqual(sort, expected_sort)
-            self.assertEqual(ids_only, True)
-            self.assertEqual(retries, 3)
-
-            return doc_ids, expected_result_cursor
-
-        with self.swap(search_services, 'search', mock_search):
-            result, cursor = collection_services.search_collections(
-                expected_query_string,
-                expected_limit,
-                sort=expected_sort,
-                cursor=expected_cursor,
-            )
-
-        self.assertEqual(cursor, expected_result_cursor)
-        self.assertEqual(result, doc_ids)
 
 
 class CollectionSummaryTests(CollectionServicesUnitTests):
@@ -1844,3 +1751,23 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         #       self.COLLECTION_ID, 4, 3)
         # self._check_contributors_summary(self.COLLECTION_ID,
         #                                 {albert_id: 1, bob_id: 2})
+
+
+class GetCollectionAndCollectionRightsTest(CollectionServicesUnitTests):
+
+    def test_get_collection_and_collection_rights_object(self):
+        collection_id = self.COLLECTION_ID
+        self.save_new_valid_collection(
+            collection_id, self.owner_id, objective='The objective')
+
+        (collection, collection_rights) = (
+            collection_services.get_collection_and_collection_rights_by_id(
+                collection_id))
+        self.assertEqual(collection.id, collection_id)
+        self.assertEqual(collection_rights.id, collection_id)
+
+        (collection, collection_rights) = (
+            collection_services.get_collection_and_collection_rights_by_id(
+                'fake_id'))
+        self.assertIsNone(collection)
+        self.assertIsNone(collection_rights)
