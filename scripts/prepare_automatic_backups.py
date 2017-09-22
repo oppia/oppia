@@ -60,7 +60,8 @@ def update_cron_dict(cron_dict):
     if len(backup_url) > warning_threshold:
         print (
             'IMPORTANT: Bad things are going to happen in the next release if '
-            'you don\'t fix this. Bring it up at the TL meeting.')
+            'a permanent solution to backups is not found for this release. '
+            'Bring this up at the TL meeting.')
     if len(backup_url) > _MAX_BACKUP_URL_LENGTH:
         raise Exception(
             'Backup URL exceeds app engine limit by %d: %s' % (
