@@ -106,7 +106,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.testapp.get('/about')
         self.assertIn(new_config_value, response.body)
 
-
     def test_add_notification_email_for_failed_tasks(self):
         """ Test if admin is able to correctly change notification emails
         for failing tasks
@@ -117,20 +116,24 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
+
+        notification_emails_for_failed_tasks = \
+            email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name
+
         self.assertDictContainsSubset({
             'value': ['moderator@example.com'],
-        }, response_config_properties[email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name])
+        }, response_config_properties[notification_emails_for_failed_tasks])
 
         # check for some valid emails
         for emails in [
-            [u'admin@oppia.com'],
-            [u'admin{}@oppia.com'.format(i) for i in xrange(
-                0, email_manager.MAX_NOTIFICATION_EMAILS)]
+                [u'admin@oppia.com'],
+                [u'admin{}@oppia.com'.format(i) for i in xrange(
+                    0, feconf.MAX_NOTIFICATION_EMAILS)]
         ]:
             payload = {
                 'action': 'save_config_properties',
                 'new_config_property_values': {
-                    email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name:
+                    notification_emails_for_failed_tasks:
                         emails
                 }
             }
@@ -138,9 +141,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         # check against some invalid emails
         for emails in [
-            [u'adminoppia'],
-            [u'admin{}@oppia.com'.format(i) for i in xrange(
-                0, feconf.MAX_NOTIFICATION_EMAILS + 1)]
+                [u'adminoppia'],
+                [u'admin{}@oppia.com'.format(i) for i in xrange(
+                    0, feconf.MAX_NOTIFICATION_EMAILS + 1)]
         ]:
             payload = {
                 'action': 'save_config_properties',

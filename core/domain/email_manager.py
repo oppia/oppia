@@ -49,8 +49,7 @@ NOTIFICATION_EMAIL_LIST_SCHEMA = {
         'id': 'is_valid_email_list',
     }, {
         'id': 'is_uniquified',
-    }
-    ]
+    }]
 }
 
 EMAIL_HTML_BODY_SCHEMA = {
@@ -133,7 +132,7 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'exploration.')
 
 NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
-        'notification_emails_for_failed_tasks',
+    'notification_emails_for_failed_tasks',
     NOTIFICATION_EMAIL_LIST_SCHEMA,
     'Email(s) to notify if a training task fails',
     ['moderator@example.com']
