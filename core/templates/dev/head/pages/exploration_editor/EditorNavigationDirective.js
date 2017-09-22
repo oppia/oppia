@@ -27,14 +27,14 @@ oppia.directive('editorNavigation', [function() {
       'explorationWarningsService',
       'stateEditorTutorialFirstTimeService',
       'threadDataService', 'siteAnalyticsService',
-      'explorationContextService', 'windowDimensionsService',
+      'ExplorationContextService', 'windowDimensionsService',
       function(
           $scope, $rootScope, $timeout, $modal,
           routerService, explorationRightsService,
           explorationWarningsService,
           stateEditorTutorialFirstTimeService,
           threadDataService, siteAnalyticsService,
-          explorationContextService, windowDimensionsService) {
+          ExplorationContextService, windowDimensionsService) {
         $scope.postTutorialHelpPopoverIsShown = false;
         $scope.isLargeScreen = (windowDimensionsService.getWidth() >= 1024);
 
@@ -50,19 +50,19 @@ oppia.directive('editorNavigation', [function() {
         });
 
         $scope.showUserHelpModal = function() {
-          var explorationId = explorationContextService.getExplorationId();
+          var explorationId = ExplorationContextService.getExplorationId();
           siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
           var modalInstance = $modal.open({
             templateUrl: 'modals/userHelp',
             backdrop: true,
             controller: [
               '$scope', '$modalInstance',
-              'siteAnalyticsService', 'explorationContextService',
+              'siteAnalyticsService', 'ExplorationContextService',
               function(
                 $scope, $modalInstance,
-                siteAnalyticsService, explorationContextService) {
+                siteAnalyticsService, ExplorationContextService) {
                 var explorationId = (
-                  explorationContextService.getExplorationId());
+                  ExplorationContextService.getExplorationId());
 
                 $scope.beginTutorial = function() {
                   siteAnalyticsService.registerOpenTutorialFromHelpCenterEvent(

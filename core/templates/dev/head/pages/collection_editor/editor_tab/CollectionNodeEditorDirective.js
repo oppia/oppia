@@ -28,19 +28,19 @@ oppia.directive('collectionNodeEditor', [function() {
     templateUrl: 'inline/collection_node_editor_directive',
     controller: [
       '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
-      'CollectionUpdateService', 'alertsService',
+      'CollectionUpdateService', 'AlertsService',
       function(
           $scope, CollectionEditorStateService, CollectionLinearizerService,
-          CollectionUpdateService, alertsService) {
+          CollectionUpdateService, AlertsService) {
         $scope.collection = CollectionEditorStateService.getCollection();
 
         var _addSkill = function(skillList, newSkillName) {
           // Ensure the user entered a skill name.
           if (!newSkillName) {
-            alertsService.addWarning('Cannot add empty skill to collection.');
+            AlertsService.addWarning('Cannot add empty skill to collection.');
             return false;
           } else if (!skillList.addSkill(newSkillName)) {
-            alertsService.addWarning(
+            AlertsService.addWarning(
               'Skill is already added: ' + newSkillName);
             return false;
           }
@@ -113,7 +113,7 @@ oppia.directive('collectionNodeEditor', [function() {
           var explorationId = $scope.getCollectionNode().getExplorationId();
           if (!CollectionLinearizerService.removeCollectionNode(
               $scope.collection, explorationId)) {
-            alertsService.fatalWarning(
+            AlertsService.fatalWarning(
               'Internal collection editor error. Could not delete ' +
               'exploration by ID: ' + explorationId);
           }
@@ -125,7 +125,7 @@ oppia.directive('collectionNodeEditor', [function() {
           var explorationId = $scope.getCollectionNode().getExplorationId();
           if (!CollectionLinearizerService.shiftNodeLeft(
               $scope.collection, explorationId)) {
-            alertsService.fatalWarning(
+            AlertsService.fatalWarning(
               'Internal collection editor error. Could not shift node left ' +
               'with ID: ' + explorationId);
           }
@@ -137,7 +137,7 @@ oppia.directive('collectionNodeEditor', [function() {
           var explorationId = $scope.getCollectionNode().getExplorationId();
           if (!CollectionLinearizerService.shiftNodeRight(
               $scope.collection, explorationId)) {
-            alertsService.fatalWarning(
+            AlertsService.fatalWarning(
               'Internal collection editor error. Could not shift node right ' +
               'with ID: ' + explorationId);
           }

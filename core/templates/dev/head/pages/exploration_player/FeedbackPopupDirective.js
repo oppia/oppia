@@ -34,10 +34,10 @@ oppia.directive('feedbackPopup', [
       templateUrl: 'components/feedback',
       controller: [
         '$scope', '$element', '$http', '$timeout', 'focusService',
-        'alertsService', 'playerPositionService',
+        'AlertsService', 'playerPositionService',
         function(
             $scope, $element, $http, $timeout, focusService,
-            alertsService, playerPositionService) {
+            AlertsService, playerPositionService) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();

@@ -18,8 +18,8 @@
  */
 
 oppia.factory('threadDataService', [
-  '$http', '$q', 'explorationData', 'alertsService',
-  function($http, $q, explorationData, alertsService) {
+  '$http', '$q', 'explorationData', 'AlertsService',
+  function($http, $q, explorationData, AlertsService) {
     var _expId = explorationData.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
@@ -101,7 +101,7 @@ oppia.factory('threadDataService', [
           }
         }, function() {
           _openThreadsCount -= 1;
-          alertsService.addWarning('Error creating new thread.');
+          AlertsService.addWarning('Error creating new thread.');
         });
       },
       markThreadAsSeen: function(threadId) {

@@ -26,10 +26,10 @@ oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
-  '$http', '$q', 'LearnerParamsService', 'alertsService', 'INTERACTION_SPECS',
+  '$http', '$q', 'LearnerParamsService', 'AlertsService', 'INTERACTION_SPECS',
   'ENABLE_STRING_CLASSIFIER', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'RULE_TYPE_CLASSIFIER',
-  function($http, $q, LearnerParamsService, alertsService, INTERACTION_SPECS,
+  function($http, $q, LearnerParamsService, AlertsService, INTERACTION_SPECS,
       ENABLE_STRING_CLASSIFIER, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION, RULE_TYPE_CLASSIFIER) {
     /**
@@ -81,7 +81,7 @@ oppia.factory('AnswerClassificationService', [
           classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
         };
       } else {
-        alertsService.addWarning('Something went wrong with the exploration.');
+        AlertsService.addWarning('Something went wrong with the exploration.');
       }
     };
 
@@ -118,7 +118,7 @@ oppia.factory('AnswerClassificationService', [
           result = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);
         } else {
-          alertsService.addWarning(
+          AlertsService.addWarning(
             'Something went wrong with the exploration: no ' +
             'interactionRulesService was available.');
           deferred.reject();

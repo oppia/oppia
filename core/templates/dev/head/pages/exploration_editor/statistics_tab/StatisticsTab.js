@@ -21,12 +21,12 @@ oppia.constant('IMPROVE_TYPE_DEFAULT', 'default');
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
+  '$scope', '$http', '$modal', 'AlertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'IMPROVE_TYPE_DEFAULT', 'IMPROVE_TYPE_INCOMPLETE',
   function(
-      $scope, $http, $modal, alertsService, explorationStatesService,
+      $scope, $http, $modal, AlertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
       IMPROVE_TYPE_DEFAULT, IMPROVE_TYPE_INCOMPLETE) {
@@ -129,7 +129,7 @@ oppia.controller('StatisticsTab', [
     };
 
     $scope.showStateStatsModal = function(stateName, improvementType) {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
       $http.get(
         '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
@@ -182,7 +182,7 @@ oppia.controller('StatisticsTab', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                AlertsService.clearWarnings();
               };
             }
           ]

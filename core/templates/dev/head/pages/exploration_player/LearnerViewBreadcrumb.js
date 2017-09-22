@@ -18,11 +18,11 @@
  */
 
 oppia.controller('LearnerViewBreadcrumb', [
-  '$scope', '$modal', '$http', '$log', 'explorationContextService',
+  '$scope', '$modal', '$http', '$log', 'ExplorationContextService',
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-  function($scope, $modal, $http, $log, explorationContextService,
+  function($scope, $modal, $http, $log, ExplorationContextService,
     EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
-    var explorationId = explorationContextService.getExplorationId();
+    var explorationId = ExplorationContextService.getExplorationId();
     var expInfo = null;
 
     $scope.showInformationCard = function() {

@@ -555,9 +555,9 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.factory('rteHelperService', [
-  '$filter', '$log', '$interpolate', 'explorationContextService',
+  '$filter', '$log', '$interpolate', 'ExplorationContextService',
   'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
-  function($filter, $log, $interpolate, explorationContextService,
+  function($filter, $log, $interpolate, ExplorationContextService,
     RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
     var _RICH_TEXT_COMPONENTS = [];
 
@@ -610,7 +610,7 @@ oppia.factory('rteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        if (explorationContextService.isInExplorationContext()) {
+        if (ExplorationContextService.isInExplorationContext()) {
           // TODO(sll): This extra key was introduced in commit
           // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
           // image for RTE previews. However, it has had the unfortunate side-
@@ -619,7 +619,7 @@ oppia.factory('rteHelperService', [
           // convertRteToHtml(), but we need to find a less invasive way to
           // handle previews.
           customizationArgsDict = angular.extend(customizationArgsDict, {
-            explorationId: explorationContextService.getExplorationId()
+            explorationId: ExplorationContextService.getExplorationId()
           });
         }
         var interpolatedUrl = $interpolate(
@@ -718,12 +718,12 @@ oppia.factory('rteHelperService', [
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$document', '$modal', '$timeout', 'focusService',
-    'taRegisterTool', 'rteHelperService', 'alertsService',
-    'explorationContextService', 'PAGE_CONTEXT',
+    'taRegisterTool', 'rteHelperService', 'AlertsService',
+    'ExplorationContextService', 'PAGE_CONTEXT',
     function(
         taOptions, $document, $modal, $timeout, focusService,
-        taRegisterTool, rteHelperService, alertsService,
-        explorationContextService, PAGE_CONTEXT) {
+        taRegisterTool, rteHelperService, AlertsService,
+        ExplorationContextService, PAGE_CONTEXT) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -801,7 +801,7 @@ oppia.config(['$provide', function($provide) {
 
       rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         var buttonDisplay = rteHelperService.createToolbarIcon(componentDefn);
-        var canUseFs = explorationContextService.getPageContext() ===
+        var canUseFs = ExplorationContextService.getPageContext() ===
           PAGE_CONTEXT.EDITOR;
 
         taRegisterTool(componentDefn.name, {
@@ -823,7 +823,7 @@ oppia.config(['$provide', function($provide) {
               if (!canUseFs && componentDefn.requiresFs) {
                 var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
                   'exploration authors can make changes involving files.';
-                alertsService.addWarning(FS_UNAUTHORIZED_WARNING);
+                AlertsService.addWarning(FS_UNAUTHORIZED_WARNING);
                 // Without this, the view will not update to show the warning.
                 textAngular.$editor().$parent.$apply();
                 return;

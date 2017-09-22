@@ -33,7 +33,7 @@ oppia.controller('ExplorationEditor', [
   'explorationTagsService', 'editabilityService', 'explorationStatesService',
   'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
-  'explorationWarningsService', '$templateCache', 'explorationContextService',
+  'explorationWarningsService', '$templateCache', 'ExplorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
@@ -46,7 +46,7 @@ oppia.controller('ExplorationEditor', [
       explorationTagsService, editabilityService, explorationStatesService,
       routerService, graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
-      explorationWarningsService, $templateCache, explorationContextService,
+      explorationWarningsService, $templateCache, ExplorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory) {
@@ -61,7 +61,7 @@ oppia.controller('ExplorationEditor', [
      *********************************************************/
     $rootScope.loadingMessage = 'Loading';
 
-    $scope.explorationId = explorationContextService.getExplorationId();
+    $scope.explorationId = ExplorationContextService.getExplorationId();
     $scope.explorationUrl = '/create/' + $scope.explorationId;
     $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
     $scope.explorationDownloadUrl = (
@@ -362,10 +362,10 @@ oppia.controller('ExplorationEditor', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'UrlInterpolationService',
-          'siteAnalyticsService', 'explorationContextService',
+          'siteAnalyticsService', 'ExplorationContextService',
           function($scope, $modalInstance, UrlInterpolationService,
-              siteAnalyticsService, explorationContextService) {
-            var explorationId = explorationContextService.getExplorationId();
+              siteAnalyticsService, ExplorationContextService) {
+            var explorationId = ExplorationContextService.getExplorationId();
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
 

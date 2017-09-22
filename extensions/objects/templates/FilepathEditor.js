@@ -15,10 +15,10 @@
 // This directive can only be used in the context of an exploration.
 
 oppia.directive('filepathEditor', [
-  '$compile', '$http', '$sce', 'alertsService', 'explorationContextService',
+  '$compile', '$http', '$sce', 'AlertsService', 'ExplorationContextService',
   'OBJECT_EDITOR_URL_PREFIX',
   function(
-      $compile, $http, $sce, alertsService, explorationContextService,
+      $compile, $http, $sce, AlertsService, ExplorationContextService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       link: function(scope, element) {
@@ -40,7 +40,7 @@ oppia.directive('filepathEditor', [
           $scope.imageUploaderIsActive = false;
         });
 
-        $scope.explorationId = explorationContextService.getExplorationId();
+        $scope.explorationId = ExplorationContextService.getExplorationId();
 
         $scope.validate = function(localValue) {
           return localValue.label && localValue.label.length > 0;
@@ -48,7 +48,7 @@ oppia.directive('filepathEditor', [
 
         $scope.$watch('localValue.label', function(newValue) {
           if (newValue) {
-            alertsService.clearWarnings();
+            AlertsService.clearWarnings();
             $scope.localValue = {
               label: newValue
             };
@@ -113,20 +113,20 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.saveUploadedFile = function(file, filename) {
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
 
           if (!file || !file.size) {
-            alertsService.addWarning('Empty file detected.');
+            AlertsService.addWarning('Empty file detected.');
             return;
           }
           if (!file.type.match('image.*')) {
-            alertsService.addWarning(
+            AlertsService.addWarning(
               'This file is not recognized as an image.');
             return;
           }
 
           if (!filename) {
-            alertsService.addWarning('Filename must not be empty.');
+            AlertsService.addWarning('Filename must not be empty.');
             return;
           }
 
@@ -159,7 +159,7 @@ oppia.directive('filepathEditor', [
             // Remove the XSSI prefix.
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);
-            alertsService.addWarning(
+            AlertsService.addWarning(
               parsedResponse.error || 'Error communicating with server.');
             $scope.$apply();
           });

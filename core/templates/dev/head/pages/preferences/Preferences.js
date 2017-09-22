@@ -18,9 +18,9 @@
 
 oppia.controller('Preferences', [
   '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
-  'alertsService', 'UrlInterpolationService', 'utilsService',
+  'AlertsService', 'UrlInterpolationService', 'utilsService',
   function(
-      $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService,
+      $scope, $http, $rootScope, $modal, $timeout, $translate, AlertsService,
       UrlInterpolationService, utilsService) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
@@ -80,7 +80,7 @@ oppia.controller('Preferences', [
     };
 
     $scope.onSubjectInterestsSelectionChange = function(subjectInterests) {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $scope.subjectInterestsChangedAtLeastOnce = true;
       $scope.subjectInterestsWarningText = null;
       $scope.updateSubjectInterestsWarning(subjectInterests);

@@ -246,7 +246,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService', 'UrlInterpolationService',
       'siteAnalyticsService', 'ExplorationPlayerStateService',
-      'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
+      'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'AlertsService',
       'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
       function(
           $scope, $timeout, $rootScope, $window, $translate, $http,
@@ -256,7 +256,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           playerPositionService, explorationRecommendationsService,
           StatsReportingService, UrlInterpolationService,
           siteAnalyticsService, ExplorationPlayerStateService,
-          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
+          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
           CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
         // The minimum width, in pixels, needed to be able to show two cards
@@ -758,7 +758,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
               $scope.collectionSummary = response.data.summaries[0];
             },
             function() {
-              alertsService.addWarning(
+              AlertsService.addWarning(
                 'There was an error while fetching the collection summary.');
             }
           );

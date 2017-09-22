@@ -76,7 +76,7 @@ describe('Creator dashboard controller', function() {
         scope = $rootScope.$new();
         ctrl = $controller('Dashboard', {
           $scope: scope,
-          alertsService: null,
+          AlertsService: null,
           DashboardBackendApiService: mockDashboardBackendApiService
         });
       }

@@ -17,12 +17,12 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
+  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'AlertsService',
   'oppiaDatetimeFormatter', 'threadStatusDisplayService',
   'threadDataService', 'explorationStatesService', 'explorationData',
   'changeListService', 'StateObjectFactory',
   function(
-    $scope, $http, $modal, $timeout, $rootScope, alertsService,
+    $scope, $http, $modal, $timeout, $rootScope, AlertsService,
     oppiaDatetimeFormatter, threadStatusDisplayService,
     threadDataService, explorationStatesService, explorationData,
     changeListService, StateObjectFactory) {
@@ -66,11 +66,11 @@ oppia.controller('FeedbackTab', [
 
           $scope.create = function(newThreadSubject, newThreadText) {
             if (!newThreadSubject) {
-              alertsService.addWarning('Please specify a thread subject.');
+              AlertsService.addWarning('Please specify a thread subject.');
               return;
             }
             if (!newThreadText) {
-              alertsService.addWarning('Please specify a message.');
+              AlertsService.addWarning('Please specify a message.');
               return;
             }
 
@@ -88,7 +88,7 @@ oppia.controller('FeedbackTab', [
         threadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
             $scope.clearActiveThread();
-            alertsService.addSuccessMessage('Feedback thread created.');
+            AlertsService.addSuccessMessage('Feedback thread created.');
           });
       });
     };
@@ -230,11 +230,11 @@ oppia.controller('FeedbackTab', [
 
     $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
       if (threadId === null) {
-        alertsService.addWarning('Cannot add message to thread with ID: null.');
+        AlertsService.addWarning('Cannot add message to thread with ID: null.');
         return;
       }
       if (!tmpStatus) {
-        alertsService.addWarning('Invalid message status: ' + tmpStatus);
+        AlertsService.addWarning('Invalid message status: ' + tmpStatus);
         return;
       }
 

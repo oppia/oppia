@@ -93,7 +93,7 @@ oppia.config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'alertsService', function($q, $log, alertsService) {
+      '$q', '$log', 'AlertsService', function($q, $log, AlertsService) {
         return {
           request: function(config) {
             if (config.data) {
@@ -118,7 +118,7 @@ oppia.config([
               if (rejection.data && rejection.data.error) {
                 warningMessage = rejection.data.error;
               }
-              alertsService.addWarning(warningMessage);
+              AlertsService.addWarning(warningMessage);
             }
             return $q.reject(rejection);
           }
@@ -290,7 +290,7 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
 // Service for validating things and (optionally) displaying warning messages
 // if the validation fails.
 oppia.factory('validatorsService', [
-  '$filter', 'alertsService', function($filter, alertsService) {
+  '$filter', 'AlertsService', function($filter, AlertsService) {
     return {
       /**
        * Checks whether an entity name is valid, and displays a warning message
@@ -304,7 +304,7 @@ oppia.factory('validatorsService', [
         input = $filter('normalizeWhitespace')(input);
         if (!input && !allowEmpty) {
           if (showWarnings) {
-            alertsService.addWarning('Please enter a non-empty name.');
+            AlertsService.addWarning('Please enter a non-empty name.');
           }
           return false;
         }
@@ -312,7 +312,7 @@ oppia.factory('validatorsService', [
         for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
           if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
             if (showWarnings) {
-              alertsService.addWarning(
+              AlertsService.addWarning(
                'Invalid input. Please use a non-empty description consisting ' +
                'of alphanumeric characters, spaces and/or hyphens.'
               );
@@ -329,7 +329,7 @@ oppia.factory('validatorsService', [
 
         if (input.length > 40) {
           if (showWarnings) {
-            alertsService.addWarning(
+            AlertsService.addWarning(
               'Exploration titles should be at most 40 characters long.');
           }
           return false;
@@ -346,7 +346,7 @@ oppia.factory('validatorsService', [
 
         if (input.length > 50) {
           if (showWarnings) {
-            alertsService.addWarning(
+            AlertsService.addWarning(
               'Card names should be at most 50 characters long.');
           }
           return false;
@@ -359,7 +359,7 @@ oppia.factory('validatorsService', [
           if (showWarnings) {
             // TODO(sll): Allow this warning to be more specific in terms of
             // what needs to be entered.
-            alertsService.addWarning('Please enter a non-empty value.');
+            AlertsService.addWarning('Please enter a non-empty value.');
           }
           return false;
         }
