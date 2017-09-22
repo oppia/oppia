@@ -25,12 +25,14 @@ _BACKUP_EVENT_QUEUE_NAME = 'backups'
 _BACKUP_EVENT_QUEUE_RATE = '5/s'
 _MAX_BACKUP_URL_LENGTH = 2000
 _CRON_YAML_FILE_NAME = 'cron.yaml'
+_OMITTED_MODELS = [
+    'JobModel', 'ContinuousComputationModel', 'FeedbackAnalyticsModel',
+    'ExplorationRecommendationsModel', 'TopicSimilaritiesModel',
+    'ExplorationAnnotationsModel', 'StateAnswersCalcOutputModel',
+    'UserRecentChangesBatchModel', 'UserStatsModel']
 
 
-def generate_backup_url():
-    sys_args = sys.argv
-    cloud_storage_bucket_name = sys_args[1]
-    module_class_names = sys_args[2:]
+def generate_backup_url(cloud_storage_bucket_name, module_class_names):
     return (
         '/_ah/datastore_admin/backup.create?name=%s&kind=%s&queue=%s'
         '&filesystem=gs&gs_bucket_name=%s' % (
@@ -41,9 +43,30 @@ def generate_backup_url():
 
 
 def update_cron_dict(cron_dict):
-    backup_url = generate_backup_url()
+    sys_args = sys.argv
+    cloud_storage_bucket_name = sys_args[1]
+    module_class_names = [
+        module_name for module_name in sys_args[2:]
+        if module_name not in _OMITTED_MODELS]
+    backup_url = generate_backup_url(
+        cloud_storage_bucket_name, module_class_names)
+    print 'Generating URL to backup %d models (%d were skipped)' % (
+        len(module_class_names), len(sys_args[2:]) - len(module_class_names))
+
+    average_model_name_length = (
+        sum([len(model_name) for model_name in module_class_names])
+        / len(module_class_names))
+    warning_threshold = _MAX_BACKUP_URL_LENGTH - average_model_name_length * 3
+    if len(backup_url) > warning_threshold:
+        print (
+            'IMPORTANT: Bad things are going to happen in the next release if '
+            'a permanent solution to backups is not found for this release. '
+            'Bring this up at the TL meeting.')
     if len(backup_url) > _MAX_BACKUP_URL_LENGTH:
-        raise Exception('Backup URL exceeds app engine limit')
+        raise Exception(
+            'Backup URL exceeds app engine limit by %d: %s' % (
+                len(backup_url) - _MAX_BACKUP_URL_LENGTH, backup_url))
+
     cron_dict['cron'].append({
         'description': 'weekly backup',
         'url': '%s' % backup_url,
