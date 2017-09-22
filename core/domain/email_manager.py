@@ -37,8 +37,6 @@ transaction_services = models.Registry.import_transaction_services()
 def log_new_error(*args, **kwargs):
     logging.error(*args, **kwargs)
 
-MAX_NOTIFICATION_EMAILS = 5
-
 NOTIFICATION_EMAIL_LIST_SCHEMA = {
     'type': 'list',
     'items': {
@@ -46,9 +44,11 @@ NOTIFICATION_EMAIL_LIST_SCHEMA = {
     },
     'validators': [{
         'id': 'has_length_at_most',
-        'max_value': MAX_NOTIFICATION_EMAILS
+        'max_value': feconf.MAX_NOTIFICATION_EMAILS
     }, {
         'id': 'is_valid_email_list',
+    }, {
+        'id': 'is_uniquified',
     }
     ]
 }

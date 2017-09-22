@@ -24,7 +24,6 @@ from core.domain import stats_services
 from core.tests import test_utils
 
 import feconf
-import webtest
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -141,7 +140,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         for emails in [
             [u'adminoppia'],
             [u'admin{}@oppia.com'.format(i) for i in xrange(
-                0, email_manager.MAX_NOTIFICATION_EMAILS + 1)]
+                0, feconf.MAX_NOTIFICATION_EMAILS + 1)]
         ]:
             payload = {
                 'action': 'save_config_properties',
@@ -150,7 +149,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                         emails
                 }
             }
-            with self.assertRaises(webtest.app.AppError):
+            with self.assertRaisesRegexp(Exception, 'Validation failed.'):
                 self.post_json('/adminhandler', payload, csrf_token)
 
         self.logout()
