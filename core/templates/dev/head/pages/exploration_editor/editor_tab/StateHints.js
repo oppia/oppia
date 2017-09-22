@@ -20,18 +20,18 @@ oppia.controller('StateHints', [
   '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
   'alertsService', 'INTERACTION_SPECS', 'stateHintsService',
   'explorationStatesService', 'stateInteractionIdService',
-  'UrlInterpolationService', 'HintObjectFactory', 'oppiaPlayerService',
+  'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
   'stateSolutionService',
   function(
     $scope, $rootScope, $modal, $filter, editorContextService,
     alertsService, INTERACTION_SPECS, stateHintsService,
     explorationStatesService, stateInteractionIdService,
-    UrlInterpolationService, HintObjectFactory, oppiaPlayerService,
+    UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
     stateSolutionService) {
     $scope.editorContextService = editorContextService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
-    $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+    $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/drag_dots.png');
