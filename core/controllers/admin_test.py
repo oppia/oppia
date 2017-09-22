@@ -109,6 +109,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
 
     def test_add_notification_email_for_failed_tasks(self):
+        """ Test if admin is able to correctly change notification emails
+        for failing tasks
+        """
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -119,6 +122,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'value': ['moderator@example.com'],
         }, response_config_properties[email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name])
 
+        # check for some valid emails
         for emails in [
             [u'admin@oppia.com'],
             [u'admin{}@oppia.com'.format(i) for i in xrange(
@@ -133,6 +137,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
             self.post_json('/adminhandler', payload, csrf_token)
 
+        # check against some invalid emails
         for emails in [
             [u'adminoppia'],
             [u'admin{}@oppia.com'.format(i) for i in xrange(

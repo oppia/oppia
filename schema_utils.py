@@ -268,6 +268,7 @@ class _Validators(object):
 
     @staticmethod
     def is_valid_email_list(obj):
+        """Ensures that `obj` (a list of strings) is a valid list of emails"""
         def is_valid_email(email):
             return '@' in email and not email.startswith('@') and \
                    not email.endswith('@')
