@@ -112,7 +112,7 @@ BAD_PATTERNS_JS_REGEXP = [
 ]
 
 BAD_PATTERNS_FECONF = {
-    'FORCE_DEV_MODE = True': {
+    'FORCE_PROD_MODE = True': {
         'message': 'Please set the FORCE_PROD_MODE variable in feconf.py '
                    'to False before committing.',
         'excluded_files': ()}

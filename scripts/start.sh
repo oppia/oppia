@@ -64,7 +64,8 @@ fi
 # Argument passed to dev_appserver.py to indicate whether or not to
 # clear the datastore.
 CLEAR_DATASTORE_ARG="--clear_datastore=true"
-# Argument passed to gulpfile.js to help build with minification.
+
+# Argument passed to feconf.py to help choose production templates folder.
 FORCE_PROD_MODE=False
 for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
@@ -79,7 +80,7 @@ done
 
 feconf_env_variable="FORCE_PROD_MODE = $FORCE_PROD_MODE"
 sed -i.bak -e s/"FORCE_PROD_MODE = .*"/"$feconf_env_variable"/ feconf.py
-# Delete the modified yaml file(-i.bak)
+# Delete the modified feconf.py file(-i.bak)
 rm feconf.py.bak
 
 # Launch a browser window.
