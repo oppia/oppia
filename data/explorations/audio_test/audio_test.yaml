@@ -1,0 +1,103 @@
+author_notes: ''
+blurb: ''
+category: Art
+init_state_name: Introduction
+language_code: en
+objective: Try out playing audio on Oppia
+param_changes: []
+param_specs: {}
+schema_version: 17
+states:
+  Finish:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        en:
+          file_size_bytes: 59289
+          filename: test_audio_2_en.mp3
+          needs_update: false
+        hi-en:
+          file_size_bytes: 88905
+          filename: test_audio_2_hi_en.mp3
+          needs_update: true
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  Introduction:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        en:
+          file_size_bytes: 95426
+          filename: test_audio_1_en.mp3
+          needs_update: false
+        hi-en:
+          file_size_bytes: 132719
+          filename: test_audio_1_hi_en.mp3
+          needs_update: false
+      html: <p>Try clicking on the speaker! After listening, click continue.</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: Second
+        feedback: []
+        param_changes: []
+      hints: []
+      id: Continue
+      solution: null
+    param_changes: []
+  Second:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        hi-en:
+          file_size_bytes: 59613
+          filename: test_audio_3_hi_en.mp3
+          needs_update: true
+      html: <p>Try typing some code.</p>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Finish
+          feedback:
+          - <p>Nice!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: x
+          rule_type: CodeEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# Type your code here.'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Finish
+        feedback: []
+        param_changes: []
+      hints: []
+      id: CodeRepl
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Audio Test
