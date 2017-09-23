@@ -208,8 +208,8 @@ oppia.factory('SimpleEditorManagerService', [
           }
         }
         // Update the question in the locally-stored questionList.
-      var questions = StatesToQuestionsService.getQuestions();
-     data.questionList.updateQuestion(index, questions[index]);
+        var questions = StatesToQuestionsService.getQuestions();
+        data.questionList.updateQuestion(index, questions[index]);
       },
       deleteQuestion: function(question) {
         // - Change destination of answer groups that point to it.

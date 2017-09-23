@@ -29,7 +29,7 @@ oppia.factory('StatesToQuestionsService', [
       id: 'TextInput',
       name: 'Text'
     }
-  ];
+    ];
     var INTERACTION_ID_END_EXPLORATION = 'EndExploration';
 
     var allowedInteractionIds = SUPPORTED_INTERACTION_TYPES.map(
