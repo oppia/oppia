@@ -248,7 +248,7 @@ oppia.directive('conversationSkin', [
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
         'messengerService', 'ExplorationPlayerService', 'urlService',
-	      'focusService', 'LearnerViewRatingService', 'windowDimensionsService',
+        'focusService', 'LearnerViewRatingService', 'windowDimensionsService',
         'PlayerTranscriptService', 'LearnerParamsService',
         'PlayerPositionService', 'ExplorationRecommendationsService',
         'StatsReportingService',
@@ -259,7 +259,7 @@ oppia.directive('conversationSkin', [
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             messengerService, ExplorationPlayerService, urlService,
-	          focusService, LearnerViewRatingService, windowDimensionsService,
+            focusService, LearnerViewRatingService, windowDimensionsService,
             PlayerTranscriptService, LearnerParamsService,
             PlayerPositionService, ExplorationRecommendationsService,
             StatsReportingService,
@@ -451,39 +451,39 @@ oppia.directive('conversationSkin', [
             PlayerPositionService.init(_navigateToActiveCard);
             ExplorationPlayerService.init(
               function(exploration, initHtml, newParams) {
-              ExplorationPlayerStateService.setExploration(exploration);
-              $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
-              _nextFocusLabel = focusService.generateFocusLabel();
+                ExplorationPlayerStateService.setExploration(exploration);
+                $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
+                _nextFocusLabel = focusService.generateFocusLabel();
 
-              _addNewCard(
+                _addNewCard(
                 exploration.initStateName,
                 newParams,
                 initHtml,
                 ExplorationPlayerService.getInteractionHtml(
                   exploration.initStateName, _nextFocusLabel));
-              $rootScope.loadingMessage = '';
-              $scope.hasFullyLoaded = true;
+                $rootScope.loadingMessage = '';
+                $scope.hasFullyLoaded = true;
 
               // If the exploration is embedded, use the exploration language
               // as site language. If the exploration language is not supported
               // as site language, English is used as default.
-              var langCodes = constants.SUPPORTED_SITE_LANGUAGES.map(
+                var langCodes = constants.SUPPORTED_SITE_LANGUAGES.map(
                 function(language) {
                   return language.id;
                 });
-              if ($scope.isIframed) {
-                var explorationLanguageCode = (
-                  ExplorationPlayerService.getExplorationLanguageCode());
+                if ($scope.isIframed) {
+                  var explorationLanguageCode = (
+                    ExplorationPlayerService.getExplorationLanguageCode());
                 if (langCodes.indexOf(explorationLanguageCode) !== -1) {
                   $translate.use(explorationLanguageCode);
                 } else {
                   $translate.use('en');
                 }
               }
-              $scope.adjustPageHeight(false, null);
-              $window.scrollTo(0, 0);
-              focusService.setFocusIfOnDesktop(_nextFocusLabel);
-            });
+                $scope.adjustPageHeight(false, null);
+                $window.scrollTo(0, 0);
+                focusService.setFocusIfOnDesktop(_nextFocusLabel);
+              });
           };
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
@@ -602,7 +602,7 @@ oppia.directive('conversationSkin', [
                         newStateName,
                         newParams,
                         contentHtml +
-			                  ExplorationPlayerService.getRandomSuffix());
+                        ExplorationPlayerService.getRandomSuffix());
                     }
                   }
 
@@ -623,7 +623,7 @@ oppia.directive('conversationSkin', [
               // Note that newInteractionHtml may be null.
               if (newInteractionHtml) {
                 newInteractionHtml +=
-		            ExplorationPlayerService.getRandomSuffix();
+                ExplorationPlayerService.getRandomSuffix();
               }
 
               _addNewCard(
