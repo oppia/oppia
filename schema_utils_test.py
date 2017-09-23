@@ -148,6 +148,7 @@ VALIDATOR_SPECS = {
             }
         },
         'is_uniquified': {},
+        'is_valid_email_list': {},
     },
     SCHEMA_TYPE_UNICODE: {
         'matches_regex': {

@@ -44,7 +44,7 @@ NOTIFICATION_EMAIL_LIST_SCHEMA = {
     },
     'validators': [{
         'id': 'has_length_at_most',
-        'max_value': feconf.MAX_NOTIFICATION_EMAILS
+        'max_value': 5
     }, {
         'id': 'is_valid_email_list',
     }, {

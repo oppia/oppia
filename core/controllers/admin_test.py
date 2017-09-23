@@ -117,19 +117,17 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
 
-        notification_emails_for_failed_tasks = \
-            email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name
+        notification_emails_for_failed_tasks = (
+            email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name)
 
         self.assertDictContainsSubset({
             'value': ['moderator@example.com'],
         }, response_config_properties[notification_emails_for_failed_tasks])
 
         # check for some valid emails
-        for emails in [
-                [u'admin@oppia.com'],
-                [u'admin{}@oppia.com'.format(i) for i in xrange(
-                    0, feconf.MAX_NOTIFICATION_EMAILS)]
-        ]:
+        valid_emails = ([u'admin@oppia.com'],
+                        [u'user{}@oppia.com'.format(i) for i in xrange(0, 5)])
+        for emails in valid_emails:
             payload = {
                 'action': 'save_config_properties',
                 'new_config_property_values': {
@@ -140,11 +138,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             self.post_json('/adminhandler', payload, csrf_token)
 
         # check against some invalid emails
-        for emails in [
-                [u'adminoppia'],
-                [u'admin{}@oppia.com'.format(i) for i in xrange(
-                    0, feconf.MAX_NOTIFICATION_EMAILS + 1)]
-        ]:
+        invalid_emails = ([u'adminoppia.com'],
+                          [u'user{}@oppia.com'.format(i) for i in xrange(0, 6)])
+
+        for emails in invalid_emails:
             payload = {
                 'action': 'save_config_properties',
                 'new_config_property_values': {

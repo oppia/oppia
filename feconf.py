@@ -782,6 +782,3 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
 VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'
-
-# Maximum number of emails admin can notify when a task fails.
-MAX_NOTIFICATION_EMAILS = 5
