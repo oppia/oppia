@@ -24,7 +24,12 @@ oppia.factory('StatesToQuestionsService', [
     var SUPPORTED_INTERACTION_TYPES = [{
       id: 'MultipleChoiceInput',
       name: 'Multiple choice'
-    }];
+    },
+    {
+      id: 'TextInput',
+      name: 'Text'
+    }
+  ];
     var INTERACTION_ID_END_EXPLORATION = 'EndExploration';
 
     var allowedInteractionIds = SUPPORTED_INTERACTION_TYPES.map(

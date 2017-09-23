@@ -47,6 +47,22 @@ oppia.factory('SimpleEditorManagerService', [
             x: 0
           }
         }
+      },
+      TextInput: {
+        CUSTOMIZATION_ARGS:  {
+          placeholder: {
+            value: 'replacethis'
+          },
+          rows: {
+            value: 1
+          }
+        },
+        FIRST_ANSWER_GROUP_RULE: {
+          type: 'Contains',
+          value: {
+            x: 'replace'
+          }
+        }
       }
     };
 
@@ -168,6 +184,7 @@ oppia.factory('SimpleEditorManagerService', [
           var questionCount = data.questionList.getQuestionCount();
           var doesLastQuestionHaveAnswerGroups = (
             data.questionList.doesLastQuestionHaveAnswerGroups());
+          console.log(newInteractionId);
           SimpleEditorShimService.saveInteractionId(
             currentStateName, newInteractionId);
           SimpleEditorShimService.saveCustomizationArgs(
@@ -191,8 +208,8 @@ oppia.factory('SimpleEditorManagerService', [
           }
         }
         // Update the question in the locally-stored questionList.
-        var questions = StatesToQuestionsService.getQuestions();
-        data.questionList.updateQuestion(index, questions[index]);
+      var questions = StatesToQuestionsService.getQuestions();
+     data.questionList.updateQuestion(index, questions[index]);
       },
       deleteQuestion: function(question) {
         // - Change destination of answer groups that point to it.
