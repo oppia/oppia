@@ -247,8 +247,8 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        'messengerService', 'ExplorationPlayerService', 'urlService', 
-	'focusService', 'LearnerViewRatingService', 'windowDimensionsService',
+        'messengerService', 'ExplorationPlayerService', 'urlService',
+	      'focusService', 'LearnerViewRatingService', 'windowDimensionsService',
         'PlayerTranscriptService', 'LearnerParamsService',
         'PlayerPositionService', 'ExplorationRecommendationsService',
         'StatsReportingService',
@@ -258,8 +258,8 @@ oppia.directive('conversationSkin', [
         'FatigueDetectionService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            messengerService, ExplorationPlayerService, urlService, 
-	    focusService, LearnerViewRatingService, windowDimensionsService,
+            messengerService, ExplorationPlayerService, urlService,
+	          focusService, LearnerViewRatingService, windowDimensionsService,
             PlayerTranscriptService, LearnerParamsService,
             PlayerPositionService, ExplorationRecommendationsService,
             StatsReportingService,
@@ -449,8 +449,8 @@ oppia.directive('conversationSkin', [
             $scope.recommendedExplorationSummaries = null;
 
             PlayerPositionService.init(_navigateToActiveCard);
-            ExplorationPlayerService.init(function(exploration, initHtml, 
-						   newParams) {
+            ExplorationPlayerService.init(
+              function(exploration, initHtml, newParams) {
               ExplorationPlayerStateService.setExploration(exploration);
               $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
               _nextFocusLabel = focusService.generateFocusLabel();
@@ -601,8 +601,8 @@ oppia.directive('conversationSkin', [
                       $scope.showPendingCard(
                         newStateName,
                         newParams,
-                        contentHtml + 
-			ExplorationPlayerService.getRandomSuffix());
+                        contentHtml +
+			                  ExplorationPlayerService.getRandomSuffix());
                     }
                   }
 
@@ -617,13 +617,13 @@ oppia.directive('conversationSkin', [
             $scope.startCardChangeAnimation = true;
 
             $timeout(function() {
-              var newInteractionHtml = 
+              var newInteractionHtml =
 		ExplorationPlayerService.getInteractionHtml(
                 newStateName, _nextFocusLabel);
               // Note that newInteractionHtml may be null.
               if (newInteractionHtml) {
-                newInteractionHtml += 
-		ExplorationPlayerService.getRandomSuffix();
+                newInteractionHtml +=
+		            ExplorationPlayerService.getRandomSuffix();
               }
 
               _addNewCard(
