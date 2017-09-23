@@ -22,6 +22,7 @@
         </anchor-header>
         <ul class="dropdown-menu oppia-question-list-menu" >
           <li ng-click="changeQuestionType('MultipleChoiceInput', $index)">Multiple Choice Input</li>
+          <li ng-click="changeQuestionType('NumericInput', $index)">Numeric Input</li>
         </ul>
       </div>
 
@@ -36,6 +37,17 @@
                               add-state="addState()">
       </multiple-choice-editor>
 
+
+      <numeric-interaction ng-if="question.getInteractionId() === 'NumericInput'"
+                        unique-id="question.getId()"
+                        customization-args="question.getInteractionCustomizationArgs()"
+                        answer-groups="question.getAnswerGroups()"
+                        default-outcome="question.getDefaultOutcome()"
+                        save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
+                        save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
+                        save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
+                        add-state="addState()">
+      </numeric-interaction>
       <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
       <div ng-if="!$last" id="<[getSubfieldId(question, 'Bridge text')]>">
         <anchor-header header-id="getSubfieldId(question, 'Bridge text')"

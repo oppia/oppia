@@ -42,6 +42,19 @@ oppia.factory('SimpleEditorManagerService', [
           }
         },
         FIRST_ANSWER_GROUP_RULE: {
+          type: 'IsGreaterThan',
+          value: {
+            x: 9.0
+          }
+        }
+      },
+      NumericInput: {
+        CUSTOMIZATION_ARGS:  {
+          choices: {
+            value: ['<p>Option 1</p>']
+          }
+        },
+        FIRST_ANSWER_GROUP_RULE: {
           type: 'Equals',
           value: {
             x: 0
@@ -176,8 +189,8 @@ oppia.factory('SimpleEditorManagerService', [
               CUSTOMIZATION_ARGS);
           // Don't save answer group when it's the last question and doesn't
           // have a answer group.
-          if (index !== questionCount - 1 || doesLastQuestionHaveAnswerGroups) {
-            var newAnswerGroups = [];
+          var newAnswerGroups = [];
+          if (index !== questionCount - 1) {
             newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
               RuleObjectFactory.createNew(
                 DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
@@ -186,6 +199,22 @@ oppia.factory('SimpleEditorManagerService', [
                   FIRST_ANSWER_GROUP_RULE.value
               )
             ], OutcomeObjectFactory.createEmpty(nextStateName), false));
+            SimpleEditorShimService.saveAnswerGroups(
+              currentStateName, newAnswerGroups);
+          }
+          if (index === questionCount - 1 && doesLastQuestionHaveAnswerGroups) {
+            var lastStateName = (
+              data.questionList.isEmpty() ?
+              SimpleEditorShimService.getInitStateName() :
+              data.questionList.getLastQuestion().getDestinationStateName());
+            newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+              RuleObjectFactory.createNew(
+                DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
+                  FIRST_ANSWER_GROUP_RULE.type,
+                DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
+                  FIRST_ANSWER_GROUP_RULE.value
+              )
+            ], OutcomeObjectFactory.createEmpty(lastStateName), false));
             SimpleEditorShimService.saveAnswerGroups(
               currentStateName, newAnswerGroups);
           }

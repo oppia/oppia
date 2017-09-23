@@ -1,0 +1,21 @@
+<editor-plaintext-field original-value="getAnswer()"
+                   on-finish-editing="saveAnswer(newValue)"
+                   placeholder="Write Numeric Answer Here">
+</editor-plaintext-field>
+
+<div ng-if="getAnswerGroups().length > 0">
+    <h3>Provide additional explanation for the correct answer</h3>
+    <editor-html-field original-value="getAnswerGroups()[0].outcome.feedback[0]"
+                       on-finish-editing="saveCorrectAnswerFeedback(newValue)"
+                       placeholder="Type something"
+                       field-id="<[getFieldId('correct-response')]>">
+    </editor-html-field>
+</div>
+
+<anchor-header header-id="getSubfieldId('Hints')"
+               header-text="Provide a hint for all other answers">
+</anchor-header>
+<editor-html-field original-value="getDefaultOutcome().feedback[0]"
+                   on-finish-editing="saveDefaultFeedback(newValue)"
+                   placeholder="Type something">
+</editor-html-field>
