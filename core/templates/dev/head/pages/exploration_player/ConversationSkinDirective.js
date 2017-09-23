@@ -476,9 +476,9 @@ oppia.directive('conversationSkin', [
                     ExplorationPlayerService.getExplorationLanguageCode());
                   if (langCodes.indexOf(explorationLanguageCode) !== -1) {
                     $translate.use(explorationLanguageCode);
-                } else {
-                  $translate.use('en');
-                }
+                  } else {
+                    $translate.use('en');
+                  }
                 }
                 $scope.adjustPageHeight(false, null);
                 $window.scrollTo(0, 0);
