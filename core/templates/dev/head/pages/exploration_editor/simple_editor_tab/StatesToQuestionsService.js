@@ -24,6 +24,9 @@ oppia.factory('StatesToQuestionsService', [
     var SUPPORTED_INTERACTION_TYPES = [{
       id: 'MultipleChoiceInput',
       name: 'Multiple choice'
+    }, {
+      id: 'ItemSelectionInput',
+      name: 'Checkbox'
     }];
     var INTERACTION_ID_END_EXPLORATION = 'EndExploration';
 
@@ -164,7 +167,6 @@ oppia.factory('StatesToQuestionsService', [
           return null;
         }
       }
-
       return questions;
     };
 
