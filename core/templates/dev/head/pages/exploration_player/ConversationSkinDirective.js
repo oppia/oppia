@@ -474,12 +474,12 @@ oppia.directive('conversationSkin', [
                 if ($scope.isIframed) {
                   var explorationLanguageCode = (
                     ExplorationPlayerService.getExplorationLanguageCode());
-                if (langCodes.indexOf(explorationLanguageCode) !== -1) {
-                  $translate.use(explorationLanguageCode);
+                  if (langCodes.indexOf(explorationLanguageCode) !== -1) {
+                    $translate.use(explorationLanguageCode);
                 } else {
                   $translate.use('en');
                 }
-              }
+                }
                 $scope.adjustPageHeight(false, null);
                 $window.scrollTo(0, 0);
                 focusService.setFocusIfOnDesktop(_nextFocusLabel);
