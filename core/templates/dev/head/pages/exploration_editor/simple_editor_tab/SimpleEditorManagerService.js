@@ -184,7 +184,6 @@ oppia.factory('SimpleEditorManagerService', [
           var questionCount = data.questionList.getQuestionCount();
           var doesLastQuestionHaveAnswerGroups = (
             data.questionList.doesLastQuestionHaveAnswerGroups());
-          console.log(newInteractionId);
           SimpleEditorShimService.saveInteractionId(
             currentStateName, newInteractionId);
           SimpleEditorShimService.saveCustomizationArgs(
