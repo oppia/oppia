@@ -65,11 +65,6 @@
   </div>
 </div>
 
-<oppia-gadget-panel ng-if="activeCard" current-state-name="activeCard.stateName"
-                    panel-contents="getExplorationGadgetPanelsContents().bottom"
-                    class="conversation-skin-bottom-gadget-panel">
-</oppia-gadget-panel>
-
 <div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
      class="conversation-skin-final-summary">
   <div ng-if="isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
@@ -104,6 +99,10 @@
                                   is-community-owned="exp.community_owned"
                                   style="margin-left: 10px;">
         </exploration-summary-tile>
+      </div>
+
+      <div ng-if="collectionSummary" class="conversation-skin-back-to-collection-container">
+        <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
       </div>
     </div>
 
@@ -144,6 +143,16 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
 
   /* All classes below should start with .conversation-skin */
+  .conversation-skin-back-to-collection-container {
+    margin-top: 25px;
+    margin-bottom: 92px;
+    text-align: center;
+  }
+
+  .conversation-skin-back-to-collection {
+    color: #064b46;
+  }
+
   .conversation-skin-progress-dots {
     left: 0;
     margin: 0 auto;
@@ -160,23 +169,11 @@ otherwise they will interfere with the iframed conversation skin directive.
     width: 36px;
     z-index: 1;
   }
-  .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar { 
+  .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
     height: 100px;
     left: -87px;
     top: -20px;
     width: 100px;
-  }
-
-  .conversation-skin-bottom-gadget-panel {
-    bottom: 4px;
-    left: 0;
-    margin: 0 auto;
-    max-height: 135px;
-    max-width: 400px;
-    min-width: 150px;
-    position: fixed;
-    right: 0;
-    width: 360px;
   }
 
   .conversation-skin-cards-container {
@@ -193,9 +190,19 @@ otherwise they will interfere with the iframed conversation skin directive.
   .conversation-skin-tutor-card-container {
     flex-shrink: 10000;
     max-width: 560px;
+    /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
+       below should be changed to match. */
     min-width: 360px;
     width: 100%;
     z-index: 1;
+  }
+
+  /* Some mobile devices have CSS width below 360px, use a responsive min-width
+     when under 360px to prevent pushing things offscreen. */
+  @media(max-width: 360px) {
+    .conversation-skin-tutor-card-container {
+      min-width: 100vw;
+    }
   }
 
   .conversation-skin-future-tutor-card {

@@ -51,18 +51,25 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
-INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
-GADGETS_DIR = os.path.join('extensions', 'gadgets')
-RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
+
+EXTENSIONS_DIR_PREFIX = (
+    'backend_prod_files' if (IS_MINIFIED or not DEV_MODE) else '')
+INTERACTIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+RTE_EXTENSIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
-# Choose production template if minification flag is used or
+# Choose production templates folder if minification flag is used or
 # if in production mode
-TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
-FRONTEND_TEMPLATES_DIR = os.path.join(
-    'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
-DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
+if IS_MINIFIED or not DEV_MODE:
+    FRONTEND_TEMPLATES_DIR = (
+        os.path.join('backend_prod_files', 'templates', 'head'))
+else:
+    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+DEPENDENCIES_TEMPLATES_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
@@ -70,10 +77,51 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
-# A mapping of interaction ids to their default classifier.
+# A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
-    'TextInput': 'LDAStringClassifier'
+    'TextInput': {
+        'algorithm_id': 'LDAStringClassifier',
+        'current_data_schema_version': 1
+    },
+    'CodeRepl': {
+        'algorithm_id': 'CodeClassifier',
+        'current_data_schema_version': 1
+    }
 }
+# Classifier job time to live (in mins).
+CLASSIFIER_JOB_TTL_MINS = 5
+TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
+TRAINING_JOB_STATUS_FAILED = 'FAILED'
+TRAINING_JOB_STATUS_NEW = 'NEW'
+TRAINING_JOB_STATUS_PENDING = 'PENDING'
+
+ALLOWED_TRAINING_JOB_STATUSES = [
+    TRAINING_JOB_STATUS_COMPLETE,
+    TRAINING_JOB_STATUS_FAILED,
+    TRAINING_JOB_STATUS_NEW,
+    TRAINING_JOB_STATUS_PENDING
+]
+
+# The maximum number of characters allowed for userbio length.
+MAX_BIO_LENGTH_IN_CHARS = 2000
+
+ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
+    TRAINING_JOB_STATUS_COMPLETE: [],
+    TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
+    TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
+                                  TRAINING_JOB_STATUS_FAILED],
+    TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
+}
+
+# The maximum number of activities allowed in the playlist of the learner. This
+# limit applies to both the explorations playlist and the collections playlist.
+MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
+
+# The minimum number of training samples required for training a classifier.
+MIN_TOTAL_TRAINING_EXAMPLES = 50
+
+# The minimum number of assigned labels required for training a classifier.
+MIN_ASSIGNED_LABELS = 2
 
 # Default label for classification algorithms.
 DEFAULT_CLASSIFIER_LABEL = '_default'
@@ -106,13 +154,16 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 9
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 3
+CURRENT_COLLECTION_SCHEMA_VERSION = 4
+
+# The current version of the question schema.
+CURRENT_QUESTION_SCHEMA_VERSION = 1
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -149,14 +200,26 @@ DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
 
-# A dict containing the accepted image formats (as determined by the imghdr
+# Default ID of VM which is used for training classifier.
+DEFAULT_VM_ID = 'vm_default'
+# Shared secret key for default VM.
+DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
+
+# An array containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
-# files.
+# images.
 ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'jpeg': ['jpg', 'jpeg'],
     'png': ['png'],
-    'gif': ['gif']
+    'gif': ['gif'],
 }
+
+# An array containing the accepted audio extensions for uploaded files and
+# the corresponding MIME types.
+ACCEPTED_AUDIO_EXTENSIONS = {
+    'mp3': ['audio/mp3']
+}
+
 
 # A string containing the disallowed characters in state or exploration names.
 # The underscore is needed because spaces in names must be converted to
@@ -169,9 +232,6 @@ for ind in range(32):
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A regular expression for alphanumeric words separated by single spaces.
-# Ex.: 'valid name', 'another valid name', 'invalid   name'.
-ALPHANUMERIC_SPACE_REGEX = r'^[0-9A-Za-z]+(?:[ ]?[0-9A-Za-z]+)*$'
 # A regular expression for tags.
 TAG_REGEX = r'^[a-z ]+$'
 
@@ -245,8 +305,6 @@ DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
 # Whether to require an email to be sent, following a moderator action.
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
-# Whether to allow custom event reporting to Google Analytics.
-CAN_SEND_ANALYTICS_EVENTS = False
 # Timespan in minutes before allowing duplicate emails.
 DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
@@ -271,7 +329,6 @@ EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION = 'subscription_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
-EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
@@ -286,7 +343,6 @@ BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
-MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
@@ -295,15 +351,6 @@ DEFAULT_SIGNOFF_HTML_FN = (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
 VALID_MODERATOR_ACTIONS = {
-    MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
-        'email_config': 'publicize_exploration_email_html_body',
-        'email_subject_fn': (
-            lambda exp_title: (
-                'Your Oppia exploration "%s" has been featured!' % exp_title)),
-        'email_intent': EMAIL_INTENT_PUBLICIZE_EXPLORATION,
-        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
-        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
-    },
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
         'email_subject_fn': (
@@ -314,18 +361,6 @@ VALID_MODERATOR_ACTIONS = {
         'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
         'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
     },
-}
-
-# Panel properties and other constants for the default skin.
-GADGET_PANEL_AXIS_HORIZONTAL = 'horizontal'
-PANELS_PROPERTIES = {
-    'bottom': {
-        'width': 350,
-        'height': 100,
-        'stackable_axis': GADGET_PANEL_AXIS_HORIZONTAL,
-        'pixels_between_gadgets': 80,
-        'max_gadgets': 1
-    }
 }
 
 # When the site terms were last updated, in UTC.
@@ -339,12 +374,8 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
-# The default language code for an exploration.
-DEFAULT_LANGUAGE_CODE = 'en'
-
-# The id of the default skin.
-# TODO(sll): Deprecate this; it is no longer used.
-DEFAULT_SKIN_ID = 'conversation_v1'
+# The maximum playback length of an audio file, in seconds.
+MAX_AUDIO_FILE_LENGTH_SEC = 300
 
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
@@ -429,15 +460,6 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 # test in extensions.interactions.base_test.
 LINEAR_INTERACTION_IDS = ['Continue']
 
-ALLOWED_GADGETS = {
-    'ScoreBar': {
-        'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
-    },
-}
-
-# Gadgets subclasses must specify a valid panel option from this list.
-ALLOWED_GADGET_PANELS = ['bottom']
-
 # Demo explorations to load through the admin panel. The id assigned to each
 # exploration is based on the key of the exploration in this dict, so ensure it
 # doesn't change once it's in the list. Only integer-based indices should be
@@ -464,6 +486,8 @@ DEMO_EXPLORATIONS = {
     u'14': 'about_oppia.yaml',
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
+    u'17': 'audio_test',
+    u'18': 'code_classifier_test.yaml',
 }
 
 DEMO_COLLECTIONS = {
@@ -496,21 +520,24 @@ TASK_URL_SUGGESTION_EMAILS = (
 
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
+ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
 EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
+COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
+COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-DASHBOARD_URL = '/dashboard'
-DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
-DASHBOARD_DATA_URL = '/dashboardhandler/data'
-DASHBOARD_EXPLORATION_STATS_PREFIX = '/dashboardhandler/explorationstats'
+CREATOR_DASHBOARD_URL = '/creator_dashboard'
+DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
+CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
+EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
 EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
@@ -520,6 +547,12 @@ FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
+LEARNER_DASHBOARD_URL = '/learner_dashboard'
+LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
+LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
+LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
+LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
+LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -553,9 +586,10 @@ NAV_MODE_BLOG = 'blog'
 NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
-NAV_MODE_DASHBOARD = 'dashboard'
+NAV_MODE_CREATOR_DASHBOARD = 'creator_dashboard'
 NAV_MODE_DONATE = 'donate'
 NAV_MODE_EXPLORE = 'explore'
+NAV_MODE_LEARNER_DASHBOARD = 'learner_dashboard'
 NAV_MODE_LIBRARY = 'library'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
@@ -570,15 +604,16 @@ EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
+EVENT_TYPE_SOLUTION = 'solution'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
+EVENT_TYPE_ACTUAL_START_EXPLORATION = 'actual_start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
-ACTIVITY_STATUS_PUBLICIZED = 'publicized'
 
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'
@@ -587,6 +622,7 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
+COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
@@ -595,8 +631,8 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with base.js
-ENABLE_STRING_CLASSIFIER = False
+# NOTE TO DEVELOPERS: This should be synchronized with app.js
+ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
@@ -620,72 +656,6 @@ USER_QUERY_STATUS_FAILED = 'failed'
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
-
-DEFAULT_COLOR = '#a33f40'
-DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
-
-# List of supported default categories. For now, each category has a specific
-# color associated with it. Each category also has a thumbnail icon whose
-# filename is "{{CategoryName}}.svg".
-CATEGORIES_TO_COLORS = {
-    'Mathematics': '#cd672b',
-    'Algebra': '#cd672b',
-    'Arithmetic': '#d68453',
-    'Calculus': '#b86330',
-    'Logic': '#d68453',
-    'Combinatorics': '#cf5935',
-    'Graph Theory': '#cf5935',
-    'Probability': '#cf5935',
-    'Statistics': '#cd672b',
-    'Geometry': '#d46949',
-    'Trigonometry': '#d46949',
-
-    'Algorithms': '#d0982a',
-    'Computing': '#bb8b2f',
-    'Programming': '#d9aa53',
-
-    'Astronomy': '#879d6c',
-    'Biology': '#97a766',
-    'Chemistry': '#aab883',
-    'Engineering': '#8b9862',
-    'Environment': '#aba86d',
-    'Medicine': '#97a766',
-    'Physics': '#879d6c',
-
-    'Architecture': '#6e3466',
-    'Art': '#895a83',
-    'Music': '#6a3862',
-    'Philosophy': '#613968',
-    'Poetry': '#7f507f',
-
-    'English': '#193a69',
-    'Languages': '#1b4174',
-    'Latin': '#3d5a89',
-    'Reading': '#193a69',
-    'Spanish': '#405185',
-    'Gaulish': '#1b4174',
-
-    'Business': '#387163',
-    'Economics': '#5d8b7f',
-    'Geography': '#3c6d62',
-    'Government': '#538270',
-    'History': '#3d6b52',
-    'Law': '#538270',
-
-    'Education': '#942e20',
-    'Puzzles': '#a8554a',
-    'Sport': '#893327',
-    'Welcome': '#992a2b',
-}
-
-# Types of activities that can be created with Oppia.
-ACTIVITY_TYPE_EXPLORATION = 'exploration'
-ACTIVITY_TYPE_COLLECTION = 'collection'
-ALL_ACTIVITY_TYPES = [ACTIVITY_TYPE_EXPLORATION, ACTIVITY_TYPE_COLLECTION]
-
-# A sorted list of default categories for which icons and background colours
-# exist.
-ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
 
 # These categories are shown in the library navbar.
 SEARCH_DROPDOWN_CATEGORIES = sorted([
@@ -737,142 +707,10 @@ LIBRARY_PAGE_MODE_INDEX = 'index'
 # Page mode for the search results page.
 LIBRARY_PAGE_MODE_SEARCH = 'search'
 
-# List of supported language codes. Each description has a
-# parenthetical part that may be stripped out to give a shorter
-# description.
-ALL_LANGUAGE_CODES = [{
-    'code': 'en', 'description': u'English',
-}, {
-    'code': 'ar', 'description': u'العربية (Arabic)',
-}, {
-    'code': 'bg', 'description': u'български (Bulgarian)',
-}, {
-    'code': 'ca', 'description': u'català (Catalan)',
-}, {
-    'code': 'zh', 'description': u'中文 (Chinese)',
-}, {
-    'code': 'hr', 'description': u'hrvatski (Croatian)',
-}, {
-    'code': 'cs', 'description': u'čeština (Czech)',
-}, {
-    'code': 'da', 'description': u'dansk (Danish)',
-}, {
-    'code': 'nl', 'description': u'Nederlands (Dutch)',
-}, {
-    'code': 'tl', 'description': u'Filipino (Filipino)',
-}, {
-    'code': 'fi', 'description': u'suomi (Finnish)',
-}, {
-    'code': 'fr', 'description': u'français (French)',
-}, {
-    'code': 'de', 'description': u'Deutsch (German)',
-}, {
-    'code': 'el', 'description': u'ελληνικά (Greek)',
-}, {
-    'code': 'he', 'description': u'עברית (Hebrew)',
-}, {
-    'code': 'hi', 'description': u'हिन्दी (Hindi)',
-}, {
-    'code': 'hu', 'description': u'magyar (Hungarian)',
-}, {
-    'code': 'id', 'description': u'Bahasa Indonesia (Indonesian)',
-}, {
-    'code': 'it', 'description': u'italiano (Italian)',
-}, {
-    'code': 'ja', 'description': u'日本語 (Japanese)',
-}, {
-    'code': 'ko', 'description': u'한국어 (Korean)',
-}, {
-    'code': 'lv', 'description': u'latviešu (Latvian)',
-}, {
-    'code': 'lt', 'description': u'lietuvių (Lithuanian)',
-}, {
-    'code': 'no', 'description': u'Norsk (Norwegian)',
-}, {
-    'code': 'fa', 'description': u'فارسی (Persian)',
-}, {
-    'code': 'pl', 'description': u'polski (Polish)',
-}, {
-    'code': 'pt', 'description': u'português (Portuguese)',
-}, {
-    'code': 'ro', 'description': u'română (Romanian)',
-}, {
-    'code': 'ru', 'description': u'русский (Russian)',
-}, {
-    'code': 'sr', 'description': u'српски (Serbian)',
-}, {
-    'code': 'sk', 'description': u'slovenčina (Slovak)',
-}, {
-    'code': 'sl', 'description': u'slovenščina (Slovenian)',
-}, {
-    'code': 'es', 'description': u'español (Spanish)',
-}, {
-    'code': 'sv', 'description': u'svenska (Swedish)',
-}, {
-    'code': 'th', 'description': u'ภาษาไทย (Thai)',
-}, {
-    'code': 'tr', 'description': u'Türkçe (Turkish)',
-}, {
-    'code': 'uk', 'description': u'українська (Ukrainian)',
-}, {
-    'code': 'vi', 'description': u'Tiếng Việt (Vietnamese)',
-}]
-
 # Defaults for topic similarities
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
-# NOTE TO DEVELOPERS: While adding another language, please ensure that the
-# languages are in alphabetical order.
-SUPPORTED_SITE_LANGUAGES = [{
-    'id': 'id',
-    'text': 'Bahasa Indonesia'
-}, {
-    'id': 'en',
-    'text': 'English'
-}, {
-    'id': 'de',
-    'text': 'Deutsch'
-}, {
-    'id': 'fr',
-    'text': 'français'
-}, {
-    'id': 'nl',
-    'text': 'Nederlands'
-}, {
-    'id': 'es',
-    'text': 'Español'
-}, {
-    'id': 'hu',
-    'text': 'magyar'
-}, {
-    'id': 'pt',
-    'text': 'Português'
-}, {
-    'id': 'pt-br',
-    'text': 'Português (Brasil)'
-}, {
-    'id': 'mk',
-    'text': 'македонски јазик'
-}, {
-    'id': 'vi',
-    'text': 'Tiếng Việt'
-}, {
-    'id': 'hi',
-    'text': 'हिन्दी'
-}, {
-    'id': 'bn',
-    'text': 'বাংলা'
-}, {
-    'id': 'tr',
-    'text': 'Türkçe'
-}, {
-    'id': 'zh-hans',
-    'text': '中文(简体)'
-}, {
-    'id': 'zh-hant',
-    'text': '中文(繁體)'
-}]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 
@@ -891,7 +729,7 @@ CONTACT_PAGE_DESCRIPTION = (
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
-DASHBOARD_PAGE_DESCRIPTION = (
+CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
 DONATE_PAGE_DESCRIPTION = (
@@ -933,3 +771,20 @@ SITE_NAME = 'Oppia.org'
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
+
+# Following are the constants for the role IDs.
+ROLE_ID_GUEST = 'GUEST'
+ROLE_ID_BANNED_USER = 'BANNED_USER'
+ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
+ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_ID_MODERATOR = 'MODERATOR'
+ROLE_ID_ADMIN = 'ADMIN'
+
+# Intent of the User making query to role structure via admin interface. Used
+# to store audit data regarding queries to role IDs.
+ROLE_ACTION_UPDATE = 'update'
+ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
+ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
+
+VIEW_METHOD_ROLE = 'role'
+VIEW_METHOD_USERNAME = 'username'

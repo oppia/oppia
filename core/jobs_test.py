@@ -24,6 +24,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -87,8 +88,10 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
     def test_enqueue_job(self):
         """Test the enqueueing of a job."""
         job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_DEFAULT), 1)
 
         self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_QUEUED)
@@ -98,19 +101,25 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
     def test_failure_for_job_enqueued_using_wrong_manager(self):
         job_id = DummyJobManager.create_new()
         with self.assertRaisesRegexp(Exception, 'Invalid job type'):
-            AnotherDummyJobManager.enqueue(job_id)
+            AnotherDummyJobManager.enqueue(
+                job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
     def test_failure_for_job_with_no_run_method(self):
         job_id = JobWithNoRunMethodManager.create_new()
-        JobWithNoRunMethodManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        JobWithNoRunMethodManager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         with self.assertRaisesRegexp(Exception, 'NotImplementedError'):
             self.process_and_flush_pending_tasks()
 
     def test_complete_job(self):
         job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
@@ -139,12 +148,16 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         """Test the enqueueing of a job with additional parameters."""
         job_id_1 = DummyJobManagerWithParams.create_new()
         DummyJobManagerWithParams.enqueue(
-            job_id_1, additional_job_params={'random': 3, 'correct': 60})
+            job_id_1, taskqueue_services.QUEUE_NAME_DEFAULT,
+            additional_job_params={'random': 3, 'correct': 60})
         job_id_2 = DummyJobManagerWithParams.create_new()
         DummyJobManagerWithParams.enqueue(
-            job_id_2, additional_job_params={'random': 20, 'correct': 25})
+            job_id_2, taskqueue_services.QUEUE_NAME_DEFAULT,
+            additional_job_params={'random': 20, 'correct': 25})
 
-        self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            2)
         self.process_and_flush_pending_tasks()
 
         self.assertTrue(DummyJobManagerWithParams.has_finished(job_id_1))
@@ -154,8 +167,11 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_job_failure(self):
         job_id = DummyFailingJobManager.create_new()
-        DummyFailingJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        DummyFailingJobManager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         with self.assertRaisesRegexp(Exception, 'Task failed'):
             self.process_and_flush_pending_tasks()
 
@@ -186,12 +202,13 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
     def test_status_code_transitions(self):
         """Test that invalid status code transitions are caught."""
         job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         DummyJobManager.register_start(job_id)
         DummyJobManager.register_completion(job_id, ['output'])
 
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            DummyJobManager.enqueue(job_id)
+            DummyJobManager.enqueue(
+                job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
             DummyJobManager.register_completion(job_id, ['output'])
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
@@ -201,9 +218,10 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job_id = DummyJobManager.create_new()
         another_job_id = AnotherDummyJobManager.create_new()
 
-        DummyJobManager.enqueue(job_id)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         DummyJobManager.register_start(job_id)
-        AnotherDummyJobManager.enqueue(another_job_id)
+        AnotherDummyJobManager.enqueue(
+            another_job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
         self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_STARTED)
@@ -219,19 +237,20 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_enqueue_same_job_twice(self):
         job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            DummyJobManager.enqueue(job_id)
+            DummyJobManager.enqueue(
+                job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
     def test_can_enqueue_two_instances_of_the_same_job(self):
         job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         job_id_2 = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id_2)
+        DummyJobManager.enqueue(job_id_2, taskqueue_services.QUEUE_NAME_DEFAULT)
 
     def test_cancel_kills_queued_job(self):
         job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertTrue(DummyJobManager.is_active(job_id))
         DummyJobManager.cancel(job_id, 'admin_user_id')
 
@@ -244,7 +263,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_cancel_kills_started_job(self):
         job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertTrue(DummyJobManager.is_active(job_id))
         DummyJobManager.register_start(job_id)
 
@@ -265,7 +284,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_cancel_does_not_kill_completed_job(self):
         job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertTrue(DummyJobManager.is_active(job_id))
         # Complete the job.
         self.process_and_flush_pending_tasks()
@@ -288,7 +307,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_cancel_does_not_kill_failed_job(self):
         job_id = DummyFailingJobManager.create_new()
-        DummyFailingJobManager.enqueue(job_id)
+        DummyFailingJobManager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertTrue(DummyFailingJobManager.is_active(job_id))
         with self.assertRaisesRegexp(Exception, 'Task failed'):
             self.process_and_flush_pending_tasks()
@@ -312,9 +332,9 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_cancelling_multiple_unfinished_jobs(self):
         job1_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job1_id)
+        DummyJobManager.enqueue(job1_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         job2_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job2_id)
+        DummyJobManager.enqueue(job2_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
         DummyJobManager.register_start(job1_id)
         DummyJobManager.register_start(job2_id)
@@ -337,9 +357,9 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_cancelling_one_unfinished_job(self):
         job1_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job1_id)
+        DummyJobManager.enqueue(job1_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         job2_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job2_id)
+        DummyJobManager.enqueue(job2_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
         DummyJobManager.register_start(job1_id)
         DummyJobManager.register_start(job2_id)
@@ -361,6 +381,56 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             'Canceled by admin_user_id', DummyJobManager.get_error(job1_id))
         self.assertIsNone(DummyJobManager.get_error(job2_id))
+
+    def test_compress_output_list_with_single_char_outputs(self):
+        input_list = [1, 2, 3, 4, 5]
+        expected_output = ['1', '2', '3', '<TRUNCATED>']
+        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+            input_list, test_only_max_output_len_chars=3)
+        self.assertEquals(actual_output, expected_output)
+
+    def test_compress_output_list_with_multi_char_outputs(self):
+        input_list = ['abcd', 'efgh', 'ijkl']
+        expected_output = ['abcd', 'efgh', 'ij <TRUNCATED>']
+        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+            input_list, test_only_max_output_len_chars=10)
+        self.assertEquals(actual_output, expected_output)
+
+    def test_compress_output_list_with_zero_max_output_len(self):
+        input_list = [1, 2, 3]
+        expected_output = ['<TRUNCATED>']
+        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+            input_list, test_only_max_output_len_chars=0)
+        self.assertEquals(actual_output, expected_output)
+
+    def test_compress_output_list_with_exact_max_output_len(self):
+        input_list = ['abc']
+        expected_output = ['abc']
+        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+            input_list, test_only_max_output_len_chars=3)
+        self.assertEquals(actual_output, expected_output)
+
+    def test_compress_output_list_with_empty_outputs(self):
+        input_list = []
+        expected_output = []
+        actual_output = jobs.BaseJobManager._compress_output_list(input_list)  # pylint: disable=protected-access
+        self.assertEquals(actual_output, expected_output)
+
+    def test_compress_output_list_with_duplicate_outputs(self):
+        input_list = ['bar', 'foo'] * 3
+        expected_output = ['(3x) bar', '(3x) foo']
+        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+            input_list,
+            # Make sure no output gets truncated.
+            test_only_max_output_len_chars=sum(len(s) for s in expected_output))
+        self.assertEquals(actual_output, expected_output)
+
+    def test_compress_output_list_with_truncated_duplicate_outputs(self):
+        input_list = ['supercalifragilisticexpialidocious'] * 3
+        expected_output = ['(3x) super <TRUNCATED>']
+        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
+            input_list, test_only_max_output_len_chars=10)
+        self.assertEquals(actual_output, expected_output)
 
 
 SUM_MODEL_ID = 'all_data_id'
@@ -433,38 +503,51 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_stored_total(), 0)
 
         TestAdditionJobManager.enqueue(
-            TestAdditionJobManager.create_new())
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            TestAdditionJobManager.create_new(),
+            taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self._get_stored_total(), 6)
 
         NumbersModel(number=3).put()
 
         TestAdditionJobManager.enqueue(
-            TestAdditionJobManager.create_new())
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            TestAdditionJobManager.create_new(),
+            taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self._get_stored_total(), 9)
 
     def test_multiple_enqueued_jobs(self):
         self._populate_data()
         TestAdditionJobManager.enqueue(
-            TestAdditionJobManager.create_new())
+            TestAdditionJobManager.create_new(),
+            taskqueue_services.QUEUE_NAME_DEFAULT)
 
         NumbersModel(number=3).put()
         TestAdditionJobManager.enqueue(
-            TestAdditionJobManager.create_new())
+            TestAdditionJobManager.create_new(),
+            taskqueue_services.QUEUE_NAME_DEFAULT)
 
-        self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            2)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self._get_stored_total(), 9)
 
     def test_failing_job(self):
         self._populate_data()
         job_id = FailingAdditionJobManager.create_new()
-        FailingAdditionJobManager.enqueue(job_id)
+        FailingAdditionJobManager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         with self.assertRaisesRegexp(
             taskqueue_services.PermanentTaskFailure, 'Oops, I failed'
             ):
@@ -509,8 +592,11 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
 
     def test_count_all_explorations(self):
         job_id = SampleMapReduceJobManager.create_new()
-        SampleMapReduceJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        SampleMapReduceJobManager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_DEFAULT), 1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
@@ -568,7 +654,7 @@ class JobQueriesTests(test_utils.GenericTestBase):
         self.assertEqual(jobs.get_data_for_recent_jobs(), [])
 
         job_id = DummyJobManager.create_new()
-        DummyJobManager.enqueue(job_id)
+        DummyJobManager.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         recent_jobs = jobs.get_data_for_recent_jobs()
         self.assertEqual(len(recent_jobs), 1)
         self.assertDictContainsSubset({
@@ -614,8 +700,11 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(exp_models.ExplorationRightsModel.query().count(), 1)
 
         job_id = TwoClassesMapReduceJobManager.create_new()
-        TwoClassesMapReduceJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        TwoClassesMapReduceJobManager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
@@ -760,12 +849,16 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 {}, feconf.PLAY_TYPE_NORMAL)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
 
             # When the task queue is flushed, the data is recorded in the two
             # realtime layers.
             self.process_and_flush_pending_tasks()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             self.assertEqual(StartExplorationRealtimeModel.get(
@@ -787,7 +880,9 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertIsNone(StartExplorationRealtimeModel.get(
                 '1:%s' % self.EXP_ID, strict=False))
 
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 stats_models.ExplorationAnnotationsModel.get(

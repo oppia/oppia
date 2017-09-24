@@ -21,3 +21,30 @@ oppia.constant('CONTENT_FOCUS_LABEL_PREFIX', 'content-focus-label-');
 oppia.constant('TWO_CARD_THRESHOLD_PX', 960);
 
 oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
+
+// The enforced waiting period between successive hint requests.
+oppia.constant('WAIT_FOR_HINT_MSEC', 30000);
+
+// The time delay between the learner clicking the hint button
+// and the appearance of the hint.
+oppia.constant('DELAY_FOR_HINT_FEEDBACK_MSEC', 100);
+
+// Array of i18n IDs for the possible hint request strings.
+oppia.constant(
+  'HINT_REQUEST_STRING_I18N_IDS', [
+    'I18N_PLAYER_HINT_REQUEST_STRING_1',
+    'I18N_PLAYER_HINT_REQUEST_STRING_2',
+    'I18N_PLAYER_HINT_REQUEST_STRING_3']);
+
+oppia.constant(
+    'EXPLORATION_DATA_URL_TEMPLATE',
+    '/explorehandler/init/<exploration_id>');
+oppia.constant(
+  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>?v=<version>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');

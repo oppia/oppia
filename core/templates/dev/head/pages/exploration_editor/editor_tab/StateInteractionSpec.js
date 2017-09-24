@@ -58,19 +58,19 @@ describe('State Interaction controller', function() {
       ess = $injector.get('explorationStatesService');
       siis = $injector.get('stateInteractionIdService');
       scas = $injector.get('stateCustomizationArgsService');
-      idc = $injector.get('interactionDetailsCache');
+      idc = $injector.get('InteractionDetailsCacheService');
       IS = $injector.get('INTERACTION_SPECS');
       $httpBackend = $injector.get('$httpBackend');
       scope.stateInteractionIdService = siis;
       scope.stateCustomizationArgsService = scas;
-      scope.interactionDetailsCache = idc;
+      scope.InteractionDetailsCacheService = idc;
 
       ess.init({
         'First State': {
-          content: [{
-            type: 'text',
-            value: 'First State Content'
-          }],
+          content: {
+            html: 'First State Content',
+            audio_translations: {}
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
@@ -83,15 +83,15 @@ describe('State Interaction controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: []
+            hints: []
           },
           param_changes: []
         },
         'End State': {
-          content: [{
-            type: 'text',
-            value: ''
-          }],
+          content: {
+            html: '',
+            audio_translations: {}
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
@@ -104,7 +104,7 @@ describe('State Interaction controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: []
+            hints: []
           },
           param_changes: []
         }
@@ -135,7 +135,7 @@ describe('State Interaction controller', function() {
         },
         stateInteractionIdService: siis,
         stateCustomizationArgsService: scas,
-        interactionDetailsCache: idc,
+        InteractionDetailsCacheService: idc,
         INTERACTION_SPECS: IS
       });
     }));
@@ -155,7 +155,7 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TerminalInteraction';
         scope.onCustomizationModalSavePostHook();
 
-        expect(ess.getState('First State').content[0].value).toEqual(
+        expect(ess.getState('First State').content.getHtml()).toEqual(
           'First State Content');
         expect(ess.getState('First State').interaction.id).toEqual(
           'TerminalInteraction');
@@ -177,8 +177,8 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TerminalInteraction';
         scope.onCustomizationModalSavePostHook();
 
-        expect(state.content[0].value).toEqual('');
-        expect(ess.getState('End State').content[0].value).toEqual(
+        expect(state.content.getHtml()).toEqual('');
+        expect(ess.getState('End State').content.getHtml()).toEqual(
           'Congratulations, you have finished!');
         expect(ess.getState('End State').interaction.id).toEqual(
           'TerminalInteraction');
@@ -200,8 +200,8 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TextInput';
         scope.onCustomizationModalSavePostHook();
 
-        expect(state.content[0].value).toEqual('');
-        expect(ess.getState('End State').content[0].value).toEqual('');
+        expect(state.content.getHtml()).toEqual('');
+        expect(ess.getState('End State').content.getHtml()).toEqual('');
         expect(ess.getState('End State').interaction.id).toEqual('TextInput');
       }
     );

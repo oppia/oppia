@@ -29,6 +29,7 @@ class GraphInput(base.BaseInteraction):
     instructions = 'Create a graph'
     narrow_instructions = 'View graph'
     needs_summary = True
+    can_have_solution = True
 
     _customization_arg_specs = [{
         'name': 'graph',
@@ -114,5 +115,3 @@ class GraphInput(base.BaseInteraction):
         },
         'default_value': False
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

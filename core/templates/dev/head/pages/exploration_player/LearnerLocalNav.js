@@ -36,10 +36,10 @@ oppia.controller('LearnerLocalNav', [
               $scope, $modalInstance, $timeout, playerPositionService,
               oppiaPlayerService) {
             var stateName = playerPositionService.getCurrentStateName();
-            $scope.initContent = oppiaPlayerService.getStateContentHtml(
+            $scope.originalHtml = oppiaPlayerService.getStateContentHtml(
               stateName);
             $scope.description = '';
-            $scope.suggestionContent = $scope.initContent;
+            $scope.suggestionHtml = $scope.originalHtml;
             $scope.showEditor = false;
             // Rte initially displays content unrendered for a split second
             $timeout(function() {
@@ -56,7 +56,7 @@ oppia.controller('LearnerLocalNav', [
                 version: oppiaPlayerService.getExplorationVersion(),
                 stateName: stateName,
                 description: $scope.description,
-                suggestionContent: $scope.suggestionContent
+                suggestionHtml: $scope.suggestionHtml
               });
             };
           }]
@@ -65,10 +65,7 @@ oppia.controller('LearnerLocalNav', [
           exploration_version: result.version,
           state_name: result.stateName,
           description: result.description,
-          suggestion_content: {
-            type: 'text',
-            value: result.suggestionContent
-          }
+          suggestion_html: result.suggestionHtml
         }).error(function(res) {
           alertsService.addWarning(res);
         });
@@ -90,7 +87,8 @@ oppia.controller('LearnerLocalNav', [
 
     $scope.showFlagExplorationModal = function() {
       $modal.open({
-        templateUrl: 'modals/flagExploration',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/flag_exploration_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'playerPositionService',
@@ -122,9 +120,9 @@ oppia.controller('LearnerLocalNav', [
         ]
       }).result.then(function(result) {
         var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
-            FLAG_EXPLORATION_URL_TEMPLATE, {
-              exploration_id: $scope.explorationId
-            }
+          FLAG_EXPLORATION_URL_TEMPLATE, {
+            exploration_id: $scope.explorationId
+          }
         );
         var report = (
           '[' + result.state + '] (' + result.report_type + ') ' +
@@ -135,7 +133,9 @@ oppia.controller('LearnerLocalNav', [
           alertsService.addWarning(error);
         });
         $modal.open({
-          templateUrl: 'modals/explorationSuccessfullyFlagged',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/' +
+            'exploration_successfully_flagged_modal_directive.html'),
           backdrop: true,
           controller: [
             '$scope', '$modalInstance',

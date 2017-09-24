@@ -51,7 +51,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
           the document's rank.
           By default, search results are returned ordered by descending rank.
           If there is a key named 'language_code', its value will be used as
-          the document's language. Otherwise, feconf.DEFAULT_LANGUAGE_CODE is
+          the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE is
           used.
       - index: the name of the index to insert the document into, a string.
       - retries: the number of times to retry inserting the documents.

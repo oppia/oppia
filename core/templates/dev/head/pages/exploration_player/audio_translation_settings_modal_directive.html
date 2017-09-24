@@ -1,0 +1,16 @@
+<div class="modal-header">
+  <h3 translate="I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS">
+  </h3>
+</div>
+
+<div class="modal-body">
+  <p translate="I18N_PLAYER_AUDIO_LANGUAGE">
+  </p>
+  <select ng-model="selectedLanguage"
+          ng-options="o.value as o.displayed for o in languagesInExploration">
+  </select>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-success" ng-click="save()">Save</button>
+</div>

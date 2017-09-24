@@ -23,12 +23,13 @@ class CodeRepl(base.BaseInteraction):
     name = 'Code Editor'
     description = 'Allows learners to enter code and get it evaluated.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = False
-    _dependency_ids = ['skulpt', 'codemirror']
+    is_trainable = True
+    _dependency_ids = ['skulpt', 'codemirror', 'code_repl_prediction']
     answer_type = 'CodeEvaluation'
     instructions = 'Type code in the editor'
     narrow_instructions = 'Go to code editor'
     needs_summary = True
+    can_have_solution = True
 
     # Language options 'lua', 'scheme', 'coffeescript', 'javascript', and
     # 'ruby' have been removed for possible later re-release.
@@ -75,21 +76,10 @@ class CodeRepl(base.BaseInteraction):
     }]
 
     _answer_visualization_specs = [{
-        # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
             'column_headers': ['Answer', 'Count'],
-            'title': 'Top 5 answers'
+            'title': 'Top 10 answers'
         },
-        'calculation_id': 'Top5AnswerFrequencies',
-    }, {
-        # Table with answer counts.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'All answers'
-        },
-        'calculation_id': 'AnswerFrequencies',
+        'calculation_id': 'Top10AnswerFrequencies',
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

@@ -17,8 +17,68 @@
 import datetime
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
+
+class UserSettingsModelTest(test_utils.GenericTestBase):
+    """Tests for UserSettingsModel class."""
+    user_email = 'user@example.com'
+    user_role = feconf.ROLE_ID_ADMIN
+    user2_email = 'user2@example.com'
+    user2_role = feconf.ROLE_ID_BANNED_USER
+
+    def setUp(self):
+        super(UserSettingsModelTest, self).setUp()
+        user_models.UserSettingsModel(
+            email=self.user_email, role=self.user_role).put()
+        user_models.UserSettingsModel(
+            email=self.user2_email, role=self.user2_role).put()
+
+    def test_get_by_role(self):
+        user = user_models.UserSettingsModel.get_by_role(
+            feconf.ROLE_ID_ADMIN)
+        self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
+
+
+class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
+    """Tests for ExpUserLastPlaythroughModel class."""
+
+    USER_ID = 'user_id'
+    EXP_ID_0 = 'exp_id_0'
+    EXP_ID_1 = 'exp_id_1'
+
+    def setUp(self):
+        super(ExpUserLastPlaythroughModelTest, self).setUp()
+        user_models.ExpUserLastPlaythroughModel(
+            id='%s.%s' % (self.USER_ID, self.EXP_ID_0), user_id=self.USER_ID,
+            exploration_id=self.EXP_ID_0, last_played_exp_version=1,
+            last_played_state_name='state_name').put()
+
+    def test_create_success(self):
+        user_models.ExpUserLastPlaythroughModel.create(
+            self.USER_ID, self.EXP_ID_1).put()
+        retrieved_object = user_models.ExpUserLastPlaythroughModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID_1))
+
+        self.assertEqual(retrieved_object.user_id, self.USER_ID)
+        self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_1)
+
+    def test_get_success(self):
+        retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
+            self.USER_ID, self.EXP_ID_0)
+
+        self.assertEqual(retrieved_object.user_id, self.USER_ID)
+        self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_0)
+        self.assertEqual(retrieved_object.last_played_exp_version, 1)
+        self.assertEqual(retrieved_object.last_played_state_name, 'state_name')
+
+    def test_get_failure(self):
+        retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
+            self.USER_ID, 'unknown_exp_id')
+
+        self.assertEqual(retrieved_object, None)
 
 
 class ExplorationUserDataModelTest(test_utils.GenericTestBase):
@@ -37,7 +97,8 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             rated_on=self.DATETIME_OBJECT,
             draft_change_list={'new_content': {}},
             draft_change_list_last_updated=self.DATETIME_OBJECT,
-            draft_change_list_exp_version=3).put()
+            draft_change_list_exp_version=3,
+            draft_change_list_id=1).put()
 
     def test_create_success(self):
         user_models.ExplorationUserDataModel.create(
@@ -61,6 +122,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.draft_change_list_last_updated,
                          self.DATETIME_OBJECT)
         self.assertEqual(retrieved_object.draft_change_list_exp_version, 3)
+        self.assertEqual(retrieved_object.draft_change_list_id, 1)
 
     def test_get_failure(self):
         retrieved_object = user_models.ExplorationUserDataModel.get(

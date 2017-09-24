@@ -16,9 +16,11 @@
  * @fileoverview Directive for displaying animated loading dots.
  */
 
-oppia.directive('loadingDots', function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'components/loadingDots'
-  };
-});
+oppia.directive('loadingDots', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/loading/loading_dots_directive.html')
+    };
+  }]);

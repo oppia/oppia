@@ -17,10 +17,13 @@
 import json
 import os
 
+from constants import constants
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_manager
+from core.domain import user_services
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -38,6 +41,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
 
     def test_library_page(self):
         """Test access to the library page."""
@@ -72,9 +76,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-        # Publicize the demo exploration.
         self.set_admins([self.ADMIN_USERNAME])
-        rights_manager.publicize_exploration(self.admin_id, '0')
 
         # Run migration job to create exploration summaries.
         # This is not necessary, but serves as additional check that
@@ -82,9 +84,13 @@ class LibraryPageTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         job_id = (exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
-        self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertGreaterEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         # change title and category
         exp_services.update_exploration(
@@ -108,11 +114,11 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'title': 'A new title!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
     def test_library_handler_for_created_explorations(self):
-        """Test the library data handler for manually created explirations."""
+        """Test the library data handler for manually created explorations."""
         self.set_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
@@ -144,11 +150,10 @@ class LibraryPageTest(test_utils.GenericTestBase):
             objective='Objective B')
         exp_services._save_exploration(  # pylint: disable=protected-access
             self.admin_id, exploration, 'Exploration B', [])
-        rights_manager.publish_exploration(self.admin_id, 'B')
-        rights_manager.publicize_exploration(self.admin_id, 'B')
+        rights_manager.publish_exploration(self.admin, 'B')
 
         # Publish exploration A
-        rights_manager.publish_exploration(self.admin_id, 'A')
+        rights_manager.publish_exploration(self.admin, 'A')
 
         exp_services.index_explorations_given_ids(['A', 'B'])
 
@@ -161,8 +166,8 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-        }, response_dict['activity_list'][0])
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_list'][1])
         self.assertDictContainsSubset({
             'id': 'A',
             'category': 'Category A',
@@ -170,7 +175,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'Objective A',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_list'][1])
+        }, response_dict['activity_list'][0])
 
         # Delete exploration A
         exp_services.delete_exploration(self.admin_id, 'A')
@@ -184,7 +189,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
 
@@ -306,7 +311,7 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
 class CategoryConfigTest(test_utils.GenericTestBase):
 
     def test_thumbnail_icons_exist_for_each_category(self):
-        all_categories = feconf.CATEGORIES_TO_COLORS.keys()
+        all_categories = constants.CATEGORIES_TO_COLORS.keys()
 
         # Test that an icon exists for each default category.
         for category in all_categories:
@@ -317,7 +322,7 @@ class CategoryConfigTest(test_utils.GenericTestBase):
         # Test that the default icon exists.
         utils.get_file_contents(os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'subjects',
-            '%s.svg' % feconf.DEFAULT_THUMBNAIL_ICON))
+            '%s.svg' % constants.DEFAULT_THUMBNAIL_ICON))
 
 
 class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
@@ -334,6 +339,8 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
         self.save_new_valid_exploration(
             self.PRIVATE_EXP_ID_EDITOR, self.editor_id)
         self.save_new_valid_exploration(
@@ -342,7 +349,7 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
             self.PRIVATE_EXP_ID_VIEWER, self.viewer_id)
 
         rights_manager.publish_exploration(
-            self.editor_id, self.PUBLIC_EXP_ID_EDITOR)
+            self.editor, self.PUBLIC_EXP_ID_EDITOR)
 
     def test_can_get_public_exploration_summaries(self):
         self.login(self.VIEWER_EMAIL)
@@ -384,7 +391,7 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
         # If the viewer user is granted edit access to the editor user's
         # private exploration, then it will show up for the next request.
         rights_manager.assign_role_for_exploration(
-            self.editor_id, self.PRIVATE_EXP_ID_EDITOR, self.viewer_id,
+            self.editor, self.PRIVATE_EXP_ID_EDITOR, self.viewer_id,
             rights_manager.ROLE_EDITOR)
 
         response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {

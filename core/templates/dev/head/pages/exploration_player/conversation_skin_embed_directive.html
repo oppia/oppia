@@ -48,7 +48,7 @@
   <footer class="grid-container">
     <nav class="bottom-nav-row">
       <div class="col-1-4 bottom-nav-left">
-        <div ng-if="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml &&
+        <div ng-if="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse &&
                     !isCurrentSupplementalCardNonempty() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback && activeCard.destStateName &&
                     !isOnTerminalCard()">
           <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
@@ -68,7 +68,7 @@
           <div class="nav-bar-bottom-visit-oppia">
             <span ng-if="isOnTerminalCard()" class="oppia-view-more-explorations">For more explorations, visit:</span>
             <a class="oppia-link" ng-click="onNavigateFromIframe()" href="https://www.oppia.org/" target="_blank">
-              <img class="logo-bottom-nav-bar" src="/assets/images/logo/288x128_logo_white.png">
+              <img class="logo-bottom-nav-bar" src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>">
             </a>
           </div>
         </div>
@@ -221,7 +221,7 @@ directive. -->
   }
 
   .conversation-skin-oppia-avatar,
-  .conversation-skin-user-avatar {
+  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
     height: 36px;
     position: absolute;
     top: 0;
@@ -236,6 +236,7 @@ directive. -->
   .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
     height: 48px;
     left: -28px;
+    top: -20px;
     width: 48px;
   }
 
@@ -283,18 +284,6 @@ directive. -->
     color: #888;
     font-size: 0.8em;
     padding: 0 10px;
-  }
-
-  .conversation-skin-bottom-gadget-panel {
-    bottom: 4px;
-    left: 0;
-    margin: 0 auto;
-    max-height: 135px;
-    max-width: 400px;
-    min-width: 150px;
-    position: fixed;
-    right: 0;
-    width: 360px;
   }
 
   .conversation-skin-cards-container {
@@ -501,6 +490,7 @@ directive. -->
 
   .conversation-skin-learner-answer-container {
     text-align: right;
+    width: auto;
   }
 
   .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {

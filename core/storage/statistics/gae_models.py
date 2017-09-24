@@ -19,7 +19,6 @@
 import datetime
 import json
 import logging
-import operator
 import sys
 
 from core.platform import models
@@ -31,15 +30,11 @@ from google.appengine.ext import ndb
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
 
-# TODO(bhenning): Everything is handler name submit; therefore, it is
-# pointless and should be removed.
-_OLD_SUBMIT_HANDLER_NAME = 'submit'
-
 
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
 
-    The id/key of instances of this class has the form
+    The ID/key of instances of this class has the form
         [EXPLORATION_ID].[STATE_NAME].
     """
     # Number of times the state was entered for the first time in a reader
@@ -57,6 +52,15 @@ class StateCounterModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(cls, exploration_id, state_name):
+        """Gets or creates an entity by exploration_id and state_name.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            state_name: str. Name of the current state.
+
+        Returns:
+            StateCounterModel. An instance of the StateCounterModel.
+        """
         instance_id = '.'.join([exploration_id, state_name])
         counter = cls.get(instance_id, strict=False)
         if not counter:
@@ -64,117 +68,187 @@ class StateCounterModel(base_models.BaseModel):
         return counter
 
 
-class StateRuleAnswerLogModel(base_models.BaseModel):
-    """The log of all answers hitting a given state rule.
+class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student submitting an answer.
 
-    The id/key of instances of this class has the form
-        [EXPLORATION_ID].[STATE_NAME].[HANDLER_NAME].[RULE_NAME]
-
-    WARNING: If a change is made to existing rules in data/objects (e.g.
-    renaming them or changing their signature), this class will contain
-    invalid values.
-
-    WARNING: Rule names and args that are used to construct the key here must
-    be < 400 characters in length, since these are used as part of the key.
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'answer_submit'
+        exp_id: id of exploration currently being played
+        exp_version: version of exploration
+        state_name: Name of current state
+        client_time_spent_in_secs: Time since start of this state when this
+            event was recorded
+        session_id: ID of current student's session
+        is_feedback_useful: Whether the answer received useful feedback
+        is_answer_correct: Whether the answer is correct
     """
-    # Log of answers that hit this rule and that have not been resolved. The
-    # JSON blob represents a dict. The keys of this dict are the answers
-    # encoded as HTML strings, and the values are integer counts representing
-    # how many times the answer has been entered.
-    # WARNING: do not use default={} in JsonProperty, it does not work as you
-    # expect.
-    answers = ndb.JsonProperty(indexed=False)
+    # Which specific type of event this is
+    event_type = ndb.StringProperty()
+    # Id of exploration currently being played.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    client_time_spent_in_secs = ndb.FloatProperty()
+    # Whether the submitted answer received useful feedback
+    is_feedback_useful = ndb.BooleanProperty(indexed=True)
+    # Whether the submitted answer is the correct answer.
+    is_answer_correct = ndb.BooleanProperty(indexed=True)
 
     @classmethod
-    def get_or_create(cls, exploration_id, state_name, rule_str):
-        # TODO(sll): Deprecate this method.
-        return cls.get_or_create_multi_for_multi_explorations(
-            [(exploration_id, state_name)], [rule_str])[0][0]
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
 
     @classmethod
-    def _get_entity_key(cls, unused_exploration_id, entity_id):
-        return ndb.Key(cls._get_kind(), entity_id)
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               client_time_spent_in_secs, is_feedback_useful,
+               is_answer_correct):
+        """Creates a new answer submitted event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        answer_submitted_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_ANSWER_SUBMITTED,
+            exp_id=exp_id,
+            exp_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=client_time_spent_in_secs,
+            is_feedback_useful=is_feedback_useful,
+            is_answer_correct=is_answer_correct)
+        answer_submitted_event_entity.put()
+        return entity_id
+
+
+class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student entering an exploration. In this context,
+    'actually' entering an exploration means the student has spent a defined
+    MIN_TIME on the exploration.
+
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'actual_start'
+        exp_id: id of exploration currently being played
+        exp_version: version of exploration
+        state_name: Name of current state
+        client_time_spent_in_secs: Time since start of the exploration when
+            this event was recorded (MIN_TIME to record this event)
+        session_id: ID of current student's session
+    """
+    # Which specific type of event this is
+    event_type = ndb.StringProperty()
+    # Id of exploration currently being played.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec). This
+    # should be equal to the MIN_TIME defined for recording this event.
+    client_time_spent_in_secs = ndb.FloatProperty()
 
     @classmethod
-    def get_or_create_multi_for_multi_explorations(
-            cls, exploration_state_list, rule_str_list):
-        """Gets entities given a list of exploration ID and state name tuples,
-        and a list of rule spec strings to filter answers matched for each of
-        the given explorations and states. Returns a list containing a list of
-        matched entities for each input exploration ID-state name tuple.
-
-        Args:
-            exploration_state_list: a list of exploration ID and state name
-                tuples
-            rule_str_list: a list of rule spec strings which are used to filter
-                the answers matched to the provided explorations and states
-        """
-        # TODO(sll): Use a hash instead to disambiguate.
-        exploration_ids = []
-        state_names = []
-        entity_ids = []
-        for exploration_id, state_name in exploration_state_list:
-            for rule_str in rule_str_list:
-                exploration_ids.append(exploration_id)
-                state_names.append(state_name)
-                entity_ids.append('.'.join([
-                    exploration_id, state_name, _OLD_SUBMIT_HANDLER_NAME,
-                    rule_str])[:490])
-
-        entity_keys = [
-            cls._get_entity_key(exploration_id, entity_id)
-            for exploration_id, entity_id in zip(exploration_ids, entity_ids)]
-
-        entities = ndb.get_multi(entity_keys)
-        entities_to_put = []
-        for ind, entity in enumerate(entities):
-            if entity is None:
-                new_entity = cls(id=entity_ids[ind], answers={})
-                entities_to_put.append(new_entity)
-                entities[ind] = new_entity
-        if entities_to_put:
-            ndb.put_multi(entities_to_put)
-
-        exploration_entities_list = []
-        exploration_state_name_entity_map = {}
-        for ind, exp_state_tuple in enumerate(exploration_state_list):
-            exploration_entities_list.append([])
-            exploration_state_name_entity_map[exp_state_tuple] = (
-                exploration_entities_list[ind])
-
-        for (exploration_id, state_name, entity) in zip(
-                exploration_ids, state_names, entities):
-            exploration_state_name_entity_map[(
-                exploration_id, state_name)].append(entity)
-        return exploration_entities_list
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
 
     @classmethod
-    def get_or_create_multi(cls, exploration_id, rule_data):
-        """Gets or creates entities for the given rules.
-        Args:
-            exploration_id: the exploration id
-            rule_data: a list of dicts, each with the following keys:
-                (state_name, rule_str).
-        """
-        # TODO(sll): Use a hash instead to disambiguate.
-        entity_ids = ['.'.join([
-            exploration_id, datum['state_name'],
-            _OLD_SUBMIT_HANDLER_NAME, datum['rule_str']
-        ])[:490] for datum in rule_data]
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               client_time_spent_in_secs):
+        """Creates a new actual exploration start event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        actual_start_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+            exp_id=exp_id,
+            exp_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=client_time_spent_in_secs)
+        actual_start_event_entity.put()
+        return entity_id
 
-        entity_keys = [cls._get_entity_key(exploration_id, entity_id)
-                       for entity_id in entity_ids]
 
-        entities = ndb.get_multi(entity_keys)
-        entities_to_put = []
-        for ind, entity in enumerate(entities):
-            if entity is None:
-                new_entity = cls(id=entity_ids[ind], answers={})
-                entities_to_put.append(new_entity)
-                entities[ind] = new_entity
+class SolutionHitEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student triggering the solution.
 
-        ndb.put_multi(entities_to_put)
-        return entities
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'solution'
+        exp_id: id of exploration currently being played
+        exp_version: version of exploration
+        state_name: Name of current state
+        client_time_spent_in_secs: Time since start of this state when this
+            event was recorded
+        session_id: ID of current student's session
+        is_solution_preceding_answer: Whether the solution was triggered before
+            a correct answer was submitted.
+    """
+    # Which specific type of event this is
+    event_type = ndb.StringProperty()
+    # Id of exploration currently being played.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    client_time_spent_in_secs = ndb.FloatProperty()
+    # Whether the solution was triggered before the student submitted a correct
+    # answer to the same state.
+    is_solution_preceding_answer = ndb.BooleanProperty(indexed=True)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               client_time_spent_in_secs, is_solution_preceding_answer):
+        """Creates a new answer submitted event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        solution_hit_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_SOLUTION,
+            exp_id=exp_id,
+            exp_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=client_time_spent_in_secs,
+            is_solution_preceding_answer=is_solution_preceding_answer)
+        solution_hit_event_entity.put()
+        return entity_id
 
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
@@ -183,17 +257,16 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'start'
-        exploration_id: id of exploration currently being played
-        exploration_version: version of exploration
-        state_name: Name of current state
-        client_time_spent_in_secs: 0
-        play_type: 'normal'
-        created_on date
-        event_schema_version: 1
-        session_id: ID of current student's session
-        params: current parameter values, in the form of a map of parameter
-            name to value
+        event_type: 'start'.
+        exploration_id: ID of exploration currently being played.
+        exploration_version: Version of exploration.
+        state_name: Name of current state.
+        client_time_spent_in_secs: 0.
+        play_type: 'normal'.
+        event_schema_version: 1.
+        session_id: ID of current student's session.
+        params: Current parameter values, in the form of a map of parameter
+            name to value.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -225,6 +298,16 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates entity ID for a new event based on its
+        exploration and session ID.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            session_id: str. ID of current student's session.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -234,8 +317,20 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                params, play_type, unused_version=1):
-        """Creates a new start exploration event."""
-        # TODO(sll): Some events currently do not have an entity id that was
+        """Creates a new start exploration event and then writes it to
+        the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            params: dict. Current parameter values, map of parameter
+                name to value.
+            play_type: str. Type of play-through.
+            unused_version: int. Default is 1.
+        """
+        # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due tg an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(
@@ -259,7 +354,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     Due to complexity on browser end, this event may be logged when user clicks
     close and then cancel. Thus, the real event is the last event of this type
-    logged for the session id.
+    logged for the session ID.
 
     Note: shortly after the release of v2.0.0.rc.2, some of these events
     were migrated from StateHitEventLogEntryModel. These events have their
@@ -271,18 +366,17 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'leave' (there are no 'maybe leave' events in V0)
-        exploration_id: id of exploration currently being played
-        exploration_version: version of exploration
-        state_name: Name of current state
-        play_type: 'normal'
-        created_on date
-        event_schema_version: 1
-        session_id: ID of current student's session
-        params: current parameter values, in the form of a map of parameter
-            name to value
-        client_time_spent_in_secs: time spent in this state before the event
-            was triggered
+        event_type: 'leave' (there are no 'maybe leave' events in V0).
+        exploration_id: ID of exploration currently being played.
+        exploration_version: version of exploration.
+        state_name: Name of current state.
+        play_type: 'normal'.
+        event_schema_version: 1.
+        session_id: ID of current student's session.
+        params: Current parameter values, in the form of a map of parameter
+            name to value.
+        client_time_spent_in_secs: Time spent in this state before the event
+            was triggered.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -317,6 +411,16 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates entity ID for a new event based on its
+        exploration and session ID.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            session_id: str. ID of current student's session.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -326,8 +430,21 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                client_time_spent_in_secs, params, play_type):
-        """Creates a new leave exploration event."""
-        # TODO(sll): Some events currently do not have an entity id that was
+        """Creates a new leave exploration event and then writes it
+        to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            params: dict. Current parameter values, map of parameter name
+                to value.
+            play_type: str. Type of play-through.
+            client_time_spent_in_secs: float. Time since start of this
+                state before this event occurred.
+        """
+        # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(
@@ -352,18 +469,17 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'complete'
-        exploration_id: id of exploration currently being played
-        exploration_version: version of exploration
-        state_name: Name of the terminal state
-        play_type: 'normal'
-        created_on date
-        event_schema_version: 1
-        session_id: ID of current student's session
-        params: current parameter values, in the form of a map of parameter
-            name to value
-        client_time_spent_in_secs: time spent in this state before the event
-            was triggered
+        event_type: 'complete'.
+        exploration_id: ID of exploration currently being played.
+        exploration_version: version of exploration.
+        state_name: Name of the terminal state.
+        play_type: 'normal'.
+        event_schema_version: 1.
+        session_id: ID of current student's session.
+        params: Current parameter values, in the form of a map of parameter
+            name to value.
+        client_time_spent_in_secs: Time spent in this state before the event
+            was triggered.
 
     Note: shortly after the release of v2.0.0.rc.3, some of these events
     were migrated from MaybeLeaveExplorationEventLogEntryModel. These events
@@ -403,6 +519,16 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates entity ID for a new event based on its
+        exploration and session ID.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            session_id: str. ID of current student's session.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -412,7 +538,20 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                client_time_spent_in_secs, params, play_type):
-        """Creates a new exploration completion event."""
+        """Creates a new exploration completion event and then writes it
+        to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            params: dict. Current parameter values, map of parameter name
+                to value.
+            play_type: str. Type of play-through.
+            client_time_spent_in_secs: float. Time since start of this
+                state before this event occurred.
+        """
         entity_id = cls.get_new_event_entity_id(exp_id, session_id)
         complete_event_entity = cls(
             id=entity_id,
@@ -425,6 +564,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type)
         complete_event_entity.put()
+        return entity_id
 
 
 class RateExplorationEventLogEntryModel(base_models.BaseModel):
@@ -433,9 +573,9 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'rate_exploration'
-        exploration_id: id of exploration which is being rated
-        rating: value of rating assigned to exploration
+        event_type: 'rate_exploration'.
+        exploration_id: ID of exploration which is being rated.
+        rating: Value of rating assigned to exploration.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -456,6 +596,16 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
+        """Generates entity ID for a new rate exploration event based on its
+        exploration_id and user_id of the learner.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            user_id: str. ID of the user.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -464,7 +614,16 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, user_id, rating, old_rating):
-        """Creates a new rate exploration event."""
+        """Creates a new rate exploration event and then writes it to the
+        datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            user_id: str. ID of the user.
+            rating: int. Value of rating assigned to exploration.
+            old_rating: int or None. Will be None if the user rates an
+                exploration for the first time.
+        """
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)
         cls(id=entity_id,
@@ -477,16 +636,15 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 class StateHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student getting to a particular state. The
     definitions of the fields are as follows:
-    - event_type: 'state_hit'
-    - exploration_id: id of exploration currently being played
-    - exploration_version: version of exploration
-    - state_name: Name of current state
-    - play_type: 'normal'
-    - created_on date
-    - event_schema_version: 1
-    - session_id: ID of current student's session
-    - params: current parameter values, in the form of a map of parameter name
-              to its value
+    - event_type: 'state_hit'.
+    - exploration_id: ID of exploration currently being played.
+    - exploration_version: Version of exploration.
+    - state_name: Name of current state.
+    - play_type: 'normal'.
+    - event_schema_version: 1.
+    - session_id: ID of current student's session.
+    - params: Current parameter values, in the form of a map of parameter name
+              to its value.
     NOTE TO DEVELOPERS: Unlike other events, this event does not have a
     client_time_spent_in_secs. Instead, it is the reference event for
     all other client_time_spent_in_secs values, which each represent the
@@ -521,6 +679,16 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates entity ID for a new event based on its
+        exploration and session ID.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            session_id: str. ID of current student's session.
+
+        Returns:
+            str. New unique ID for this entity class.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -531,8 +699,19 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     def create(
             cls, exp_id, exp_version, state_name, session_id, params,
             play_type):
-        """Creates a new leave exploration event."""
-        # TODO(sll): Some events currently do not have an entity id that was
+        """Creates a new state hit event entity and then writes
+        it to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            params: dict. Current parameter values, map of parameter name
+                to value.
+            play_type: str. Type of play-through.
+        """
+        # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(exp_id, session_id)
@@ -546,13 +725,85 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type)
         state_event_entity.put()
+        return entity_id
+
+
+class ExplorationStatsModel(base_models.BaseModel):
+    """Model for storing analytics data for an exploration.
+
+    The ID of instances of this class has the form {{exp_id}}.{{exp_version}}.
+    """
+    # ID of exploration.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Number of students who actually attempted the exploration. Only learners
+    # who spent a minimum time on the exploration are considered to have
+    # actually started the exploration.
+    num_actual_starts = ndb.IntegerProperty(indexed=False)
+    # Number of students who completed the exploration.
+    num_completions = ndb.IntegerProperty(indexed=False)
+    # Keyed by state name that describes the analytics for that state.
+    # {state_name: {
+    #   'total_answers_count': ...,
+    #   'useful_feedback_count': ...,
+    #   'learners_answered_correctly': ...,
+    #   'total_hit_count': ...,
+    #   'first_hit_count': ...,
+    #   'total_solutions_triggered_count': ...}}
+    state_stats_mapping = ndb.JsonProperty(indexed=False)
+
+    @classmethod
+    def get_entity_id(cls, exp_id, exp_version):
+        """Generates an ID for the instance of the form
+        {{exp_id}}.{{exp_version}}.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            str. ID of the new ExplorationStatsModel instance.
+        """
+        return '%s.%s' % (exp_id, exp_version)
+
+    @classmethod
+    def create(
+            cls, exp_id, exp_version, num_actual_starts, num_completions,
+            state_stats_mapping):
+        """Creates an ExplorationStatsModel instance and writes it to the
+        datastore.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+            num_actual_starts: int. Number of learners who attempted the
+                exploration.
+            num_completions: int. Number of learners who completed the
+                exploration.
+            state_stats_mapping: dict. Mapping from state names to state stats
+                dicts.
+
+        Returns:
+            str. ID of the new ExplorationStatsModel instance.
+        """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
+        stats_instance = cls(
+            id=instance_id, exp_id=exp_id, exp_version=exp_version,
+            num_actual_starts=num_actual_starts,
+            num_completions=num_completions,
+            state_stats_mapping=state_stats_mapping)
+        stats_instance.put()
+        return instance_id
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
+    This model is keyed using a custom ID of the format
+    {[EXPLORATION_ID]:[EXPLORATION_VERSION]}.
     """
-    # Id of exploration.
+    # ID of exploration.
     exploration_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
     version = ndb.StringProperty(indexed=False)
@@ -568,13 +819,34 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_entity_id(cls, exploration_id, exploration_version):
+        """Gets entity_id for a batch model based on given exploration state.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of the exploration currently
+                being played.
+
+        Returns:
+            str. Returns entity_id for a new instance of this class.
+        """
         return '%s:%s' % (exploration_id, exploration_version)
 
     @classmethod
     def create(
             cls, exp_id, version, num_starts, num_completions,
             state_hit_counts):
-        """Creates a new ExplorationAnnotationsModel."""
+        """Creates a new ExplorationAnnotationsModel and
+        then writes it to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            version: int. Version of exploration.
+            num_starts: int. Number of students who started the exploration.
+            num_completions: int. Number of students who have completed
+                the exploration.
+            state_hit_counts: dict. Describes the number of hits
+                for each state.
+        """
         entity_id = cls.get_entity_id(exp_id, version)
         cls(
             id=entity_id,
@@ -586,6 +858,16 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_versions(cls, exploration_id):
+        """This function returns a list containing versions of
+        ExplorationAnnotationsModel for a specific exploration_id.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+
+        Returns:
+            list(int). List of versions corresponding to annotation models
+                with given exp_id.
+        """
         return [
             annotations.version for annotations in cls.get_all().filter(
                 cls.exploration_id == exploration_id
@@ -600,8 +882,8 @@ class StateAnswersModel(base_models.BaseModel):
     information is duplicated across all shards, since they are immutable or are
     local to that shard.
 
-    The id/key of instances of this class has the form
-        [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID].
+    This model is keyed using a custom ID of the format
+        {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID]}.
     """
     # This provides about 124k of padding for the other properties and entity
     # storage overhead (since the max entity size is 1MB). The meta data can
@@ -609,7 +891,7 @@ class StateAnswersModel(base_models.BaseModel):
     # risking overflowing an entity.
     _MAX_ANSWER_LIST_BYTE_SIZE = 900000
 
-    # Explicitly store exploration id, exploration version and state name
+    # Explicitly store exploration ID, exploration version and state name
     # so we can easily do queries on them.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
     exploration_version = ndb.IntegerProperty(indexed=True, required=True)
@@ -646,15 +928,59 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     def _get_model(
             cls, exploration_id, exploration_version, state_name, shard_id):
+        """Gets model instance based on given exploration state and shard_id.
+
+        Args:
+            exploration_id: str. The exploration ID.
+            exploration_version: int. The version of the exploration to
+                fetch answers for.
+            state_name: str. The name of the state to fetch answers for.
+            shard_id: int. The ID of the shard to fetch answers for.
+
+        Returns:
+            StateAnswersModel. The model associated with the specified
+                exploration state and shard ID, or None if no answers
+                have been submitted corresponding to this state.
+        """
         entity_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, shard_id)
         return cls.get(entity_id, strict=False)
 
     @classmethod
+    def get_master_model(cls, exploration_id, exploration_version, state_name):
+        """Retrieves the master model associated with the specific exploration
+        state. Returns None if no answers have yet been submitted to the
+        specified exploration state.
+
+        Args:
+            exploration_id: str. The exploration ID.
+            exploration_version: int. The version of the exploration to fetch
+                answers for.
+            state_name: str. The name of the state to fetch answers for.
+
+        Returns:
+            StateAnswersModel|None. The master model associated with the
+                specified exploration state, or None if no answers have been
+                submitted to this state.
+        """
+        main_shard = cls._get_model(
+            exploration_id, exploration_version, state_name, 0)
+        return main_shard if main_shard else None
+
+    @classmethod
     def get_all_models(cls, exploration_id, exploration_version, state_name):
         """Retrieves all models and shards associated with the specific
-        exploration state. Returns None if no answers have yet been submitted to
-        the specified exploration state.
+        exploration state.
+
+        Args:
+            exploration_id: str. The exploration ID.
+            exploration_version: int. The version of the exploration to fetch
+                answers for.
+            state_name: str. The name of the state to fetch answers for.
+
+        Returns:
+            list(StateAnswersModel)|None. Returns None if no answers have yet
+                been submitted to the specified exploration state.
         """
         # It's okay if this isn't run in a transaction. When adding new shards,
         # it's guaranteed the master shard will be updated at the same time the
@@ -662,10 +988,10 @@ class StateAnswersModel(base_models.BaseModel):
         # shard is added after the master shard is retrieved, it will simply be
         # ignored in the result of this function. It will be included during the
         # next call.
-        main_shard = cls._get_model(
-            exploration_id, exploration_version, state_name, 0)
+        main_shard = cls.get_master_model(
+            exploration_id, exploration_version, state_name)
 
-        if main_shard:
+        if main_shard is not None:
             all_models = [main_shard]
             if main_shard.shard_count > 0:
                 shard_ids = [
@@ -685,11 +1011,19 @@ class StateAnswersModel(base_models.BaseModel):
         """See the insert_submitted_answers for general documentation of what
         this method does. It's only safe to call this method from within a
         transaction.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            interaction_id: str. ID of the interaction.
+            new_submitted_answer_dict_list: list(dict). List of new submitted
+                answers each of which is stored as a JSON blob.
         """
         # The main shard always needs to be retrieved. At most one other shard
         # needs to be retrieved (the last one).
-        main_shard = cls._get_model(
-            exploration_id, exploration_version, state_name, 0)
+        main_shard = cls.get_master_model(
+            exploration_id, exploration_version, state_name)
         last_shard = main_shard
 
         if not main_shard:
@@ -710,7 +1044,8 @@ class StateAnswersModel(base_models.BaseModel):
             last_shard.submitted_answer_list,
             last_shard.accumulated_answer_json_size_bytes,
             new_submitted_answer_dict_list)
-        new_shard_count = main_shard.shard_count + len(sharded_answer_lists) - 1
+        new_shard_count = main_shard.shard_count + (
+            len(sharded_answer_lists) - 1)
 
         # Collect all entities to update to efficiently send them as a single
         # update.
@@ -733,9 +1068,12 @@ class StateAnswersModel(base_models.BaseModel):
             entity_id = cls._get_entity_id(
                 exploration_id, exploration_version, state_name, shard_id)
             new_shard = cls(
-                id=entity_id, exploration_id=exploration_id,
-                exploration_version=exploration_version, state_name=state_name,
-                shard_id=shard_id, interaction_id=interaction_id,
+                id=entity_id,
+                exploration_id=exploration_id,
+                exploration_version=exploration_version,
+                state_name=state_name,
+                shard_id=shard_id,
+                interaction_id=interaction_id,
                 submitted_answer_list=sharded_answer_lists[i],
                 accumulated_answer_json_size_bytes=sharded_answer_list_sizes[i])
             entities_to_put.append(new_shard)
@@ -771,6 +1109,14 @@ class StateAnswersModel(base_models.BaseModel):
         is interrupted and retried. Furthermore, this method may fail with a
         DeadlineExceededError if too many answers are attempted for submission
         simultaneously.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            interaction_id: str. ID of the interaction.
+            new_submitted_answer_dict_list: list(dict). List of new submitted
+                answers each of which is stored as a JSON blob.
         """
         transaction_services.run_in_transaction(
             cls._insert_submitted_answers_unsafe, exploration_id,
@@ -780,6 +1126,18 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     def _get_entity_id(
             cls, exploration_id, exploration_version, state_name, shard_id):
+        """Returns the entity_id of a StateAnswersModel based on it's
+        exp_id, state_name, exploration_version and shard_id.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            shard_id: int. ID of shard.
+
+        Returns:
+            str. Entity_id for a StateAnswersModel instance.
+        """
         return ':'.join([
             exploration_id, str(exploration_version), state_name,
             str(shard_id)])
@@ -793,6 +1151,24 @@ class StateAnswersModel(base_models.BaseModel):
         list, shard the answers such that a list of answer lists are returned.
         The first entry is guaranteed to contain all answers of the current
         answer list.
+
+        Args:
+            current_answer_list: list(dict). List of answer dicts each of which
+                is stored as JSON blob.
+            current_answer_list_size: int. Number of bytes required
+                to store all the answers in the current_answer_list.
+            new_answer_list: list(dict). List of new submitted answers each of
+                which is stored as a JSON blob.
+
+        Returns:
+            tuple(list(list(dict)), list(int)).
+            Where:
+                sharded_answer_lists: A sharded answer list
+                    containing list of answer dicts.
+                sharded_answer_list_sizes: List where each element corresponds
+                    to number of bytes required to store all the
+                    answers in the corresponding list of answer dicts
+                    in sharded_answer_lists.
         """
         # Sort the new answers to insert in ascending order of their sizes in
         # bytes.
@@ -818,12 +1194,22 @@ class StateAnswersModel(base_models.BaseModel):
 
     @classmethod
     def _get_answer_dict_size(cls, answer_dict):
-        """Returns a size overestimate (in bytes) of the given answer dict."""
+        """Returns a size overestimate (in bytes) of the given answer dict.
+
+        Args:
+            answer_dict: dict. Answer entered by the user.
+
+        Returns:
+            int. Size of the answer_dict.
+        """
         return sys.getsizeof(json.dumps(answer_dict))
 
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
-    """Store output of calculation performed on StateAnswers."""
+    """Store output of calculation performed on StateAnswers.
+    This model is keyed using a custom ID of the format
+    {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[CALCULATION_ID]}.
+    """
 
     exploration_id = ndb.StringProperty(indexed=True, required=True)
     # May be an integral exploration_version or 'all' if this entity represents
@@ -837,6 +1223,20 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def create_or_update(cls, exploration_id, exploration_version, state_name,
                          calculation_id, calculation_output):
+        """Creates or updates StateAnswersCalcOutputModel and then writes
+        it to the datastore.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            calculation_id: str. ID of the calculation performed.
+            calculation_output: dict. Output of the calculation which is to be
+                stored as a JSON blob.
+
+        Raises:
+            Exception: The calculation_output is too large.
+        """
         instance_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, calculation_id)
         instance = cls.get(instance_id, strict=False)
@@ -863,6 +1263,18 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def get_model(cls, exploration_id, exploration_version, state_name,
                   calculation_id):
+        """Gets entity instance corresponding to the given exploration state.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            calculation_id: str. ID of the calculation performed.
+
+        Returns:
+            StateAnswersCalcOutputModel. Entity instance associated with the
+                given exploration state.
+        """
         entity_id = cls._get_entity_id(
             exploration_id, str(exploration_version), state_name,
             calculation_id)
@@ -872,255 +1284,17 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def _get_entity_id(cls, exploration_id, exploration_version, state_name,
                        calculation_id):
+        """Returns entity_id corresponding to the given exploration state.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            exploration_version: int. Version of exploration.
+            state_name: str. Name of current state.
+            calculation_id: str. ID of the calculation performed.
+
+        Returns:
+            str. The entity ID corresponding to the given exploration state.
+        """
         return ':'.join([
             exploration_id, str(exploration_version), state_name,
             calculation_id])
-
-
-class LargeAnswerBucketModel(base_models.BaseModel):
-    """Stores answers from StateRuleAnswerLogModel for entities with very large
-    numbers of answers. Those answers are copied to this model and stored in a
-    fragmented way so that the answer migration can perform the larger
-    migrations in smaller chunks.
-    """
-    # TODO(bhenning): Remove this model once the AnswerMigrationJob has
-    # successfully run in production.
-
-    _MAX_ANSWERS_PER_BUCKET = 100
-    log_model_item_id = ndb.StringProperty(indexed=True)
-    answers = ndb.JsonProperty(indexed=False)
-    log_model_last_update = ndb.DateTimeProperty(indexed=False)
-
-    @classmethod
-    def should_split_log_entity(cls, item):
-        """Returns whether the given StateRuleAnswerLogModel entity has enough
-        answers to be split up.
-        """
-        return len(item.answers) > cls._MAX_ANSWERS_PER_BUCKET
-
-    @classmethod
-    def get_split_entity_count_for_answer_log_entity(cls, item_id):
-        """Returns how many times the given StateRuleAnswerLogModel entity (by
-        ID) has been split and stored within this model in shards, or 0 if it is
-        not split at all. This will never return 1.
-        """
-        return cls.query(cls.log_model_item_id == item_id).count()
-
-    @classmethod
-    def insert_state_rule_answer_log_entity(cls, item):
-        """Attemps to instance a StateRuleAnswerLogModel entity, splitting up
-        its entities as necessary. This method guarantees more than one
-        LargeAnswerBucketModel entity will be written, otherwise the entity will
-        not be split up.
-        """
-        total_answer_count = len(item.answers)
-        if total_answer_count <= cls._MAX_ANSWERS_PER_BUCKET:
-            raise Exception(
-                'Cannot split up entity with less than max answers: %s' % (
-                    item.id))
-        full_bucket_count = total_answer_count / cls._MAX_ANSWERS_PER_BUCKET
-        remaining_answer_count = (
-            total_answer_count % cls._MAX_ANSWERS_PER_BUCKET)
-        answer_list = item.answers.items()
-        # TODO(bhenning): Figure out a better way to deal with this situation.
-        # This sort is only here for the benefit of tests, but it might be slow
-        # enough to cause the transaction to fail.
-        answer_list.sort(key=operator.itemgetter(0))
-        for i in xrange(full_bucket_count):
-            bucket_id = cls.get_new_id('')
-            start_shard_answer_index = i * cls._MAX_ANSWERS_PER_BUCKET
-            end_shard_answer_index = (i + 1) * cls._MAX_ANSWERS_PER_BUCKET
-            # Since the answers submitted to the model were converted to a list
-            # of tuples earlier, take only a subset of the list and convert it
-            # back to a dict for storage.
-            sharded_answer_list = answer_list[
-                start_shard_answer_index:end_shard_answer_index]
-            bucket_entity = cls(
-                id=bucket_id,
-                log_model_item_id=item.id,
-                answers=dict(sharded_answer_list),
-                log_model_last_update=item.last_updated)
-            bucket_entity.put()
-
-        if remaining_answer_count > 0:
-            bucket_id = cls.get_new_id('')
-            sharded_answer_list = answer_list[
-                full_bucket_count*cls._MAX_ANSWERS_PER_BUCKET:]
-            bucket_entity = cls(
-                id=bucket_id,
-                log_model_item_id=item.id,
-                answers=dict(sharded_answer_list),
-                log_model_last_update=item.last_updated)
-            bucket_entity.put()
-
-
-class MigratedAnswerModel(base_models.BaseModel):
-    """A temporary model which maps answers in StateRuleAnswerLogModel and
-    LargeAnswerBucketModel to answers migrated and inserted in
-    StateAnswersModel. This model can be used to verify a given answer exists
-    (and the correct number of times) in StateAnswersModel. Although the
-    AnswerMigrationJob is not idempotent, this model aims to help make it closer
-    to idempotent.
-    """
-    # TODO(bhenning): Remove this model once the AnswerMigrationJob has
-    # successfully run in production.
-
-    exploration_id = ndb.StringProperty(indexed=True, required=True)
-    state_name = ndb.StringProperty(indexed=True, required=True)
-    exploration_versions = ndb.IntegerProperty(indexed=False, repeated=True)
-    started_migration = ndb.BooleanProperty(indexed=False, default=False)
-    finished_migration = ndb.BooleanProperty(indexed=False, default=False)
-    started_large_answer_bucket_ids = ndb.StringProperty(
-        indexed=False, repeated=True)
-    # pylint: disable=invalid-name
-    finished_large_answer_bucket_ids = ndb.StringProperty(
-        indexed=False, repeated=True)
-    expected_large_answer_bucket_count = ndb.IntegerProperty(
-        indexed=False, default=0)
-    # pylint: enable=invalid-name
-
-    @classmethod
-    def _start_migrating_answer_bucket(
-            cls, state_answer_log_model_item_id, exploration_id, state_name,
-            large_answer_bucket_id, large_answer_bucket_count):
-        model = cls.get(state_answer_log_model_item_id, strict=False)
-        # Only expect migration to not have been started if there aren't a group
-        # of answers being matched to this entity.
-        if not large_answer_bucket_id and model:
-            raise Exception(
-                'Expected to not have started migrating answer bucket: %s' % (
-                    state_answer_log_model_item_id))
-
-        if (large_answer_bucket_id and model
-                and large_answer_bucket_id
-                in model.started_large_answer_bucket_ids):
-            raise Exception(
-                'Expected to not have started migrating large answer bucket: '
-                '\'%s\' (part of group \'%s\')' % (
-                    large_answer_bucket_id, state_answer_log_model_item_id))
-        if not model:
-            started_large_answer_bucket_ids = (
-                [large_answer_bucket_id] if large_answer_bucket_id else [])
-            model = cls(
-                id=state_answer_log_model_item_id,
-                exploration_id=exploration_id, state_name=state_name,
-                exploration_versions=[], started_migration=True,
-                started_large_answer_bucket_ids=started_large_answer_bucket_ids,
-                finished_large_answer_bucket_ids=[],
-                expected_large_answer_bucket_count=large_answer_bucket_count)
-        else:
-            started_large_answer_bucket_ids = set(
-                model.started_large_answer_bucket_ids)
-            started_large_answer_bucket_ids.add(large_answer_bucket_id)
-            model.started_large_answer_bucket_ids = list(
-                started_large_answer_bucket_ids)
-        model.put()
-
-    @classmethod
-    def start_migrating_answer_bucket(
-            cls, state_answer_log_model_item_id, exploration_id, state_name,
-            large_answer_bucket_id, large_answer_bucket_count):
-        transaction_services.run_in_transaction(
-            cls._start_migrating_answer_bucket, state_answer_log_model_item_id,
-            exploration_id, state_name, large_answer_bucket_id,
-            large_answer_bucket_count)
-
-    @classmethod
-    def _finish_migrating_answer(
-            cls, state_answer_log_model_item_id, exploration_version):
-        model = cls.get(state_answer_log_model_item_id)
-        # Avoid an unnecessary put if the given version is already recorded
-        if exploration_version not in model.exploration_versions:
-            model.exploration_versions.append(exploration_version)
-            model.put()
-
-    @classmethod
-    def finish_migrating_answer(
-            cls, state_answer_log_model_item_id, exploration_version):
-        transaction_services.run_in_transaction(
-            cls._finish_migrating_answer, state_answer_log_model_item_id,
-            exploration_version)
-
-    @classmethod
-    def _finish_migration_answer_bucket(
-            cls, state_answer_log_model_item_id, large_answer_bucket_id):
-        model = cls.get(state_answer_log_model_item_id)
-        if large_answer_bucket_id:
-            finished_large_answer_bucket_ids = set(
-                model.finished_large_answer_bucket_ids)
-            finished_large_answer_bucket_ids.add(large_answer_bucket_id)
-            expected_bucket_count = model.expected_large_answer_bucket_count
-            model.finished_migration = (
-                len(finished_large_answer_bucket_ids) >= expected_bucket_count)
-            model.finished_large_answer_bucket_ids = list(
-                finished_large_answer_bucket_ids)
-        else:
-            model.finished_migration = True
-        model.put()
-
-    @classmethod
-    def finish_migration_answer_bucket(
-            cls, state_answer_log_model_item_id, large_answer_bucket_id):
-        transaction_services.run_in_transaction(
-            cls._finish_migration_answer_bucket, state_answer_log_model_item_id,
-            large_answer_bucket_id)
-
-    @classmethod
-    def has_started_being_migrated(
-            cls, state_answer_log_model_item_id, large_answer_bucket_id=None):
-        model = cls.get(state_answer_log_model_item_id, strict=False)
-        return model is not None and (
-            not large_answer_bucket_id or large_answer_bucket_id
-            in model.started_large_answer_bucket_ids)
-
-    @classmethod
-    def validate_answers_are_migrated(cls, state_rule_answer_log_model):
-        migrated_answer_model = MigratedAnswerModel.get(
-            state_rule_answer_log_model.id, strict=False)
-        if not migrated_answer_model:
-            raise utils.ValidationError(
-                u'Answers not migrated: %s' % state_rule_answer_log_model.id)
-        state_answer_models_list = []
-
-        # A version of -1 is a special sentinel value to silence the
-        # validation on this answer bucket. It typically represents an
-        # answer which cannot be migrated for a known reason. These answers
-        # should not be validated, since they were never migrated.
-        if migrated_answer_model.exploration_versions == [-1]:
-            return
-
-        for exploration_version in migrated_answer_model.exploration_versions:
-            state_answer_models = StateAnswersModel.get_all_models(
-                migrated_answer_model.exploration_id, exploration_version,
-                migrated_answer_model.state_name)
-            if not state_answer_models:
-                raise utils.ValidationError(
-                    u'Inconsistency: previous mentioned answers were migrated '
-                    'for exploration %s (version=%s) state name %s, but none '
-                    'found' % (
-                        migrated_answer_model.exploration_id,
-                        exploration_version, migrated_answer_model.state_name))
-            state_answer_models_list.append(state_answer_models)
-        answer_str_list = (
-            cls._get_answer_str_list_from_state_answer_models_list(
-                state_answer_models_list))
-        for answer_str, expected_count in (
-                state_rule_answer_log_model.answers.iteritems()):
-            observed_count = answer_str_list.count(answer_str)
-            if expected_count != observed_count:
-                raise utils.ValidationError(
-                    u'Expected \'%s\' answer string %d time(s) in new data '
-                    'model, but found it %d time(s)' % (
-                        answer_str, expected_count, observed_count))
-
-    @classmethod
-    def _get_answer_str_list_from_state_answer_models_list(
-            cls, state_answer_models_list):
-        answer_str_list = []
-        for state_answer_models in state_answer_models_list:
-            for state_answer_model in state_answer_models:
-                for submitted_answer_dict in (
-                        state_answer_model.submitted_answer_list):
-                    answer_str_list.append(
-                        submitted_answer_dict.get('answer_str'))
-        return answer_str_list

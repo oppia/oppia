@@ -28,6 +28,7 @@ class SetInput(base.BaseInteraction):
     instructions = None
     narrow_instructions = None
     needs_summary = False
+    can_have_solution = True
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.
@@ -38,9 +39,9 @@ class SetInput(base.BaseInteraction):
         'id': 'FrequencyTable',
         'options': {
             'column_headers': ['Answer', 'Count'],
-            'title': 'Top 5 answers'
+            'title': 'Top 10 answers'
         },
-        'calculation_id': 'Top5AnswerFrequencies',
+        'calculation_id': 'Top10AnswerFrequencies',
     }, {
         # Table with most commonly submitted elements of set.
         'id': 'FrequencyTable',
@@ -49,14 +50,4 @@ class SetInput(base.BaseInteraction):
             'title': 'Commonly submitted elements'
         },
         'calculation_id': 'FrequencyCommonlySubmittedElements',
-    }, {
-        # Table with answer counts.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'All answers'
-        },
-        'calculation_id': 'AnswerFrequencies',
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

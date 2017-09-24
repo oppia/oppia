@@ -16,13 +16,14 @@
 
 """Commands that can be used to operate on activity summaries."""
 
+from constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import stats_jobs_continuous
 from core.domain import user_services
-import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
@@ -88,14 +89,15 @@ def get_human_readable_contributors_summary(contributors_summary):
 
 
 def get_learner_collection_dict_by_id(
-        collection_id, user_id, strict=True, allow_invalid_explorations=False,
-        version=None):
+        collection_id, user, strict=True,
+        allow_invalid_explorations=False, version=None):
     """Gets a dictionary representation of a collection given by the provided
     collection ID. This dict includes user-specific playthrough information.
 
     Args:
         collection_id: str. The id of the collection.
-        user_id: str. The user_id of the learner.
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
         strict: bool. Whether to fail noisily if no collection with the given
             id exists in the datastore.
         allow_invalid_explorations: bool. Whether to also return explorations
@@ -119,7 +121,7 @@ def get_learner_collection_dict_by_id(
 
     exp_ids = collection.exploration_ids
     exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exp_ids, editor_user_id=user_id)
+        exp_ids, user=user)
     exp_summaries_dict_map = {
         exp_summary_dict['id']: exp_summary_dict
         for exp_summary_dict in exp_summary_dicts
@@ -129,10 +131,10 @@ def get_learner_collection_dict_by_id(
     # completed outside the context of a collection (see #1461).
     next_exploration_ids = None
     completed_exp_ids = None
-    if user_id:
+    if user.user_id:
         completed_exp_ids = (
             collection_services.get_valid_completed_exploration_ids(
-                user_id, collection))
+                user.user_id, collection))
         next_exploration_ids = collection.get_next_exploration_ids(
             completed_exp_ids)
     else:
@@ -143,7 +145,6 @@ def get_learner_collection_dict_by_id(
         completed_exp_ids = []
 
     collection_dict = collection.to_dict()
-    collection_dict['skills'] = collection.skills
     collection_dict['playthrough_dict'] = {
         'next_exploration_ids': next_exploration_ids,
         'completed_exploration_ids': completed_exp_ids
@@ -196,7 +197,7 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
 
-def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
+def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user):
     """Given a query string and a search cursor, returns a list of exploration
     metadata dicts that satisfy the search query.
 
@@ -206,9 +207,8 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
         search_cursor: str or None. The cursor location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
-        user_id: str or None. The id of the user performing the query.
-            If not None, private explorations that are editable by this user
-            are also returned.
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
 
     Returns:
         exploration_list: list(dict). A list of metadata dicts for explorations
@@ -219,12 +219,13 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))
 
-    exploration_list = get_exploration_metadata_dicts(exp_ids, user_id)
+    exploration_list = get_exploration_metadata_dicts(
+        exp_ids, user)
 
     return exploration_list, new_search_cursor
 
 
-def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
+def get_exploration_metadata_dicts(exploration_ids, user):
     """Given a list of exploration ids, optionally filters the list for
     explorations that are currently non-private and not deleted, and returns a
     list of dicts of the corresponding exploration summaries for collection
@@ -233,9 +234,8 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
     Args:
         exploration_ids: list(str). A list of exploration ids for which
             exploration metadata dicts are to be returned.
-        editor_user_id: str or None. The id of the user performing the query.
-            If not None, private explorations that are editable by this user
-            are also returned.
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
 
     Returns:
         list(dict). A list of metadata dicts corresponding to the given
@@ -246,18 +246,25 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+    exploration_rights_objects = (
+        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
-    for exploration_summary in exploration_summaries:
+    for (exploration_summary, exploration_rights) in (
+            zip(exploration_summaries, exploration_rights_objects)):
         if exploration_summary is None:
             continue
+
+        if exploration_rights is None:
+            continue
+
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if editor_user_id is None:
+            if user.user_id is None:
                 continue
-            if not rights_manager.Actor(editor_user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION,
-                    exploration_summary.id):
+
+            if not rights_manager.check_can_edit_activity(
+                    user, exploration_rights):
                 continue
 
         filtered_exploration_summaries.append(exploration_summary)
@@ -267,8 +274,7 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
         for summary in filtered_exploration_summaries]
 
 
-def get_displayable_exp_summary_dicts_matching_ids(
-        exploration_ids, editor_user_id=None):
+def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
     """Gets a summary of explorations in human readable form from
     exploration ids.
 
@@ -282,10 +288,8 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
     Args:
         exploration_ids: list(str). List of exploration ids.
-        editor_user_id: str or None. If provided, the returned value is
-            filtered based on a user ID who has edit access to the
-            corresponding explorations. Otherwise, the returned list is not
-            filtered.
+        user: UserActionsInfo or None. Object having user_id, role and actions
+            for given user.
 
     Return:
         list(dict). A list of exploration summary dicts in human readable form.
@@ -308,18 +312,23 @@ def get_displayable_exp_summary_dicts_matching_ids(
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+    exploration_rights_objects = (
+        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
-    for exploration_summary in exploration_summaries:
+    for (exploration_summary, exploration_rights) in (
+            zip(exploration_summaries, exploration_rights_objects)):
         if exploration_summary is None:
+            continue
+
+        if exploration_rights is None:
             continue
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if editor_user_id is None:
+            if user is None:
                 continue
-            if not rights_manager.Actor(editor_user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION,
-                    exploration_summary.id):
+            if not rights_manager.check_can_edit_activity(
+                    user, exploration_rights):
                 continue
 
         filtered_exploration_summaries.append(exploration_summary)
@@ -375,7 +384,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
         summary_dict = {
             'id': exploration_summary.id,
             'title': exploration_summary.title,
-            'activity_type': feconf.ACTIVITY_TYPE_EXPLORATION,
+            'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
             'category': exploration_summary.category,
             'created_on_msec': utils.get_time_in_millisecs(
                 exploration_summary.exploration_model_created_on),
@@ -438,7 +447,7 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
                 'id': collection_summary.id,
                 'title': collection_summary.title,
                 'category': collection_summary.category,
-                'activity_type': feconf.ACTIVITY_TYPE_COLLECTION,
+                'activity_type': constants.ACTIVITY_TYPE_COLLECTION,
                 'objective': collection_summary.objective,
                 'language_code': collection_summary.language_code,
                 'tags': collection_summary.tags,
@@ -489,7 +498,7 @@ def get_library_groups(language_codes):
     all_collection_ids = []
     header_id_to_collection_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
-        collection_ids = collection_services.search_collections(
+        collection_ids = search_services.search_collections(
             _generate_query(group['search_categories']), 8)[0]
         header_id_to_collection_ids[group['header_i18n_id']] = collection_ids
         all_collection_ids += collection_ids
@@ -510,7 +519,7 @@ def get_library_groups(language_codes):
     all_exp_ids = []
     header_to_exp_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
-        exp_ids = exp_services.search_explorations(
+        exp_ids = search_services.search_explorations(
             _generate_query(group['search_categories']), 8)[0]
         header_to_exp_ids[group['header_i18n_id']] = exp_ids
         all_exp_ids += exp_ids
@@ -570,12 +579,12 @@ def require_activities_to_be_public(activity_references):
         activity_references)
 
     activity_summaries_by_type = [{
-        'type': feconf.ACTIVITY_TYPE_EXPLORATION,
+        'type': constants.ACTIVITY_TYPE_EXPLORATION,
         'ids': exploration_ids,
         'summaries': exp_services.get_exploration_summaries_matching_ids(
             exploration_ids),
     }, {
-        'type': feconf.ACTIVITY_TYPE_COLLECTION,
+        'type': constants.ACTIVITY_TYPE_COLLECTION,
         'ids': collection_ids,
         'summaries': collection_services.get_collection_summaries_matching_ids(
             collection_ids),
@@ -612,7 +621,7 @@ def get_featured_activity_summary_dicts(language_codes):
             'tags': [],
             'thumbnail_icon_url': self.get_static_asset_url(
                 '/images/subjects/Lightbulb.svg'),
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': 'eid2',
             'category': 'A category',
             'ratings': feconf.get_empty_ratings(),
@@ -631,11 +640,11 @@ def get_featured_activity_summary_dicts(language_codes):
         collection_ids)
 
     summary_dicts_by_id = {
-        feconf.ACTIVITY_TYPE_EXPLORATION: {
+        constants.ACTIVITY_TYPE_EXPLORATION: {
             summary_dict['id']: summary_dict
             for summary_dict in exp_summary_dicts
         },
-        feconf.ACTIVITY_TYPE_COLLECTION: {
+        constants.ACTIVITY_TYPE_COLLECTION: {
             summary_dict['id']: summary_dict
             for summary_dict in col_summary_dicts
         },

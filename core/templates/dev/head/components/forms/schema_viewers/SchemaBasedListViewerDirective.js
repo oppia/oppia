@@ -17,14 +17,17 @@
  */
 
 oppia.directive('schemaBasedListViewer', [
-  'recursionHelper', function(recursionHelper) {
+  'recursionHelper', 'UrlInterpolationService',
+  function(recursionHelper, UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
         // Read-only property. The schema definition for each item in the list.
         itemSchema: '&'
       },
-      templateUrl: 'schemaBasedViewer/list',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_viewers/' +
+        'schema_based_list_viewer_directive.html'),
       restrict: 'E',
       compile: recursionHelper.compile
     };

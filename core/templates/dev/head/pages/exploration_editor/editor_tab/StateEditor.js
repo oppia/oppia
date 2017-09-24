@@ -17,109 +17,69 @@
  */
 
 oppia.controller('StateEditor', [
-  '$scope', '$rootScope', 'editorContextService', 'changeListService',
-  'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
-  'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
-  'UrlInterpolationService', 'editorFirstTimeEventsService',
+  '$scope', '$rootScope', 'editorContextService', 'explorationStatesService',
+  'INTERACTION_SPECS', 'explorationAdvancedFeaturesService',
+  'UrlInterpolationService', 'stateContentService',
   function(
-      $scope, $rootScope, editorContextService, changeListService,
-      editabilityService, explorationStatesService, INTERACTION_SPECS,
-      explorationInitStateNameService, explorationAdvancedFeaturesService,
-      UrlInterpolationService, editorFirstTimeEventsService) {
-    $scope.STATE_CONTENT_SCHEMA = {
-      type: 'html'
-    };
-
+      $scope, $rootScope, editorContextService, explorationStatesService,
+      INTERACTION_SPECS, explorationAdvancedFeaturesService,
+      UrlInterpolationService, stateContentService) {
     $scope.areParametersEnabled = (
       explorationAdvancedFeaturesService.areParametersEnabled);
-    $scope.areFallbacksEnabled = (
-      explorationAdvancedFeaturesService.areFallbacksEnabled);
 
-    $scope.isCurrentStateTerminal = false;
-    $scope.isInteractionIdSet = false;
-    $scope.isInteractionShown = false;
+    $scope.currentStateIsTerminal = false;
+    $scope.interactionIdIsSet = false;
+    $scope.interactionIsShown = false;
 
     $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/avatar/oppia_avatar_100px.svg');
-
-    $scope.isCurrentStateInitialState = function() {
-      return (
-        editorContextService.getActiveStateName() ===
-        explorationInitStateNameService.savedMemento);
-    };
 
     $scope.$on('refreshStateEditor', function() {
       $scope.initStateEditor();
     });
 
-    $scope.$on('refreshStateContent', function() {
-      $scope.content = explorationStatesService.getStateContentMemento(
-        editorContextService.getActiveStateName());
-    });
-
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
-      $scope.isInteractionIdSet = Boolean(newInteractionId);
-      $scope.isCurrentStateTerminal = (
-        $scope.isInteractionIdSet && INTERACTION_SPECS[
+      $scope.interactionIdIsSet = Boolean(newInteractionId);
+      $scope.currentInteractionCanHaveSolution = Boolean(
+        $scope.interactionIdIsSet &&
+        INTERACTION_SPECS[newInteractionId].can_have_solution);
+      $scope.currentStateIsTerminal = Boolean(
+        $scope.interactionIdIsSet && INTERACTION_SPECS[
           newInteractionId].is_terminal);
     });
-
-    $scope.contentEditorIsOpen = false;
 
     $scope.initStateEditor = function() {
       var stateName = editorContextService.getActiveStateName();
       var stateData = explorationStatesService.getState(stateName);
       if (stateName && stateData) {
-        $scope.content = explorationStatesService.getStateContentMemento(
-          stateName);
+        stateContentService.init(
+          editorContextService.getActiveStateName(), stateData.content);
 
         $rootScope.$broadcast('stateEditorInitialized', stateData);
         var interactionId = explorationStatesService.getInteractionIdMemento(
           stateName);
-        $scope.isInteractionIdSet = Boolean(interactionId);
-        $scope.isCurrentStateTerminal = (
-          $scope.isInteractionIdSet &&
+        $scope.interactionIdIsSet = Boolean(interactionId);
+        $scope.currentInteractionCanHaveSolution = Boolean(
+          $scope.interactionIdIsSet &&
+          INTERACTION_SPECS[interactionId].can_have_solution);
+        $scope.currentStateIsTerminal = Boolean(
+          $scope.interactionIdIsSet &&
           INTERACTION_SPECS[interactionId].is_terminal);
 
-        if ($scope.content[0].value || stateData.interaction.id) {
-          $scope.isInteractionShown = true;
+        var content = explorationStatesService.getStateContentMemento(
+          stateName);
+        if (content.getHtml() || stateData.interaction.id) {
+          $scope.interactionIsShown = true;
         }
-
-        $scope.$on('externalSave', function() {
-          if ($scope.contentEditorIsOpen) {
-            $scope.saveTextContent();
-          }
-        });
 
         $rootScope.loadingMessage = '';
       }
     };
 
-    $scope.openStateContentEditor = function() {
-      if (editabilityService.isEditable()) {
-        editorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
-        $scope.contentEditorIsOpen = true;
-      }
-    };
-
-    $scope.saveTextContent = function() {
-      explorationStatesService.saveStateContent(
-        editorContextService.getActiveStateName(), $scope.content);
-      $scope.contentEditorIsOpen = false;
-    };
-
-    $scope.onSaveContentButtonClicked = function() {
-      editorFirstTimeEventsService.registerFirstSaveContentEvent();
-      $scope.saveTextContent();
-      // Show the interaction when the text content is saved, even if no content
-      // is entered.
-      $scope.isInteractionShown = true;
-    };
-
-    $scope.cancelEdit = function() {
-      $scope.content = explorationStatesService.getStateContentMemento(
-        editorContextService.getActiveStateName());
-      $scope.contentEditorIsOpen = false;
+    $scope.showInteraction = function() {
+      // Show the interaction when the text content is saved, even if no
+      // content is entered.
+      $scope.interactionIsShown = true;
     };
   }
 ]);
@@ -173,40 +133,39 @@ oppia.factory('trainingModalService', [
                 // Retrieve the interaction ID.
                 var interactionId = stateInteractionIdService.savedMemento;
 
-                var rulesServiceName = 
+                var rulesServiceName =
                   angularNameService.getNameOfInteractionRulesService(
                     interactionId)
 
                 // Inject RulesService dynamically.
                 var rulesService = $injector.get(rulesServiceName);
 
-                AnswerClassificationService.getMatchingClassificationResult(
-                  explorationId, state, unhandledAnswer, true, rulesService)
-                  .then(function(classificationResult) {
-                    var feedback = 'Nothing';
-                    var dest = classificationResult.outcome.dest;
-                    if (classificationResult.outcome.feedback.length > 0) {
-                      feedback = classificationResult.outcome.feedback[0];
-                    }
-                    if (dest === currentStateName) {
-                      dest = '<em>(try again)</em>';
-                    }
+                var classificationResult = (
+                  AnswerClassificationService.getMatchingClassificationResult(
+                    explorationId, currentStateName, state, unhandledAnswer,
+                    true, rulesService));
+                var feedback = 'Nothing';
+                var dest = classificationResult.outcome.dest;
+                if (classificationResult.outcome.feedback.length > 0) {
+                  feedback = classificationResult.outcome.feedback[0];
+                }
+                if (dest === currentStateName) {
+                  dest = '<em>(try again)</em>';
+                }
 
-                    // $scope.trainingDataAnswer, $scope.trainingDataFeedback
-                    // $scope.trainingDataOutcomeDest are intended to be local
-                    // to this modal and should not be used to populate any
-                    // information in the active exploration (including the
-                    // feedback). The feedback here refers to a representation
-                    // of the outcome of an answer group, rather than the
-                    // specific feedback of the outcome (for instance, it
-                    // includes the destination state within the feedback).
-                    $scope.trainingDataAnswer = unhandledAnswer;
-                    $scope.trainingDataFeedback = feedback;
-                    $scope.trainingDataOutcomeDest = dest;
-                    $scope.classification.answerGroupIndex = (
-                      classificationResult.answerGroupIndex);
-                  }
-                );
+                // $scope.trainingDataAnswer, $scope.trainingDataFeedback
+                // $scope.trainingDataOutcomeDest are intended to be local
+                // to this modal and should not be used to populate any
+                // information in the active exploration (including the
+                // feedback). The feedback here refers to a representation
+                // of the outcome of an answer group, rather than the
+                // specific feedback of the outcome (for instance, it
+                // includes the destination state within the feedback).
+                $scope.trainingDataAnswer = unhandledAnswer;
+                $scope.trainingDataFeedback = feedback;
+                $scope.trainingDataOutcomeDest = dest;
+                $scope.classification.answerGroupIndex = (
+                  classificationResult.answerGroupIndex);
               };
 
               $scope.init();

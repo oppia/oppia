@@ -18,34 +18,37 @@
  * dismissible.
  */
 
-oppia.directive('promoBar', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      getPromoMessage: '&promoMessage'
-    },
-    templateUrl: 'components/promoBar',
-    controller: [
-      '$scope',
-      function($scope) {
-        var isPromoDismissed = function() {
-          return !!angular.fromJson(sessionStorage.promoIsDismissed);
-        };
-        var setPromoDismissed = function(promoIsDismissed) {
-          sessionStorage.promoIsDismissed = angular.toJson(promoIsDismissed);
-        };
+oppia.directive('promoBar', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        getPromoMessage: '&promoMessage'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/promo/' +
+        'promo_bar_directive.html'),
+      controller: [
+        '$scope',
+        function($scope) {
+          var isPromoDismissed = function() {
+            return !!angular.fromJson(sessionStorage.promoIsDismissed);
+          };
+          var setPromoDismissed = function(promoIsDismissed) {
+            sessionStorage.promoIsDismissed = angular.toJson(promoIsDismissed);
+          };
 
-        // TODO(bhenning): Utilize cookies for tracking when a promo is
-        // dismissed. Cookies allow for a longer-lived memory of whether the
-        // promo is dismissed.
-        $scope.promoIsVisible = !isPromoDismissed();
-        console.log('Promo is visible: ', $scope.promoIsVisible);
+          // TODO(bhenning): Utilize cookies for tracking when a promo is
+          // dismissed. Cookies allow for a longer-lived memory of whether the
+          // promo is dismissed.
+          $scope.promoIsVisible = !isPromoDismissed();
+          console.log('Promo is visible: ', $scope.promoIsVisible);
 
-        $scope.dismissPromo = function() {
-          $scope.promoIsVisible = false;
-          setPromoDismissed(true);
-        };
-      }
-    ]
-  };
-}]);
+          $scope.dismissPromo = function() {
+            $scope.promoIsVisible = false;
+            setPromoDismissed(true);
+          };
+        }
+      ]
+    };
+  }]);

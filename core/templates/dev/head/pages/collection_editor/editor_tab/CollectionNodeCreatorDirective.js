@@ -25,20 +25,58 @@ oppia.directive('collectionNodeCreator', [
         'collection_node_creator_directive.html'),
       controller: [
         '$scope', '$http', '$window', '$filter', 'alertsService',
-        'validatorsService', 'CollectionEditorStateService',
+        'ValidatorsService', 'CollectionEditorStateService',
         'CollectionLinearizerService', 'CollectionUpdateService',
         'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-        'siteAnalyticsService',
+        'SearchExplorationsBackendApiService', 'siteAnalyticsService',
         function(
             $scope, $http, $window, $filter, alertsService,
-            validatorsService, CollectionEditorStateService,
+            ValidatorsService, CollectionEditorStateService,
             CollectionLinearizerService, CollectionUpdateService,
             CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-            siteAnalyticsService) {
+            SearchExplorationsBackendApiService, siteAnalyticsService) {
           $scope.collection = CollectionEditorStateService.getCollection();
           $scope.newExplorationId = '';
           $scope.newExplorationTitle = '';
+          $scope.searchQueryHasError = false;
+
           var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+
+          /**
+           * Fetches a list of exploration metadata dicts from backend, given
+           * a search query. It then extracts the title and id of the
+           * exploration to prepare typeahead options.
+           */
+          $scope.fetchTypeaheadResults = function(searchQuery) {
+            if (isValidSearchQuery(searchQuery)) {
+              $scope.searchQueryHasError = false;
+              return SearchExplorationsBackendApiService.fetchExplorations(
+                searchQuery
+              ).then(function(explorationMetadataBackendDict) {
+                var options = [];
+                explorationMetadataBackendDict.collection_node_metadata_list.
+                  map(function(item) {
+                    if (!$scope.collection.containsCollectionNode(item.id)) {
+                      options.push(item.title + ' (#' + item.id + ')');
+                    }
+                  });
+                return options;
+              }, function() {
+                alertsService.addWarning(
+                  'There was an error when searching for matching ' + 
+                  'explorations.');
+              });
+            } else {
+              $scope.searchQueryHasError = true;
+            }
+          };
+
+          var isValidSearchQuery = function(searchQuery) {
+            if (/^[a-zA-Z0-9- ]*$/.test(searchQuery)) {
+              return true;
+            }
+            return;
+          };
 
           var addExplorationToCollection = function(newExplorationId) {
             if (!newExplorationId) {
@@ -51,7 +89,7 @@ oppia.directive('collectionNodeCreator', [
                 'with that id.');
               return;
             }
-      
+
             ExplorationSummaryBackendApiService
               .loadPublicAndPrivateExplorationSummaries([newExplorationId])
               .then(function(summaries) {
@@ -76,12 +114,20 @@ oppia.directive('collectionNodeCreator', [
             );
           };
 
+          var convertTypeaheadToExplorationId = function(typeaheadOption) {
+            var matchResults = typeaheadOption.match(/\(#(.*?)\)$/);
+            if (matchResults == null) {
+              return typeaheadOption;
+            }
+            return matchResults[1];
+          };
+
           // Creates a new exploration, then adds it to the collection.
           $scope.createNewExploration = function() {
             var title = $filter('normalizeWhitespace')(
               $scope.newExplorationTitle);
 
-            if (!validatorsService.isValidExplorationTitle(title, true)) {
+            if (!ValidatorsService.isValidExplorationTitle(title, true)) {
               return;
             }
 
@@ -99,8 +145,19 @@ oppia.directive('collectionNodeCreator', [
             });
           };
 
+          // Checks whether the user has left a '#' at the end of their ID
+          // by accident (which can happen if it's being copy/pasted from the
+          // editor page.
+          $scope.isMalformedId = function(typedExplorationId) {
+            return (
+              typedExplorationId &&
+              typedExplorationId.lastIndexOf('#') ===
+              typedExplorationId.length - 1);
+          };
+
           $scope.addExploration = function() {
-            addExplorationToCollection($scope.newExplorationId);
+            addExplorationToCollection(convertTypeaheadToExplorationId(
+              $scope.newExplorationId));
             $scope.newExplorationId = '';
           };
         }

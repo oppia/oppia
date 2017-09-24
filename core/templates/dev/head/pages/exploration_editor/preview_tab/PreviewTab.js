@@ -21,20 +21,18 @@ oppia.controller('PreviewTab', [
   '$scope', '$modal', '$q', '$timeout', 'LearnerParamsService',
   'explorationData', 'explorationAdvancedFeaturesService',
   'explorationCategoryService', 'editorContextService',
-  'explorationGadgetsService', 'explorationInitStateNameService',
-  'explorationParamChangesService', 'explorationParamSpecsService',
-  'explorationStatesService', 'explorationTitleService',
-  'oppiaPlayerService', 'parameterMetadataService',
-  'ParamChangeObjectFactory',
+  'explorationInitStateNameService', 'explorationParamChangesService',
+  'explorationParamSpecsService', 'explorationStatesService',
+  'explorationTitleService', 'oppiaPlayerService', 'parameterMetadataService',
+  'ParamChangeObjectFactory', 'UrlInterpolationService',
   function(
       $scope, $modal, $q, $timeout, LearnerParamsService,
       explorationData, explorationAdvancedFeaturesService,
       explorationCategoryService, editorContextService,
-      explorationGadgetsService, explorationInitStateNameService,
-      explorationParamChangesService, explorationParamSpecsService,
-      explorationStatesService, explorationTitleService,
-      oppiaPlayerService, parameterMetadataService,
-      ParamChangeObjectFactory) {
+      explorationInitStateNameService, explorationParamChangesService,
+      explorationParamSpecsService, explorationStatesService,
+      explorationTitleService, oppiaPlayerService, parameterMetadataService,
+      ParamChangeObjectFactory, UrlInterpolationService) {
     $scope.isExplorationPopulated = false;
     explorationData.getData().then(function() {
       var initStateNameForPreview = editorContextService.getActiveStateName();
@@ -90,7 +88,9 @@ oppia.controller('PreviewTab', [
 
     $scope.showSetParamsModal = function(manualParamChanges, callback) {
       var modalInstance = $modal.open({
-        templateUrl: 'modals/previewParams',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/preview_tab/' +
+          'preview_set_parameters_modal_directive.html'),
         backdrop: 'static',
         windowClass: 'oppia-preview-set-params-modal',
         controller: [

@@ -16,7 +16,11 @@
 
 """Domain objects for user."""
 
+from core.platform import models
 import feconf
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
+
 
 class UserGlobalPrefs(object):
     """Domain object for user global email preferences.
@@ -107,3 +111,153 @@ class UserExplorationPrefs(object):
             'mute_feedback_notifications': self.mute_feedback_notifications,
             'mute_suggestion_notifications': self.mute_suggestion_notifications
         }
+
+
+class ExpUserLastPlaythrough(object):
+    """Domain object for an exploration last playthrough model."""
+
+    def __init__(self, user_id, exploration_id, last_played_exp_version,
+                 last_updated, last_played_state_name):
+        self.id = '%s.%s' % (user_id, exploration_id)
+        self.user_id = user_id
+        self.exploration_id = exploration_id
+        self.last_played_exp_version = last_played_exp_version
+        self.last_updated = last_updated
+        self.last_played_state_name = last_played_state_name
+
+    def update_last_played_information(self, last_played_exp_version,
+                                       last_played_state_name):
+        """Updates the last playthrough information of the user.
+
+        Args:
+            last_played_exp_version: int. The version of the exploration that
+                was played by the user.
+            last_played_state_name: str. The name of the state at which the
+                learner left the exploration.
+        """
+        self.last_played_exp_version = last_played_exp_version
+        self.last_played_state_name = last_played_state_name
+
+
+class IncompleteActivities(object):
+    """Domain object for the incomplete activities model."""
+
+    def __init__(self, user_id, exploration_ids,
+                 collection_ids):
+        self.id = user_id
+        self.exploration_ids = exploration_ids
+        self.collection_ids = collection_ids
+
+    def add_exploration_id(self, exploration_id):
+        """Adds the exploration id to the list of incomplete exploration ids."""
+        self.exploration_ids.append(exploration_id)
+
+    def remove_exploration_id(self, exploration_id):
+        """Removes the exploration id from the list of incomplete exploration
+        ids.
+        """
+        self.exploration_ids.remove(exploration_id)
+
+    def add_collection_id(self, collection_id):
+        """Adds the collection id to the list of incomplete collection ids."""
+        self.collection_ids.append(collection_id)
+
+    def remove_collection_id(self, collection_id):
+        """Removes the collection id from the list of incomplete collection
+        ids.
+        """
+        self.collection_ids.remove(collection_id)
+
+
+class CompletedActivities(object):
+    """Domain object for the activities completed by learner model."""
+
+    def __init__(self, user_id, exploration_ids,
+                 collection_ids):
+        self.id = user_id
+        self.exploration_ids = exploration_ids
+        self.collection_ids = collection_ids
+
+    def add_exploration_id(self, exploration_id):
+        """Adds the exploration id to the list of completed exploration ids."""
+        self.exploration_ids.append(exploration_id)
+
+    def remove_exploration_id(self, exploration_id):
+        """Removes the exploration id from the list of completed exploration
+        ids.
+        """
+        self.exploration_ids.remove(exploration_id)
+
+    def add_collection_id(self, collection_id):
+        """Adds the collection id to the list of completed collection ids."""
+        self.collection_ids.append(collection_id)
+
+    def remove_collection_id(self, collection_id):
+        """Removes the collection id from the list of completed collection
+        ids.
+        """
+        self.collection_ids.remove(collection_id)
+
+
+class LearnerPlaylist(object):
+    """Domain object for the learner playlist model,"""
+
+    def __init__(self, user_id, exploration_ids,
+                 collection_ids):
+        self.id = user_id
+        self.exploration_ids = exploration_ids
+        self.collection_ids = collection_ids
+
+    def insert_exploration_id_at_given_position(
+            self, exploration_id, position_to_be_inserted):
+        """Inserts the given exploration id at the given position.
+
+        Args:
+            exploration_id: str. The exploration id to be inserted into the
+                play later list.
+            position_to_be_inserted: The position at which it is to be inserted.
+        """
+        self.exploration_ids.insert(position_to_be_inserted, exploration_id)
+
+    def add_exploration_id_to_list(self, exploration_id):
+        """Inserts the exploration id at the end of the list.
+
+        Args:
+            exploration_id: str. The exploration id to be appended to the end
+                of the list.
+        """
+        self.exploration_ids.append(exploration_id)
+
+    def insert_collection_id_at_given_position(
+            self, collection_id, position_to_be_inserted):
+        """Inserts the given collection id at the given position.
+
+        Args:
+            collection_id: str. The collection id to be inserted into the
+                play later list.
+            position_to_be_inserted: The position at which it is to be inserted.
+        """
+        self.collection_ids.insert(position_to_be_inserted, collection_id)
+
+    def add_collection_id_to_list(self, collection_id):
+        """Inserts the collection id at the end of the list.
+
+        Args:
+            collection_id: str. The collection id to be appended to the end
+                of the list.
+        """
+        self.collection_ids.append(collection_id)
+
+    def remove_exploration_id(self, exploration_id):
+        """Removes the exploration id from the learner playlist.
+
+        exploration_id: str. The id of the exploration to be removed.
+        """
+        self.exploration_ids.remove(exploration_id)
+
+    def remove_collection_id(self, collection_id):
+        """Removes the collection id from the learner playlist.
+
+        collection_id: str. The id of the collection to be removed.
+        """
+        self.collection_ids.remove(collection_id)

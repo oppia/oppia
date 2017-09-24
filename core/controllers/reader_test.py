@@ -16,12 +16,22 @@
 
 import os
 
+from constants import constants
+from core.domain import classifier_services
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import learner_progress_services
 from core.domain import param_domain
 from core.domain import rights_manager
+from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
+
+(classifier_models,) = models.Registry.import_models(
+    [models.NAMES.classifier])
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -35,6 +45,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
@@ -88,7 +99,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_published_explorations_are_visible_to_logged_out_users(self):
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
@@ -96,7 +107,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
     def test_published_explorations_are_visible_to_logged_in_users(self):
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -112,8 +123,8 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         """Before the test, create an exploration_dict."""
         super(ClassifyHandlerTest, self).setUp()
-        self.enable_string_classifier = self.swap(
-            feconf, 'ENABLE_STRING_CLASSIFIER', True)
+        self.enable_ml_classifiers = self.swap(
+            feconf, 'ENABLE_ML_CLASSIFIERS', True)
 
         # Reading YAML exploration into a dictionary.
         yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
@@ -141,7 +152,7 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
     def test_classification_handler(self):
         """Test the classification handler for a right answer."""
 
-        with self.enable_string_classifier:
+        with self.enable_ml_classifiers:
             # Testing the handler for a correct answer.
             old_state_dict = self.exploration.states['Home'].to_dict()
             answer = 'Permutations'
@@ -182,6 +193,55 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+
+class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
+    """Test the handler for initialising exploration with
+    state_classifier_mapping.
+    """
+
+    def test_creation_of_state_classifier_mapping(self):
+        super(ExplorationStateClassifierMappingTests, self).setUp()
+        exploration_id = '15'
+
+        self.login(self.VIEWER_EMAIL)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        exp_services.delete_demo(exploration_id)
+        # We enable ENABLE_ML_CLASSIFIERS so that the subsequent call to
+        # save_exploration handles job creation for trainable states.
+        # Since only one demo exploration has a trainable state, we modify our
+        # values for MIN_ASSIGNED_LABELS and MIN_TOTAL_TRAINING_EXAMPLES to let
+        # the classifier_demo_exploration.yaml be trainable. This is
+        # completely for testing purposes.
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    exp_services.load_demo(exploration_id)
+
+        # Retrieve job_id of created job (because of save_exp).
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 1)
+        for job in all_jobs:
+            job_id = job.id
+
+        classifier_services.store_classifier_data(job_id, {})
+
+        expected_state_classifier_mapping = {
+            'text': {
+                'algorithm_id': 'LDAStringClassifier',
+                'classifier_data': {},
+                'data_schema_version': 1
+            }
+        }
+        # Call the handler.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id))
+        retrieved_state_classifier_mapping = exploration_dict[
+            'state_classifier_mapping']
+
+        self.assertEqual(expected_state_classifier_mapping,
+                         retrieved_state_classifier_mapping)
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
@@ -364,6 +424,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         # Load exploration 0.
         exp_services.load_demo(self.EXP_ID)
@@ -379,7 +440,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             objective='Test a spam exploration.')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
         self.logout()
 
     def test_that_emails_are_sent(self):
@@ -454,3 +515,281 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
                 'report_text': self.REPORT_TEXT,
             }, csrf_token, expected_status_int=401, expect_errors=True)
+
+
+class LearnerProgressTest(test_utils.GenericTestBase):
+    """Tests for tracking learner progress."""
+
+    EXP_ID_0 = 'exp_0'
+    EXP_ID_1 = 'exp_1'
+    # The first number corresponds to the collection to which the exploration
+    # belongs. The second number corresponds to the exploration id.
+    EXP_ID_1_0 = 'exp_2'
+    EXP_ID_1_1 = 'exp_3'
+    COL_ID_0 = 'col_0'
+    COL_ID_1 = 'col_1'
+    USER_EMAIL = 'user@example.com'
+    USER_USERNAME = 'user'
+
+    def setUp(self):
+        super(LearnerProgressTest, self).setUp()
+
+        self.signup(self.USER_EMAIL, self.USER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        # Save and publish explorations.
+        self.save_new_valid_exploration(
+            self.EXP_ID_0, self.owner_id, title='Bridges in England',
+            category='Architecture', language_code='en')
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id, title='Welcome',
+            category='Architecture', language_code='fi')
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1_0, self.owner_id, title='Sillat Suomi',
+            category='Architecture', language_code='fi')
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1_1, self.owner_id,
+            title='Introduce Interactions in Oppia',
+            category='Welcome', language_code='en')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1_1)
+
+        # Save a new collection.
+        self.save_new_default_collection(
+            self.COL_ID_0, self.owner_id, title='Welcome',
+            category='Architecture')
+
+        self.save_new_default_collection(
+            self.COL_ID_1, self.owner_id, title='Bridges in England',
+            category='Architecture')
+
+        # Add two explorations to the previously saved collection and publish
+        # it.
+        for exp_id in [self.EXP_ID_1_0, self.EXP_ID_1_1]:
+            collection_services.update_collection(
+                self.owner_id, self.COL_ID_1, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': exp_id
+                }], 'Added new exploration')
+
+        # Publish the collections.
+        rights_manager.publish_collection(self.owner, self.COL_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_1)
+
+    def test_independent_exp_complete_event_handler(self):
+        """Test handler for completion of explorations not in the context of
+        collections.
+        """
+
+        self.login(self.USER_EMAIL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'final',
+            'version': 1
+        }
+
+        # When an exploration is completed but is not in the context of a
+        # collection, it is just added to the completed explorations list.
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
+            payload, csrf_token)
+        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
+            self.user_id), [self.EXP_ID_0])
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [])
+
+        # Test another exploration.
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
+            payload, csrf_token)
+        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
+            self.user_id), [self.EXP_ID_0, self.EXP_ID_1_0])
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [])
+
+    def test_exp_complete_event_in_collection(self):
+        """Test handler for completion of explorations in the context of
+        collections.
+        """
+
+        self.login(self.USER_EMAIL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'collection_id': self.COL_ID_1,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'final',
+            'version': 1
+        }
+
+        # If the exploration is completed in the context of a collection,
+        # then in addition to the exploration being added to the completed
+        # list, the collection is also added to the incomplete/complete list
+        # dependent on whether there are more explorations left to complete.
+
+        # Here we test the case when the collection is partially completed.
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
+            payload, csrf_token)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_1])
+        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
+            self.user_id), [self.EXP_ID_1_0])
+
+        # Now we test the case when the collection is completed.
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_1,
+            payload, csrf_token)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [])
+        self.assertEqual(
+            learner_progress_services.get_all_completed_collection_ids(
+                self.user_id), [self.COL_ID_1])
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_1_0, self.EXP_ID_1_1])
+
+    def test_exp_incomplete_event_handler(self):
+        """Test handler for leaving an exploration incomplete."""
+
+        self.login(self.USER_EMAIL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+            'version': 1
+        }
+
+        # Add the incomplete exploration id to the incomplete list.
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
+            payload, csrf_token)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_0])
+
+        # Adding the exploration again has no effect.
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
+            payload, csrf_token)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_0])
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'collection_id': self.COL_ID_1,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+            'version': 1
+        }
+
+        # If the exploration is played in the context of a collection, the
+        # collection is also added to the incomplete list.
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_1_0, # pylint: disable=line-too-long
+            payload, csrf_token)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1_0])
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_1])
+
+    def test_remove_exp_from_incomplete_list_handler(self):
+        """Test handler for removing explorations from the partially completed
+        list.
+        """
+        self.login(self.USER_EMAIL)
+
+        state_name = 'state_name'
+        version = 1
+
+        # Add two explorations to the partially completed list.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_0, state_name, version)
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+
+        # Remove one exploration.
+        self.testapp.delete(str(
+            '%s/%s/%s' %
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+             constants.ACTIVITY_TYPE_EXPLORATION,
+             self.EXP_ID_0)))
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_1])
+
+        # Remove another exploration.
+        self.testapp.delete(str(
+            '%s/%s/%s' %
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+             constants.ACTIVITY_TYPE_EXPLORATION,
+             self.EXP_ID_1)))
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id), [])
+
+    def test_remove_collection_from_incomplete_list_handler(self):
+        """Test handler for removing collections from incomplete list."""
+
+        self.login(self.USER_EMAIL)
+
+        # Add two collections to incomplete list.
+        learner_progress_services.mark_collection_as_incomplete(
+            self.user_id, self.COL_ID_0)
+        learner_progress_services.mark_collection_as_incomplete(
+            self.user_id, self.COL_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
+        # Remove one collection.
+        self.testapp.delete(str(
+            '%s/%s/%s' %
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+             constants.ACTIVITY_TYPE_COLLECTION,
+             self.COL_ID_0)))
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_1])
+
+        # Remove another collection.
+        self.testapp.delete(str(
+            '%s/%s/%s' %
+            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+             constants.ACTIVITY_TYPE_COLLECTION,
+             self.COL_ID_1)))
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [])

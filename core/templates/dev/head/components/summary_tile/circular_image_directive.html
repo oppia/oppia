@@ -1,7 +1,5 @@
-<script type="text/ng-template" id="components/circularImage">
-  <a ng-if="isLinkAvailable()" ng-href="<[link()]>">
-    <img ng-src="<[src()]>" alt="" class="img-circle">
-  </a>
+<a ng-if="isLinkAvailable()" ng-href="<[link()]>">
+<img ng-src="<[src()]>" alt="" class="img-circle">
+</a>
 
-  <img ng-if="!isLinkAvailable()" class="img-circle" ng-src="<[src()]>">
-</script>
+<img ng-if="!isLinkAvailable()" class="img-circle" ng-src="<[src()]>">

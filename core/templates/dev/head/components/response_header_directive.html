@@ -47,16 +47,16 @@
     <span ng-if="isActive()">&nbsp;</span>
   </div>
 
-  <span>→</span>
-  <span ng-if="!isOutcomeLooping() && !isCreatingNewState()"
+  <span ng-if="getOutcome()">→</span>
+  <span ng-if="getOutcome() && !isOutcomeLooping() && !isCreatingNewState()"
         ng-click="navigateToState(getOutcome().dest)" class="oppia-nested-link">
     <[getOutcome().dest]>
   </span>
-  <span ng-if="!isOutcomeLooping() && isCreatingNewState()">
+  <span ng-if="getOutcome() && !isOutcomeLooping() && isCreatingNewState()">
     <em ng-if="getOutcome().newStateName">(<[getOutcome().newStateName]>)</em>
     <em ng-if="!getOutcome().newStateName">Nowhere yet...</em>
   </span>
-  <span ng-if="isOutcomeLooping()">
+  <span ng-if="getOutcome() && isOutcomeLooping()">
     <em>(try again)</em>
   </span>
 </div>

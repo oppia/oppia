@@ -1,126 +1,118 @@
-<script type="text/ng-template" id="inline/editor_navigation_directive">
-  <style>
-    /* Overwrite the Bootstrap defaults. */
-    .nav > li > a.oppia-editor-navbar-tab-anchor {
-      padding: 15px 11px;
-    }
-    editor-navigation .oppia-exploration-open-threads-count {
-      bottom: 8px;
-      color: white;
-      font-size: 9px;
-      position: relative;
-    }
-    editor-navigation .oppia-exploration-open-threads-color {
-      background-color: #4078C0;
-      border: 1px solid rgb(243, 243, 243);
-    }
-    editor-navigation .oppia-exploration-open-threads-indicator {
-      border-radius: 10%;
-      bottom: 10px;
-      height: 13px;
-      position: absolute;
-      right: 5px;
-      text-align: center;
-      width: 16px;
-    }
-  </style>
-  <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
-    <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
-      <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
-         class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
-        <i class="material-icons">&#xE254;</i>
-      </a>
-      <div ng-show="countWarnings()" class="oppia-editor-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
-        <span class="oppia-editor-warnings-count">
-          <[countWarnings()]>
-        </span>
-      </div>
-      <ul class="dropdown-menu oppia-editor-warnings-box">
-        <span class="oppia-editor-warnings-header">Warnings</span>
-        <li class="oppia-editor-warnings-text" ng-repeat="warning in getWarnings() track by $index">
-          <hr class="oppia-editor-warnings-separator">
-          <span ng-if="warning.type === 'critical'">
-            <strong><[warning.message]></strong>
-          </span>
-          <span ng-if="warning.type !== 'critical'">
-            <[warning.message]>
-          </span>
-        </li>
-      </ul>
-    </li>
-
-    {% if username %}
-      <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
-        <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
-           class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
-          <i class="material-icons">&#xE037;</i>
-        </a>
-      </li>
-    {% endif %}
-
-    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'settings'}">
-      <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
-         class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
-        <i class="material-icons">&#xE8B8;</i>
-      </a>
-    </li>
-
-    {% if username %}
-      <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'stats'}">
-        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
-           class="oppia-editor-navbar-tab-anchor">
-          <i class="material-icons">&#xE24B;</i>
-        </a>
-      </li>
-    {% endif %}
-
-    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'history'}">
-      <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
-         disabled="explorationRightsService.isCloned()"
-         class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
-        <i class="material-icons">&#xE192;</i>
-      </a>
-    </li>
-
-    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
-      <a href="#" tooltip="Feedback" tooltip-placement="bottom"
-         class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
-        <i class="material-icons">&#xE87F;</i>
-      </a>
-      <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
-        <span class="oppia-exploration-open-threads-count">
-          <[getOpenThreadsCount()]>
-        </span>
-      </div>
-    </li>
-
-    {% if username %}
-    <div class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">
-      <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
-          popover-placement="bottom" popover-trigger="none"
-          popover="To get help in the future, click here!">
-        <a href="#" tooltip="Help" tooltip-placement="bottom"
-           class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">
-          <i class="material-icons">&#xE887;</i>
-        </a>
-      </li>
+<style>
+  /* Overwrite the Bootstrap defaults. */
+  .nav > li > a.oppia-editor-navbar-tab-anchor {
+    padding: 15px 11px;
+  }
+  editor-navigation .oppia-exploration-open-threads-count {
+    bottom: 8px;
+    color: white;
+    font-size: 9px;
+    position: relative;
+  }
+  editor-navigation .oppia-exploration-open-threads-color {
+    background-color: #4078C0;
+    border: 1px solid rgb(243, 243, 243);
+  }
+  editor-navigation .oppia-exploration-open-threads-indicator {
+    border-radius: 10%;
+    bottom: 10px;
+    height: 13px;
+    position: absolute;
+    right: 5px;
+    text-align: center;
+    width: 16px;
+  }
+</style>
+<ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
+  <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
+    <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
+       class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
+      <i class="material-icons">&#xE254;</i>
+    </a>
+    <div ng-show="countWarnings()" class="oppia-editor-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+      <span class="oppia-editor-warnings-count">
+        <[countWarnings()]>
+      </span>
     </div>
-    {% endif %}
-  </ul>
-  <style type="text/css">
-    .oppia-help-dropdown .popover{
-      background-color: black;
-      color: white;
-      font-size: 14px;
-      max-width: 200px;
-      text-align: center;
-      z-index: -1;
-    }
-    .oppia-help-dropdown .popover.bottom > .arrow{
-      border-bottom-color: #000;
-    }
-    .oppia-help-dropdown .popover.bottom > .arrow:after {
-      border-bottom-color: #000;
-    }
-  </style>
-</script>
+    <ul class="dropdown-menu oppia-editor-warnings-box">
+      <span class="oppia-editor-warnings-header">Warnings</span>
+      <li class="oppia-editor-warnings-text" ng-repeat="warning in getWarnings() track by $index">
+        <hr class="oppia-editor-warnings-separator">
+        <span ng-if="warning.type === 'critical'">
+          <strong><[warning.message]></strong>
+        </span>
+        <span ng-if="warning.type !== 'critical'">
+          <[warning.message]>
+        </span>
+      </li>
+    </ul>
+  </li>
+
+  <li ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
+    <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
+       class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
+      <i class="material-icons">&#xE037;</i>
+    </a>
+  </li>
+
+  <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'settings'}">
+    <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
+       class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
+      <i class="material-icons">&#xE8B8;</i>
+    </a>
+  </li>
+
+  <li ng-if="isLargeScreen && userIsLoggedIn" ng-class="{'active': getTabStatuses().active === 'stats'}">
+    <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
+       class="oppia-editor-navbar-tab-anchor">
+      <i class="material-icons">&#xE24B;</i>
+    </a>
+  </li>
+
+  <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'history'}">
+    <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
+       disabled="explorationRightsService.isCloned()"
+       class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
+      <i class="material-icons">&#xE192;</i>
+    </a>
+  </li>
+
+  <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
+    <a href="#" tooltip="Feedback" tooltip-placement="bottom"
+       class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
+      <i class="material-icons">&#xE87F;</i>
+    </a>
+    <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+      <span class="oppia-exploration-open-threads-count">
+        <[getOpenThreadsCount()]>
+      </span>
+    </div>
+  </li>
+
+  <div ng-if="userIsLoggedIn" class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">
+    <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
+        popover-placement="bottom" popover-trigger="none"
+        popover="To get help in the future, click here!">
+      <a href="#" tooltip="Help" tooltip-placement="bottom"
+         class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">
+        <i class="material-icons">&#xE887;</i>
+      </a>
+    </li>
+  </div>
+</ul>
+<style type="text/css">
+  .oppia-help-dropdown .popover{
+    background-color: black;
+    color: white;
+    font-size: 14px;
+    max-width: 200px;
+    text-align: center;
+    z-index: -1;
+  }
+  .oppia-help-dropdown .popover.bottom > .arrow{
+    border-bottom-color: #000;
+  }
+  .oppia-help-dropdown .popover.bottom > .arrow:after {
+    border-bottom-color: #000;
+  }
+</style>

@@ -59,7 +59,9 @@ oppia.factory('ExplorationCreationService', [
 
         $modal.open({
           backdrop: true,
-          templateUrl: 'modals/uploadActivity',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/creator_dashboard/' +
+            'upload_activity_modal_directive.html'),
           controller: [
             '$scope', '$modalInstance', function($scope, $modalInstance) {
               $scope.save = function() {

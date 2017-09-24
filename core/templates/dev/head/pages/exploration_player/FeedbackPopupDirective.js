@@ -27,17 +27,21 @@
 // The state-name argument is optional. If it is not provided, the feedback is
 // assumed to apply to the exploration as a whole.
 oppia.directive('feedbackPopup', [
-  'oppiaPlayerService', function(oppiaPlayerService) {
+  'oppiaPlayerService', 'UrlInterpolationService',
+  function(oppiaPlayerService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'components/feedback',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
         '$scope', '$element', '$http', '$timeout', 'focusService',
-        'alertsService', 'playerPositionService',
+        'alertsService', 'BackgroundMaskService', 'playerPositionService',
+        'windowDimensionsService',
         function(
             $scope, $element, $http, $timeout, focusService,
-            alertsService, playerPositionService) {
+            alertsService, BackgroundMaskService, playerPositionService,
+            windowDimensionsService) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
@@ -46,6 +50,10 @@ oppia.directive('feedbackPopup', [
           // elements on the same page.
           $scope.feedbackPopoverId = (
             'feedbackPopover' + Math.random().toString(36).slice(2));
+
+          if (windowDimensionsService.isWindowNarrow()) {
+            BackgroundMaskService.activateMask();
+          }
 
           focusService.setFocus($scope.feedbackPopoverId);
 
@@ -125,7 +133,12 @@ oppia.directive('feedbackPopup', [
             $timeout(function() {
               getTriggerElt().trigger('click');
             });
+            BackgroundMaskService.deactivateMask();
           };
+
+          $scope.$on('$destroy', function() {
+            BackgroundMaskService.deactivateMask();
+          });
         }
       ]
     };

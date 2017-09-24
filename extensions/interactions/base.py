@@ -80,11 +80,9 @@ class BaseInteraction(object):
     is_terminal = False
     # Whether the interaction has only one possible answer.
     is_linear = False
-    # Whether this interaction supports training and statistical classification.
-    is_trainable = False
-    # Whether this interaction supports the string classifier.
+    # Whether this interaction supports machine learning classification.
     # TODO(chiangs): remove once classifier_services is generalized.
-    is_string_classifier_trainable = False
+    is_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
@@ -99,9 +97,6 @@ class BaseInteraction(object):
     # Specs for desired visualizations of recorded state answers. Overridden
     # in subclasses.
     _answer_visualization_specs = []
-    # Auxiliary calculations supported by this interaction, but not used for
-    # visualization.
-    _auxiliary_calculation_ids = []
     # Instructions for using this interaction, to be shown to the learner. Only
     # relevant for supplemental interactions.
     instructions = None
@@ -114,6 +109,8 @@ class BaseInteraction(object):
     # The heading for the 'default outcome' section in the editor. This should
     # be None unless the interaction is linear and non-terminal.
     default_outcome_heading = None
+    # Whether the solution feature supports this interaction.
+    can_have_solution = None
 
     # Temporary cache for the rule definitions.
     _cached_rules_dict = None
@@ -146,8 +143,7 @@ class BaseInteraction(object):
     def answer_calculation_ids(self):
         visualizations = self.answer_visualizations
         return set(
-            [visualization.calculation_id for visualization in visualizations]
-            + self._auxiliary_calculation_ids)
+            [visualization.calculation_id for visualization in visualizations])
 
     @property
     def dependency_ids(self):
@@ -202,7 +198,9 @@ class BaseInteraction(object):
         return (
             '<script>%s</script>\n' %
             utils.get_file_contents(os.path.join(
-                feconf.INTERACTIONS_DIR, self.id, 'validator.js')))
+                feconf.INTERACTIONS_DIR,
+                self.id,
+                '%sValidationService.js' % self.id)))
 
     def to_dict(self):
         """Gets a dict representing this interaction. Only default values are
@@ -215,8 +213,6 @@ class BaseInteraction(object):
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
             'is_trainable': self.is_trainable,
-            'is_string_classifier_trainable':
-                self.is_string_classifier_trainable,
             'is_linear': self.is_linear,
             'needs_summary': self.needs_summary,
             'customization_arg_specs': [{
@@ -229,6 +225,7 @@ class BaseInteraction(object):
             'narrow_instructions': self.narrow_instructions,
             'default_outcome_heading': self.default_outcome_heading,
             'rule_descriptions': self._rule_description_strings,
+            'can_have_solution': self.can_have_solution,
         }
 
     def get_rule_description(self, rule_name):

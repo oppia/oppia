@@ -21,6 +21,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -55,53 +56,17 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
         'title': 'Title 5'
     }]
 
-    def test_all_exps_publicized(self):
-        """Test exploration summary batch job if all explorations are
-        publicized.
-        """
-        self._run_batch_job_once_and_verify_output(
-            self.EXP_SPECS,
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED)
-
     def test_all_exps_public(self):
-        """Test summary batch job if all explorations are public
-        but not publicized."""
+        """Test summary batch job if all explorations are public."""
         self._run_batch_job_once_and_verify_output(
             self.EXP_SPECS,
             default_status=rights_manager.ACTIVITY_STATUS_PUBLIC)
-
-    def test_exps_some_publicized(self):
-        """Test summary batch job if some explorations are publicized."""
-
-        exp_specs = [{
-            'category': 'Category A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-            'title': 'Title 1'
-        }, {
-            'category': 'Category B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 2'
-        }, {
-            'category': 'Category C',
-            'status': rights_manager.ACTIVITY_STATUS_PRIVATE,
-            'title': 'Title 3'
-        }, {
-            'category': 'Category A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 4'
-        }, {
-            'category': 'Category C',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 5'
-        }]
-
-        self._run_batch_job_once_and_verify_output(exp_specs)
 
     def _run_batch_job_once_and_verify_output(
             self, exp_specs,
             default_title='A title',
             default_category='A category',
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED):
+            default_status=rights_manager.ACTIVITY_STATUS_PUBLIC):
         """Run batch job for creating exploration summaries once and verify its
         output. exp_specs is a list of dicts with exploration specifications.
         Allowed keys are category, status, title. If a key is not specified,
@@ -122,6 +87,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.login(self.ADMIN_EMAIL)
             admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
             self.set_admins([self.ADMIN_USERNAME])
+            admin = user_services.UserActionsInfo(admin_id)
 
             # Create and delete an exploration (to make sure job handles
             # deleted explorations correctly).
@@ -149,14 +115,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     category=spec['category'])
                 exploration = exp_services.get_exploration_by_id(exp_id)
 
-                # Publish or publicize exploration.
+                # Publish exploration.
                 if spec['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
-                    rights_manager.publish_exploration(admin_id, exp_id)
-                elif (
-                        spec['status'] ==
-                        rights_manager.ACTIVITY_STATUS_PUBLICIZED):
-                    rights_manager.publish_exploration(admin_id, exp_id)
-                    rights_manager.publicize_exploration(admin_id, exp_id)
+                    rights_manager.publish_exploration(admin, exp_id)
 
                 # Do not include user_id here, so all explorations are not
                 # editable for now (will be updated depending on user_id
@@ -255,10 +216,12 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner = user_services.UserActionsInfo(owner_id)
+        admin = user_services.UserActionsInfo(admin_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID, owner_id, end_state_name='End')
-        rights_manager.publish_exploration(owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(owner, self.EXP_ID)
         job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
@@ -273,8 +236,8 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         self.assertLess(
             exp_first_published, last_updated_time_msec)
 
-        rights_manager.unpublish_exploration(admin_id, self.EXP_ID)
-        rights_manager.publish_exploration(owner_id, self.EXP_ID)
+        rights_manager.unpublish_exploration(admin, self.EXP_ID)
+        rights_manager.publish_exploration(owner, self.EXP_ID)
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -584,56 +547,6 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
             self.assertNotIn(
                 system_id,
                 exploration_summary.contributors_summary)
-
-
-class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
-
-    EXP_ID = 'exp_id'
-
-    def setUp(self):
-        super(OneOffReindexExplorationsJobTest, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s%s' % (self.EXP_ID, i),
-            title='title %d' % i,
-            category='category%d' % i
-        ) for i in xrange(5)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-            rights_manager.publish_exploration(self.owner_id, exp.id)
-
-        self.process_and_flush_pending_tasks()
-
-    def test_standard_operation(self):
-        job_id = (exp_jobs_one_off.IndexAllExplorationsJobManager.create_new())
-        exp_jobs_one_off.IndexAllExplorationsJobManager.enqueue(job_id)
-
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
-        indexed_docs = []
-
-        def add_docs_mock(docs, index):
-            indexed_docs.extend(docs)
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-
-        add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_mock)
-
-        with add_docs_swap:
-            self.process_and_flush_pending_tasks()
-
-        ids = [doc['id'] for doc in indexed_docs]
-        titles = [doc['title'] for doc in indexed_docs]
-        categories = [doc['category'] for doc in indexed_docs]
-
-        for index in xrange(5):
-            self.assertIn("%s%s" % (self.EXP_ID, index), ids)
-            self.assertIn('title %d' % index, titles)
-            self.assertIn('category%d' % index, categories)
 
 
 class ExplorationMigrationJobTest(test_utils.GenericTestBase):

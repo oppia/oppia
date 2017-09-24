@@ -11,7 +11,7 @@
   }
 </style>
 <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
-  <div class="navbar-container">
+  <div class="navbar-container" style="background-color: #00376d">
     <div class="navbar-header protractor-test-navbar-header pull-left">
       <a class="oppia-navbar-brand-name oppia-transition-200" href="/library">
         <img ng-src="<[logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
@@ -62,7 +62,7 @@
             <hr class="oppia-top-right-menu-item-separator">
             <li>
               <a ng-click="onMouseoutProfilePictureOrDropdown($event)"
-                 href="/dashboard"
+                 href="/creator_dashboard"
                  style="color: #00376d">
                 Creator Dashboard
               </a>
@@ -113,6 +113,15 @@
                tooltip="Miscellaneous"
                tooltip-placement="bottom">
               Misc
+            </a>
+          </li>
+          <li class="oppia-clickable-navbar-element pull-right">
+            <a class="oppia-navbar-tab protractor-test-admin-roles-tab"
+               ng-click="showTab(ADMIN_TAB_URLS.ROLES)"
+               ng-href="<[::ADMIN_TAB_URLS.ROLES]>"
+               tooltip="Roles"
+               tooltip-placemnt="bottom">
+              Roles
             </a>
           </li>
           <li class="oppia-clickable-navbar-element pull-right">

@@ -29,6 +29,9 @@ class MultipleChoiceInput(base.BaseInteraction):
     instructions = None
     narrow_instructions = None
     needs_summary = False
+    # Radio buttons get unselected when specifying a solution. This needs to be
+    # fixed before solution feature can support this interaction.
+    can_have_solution = False
 
     _customization_arg_specs = [{
         'name': 'choices',
@@ -61,22 +64,4 @@ class MultipleChoiceInput(base.BaseInteraction):
             'y_axis_label': 'Count',
         },
         'calculation_id': 'AnswerFrequencies',
-    }, {
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top 5 answers'
-        },
-        'calculation_id': 'Top5AnswerFrequencies',
-    }, {
-        # Table with answer counts.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'All answers'
-        },
-        'calculation_id': 'AnswerFrequencies',
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

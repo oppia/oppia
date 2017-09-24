@@ -149,6 +149,7 @@ oppia.factory('StatsReportingService', [
       recordMaybeLeaveEvent: function(stateName, params) {
         $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
           client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          collection_id: optionalCollectionId,
           params: params,
           session_id: sessionId,
           state_name: stateName,

@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core import jobs_registry
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -237,7 +236,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(RecordAnswerTests, self).setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
@@ -447,12 +446,12 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 self.exploration.init_state_name, 'TextInput',
                 submitted_answer_list * 200)
 
-            # Verify more than 1 shard was stored. The index shard (shard_id 0)
-            # is not included in the shard count.
-            model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-                self.exploration.id, str(self.exploration.version),
-                self.exploration.init_state_name, '0'))
-            self.assertEqual(model.shard_count, 1)
+            # Verify that more than 1 shard was stored. The index shard
+            # (shard_id 0) is not included in the shard count.
+            master_model = stats_models.StateAnswersModel.get_master_model(
+                self.exploration.id, self.exploration.version,
+                self.exploration.init_state_name)
+            self.assertGreater(master_model.shard_count, 0)
 
             # The order of the answers returned depends on the size of the
             # answers.
@@ -554,465 +553,113 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         }])
 
 
-class AnswerStatsTests(test_utils.GenericTestBase):
-    """Tests functionality related to answer statistics."""
+class SampleAnswerTests(test_utils.GenericTestBase):
+    """Tests for functionality related to retrieving sample answers."""
 
-    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
-    DEFAULT_TIME_SPENT = 10.0
+    EXP_ID = 'exp_id0'
 
     def setUp(self):
-        super(AnswerStatsTests, self).setUp()
-        self.exploration0 = self.save_new_valid_exploration(
-            'eid0', 'test@example.com')
-        self.exploration1 = self.save_new_valid_exploration(
-            'eid1', 'test@example.com')
-        self.state_name00 = self.exploration0.init_state_name
-        self.state_name01 = 'Second'
-        self.state_name10 = self.exploration1.init_state_name
+        super(SampleAnswerTests, self).setUp()
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
 
-        exp_services.update_exploration('test@example.com', 'eid0', [{
-            'cmd': 'add_state',
-            'state_name': self.state_name01,
-        }, {
-            'cmd': 'edit_state_property',
-            'state_name': self.state_name01,
-            'property_name': 'widget_id',
-            'new_value': 'TextInput',
-        }], 'Add new state')
-        self.exploration0 = exp_services.get_exploration_by_id('eid0')
-
-    def _record_answer(
-            self, answer_str, exploration, state_name,
-            classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
-        stats_services.record_answer(
-            exploration.id, exploration.version, state_name, 'TextInput',
+    def test_at_most_100_answers_returned_even_if_there_are_lots(self):
+        submitted_answer_list = [
             stats_domain.SubmittedAnswer(
-                answer_str, 'TextInput', 0, 0, classification, {}, 'session',
-                self.DEFAULT_TIME_SPENT))
-
-    def _record_answer_to_default_exp(
-            self, answer_str,
-            classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
-        self._record_answer(
-            answer_str, self.exploration0, self.state_name00,
-            classification=classification)
-
-    def _run_aggregator_job(self):
-        """Start the InteractionAnswerSummariesAggregator to aggregate submitted
-        answers.
-        """
-        ModifiedInteractionAnswerSummariesAggregator.start_computation()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
-
-    def test_get_top_state_rule_answers(self):
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS):
-            # There are no initial top answers for this state.
-            top_answers = stats_services.get_top_state_rule_answers(
-                'eid0', self.state_name00, [
-                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEqual(len(top_answers), 0)
-
-            # Submit some answers.
-            self._record_answer_to_default_exp('a')
-            self._record_answer_to_default_exp('a')
-            self._record_answer_to_default_exp('b')
-            self._record_answer_to_default_exp('b')
-            self._record_answer_to_default_exp('b')
-            self._record_answer_to_default_exp('c')
-            self._record_answer_to_default_exp('c')
-            self._run_aggregator_job()
-
-            top_answers = stats_services.get_top_state_rule_answers(
-                'eid0', self.state_name00, [
-                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEqual(len(top_answers), 3)
-            self.assertEqual(top_answers, [{
-                'answer': 'b',
-                'frequency': 3
-            }, {
-                'answer': 'a',
-                'frequency': 2
-            }, {
-                'answer': 'c',
-                'frequency': 2
-            }])
-
-    def test_get_top_state_answers_for_multiple_classified_rules(self):
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS):
-            # There are no initial top answers for this state.
-            top_answers = stats_services.get_top_state_rule_answers(
-                'eid0', self.state_name00, [
-                    exp_domain.STATISTICAL_CLASSIFICATION,
-                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEqual(len(top_answers), 0)
-
-            # Submit some answers.
-            self._record_answer_to_default_exp(
-                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'c', classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'c', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-            self._run_aggregator_job()
-
-            top_answers = stats_services.get_top_state_rule_answers(
-                'eid0', self.state_name00, [
-                    exp_domain.STATISTICAL_CLASSIFICATION,
-                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEqual(len(top_answers), 3)
-            # Rules across multiple rule types are combined and still sorted by
-            # frequency.
-            self.assertEqual(top_answers, [{
-                'answer': 'b',
-                'frequency': 3
-            }, {
-                'answer': 'c',
-                'frequency': 2
-            }, {
-                'answer': 'a',
-                'frequency': 2
-            }])
-
-    def test_get_top_state_rule_answers_from_multiple_explorations(self):
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS):
-            # There are no initial top answers for these explorations.
-            top_answers_list = stats_services.get_top_state_rule_answers_multi(
-                [('eid0', self.state_name00), ('eid1', self.state_name10)],
-                [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEqual(len(top_answers_list), 2)
-            self.assertEqual(len(top_answers_list[0]), 0)
-            self.assertEqual(len(top_answers_list[1]), 0)
-
-            # Submit some answers.
-            self._record_answer('a', self.exploration0, self.state_name00)
-            self._record_answer('a', self.exploration1, self.state_name10)
-            self._record_answer('b', self.exploration1, self.state_name10)
-            self._record_answer('b', self.exploration1, self.state_name10)
-            self._record_answer('b', self.exploration1, self.state_name10)
-            self._record_answer('c', self.exploration1, self.state_name10)
-            self._record_answer('c', self.exploration0, self.state_name00)
-            self._run_aggregator_job()
-
-            top_answers_list = stats_services.get_top_state_rule_answers_multi(
-                [('eid0', self.state_name00), ('eid1', self.state_name10)],
-                [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEqual(len(top_answers_list), 2)
-            self.assertEqual(top_answers_list[0], [{
-                'answer': 'a',
-                'frequency': 1
-            }, {
-                'answer': 'c',
-                'frequency': 1
-            }])
-            self.assertEqual(top_answers_list[1], [{
-                'answer': 'b',
-                'frequency': 3
-            }, {
-                'answer': 'a',
-                'frequency': 1
-            }, {
-                'answer': 'c',
-                'frequency': 1
-            }])
-
-    def test_get_top_state_rule_answers_from_multiple_states(self):
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS):
-            # There are no initial top answers for these states.
-            top_answers_list = stats_services.get_top_state_rule_answers_multi(
-                [('eid0', self.state_name00), ('eid0', self.state_name01)],
-                [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEqual(len(top_answers_list), 2)
-            self.assertEqual(len(top_answers_list[0]), 0)
-            self.assertEqual(len(top_answers_list[1]), 0)
-
-            # Submit some answers.
-            self._record_answer('a', self.exploration0, self.state_name00)
-            self._record_answer('a', self.exploration0, self.state_name01)
-            self._record_answer('b', self.exploration0, self.state_name01)
-            self._record_answer('b', self.exploration0, self.state_name01)
-            self._record_answer('b', self.exploration0, self.state_name01)
-            self._record_answer('c', self.exploration0, self.state_name01)
-            self._record_answer('c', self.exploration0, self.state_name00)
-            self._run_aggregator_job()
-
-            top_answers_list = stats_services.get_top_state_rule_answers_multi(
-                [('eid0', self.state_name00), ('eid0', self.state_name01)],
-                [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEqual(len(top_answers_list), 2)
-            self.assertEqual(top_answers_list[0], [{
-                'answer': 'a',
-                'frequency': 1
-            }, {
-                'answer': 'c',
-                'frequency': 1
-            }])
-            self.assertEqual(top_answers_list[1], [{
-                'answer': 'b',
-                'frequency': 3
-            }, {
-                'answer': 'a',
-                'frequency': 1
-            }, {
-                'answer': 'c',
-                'frequency': 1
-            }])
-
-    def test_count_top_state_rule_answers(self):
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS):
-            # There are no initial top answers for this state.
-            default_answer_count = stats_services.count_top_state_rule_answers(
-                'eid0', self.state_name00,
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-            self.assertEqual(default_answer_count, 0)
-
-            stats_answer_count = stats_services.count_top_state_rule_answers(
-                'eid0', self.state_name00,
-                exp_domain.STATISTICAL_CLASSIFICATION)
-            self.assertEqual(stats_answer_count, 0)
-
-            # Submit some answers.
-            self._record_answer_to_default_exp(
-                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'c', classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._record_answer_to_default_exp(
-                'c', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-            self._run_aggregator_job()
-
-            top_answers = stats_services.get_top_state_rule_answers(
-                'eid0', self.state_name00, [
-                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            # Rules across multiple rule types are combined and still sorted by
-            # frequency.
-            self.assertEqual(top_answers, [{
-                'answer': 'a',
-                'frequency': 2
-            }, {
-                'answer': 'c',
-                'frequency': 1
-            }])
-
-            default_answer_count = stats_services.count_top_state_rule_answers(
-                'eid0', self.state_name00,
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-            self.assertEqual(default_answer_count, 3)
-
-            top_answers = stats_services.get_top_state_rule_answers(
-                'eid0', self.state_name00, [
-                    exp_domain.STATISTICAL_CLASSIFICATION])
-            # Rules across multiple rule types are combined and still sorted by
-            # frequency.
-            self.assertEqual(top_answers, [{
-                'answer': 'b',
-                'frequency': 3
-            }, {
-                'answer': 'c',
-                'frequency': 1
-            }])
-
-            stats_answer_count = stats_services.count_top_state_rule_answers(
-                'eid0', self.state_name00,
-                exp_domain.STATISTICAL_CLASSIFICATION)
-            self.assertEqual(stats_answer_count, 4)
-
-
-class UnresolvedAnswersTests(test_utils.GenericTestBase):
-    """Tests the unresolved answers methods."""
-
-    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
-    STATE_2_NAME = 'State 2'
-    DEFAULT_TIME_SPENT = 10.0
-
-    def _create_and_update_fake_exploration(self, exp_id):
-        self.save_new_valid_exploration(exp_id, 'fake@user.com')
-        exp_services.update_exploration('fake@user.com', exp_id, [{
-            'cmd': 'add_state',
-            'state_name': self.STATE_2_NAME,
-        }, {
-            'cmd': 'edit_state_property',
-            'state_name': self.STATE_2_NAME,
-            'property_name': 'widget_id',
-            'new_value': 'TextInput',
-        }], 'Add new state')
-        return exp_services.get_exploration_by_id(exp_id)
-
-    def _get_default_dict_when_no_unresolved_answers(self, exp_ids):
-        result = {}
-        for exp_id in exp_ids:
-            result[exp_id] = {'frequency': 0, 'unresolved_answers': []}
-        return result
-
-    def _record_answer(
-            self, answer_str, exploration, state_name,
-            classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
-        stats_services.record_answer(
-            exploration.id, exploration.version, state_name, 'TextInput',
+                'answer a', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0),
             stats_domain.SubmittedAnswer(
-                answer_str, 'TextInput', 0, 0, classification, {}, 'session',
-                self.DEFAULT_TIME_SPENT))
+                'answer ccc', 'TextInput', 1, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 3.0),
+            stats_domain.SubmittedAnswer(
+                'answer bbbbb', 'TextInput', 1, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
+        ]
+        # Record 600 answers.
+        stats_services.record_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            submitted_answer_list * 200)
 
-    def _run_aggregator_job(self):
-        """Start the InteractionAnswerSummariesAggregator to aggregate submitted
-        answers.
-        """
-        ModifiedInteractionAnswerSummariesAggregator.start_computation()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(len(sample_answers), 100)
 
-    def test_unresolved_answers_for_single_exploration(self):
+    def test_exactly_100_answers_returned_if_main_shard_has_100_answers(self):
+        submitted_answer_list = [
+            stats_domain.SubmittedAnswer(
+                'answer a', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0)
+        ]
+        # Record 100 answers.
+        stats_services.record_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            submitted_answer_list * 100)
+
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(sample_answers, ['answer a'] * 100)
+
+    def test_all_answers_returned_if_main_shard_has_few_answers(self):
+        submitted_answer_list = [
+            stats_domain.SubmittedAnswer(
+                'answer a', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0),
+            stats_domain.SubmittedAnswer(
+                'answer bbbbb', 'TextInput', 1, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
+        ]
+        # Record 2 answers.
+        stats_services.record_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            submitted_answer_list)
+
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(sample_answers, ['answer a', 'answer bbbbb'])
+
+    def test_only_sample_answers_in_main_shard_returned(self):
+        # Use a smaller max answer list size so fewer answers are needed to
+        # exceed a shard.
         with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS):
-            exp_1 = self._create_and_update_fake_exploration('eid1')
-            self.assertEqual(
-                stats_services.get_exps_unresolved_answers_for_default_rule(
-                    ['eid1']),
-                self._get_default_dict_when_no_unresolved_answers(['eid1']))
-            self._record_answer('a1', exp_1, exp_1.init_state_name)
-            self._run_aggregator_job()
-            self.assertEqual(
-                stats_services.get_exps_unresolved_answers_for_default_rule(
-                    ['eid1']), {
-                        'eid1': {
-                            'frequency': 1,
-                            'unresolved_answers': [{
-                                'frequency': 1,
-                                'answer': 'a1',
-                                'state': exp_1.init_state_name
-                            }]
-                        }
-                    })
+            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
+            15000):
+            state_answers = stats_services.get_state_answers(
+                self.EXP_ID, self.exploration.version,
+                self.exploration.init_state_name)
+            self.assertIsNone(state_answers)
 
-    def test_unresolved_answers_for_multiple_explorations(self):
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS):
-            exp_1 = self._create_and_update_fake_exploration('eid1')
-            exp_2 = self._create_and_update_fake_exploration('eid2')
-            exp_3 = self._create_and_update_fake_exploration('eid3')
-            self.assertEqual(
-                stats_services.get_exps_unresolved_answers_for_default_rule(
-                    ['eid1', 'eid2', 'eid3']),
-                self._get_default_dict_when_no_unresolved_answers(
-                    ['eid1', 'eid2', 'eid3']))
-            self._record_answer('a1', exp_1, exp_1.init_state_name)
-            self._record_answer('a3', exp_2, exp_2.init_state_name)
-            self._record_answer('a2', exp_2, exp_2.init_state_name)
-            self._record_answer('a2', exp_3, exp_3.init_state_name)
-            self._run_aggregator_job()
-            self.assertEqual(
-                stats_services.get_exps_unresolved_answers_for_default_rule(
-                    ['eid1', 'eid2', 'eid3']), {
-                        'eid1': {
-                            'frequency': 1,
-                            'unresolved_answers': [{
-                                'frequency': 1,
-                                'answer': 'a1',
-                                'state': exp_1.init_state_name
-                            }]
-                        },
-                        'eid2': {
-                            'frequency': 2,
-                            'unresolved_answers': [{
-                                'frequency': 1,
-                                'answer': 'a3',
-                                'state': exp_2.init_state_name
-                            }, {
-                                'frequency': 1,
-                                'answer': 'a2',
-                                'state': exp_2.init_state_name
-                            }]
-                        },
-                        'eid3': {
-                            'frequency': 1,
-                            'unresolved_answers': [{
-                                'frequency': 1,
-                                'answer': 'a2',
-                                'state': exp_3.init_state_name
-                            }]
-                        }
-                    })
+            submitted_answer_list = [
+                stats_domain.SubmittedAnswer(
+                    'answer ccc', 'TextInput', 1, 1,
+                    exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v',
+                    3.0),
+            ]
+            stats_services.record_answers(
+                self.EXP_ID, self.exploration.version,
+                self.exploration.init_state_name, 'TextInput',
+                submitted_answer_list * 100)
 
-    def test_unresolved_answers_count_for_multiple_states(self):
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS):
-            exp_1 = self._create_and_update_fake_exploration('eid1')
-            self.assertEqual(
-                stats_services.get_exps_unresolved_answers_for_default_rule(
-                    ['eid1']),
-                self._get_default_dict_when_no_unresolved_answers(['eid1']))
-            self._record_answer('a1', exp_1, exp_1.init_state_name)
-            self._record_answer('a1', exp_1, self.STATE_2_NAME)
-            self._record_answer('a2', exp_1, self.STATE_2_NAME)
-            self._run_aggregator_job()
-            self.assertEqual(
-                stats_services.get_exps_unresolved_answers_for_default_rule(
-                    ['eid1']), {
-                        'eid1': {
-                            'frequency': 3,
-                            'unresolved_answers': [{
-                                'frequency': 1,
-                                'answer': 'a1',
-                                'state': exp_1.init_state_name
-                            }, {
-                                'frequency': 1,
-                                'answer': 'a1',
-                                'state': self.STATE_2_NAME
-                            }, {
-                                'frequency': 1,
-                                'answer': 'a2',
-                                'state': self.STATE_2_NAME
-                            }]
-                        }
-                    })
+        # Verify more than 1 shard was stored. The index shard (shard_id 0)
+        # is not included in the shard count. Since a total of 100 answers were
+        # submitted, there must therefore be fewer than 100 answers in the
+        # index shard.
+        model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
+            self.exploration.id, str(self.exploration.version),
+            self.exploration.init_state_name, '0'))
+        self.assertEqual(model.shard_count, 1)
 
-    def test_unresolved_answers_count_for_non_default_rules(self):
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS):
-            exp_1 = self._create_and_update_fake_exploration('eid1')
-            self.assertEqual(
-                stats_services.get_exps_unresolved_answers_for_default_rule(
-                    ['eid1']),
-                self._get_default_dict_when_no_unresolved_answers(['eid1']))
-            self._record_answer(
-                'a1', exp_1, exp_1.init_state_name,
-                classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._record_answer(
-                'a1', exp_1, self.STATE_2_NAME,
-                classification=exp_domain.STATISTICAL_CLASSIFICATION)
-            self._run_aggregator_job()
-            self.assertEqual(
-                stats_services.get_exps_unresolved_answers_for_default_rule(
-                    ['eid1']),
-                self._get_default_dict_when_no_unresolved_answers(['eid1']))
+        # Verify that the list of sample answers returned contains fewer than
+        # 100 answers, although a total of 100 answers were submitted.
+        sample_answers = stats_services.get_sample_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertLess(len(sample_answers), 100)

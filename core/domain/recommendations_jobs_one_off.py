@@ -32,7 +32,7 @@ MAX_RECOMMENDATIONS = 10
 SIMILARITY_SCORE_THRESHOLD = 3.0
 
 
-class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceJobManager):
+class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job that computes a list of recommended explorations to play
     after completing an exploration.
     """

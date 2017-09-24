@@ -26,6 +26,9 @@ class ItemSelectionInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     answer_type = 'SetOfHtmlString'
+    # Radio buttons get unselected when specifying a solution. This needs to be
+    # fixed before solution feature can support this interaction.
+    can_have_solution = False
 
     _customization_arg_specs = [{
         'name': 'minAllowableSelectionCount',
@@ -67,5 +70,3 @@ class ItemSelectionInput(base.BaseInteraction):
         },
         'default_value': [''],
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

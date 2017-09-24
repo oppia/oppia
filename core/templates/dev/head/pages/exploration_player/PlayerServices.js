@@ -16,7 +16,6 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 // A service that provides a number of utility functions for JS used by
@@ -25,24 +24,26 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-//
-// TODO(sll): Make this read from a local client-side copy of the exploration
-// and audit it to ensure it behaves differently for learner mode and editor
-// mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
   'alertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
-  'expressionInterpolationService', 'StatsReportingService',
-  'UrlInterpolationService',
+  'ExpressionInterpolationService', 'StateClassifierMappingService',
+  'StatsReportingService', 'UrlInterpolationService',
+  'ReadOnlyExplorationBackendApiService',
+  'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
+  'LanguageUtilService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
-      expressionInterpolationService, StatsReportingService,
-      UrlInterpolationService) {
+      ExpressionInterpolationService, StateClassifierMappingService,
+      StatsReportingService, UrlInterpolationService,
+      ReadOnlyExplorationBackendApiService,
+      EditableExplorationBackendApiService, AudioTranslationManagerService,
+      LanguageUtilService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -63,7 +64,7 @@ oppia.factory('oppiaPlayerService', [
     // Evaluate feedback.
     var makeFeedback = function(feedbacks, envs) {
       var feedbackHtml = feedbacks.length > 0 ? feedbacks[0] : '';
-      return expressionInterpolationService.processHtml(feedbackHtml, envs);
+      return ExpressionInterpolationService.processHtml(feedbackHtml, envs);
     };
 
     // Evaluate parameters. Returns null if any evaluation fails.
@@ -74,7 +75,7 @@ oppia.factory('oppiaPlayerService', [
           if (!pc.customizationArgs.parse_with_jinja) {
             newParams[pc.name] = pc.customizationArgs.value;
           } else {
-            var paramValue = expressionInterpolationService.processUnicode(
+            var paramValue = ExpressionInterpolationService.processUnicode(
               pc.customizationArgs.value, [newParams].concat(envs));
             if (paramValue === null) {
               return false;
@@ -97,8 +98,8 @@ oppia.factory('oppiaPlayerService', [
 
     // Evaluate question string.
     var makeQuestion = function(newState, envs) {
-      return expressionInterpolationService.processHtml(
-        newState.content[0].value, envs);
+      return ExpressionInterpolationService.processHtml(
+        newState.content.getHtml(), envs);
     };
 
     // This should only be called when 'exploration' is non-null.
@@ -188,37 +189,44 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
-          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-            '/createhandler/data/<exploration_id>', {
-              exploration_id: _explorationId
+          EditableExplorationBackendApiService.fetchApplyDraftExploration(
+            _explorationId).then(function(data) {
+              exploration = ExplorationObjectFactory.createFromBackendDict(
+                data);
+              exploration.setInitialStateName(initStateName);
+              initParams(manualParamChanges);
+              AudioTranslationManagerService.init(
+                exploration.getAllAudioLanguageCodes(),
+                null,
+                exploration.getLanguageCode());
+              _loadInitialState(successCallback);
             });
-          $http.get(explorationDataUrl, {
-            params: {
-              apply_draft: true
-            }
-          }).then(function(response) {
-            exploration = ExplorationObjectFactory.createFromBackendDict(
-              response.data);
-            exploration.setInitialStateName(initStateName);
-            initParams(manualParamChanges);
-            _loadInitialState(successCallback);
-          });
         } else {
-          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-            '/explorehandler/init/<exploration_id>', {
-              exploration_id: _explorationId
-            }) + (version ? '?v=' + version : '');
-          $http.get(explorationDataUrl).then(function(response) {
-            var data = response.data;
+          var loadedExploration = null;
+          if (version) {
+            loadedExploration = (
+              ReadOnlyExplorationBackendApiService.loadExploration(
+                _explorationId, version));
+          } else {
+            loadedExploration = (
+              ReadOnlyExplorationBackendApiService.loadLatestExploration(
+                _explorationId));
+          }
+          loadedExploration.then(function(data) {
             exploration = ExplorationObjectFactory.createFromBackendDict(
               data.exploration);
             version = data.version;
-
             initParams([]);
 
+            StateClassifierMappingService.init(data.state_classifier_mapping);
+
             StatsReportingService.initSession(
-              _explorationId, data.version, data.session_id,
+              _explorationId, version, data.session_id,
               GLOBALS.collectionId);
+            AudioTranslationManagerService.init(
+              exploration.getAllAudioLanguageCodes(),
+              data.preferred_audio_language_code,
+              exploration.getLanguageCode());
 
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
@@ -239,6 +247,21 @@ oppia.factory('oppiaPlayerService', [
       },
       getStateContentHtml: function(stateName) {
         return exploration.getUninterpolatedContentHtml(stateName);
+      },
+      getStateContentAudioTranslations: function(stateName) {
+        return exploration.getAudioTranslations(stateName);
+      },
+      getStateContentAudioTranslation: function(stateName, languageCode) {
+        return exploration.getAudioTranslation(stateName, languageCode);
+      },
+      getAllAudioTranslations: function() {
+        return exploration.getAllAudioTranslations();
+      },
+      isContentAudioTranslationAvailable: function(stateName) {
+        return Object.keys(
+          exploration.getAudioTranslations(stateName)).length > 0 ||
+          LanguageUtilService.supportsAutogeneratedAudio(
+            exploration.languageCode);
       },
       getInteractionHtml: function(stateName, labelForFocusTarget) {
         var interactionId = exploration.getInteractionId(stateName);
@@ -267,6 +290,9 @@ oppia.factory('oppiaPlayerService', [
         }
         return randomSuffix;
       },
+      getSolution: function(stateName) {
+        return exploration.getInteraction(stateName).solution;
+      },
       isLoggedIn: function() {
         return _isLoggedIn;
       },
@@ -279,96 +305,80 @@ oppia.factory('oppiaPlayerService', [
         }
 
         answerIsBeingProcessed = true;
-        var oldState = exploration.getState(
-          playerTranscriptService.getLastStateName());
-        AnswerClassificationService.getMatchingClassificationResult(
-          _explorationId, oldState, answer, false, interactionRulesService
-        ).then(function(classificationResult) {
-          if (!_editorPreviewMode) {
-            StatsReportingService.recordAnswerSubmitted(
-              playerTranscriptService.getLastStateName(),
-              LearnerParamsService.getAllParams(),
-              answer,
-              classificationResult.answerGroupIndex,
-              classificationResult.ruleIndex,
-              classificationResult.classificationCategorization);
-          }
+        var oldStateName = playerTranscriptService.getLastStateName();
+        var oldState = exploration.getState(oldStateName);
+        var classificationResult = (
+          AnswerClassificationService.getMatchingClassificationResult(
+            _explorationId, oldStateName, oldState, answer, false,
+            interactionRulesService));
 
-          // Use angular.copy() to clone the object
-          // since classificationResult.outcome points
-          // at oldState.interaction.default_outcome
-          var outcome = angular.copy(classificationResult.outcome);
+        if (!_editorPreviewMode) {
+          StatsReportingService.recordAnswerSubmitted(
+            oldStateName,
+            LearnerParamsService.getAllParams(),
+            answer,
+            classificationResult.answerGroupIndex,
+            classificationResult.ruleIndex,
+            classificationResult.classificationCategorization);
+        }
 
-          // If this is a return to the same state, and the resubmission trigger
-          // kicks in, replace the dest, feedback and param changes with that
-          // of the trigger.
-          if (outcome.dest === playerTranscriptService.getLastStateName()) {
-            for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
-              var fallback = oldState.interaction.fallbacks[i];
-              if (fallback.trigger.type === 'NthResubmission' &&
-                  fallback.trigger.customizationArgs.num_submits.value ===
-                    playerTranscriptService.getNumSubmitsForLastCard()) {
-                outcome.dest = fallback.outcome.dest;
-                outcome.feedback = fallback.outcome.feedback;
-                outcome.paramChanges = fallback.outcome.paramChanges;
-                break;
-              }
-            }
-          }
+        // Use angular.copy() to clone the object
+        // since classificationResult.outcome points
+        // at oldState.interaction.default_outcome
+        var outcome = angular.copy(classificationResult.outcome);
 
-          var newStateName = outcome.dest;
-          var newState = exploration.getState(newStateName);
+        var newStateName = outcome.dest;
+        var newState = exploration.getState(newStateName);
 
-          // Compute the data for the next state.
-          var oldParams = LearnerParamsService.getAllParams();
-          oldParams.answer = answer;
-          var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
-          if (feedbackHtml === null) {
-            answerIsBeingProcessed = false;
-            alertsService.addWarning('Expression parsing error.');
-            return;
-          }
-
-          var newParams = (
-            newState ? makeParams(
-              oldParams, newState.paramChanges, [oldParams]) : oldParams);
-          if (newParams === null) {
-            answerIsBeingProcessed = false;
-            alertsService.addWarning('Expression parsing error.');
-            return;
-          }
-
-          var questionHtml = makeQuestion(newState, [newParams, {
-            answer: 'answer'
-          }]);
-          if (questionHtml === null) {
-            answerIsBeingProcessed = false;
-            alertsService.addWarning('Expression parsing error.');
-            return;
-          }
-
-          // TODO(sll): Remove the 'answer' key from newParams.
-          newParams.answer = answer;
-
+        // Compute the data for the next state.
+        var oldParams = LearnerParamsService.getAllParams();
+        oldParams.answer = answer;
+        var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
+        if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
+          alertsService.addWarning('Expression parsing error.');
+          return;
+        }
 
-          var oldStateName = playerTranscriptService.getLastStateName();
-          var refreshInteraction = (
-            oldStateName !== newStateName ||
-            exploration.isInteractionInline(oldStateName));
+        var newParams = (
+          newState ? makeParams(
+            oldParams, newState.paramChanges, [oldParams]) : oldParams);
+        if (newParams === null) {
+          answerIsBeingProcessed = false;
+          alertsService.addWarning('Expression parsing error.');
+          return;
+        }
 
-          if (!_editorPreviewMode) {
-            StatsReportingService.recordStateTransition(
-              oldStateName, newStateName, answer,
-              LearnerParamsService.getAllParams());
-          }
+        var questionHtml = makeQuestion(newState, [newParams, {
+          answer: 'answer'
+        }]);
+        if (questionHtml === null) {
+          answerIsBeingProcessed = false;
+          alertsService.addWarning('Expression parsing error.');
+          return;
+        }
 
-          $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
-          $rootScope.$broadcast('playerStateChange', newStateName);
-          successCallback(
-            newStateName, refreshInteraction, feedbackHtml, questionHtml,
-            newParams);
-        });
+        // TODO(sll): Remove the 'answer' key from newParams.
+        newParams.answer = answer;
+
+        answerIsBeingProcessed = false;
+
+        oldStateName = playerTranscriptService.getLastStateName();
+        var refreshInteraction = (
+          oldStateName !== newStateName ||
+          exploration.isInteractionInline(oldStateName));
+
+        if (!_editorPreviewMode) {
+          StatsReportingService.recordStateTransition(
+            oldStateName, newStateName, answer,
+            LearnerParamsService.getAllParams());
+        }
+
+        $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
+        $rootScope.$broadcast('playerStateChange', newStateName);
+        successCallback(
+          newStateName, refreshInteraction, feedbackHtml, questionHtml,
+          newParams);
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;

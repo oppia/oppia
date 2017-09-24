@@ -18,20 +18,30 @@
  */
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
-oppia.constant('PANEL_SPECS', GLOBALS.PANEL_SPECS);
 oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   'explorationTitleInputFocusLabel');
+oppia.constant(
+  'EXPLORATION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>');
+oppia.constant(
+  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>?v=<version>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
   'explorationData', 'editorContextService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationGadgetsService',
-  'explorationObjectiveService', 'explorationLanguageCodeService',
-  'explorationRightsService', 'explorationInitStateNameService',
-  'explorationTagsService', 'editabilityService', 'explorationStatesService',
-  'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
+  'explorationCategoryService', 'explorationObjectiveService',
+  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationInitStateNameService', 'explorationTagsService',
+  'editabilityService', 'explorationStatesService', 'routerService',
+  'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
@@ -41,11 +51,11 @@ oppia.controller('ExplorationEditor', [
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
-      explorationCategoryService, explorationGadgetsService,
-      explorationObjectiveService, explorationLanguageCodeService,
-      explorationRightsService, explorationInitStateNameService,
-      explorationTagsService, editabilityService, explorationStatesService,
-      routerService, graphDataService, stateEditorTutorialFirstTimeService,
+      explorationCategoryService, explorationObjectiveService,
+      explorationLanguageCodeService, explorationRightsService,
+      explorationInitStateNameService, explorationTagsService,
+      editabilityService, explorationStatesService, routerService,
+      graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
@@ -55,9 +65,6 @@ oppia.controller('ExplorationEditor', [
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
-    $scope.areGadgetsEnabled = (
-      explorationAdvancedFeaturesService.areGadgetsEnabled);
-
     /**********************************************************
      * Called on initial load of the exploration editor page.
      *********************************************************/
@@ -65,7 +72,6 @@ oppia.controller('ExplorationEditor', [
 
     $scope.explorationId = explorationContextService.getExplorationId();
     $scope.explorationUrl = '/create/' + $scope.explorationId;
-    $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
     $scope.explorationDownloadUrl = (
       '/createhandler/download/' + $scope.explorationId);
     $scope.revertExplorationUrl = (
@@ -94,12 +100,16 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      explorationData.getData().then(function(data) {
+      explorationData.getData(function(explorationId, lostChanges) {
+        if (!autosaveInfoModalsService.isModalOpen()) {
+          autosaveInfoModalsService.showLostChangesModal(
+            lostChanges, explorationId);
+        }
+      }).then(function(data) {
         explorationStatesService.init(data.states);
 
         explorationTitleService.init(data.title);
         explorationCategoryService.init(data.category);
-        explorationGadgetsService.init(data.skin_customizations);
         explorationObjectiveService.init(data.objective);
         explorationLanguageCodeService.init(data.language_code);
         explorationInitStateNameService.init(data.init_state_name);
@@ -110,7 +120,6 @@ oppia.controller('ExplorationEditor', [
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
-        $scope.explorationGadgetsService = explorationGadgetsService;
         $scope.explorationObjectiveService = explorationObjectiveService;
         $scope.explorationRightsService = explorationRightsService;
         $scope.explorationInitStateNameService = (
@@ -217,7 +226,7 @@ oppia.controller('ExplorationEditor', [
       selector: _ID_TUTORIAL_STATE_CONTENT,
       heading: 'Content',
       text: (
-        '<p>An Oppia exploration is divided into several \'cards.\' ' +
+        '<p>An Oppia exploration is divided into several \'cards\'. ' +
         'The first part of a card is the <b>content</b>.</p>' +
         '<p>Use the content section to set the scene. ' +
         'Tell the learner a story, give them some information, ' +
@@ -240,7 +249,7 @@ oppia.controller('ExplorationEditor', [
       text: (
         '<p>After you\'ve written the content of your conversation, ' +
         'choose an <b>interaction type</b>. ' +
-        'An interaction is how you want your leaner to respond ' +
+        'An interaction is how you want your learner to respond ' +
         'to your question.</p> ' +
         '<p>Oppia has several built-in interactions, including:</p>' +
         '<ul>' +

@@ -29,6 +29,7 @@ class LogicProof(base.BaseInteraction):
     instructions = 'Construct a proof'
     narrow_instructions = 'Construct a proof'
     needs_summary = True
+    can_have_solution = True
 
     _customization_arg_specs = [{
         'name': 'question',
@@ -59,17 +60,7 @@ class LogicProof(base.BaseInteraction):
         'id': 'FrequencyTable',
         'options': {
             'column_headers': ['Answer', 'Count'],
-            'title': 'Top 5 answers'
+            'title': 'Top 10 answers'
         },
-        'calculation_id': 'Top5AnswerFrequencies',
-    }, {
-        # Table with answer counts.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'All answers'
-        },
-        'calculation_id': 'AnswerFrequencies',
+        'calculation_id': 'Top10AnswerFrequencies',
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

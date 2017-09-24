@@ -27,7 +27,7 @@
 
 if [ -e "/etc/is_vagrant_vm" ]
 then
-  source $(dirname $0)/vagrant_lockfile.sh || exit 1
+  source $(dirname $0)/vagrant_lock.sh || exit 1
 fi
 
 sudo apt-get update

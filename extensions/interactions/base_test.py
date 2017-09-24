@@ -147,10 +147,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         interaction_dict = interaction.to_dict()
         self.assertItemsEqual(interaction_dict.keys(), [
             'id', 'name', 'description', 'display_mode',
-            'customization_arg_specs', 'is_trainable',
-            'is_string_classifier_trainable', 'is_terminal', 'is_linear',
-            'rule_descriptions', 'instructions', 'narrow_instructions',
-            'needs_summary', 'default_outcome_heading'])
+            'customization_arg_specs', 'is_trainable', 'is_terminal',
+            'is_linear', 'rule_descriptions', 'instructions',
+            'narrow_instructions', 'needs_summary',
+            'default_outcome_heading', 'can_have_solution'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
@@ -212,11 +212,17 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 feconf.INTERACTIONS_DIR, interaction_id)
             self.assertTrue(os.path.isdir(interaction_dir))
 
-            # In this directory there should only be a config .py file, an
-            # html file, a JS file, a validator.js file,  a directory named
-            # 'static' that contains (at least) a .png thumbnail file,
-            # (optionally) a JS test spec file, (optionally) a JS test spec
-            # file for rules, and (optionally) a protractor.js file.
+            # In this directory there should only be the following files:
+            #  Required:
+            #    * A python file called {InteractionName}.py.
+            #    * An html file called {InteractionName}.html.
+            #    * A JS file called {InteractionName}.js.
+            #    * A JS file called {InteractionName}ValidationService.js
+            #    * A directory named 'static' containing at least a .png file.
+            #  Optional:
+            #    * A JS file called {InteractionName}ValidationServiceSpecs.js
+            #    * A JS file called {InteractionName}RulesServiceSpecs.js
+            #    * A JS file called protractor.js.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
@@ -230,7 +236,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, 'validatorSpec.js')))
+                    interaction_dir,
+                    '%sValidationServiceSpec.js' % interaction_id)))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -249,6 +256,22 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             except Exception:
                 pass
 
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir,
+                    '%sPredictionService.js' % interaction_id)))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir,
+                    '%sPredictionServiceSpec.js' % interaction_id)))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
             self.assertEqual(
                 optional_dirs_and_files_count + 5, len(dir_contents),
                 dir_contents
@@ -258,7 +281,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             html_file = os.path.join(
                 interaction_dir, '%s.html' % interaction_id)
             js_file = os.path.join(interaction_dir, '%s.js' % interaction_id)
-            validator_js_file = os.path.join(interaction_dir, 'validator.js')
+            validation_service_js_file = os.path.join(
+                interaction_dir, '%sValidationService.js' % interaction_id)
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
@@ -279,8 +303,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
-            validator_js_file_content = utils.get_file_contents(
-                validator_js_file)
+            validation_service_js_file_content = utils.get_file_contents(
+                validation_service_js_file)
 
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id, js_file_content)
@@ -300,15 +324,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 html_file_content)
             self.assertIn(
                 '<script src="{{cache_slug}}/extensions/interactions/%s/'
-                'validator.js"></script>' % interaction_id,
+                '%sValidationService.js"></script>' % (
+                    interaction_id, interaction_id),
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
             self.assertIn(
-                'oppiaInteractive%sValidator' % interaction_id,
-                validator_js_file_content)
-            self.assertNotIn('<script>', validator_js_file_content)
-            self.assertNotIn('</script>', validator_js_file_content)
+                '%sValidationService' % interaction_id,
+                validation_service_js_file_content)
+            self.assertNotIn('<script>', validation_service_js_file_content)
+            self.assertNotIn('</script>', validation_service_js_file_content)
 
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
@@ -383,6 +408,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             else:
                 self.assertIsNone(interaction.default_outcome_heading)
 
+            # Check that interactions that can have solution cannot be linear.
+            if interaction.can_have_solution:
+                self.assertFalse(interaction.is_linear)
+
             default_object_values = obj_services.get_default_object_values()
 
             # Check that the rules for this interaction have object editor
@@ -393,8 +422,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 for (_, param_obj_cls) in param_list:
                     # TODO(sll): Get rid of these special cases.
                     if param_obj_cls.__name__ in [
-                            'NonnegativeInt', 'ListOfGraph',
-                            'ListOfCoordTwoDim', 'SetOfNormalizedString']:
+                            'NonnegativeInt', 'ListOfCodeEvaluation',
+                            'ListOfCoordTwoDim', 'ListOfGraph',
+                            'SetOfNormalizedString']:
                         continue
 
                     # Check that the rule has an object editor template.

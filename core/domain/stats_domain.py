@@ -41,6 +41,157 @@ MIGRATED_STATE_ANSWER_SESSION_ID_2017 = 'migrated_state_answer_session_id_2017'
 MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 
 
+class ExplorationStats(object):
+    """Domain object representing analytics data for an exploration."""
+
+    def __init__(
+            self, exp_id, exp_version, num_actual_starts, num_completions,
+            state_stats_mapping):
+        """Constructs an ExplorationStats domain object.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+            num_actual_starts: int. Number of learners who actually attempted
+                the exploration. Theses are the learners who spent some
+                minimum fixed time on the exploration.
+            num_completions: int. Number of learners who completed the
+                exploration.
+            state_stats_mapping: dict. A dictionary mapping the state names of
+                an exploration to the corresponding StateStats domain object.
+        """
+        self.exp_id = exp_id
+        self.exp_version = exp_version
+        self.num_actual_starts = num_actual_starts
+        self.num_completions = num_completions
+        self.state_stats_mapping = state_stats_mapping
+
+    def to_dict(self):
+        """Returns a dict representation of the domain object."""
+        exploration_stats_dict = {
+            'exp_id': self.exp_id,
+            'exp_version': self.exp_version,
+            'num_actual_starts': self.num_actual_starts,
+            'num_completions': self.num_completions,
+            'state_stats_mapping': self.state_stats_mapping
+        }
+        return exploration_stats_dict
+
+    def validate(self):
+        """Validates the ExplorationStats domain object."""
+
+        if not isinstance(self.exp_id, basestring):
+            raise utils.ValidationError(
+                'Expected exp_id to be a string, received %s' % (self.exp_id))
+
+        if not isinstance(self.exp_version, int):
+            raise utils.ValidationError(
+                'Expected exp_version to be an int, received %s' % (
+                    self.exp_version))
+
+        if not isinstance(self.num_actual_starts, int):
+            raise utils.ValidationError(
+                'Expected num_actual_starts to be an int, received %s' % (
+                    self.num_actual_starts))
+
+        if self.num_actual_starts < 0:
+            raise utils.ValidationError(
+                '%s cannot have negative values' % ('num_actual_starts'))
+
+        if not isinstance(self.num_completions, int):
+            raise utils.ValidationError(
+                'Expected num_completions to be an int, received %s' % (
+                    self.num_completions))
+
+        if self.num_completions < 0:
+            raise utils.ValidationError(
+                '%s cannot have negative values' % ('num_completions'))
+
+        if not isinstance(self.state_stats_mapping, dict):
+            raise utils.ValidationError(
+                'Expected state_stats_mapping to be a dict, received %s' % (
+                    self.state_stats_mapping))
+
+
+class StateStats(object):
+    """Domain object representing analytics data for an exploration's state."""
+
+    def __init__(
+            self, total_answers_count, useful_feedback_count,
+            learners_answered_correctly, total_hit_count, first_hit_count,
+            total_solutions_triggered_count):
+        """Constructs a StateStats domain object.
+
+        Args:
+            total_answers_count: int. Total number of answers submitted to this
+                state.
+            useful_feedback_count: int. Total number of answers that received
+                useful feedback.
+            learners_answered_correctly: int. Number of learners who submitted
+                correct answers to the state.
+            total_hit_count: int. Total number of times the state was entered.
+            first_hit_count: int. Number of times the state was entered for the
+                first time.
+            total_solutions_triggered_count: int. Number of times the solution
+                button was triggered to answer a state.
+        """
+        self.total_answers_count = total_answers_count
+        self.useful_feedback_count = useful_feedback_count
+        self.learners_answered_correctly = learners_answered_correctly
+        self.total_hit_count = total_hit_count
+        self.first_hit_count = first_hit_count
+        self.total_solutions_triggered_count = total_solutions_triggered_count
+
+    def to_dict(self):
+        """Returns a dict representation of the domain oject."""
+        state_stats_dict = {
+            'total_answers_count': self.total_answers_count,
+            'useful_feedback_count': self.useful_feedback_count,
+            'learners_answered_correctly': self.learners_answered_correctly,
+            'total_hit_count': self.total_hit_count,
+            'first_hit_count': self.first_hit_count,
+            'total_solutions_triggered_count': (
+                self.total_solutions_triggered_count)
+        }
+        return state_stats_dict
+
+    @classmethod
+    def from_dict(cls, state_stats_dict):
+        """Constructs a StateStats domain object from a dict."""
+        return cls(
+            state_stats_dict['total_answers_count'],
+            state_stats_dict['useful_feedback_count'],
+            state_stats_dict['learners_answered_correctly'],
+            state_stats_dict['total_hit_count'],
+            state_stats_dict['first_hit_count'],
+            state_stats_dict['total_solutions_triggered_count']
+        )
+
+    def validate(self):
+        """Validates the StateStats domain object."""
+
+        state_stats_properties = [
+            'total_answers_count',
+            'useful_feedback_count',
+            'learners_answered_correctly',
+            'total_hit_count',
+            'first_hit_count',
+            'total_solutions_triggered_count'
+        ]
+
+        state_stats_dict = self.to_dict()
+
+        for stat_property in state_stats_properties:
+            if not isinstance(state_stats_dict[stat_property], int):
+                raise utils.ValidationError(
+                    'Expected %s to be an int, received %s' % (
+                        stat_property, state_stats_dict[stat_property]))
+
+            if state_stats_dict[stat_property] < 0:
+                raise utils.ValidationError(
+                    '%s cannot have negative values' % (stat_property))
+
+
 # TODO(bhenning): Monitor sizes (lengths of submitted_answer_list) of these
 # objects and determine if we should enforce an upper bound for
 # submitted_answer_list.
@@ -135,12 +286,10 @@ class SubmittedAnswer(object):
     # referenced in future migration or mapreduce jobs, or they may be removed
     # without warning or migration.
 
-    # TODO(bhenning): Remove large_bucket_entity_id once the answer migration is
-    # completed in production.
     def __init__(self, answer, interaction_id, answer_group_index,
                  rule_spec_index, classification_categorization, params,
                  session_id, time_spent_in_sec, rule_spec_str=None,
-                 answer_str=None, large_bucket_entity_id=None):
+                 answer_str=None):
         self.answer = answer
         self.interaction_id = interaction_id
         self.answer_group_index = answer_group_index
@@ -151,7 +300,6 @@ class SubmittedAnswer(object):
         self.time_spent_in_sec = time_spent_in_sec
         self.rule_spec_str = rule_spec_str
         self.answer_str = answer_str
-        self.large_bucket_entity_id = large_bucket_entity_id
 
     def to_dict(self):
         submitted_answer_dict = {
@@ -168,9 +316,6 @@ class SubmittedAnswer(object):
             submitted_answer_dict['rule_spec_str'] = self.rule_spec_str
         if self.answer_str is not None:
             submitted_answer_dict['answer_str'] = self.answer_str
-        if self.large_bucket_entity_id is not None:
-            submitted_answer_dict['large_bucket_entity_id'] = (
-                self.large_bucket_entity_id)
         return submitted_answer_dict
 
     @classmethod
@@ -185,9 +330,7 @@ class SubmittedAnswer(object):
             submitted_answer_dict['session_id'],
             submitted_answer_dict['time_spent_in_sec'],
             rule_spec_str=submitted_answer_dict.get('rule_spec_str'),
-            answer_str=submitted_answer_dict.get('answer_str'),
-            large_bucket_entity_id=submitted_answer_dict.get(
-                'large_bucket_entity_id'))
+            answer_str=submitted_answer_dict.get('answer_str'))
 
     def validate(self):
         """Validates this submitted answer object."""

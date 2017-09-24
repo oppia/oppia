@@ -15,8 +15,8 @@
 """Controllers for the Oppia collection learner view."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.platform import models
@@ -26,49 +26,25 @@ import utils
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-def require_collection_playable(handler):
-    """Decorator that checks if the user can play the given collection."""
-    def test_can_play(self, collection_id, **kwargs):
-        """Check if the current user can play the collection."""
-        actor = rights_manager.Actor(self.user_id)
-        can_play = actor.can_play(
-            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
-        can_view = actor.can_view(
-            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
-        if can_play and can_view:
-            return handler(self, collection_id, **kwargs)
-        else:
-            raise self.PageNotFoundException
-
-    return test_can_play
-
-
 class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
 
-    @require_collection_playable
+    @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Handles GET requests."""
-        try:
-            collection = collection_services.get_collection_by_id(
-                collection_id)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
-        whitelisted_usernames = (
-            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value)
+        (collection, collection_rights) = (
+            collection_services.get_collection_and_collection_rights_by_id(
+                collection_id))
+        if collection is None:
+            raise self.PageNotFoundException
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_COLLECTION,
-            'can_edit': (
-                bool(self.username) and
-                self.username in whitelisted_usernames and
-                self.username not in config_domain.BANNED_USERNAMES.value and
-                rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
-            ),
+            'can_edit': rights_manager.check_can_edit_activity(
+                self.user, collection_rights),
             'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
             'collection_title': collection.title,
-            'collection_skills': collection.skills,
             'is_private': rights_manager.is_collection_private(collection_id),
             'meta_name': collection.title,
             'meta_description': utils.capitalize_string(collection.objective)
@@ -82,22 +58,21 @@ class CollectionDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @require_collection_playable
+    @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
-
         try:
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user_id,
+                    collection_id, self.user,
                     allow_invalid_explorations=False))
         except Exception as e:
             raise self.PageNotFoundException(e)
-
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
         self.values.update({
-            'can_edit': (
-                self.user_id and rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)),
+            'can_edit': rights_manager.check_can_edit_activity(
+                self.user, collection_rights),
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),

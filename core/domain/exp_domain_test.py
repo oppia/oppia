@@ -16,14 +16,18 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 
+import copy
 import os
 
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
@@ -41,15 +45,12 @@ objective: ''
 param_changes: []
 param_specs: {}
 schema_version: %d
-skin_customizations:
-  panels_contents:
-    bottom: []
 states:
   %s:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: {}
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -58,14 +59,15 @@ states:
         dest: %s
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: null
+      solution: null
     param_changes: []
   New state:
     classifier_model_id: null
     content:
-    - type: text
-      value: ''
+      audio_translations: {}
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -74,17 +76,9 @@ states:
         dest: New state
         feedback: []
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: New state
-          feedback: []
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 42
-          trigger_type: NthResubmission
+      hints: []
       id: null
+      solution: null
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -105,8 +99,6 @@ objective: ''
 param_changes: []
 param_specs: {}
 schema_version: %d
-skin_customizations:
-  panels_contents: {}
 states:
   %s:
     content:
@@ -133,16 +125,7 @@ states:
         dest: New state
         feedback: []
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: New state
-          feedback: []
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 42
-          trigger_type: NthResubmission
+      fallbacks: []
       id: null
     param_changes: []
 states_schema_version: %d
@@ -153,121 +136,6 @@ tags: []
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-
-SAMPLE_YAML_CONTENT_WITH_GADGETS = ("""author_notes: ''
-blurb: ''
-category: Category
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-skin_customizations:
-  panels_contents:
-    bottom:
-      - customization_args:
-          adviceObjects:
-            value:
-              - adviceTitle: b
-                adviceHtml: <p>c</p>
-        gadget_type: TestGadget
-        gadget_name: ATestGadget
-        visible_in_states:
-          - New state
-          - Second state
-states:
-  %s:
-    classifier_model_id: null
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: %s
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: New state
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-  Second state:
-    classifier_model_id: null
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: Second state
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-states_schema_version: %d
-tags: []
-title: Title
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-
-TEST_GADGETS = {
-    'TestGadget': {
-        'dir': os.path.join(feconf.GADGETS_DIR, 'TestGadget')
-    }
-}
-
-TEST_GADGET_CUSTOMIZATION_ARGS = {
-    'adviceObjects': {
-        'value': [{
-            'adviceTitle': 'b',
-            'adviceHtml': '<p>c</p>'
-        }]
-    }
-}
-
-TEST_GADGET_DICT = {
-    'gadget_type': 'TestGadget',
-    'gadget_name': 'ATestGadget',
-    'customization_args': TEST_GADGET_CUSTOMIZATION_ARGS,
-    'visible_in_states': ['First state']
-}
 
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
@@ -512,16 +380,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.answer_groups = []
         exploration.validate()
 
-        interaction.fallbacks = {}
-        self._assert_validation_error(
-            exploration, 'Expected fallbacks to be a list')
-
         # Restore a valid exploration.
         interaction.id = 'TextInput'
         interaction.answer_groups = answer_groups
         interaction.default_outcome = default_outcome
-        interaction.fallbacks = []
         exploration.validate()
+
+        interaction.hints = {}
+        self._assert_validation_error(
+            exploration, 'Expected hints to be a list')
 
         # Validate AnswerGroup.
         answer_group.rule_specs = {}
@@ -565,100 +432,70 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
-    def test_fallbacks_validation(self):
-        """Test validation of state fallbacks."""
+    def test_hints_validation(self):
+        """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
-        base_outcome = {
-            'dest': exploration.init_state_name,
-            'feedback': [],
-            'param_changes': [],
+        init_state.update_interaction_hints([{
+            'hint_text': 'hint one',
+        }])
+
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': 'hello_world is a string',
+        }
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
+        exploration.validate()
+
+        # Add hint and delete hint
+        init_state.add_hint('new hint')
+        self.assertEquals(
+            init_state.interaction.hints[1].hint_text,
+            'new hint')
+        init_state.add_hint('hint three')
+        init_state.delete_hint(1)
+        self.assertEquals(
+            len(init_state.interaction.hints),
+            2)
+        exploration.validate()
+
+    def test_solution_validation(self):
+        """Test validation of state solution."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.objective = 'Objective'
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        exploration.validate()
+
+        # Solution should be set to None as default.
+        self.assertEquals(init_state.interaction.solution, None)
+
+        init_state.add_hint('hint #1')
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': [0, 0],
+            'explanation': 'hello_world is a string',
         }
 
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'FakeTriggerName',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 42,
-                    },
-                },
-            },
-            'outcome': base_outcome,
-        }])
-        self._assert_validation_error(exploration, 'Unknown trigger type')
+        # Object type of answer must match that of correct_answer
+        with self.assertRaises(AssertionError):
+            init_state.interaction.solution = (
+                exp_domain.Solution.from_dict(
+                    init_state.interaction.id, solution))
 
-        with self.assertRaises(KeyError):
-            init_state.update_interaction_fallbacks([{
-                'trigger': {
-                    'trigger_type': 'NthResubmission',
-                    'customization_args': {
-                        'num_submits': {
-                            'value': 42,
-                        },
-                    },
-                },
-                'outcome': {},
-            }])
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {},
-            },
-            'outcome': base_outcome,
-        }])
-        # Default values for the customization args will be added silently.
-        exploration.validate()
-        self.assertEqual(len(init_state.interaction.fallbacks), 1)
-        self.assertEqual(
-            init_state.interaction.fallbacks[0].trigger.customization_args,
-            {
-                'num_submits': {
-                    'value': 3,
-                }
-            })
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 42,
-                    },
-                    'bad_key_that_will_get_stripped_silently': {
-                        'value': 'unused_value',
-                    }
-                },
-            },
-            'outcome': base_outcome,
-        }])
-        # Unused customization arg keys will be stripped silently.
-        exploration.validate()
-        self.assertEqual(len(init_state.interaction.fallbacks), 1)
-        self.assertEqual(
-            init_state.interaction.fallbacks[0].trigger.customization_args,
-            {
-                'num_submits': {
-                    'value': 42,
-                }
-            })
-
-        init_state.update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 2,
-                    },
-                },
-            },
-            'outcome': base_outcome,
-        }])
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'hello_world!',
+            'explanation': 'hello_world is a string',
+        }
+        init_state.interaction.solution = (
+            exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
     def test_tag_validation(self):
@@ -707,148 +544,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.tags = ['computer science', 'analysis', 'a b c']
         exploration.validate()
 
-    def test_exploration_skin_and_gadget_validation(self):
-        """Test that Explorations including gadgets validate properly."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-
-        invalid_gadget_instance = exp_domain.GadgetInstance(
-            'bad_type', 'aUniqueGadgetName', [], {})
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Unknown gadget with type bad_type is not in the registry.'
-            ):
-            invalid_gadget_instance.validate()
-
-        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            gadget_instance = exploration.skin_instance.panel_contents_dict[
-                'bottom'][0]
-
-            # Force a GadgetInstance to require certain state names.
-            gadget_instance.visible_in_states.extend(['DEF', 'GHI'])
-
-            self._assert_validation_error(
-                exploration, 'Exploration missing required states: DEF, GHI')
-
-            def_state = exp_domain.State.create_default_state('DEF')
-            def_state.update_interaction_id('TextInput')
-            exploration.states['DEF'] = def_state
-            self._assert_validation_error(
-                exploration, 'Exploration missing required state: GHI')
-
-            ghi_state = exp_domain.State.create_default_state('GHI')
-            ghi_state.update_interaction_id('TextInput')
-            exploration.states['GHI'] = ghi_state
-            exploration.validate()
-
-            # Force a gadget name collision.
-            gadget_instance.visible_in_states = ['DEF']
-            exploration.add_gadget(TEST_GADGET_DICT, 'bottom')
-            exploration.skin_instance.panel_contents_dict[
-                'bottom'][1].visible_in_states = ['GHI']
-            self._assert_validation_error(
-                exploration,
-                'ATestGadget gadget instance name must be unique.')
-            exploration.skin_instance.panel_contents_dict['bottom'].pop()
-
-            gadget_instance.visible_in_states.extend(['DEF'])
-            self._assert_validation_error(
-                exploration,
-                'TestGadget specifies visibility repeatedly for state: DEF')
-
-            # Remove duplicate state.
-            gadget_instance.visible_in_states.pop()
-
-            # Adding a panel that doesn't exist in the skin.
-            exploration.skin_instance.panel_contents_dict[
-                'non_existent_panel'] = []
-
-            self._assert_validation_error(
-                exploration,
-                'The panel name \'non_existent_panel\' is invalid.')
-
-    def test_gadget_name_validation(self):
-        """Test that gadget naming conditions validate properly."""
-
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-
-        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            gadget_instance = exploration.skin_instance.panel_contents_dict[
-                'bottom'][0]
-            gadget_instance.validate()
-
-            gadget_instance.name = ''
-            self._assert_validation_error(
-                gadget_instance, 'Gadget name must not be an empty string.')
-
-            gadget_instance.name = 0
-            self._assert_validation_error(
-                gadget_instance,
-                'Gadget name must be a string. Received type: int')
-
-            gadget_instance.name = 'ASuperLongGadgetNameThatExceedsTheLimit'
-            max_length = exp_domain.GadgetInstance._MAX_GADGET_NAME_LENGTH  # pylint: disable=protected-access
-            self._assert_validation_error(
-                gadget_instance,
-                'ASuperLongGadgetNameThatExceedsTheLimit gadget name'
-                ' exceeds maximum length of %d' % max_length)
-
-            gadget_instance.name = 'VERYGADGET!'
-            self._assert_validation_error(
-                gadget_instance,
-                'Gadget names must be alphanumeric. Spaces are allowed. '
-                'Received: VERYGADGET!')
-
-            gadget_instance.name = 'Name with \t tab'
-            self._assert_validation_error(
-                gadget_instance,
-                'Gadget names must be alphanumeric. Spaces are allowed. '
-                'Received: Name with \t tab')
-
-            gadget_instance.name = 'Name with \n newline'
-            self._assert_validation_error(
-                gadget_instance,
-                'Gadget names must be alphanumeric. Spaces are allowed. '
-                'Received: Name with \n newline')
-
-            gadget_instance.name = 'Name with   3 space'
-            self._assert_validation_error(
-                gadget_instance,
-                'Gadget names must be alphanumeric. Spaces are allowed. '
-                'Received: Name with   3 space')
-
-            gadget_instance.name = ' untrim whitespace '
-            self._assert_validation_error(
-                gadget_instance,
-                'Gadget names must be alphanumeric. Spaces are allowed. '
-                'Received:  untrim whitespace ')
-
-            # Names with spaces and number should pass.
-            gadget_instance.name = 'Space and 1'
-            gadget_instance.validate()
-
-    def test_exploration_get_gadget_types(self):
-        """Test that Exploration.get_gadget_types returns apt results."""
-        exploration_without_gadgets = exp_domain.Exploration.from_yaml(
-            'An Exploration ID', SAMPLE_YAML_CONTENT)
-        self.assertEqual(exploration_without_gadgets.get_gadget_types(), [])
-
-        exploration_with_gadgets = exp_domain.Exploration.from_yaml(
-            'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        self.assertEqual(
-            exploration_with_gadgets.get_gadget_types(), ['TestGadget'])
-
-        another_gadget = exp_domain.GadgetInstance(
-            'AnotherGadget', 'GadgetUniqueName1', [], {}
-        )
-        exploration_with_gadgets.skin_instance.panel_contents_dict[
-            'bottom'].append(another_gadget)
-        self.assertEqual(
-            exploration_with_gadgets.get_gadget_types(),
-            ['AnotherGadget', 'TestGadget']
-        )
-
     def test_title_category_and_objective_validation(self):
         """Test that titles, categories and objectives are validated only in
         'strict' mode.
@@ -879,6 +574,295 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.objective = 'An objective'
 
         exploration.validate(strict=True)
+
+    def test_audio_translation_validation(self):
+        """Test validation of audio translations."""
+        audio_translation = exp_domain.AudioTranslation('a.mp3', 20, True)
+        audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected audio filename to be a string'
+            ):
+            with self.swap(audio_translation, 'filename', 20):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid audio filename'
+            ):
+            with self.swap(audio_translation, 'filename', '.invalidext'):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid audio filename'
+            ):
+            with self.swap(audio_translation, 'filename', 'justanextension'):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid audio filename'
+            ):
+            with self.swap(audio_translation, 'filename', 'a.invalidext'):
+                audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected file size to be an int'
+            ):
+            with self.swap(audio_translation, 'file_size_bytes', 'abc'):
+                audio_translation.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid file size'
+            ):
+            with self.swap(audio_translation, 'file_size_bytes', -3):
+                audio_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected needs_update to be a bool'
+            ):
+            with self.swap(audio_translation, 'needs_update', 'hello'):
+                audio_translation.validate()
+
+    def test_subtitled_html_validation(self):
+        """Test validation of subtitled HTML."""
+        audio_translation = exp_domain.AudioTranslation(
+            'a.mp3', 20, True)
+        subtitled_html = exp_domain.SubtitledHtml('some html', {
+            'hi-en': audio_translation,
+        })
+        subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content HTML'
+            ):
+            with self.swap(subtitled_html, 'html', 20):
+                subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected audio_translations to be a dict'
+            ):
+            with self.swap(subtitled_html, 'audio_translations', 'not_dict'):
+                subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected language code to be a string'
+            ):
+            with self.swap(subtitled_html, 'audio_translations',
+                           {20: audio_translation}):
+                subtitled_html.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Unrecognized language code'
+            ):
+            with self.swap(subtitled_html, 'audio_translations',
+                           {'invalid-code': audio_translation}):
+                subtitled_html.validate()
+
+    def test_get_state_names_mapping(self):
+        """Test the get_state_names_mapping() method."""
+        exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Rename a state.
+        exploration.rename_state('Home', 'Renamed state')
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        }]
+
+        expected_dict = {
+            'Renamed state': 'Home',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Add a state
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }]
+
+        expected_dict = {
+            'New state': 'New state',
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Delete state.
+        exploration.delete_state('New state')
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        }]
+
+        expected_dict = {
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Test addition and multiple renames.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        exploration.rename_state('New state', 'New state2')
+        exploration.rename_state('New state2', 'New state3')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        }]
+
+        expected_dict = {
+            'New state3': 'New state',
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
+    def test_get_trainable_states_dict(self):
+        """Test the get_trainable_states_dict() method."""
+        exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+
+        exploration_model = exp_models.ExplorationModel.get(
+            exp_id, strict=False)
+        old_states = exp_services.get_exploration_from_model(
+            exploration_model).states
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Rename a state to add it in unchanged answer group.
+        exploration.rename_state('Home', 'Renamed state')
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [],
+            'state_names_with_unchanged_answer_groups': ['Renamed state']
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Modify answer groups to trigger change in answer groups.
+        state = exploration.states['Renamed state']
+        exploration.states['Renamed state'].interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[3])
+        answer_groups = []
+        for answer_group in state.interaction.answer_groups:
+            answer_groups.append(answer_group.to_dict())
+        change_list = [{
+            'cmd': 'edit_state_property',
+            'state_name': 'Renamed state',
+            'property_name': 'answer_groups',
+            'new_value': answer_groups
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Add new state to trigger change in answer groups.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'New state', 'Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Delete state.
+        exploration.delete_state('New state')
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Test addition and multiple renames.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        exploration.rename_state('New state', 'New state2')
+        exploration.rename_state('New state2', 'New state3')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        }]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'Renamed state', 'New state3'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_to_old_state_names = exploration.get_state_names_mapping(
+            change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, new_to_old_state_names)
+        self.assertEqual(actual_dict, expected_dict)
+
 
     def test_is_demo_property(self):
         """Test the is_demo property."""
@@ -922,10 +906,10 @@ class StateExportUnitTests(test_utils.GenericTestBase):
         state_dict = exploration.states['New state'].to_dict()
         expected_dict = {
             'classifier_model_id': None,
-            'content': [{
-                'type': 'text',
-                'value': u''
-            }],
+            'content': {
+                'html': '',
+                'audio_translations': {}
+            },
             'interaction': {
                 'answer_groups': [],
                 'confirmed_unclassified_answers': [],
@@ -935,8 +919,9 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     'feedback': [],
                     'param_changes': [],
                 },
-                'fallbacks': [],
+                'hints': [],
                 'id': None,
+                'solution': None,
             },
             'param_changes': [],
         }
@@ -954,22 +939,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             self.EXP_ID, title='Title', category='Category')
         exploration.add_states(['New state'])
         self.assertEqual(len(exploration.states), 2)
-
-        exploration.states['New state'].update_interaction_fallbacks([{
-            'trigger': {
-                'trigger_type': 'NthResubmission',
-                'customization_args': {
-                    'num_submits': {
-                        'value': 42,
-                    },
-                },
-            },
-            'outcome': {
-                'dest': 'New state',
-                'feedback': [],
-                'param_changes': [],
-            },
-        }])
 
         exploration.validate()
 
@@ -1003,25 +972,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             ):
             exp_domain.Exploration.from_untitled_yaml(
                 'exp4', 'Title', 'Category', SAMPLE_YAML_CONTENT)
-
-    def test_yaml_import_and_export_without_gadgets(self):
-        """Test from_yaml() and to_yaml() methods without gadgets."""
-        exploration_without_gadgets = exp_domain.Exploration.from_yaml(
-            self.EXP_ID, SAMPLE_YAML_CONTENT)
-        yaml_content = exploration_without_gadgets.to_yaml()
-        self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
-
-    def test_yaml_import_and_export_with_gadgets(self):
-        """Test from_yaml() and to_yaml() methods including gadgets."""
-        exploration_with_gadgets = exp_domain.Exploration.from_yaml(
-            self.EXP_ID, SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            generated_yaml = exploration_with_gadgets.to_yaml()
-
-        generated_yaml_as_dict = utils.dict_from_yaml(generated_yaml)
-        sample_yaml_as_dict = utils.dict_from_yaml(
-            SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        self.assertEqual(generated_yaml_as_dict, sample_yaml_as_dict)
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
@@ -1907,7 +1857,444 @@ states_schema_version: 9
 tags: []
 title: Title
 """)
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V12
+
+    YAML_CONTENT_V13 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 13
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: {}
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+states_schema_version: 10
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V14 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 14
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: []
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: []
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: {}
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: []
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+states_schema_version: 11
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V15 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 15
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      hints: []
+      id: EndExploration
+      solution: {}
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      hints: []
+      id: TextInput
+      solution: {}
+    param_changes: []
+states_schema_version: 12
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V16 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 16
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V17 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 17
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V17
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -1981,6 +2368,37 @@ title: Title
             'eid', self.YAML_CONTENT_V12)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v13(self):
+        """Test direct loading from a v13 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V13)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v14(self):
+        """Test direct loading from a v14 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V14)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v15(self):
+        """Test direct loading from a v15 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V15)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v16(self):
+        """Test direct loading from a v16 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V16)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v17(self):
+        """Test direct loading from a v17 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V17)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
 
@@ -1995,10 +2413,10 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name):
             return {
                 'classifier_model_id': None,
-                'content': [{
-                    'type': 'text',
-                    'value': content_str,
-                }],
+                'content': {
+                    'audio_translations': {},
+                    'html': content_str,
+                },
                 'interaction': {
                     'answer_groups': [],
                     'confirmed_unclassified_answers': [],
@@ -2008,8 +2426,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'feedback': [],
                         'param_changes': [],
                     },
-                    'fallbacks': [],
+                    'hints': [],
                     'id': None,
+                    'solution': None,
                 },
                 'param_changes': [],
             }
@@ -2026,15 +2445,58 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'param_specs': {},
-            'skin_customizations': (
-                exp_domain.SkinInstance._get_default_skin_customizations()  # pylint: disable=protected-access
-            ),
             'language_code': 'en',
         })
 
 
 class StateOperationsUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
+
+    def test_can_undergo_classification(self):
+        """Test the can_undergo_classification() function."""
+        exploration_id = 'eid'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            assets_list)
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        state_with_training_data = exploration.states['Home']
+        state_without_training_data = exploration.states['End']
+
+        # A state with 786 training examples.
+        self.assertTrue(
+            state_with_training_data.can_undergo_classification())
+
+        # A state with no training examples.
+        self.assertFalse(
+            state_without_training_data.can_undergo_classification())
+
+    def test_get_training_data(self):
+        """Test retrieval of training data."""
+        exploration_id = 'eid'
+        test_exp_filepath = os.path.join(
+            feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            assets_list)
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        state = exploration.states['text']
+
+        expected_training_data = [{
+            'answer_group_index': 1,
+            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
+                        u'overjoyed', u'pleased', u'thrilled', u'smile']}]
+
+        observed_training_data = state.get_training_data()
+
+        self.assertEqual(observed_training_data, expected_training_data)
 
     def test_delete_state(self):
         """Test deletion of states."""
@@ -2133,242 +2595,3 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         # Should be able to successfully delete it
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
-
-
-class GadgetOperationsUnitTests(test_utils.GenericTestBase):
-    """Test methods operating on gadgets."""
-
-    def test_gadget_operations(self):
-        """Test deletion of gadgets."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')
-
-        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            exploration.add_gadget(TEST_GADGET_DICT, 'bottom')
-
-            self.assertEqual(exploration.skin_instance.panel_contents_dict[
-                'bottom'][0].type, TEST_GADGET_DICT['gadget_type'])
-            self.assertEqual(exploration.skin_instance.panel_contents_dict[
-                'bottom'][0].name, TEST_GADGET_DICT['gadget_name'])
-
-            with self.assertRaisesRegexp(
-                ValueError, 'Gadget NotARealGadget does not exist.'
-                ):
-                exploration.rename_gadget('NotARealGadget', 'ANewName')
-
-            exploration.rename_gadget(
-                TEST_GADGET_DICT['gadget_name'], 'ANewName')
-            self.assertEqual(exploration.skin_instance.panel_contents_dict[
-                'bottom'][0].name, 'ANewName')
-
-            # Add another gadget.
-            with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-                exploration.add_gadget(TEST_GADGET_DICT, 'bottom')
-
-            self.assertEqual(
-                exploration.get_all_gadget_names(),
-                ['ANewName', 'ATestGadget']
-            )
-
-            with self.assertRaisesRegexp(
-                ValueError, 'Duplicate gadget name: ANewName'
-                ):
-                exploration.rename_gadget('ATestGadget', 'ANewName')
-
-            gadget_instance = exploration.get_gadget_instance_by_name(
-                'ANewName')
-            self.assertIs(
-                exploration.skin_instance.panel_contents_dict['bottom'][0],
-                gadget_instance
-            )
-
-            panel = exploration._get_panel_for_gadget('ANewName')  # pylint: disable=protected-access
-            self.assertEqual(panel, 'bottom')
-
-            exploration.delete_gadget('ANewName')
-            exploration.delete_gadget('ATestGadget')
-            self.assertEqual(exploration.skin_instance.panel_contents_dict[
-                'bottom'], [])
-            with self.assertRaisesRegexp(
-                ValueError, 'Gadget ANewName does not exist.'
-                ):
-                exploration.delete_gadget('ANewName')
-
-
-class SkinInstanceUnitTests(test_utils.GenericTestBase):
-    """Test methods for SkinInstance."""
-
-    _SAMPLE_SKIN_INSTANCE_DICT = {
-        'skin_id': 'conversation_v1',
-        'skin_customizations': {
-            'panels_contents': {
-                'bottom': [
-                    {
-                        'customization_args': TEST_GADGET_CUSTOMIZATION_ARGS,
-                        'gadget_type': 'TestGadget',
-                        'gadget_name': 'ATestGadget',
-                        'visible_in_states': ['New state', 'Second state']
-                    }
-                ]
-            }
-        }
-    }
-
-    def test_get_state_names_required_by_gadgets(self):
-        """Test accurate computation of state_names_required_by_gadgets."""
-        skin_instance = exp_domain.SkinInstance(
-            'conversation_v1',
-            self._SAMPLE_SKIN_INSTANCE_DICT['skin_customizations'])
-        self.assertEqual(
-            skin_instance.get_state_names_required_by_gadgets(),
-            ['New state', 'Second state'])
-
-    def test_generation_of_get_default_skin_customizations(self):
-        """Tests that default skin customizations are created properly."""
-        skin_instance = exp_domain.SkinInstance(feconf.DEFAULT_SKIN_ID, None)
-        self.assertEqual(
-            skin_instance.panel_contents_dict,
-            {'bottom': []}
-        )
-
-    def test_conversion_of_skin_to_and_from_dict(self):
-        """Tests conversion of SkinInstance to and from dict representations."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        skin_instance = exploration.skin_instance
-
-        skin_instance_as_dict = skin_instance.to_dict()
-
-        self.assertEqual(
-            skin_instance_as_dict,
-            self._SAMPLE_SKIN_INSTANCE_DICT)
-
-        skin_instance_as_instance = exp_domain.SkinInstance.from_dict(
-            skin_instance_as_dict)
-
-        self.assertEqual(skin_instance_as_instance.skin_id, 'conversation_v1')
-        self.assertEqual(
-            sorted(skin_instance_as_instance.panel_contents_dict.keys()),
-            ['bottom'])
-
-
-class GadgetInstanceUnitTests(test_utils.GenericTestBase):
-    """Tests methods instantiating and validating GadgetInstances."""
-
-    def test_gadget_instantiation(self):
-        """Test instantiation of GadgetInstances."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-
-        self.assertEqual(len(exploration.skin_instance.panel_contents_dict[
-            'bottom']), 1)
-
-    def test_gadget_instance_properties(self):
-        """Test accurate representation of gadget properties."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        panel_contents_dict = exploration.skin_instance.panel_contents_dict
-
-        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            test_gadget_instance = panel_contents_dict['bottom'][0]
-
-        self.assertEqual(test_gadget_instance.height, 50)
-        self.assertEqual(test_gadget_instance.width, 60)
-        self.assertIn('New state', test_gadget_instance.visible_in_states)
-
-    def test_gadget_instance_validation(self):
-        """Test validation of GadgetInstance."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        panel_contents_dict = exploration.skin_instance.panel_contents_dict
-
-        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            test_gadget_instance = panel_contents_dict['bottom'][0]
-
-        # Validation against sample YAML should pass without error.
-        exploration.validate()
-
-        # Assert size exceeded error triggers when a gadget's size exceeds
-        # a panel's capacity.
-        with self.swap(
-            test_gadget_instance.gadget,
-            'width_px',
-            4600):
-
-            self._assert_validation_error(
-                exploration,
-                'Width 4600 of panel \'bottom\' exceeds limit of 350')
-
-        # Assert internal validation against CustomizationArgSpecs.
-        test_gadget_instance.customization_args[
-            'adviceObjects']['value'].extend(
-                [
-                    {'adviceTitle': 'test_title', 'adviceHtml': 'test html'},
-                    {'adviceTitle': 'another_title', 'adviceHtml': 'more html'},
-                    {'adviceTitle': 'third_title', 'adviceHtml': 'third html'}
-                ]
-            )
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'TestGadget is limited to 3 tips, found 4.'
-            ):
-            test_gadget_instance.validate()
-        test_gadget_instance.customization_args[
-            'adviceObjects']['value'].pop()
-
-        # Assert that too many gadgets in a panel raise a ValidationError.
-        panel_contents_dict['bottom'].append(test_gadget_instance)
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            '\'bottom\' panel expected at most 1 gadget, but 2 gadgets are '
-            'visible in state \'New state\'.'
-            ):
-            exploration.validate()
-
-        # Assert that an error is raised when a gadget is not visible in any
-        # states.
-        test_gadget_instance.visible_in_states = []
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'TestGadget gadget not visible in any states.'):
-            test_gadget_instance.validate()
-
-    def test_conversion_of_gadget_instance_to_and_from_dict(self):
-        """Test conversion of GadgetInstance to and from dict. """
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        panel_contents_dict = exploration.skin_instance.panel_contents_dict
-        test_gadget_instance = panel_contents_dict['bottom'][0]
-
-        test_gadget_as_dict = test_gadget_instance.to_dict()
-
-        self.assertEqual(
-            test_gadget_as_dict,
-            {
-                'gadget_type': 'TestGadget',
-                'gadget_name': 'ATestGadget',
-                'visible_in_states': ['New state', 'Second state'],
-                'customization_args': TEST_GADGET_CUSTOMIZATION_ARGS
-            }
-        )
-
-        test_gadget_as_instance = exp_domain.GadgetInstance.from_dict(
-            test_gadget_as_dict)
-
-        self.assertEqual(test_gadget_as_instance.width, 60)
-        self.assertEqual(test_gadget_as_instance.height, 50)
-
-
-class GadgetVisibilityInStatesUnitTests(test_utils.GenericTestBase):
-    """Tests methods affecting gadget visibility in states."""
-
-    def test_retrieving_affected_gadgets(self):
-        """Test that appropriate gadgets are retrieved."""
-
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-
-        affected_gadget_instances = (
-            exploration._get_gadget_instances_visible_in_state('Second state'))  # pylint: disable=protected-access
-
-        self.assertEqual(len(affected_gadget_instances), 1)
-        self.assertEqual(affected_gadget_instances[0].name, 'ATestGadget')

@@ -25,23 +25,118 @@ DELETED_FIELD = 'deleted'
 FIELDS_NOT_REQUIRED = [CREATED_ON_FIELD, LAST_UPDATED_FIELD, DELETED_FIELD]
 
 
+class FeedbackThreadModelTest(test_utils.GenericTestBase):
+    """Tests for the FeedbackThreadModel class."""
+
+    def test_put_function(self):
+        feedback_thread_model = feedback_models.FeedbackThreadModel(
+            exploration_id='exp_id_1')
+        feedback_thread_model.put()
+
+        last_updated = feedback_thread_model.last_updated
+
+        # If we do not wish to update the last_updated time, we should set
+        # the update_last_updated_time argument to False in the put function.
+        feedback_thread_model.put(update_last_updated_time=False)
+        self.assertEqual(feedback_thread_model.last_updated, last_updated)
+
+        # If we do wish to change it however, we can simply use the put function
+        # as the default value of update_last_updated_time is True.
+        feedback_thread_model.put()
+        self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
+
+    def test_get_exploration_and_thread_ids(self):
+        # Generate some full thread ids.
+        full_thread_id_1 = (
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                'exp_id_1', 'thread_id_1'))
+        full_thread_id_2 = (
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                'exp_id_2', 'thread_id_2'))
+
+        exploration_ids, thread_ids = (
+            feedback_models.FeedbackThreadModel.get_exploration_and_thread_ids(
+                [full_thread_id_1, full_thread_id_2]))
+
+        self.assertEqual(exploration_ids, ('exp_id_1', 'exp_id_2'))
+        self.assertEqual(thread_ids, ('thread_id_1', 'thread_id_2'))
+
+
+class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
+    """Tests for the FeedbackThreadUserModel class."""
+
+    def test_create_new_object(self):
+        feedback_models.FeedbackThreadUserModel.create(
+            'user_id', 'exp_id', 'thread_id')
+        feedback_thread_user_model = (
+            feedback_models.FeedbackThreadUserModel.get(
+                'user_id', 'exp_id', 'thread_id'))
+
+        self.assertEqual(
+            feedback_thread_user_model.id, 'user_id.exp_id.thread_id')
+        self.assertEqual(
+            feedback_thread_user_model.message_ids_read_by_user, [])
+
+    def test_get_object(self):
+        feedback_models.FeedbackThreadUserModel.create(
+            'user_id', 'exp_id', 'thread_id')
+        expected_model = feedback_models.FeedbackThreadUserModel(
+            id='user_id.exp_id.thread_id',
+            message_ids_read_by_user=[])
+
+        actual_model = (
+            feedback_models.FeedbackThreadUserModel.get(
+                'user_id', 'exp_id', 'thread_id'))
+
+        self.assertEqual(actual_model.id, expected_model.id)
+        self.assertEqual(
+            actual_model.message_ids_read_by_user,
+            expected_model.message_ids_read_by_user)
+
+    def test_get_multi(self):
+        feedback_models.FeedbackThreadUserModel.create(
+            'user_id', 'exp_id', 'thread_id_1')
+        feedback_models.FeedbackThreadUserModel.create(
+            'user_id', 'exp_id', 'thread_id_2')
+
+        expected_model_1 = feedback_models.FeedbackThreadUserModel(
+            id='user_id.exp_id.thread_id_1',
+            message_ids_read_by_user=[])
+        expected_model_2 = feedback_models.FeedbackThreadUserModel(
+            id='user_id.exp_id.thread_id_2',
+            message_ids_read_by_user=[])
+
+        actual_models = feedback_models.FeedbackThreadUserModel.get_multi(
+            'user_id', ['exp_id', 'exp_id'], ['thread_id_1', 'thread_id_2'])
+
+        actual_model_1 = actual_models[0]
+        actual_model_2 = actual_models[1]
+
+        self.assertEqual(actual_model_1.id, expected_model_1.id)
+        self.assertEqual(
+            actual_model_1.message_ids_read_by_user,
+            expected_model_1.message_ids_read_by_user)
+
+        self.assertEqual(actual_model_2.id, expected_model_2.id)
+        self.assertEqual(
+            actual_model_2.message_ids_read_by_user,
+            expected_model_2.message_ids_read_by_user)
+
+
 class SuggestionModelTest(test_utils.GenericTestBase):
     """Tests the SuggestionModel class."""
 
     def setUp(self):
         super(SuggestionModelTest, self).setUp()
-        feedback_models.SuggestionModel.create('exp_id1', 'thread_id1',
-                                               'author_id', 1, 'state_name',
-                                               'description',
-                                               {'old_content': {}})
-        feedback_models.SuggestionModel.create('exp_id1', 'thread_id2',
-                                               'author_id', 1, 'state_name',
-                                               'description',
-                                               {'old_content': {}})
-        feedback_models.SuggestionModel.create('exp_id2', 'thread_id2',
-                                               'author_id', 1, 'state_name',
-                                               'description',
-                                               {'old_content': {}})
+        feedback_models.SuggestionModel.create(
+            'exp_id1', 'thread_id1', 'author_id', 1, 'state_name',
+            'description', 'suggestion_text')
+        feedback_models.SuggestionModel.create(
+            'exp_id1', 'thread_id2', 'author_id', 1, 'state_name',
+            'description', 'suggestion_text')
+        feedback_models.SuggestionModel.create(
+            'exp_id2', 'thread_id2', 'author_id', 1, 'state_name',
+            'description', 'suggestion_text')
 
     def _get_suggestion_models_for_test(self, suggestions_list):
         """Removes fields that are set to default values in the base model and
@@ -57,10 +152,9 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         return updated_suggestions_list
 
     def test_create_new_object_runs_successfully(self):
-        feedback_models.SuggestionModel.create('exp_id3', 'thread_id2',
-                                               'author_id', 1, 'state_name',
-                                               'description',
-                                               {'old_content': {}})
+        feedback_models.SuggestionModel.create(
+            'exp_id3', 'thread_id2', 'author_id', 1, 'state_name',
+            'description', 'suggestion_text')
         suggestion = (
             feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
                 'exp_id3', 'thread_id2'))
@@ -70,17 +164,18 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.exploration_version, 1)
         self.assertEqual(suggestion.state_name, 'state_name')
         self.assertEqual(suggestion.description, 'description')
-        self.assertEqual(suggestion.state_content, {'old_content': {}})
+        self.assertEqual(suggestion.state_content, {
+            'type': 'text',
+            'value': 'suggestion_text',
+        })
 
     def test_create_suggestion_fails_if_thread_already_has_suggestion(self):
         with self.assertRaisesRegexp(Exception, 'There is already a feedback '
                                      'thread with the given thread id: '
                                      'exp_id1.thread_id1'):
-            feedback_models.SuggestionModel.create('exp_id1',
-                                                   'thread_id1', 'author_id', 1,
-                                                   'state_name',
-                                                   'description',
-                                                   {'old_content': {}})
+            feedback_models.SuggestionModel.create(
+                'exp_id1', 'thread_id1', 'author_id', 1, 'state_name',
+                'description', 'suggestion_text')
 
     def test_get_by_exploration_and_thread_id_suggestion_present(self):
         actual_suggestion = [(
@@ -93,7 +188,11 @@ class SuggestionModelTest(test_utils.GenericTestBase):
             exploration_version=1,
             state_name='state_name',
             description='description',
-            state_content={'old_content': {}})]
+            state_content={
+                'type': 'text',
+                'value': 'suggestion_text'
+            }
+        )]
 
         self.assertEqual(len(self._get_suggestion_models_for_test(
             actual_suggestion)), 1)
@@ -107,6 +206,12 @@ class SuggestionModelTest(test_utils.GenericTestBase):
                 'invalid_exp_id', 'thread_id1'))
 
         self.assertIsNone(actual_suggestion)
+
+    def test_get_suggestion_html(self):
+        suggestion = (
+            feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+                'exp_id2', 'thread_id2'))
+        self.assertEqual(suggestion.get_suggestion_html(), 'suggestion_text')
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):

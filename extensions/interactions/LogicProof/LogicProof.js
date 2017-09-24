@@ -13,7 +13,7 @@
 // limitations under the License.
 
 oppia.directive('oppiaInteractiveLogicProof', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {
@@ -23,7 +23,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
       controller: [
         '$scope', '$attrs', '$modal', 'logicProofRulesService',
         function($scope, $attrs, $modal, logicProofRulesService) {
-          $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj(
+          $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
             $attrs.questionWithValue);
 
           // This is the information about how to mark a question (e.g. the
@@ -51,22 +51,25 @@ oppia.directive('oppiaInteractiveLogicProof', [
             ['variable', 'constant', 'prefix_function']
           );
 
-          var operators = $scope.typing[0].operators;
+          $scope.questionData.language.operators = $scope.typing[0].operators;
 
           if ($scope.questionData.assumptions.length <= 1) {
             $scope.assumptionsString = logicProofShared.displayExpressionArray(
-              $scope.questionData.assumptions, operators);
+              $scope.questionData.assumptions,
+              $scope.questionData.language.operators);
           } else {
             $scope.assumptionsString = logicProofShared.displayExpressionArray(
               $scope.questionData.assumptions.slice(
                 0, $scope.questionData.assumptions.length - 1
-              ), operators
+              ), $scope.questionData.language.operators
             ) + ' and ' + logicProofShared.displayExpression(
               $scope.questionData.assumptions[
-                $scope.questionData.assumptions.length - 1], operators);
+                $scope.questionData.assumptions.length - 1],
+                $scope.questionData.language.operators);
           }
           $scope.targetString = logicProofShared.displayExpression(
-            $scope.questionData.results[0], operators);
+            $scope.questionData.results[0],
+            $scope.questionData.language.operators);
           $scope.questionString = (
             $scope.assumptionsString === '' ?
             'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_NO_ASSUMPTION' :
@@ -257,26 +260,26 @@ oppia.directive('oppiaInteractiveLogicProof', [
 ]);
 
 oppia.directive('oppiaResponseLogicProof', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/LogicProof',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }
 ]);
 
 oppia.directive('oppiaShortResponseLogicProof', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/LogicProof',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }

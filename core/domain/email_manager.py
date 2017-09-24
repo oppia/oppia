@@ -32,6 +32,7 @@ app_identity_services = models.Registry.import_app_identity_services()
 email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
+
 # Stub for logging.error(), so that it can be swapped out in tests.
 def log_new_error(*args, **kwargs):
     logging.error(*args, **kwargs)
@@ -107,13 +108,6 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
 
-PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
-    'publicize_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
-    'Default content for the email sent after an exploration is publicized by '
-    'a moderator. These emails are only sent if the functionality is enabled '
-    'in feconf.py. Leave this field blank if emails should not be sent.',
-    'Congratulations, your exploration has been featured in the Oppia '
-    'library!')
 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
     'Default content for the email sent after an exploration is unpublished '
@@ -125,10 +119,8 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
 
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION: (
-        lambda x: rights_manager.Actor(x).is_moderator()),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-        lambda x: rights_manager.Actor(x).is_moderator()),
+        user_services.is_at_least_moderator),
     feconf.EMAIL_INTENT_DAILY_BATCH: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
@@ -141,30 +133,17 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_MARKETING: (
-        lambda x: rights_manager.Actor(x).is_admin()),
+    feconf.EMAIL_INTENT_MARKETING: user_services.is_admin,
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-        lambda x: rights_manager.Actor(x).is_moderator()),
+        user_services.is_at_least_moderator),
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_MARKETING: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value),
-    feconf.BULK_EMAIL_INTENT_TEST: (
-        lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value)
+    feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_TEST: user_services.is_admin
 }
 
 
@@ -430,8 +409,8 @@ def require_moderator_email_prereqs_are_satisfied():
 
 def send_moderator_action_email(
         sender_id, recipient_id, intent, exploration_title, email_body):
-    """Sends a email immediately following a moderator action (publicize,
-    unpublish, delete) to the given user.
+    """Sends a email immediately following a moderator action (unpublish,
+    delete) to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
     feconf.CAN_SEND_EMAILS is False).
@@ -624,7 +603,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         'You\'ve received %s new message%s on your Oppia explorations:<br>'
         '<ul>%s</ul>'
         'You can view and reply to your messages from your '
-        '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+        '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
         '<br>'
         '<br>Thanks, and happy teaching!<br>'
         '<br>'
@@ -842,7 +821,8 @@ def send_flag_exploration_email(
         exploration_title, report_text, exploration_id,
         EMAIL_FOOTER.value)
 
-    recipient_list = config_domain.MODERATOR_IDS.value
+    recipient_list = user_services.get_user_ids_by_role(
+        feconf.ROLE_ID_MODERATOR)
     for recipient_id in recipient_list:
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,

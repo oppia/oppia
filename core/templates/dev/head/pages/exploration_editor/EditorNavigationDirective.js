@@ -21,7 +21,8 @@ oppia.directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: 'inline/editor_navigation_directive',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', '$modal',
         'routerService', 'explorationRightsService',
@@ -49,6 +50,8 @@ oppia.directive('editorNavigation', [
               $scope.postTutorialHelpPopoverIsShown = false;
             }
           });
+
+          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
 
           $scope.showUserHelpModal = function() {
             var explorationId = explorationContextService.getExplorationId();

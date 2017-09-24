@@ -29,6 +29,7 @@ class PencilCodeEditor(base.BaseInteraction):
     instructions = 'Edit the code. Click \'Play\' to check it!'
     narrow_instructions = 'Show code editor'
     needs_summary = True
+    can_have_solution = True
 
     _customization_arg_specs = [{
         'name': 'initial_code',
@@ -41,5 +42,3 @@ class PencilCodeEditor(base.BaseInteraction):
         },
         'default_value': '# Add the initial code snippet here.'
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

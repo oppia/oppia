@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveVideo', [
-  '$sce', 'oppiaHtmlEscaper', function($sce, oppiaHtmlEscaper) {
+  '$sce', 'HtmlEscaperService', function($sce, HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -30,17 +30,18 @@ oppia.directive('oppiaNoninteractiveVideo', [
         'autoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
         function($scope, $attrs, explorationContextService, $element,
           autoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
-          var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue);
-          var end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
+          var start = (
+            HtmlEscaperService.escapedJsonToObj($attrs.startWithValue));
+          var end = HtmlEscaperService.escapedJsonToObj($attrs.endWithValue);
 
-          $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
+          $scope.videoId = HtmlEscaperService.escapedJsonToObj(
             $attrs.videoIdWithValue);
           $scope.timingParams = '&start=' + start + '&end=' + end;
           $scope.autoplaySuffix = '&autoplay=0';
 
           $timeout(function() {
             // Check whether creator wants to autoplay this video or not
-            var autoplayVal = oppiaHtmlEscaper.escapedJsonToObj(
+            var autoplayVal = HtmlEscaperService.escapedJsonToObj(
               $attrs.autoplayWithValue);
 
             // This code helps in visibility of video. It checks whether

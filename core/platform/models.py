@@ -21,9 +21,9 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'activity', 'base_model', 'classifier', 'collection', 'config', 'email',
-    'exploration', 'feedback', 'file', 'job', 'recommendations', 'statistics',
-    'user')
+    'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
+    'email', 'exploration', 'feedback', 'file', 'job', 'question',
+    'recommendations', 'statistics', 'user')
 
 
 class _Platform(object):
@@ -53,12 +53,15 @@ class _Gae(_Platform):
             if name == NAMES.activity:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
+            elif name == NAMES.audit:
+                from core.storage.audit import gae_models as audit_models
+                returned_models.append(audit_models)
             elif name == NAMES.base_model:
                 from core.storage.base_model import gae_models as base_models
                 returned_models.append(base_models)
             elif name == NAMES.classifier:
-                from core.storage.classifier import gae_models as classifier_models # pylint: disable=line-too-long
-                returned_models.append(classifier_models)
+                from core.storage.classifier import gae_models as classifier_data_models # pylint: disable=line-too-long
+                returned_models.append(classifier_data_models)
             elif name == NAMES.collection:
                 from core.storage.collection import gae_models as collection_models # pylint: disable=line-too-long
                 returned_models.append(collection_models)
@@ -80,6 +83,9 @@ class _Gae(_Platform):
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
+            elif name == NAMES.question:
+                from core.storage.question import gae_models as question_models
+                returned_models.append(question_models)
             elif name == NAMES.recommendations:
                 from core.storage.recommendations import gae_models as recommendations_models # pylint: disable=line-too-long
                 returned_models.append(recommendations_models)
@@ -113,6 +119,16 @@ class _Gae(_Platform):
         """
         from core.platform.users import gae_current_user_services
         return gae_current_user_services
+
+    @classmethod
+    def import_datastore_services(cls):
+        """Imports and returns gae_datastore_services module.
+
+        Returns:
+            module. The gae_datastore_services module.
+        """
+        from core.platform.datastore import gae_datastore_services
+        return gae_datastore_services
 
     @classmethod
     def import_app_identity_services(cls):
@@ -220,6 +236,15 @@ class Registry(object):
             module. The current_user_services module.
         """
         return cls._get().import_current_user_services()
+
+    @classmethod
+    def import_datastore_services(cls):
+        """Imports and returns datastore_services module.
+
+        Returns:
+            module. The datastore_services module.
+        """
+        return cls._get().import_datastore_services()
 
     @classmethod
     def import_transaction_services(cls):
