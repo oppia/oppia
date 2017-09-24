@@ -636,15 +636,17 @@ def check_can_delete_activity(user, activity_rights):
     """
     if activity_rights is None:
         return False
-    if (activity_rights.is_private() and
-            (role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in (
-                user.actions)) and
-            activity_rights.is_owner(user.user_id)):
+
+    if role_services.ACTION_DELETE_ANY_ACTIVITY in user.actions:
+        return True
+    elif (activity_rights.is_private() and
+          (role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions)
+          and activity_rights.is_owner(user.user_id)):
         return True
     elif (activity_rights.is_published() and
-          (role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY in (
-              user.actions))):
+          (role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY in user.actions)):
         return True
+
     return False
 
 
