@@ -5,7 +5,6 @@
                          activity-active="explorationIsCurrentlyHoveredOver">
 </learner-dashboard-icons>
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
-         ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"
          style="position: relative; z-index: 5;">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
@@ -27,7 +26,9 @@
         </div>
       </div>
     </div>
-    <div ng-if="!isPlaylistTile()" class="title-section-mask"></div>
+    <div ng-if="!isPlaylistTile()" class="title-section-mask"
+         ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)">
+    </div>
     <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>" class="summary-section">
       <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
         <[getObjective() | truncateAndCapitalize: 95]>
