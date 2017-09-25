@@ -2037,7 +2037,7 @@ oppia.factory('autosaveInfoModalsService', [
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
-            'save_validation_fail_modal.html'),
+            'save_validation_fail_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: [
@@ -2063,7 +2063,7 @@ oppia.factory('autosaveInfoModalsService', [
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
-            'save_version_mismatch_modal.html'),
+            'save_version_mismatch_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', function($scope) {
@@ -2096,8 +2096,7 @@ oppia.factory('autosaveInfoModalsService', [
       showLostChangesModal: function(lostChanges, explorationId) {
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'lost_changes_modal.html'),
+            '/pages/exploration_editor/lost_changes_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', '$modalInstance', function(
