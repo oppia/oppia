@@ -27,7 +27,7 @@ describe('Checkbox input checker service', function() {
       value: [
         '<p>Option 1</p>',
         '<p>Option 2</p>',
-        '<p>Op 3</p>'
+        '<p>Option 3</p>'
       ]
     }
   };
