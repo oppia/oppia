@@ -20,6 +20,7 @@
 
 import inspect
 
+from core.domain.email_manager import NOTIFICATION_EMAIL_LIST_SCHEMA
 from core.tests import test_utils
 import schema_utils
 
@@ -148,7 +149,6 @@ VALIDATOR_SPECS = {
             }
         },
         'is_uniquified': {},
-        'is_valid_email_list': {},
     },
     SCHEMA_TYPE_UNICODE: {
         'matches_regex': {
@@ -161,6 +161,7 @@ VALIDATOR_SPECS = {
         },
         'is_nonempty': {},
         'is_regex': {},
+        'is_valid_email': {},
     },
 }
 
@@ -568,4 +569,15 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             'unicodeListProp', 'intProp', 'dictProp'
         ], None, 123, 'abc']
 
+        self.check_normalization(schema, mappings, invalid_vals)
+
+    def test_notification_email_list_validator(self):
+        schema = NOTIFICATION_EMAIL_LIST_SCHEMA
+        valid_email_list = [u'user{}@oppia.com'.format(i) for i in xrange(0, 5)]
+        big_email_list = [u'user{}@oppia.com'.format(i) for i in xrange(0, 7)]
+        mappings = [
+            ([u'admin@oppia.com'], [u'admin@oppia.com']),
+            (valid_email_list, valid_email_list)]
+        invalid_vals = [[u'admin@oppia'], big_email_list,
+                        [u'admin@oppia.commmm'], [u'a@.com']]
         self.check_normalization(schema, mappings, invalid_vals)

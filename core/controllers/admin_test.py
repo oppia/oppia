@@ -16,7 +16,6 @@
 
 from core.controllers import admin
 from core.controllers import base
-from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
@@ -106,53 +105,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.testapp.get('/about')
         self.assertIn(new_config_value, response.body)
 
-    def test_add_notification_email_for_failed_tasks(self):
-        """ Test if admin is able to correctly change notification emails
-        for failing tasks
-        """
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.testapp.get('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-
-        response_dict = self.get_json('/adminhandler')
-        response_config_properties = response_dict['config_properties']
-
-        notification_emails_for_failed_tasks = (
-            email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name)
-
-        self.assertDictContainsSubset({
-            'value': ['moderator@example.com'],
-        }, response_config_properties[notification_emails_for_failed_tasks])
-
-        # check for some valid emails
-        valid_emails = ([u'admin@oppia.com'],
-                        [u'user{}@oppia.com'.format(i) for i in xrange(0, 5)])
-        for emails in valid_emails:
-            payload = {
-                'action': 'save_config_properties',
-                'new_config_property_values': {
-                    notification_emails_for_failed_tasks:
-                        emails
-                }
-            }
-            self.post_json('/adminhandler', payload, csrf_token)
-
-        # check against some invalid emails
-        invalid_emails = ([u'adminoppia.com'],
-                          [u'user{}@oppia.com'.format(i) for i in xrange(0, 6)])
-
-        for emails in invalid_emails:
-            payload = {
-                'action': 'save_config_properties',
-                'new_config_property_values': {
-                    email_manager.NOTIFICATION_EMAILS_FOR_FAILED_TASKS.name:
-                        emails
-                }
-            }
-            with self.assertRaisesRegexp(Exception, 'Validation failed.'):
-                self.post_json('/adminhandler', payload, csrf_token)
-
-        self.logout()
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """ Test the conditions for generation of dummy explorations."""

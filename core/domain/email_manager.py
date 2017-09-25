@@ -40,13 +40,14 @@ def log_new_error(*args, **kwargs):
 NOTIFICATION_EMAIL_LIST_SCHEMA = {
     'type': 'list',
     'items': {
-        'type': 'unicode'
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_email',
+        }]
     },
     'validators': [{
         'id': 'has_length_at_most',
         'max_value': 5
-    }, {
-        'id': 'is_valid_email_list',
     }, {
         'id': 'is_uniquified',
     }]
@@ -134,8 +135,8 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
 NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
     'notification_emails_for_failed_tasks',
     NOTIFICATION_EMAIL_LIST_SCHEMA,
-    'Email(s) to notify if a training task fails',
-    ['moderator@example.com']
+    'Email(s) to notify if an ML training task fails',
+    []
 )
 
 SENDER_VALIDATORS = {

@@ -25,6 +25,7 @@ following Python types: bool, dict, float, int, list, unicode.
 """
 
 import numbers
+import re
 import urllib
 import urlparse
 
@@ -267,10 +268,7 @@ class _Validators(object):
         raise NotImplementedError
 
     @staticmethod
-    def is_valid_email_list(obj):
-        """Ensures that `obj` (a list of strings) is a valid list of emails"""
-        def is_valid_email(email):
-            return '@' in email and not email.startswith('@') and \
-                   not email.endswith('@')
+    def is_valid_email(obj):
+        """Ensures that `obj` (a string) is a valid email."""
+        return bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", obj))
 
-        return all([is_valid_email(email) for email in obj])
