@@ -32,7 +32,8 @@
   <md-button md-theme="primary" class="md-raised correct-answer-option"
           ng-repeat="choice in getChoices() track by $index"
           ng-click="toggleCorrectAnswer(choice)"
-          ng-class="{'correct-answer-option-selected': isCorrectAnswer(choice)}">
+          ng-class="{'correct-answer-option-selected': isCorrectAnswer(choice)}"
+          aria-label="<[choice]>">
     <div class="correct-answer-content-container">
       <span angular-html-bind="choice"></span>
     </div>
