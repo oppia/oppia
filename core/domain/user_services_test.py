@@ -367,6 +367,24 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.ROLE_ID_BANNED_USER)),
             set(['test3', 'test4']))
 
+    def test_update_user_creator_dashboard_display(self):
+        user_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_services.create_new_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        user_setting = user_services.get_user_settings(user_id)
+        self.assertEqual(user_setting.creator_dashboard_display,
+                         feconf.CREATOR_DASHBOARD_DISPLAY_PREF_CARD)
+
+        user_services.update_user_creator_dashboard_display(
+            user_id, feconf.CREATOR_DASHBOARD_DISPLAY_PREF_LIST)
+        user_setting = user_services.get_user_settings(user_id)
+        self.assertEqual(user_setting.creator_dashboard_display,
+                         feconf.CREATOR_DASHBOARD_DISPLAY_PREF_LIST)
+
     def test_update_user_role(self):
         user_id = 'test_id'
         username = 'testname'
