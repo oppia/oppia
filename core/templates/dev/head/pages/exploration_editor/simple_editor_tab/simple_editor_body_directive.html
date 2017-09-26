@@ -13,7 +13,7 @@
                        placeholder="Type an introduction.">
     </editor-html-field>
 
-    <div ng-repeat="question in data.questionList.getQuestions() track by $index">
+    <div ng-repeat="question in data.questionList.getQuestions() track by $index" class="interaction-container">
       <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
       <div class="dropdown">
         <anchor-header header-id="getSubfieldId(question, getHumanReadableQuestionType(question.getInteractionId()))"
@@ -141,7 +141,9 @@
     text-align: center;
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
   }
-
+  simple-editor-body .content [class~='interaction-container']:last-of-type {
+    margin-bottom: 420px;
+  }
   .oppia-choose-question-dropdown {
     background: transparent;
     padding: 0;
