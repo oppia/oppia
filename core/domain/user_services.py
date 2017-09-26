@@ -81,7 +81,7 @@ class UserSettings(object):
             last_edited_an_exploration=None, profile_picture_data_url=None,
             default_dashboard=None,
             creator_dashboard_display=(
-            feconf.CREATOR_DASHBOARD_DISPLAY_PREF_CARD), user_bio='',
+                feconf.CREATOR_DASHBOARD_DISPLAY_PREF_CARD), user_bio='',
             subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
             preferred_audio_language_code=None):
