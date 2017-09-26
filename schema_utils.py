@@ -25,6 +25,7 @@ following Python types: bool, dict, float, int, list, unicode.
 """
 
 import numbers
+import re
 import urllib
 import urlparse
 
@@ -265,3 +266,8 @@ class _Validators(object):
     def matches_regex(obj, regex):
         """Ensures that `obj` (a string) matches the given regex."""
         raise NotImplementedError
+
+    @staticmethod
+    def is_valid_email(obj):
+        """Ensures that `obj` (a string) is a valid email."""
+        return bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", obj))
