@@ -20,7 +20,7 @@
 
 import inspect
 
-from core.domain.email_manager import NOTIFICATION_EMAIL_LIST_SCHEMA
+from core.domain import email_manager
 from core.tests import test_utils
 import schema_utils
 
@@ -572,7 +572,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(schema, mappings, invalid_vals)
 
     def test_notification_email_list_validator(self):
-        schema = NOTIFICATION_EMAIL_LIST_SCHEMA
+        schema = email_manager.NOTIFICATION_EMAIL_LIST_SCHEMA
         valid_email_list = [u'user{}@oppia.com'.format(i) for i in xrange(0, 5)]
         big_email_list = [u'user{}@oppia.com'.format(i) for i in xrange(0, 7)]
         mappings = [
