@@ -254,4 +254,4 @@ class Question(object):
         user_skills = collection_services.get_acquired_skills_of_user(user_id)
         #Returns True if questions_skills are present in user_skills
         #else returns false.
-        return set(question_skills) < set(user_skills):
+        return set(question_skills) < set(user_skills)
