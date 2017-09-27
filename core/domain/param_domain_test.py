@@ -27,7 +27,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     def test_param_spec_validation(self):
         """Test validation of param specs."""
         param_spec = param_domain.ParamSpec('FakeType')
-        with self.assertRaisesRegexp(TypeError, 'is not a valid object class.'):
+        with self.assertRaisesRegexp(TypeError, 'is not a valid object class'):
             param_spec.validate()
 
         param_spec.obj_type = 'Real'
