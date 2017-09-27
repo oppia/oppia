@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of ParamSpec
+ * @fileoverview Factory for creating new frontend instances of ParamType
  * domain objects.
  */
 
