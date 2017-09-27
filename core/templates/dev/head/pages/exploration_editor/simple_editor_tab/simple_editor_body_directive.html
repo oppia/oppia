@@ -38,14 +38,14 @@
       </multiple-choice-editor>
 
       <text-editor ng-if="question.getInteractionId() === 'TextInput'"
-                        unique-id="question.getId()"
-                        customization-args="question.getInteractionCustomizationArgs()"
-                        answer-groups="question.getAnswerGroups()"
-                        default-outcome="question.getDefaultOutcome()"
-                        save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
-                        save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
-                        save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
-                        add-state="addState()">
+                   unique-id="question.getId()"
+                   customization-args="question.getInteractionCustomizationArgs()"
+                   answer-groups="question.getAnswerGroups()"
+                   default-outcome="question.getDefaultOutcome()"
+                   save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
+                   save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
+                   save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
+                   add-state="addState()">
       </text-editor>
 
       <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
