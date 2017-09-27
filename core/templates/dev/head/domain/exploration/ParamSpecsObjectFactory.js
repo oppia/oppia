@@ -28,7 +28,7 @@ oppia.factory('ParamSpecsObjectFactory', [
      */
     var ParamSpecs = function(paramDict) {
       /** @member {Object.<String, ParamSpec>} */
-      this.paramDict = paramDict;
+      this._paramDict = paramDict;
     };
 
     /**
@@ -36,19 +36,19 @@ oppia.factory('ParamSpecsObjectFactory', [
      * @returns {ParamSpec} - associated to given parameter name.
      */
     ParamSpecs.prototype.getParamSpec = function(paramName) {
-      return this.paramDict[paramName];
+      return this._paramDict[paramName];
     };
 
     /**
      * @returns {Object.<String, ParamSpec>} - the map of params to their specs.
      */
     ParamSpecs.prototype.getParamDict = function() {
-      return this.paramDict;
+      return this._paramDict;
     };
 
     /** @returns {Array.<String>} - The names of the current parameter specs. */
     ParamSpecs.prototype.getParamNames = function() {
-      return Object.keys(this.paramDict);
+      return Object.keys(this._paramDict);
     };
 
     /**
@@ -60,8 +60,8 @@ oppia.factory('ParamSpecsObjectFactory', [
      * @returns {Boolean} - True when the parameter was newly added.
      */
     ParamSpecs.prototype.addParamIfNew = function(paramName, paramSpec) {
-      if (!this.paramDict.hasOwnProperty(paramName)) {
-        this.paramDict[paramName] =
+      if (!this._paramDict.hasOwnProperty(paramName)) {
+        this._paramDict[paramName] =
           paramSpec || ParamSpecObjectFactory.createDefault();
         return true;
       }
