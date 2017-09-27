@@ -26,18 +26,18 @@ oppia.factory('ParamSpecObjectFactory', [
      */
     var ParamSpec = function(objType) {
       /** @member {ParamType} */
-      this.objType = objType;
+      this._objType = objType;
     };
 
     /** @returns {ParamType} - The type name of the parameter. */
     ParamSpec.prototype.getType = function() {
-      return this.objType;
+      return this._objType;
     };
 
     /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
     ParamSpec.prototype.toBackendDict = function() {
       return {
-        obj_type: this.objType.getName(),
+        obj_type: this._objType.getName(),
       };
     };
 
