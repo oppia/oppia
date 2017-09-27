@@ -37,7 +37,7 @@
                               add-state="addState()">
       </multiple-choice-editor>
 
-      <text-interaction ng-if="question.getInteractionId() === 'TextInput'"
+      <text-editor ng-if="question.getInteractionId() === 'TextInput'"
                         unique-id="question.getId()"
                         customization-args="question.getInteractionCustomizationArgs()"
                         answer-groups="question.getAnswerGroups()"
@@ -46,7 +46,7 @@
                         save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
                         save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
                         add-state="addState()">
-      </text-interaction>
+      </text-editor>
 
       <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
       <div ng-if="!$last" id="<[getSubfieldId(question, 'Bridge text')]>">
