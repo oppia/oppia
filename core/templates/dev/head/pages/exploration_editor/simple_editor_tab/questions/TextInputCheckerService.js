@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,12 +27,10 @@
      isValid: function(customizationArgs, answerGroups) {
        // Invariant to check:
        // - Answer group rule type is 'Contains'.
-       if(answerGroups[0]) {
+       // - There is only one answer group at index 0.
+       if (answerGroups.length === 1 && answerGroups[0]) {
          var rules = answerGroups[0].rules;
-         if(rules.length !== 1) {
-           return false;
-         }
-         if(rules[0].type !== 'Contains') {
+         if (rules.length !== 1 || rules[0].type !== 'Equals') {
            return false;
          }
        }

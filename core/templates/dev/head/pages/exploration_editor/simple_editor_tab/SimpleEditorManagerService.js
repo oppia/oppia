@@ -51,14 +51,14 @@ oppia.factory('SimpleEditorManagerService', [
       TextInput: {
         CUSTOMIZATION_ARGS:  {
           placeholder: {
-            value: 'replacethis'
+            value: 'Type your answer here'
           },
           rows: {
             value: 1
           }
         },
         FIRST_ANSWER_GROUP_RULE: {
-          type: 'Contains',
+          type: 'Equals',
           value: {
             x: 'replace'
           }
@@ -184,7 +184,6 @@ oppia.factory('SimpleEditorManagerService', [
           var questionCount = data.questionList.getQuestionCount();
           var doesLastQuestionHaveAnswerGroups = (
             data.questionList.doesLastQuestionHaveAnswerGroups());
-          console.log(newInteractionId);
           SimpleEditorShimService.saveInteractionId(
             currentStateName, newInteractionId);
           SimpleEditorShimService.saveCustomizationArgs(
