@@ -19,15 +19,15 @@ from core.domain import question_services
 import feconf
 
 class QuestionsBatchHandler(base.BaseHandler):
-	"""This handler completes requests for questions batch."""
+    """This handler completes requests for questions batch."""
 
-	def post(self, collection_id):
-		"""Handles post requests."""
-		skill_ids = self.payload.get('skill_ids')
-		user_id = self.payload.get('user_id')
-		question_play_counts = self.payload.get(
-								'question_play_counts')
-		batch_size = feconf.QUESTION_BATCH_SIZE
-		questions_batch = question_services.get_questions_batch(
-							collection_id, skill_ids, user_id, question_play_counts, batch_size)
-		return questions_batch
+    def post(self, collection_id):
+        """Handles post requests."""
+        skill_ids = self.payload.get('skill_ids')
+        user_id = self.payload.get('user_id')
+        question_play_counts = self.payload.get(
+                                'question_play_counts')
+        batch_size = feconf.QUESTION_BATCH_SIZE
+        questions_batch = question_services.get_questions_batch(
+                            collection_id, skill_ids, user_id, question_play_counts, batch_size)
+        return questions_batch
