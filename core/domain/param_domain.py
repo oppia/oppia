@@ -27,9 +27,6 @@ import utils
 class ParamSpec(object):
     """Value object for an exploration parameter specification."""
 
-    # TODO(bhenning): Expand parameter support in the editor to multiple types,
-    # then validate all changes and rule inputs to properly match the type of
-    # the parameter.
     SUPPORTED_OBJ_TYPES = {
         'UnicodeString',
     }
