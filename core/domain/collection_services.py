@@ -1284,3 +1284,24 @@ def index_collections_given_ids(collection_ids):
     search_services.index_collection_summaries([
         collection_summary for collection_summary in collection_summaries
         if collection_summary is not None])
+
+
+def get_acquired_skills_of_user(user_id):
+    """Returns the acquired skills of the user identified by user_id.
+
+    Returns:
+        A list of skill ids acquired by the user.
+    """
+    completed_activities_model = (
+        user_models.CompletedActivitiesModel.get(
+            user_id, strict=False))
+    collection_ids = completed_activities_model.collection_ids
+
+    acquired_skills = []
+    for collection_id in collection_ids:
+        completed_exploration_ids = get_completed_exploration_ids(
+        user_id, collection_id)
+        acquired_skills.append(
+            collection.get_acquired_skills_for_explorations(
+                completed_exploration_ids))
+    return acquired_skills

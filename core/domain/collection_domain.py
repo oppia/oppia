@@ -852,12 +852,8 @@ class Collection(object):
             list(str). A list of exploration IDs for which the prerequisite
             skills are satisfied.
         """
-        acquired_skill_ids = set()
-        for completed_exp_id in completed_exploration_ids:
-            collection_node = self.get_node(completed_exp_id)
-            if collection_node:
-                acquired_skill_ids.update(collection_node.acquired_skill_ids)
-
+        acquired_skill_ids = self.get_acquired_skills_from_explorations(
+                                completed_exploration_ids)
         next_exp_ids = []
         for node in self.nodes:
             if node.exploration_id in completed_exploration_ids:
@@ -1064,8 +1060,14 @@ class Collection(object):
         del self.nodes[node_index]
 
     def add_skill(self, skill_name):
-        """Adds the new skill domain object with the specified name."""
+        """Adds the new skill domain object with the specified name.
 
+        Args:
+            skill_name: str. The name of the skill.
+
+        Returns
+            Id of the new skill.
+        """
         for _, skill in self.skills.iteritems():
             if skill.name == skill_name:
                 raise ValueError(
@@ -1074,6 +1076,7 @@ class Collection(object):
         skill_id = CollectionSkill.get_skill_id_from_index(self.next_skill_id)
         self.skills[skill_id] = CollectionSkill(skill_id, skill_name, [])
         self.next_skill_id += 1
+        return skill_id
 
     def update_skill(self, skill_id, new_skill_name):
         """Renames skill with specified id to the new skill name."""
@@ -1101,6 +1104,20 @@ class Collection(object):
                 node.acquired_skill_ids.remove(skill_id)
 
         del self.skills[skill_id]
+
+    def get_acquired_skills_from_explorations(self, exploration_ids):
+        """Returns a list of skill ids acquired by completing the explorations
+        of the collection.
+
+        Returns:
+            A list of skill ids.
+        """
+        acquired_skill_ids = set()
+        for exp_id in exploration_ids:
+            collection_node = self.get_node(exp_id)
+            if collection_node:
+                acquired_skill_ids.update(collection_node.acquired_skill_ids)
+        return acquired_skill_ids
 
     def validate(self, strict=True):
         """Validates all properties of this collection and its constituents.

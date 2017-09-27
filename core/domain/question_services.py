@@ -18,6 +18,7 @@
 
 import logging
 
+from core.domain import collection_services
 from core.domain import question_domain
 from core.platform import models
 import feconf
@@ -201,3 +202,37 @@ def update_question(committer_id, question_id, change_list, commit_message):
     """
     question = apply_change_list(question_id, change_list)
     _save_question(committer_id, question, change_list, commit_message)
+
+
+def get_questions_batch(collection_id, skill_ids, user_id, question_play_counts, batch_size):
+    """Fetches a batch of questions.
+
+    Args:
+        collection_id: str. Id of the collection.
+        skill_ids: list(str). A list of skill ids.
+        user_id: str. Id of the user.
+        question_play_counts: dict. A dict mapping question ids to the number
+            of times it has been played in this question session.
+        batch_size: int. The intende number of questions to be returned.
+
+    Returns:
+        A list of Question objects.
+    """
+    user_skill_ids = collection_services.get_acquired_skills_of_user(user_id)
+    question_skill_ids = unique(list(set(user_skill_ids) & set(skill_ids)))
+
+    collection = collection_services.get_collection_by_id(collection_id)
+    question_ids = []
+    for skill_id in question_skill_ids:
+        if collection.skills[skill_id]:
+            question_ids.extend(collection.skills[skill_id].question_ids)
+    unique_question_ids = unique(question_ids)
+
+    if len(unique_question_ids) < batch_size:
+        batch_size = len(unique_question_ids)
+    random_question_ids = random.sample(unique_question_ids, batch_size)
+
+    questions_batch = []
+    for question_id in random_question_ids:
+        question_batch.append(get_question_by_id(question_id))
+    return questions_batch
