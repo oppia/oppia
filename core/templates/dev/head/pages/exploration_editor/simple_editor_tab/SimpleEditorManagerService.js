@@ -42,7 +42,7 @@ oppia.factory('SimpleEditorManagerService', [
           }
         },
         FIRST_ANSWER_GROUP_RULE: {
-          type: 'IsGreaterThan',
+          type: 'Equals',
           value: {
             x: 9.0
           }
