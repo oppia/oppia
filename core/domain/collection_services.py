@@ -1300,7 +1300,7 @@ def get_acquired_skills_of_user(user_id):
     acquired_skills = []
     for collection_id in collection_ids:
         completed_exploration_ids = get_completed_exploration_ids(
-        user_id, collection_id)
+            user_id, collection_id)
         acquired_skills.append(
             collection.get_acquired_skills_for_explorations(
                 completed_exploration_ids))

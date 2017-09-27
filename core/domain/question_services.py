@@ -17,6 +17,7 @@
 """Services for questions data model."""
 
 import logging
+import random
 
 from core.domain import collection_services
 from core.domain import question_domain
@@ -220,14 +221,14 @@ def get_questions_batch(
         A list of Question objects.
     """
     user_skill_ids = collection_services.get_acquired_skills_of_user(user_id)
-    question_skill_ids = unique(list(set(user_skill_ids) & set(skill_ids)))
+    question_skill_ids = list(set(user_skill_ids) & set(skill_ids))
 
     collection = collection_services.get_collection_by_id(collection_id)
     question_ids = []
     for skill_id in question_skill_ids:
         if collection.skills[skill_id]:
             question_ids.extend(collection.skills[skill_id].question_ids)
-    unique_question_ids = unique(question_ids)
+    unique_question_ids = list(set(question_ids))
 
     if len(unique_question_ids) < batch_size:
         batch_size = len(unique_question_ids)

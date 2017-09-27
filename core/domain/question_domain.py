@@ -234,7 +234,7 @@ class Question(object):
     def get_skills(self):
         """Fetches the skills associated with the question."""
         collection = collection_services.get_collection_by_id(
-                         self.collection_id)
+            self.collection_id)
         skills = collection.skills
 
         question_skills = []
@@ -243,7 +243,7 @@ class Question(object):
                 question_skills.append(skill)
         return question_skills
 
-    def can_user_answer_question(self):
+    def can_user_answer_question(self, user_id):
         """Verifies if the current user has the acquired
         skills to answer the question.
 
@@ -251,8 +251,7 @@ class Question(object):
             A boolean representing True or False.
         """
         question_skills = self.get_skills()
-        user_skills = collection_services.get_acquired_skills_of_user()
-        if set(question_skills) < set(user_skills):
-            return True
-        else:
-            return False
+        user_skills = collection_services.get_acquired_skills_of_user(user_id)
+        #Returns True if questions_skills are present in user_skills
+        #else returns false.
+        return set(question_skills) < set(user_skills):

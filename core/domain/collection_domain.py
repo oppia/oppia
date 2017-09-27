@@ -853,7 +853,7 @@ class Collection(object):
             skills are satisfied.
         """
         acquired_skill_ids = self.get_acquired_skills_from_explorations(
-                                completed_exploration_ids)
+            completed_exploration_ids)
         next_exp_ids = []
         for node in self.nodes:
             if node.exploration_id in completed_exploration_ids:
