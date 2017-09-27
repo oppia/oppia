@@ -254,5 +254,5 @@ class Question(object):
         user_skills = collection_services.get_acquired_skills_of_user()
         if set(question_skills) < set(user_skills):
             return True
-        else
+        else:
             return False

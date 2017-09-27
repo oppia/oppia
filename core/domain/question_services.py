@@ -204,7 +204,8 @@ def update_question(committer_id, question_id, change_list, commit_message):
     _save_question(committer_id, question, change_list, commit_message)
 
 
-def get_questions_batch(collection_id, skill_ids, user_id, question_play_counts, batch_size):
+def get_questions_batch(
+        collection_id, skill_ids, user_id, question_play_counts, batch_size):
     """Fetches a batch of questions.
 
     Args:
@@ -234,5 +235,6 @@ def get_questions_batch(collection_id, skill_ids, user_id, question_play_counts,
 
     questions_batch = []
     for question_id in random_question_ids:
-        question_batch.append(get_question_by_id(question_id))
+        questions_batch.append(get_question_by_id(question_id))
+        question_play_counts[question_id] += 1
     return questions_batch
