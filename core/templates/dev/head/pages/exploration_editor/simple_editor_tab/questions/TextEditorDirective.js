@@ -66,7 +66,7 @@ oppia.directive('textEditor', [
               if (newAnswerGroups.length === 0) {
                 var newStateName = $scope.addState();
                 newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-                RuleObjectFactory.createNew('Contains', {
+                RuleObjectFactory.createNew('Equals', {
                   x: newAnswer
                 })
                 ], OutcomeObjectFactory.createEmpty(newStateName), false));
