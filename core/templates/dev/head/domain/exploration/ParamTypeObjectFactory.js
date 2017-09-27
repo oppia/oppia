@@ -30,8 +30,8 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    *    is valid.
    * @param {?} defaultValue - simple value any parameter of this type can take.
    */
-  var ParamType = function(validateFunction, defaultValue) {
-    if (!validateFunction(defaultValue)) {
+  var ParamType = function(typeDefinitionObject) {
+    if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
         'The default value is invalid according to validation function');
     }
@@ -39,9 +39,9 @@ oppia.factory('ParamTypeObjectFactory', [function() {
     /** @member {String} */
     this.name = null;
     /** @member {Function.<?, Boolean>} */
-    this.validateFunction = validateFunction;
+    this.valueIsValid = typeDefinitionObject.validate;
     /** @member {?} */
-    this.defaultValue = defaultValue;
+    this.defaultValue = typeDefinitionObject.default_value;
   };
 
 
@@ -55,14 +55,6 @@ oppia.factory('ParamTypeObjectFactory', [function() {
   /** @returns {String} - The display-name of this type. */
   ParamType.prototype.getName = function() {
     return this.name;
-  };
-
-  /**
-   * @param {?} value - A value that should be of the correct type.
-   * @returns {Boolean} - Whether the value is valid for this type.
-   */
-  ParamType.prototype.validateValue = function(value) {
-    return this.validateFunction(value);
   };
 
 
@@ -91,10 +83,12 @@ oppia.factory('ParamTypeObjectFactory', [function() {
   /** @type {Object.<String, ParamType>} */
   ParamType.registry = {};
 
-  ParamType.registry.UnicodeString = new ParamType(function(value) {
-    // Valid only for string values.
-    return (typeof value === 'string' || value instanceof String);
-  }, '');
+  ParamType.registry.UnicodeString = new ParamType({
+    validate: function(value) {
+      return (typeof value === 'string' || value instanceof String);
+    },
+    default_value: '',
+  });
 
   // To finalize type registration, we encode the name of each type into their
   // definition, then freeze them from modifications.

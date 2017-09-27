@@ -38,8 +38,13 @@ describe('ParamType objects', function() {
   });
 
   it('should not allow invalid default values', function() {
-    expect(function() { new ParamType(function(v) { return v >= 0; }, -1); })
-      .toThrowError(/default value is invalid/);
+    expect(function() {
+      // Defines a "Natural Number" type but gives it a negative default value.
+      new ParamType({
+        validate: function(v) { return v >= 0; },
+        default_value: -1,
+      });
+    }).toThrowError(/default value is invalid/);
   });
 
   describe('UnicodeString', function() {
@@ -62,9 +67,9 @@ describe('ParamType objects', function() {
     });
 
     it('should be able to tell whether or not values are strings', function() {
-      expect(UnicodeString.validateValue('abc')).toBe(true);
-      expect(UnicodeString.validateValue(3)).toBe(false);
-      expect(UnicodeString.validateValue([1,2])).toBe(false);
+      expect(UnicodeString.valueIsValid('abc')).toBe(true);
+      expect(UnicodeString.valueIsValid(3)).toBe(false);
+      expect(UnicodeString.valueIsValid([1,2])).toBe(false);
     });
   });
 });
