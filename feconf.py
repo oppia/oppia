@@ -636,6 +636,9 @@ ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
+# Bool to enable update of analytics models.
+ENABLE_STATS = False
+
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
 OUTPUT_FORMAT_ZIP = 'zip'

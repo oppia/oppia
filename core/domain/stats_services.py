@@ -28,20 +28,22 @@ from core.platform import models
 # Counts contributions from all versions.
 VERSION_ALL = 'all'
 
-def handle_stats_creation_for_new_exploration(exploration):
+def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
     """Creates ExplorationStatsModel for the freshly created exploration and
     sets all initial values to zero.
 
     Args:
-        exploration: Exploration. The exploration domain object.
+        exp_id: str. ID of the exploration.
+        exp_version. int. Version of the exploration.
+        state_names: list(str). State names of the exploration.
     """
     state_stats_mapping = {
         state_name: stats_domain.StateStats.create_default()
-        for state_name in exploration.states
+        for state_name in state_names
     }
 
     exploration_stats = stats_domain.ExplorationStats(
-        exploration.id, exploration.version, 0, 0, state_stats_mapping)
+        exp_id, exp_version, 0, 0, state_stats_mapping)
     create_stats_model(exploration_stats)
 
 
@@ -60,29 +62,36 @@ def handle_stats_creation_for_new_exp_version(exploration, change_list):
     exploration_stats = get_exploration_stats_by_id(
         exploration.id, old_exp_version)
     if exploration_stats is None:
-        handle_stats_creation_for_new_exploration(exploration)
+        handle_stats_creation_for_new_exploration(
+            exploration.id, exploration.version, exploration.states)
         return
 
-    # This mapping from new state names to old ones account for circular
+    # This mapping from new state names to old ones accounts for circular
     # renames and multiple renames within a commit. We will use this mapping
     # to handle state renames in the statistics model.
     new_to_old_state_names = exploration.get_state_names_mapping(change_list)
+    old_state_names = new_to_old_state_names.values()
 
-    # Handling state renames.
-    for state_name in exploration.states:
-        if state_name not in new_to_old_state_names.values():
-            exploration_stats.state_stats_mapping[state_name] = (
-                exploration_stats.state_stats_mapping.pop(
-                    new_to_old_state_names[state_name]))
-
-    # Handling state additions and deletions.
+    # Handling state additions, deletions and renames.
     for change_dict in change_list:
         if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
-            exploration_stats.state_stats_mapping[change_dict['state_name']] = (
-                stats_domain.StateStats.create_default())
+            if change_dict['state_name'] in old_state_names:
+                exploration_stats.state_stats_mapping[change_dict[
+                    'state_name']] = stats_domain.StateStats.create_default()
 
         if change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
-            exploration_stats.state_stats_mapping.pop(change_dict['state_name'])
+            if change_dict['state_name'] in (
+                    exploration_stats.state_stats_mapping):
+                exploration_stats.state_stats_mapping.pop(change_dict[
+                    'state_name'])
+
+        if change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
+            if change_dict['new_state_name'] in new_to_old_state_names:
+                exploration_stats.state_stats_mapping[change_dict[
+                    'new_state_name']] = (
+                        exploration_stats.state_stats_mapping.pop(
+                            new_to_old_state_names[change_dict[
+                                'new_state_name']]))
 
     exploration_stats.exp_version = new_exp_version
 
@@ -161,13 +170,14 @@ def create_stats_model(exploration_stats):
     return instance_id
 
 # TODO(bhenning): Test.
-def get_visualizations_info(exploration, state_name):
+def get_visualizations_info(exp_id, state_name, interaction_id):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.
 
     Args:
-        exploration: Exploration. The exploration domain object.
+        exp_id: str. The ID of the exploration.
         state_name: str. Name of the state.
+        interaction_id: str. The interaction type.
 
     Returns:
         list(dict). Each item in the list is a dict with keys representing
@@ -180,11 +190,11 @@ def get_visualizations_info(exploration, state_name):
         'id': 'BarChart',
         'data': [{u'frequency': 1, u'answer': 0}]}]
     """
-    if exploration.states[state_name].interaction.id is None:
+    if interaction_id is None:
         return []
 
     visualizations = interaction_registry.Registry.get_interaction_by_id(
-        exploration.states[state_name].interaction.id).answer_visualizations
+        interaction_id).answer_visualizations
 
     calculation_ids = set([
         visualization.calculation_id for visualization in visualizations])
@@ -194,7 +204,7 @@ def get_visualizations_info(exploration, state_name):
         # This is None if the calculation job has not yet been run for this
         # state.
         calc_output_domain_object = get_calc_output(
-            exploration.id, state_name, calculation_id)
+            exp_id, state_name, calculation_id)
 
         # If the calculation job has not yet been run for this state, we simply
         # exclude the corresponding visualization results.
@@ -318,7 +328,7 @@ def get_calc_output(
         exploration_id, state_name, calculation_id,
         exploration_version=VERSION_ALL):
     """Get state answers calculation output domain object obtained from
-    StateAnswersCalcOutputModel instance stored in the data store.The
+    StateAnswersCalcOutputModel instance stored in the data store. The
     calculation ID comes from the name of the calculation class used to compute
     aggregate data from submitted user answers.
     If 'exploration_version' is VERSION_ALL, this will return aggregated

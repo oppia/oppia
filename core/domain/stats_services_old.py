@@ -47,14 +47,15 @@ def get_versions_for_exploration_stats(exploration_id):
 
 
 # TODO(bhenning): Test
-def get_exploration_stats(exploration, exploration_version):
+def get_exploration_stats(exploration_id, exploration_version, state_names):
     """Returns a dict with state statistics for the given exploration id.
 
     Args:
-        exploration: Exploration. The exploration domain object.
+        exploration_id: str. The ID of the exploration.
         exploration_version: str. The version of the exploration from
             ExplorationAnnotationsModel. It can be 'all' or version number as
             string like '3'.
+        state_names: list(str). List of state names in the exploration.
 
     Returns:
         dict. A dict with state statistics for the given exploration ID.
@@ -79,7 +80,7 @@ def get_exploration_stats(exploration, exploration_version):
                     no answer for this state.
     """
     exp_stats = stats_jobs_continuous.StatisticsAggregator.get_statistics(
-        exploration.id, exploration_version)
+        exploration_id, exploration_version)
 
     last_updated = exp_stats['last_updated']
     state_hit_counts = exp_stats['state_hit_counts']
@@ -99,6 +100,6 @@ def get_exploration_stats(exploration, exploration_version):
                 'no_submitted_answer_count': (
                     state_hit_counts[state_name].get('no_answer_count', 0)
                     if state_name in state_hit_counts else 0),
-            } for state_name in exploration.states
+            } for state_name in state_names
         },
     }

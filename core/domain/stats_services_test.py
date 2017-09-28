@@ -48,46 +48,48 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         handle_stats_creation_for_new_exploration methods when an exploration is
         created or updated.
         """
+        # Initialize call counters.
+        stats_for_new_exploration_log = test_utils.CallCounter(
+            stats_services.handle_stats_creation_for_new_exploration)
+        stats_for_new_exp_version_log = test_utils.CallCounter(
+            stats_services.handle_stats_creation_for_new_exp_version)
+
         # Create exploration object in datastore.
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-                assets_list)
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        with self.swap(
+            stats_services, 'handle_stats_creation_for_new_exploration',
+            stats_for_new_exploration_log):
+            with self.swap(feconf, 'ENABLE_STATS', True):
+                exp_services.save_new_exploration_from_yaml_and_assets(
+                    feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+                    assets_list)
 
-        # Now, there are two analytics model in datastore (one from setup
-        # function).
-        all_models = stats_models.ExplorationStatsModel.get_all()
-        self.assertEqual(all_models.count(), 2)
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            exploration.id, exploration.version)
-        self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), ['Home', 'End'])
+        # Now, the stats creation for new explorations method will be called
+        # once and stats creation for new exploration version won't be called.
+        self.assertEqual(stats_for_new_exploration_log.times_called, 1)
+        self.assertEqual(stats_for_new_exp_version_log.times_called, 0)
 
         # Update exploration by adding a state.
         change_list = [{
             'cmd': 'add_state',
             'state_name': 'New state'
         }]
-        exploration.add_states(['New state'])
-        exploration.version += 1
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
+        with self.swap(
+            stats_services, 'handle_stats_creation_for_new_exp_version',
+            stats_for_new_exp_version_log):
+            with self.swap(feconf, 'ENABLE_STATS', True):
+                exp_services.update_exploration(
+                    feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
 
-        # Now, there should be three analytics models in datastore (one from
-        # setup function).
-        all_models = stats_models.ExplorationStatsModel.get_all()
-        self.assertEqual(all_models.count(), 3)
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            exploration.id, exploration.version)
-        self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'End', 'New state'])
+        # Now, the stats creation for new explorations method will be called
+        # once and stats creation for new exploration version will also be
+        # called once.
+        self.assertEqual(stats_for_new_exploration_log.times_called, 1)
+        self.assertEqual(stats_for_new_exp_version_log.times_called, 1)
 
     def test_handle_stats_creation_for_new_exploration(self):
         """Test the handle_stats_creation_for_new_exploration method."""
@@ -97,16 +99,20 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-                assets_list)
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
-        stats_services.handle_stats_creation_for_new_exploration(exploration)
+        stats_services.handle_stats_creation_for_new_exploration(
+            exploration.id, exploration.version, exploration.states)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
+        self.assertEqual(exploration_stats.exp_id, exp_id)
+        self.assertEqual(exploration_stats.exp_version, 1)
+        self.assertEqual(exploration_stats.num_actual_starts, 0)
+        self.assertEqual(exploration_stats.num_completions, 0)
         self.assertEqual(
             exploration_stats.state_stats_mapping.keys(), ['Home', 'End'])
 
@@ -118,10 +124,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-                assets_list)
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
         # Test addition of states.
@@ -139,9 +144,13 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
+        self.assertEqual(exploration_stats.exp_id, exp_id)
+        self.assertEqual(exploration_stats.exp_version, 2)
+        self.assertEqual(exploration_stats.num_actual_starts, 0)
+        self.assertEqual(exploration_stats.num_completions, 0)
         self.assertEqual(
             exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'End', 'New state 2', 'New state'])
+                'Home', 'New state 2', 'End', 'New state'])
         self.assertEqual(
             exploration_stats.state_stats_mapping['New state'].to_dict(),
             stats_domain.StateStats.create_default().to_dict())
@@ -162,9 +171,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
+        self.assertEqual(exploration_stats.exp_version, 3)
         self.assertEqual(
             exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'Renamed state', 'End', 'New state'])
+                'Home', 'End', 'Renamed state', 'New state'])
 
         # Test deletion of states.
         exploration.delete_state('New state')
@@ -178,9 +188,63 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
+        self.assertEqual(exploration_stats.exp_version, 4)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping.keys(), [
+                'Home', 'Renamed state', 'End'])
+
+        # Test addition, renaming and deletion of states.
+        exploration.add_states(['New state 2'])
+        exploration.rename_state('New state 2', 'Renamed state 2')
+        exploration.delete_state('Renamed state 2')
+        exploration.version += 1
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state 2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 2',
+            'new_state_name': 'Renamed state 2'
+        }, {
+            'cmd': 'delete_state',
+            'state_name': 'Renamed state 2'
+        }]
+        stats_services.handle_stats_creation_for_new_exp_version(
+            exploration, change_list)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(exploration_stats.exp_version, 5)
         self.assertEqual(
             exploration_stats.state_stats_mapping.keys(), [
                 'Home', 'End', 'Renamed state'])
+
+        # Test addition and multiple renames.
+        exploration.add_states(['New state 2'])
+        exploration.rename_state('New state 2', 'New state 3')
+        exploration.rename_state('New state 3', 'New state 4')
+        exploration.version += 1
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state 2',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 2',
+            'new_state_name': 'New state 3'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 3',
+            'new_state_name': 'New state 4'
+        }]
+        stats_services.handle_stats_creation_for_new_exp_version(
+            exploration, change_list)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(exploration_stats.exp_version, 6)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping.keys(), [
+                'Home', 'New state 4', 'Renamed state', 'End'])
 
     def test_get_exploration_stats_from_model(self):
         """Test the get_exploration_stats_from_model method."""

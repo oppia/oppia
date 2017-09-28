@@ -698,12 +698,14 @@ class ExplorationStatisticsHandler(EditorHandler):
     def get(self, exploration_id, exploration_version):
         """Handles GET requests."""
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            current_exploration = exp_services.get_exploration_by_id(
+                exploration_id)
         except:
             raise self.PageNotFoundException
 
         self.render_json(stats_services_old.get_exploration_stats(
-            exploration, exploration_version))
+            current_exploration.id, exploration_version,
+            current_exploration.states))
 
 
 class ExplorationStatsVersionsHandler(EditorHandler):
@@ -733,19 +735,22 @@ class StateRulesStatsHandler(EditorHandler):
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            current_exploration = exp_services.get_exploration_by_id(
+                exploration_id)
         except:
             raise self.PageNotFoundException
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
-        if state_name not in exploration.states:
+        if state_name not in current_exploration.states:
             logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % exploration.states.keys())
+            logging.error('Available states: %s' % (
+                current_exploration.states.keys()))
             raise self.PageNotFoundException
 
         self.render_json({
             'visualizations_info': stats_services.get_visualizations_info(
-                exploration, state_name),
+                current_exploration.id, state_name,
+                current_exploration.states[state_name].interaction.id),
         })
 
 
