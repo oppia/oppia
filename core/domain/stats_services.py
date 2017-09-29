@@ -74,13 +74,13 @@ def handle_stats_creation_for_new_exp_version(
             exploration_stats.state_stats_mapping[change_dict[
                 'state_name']] = stats_domain.StateStats.create_default()
 
-        if change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
+        elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
             if change_dict['state_name'] in (
                     exploration_stats.state_stats_mapping):
                 exploration_stats.state_stats_mapping.pop(change_dict[
                     'state_name'])
 
-        if change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
+        elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
             if change_dict['old_state_name'] in (
                     exploration_stats.state_stats_mapping):
                 exploration_stats.state_stats_mapping[change_dict[
