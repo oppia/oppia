@@ -47,37 +47,32 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
     create_stats_model(exploration_stats)
 
 
-def handle_stats_creation_for_new_exp_version(exploration, change_list):
+def handle_stats_creation_for_new_exp_version(
+        exp_id, exp_version, state_names, change_list):
     """Retrieves the ExplorationStatsModel for the old exp_version and makes
     any required changes to the structure of the model. Then, a new
     ExplorationStatsModel is created for the new exp_version.
 
     Args:
-        exploration: Exploration. The exploration domain object after the
-            commit.
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+        state_names: list(str). State names of the exploration.
         change_list: list(dict). A list of changes introduced in this commit.
     """
-    old_exp_version = exploration.version - 1
-    new_exp_version = exploration.version
+    old_exp_version = exp_version - 1
+    new_exp_version = exp_version
     exploration_stats = get_exploration_stats_by_id(
-        exploration.id, old_exp_version)
+        exp_id, old_exp_version)
     if exploration_stats is None:
         handle_stats_creation_for_new_exploration(
-            exploration.id, exploration.version, exploration.states)
+            exp_id, new_exp_version, state_names)
         return
-
-    # This mapping from new state names to old ones accounts for circular
-    # renames and multiple renames within a commit. We will use this mapping
-    # to handle state renames in the statistics model.
-    new_to_old_state_names = exploration.get_state_names_mapping(change_list)
-    old_state_names = new_to_old_state_names.values()
 
     # Handling state additions, deletions and renames.
     for change_dict in change_list:
         if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
-            if change_dict['state_name'] in old_state_names:
-                exploration_stats.state_stats_mapping[change_dict[
-                    'state_name']] = stats_domain.StateStats.create_default()
+            exploration_stats.state_stats_mapping[change_dict[
+                'state_name']] = stats_domain.StateStats.create_default()
 
         if change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
             if change_dict['state_name'] in (
@@ -86,12 +81,12 @@ def handle_stats_creation_for_new_exp_version(exploration, change_list):
                     'state_name'])
 
         if change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
-            if change_dict['new_state_name'] in new_to_old_state_names:
+            if change_dict['old_state_name'] in (
+                    exploration_stats.state_stats_mapping):
                 exploration_stats.state_stats_mapping[change_dict[
                     'new_state_name']] = (
                         exploration_stats.state_stats_mapping.pop(
-                            new_to_old_state_names[change_dict[
-                                'new_state_name']]))
+                            change_dict['old_state_name']))
 
     exploration_stats.exp_version = new_exp_version
 

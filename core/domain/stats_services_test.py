@@ -63,7 +63,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         with self.swap(
             stats_services, 'handle_stats_creation_for_new_exploration',
             stats_for_new_exploration_log):
-            with self.swap(feconf, 'ENABLE_STATS', True):
+            with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
                 exp_services.save_new_exploration_from_yaml_and_assets(
                     feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
                     assets_list)
@@ -81,7 +81,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         with self.swap(
             stats_services, 'handle_stats_creation_for_new_exp_version',
             stats_for_new_exp_version_log):
-            with self.swap(feconf, 'ENABLE_STATS', True):
+            with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
                 exp_services.update_exploration(
                     feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
 
@@ -140,7 +140,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'state_name': 'New state 2'
         }]
         stats_services.handle_stats_creation_for_new_exp_version(
-            exploration, change_list)
+            exploration.id, exploration.version, exploration.states,
+            change_list)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -167,7 +168,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'new_state_name': 'Renamed state'
         }]
         stats_services.handle_stats_creation_for_new_exp_version(
-            exploration, change_list)
+            exploration.id, exploration.version, exploration.states,
+            change_list)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -184,7 +186,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'state_name': 'New state'
         }]
         stats_services.handle_stats_creation_for_new_exp_version(
-            exploration, change_list)
+            exploration.id, exploration.version, exploration.states,
+            change_list)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -210,7 +213,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'state_name': 'Renamed state 2'
         }]
         stats_services.handle_stats_creation_for_new_exp_version(
-            exploration, change_list)
+            exploration.id, exploration.version, exploration.states,
+            change_list)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -237,11 +241,39 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'new_state_name': 'New state 4'
         }]
         stats_services.handle_stats_creation_for_new_exp_version(
-            exploration, change_list)
+            exploration.id, exploration.version, exploration.states,
+            change_list)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 6)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping.keys(), [
+                'Home', 'New state 4', 'Renamed state', 'End'])
+
+        # Test deletion, addition and rename.
+        exploration.delete_state('New state 4')
+        exploration.add_states(['New state'])
+        exploration.rename_state('New state', 'New state 4')
+        exploration.version += 1
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state 4'
+        }, {
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state 4'
+        }]
+        stats_services.handle_stats_creation_for_new_exp_version(
+            exploration.id, exploration.version, exploration.states,
+            change_list)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(exploration_stats.exp_version, 7)
         self.assertEqual(
             exploration_stats.state_stats_mapping.keys(), [
                 'Home', 'New state 4', 'Renamed state', 'End'])
