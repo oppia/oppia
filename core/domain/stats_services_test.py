@@ -251,6 +251,22 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping.keys(), [
                 'Home', 'New state 4', 'Renamed state', 'End'])
 
+        # Set some values for the the stats in the ExplorationStatsModel
+        # instance.
+        exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
+            exploration.id, exploration.version)
+        exploration_stats_model.num_actual_starts = 5
+        exploration_stats_model.num_completions = 2
+        exploration_stats_model.state_stats_mapping['New state 4'][
+            'total_answers_count'] = 12
+        exploration_stats_model.state_stats_mapping['Home'][
+            'total_hit_count'] = 8
+        exploration_stats_model.state_stats_mapping['Renamed state'][
+            'first_hit_count'] = 2
+        exploration_stats_model.state_stats_mapping['End'][
+            'useful_feedback_count'] = 4
+        exploration_stats_model.put()
+
         # Test deletion, addition and rename.
         exploration.delete_state('New state 4')
         exploration.add_states(['New state'])
@@ -277,6 +293,24 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping.keys(), [
                 'Home', 'New state 4', 'Renamed state', 'End'])
+
+        # Test the values of the stats carried over from the last version.
+        self.assertEqual(exploration_stats.num_actual_starts, 5)
+        self.assertEqual(exploration_stats.num_completions, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].total_hit_count, 8)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Renamed state'].first_hit_count, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].useful_feedback_count,
+            4)
+        # State 'New state 4' has been deleted and recreated, so it should
+        # now contain default values for stats instead of the values it
+        # contained in the last version.
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'New state 4'].total_answers_count, 0)
 
     def test_get_exploration_stats_from_model(self):
         """Test the get_exploration_stats_from_model method."""
