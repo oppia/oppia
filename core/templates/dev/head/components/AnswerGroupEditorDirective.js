@@ -34,19 +34,19 @@ oppia.directive('answerGroupEditor', [
         '/components/' +
         'answer_group_editor_directive.html'),
       controller: [
-        '$scope', 'stateInteractionIdService', 'responsesService',
+        '$scope', 'stateInteractionIdService', 'ResponsesService',
         'editorContextService', 'alertsService', 'INTERACTION_SPECS',
         'RULE_TYPE_CLASSIFIER', 'RuleObjectFactory',
         function(
-            $scope, stateInteractionIdService, responsesService,
+            $scope, stateInteractionIdService, ResponsesService,
             editorContextService, alertsService, INTERACTION_SPECS,
             RULE_TYPE_CLASSIFIER, RuleObjectFactory) {
           $scope.rulesMemento = null;
-          $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
+          $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
 
           $scope.getAnswerChoices = function() {
-            return responsesService.getAnswerChoices();
+            return ResponsesService.getAnswerChoices();
           };
           $scope.answerChoices = $scope.getAnswerChoices();
 
@@ -223,8 +223,8 @@ oppia.directive('answerGroupEditor', [
           };
 
           $scope.changeActiveRuleIndex = function(newIndex) {
-            responsesService.changeActiveRuleIndex(newIndex);
-            $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
+            ResponsesService.changeActiveRuleIndex(newIndex);
+            $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           };
 
           $scope.openRuleEditor = function(index) {

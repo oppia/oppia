@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the services of the history page.
  */
 
-describe('Versions tree service', function() {
+describe('versions tree service', function() {
   beforeEach(module('oppia'));
 
   describe('versions tree service', function() {
@@ -93,7 +93,7 @@ describe('Versions tree service', function() {
     }];
 
     beforeEach(inject(function($injector) {
-      vts = $injector.get('versionsTreeService');
+      vts = $injector.get('VersionTreeService');
     }));
 
     it('should get correct list of parents', function() {
@@ -162,7 +162,7 @@ describe('Versions tree service', function() {
   });
 });
 
-describe('Compare versions service', function() {
+describe('compare versions service', function() {
   beforeEach(module('oppia'));
 
   describe('compare versions service', function() {
@@ -182,8 +182,8 @@ describe('Compare versions service', function() {
     });
 
     beforeEach(inject(function($injector) {
-      cvs = $injector.get('compareVersionsService');
-      vts = $injector.get('versionsTreeService');
+      cvs = $injector.get('CompareVersionsService');
+      vts = $injector.get('VersionTreeService');
       $httpBackend = $injector.get('$httpBackend');
     }));
 
