@@ -94,6 +94,41 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
                 session_id, time_spent_in_secs))
 
 
+class ExplorationActualStartEventHandler(BaseEventHandler):
+    """Event handler for recording exploration actual start events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs):
+        stats_models.ExplorationActualStartEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs)
+        stats_services.update_stats(
+            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
+
+
+class SolutionHitEventHandler(BaseEventHandler):
+    """Event handler for recording solution hit events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_SOLUTION
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs, is_solution_preceding_answer):
+        stats_models.SolutionHitEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs, is_solution_preceding_answer)
+        update_params = {
+            'is_solution_preceding_answer': is_solution_preceding_answer
+        }
+        stats_services.update_stats(
+            exp_id, exp_version, state_name, cls.EVENT_TYPE, update_params)
+
+
 class StartExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration start events."""
 
@@ -134,6 +169,8 @@ class CompleteExplorationEventHandler(BaseEventHandler):
         stats_models.CompleteExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
+        stats_services.update_stats(
+            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class RateExplorationEventHandler(BaseEventHandler):

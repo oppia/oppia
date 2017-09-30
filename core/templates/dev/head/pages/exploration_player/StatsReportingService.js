@@ -16,6 +16,8 @@
  * @fileoverview Services for stats reporting.
  */
 
+oppia.constant('MIN_TIME_FOR_ACTUAL_START', 60);
+
 oppia.constant('STATS_REPORTING_URLS', {
   ANSWER_SUBMITTED: '/explorehandler/answer_submitted_event/<exploration_id>',
   EXPLORATION_COMPLETED: (
@@ -24,19 +26,25 @@ oppia.constant('STATS_REPORTING_URLS', {
     '/explorehandler/exploration_maybe_leave_event/<exploration_id>'),
   EXPLORATION_STARTED: (
     '/explorehandler/exploration_start_event/<exploration_id>'),
-  STATE_HIT: '/explorehandler/state_hit_event/<exploration_id>'
+  STATE_HIT: '/explorehandler/state_hit_event/<exploration_id>',
+  EXPLORATION_ACTUALLY_STARTED: (
+    '/explorehandler/exploration_actual_start_event/<exploration_id>'),
+  SOLUTION_HIT: '/explorehandler/solution_hit_event/<exploration_id>'
 });
 
 oppia.factory('StatsReportingService', [
-  '$http', 'StopwatchObjectFactory', 'messengerService',
+  '$http', '$rootScope','StopwatchObjectFactory', 'messengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
+  'MIN_TIME_FOR_ACTUAL_START',
   function(
-      $http, StopwatchObjectFactory, messengerService,
-      UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService) {
+      $http, $rootScope, StopwatchObjectFactory, messengerService,
+      UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
+      MIN_TIME_FOR_ACTUAL_START) {
     var explorationId = null;
     var explorationVersion = null;
     var sessionId = null;
     var stopwatch = null;
+    var totalTime = null;
     var optionalCollectionId = undefined;
     var statesVisited = {};
     var numStatesVisited = 0;
@@ -48,6 +56,12 @@ oppia.factory('StatsReportingService', [
         });
     };
 
+    $rootScope.$on('sessionTime', function(evt, totalTime, stateName) {
+      if(totalTime.getTimeInSecs() >= MIN_TIME_FOR_ACTUAL_START) {
+        recordExplorationActuallyStarted(stateName, totalTime);
+      }
+    });
+
     return {
       initSession: function(
           newExplorationId, newExplorationVersion, newSessionId,
@@ -56,6 +70,7 @@ oppia.factory('StatsReportingService', [
         explorationVersion = newExplorationVersion;
         sessionId = newSessionId;
         stopwatch = StopwatchObjectFactory.create();
+        totalTime = StopwatchObjectFactory.create();
         optionalCollectionId = collectionId;
       },
       // Note that this also resets the stopwatch.
@@ -84,6 +99,26 @@ oppia.factory('StatsReportingService', [
         siteAnalyticsService.registerNewCard(1);
 
         stopwatch.reset();
+        totalTime.reset();
+        $rootScope.$broadcast(
+          'sessionTime', totalTime.getTimeInSecs(), stateName);
+      },
+      recordExplorationActuallyStarted: function(stateName, totalTime) {
+        $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
+          exploration_version: explorationVersion,
+          state_name: stateName,
+          session_id: sessionId,
+          client_time_spent_in_secs: totalTime
+        });
+      },
+      recordSolutionHit: function(stateName, isSolutionPrecedingAnswer) {
+        $http.post(getFullStatsUrl('SOLUTION_HIT'), {
+          exploration_version: explorationVersion,
+          state_name: stateName,
+          session_id: sessionId,
+          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          is_solution_preceding_answer: isSolutionPrecedingAnswer
+        });
       },
       // Note that this also resets the stopwatch.
       recordStateTransition: function(
@@ -112,6 +147,8 @@ oppia.factory('StatsReportingService', [
           siteAnalyticsService.registerNewCard(numStatesVisited);
         }
 
+        $rootScope.$broadcast(
+          'sessionTime', totalTime.getTimeInSecs(), newStateName);
         stopwatch.reset();
       },
       recordExplorationCompleted: function(stateName, params) {
@@ -145,6 +182,8 @@ oppia.factory('StatsReportingService', [
           rule_spec_index: ruleIndex,
           classification_categorization: classificationCategorization
         });
+        $rootScope.$broadcast(
+          'sessionTime', totalTime.getTimeInSecs(), stateName);
       },
       recordMaybeLeaveEvent: function(stateName, params) {
         $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {

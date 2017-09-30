@@ -33,7 +33,7 @@ oppia.factory('oppiaPlayerService', [
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
-  'LanguageUtilService',
+  'LanguageUtilService', 'SolutionManagerService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
@@ -43,7 +43,7 @@ oppia.factory('oppiaPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService) {
+      LanguageUtilService, SolutionManagerService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -320,6 +320,11 @@ oppia.factory('oppiaPlayerService', [
             classificationResult.answerGroupIndex,
             classificationResult.ruleIndex,
             classificationResult.classificationCategorization);
+
+          if (SolutionManagerService.hasSolutionBeenViewed()) {
+            StatsReportingService.recordSolutionHit(
+              oldStateName, true);
+          }
         }
 
         // Use angular.copy() to clone the object

@@ -382,6 +382,35 @@ class ExplorationStartEventHandler(base.BaseHandler):
             feconf.PLAY_TYPE_NORMAL)
 
 
+class ExplorationActualStartEventHandler(base.BaseHandler):
+    """Tracks a learner actually starting an exploration."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        event_services.ExplorationActualStartEventHandler.record(
+            exploration_id, self.payload.get('exploration_version'),
+            self.payload.get('state_name'), self.payload.get('session_id'),
+            self.payload.get('client_time_spent_in_secs'))
+
+
+class SolutionHitEventHandler(base.BaseHandler):
+    """Tracks a learner using solutions to answer."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        event_services.SolutionHitEventHandler.record(
+            exploration_id, self.payload.get('exploration_version'),
+            self.payload.get('state_name'), self.payload.get('session_id'),
+            self.payload.get('client_time_spent_in_secs'),
+            self.payload.get('is_solution_preceding_answer'))
+
+
 class ExplorationCompleteEventHandler(base.BaseHandler):
     """Tracks a learner completing an exploration.
 
