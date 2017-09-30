@@ -106,4 +106,3 @@ oppia.factory('TrainingModalService', [
     };
   }
 ]);
-
