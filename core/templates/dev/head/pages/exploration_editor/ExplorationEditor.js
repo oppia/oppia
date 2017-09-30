@@ -40,11 +40,11 @@ oppia.controller('ExplorationEditor', [
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
-  'editabilityService', 'explorationStatesService', 'routerService',
+  'editabilityService', 'explorationStatesService', 'RouterService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService', '$modal', 'changeListService',
+  'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'UrlInterpolationService',
@@ -54,11 +54,11 @@ oppia.controller('ExplorationEditor', [
       explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, explorationTagsService,
-      editabilityService, explorationStatesService, routerService,
+      editabilityService, explorationStatesService, RouterService,
       graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService, $modal, changeListService,
+      ExplorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       UrlInterpolationService) {
@@ -77,7 +77,7 @@ oppia.controller('ExplorationEditor', [
     $scope.revertExplorationUrl = (
       '/createhandler/revert/' + $scope.explorationId);
 
-    $scope.getTabStatuses = routerService.getTabStatuses;
+    $scope.getTabStatuses = RouterService.getTabStatuses;
 
     /********************************************
     * Methods affecting the graph visualization.
@@ -131,7 +131,7 @@ oppia.controller('ExplorationEditor', [
         $scope.currentUser = data.user;
         $scope.currentVersion = data.version;
 
-        explorationAdvancedFeaturesService.init(data);
+        ExplorationAdvancedFeaturesService.init(data);
         explorationRightsService.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
@@ -154,10 +154,10 @@ oppia.controller('ExplorationEditor', [
             explorationInitStateNameService.displayed);
         }
 
-        if (!routerService.isLocationSetToNonStateEditorTab() &&
+        if (!RouterService.isLocationSetToNonStateEditorTab() &&
             !data.states.hasOwnProperty(
-              routerService.getCurrentStateFromLocationPath('gui'))) {
-          routerService.navigateToMainTab();
+              RouterService.getCurrentStateFromLocationPath('gui'))) {
+          RouterService.navigateToMainTab();
         }
 
         explorationWarningsService.updateWarnings();
@@ -357,7 +357,7 @@ oppia.controller('ExplorationEditor', [
 
     $scope.tutorialInProgress = false;
     $scope.startTutorial = function() {
-      routerService.navigateToMainTab();
+      RouterService.navigateToMainTab();
       // The $timeout wrapper is needed for all components on the page to load,
       // otherwise elements within ng-if's are not guaranteed to be present on
       // the page.
