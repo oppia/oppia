@@ -17,7 +17,6 @@
  * Service for handling all interactions with the version history tree.
  */
 
-
 oppia.factory('CompareVersionsService', [
   '$http', '$q','VersionTreeService', 'explorationData',
   'ExplorationDiffService', 'StateObjectFactory', 'StatesObjectFactory',
