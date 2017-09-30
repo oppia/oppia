@@ -17,7 +17,7 @@
  * Service for handling all interactions with the version history tree.
  */
 
- oppia.factory('VersionTreeService', [function() {
+oppia.factory('VersionTreeService', [function() {
   var _snapshots = null;
   var _treeParents = null;
   return {
