@@ -198,4 +198,3 @@ oppia.factory('TrainingDataService', [
     };
   }
 ]);
-
