@@ -20,11 +20,13 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveVideo', [
-  '$sce', 'HtmlEscaperService', function($sce, HtmlEscaperService) {
+  '$sce', 'HtmlEscaperService', 'UrlInterpolationService',
+  function($sce, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'richTextComponent/Video',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/rich_text_components/Video/directives/video_directive.html'),
       controller: [
         '$scope', '$attrs', 'explorationContextService', '$element',
         'autoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',

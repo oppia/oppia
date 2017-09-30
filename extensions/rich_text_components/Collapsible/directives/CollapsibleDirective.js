@@ -13,35 +13,26 @@
 // limitations under the License.
 
 /**
- * Directive for the Image rich-text component.
+ * Directive for the Collapsible rich-text component.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'HtmlEscaperService', 'explorationContextService',
-  function($rootScope, $sce, HtmlEscaperService, explorationContextService) {
+oppia.directive('oppiaNoninteractiveCollapsible', [
+  '$rootScope', '$sce', 'HtmlEscaperService', 'UrlInterpolationService',
+  function($rootScope, $sce, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'richTextComponent/Image',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/rich_text_components/Collapsible' +
+        '/directives/collapsible_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.filepath = HtmlEscaperService.escapedJsonToObj(
-          $attrs.filepathWithValue);
-        $scope.imageUrl = $sce.trustAsResourceUrl(
-          '/imagehandler/' + explorationContextService.getExplorationId() +
-          '/' + encodeURIComponent($scope.filepath));
-        $scope.imageCaption = '';
-        if ($attrs.captionWithValue) {
-          $scope.imageCaption = HtmlEscaperService.escapedJsonToObj(
-            $attrs.captionWithValue);
-        }
-        $scope.imageAltText = '';
-        if ($attrs.altWithValue) {
-          $scope.imageAltText = HtmlEscaperService.escapedJsonToObj(
-            $attrs.altWithValue);
-        }
+        $scope.heading = HtmlEscaperService.escapedJsonToObj(
+          $attrs.headingWithValue);
+        $scope.content = HtmlEscaperService.escapedJsonToObj(
+          $attrs.contentWithValue);
       }]
     };
   }
