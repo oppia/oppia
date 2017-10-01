@@ -351,13 +351,13 @@ oppia.factory('responsesService', [
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
   'editorContextService', 'alertsService', 'responsesService', 'routerService',
-  'explorationContextService', 'trainingDataService',
+  'explorationContextService', 'TrainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
-      explorationContextService, trainingDataService,
+      explorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
     $scope.editorContextService = editorContextService;
@@ -368,7 +368,7 @@ oppia.controller('StateResponses', [
     var _initializeTrainingData = function() {
       var explorationId = explorationContextService.getExplorationId();
       var currentStateName = editorContextService.getActiveStateName();
-      trainingDataService.initializeTrainingData(
+      TrainingDataService.initializeTrainingData(
         explorationId, currentStateName);
     };
 
@@ -587,7 +587,7 @@ oppia.controller('StateResponses', [
           'oppiaExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
-          'explorationStatesService', 'trainingDataService',
+          'explorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'focusService',
           'angularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
@@ -595,7 +595,7 @@ oppia.controller('StateResponses', [
               oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
-              explorationStatesService, trainingDataService,
+              explorationStatesService, TrainingDataService,
               AnswerClassificationService, focusService,
               angularNameService, RULE_TYPE_CLASSIFIER) {
             var _explorationId = explorationContextService.getExplorationId();
