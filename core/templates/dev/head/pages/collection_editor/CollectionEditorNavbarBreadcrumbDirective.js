@@ -15,6 +15,7 @@
 /**
  * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
+
 // TODO(bhenning): After the navbar is moved to a directive, this directive
 // should be updated to say 'Loading...' if the collection editor's controller
 // is not yet finished loading the collection. Also, this directive should
