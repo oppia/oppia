@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Services for the exploration history tab.
- * Service to compare versions of explorations
+ * Service to compare versions of explorations.
  */
 
 oppia.factory('CompareVersionsService', [
@@ -59,6 +59,7 @@ oppia.factory('CompareVersionsService', [
     };
 
     return {
+
       /**
        * Summarize changes to states and rules between v1 and v2.
        * Returns a promise for an object whose keys are 'initStateName',
@@ -82,6 +83,7 @@ oppia.factory('CompareVersionsService', [
        * Should be called after VersionTreeService.init() is called.
        * Should satisfy v1 < v2.
        */
+      
       getDiffGraphData: function(v1, v2) {
         if (v1 > v2) {
           throw new Error('Tried to compare v1 > v2.');

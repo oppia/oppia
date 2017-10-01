@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for the Compare versions Service.
  */
+
 describe('compare versions service', function() {
   beforeEach(module('oppia'));
 
@@ -52,6 +53,7 @@ describe('compare versions service', function() {
     //    links
     // Only information accessed by getDiffGraphData is included in the return
     // value
+    
     var _getStatesData = function(statesDetails) {
       var statesData = {};
       for (var stateName in statesDetails) {

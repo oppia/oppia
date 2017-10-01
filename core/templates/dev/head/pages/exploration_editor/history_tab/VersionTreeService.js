@@ -47,12 +47,14 @@ oppia.factory('VersionTreeService', [function() {
       }
       _treeParents[1] = -1;
     },
+
     /**
      * Returns a object whose keys are the version number and whose value is
      * the parent of each version, where parent points to previous version
      * in general or reverted version if commit is a reversion.
      * The parent of the root (version 1) is -1.
      */
+    
     getVersionTree: function() {
       if (_treeParents === null) {
         throw new Error('version tree not initialized.');
@@ -95,6 +97,7 @@ oppia.factory('VersionTreeService', [function() {
       }
       return lca;
     },
+
     /**
      * Returns the change list of a version of the exploration.
      * Should be called only after getVersionTree is called to initialize
@@ -114,6 +117,7 @@ oppia.factory('VersionTreeService', [function() {
      * for 'revert':
      *  - 'version_number': version number reverted to
      */
+
     getChangeList: function(version) {
       if (_snapshots === null) {
         throw new Error('snapshots is not initialized');
