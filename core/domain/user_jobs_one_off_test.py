@@ -23,7 +23,6 @@ import re
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_services
 from core.domain import exp_services
 from core.domain import event_services
 from core.domain import feedback_services
@@ -394,6 +393,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
 
+        self.user_a = user_services.UserActionsInfo(self.user_a_id)
+
         with self.swap(
             subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
@@ -464,11 +465,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID_1, self.user_b_id,
+                self.user_a, self.EXP_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # User A adds user C as a viewer of the exploration.
             rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID_1, self.user_c_id,
+                self.user_a, self.EXP_ID_1, self.user_c_id,
                 rights_manager.ROLE_VIEWER)
 
         self._run_one_off_job()
@@ -516,12 +517,12 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID_1, self.user_b_id,
+                self.user_a, self.EXP_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # The exploration becomes community-owned.
-            rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
+            rights_manager.publish_exploration(self.user_a, self.EXP_ID_1)
             rights_manager.release_ownership_of_exploration(
-                self.user_a_id, self.EXP_ID_1)
+                self.user_a, self.EXP_ID_1)
             # User C edits the exploration.
             exp_services.update_exploration(
                 self.user_c_id, self.EXP_ID_1, [], 'Update exploration')
@@ -574,11 +575,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
-                self.user_a_id, self.COLLECTION_ID_1, self.user_b_id,
+                self.user_a, self.COLLECTION_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # User A adds user C as a viewer of the collection.
             rights_manager.assign_role_for_collection(
-                self.user_a_id, self.COLLECTION_ID_1, self.user_c_id,
+                self.user_a, self.COLLECTION_ID_1, self.user_c_id,
                 rights_manager.ROLE_VIEWER)
 
         self._run_one_off_job()
@@ -928,9 +929,11 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -952,9 +955,9 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # Test all owners and editors of exploration after publication have
         # updated times.
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
                 'cmd': 'edit_state_property',
@@ -976,13 +979,13 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         exp_services.publish_exploration_and_update_user_profiles(
-            self.owner_id, self.EXP_ID)
+            self.owner, self.EXP_ID)
         # We now manually reset the user's first_contribution_msec to None.
         # This is to test that the one off job skips over the unpublished
         # exploration and does not reset the user's first_contribution_msec.
         user_services._update_first_contribution_msec(  # pylint: disable=protected-access
             self.owner_id, None)
-        rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
 
         # Test that first contribution time is not set for unpublished
         # explorations.
@@ -1182,70 +1185,3 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNone(owner_settings.last_created_an_exploration)
         self.assertIsNone(owner_settings.last_edited_an_exploration)
-
-
-class UserRolesMigrationOneOffJobTests(test_utils.GenericTestBase):
-    def test_create_user_with_different_roles_and_run_migration_job(self):
-        """Tests the working of roles migration job. A sample set of users
-        is created with varying roles. The migration job is run and resulted
-        change in roles is tested against expected values.
-        """
-        user_ids = [
-            'user_id1', 'user_id2', 'user_id3', 'user_id4',
-            'user_id5', 'user_id6', 'user_id7', 'user_id8'
-        ]
-        user_emails = [
-            'user1@example.com', 'user2@example.com', 'user3@example.com',
-            'user4@example.com', 'user5@example.com', 'user6@example.com',
-            'user7@example.com', 'user8@example.com'
-        ]
-        user_names = [
-            'user1', 'user2', 'user3', 'user4', 'user5', 'user6',
-            'user7', 'user8'
-        ]
-
-        for uid, uemail, uname in zip(user_ids, user_emails, user_names):
-            user_services.create_new_user(uid, uemail)
-            user_services.set_username(uid, uname)
-
-        admin_usernames = ['user1', 'user2', 'user3']
-        moderator_usernames = ['user4', 'user5', 'user2']
-        banned_usernames = ['user6']
-        collection_editor_usernames = ['user7', 'user3']
-
-        config_services.set_property(
-            'admin_id', 'admin_usernames', admin_usernames)
-        config_services.set_property(
-            'admin_id', 'moderator_usernames', moderator_usernames)
-        config_services.set_property(
-            'admin_id', 'banned_usernames', banned_usernames)
-        config_services.set_property(
-            'admin_id', 'collection_editor_whitelist',
-            collection_editor_usernames)
-
-        job_id = (
-            user_jobs_one_off.UserRolesMigrationOneOffJob.create_new())
-        user_jobs_one_off.UserRolesMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        user_final_roles = {}
-        for username in user_names:
-            user_final_roles[username] = user_services.get_user_role_from_id(
-                user_services.get_user_id_from_username(username))
-
-        self.assertEqual(
-            user_final_roles['user1'], feconf.ROLE_ID_ADMIN)
-        self.assertEqual(
-            user_final_roles['user2'], feconf.ROLE_ID_ADMIN)
-        self.assertEqual(
-            user_final_roles['user3'], feconf.ROLE_ID_ADMIN)
-        self.assertEqual(
-            user_final_roles['user4'], feconf.ROLE_ID_MODERATOR)
-        self.assertEqual(
-            user_final_roles['user5'], feconf.ROLE_ID_MODERATOR)
-        self.assertEqual(
-            user_final_roles['user6'], feconf.ROLE_ID_BANNED_USER)
-        self.assertEqual(
-            user_final_roles['user7'], feconf.ROLE_ID_COLLECTION_EDITOR)
-        self.assertEqual(
-            user_final_roles['user8'], feconf.ROLE_ID_EXPLORATION_EDITOR)

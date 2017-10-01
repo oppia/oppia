@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveMultipleChoiceInput', [
-  'oppiaHtmlEscaper', 'multipleChoiceInputRulesService',
-  function(oppiaHtmlEscaper, multipleChoiceInputRulesService) {
+  'HtmlEscaperService', 'multipleChoiceInputRulesService',
+  function(HtmlEscaperService, multipleChoiceInputRulesService) {
     return {
       restrict: 'E',
       scope: {
@@ -29,7 +29,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
       },
       templateUrl: 'interaction/MultipleChoiceInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.choices = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.choices = HtmlEscaperService.escapedJsonToObj(
           $attrs.choicesWithValue);
         $scope.answer = null;
 
@@ -46,14 +46,14 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
 ]);
 
 oppia.directive('oppiaResponseMultipleChoiceInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/MultipleChoiceInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-        var _choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choices);
+        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
         $scope.response = _choices[_answer];
       }]
     };
@@ -61,7 +61,7 @@ oppia.directive('oppiaResponseMultipleChoiceInput', [
 ]);
 
 oppia.directive('oppiaShortResponseMultipleChoiceInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -69,8 +69,8 @@ oppia.directive('oppiaShortResponseMultipleChoiceInput', [
       controller: [
         '$scope', '$attrs', '$filter',
         function($scope, $attrs, $filter) {
-          var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-          var _choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choices);
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
           var response = $filter('convertToPlainText')(_choices[_answer]);
           $scope.response = $filter('truncateAtFirstLine')(response);
         }]

@@ -27,9 +27,9 @@ oppia.filter('convertHtmlToUnicode', [function() {
 }]);
 
 oppia.filter('convertUnicodeToHtml', [
-  '$sanitize', 'oppiaHtmlEscaper', function($sanitize, oppiaHtmlEscaper) {
+  '$sanitize', 'HtmlEscaperService', function($sanitize, HtmlEscaperService) {
     return function(text) {
-      return $sanitize(oppiaHtmlEscaper.unescapedStrToEscapedStr(text));
+      return $sanitize(HtmlEscaperService.unescapedStrToEscapedStr(text));
     };
   }
 ]);
@@ -186,10 +186,10 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.directive('textAngularRte', [
-  '$filter', '$timeout', 'oppiaHtmlEscaper', 'rteHelperService',
+  '$filter', '$timeout', 'HtmlEscaperService', 'rteHelperService',
   'textAngularManager',
   function(
-    $filter, $timeout, oppiaHtmlEscaper, rteHelperService,
+    $filter, $timeout, HtmlEscaperService, rteHelperService,
     textAngularManager) {
     return {
       restrict: 'E',

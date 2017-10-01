@@ -131,6 +131,13 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             'category': collection_category,
         }])
 
+        # Save a collection summary object for indexing. The explicit commit
+        # does not create a summary object, which is needed for the
+        # job to update the index after updating the collection.
+        collection_summary = collection_services.compute_summary_of_collection(
+            model, self.albert_id)
+        collection_services.save_collection_summary(collection_summary)
+
         # Start migration job on sample collection.
         job_id = (
             collection_jobs_one_off.CollectionMigrationJob.create_new())
@@ -177,6 +184,13 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             'title': collection_title,
             'category': collection_category,
         }])
+
+        # Save a collection summary object for indexing. The explicit commit
+        # does not create a summary object, which is needed for the
+        # job to update the index after updating the collection.
+        collection_summary = collection_services.compute_summary_of_collection(
+            model, self.albert_id)
+        collection_services.save_collection_summary(collection_summary)
 
         # Check that collection_contents is empty
         self.assertEqual(model.collection_contents, {})

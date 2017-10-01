@@ -70,7 +70,6 @@ describe('State content editor directive', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []
@@ -96,7 +95,6 @@ describe('State content editor directive', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []
@@ -122,7 +120,6 @@ describe('State content editor directive', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: [{

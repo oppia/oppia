@@ -30,21 +30,19 @@ oppia.directive('supplementalCard', [
       controller: [
         '$scope', '$timeout', '$window', 'HintManagerService',
         'oppiaPlayerService', 'playerPositionService',
-        'playerTranscriptService', 'ExplorationObjectFactory',
-        'windowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',
-        'TWO_CARD_THRESHOLD_PX', 'EVENT_ACTIVE_CARD_CHANGED',
-        'CONTINUE_BUTTON_FOCUS_LABEL', 'HINT_REQUEST_STRING_I18N_IDS',
-        'DELAY_FOR_HINT_FEEDBACK_MSEC', 'SolutionManagerService',
-        'oppiaExplorationHtmlFormatterService', 'explorationStatesService',
+        'playerTranscriptService', 'windowDimensionsService',
+        'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
+        'EVENT_ACTIVE_CARD_CHANGED', 'CONTINUE_BUTTON_FOCUS_LABEL',
+        'HINT_REQUEST_STRING_I18N_IDS', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
+        'SolutionManagerService',
         function(
-          $scope, $timeout, $window, HintManagerService,
-          oppiaPlayerService, playerPositionService,
-          playerTranscriptService, ExplorationObjectFactory,
-          windowDimensionsService, CONTENT_FOCUS_LABEL_PREFIX,
-          TWO_CARD_THRESHOLD_PX, EVENT_ACTIVE_CARD_CHANGED,
-          CONTINUE_BUTTON_FOCUS_LABEL, HINT_REQUEST_STRING_I18N_IDS,
-          DELAY_FOR_HINT_FEEDBACK_MSEC, SolutionManagerService,
-          oppiaExplorationHtmlFormatterService, explorationStatesService) {
+            $scope, $timeout, $window, HintManagerService,
+            oppiaPlayerService, playerPositionService,
+            playerTranscriptService, windowDimensionsService,
+            CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
+            EVENT_ACTIVE_CARD_CHANGED, CONTINUE_BUTTON_FOCUS_LABEL,
+            HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC,
+            SolutionManagerService) {
           var updateActiveCard = function() {
             var index = playerPositionService.getActiveCardIndex();
             if (index === null) {

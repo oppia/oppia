@@ -18,8 +18,8 @@
  */
 
 oppia.factory('SolutionObjectFactory', [
-  '$filter', 'oppiaHtmlEscaper', 'oppiaExplorationHtmlFormatterService',
-  function($filter, oppiaHtmlEscaper, oppiaExplorationHtmlFormatterService) {
+  '$filter', 'HtmlEscaperService', 'oppiaExplorationHtmlFormatterService',
+  function($filter, HtmlEscaperService, oppiaExplorationHtmlFormatterService) {
     var Solution = function(answerIsExclusive, correctAnswer, explanation) {
       this.answerIsExclusive = answerIsExclusive;
       this.correctAnswer = correctAnswer;
@@ -63,7 +63,7 @@ oppia.factory('SolutionObjectFactory', [
         correctAnswer = this.correctAnswer.correct;
       } else {
         correctAnswer = (
-          oppiaHtmlEscaper.objToEscapedJson(this.correctAnswer));
+          HtmlEscaperService.objToEscapedJson(this.correctAnswer));
       }
       var explanation = (
         $filter('convertToPlainText')(this.explanation));

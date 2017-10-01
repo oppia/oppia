@@ -29,7 +29,7 @@ _VERSION_DELIMITER = '-'
 
 # Constants used for generating ids.
 MAX_RETRIES = 10
-RAND_RANGE = 127 * 127
+RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
 

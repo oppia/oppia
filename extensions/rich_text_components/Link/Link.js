@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveLink', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -28,7 +28,7 @@ oppia.directive('oppiaNoninteractiveLink', [
       controller: [
         '$scope', '$attrs', 'explorationContextService',
         function($scope, $attrs, explorationContextService) {
-          var untrustedUrl = encodeURI(oppiaHtmlEscaper.escapedJsonToObj(
+          var untrustedUrl = encodeURI(HtmlEscaperService.escapedJsonToObj(
             $attrs.urlWithValue));
           if (untrustedUrl.indexOf('http://') !== 0 &&
               untrustedUrl.indexOf('https://') !== 0) {
@@ -43,7 +43,7 @@ oppia.directive('oppiaNoninteractiveLink', [
             // have content parts that don't include a 'text' attribute on
             // their links.
             $scope.text =
-              oppiaHtmlEscaper.escapedJsonToObj($attrs.textWithValue);
+              HtmlEscaperService.escapedJsonToObj($attrs.textWithValue);
             // Note that this second 'if' condition is needed because a link may
             // have an empty 'text' value.
             if ($scope.text) {

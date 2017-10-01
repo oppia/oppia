@@ -42,7 +42,7 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      GLOBALS.AUDIO_URL_TEMPLATE, {
+      '/audiohandler/<exploration_id>/audio/<filename>', {
         exploration_id: '0',
         filename: 'myfile.mp3'
       });
@@ -65,7 +65,7 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      GLOBALS.AUDIO_URL_TEMPLATE, {
+      '/audiohandler/<exploration_id>/audio/<filename>', {
         exploration_id: '0',
         filename: 'myfile.mp3'
       });

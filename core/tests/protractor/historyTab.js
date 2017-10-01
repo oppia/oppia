@@ -138,26 +138,22 @@ describe('Exploration history', function() {
         highlighted: false
       },
       22: {
-        text: '  fallbacks: []',
-        highlighted: false
-      },
-      23: {
         text: '  hints: []',
         highlighted: false
       },
-      24: {
+      23: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      25: {
+      24: {
         text: '  solution: null',
         highlighted: false
       },
-      26: {
+      25: {
         text: 'param_changes: []',
         highlighted: false
       },
-      27: {
+      26: {
         text: ' ',
         highlighted: false
       }
@@ -215,26 +211,22 @@ describe('Exploration history', function() {
         highlighted: false
       },
       13: {
-        text: '  fallbacks: []',
-        highlighted: false
-      },
-      14: {
         text: '  hints: []',
         highlighted: false
       },
-      15: {
+      14: {
         text: '  id: null',
         highlighted: true
       },
-      16: {
+      15: {
         text: '  solution: null',
         highlighted: false
       },
-      17: {
+      16: {
         text: 'param_changes: []',
         highlighted: false
       },
-      18: {
+      17: {
         text: ' ',
         highlighted: false
       }
@@ -255,7 +247,6 @@ describe('Exploration history', function() {
       '    dest: final card\n' +
       '    feedback: []\n' +
       '    param_changes: []\n' +
-      '  fallbacks: []\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +

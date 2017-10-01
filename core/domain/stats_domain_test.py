@@ -18,6 +18,146 @@ from core.domain import exp_domain
 from core.domain import stats_domain
 from core.tests import test_utils
 import feconf
+import utils
+
+
+class ExplorationStatsTests(test_utils.GenericTestBase):
+    """Tests the ExplorationStats domain object."""
+
+    def _get_exploration_stats_from_dict(self, exploration_stats_dict):
+        return stats_domain.ExplorationStats(
+            exploration_stats_dict['exp_id'],
+            exploration_stats_dict['exp_version'],
+            exploration_stats_dict['num_actual_starts'],
+            exploration_stats_dict['num_completions'],
+            exploration_stats_dict['state_stats_mapping'])
+
+    def test_to_dict(self):
+        expected_exploration_stats_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'num_actual_starts': 10,
+            'num_completions': 5,
+            'state_stats_mapping': {
+                'Home': {}
+            }
+        }
+        observed_exploration_stats = self._get_exploration_stats_from_dict(
+            expected_exploration_stats_dict)
+        self.assertDictEqual(
+            expected_exploration_stats_dict,
+            observed_exploration_stats.to_dict())
+
+    def test_validate(self):
+        exploration_stats_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'num_actual_starts': 10,
+            'num_completions': 5,
+            'state_stats_mapping': {
+                'Home': {}
+            }
+        }
+        exploration_stats = self._get_exploration_stats_from_dict(
+            exploration_stats_dict)
+        exploration_stats.validate()
+
+        # Make the exp_id integer.
+        exploration_stats.exp_id = 10
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_id to be a string')):
+            exploration_stats.validate()
+
+        # Make the num_actual_starts string.
+        exploration_stats.exp_id = 'exp_id1'
+        exploration_stats.num_actual_starts = '0'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected num_actual_starts to be an int')):
+            exploration_stats.validate()
+
+        # Make the state_stats_mapping list.
+        exploration_stats.num_actual_starts = 10
+        exploration_stats.state_stats_mapping = []
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected state_stats_mapping to be a dict')):
+            exploration_stats.validate()
+
+        # Make the num_completions negative.
+        exploration_stats.state_stats_mapping = {}
+        exploration_stats.num_completions = -5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            '%s cannot have negative values' % ('num_completions'))):
+            exploration_stats.validate()
+
+
+class StateStatsTests(test_utils.GenericTestBase):
+    """Tests the StateStats domain object."""
+
+    def test_from_dict(self):
+        state_stats_dict = {
+            'total_answers_count': 10,
+            'useful_feedback_count': 4,
+            'learners_answered_correctly': 3,
+            'total_hit_count': 18,
+            'first_hit_count': 7,
+            'total_solutions_triggered_count': 2
+        }
+        state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
+        expected_state_stats = stats_domain.StateStats.from_dict(
+            state_stats_dict)
+        self.assertEqual(
+            state_stats.total_answers_count,
+            expected_state_stats.total_answers_count)
+        self.assertEqual(
+            state_stats.useful_feedback_count,
+            expected_state_stats.useful_feedback_count)
+        self.assertEqual(
+            state_stats.learners_answered_correctly,
+            expected_state_stats.learners_answered_correctly)
+        self.assertEqual(
+            state_stats.total_hit_count, expected_state_stats.total_hit_count)
+        self.assertEqual(
+            state_stats.first_hit_count, expected_state_stats.first_hit_count)
+        self.assertEqual(
+            state_stats.total_solutions_triggered_count,
+            expected_state_stats.total_solutions_triggered_count)
+
+    def test_create_default(self):
+        state_stats = stats_domain.StateStats.create_default()
+        self.assertEqual(state_stats.total_answers_count, 0)
+        self.assertEqual(state_stats.useful_feedback_count, 0)
+        self.assertEqual(state_stats.learners_answered_correctly, 0)
+        self.assertEqual(state_stats.total_hit_count, 0)
+        self.assertEqual(state_stats.total_answers_count, 0)
+        self.assertEqual(state_stats.total_solutions_triggered_count, 0)
+
+    def test_to_dict(self):
+        state_stats_dict = {
+            'total_answers_count': 10,
+            'useful_feedback_count': 4,
+            'learners_answered_correctly': 3,
+            'total_hit_count': 18,
+            'first_hit_count': 7,
+            'total_solutions_triggered_count': 2
+        }
+        state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
+        self.assertEqual(state_stats_dict, state_stats.to_dict())
+
+    def test_validation(self):
+        state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
+        state_stats.validate()
+
+        # Change total_answers_count to string.
+        state_stats.total_answers_count = '10'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected total_answers_count to be an int')):
+            state_stats.validate()
+
+        # Make the total_answers_count negative.
+        state_stats.total_answers_count = -5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            '%s cannot have negative values' % ('total_answers_count'))):
+            state_stats.validate()
 
 
 class StateAnswersTests(test_utils.GenericTestBase):

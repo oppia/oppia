@@ -62,9 +62,6 @@ class ExplorationModel(base_models.VersionedModel):
     blurb = ndb.TextProperty(default='', indexed=False)
     # 'Author notes' for this exploration.
     author_notes = ndb.TextProperty(default='', indexed=False)
-    # Schema storing specifications of the contents of any gadget panels,
-    # along with associated customizations for each gadget instance.
-    skin_customizations = ndb.JsonProperty(indexed=False)
 
     # The version of the states blob schema.
     states_schema_version = ndb.IntegerProperty(
@@ -89,7 +86,9 @@ class ExplorationModel(base_models.VersionedModel):
     skill_tags = ndb.StringProperty(repeated=True, indexed=True)
     # DEPRECATED in v2.0.1. Do not use.
     # TODO(sll): Remove this property from the model.
-    default_skin = ndb.StringProperty(default=feconf.DEFAULT_SKIN_ID)
+    default_skin = ndb.StringProperty(default='conversation_v1')
+    # DEPRECATED in v2.5.4. Do not use.
+    skin_customizations = ndb.JsonProperty(indexed=False)
 
     @classmethod
     def get_exploration_count(cls):
