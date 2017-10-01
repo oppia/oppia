@@ -852,7 +852,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.navigateToState = function(stateName) {
-      routerService.navigateToMainTab(stateName);
+      RouterService.navigateToMainTab(stateName);
     };
   }
 ]);

@@ -29,7 +29,8 @@ oppia.directive('collectionEditorNavbar', [
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $modal, AlertsService, routerService, UndoRedoService,
+          $scope, $modal, AlertsService, routerService, UndoRedoService,
+
             CollectionEditorStateService, CollectionValidationService,
             CollectionRightsBackendApiService,
             EditableCollectionBackendApiService,
@@ -46,12 +47,12 @@ oppia.directive('collectionEditorNavbar', [
           $scope.isSaveInProgress = (
             CollectionEditorStateService.isSavingCollection);
 
-          $scope.getTabStatuses = routerService.getTabStatuses;
-          $scope.selectMainTab = routerService.navigateToMainTab;
-          $scope.selectPreviewTab = routerService.navigateToPreviewTab;
-          $scope.selectSettingsTab = routerService.navigateToSettingsTab;
-          $scope.selectStatsTab = routerService.navigateToStatsTab;
-          $scope.selectHistoryTab = routerService.navigateToHistoryTab;
+          $scope.getTabStatuses = RouterService.getTabStatuses;
+          $scope.selectMainTab = RouterService.navigateToMainTab;
+          $scope.selectPreviewTab = RouterService.navigateToPreviewTab;
+          $scope.selectSettingsTab = RouterService.navigateToSettingsTab;
+          $scope.selectStatsTab = RouterService.navigateToStatsTab;
+          $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
 
           var _validateCollection = function() {
             if ($scope.collectionRights.isPrivate()) {

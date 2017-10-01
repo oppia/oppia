@@ -17,7 +17,7 @@
  * status label for a thread in the feedback tab of the exploration editor.
  */
 
-oppia.factory('threadStatusDisplayService', [function() {
+oppia.factory('ThreadStatusDisplayService', [function() {
   var _STATUS_CHOICES = [{
     id: 'open',
     text: 'Open'

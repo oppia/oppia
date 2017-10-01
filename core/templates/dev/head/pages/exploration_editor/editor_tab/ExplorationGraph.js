@@ -39,7 +39,7 @@ oppia.controller('ExplorationGraph', [
     };
 
     $scope.onClickStateInMinimap = function(stateName) {
-      routerService.navigateToMainTab(stateName);
+      RouterService.navigateToMainTab(stateName);
     };
 
     $scope.getActiveStateName = function() {
