@@ -226,7 +226,7 @@ class ExplorationChange(object):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name')
+        'init_state_name', 'auto_tts_enabled')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -1573,7 +1573,7 @@ class Exploration(object):
                  language_code, tags, blurb, author_notes,
                  states_schema_version, init_state_name, states_dict,
                  param_specs_dict, param_changes_list, version,
-                 created_on=None, last_updated=None):
+                 created_on=None, last_updated=None, auto_tts_enabled=True):
         """Initializes an Exploration domain object.
 
         Args:
@@ -1601,6 +1601,8 @@ class Exploration(object):
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
                 was last updated.
+            auto_tts_enabled: bool. True if automatic text-to-speech is
+                enabled.
         """
         self.id = exploration_id
         self.title = title
@@ -1628,6 +1630,7 @@ class Exploration(object):
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
+        self.auto_tts_enabled = auto_tts_enabled
 
     @classmethod
     def create_default_exploration(
@@ -2223,6 +2226,15 @@ class Exploration(object):
                 'it is not in the list of states %s for this '
                 'exploration.' % (init_state_name, self.states.keys()))
         self.init_state_name = init_state_name
+
+    def update_auto_tts_enabled(self, auto_tts_enabled):
+        """Update whether automatic text-to-speech is enabled.
+
+        Args:
+            auto_tts_enabled: bool. Boolean representing whether automatic
+                text-to-speech is enabled or not.        
+        """
+        self.auto_tts_enabled = auto_tts_enabled
 
     # Methods relating to states.
     def add_states(self, state_names):
@@ -3175,6 +3187,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v17_dict_to_v18_dict(cls, exploration_dict):
+        """ Converts a v17 exploration dict into a v18 exploration dict.
+
+        Adds auto_tts_enabled property.
+        """
+        exploration_dict['schema_version'] = 18
+
+        if exploration_dict['category'] == 'Languages':
+            exploration_dict['auto_tts_enabled'] = False
+        else:
+            exploration_dict['auto_tts_enabled'] = True
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3290,6 +3317,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v16_dict_to_v17_dict(
                 exploration_dict)
             exploration_schema_version = 17
+
+        if exploration_schema_version == 17:
+            exploration_dict = cls._convert_v17_dict_to_v18_dict(
+                exploration_dict)
+            exploration_schema_version = 18
 
         return (exploration_dict, initial_schema_version)
 

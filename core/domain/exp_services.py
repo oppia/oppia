@@ -738,6 +738,8 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_changes(change.new_value)
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
+                elif change.property_name == 'auto_tts_enabled':
+                    exploration.update_auto_tts_enabled(change.new_value)
             elif (
                     change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):

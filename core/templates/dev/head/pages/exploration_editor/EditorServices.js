@@ -275,7 +275,8 @@ oppia.factory('changeListService', [
       param_changes: true,
       param_specs: true,
       tags: true,
-      title: true
+      title: true,
+      auto_tts_enabled: true
     };
 
     var ALLOWED_STATE_BACKEND_NAMES = {
@@ -652,12 +653,17 @@ oppia.factory('explorationPropertyService', [
         if (this.propertyName === null) {
           throw 'Exploration property name cannot be null.';
         }
+        console.log("a: " + this.savedMemento);
+        console.log("3: " + this.displayed);
+
         this.displayed = this._normalize(this.displayed);
+        console.log("4: " + this.displayed);
         if (!this._isValid(this.displayed) || !this.hasChanged()) {
           this.restoreFromMemento();
           return;
         }
 
+        console.log("5: " + this.displayed);
         if (angular.equals(this.displayed, this.savedMemento)) {
           return;
         }
@@ -822,6 +828,45 @@ oppia.factory('explorationParamChangesService', [
   'explorationPropertyService', function(explorationPropertyService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'param_changes';
+    return child;
+  }
+]);
+
+oppia.factory('explorationAutomaticTextToSpeechService', [
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    console.log(child);
+    child.propertyName = 'auto_tts_enabled';
+
+    child._isValid = function(value) {
+      return typeof(value) === "boolean";
+    };
+
+    child.isAutomaticTextToSpeechEnabled = function() {
+      return child.savedMemento;
+    };
+
+    child.enableAutomaticTextToSpeech = function() {
+      child.displayed = true;
+      child.saveDisplayedValue();
+    };
+
+    child.disableAutomaticTextToSpeech = function() {
+      child.displayed = false;
+      child.saveDisplayedValue();
+    };
+
+    child.toggleAutomaticTextToSpeech = function() {
+      console.log("debug");
+      console.log("1:" + child.displayed);
+      child.displayed = !child.displayed;
+      console.log("2: " + child.displayed);
+      child.saveDisplayedValue();
+      console.log("d");
+      console.log(child.displayed);
+      console.log(child.savedMemento);
+    };
+
     return child;
   }
 ]);
