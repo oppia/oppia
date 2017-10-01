@@ -16,8 +16,6 @@
  * @fileoverview Services for stats reporting.
  */
 
-oppia.constant('MIN_TIME_FOR_ACTUAL_START_SECS', 60);
-
 oppia.constant('STATS_REPORTING_URLS', {
   ANSWER_SUBMITTED: '/explorehandler/answer_submitted_event/<exploration_id>',
   EXPLORATION_COMPLETED: (
@@ -33,18 +31,15 @@ oppia.constant('STATS_REPORTING_URLS', {
 });
 
 oppia.factory('StatsReportingService', [
-  '$http', '$rootScope', 'StopwatchObjectFactory', 'messengerService',
+  '$http', 'StopwatchObjectFactory', 'messengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
-  'MIN_TIME_FOR_ACTUAL_START_SECS',
   function(
-      $http, $rootScope, StopwatchObjectFactory, messengerService,
-      UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
-      MIN_TIME_FOR_ACTUAL_START_SECS) {
+      $http, StopwatchObjectFactory, messengerService,
+      UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService) {
     var explorationId = null;
     var explorationVersion = null;
     var sessionId = null;
     var stopwatch = null;
-    var totalTimeStopwatch = null;
     var optionalCollectionId = undefined;
     var statesVisited = {};
     var numStatesVisited = 0;
@@ -56,12 +51,6 @@ oppia.factory('StatsReportingService', [
         });
     };
 
-    $rootScope.$on('sessionTime', function(evt, totalTime, stateName) {
-      if (totalTime >= MIN_TIME_FOR_ACTUAL_START_SECS) {
-        recordExplorationActuallyStarted(stateName, totalTime);
-      }
-    });
-
     return {
       initSession: function(
           newExplorationId, newExplorationVersion, newSessionId,
@@ -70,7 +59,6 @@ oppia.factory('StatsReportingService', [
         explorationVersion = newExplorationVersion;
         sessionId = newSessionId;
         stopwatch = StopwatchObjectFactory.create();
-        totalTimeStopwatch = StopwatchObjectFactory.create();
         optionalCollectionId = collectionId;
       },
       // Note that this also resets the stopwatch.
@@ -99,9 +87,6 @@ oppia.factory('StatsReportingService', [
         siteAnalyticsService.registerNewCard(1);
 
         stopwatch.reset();
-        totalTimeStopwatch.reset();
-        $rootScope.$broadcast(
-          'sessionTime', totalTimeStopwatch.getTimeInSecs(), stateName);
       },
       recordExplorationActuallyStarted: function(stateName, totalTime) {
         $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
@@ -146,8 +131,6 @@ oppia.factory('StatsReportingService', [
           siteAnalyticsService.registerNewCard(numStatesVisited);
         }
 
-        $rootScope.$broadcast(
-          'sessionTime', totalTimeStopwatch.getTimeInSecs(), newStateName);
         stopwatch.reset();
       },
       recordExplorationCompleted: function(stateName, params) {
@@ -181,8 +164,6 @@ oppia.factory('StatsReportingService', [
           rule_spec_index: ruleIndex,
           classification_categorization: classificationCategorization
         });
-        $rootScope.$broadcast(
-          'sessionTime', totalTimeStopwatch.getTimeInSecs(), stateName);
       },
       recordMaybeLeaveEvent: function(stateName, params) {
         $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {

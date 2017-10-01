@@ -16,6 +16,8 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
+oppia.constant('MIN_TIME_FOR_ACTUAL_START_SECS', 60);
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 // A service that provides a number of utility functions for JS used by
@@ -33,7 +35,8 @@ oppia.factory('oppiaPlayerService', [
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
-  'LanguageUtilService', 'SolutionManagerService',
+  'LanguageUtilService', 'SolutionManagerService', 'StopwatchObjectFactory',
+  'MIN_TIME_FOR_ACTUAL_START_SECS',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
@@ -43,7 +46,8 @@ oppia.factory('oppiaPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, SolutionManagerService) {
+      LanguageUtilService, SolutionManagerService, StopwatchObjectFactory,
+      MIN_TIME_FOR_ACTUAL_START_SECS) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -51,6 +55,8 @@ oppia.factory('oppiaPlayerService', [
     var answerIsBeingProcessed = false;
 
     var exploration = null;
+
+    var totalTimeStopwatch = null;
 
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
@@ -125,6 +131,8 @@ oppia.factory('oppiaPlayerService', [
       }
 
       $rootScope.$broadcast('playerStateChange', initialState.name);
+      $rootScope.$broadcast(
+        'sessionTime', totalTimeStopwatch.getTimeInSecs(), initialState.name);
       successCallback(exploration, questionHtml, newParams);
     };
 
@@ -154,6 +162,13 @@ oppia.factory('oppiaPlayerService', [
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
+      }
+    });
+
+    $rootScope.$on('sessionTime', function(evt, totalTime, stateName) {
+      if (totalTime >= MIN_TIME_FOR_ACTUAL_START_SECS) {
+        StatsReportingService.recordExplorationActuallyStarted(
+          stateName, totalTime);
       }
     });
 
@@ -223,6 +238,7 @@ oppia.factory('oppiaPlayerService', [
             StatsReportingService.initSession(
               _explorationId, version, data.session_id,
               GLOBALS.collectionId);
+            totalTimeStopwatch = StopwatchObjectFactory.create();
             AudioTranslationManagerService.init(
               exploration.getAllAudioLanguageCodes(),
               data.preferred_audio_language_code,
@@ -380,6 +396,8 @@ oppia.factory('oppiaPlayerService', [
 
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
         $rootScope.$broadcast('playerStateChange', newStateName);
+        $rootScope.$broadcast(
+          'sessionTime', totalTimeStopwatch.getTimeInSecs(), newStateName);
         successCallback(
           newStateName, refreshInteraction, feedbackHtml, questionHtml,
           newParams);
