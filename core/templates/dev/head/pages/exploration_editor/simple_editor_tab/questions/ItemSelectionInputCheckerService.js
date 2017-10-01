@@ -45,13 +45,14 @@ oppia.factory('ItemSelectionInputCheckerService', [
 
           // Check to make sure that the coverage is unique.
           for (var j = 0; j < coveredChoices.length; j++) {
-            var matched = 0;
-            for (var k = 0; k < rules[0].inputs.x.length; k++) {
-              if (coveredChoices[j].indexOf(rules[0].inputs.x[k]) !== -1) {
-                matched++;
+            var matchedCoveredChoiceCount = 0;
+            var coveredChoice = coveredChoices[j];
+            rules[0].inputs.x.forEach(function(input) {
+              if (coveredChoice.indexOf(input) !== -1) {
+                matchedCoveredChoiceCount++;
               }
-            }
-            if (matched === coveredChoices[j].length) {
+            });
+            if (matchedCoveredChoiceCount === coveredChoice.length) {
               return false;
             }
           }
