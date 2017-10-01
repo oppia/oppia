@@ -4,11 +4,11 @@
 <div class="options-container">
   <div style="margin-bottom: 0;">
     <ul>
-      <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: disc;">
-        <md-button ng-click="deleteChoice(choice)" class="btn-delete-option"
+      <li ng-repeat="choice in getChoices() track by $index" class="option">
+        <button ng-click="deleteChoice(choice)" class="btn-delete-option"
                    ng-if="getChoices().length > 2">
           <i class="material-icons md-18">&#xE5CD;</i>
-        </md-button>
+        </button>
         <editor-html-field class="option-text"
                             original-value="choice"
                             on-finish-editing="saveChoice($index, newValue)"
@@ -65,10 +65,13 @@
     width: 100%;
   }
   checkbox-editor .option {
-    margin-left: 20px;
+    display: list-item;
+    list-style: disc outside none;
+    margin: 0 0 5px 20px;
   }
   checkbox-editor .option-text {
-    width: 90%;
+    display: inherit;
+    width: 100%;
   }
   checkbox-editor .option-text .view-mode {
     padding: 10px;
