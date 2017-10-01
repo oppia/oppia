@@ -20,7 +20,7 @@ describe('Checkbox input checker service', function() {
   beforeEach(module('oppia'));
 
   var AnswerGroupObjectFactory;
-  var mcics;
+  var isics;
 
   var customizationArgs = {
     choices: {
@@ -34,7 +34,7 @@ describe('Checkbox input checker service', function() {
 
   beforeEach(inject(function($injector) {
     AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
-    mcics = $injector.get('MultipleChoiceInputCheckerService');
+    isics = $injector.get('ItemSelectionInputCheckerService');
   }));
 
   it('should return false for two Equals rules', function() {
@@ -42,12 +42,12 @@ describe('Checkbox input checker service', function() {
       rules: [{
         type: 'Equals',
         inputs: {
-          x: 0
+          x: []
         }
       }, {
         type: 'Equals',
         inputs: {
-          x: 2
+          x: []
         }
       }],
       outcome: {
@@ -57,7 +57,7 @@ describe('Checkbox input checker service', function() {
       },
       correct: false
     }];
-    expect(mcics.isValid(customizationArgs, answerGroupsFalse)).toBe(false);
+    expect(isics.isValid(customizationArgs, answerGroupsFalse)).toBe(false);
   });
 
   it('should return true for one Equals rules', function() {
@@ -65,7 +65,7 @@ describe('Checkbox input checker service', function() {
       rules: [{
         type: 'Equals',
         inputs: {
-          x: 0
+          x: []
         }
       }],
       outcome: {
@@ -75,7 +75,7 @@ describe('Checkbox input checker service', function() {
       },
       correct: false
     }];
-    expect(mcics.isValid(customizationArgs, answerGroupsTrue)).toBe(true);
+    expect(isics.isValid(customizationArgs, answerGroupsTrue)).toBe(true);
   });
 
   it('should return false for duplicate rules', function() {
@@ -83,7 +83,7 @@ describe('Checkbox input checker service', function() {
       rules: [{
         type: 'Equals',
         inputs: {
-          x: 0
+          x: []
         }
       }],
       outcome: {
@@ -96,7 +96,7 @@ describe('Checkbox input checker service', function() {
       rules: [{
         type: 'Equals',
         inputs: {
-          x: 0
+          x: []
         }
       }],
       outcome: {
@@ -106,6 +106,30 @@ describe('Checkbox input checker service', function() {
       },
       correct: false
     }];
-    expect(mcics.isValid(customizationArgs, answerGroupsTrue)).toBe(false);
+    expect(isics.isValid(customizationArgs, answerGroupsTrue)).toBe(false);
+  });
+
+  it('should return false for rule sets larger than number of choices', 
+  function() {
+    var answerGroupsFalse = [{
+      rules: [{
+        type: 'Equals',
+        inputs: {
+          x: [
+            '<p>Option 1</p>',
+            '<p>Option 2</p>',
+            '<p>Option 3</p>',
+            '<p>Option 4</p>',
+          ]
+        }
+      }],
+      outcome: {
+        feedback: [],
+        param_changes: [],
+        dest: 'Question 1'
+      },
+      correct: false
+    }];
+    expect(isics.isValid(customizationArgs, answerGroupsFalse)).toBe(false);
   });
 });

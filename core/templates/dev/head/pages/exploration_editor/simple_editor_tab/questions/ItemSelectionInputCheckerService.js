@@ -30,17 +30,26 @@ oppia.factory('ItemSelectionInputCheckerService', [
         // - Each answer group has exactly one rule (for an "Equals" rule). The
         //   argument for each of these rules should match a choice in
         //   customizationArgs.
-        // - Each answer group corresponds to a different choice.
+        // - Each answer group corresponds to a different set of choices.
         var numChoices = customizationArgs.choices.value.length;
         var coveredChoices = [];
         for (var i = 0; i < answerGroups.length; i++) {
           var rules = answerGroups[i].rules;
           if (rules.length !== 1 ||
-              rules[0].type !== 'Equals' || rules[0].inputs.x >= numChoices) {
+              rules[0].type !== 'Equals' || 
+              rules[0].inputs.x.length > numChoices) {
             return false;
           }
-          if (coveredChoices.indexOf(rules[0].inputs.x) !== -1) {
-            return false;
+          for (var j = 0; j < coveredChoices.length; j++) {
+            var matched = 0;
+            for (var k = 0; k < rules[0].inputs.x.length; k++) {
+              if (coveredChoices[j].indexOf(rules[0].inputs.x[k]) !== 1) {
+                matched++;
+              }
+            }
+            if (matched === coveredChoices[j].length) {
+              return false;
+            }
           }
           coveredChoices.push(rules[0].inputs.x);
         }

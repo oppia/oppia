@@ -51,19 +51,19 @@ oppia.factory('SimpleEditorManagerService', [
       ItemSelectionInput: {
         CUSTOMIZATION_ARGS:  {
           choices: {
-            value: ['<p>Choice 1</p>']
+            value: ['<p>Choice 1</p>', '<p>Choice 2</p>']
           },
           minAllowableSelectionCount: {
-            value: 1
+            value: 2
           },
           maxAllowableSelectionCount: {
-            value: 1
+            value: 2
           }
         },
         FIRST_ANSWER_GROUP_RULE: {
           type: 'Equals',
           value: {
-            x: 0
+            x: []
           }
         }
       },
