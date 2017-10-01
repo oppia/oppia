@@ -122,6 +122,15 @@ class StateStatsTests(test_utils.GenericTestBase):
             state_stats.total_solutions_triggered_count,
             expected_state_stats.total_solutions_triggered_count)
 
+    def test_create_default(self):
+        state_stats = stats_domain.StateStats.create_default()
+        self.assertEqual(state_stats.total_answers_count, 0)
+        self.assertEqual(state_stats.useful_feedback_count, 0)
+        self.assertEqual(state_stats.learners_answered_correctly, 0)
+        self.assertEqual(state_stats.total_hit_count, 0)
+        self.assertEqual(state_stats.total_answers_count, 0)
+        self.assertEqual(state_stats.total_solutions_triggered_count, 0)
+
     def test_to_dict(self):
         state_stats_dict = {
             'total_answers_count': 10,

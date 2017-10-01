@@ -737,6 +737,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         actual_dict = exploration.get_state_names_mapping(change_list)
         self.assertEqual(actual_dict, expected_dict)
 
+        # Test addition, rename and deletion.
+        exploration.add_states(['New state 2'])
+        exploration.rename_state('New state 2', 'Renamed state 2')
+        exploration.delete_state('Renamed state 2')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state 2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 2',
+            'new_state_name': 'Renamed state 2'
+        }, {
+            'cmd': 'delete_state',
+            'state_name': 'Renamed state 2'
+        }]
+        expected_dict = {
+            'New state3': 'New state3',
+            'Renamed state': 'Renamed state',
+            'End': 'End'
+        }
+        actual_dict = exploration.get_state_names_mapping(change_list)
+        self.assertEqual(actual_dict, expected_dict)
+
     def test_get_trainable_states_dict(self):
         """Test the get_trainable_states_dict() method."""
         exp_id = 'exp_id1'
