@@ -62,9 +62,8 @@ def update_stats(exp_id, exp_version, state_name, event_type, update_params):
             exploration_stats.state_stats_mapping[
                 state_name].first_hit_count += 1
     elif event_type == feconf.EVENT_TYPE_SOLUTION:
-        if update_params['is_solution_preceding_answer']:
-            exploration_stats.state_stats_mapping[
-                state_name].total_solutions_triggered_count += 1
+        exploration_stats.state_stats_mapping[
+            state_name].total_solutions_triggered_count += 1
 
     save_stats_model(exploration_stats)
 

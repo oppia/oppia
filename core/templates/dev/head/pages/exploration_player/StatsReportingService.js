@@ -16,7 +16,7 @@
  * @fileoverview Services for stats reporting.
  */
 
-oppia.constant('MIN_TIME_FOR_ACTUAL_START', 60);
+oppia.constant('MIN_TIME_FOR_ACTUAL_START_SECS', 60);
 
 oppia.constant('STATS_REPORTING_URLS', {
   ANSWER_SUBMITTED: '/explorehandler/answer_submitted_event/<exploration_id>',
@@ -33,18 +33,18 @@ oppia.constant('STATS_REPORTING_URLS', {
 });
 
 oppia.factory('StatsReportingService', [
-  '$http', '$rootScope','StopwatchObjectFactory', 'messengerService',
+  '$http', '$rootScope', 'StopwatchObjectFactory', 'messengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
-  'MIN_TIME_FOR_ACTUAL_START',
+  'MIN_TIME_FOR_ACTUAL_START_SECS',
   function(
       $http, $rootScope, StopwatchObjectFactory, messengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
-      MIN_TIME_FOR_ACTUAL_START) {
+      MIN_TIME_FOR_ACTUAL_START_SECS) {
     var explorationId = null;
     var explorationVersion = null;
     var sessionId = null;
     var stopwatch = null;
-    var totalTime = null;
+    var totalTimeStopwatch = null;
     var optionalCollectionId = undefined;
     var statesVisited = {};
     var numStatesVisited = 0;
@@ -56,9 +56,10 @@ oppia.factory('StatsReportingService', [
         });
     };
 
-    $rootScope.$on('sessionTime', function(evt, totalTime, stateName) {
-      if(totalTime.getTimeInSecs() >= MIN_TIME_FOR_ACTUAL_START) {
-        recordExplorationActuallyStarted(stateName, totalTime);
+    $rootScope.$on('sessionTime', function(evt, totalTimeStopwatch, stateName) {
+      if (totalTimeStopwatch.getTimeInSecs() >= (
+          MIN_TIME_FOR_ACTUAL_START_SECS)) {
+        recordExplorationActuallyStarted(stateName, totalTimeStopwatch);
       }
     });
 
@@ -70,7 +71,7 @@ oppia.factory('StatsReportingService', [
         explorationVersion = newExplorationVersion;
         sessionId = newSessionId;
         stopwatch = StopwatchObjectFactory.create();
-        totalTime = StopwatchObjectFactory.create();
+        totalTimeStopwatch = StopwatchObjectFactory.create();
         optionalCollectionId = collectionId;
       },
       // Note that this also resets the stopwatch.
@@ -99,25 +100,25 @@ oppia.factory('StatsReportingService', [
         siteAnalyticsService.registerNewCard(1);
 
         stopwatch.reset();
-        totalTime.reset();
+        totalTimeStopwatch.reset();
         $rootScope.$broadcast(
-          'sessionTime', totalTime.getTimeInSecs(), stateName);
+          'sessionTime', totalTimeStopwatch.getTimeInSecs(), stateName);
       },
-      recordExplorationActuallyStarted: function(stateName, totalTime) {
+      recordExplorationActuallyStarted: function(
+          stateName, totalTimeStopwatch) {
         $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
           exploration_version: explorationVersion,
           state_name: stateName,
           session_id: sessionId,
-          client_time_spent_in_secs: totalTime
+          client_time_spent_in_secs: totalTimeStopwatch
         });
       },
-      recordSolutionHit: function(stateName, isSolutionPrecedingAnswer) {
+      recordSolutionHit: function(stateName) {
         $http.post(getFullStatsUrl('SOLUTION_HIT'), {
           exploration_version: explorationVersion,
           state_name: stateName,
           session_id: sessionId,
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
-          is_solution_preceding_answer: isSolutionPrecedingAnswer
+          client_time_spent_in_secs: stopwatch.getTimeInSecs()
         });
       },
       // Note that this also resets the stopwatch.
@@ -148,7 +149,7 @@ oppia.factory('StatsReportingService', [
         }
 
         $rootScope.$broadcast(
-          'sessionTime', totalTime.getTimeInSecs(), newStateName);
+          'sessionTime', totalTimeStopwatch.getTimeInSecs(), newStateName);
         stopwatch.reset();
       },
       recordExplorationCompleted: function(stateName, params) {
@@ -183,7 +184,7 @@ oppia.factory('StatsReportingService', [
           classification_categorization: classificationCategorization
         });
         $rootScope.$broadcast(
-          'sessionTime', totalTime.getTimeInSecs(), stateName);
+          'sessionTime', totalTimeStopwatch.getTimeInSecs(), stateName);
       },
       recordMaybeLeaveEvent: function(stateName, params) {
         $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {

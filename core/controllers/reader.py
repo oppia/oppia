@@ -407,8 +407,7 @@ class SolutionHitEventHandler(base.BaseHandler):
         event_services.SolutionHitEventHandler.record(
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
-            self.payload.get('client_time_spent_in_secs'),
-            self.payload.get('is_solution_preceding_answer'))
+            self.payload.get('client_time_spent_in_secs'))
 
 
 class ExplorationCompleteEventHandler(base.BaseHandler):

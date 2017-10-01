@@ -203,8 +203,6 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         client_time_spent_in_secs: Time since start of this state when this
             event was recorded
         session_id: ID of current student's session
-        is_solution_preceding_answer: Whether the solution was triggered before
-            a correct answer was submitted.
     """
     # Which specific type of event this is
     event_type = ndb.StringProperty()
@@ -218,9 +216,6 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     client_time_spent_in_secs = ndb.FloatProperty()
-    # Whether the solution was triggered before the student submitted a correct
-    # answer to the same state.
-    is_solution_preceding_answer = ndb.BooleanProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -234,7 +229,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
-               client_time_spent_in_secs, is_solution_preceding_answer):
+               client_time_spent_in_secs):
         """Creates a new answer submitted event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -245,8 +240,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             exp_version=exp_version,
             state_name=state_name,
             session_id=session_id,
-            client_time_spent_in_secs=client_time_spent_in_secs,
-            is_solution_preceding_answer=is_solution_preceding_answer)
+            client_time_spent_in_secs=client_time_spent_in_secs)
         solution_hit_event_entity.put()
         return entity_id
 

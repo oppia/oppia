@@ -118,15 +118,12 @@ class SolutionHitEventHandler(BaseEventHandler):
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs, is_solution_preceding_answer):
+            client_time_spent_in_secs):
         stats_models.SolutionHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs, is_solution_preceding_answer)
-        update_params = {
-            'is_solution_preceding_answer': is_solution_preceding_answer
-        }
+            client_time_spent_in_secs)
         stats_services.update_stats(
-            exp_id, exp_version, state_name, cls.EVENT_TYPE, update_params)
+            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class StartExplorationEventHandler(BaseEventHandler):
@@ -169,8 +166,9 @@ class CompleteExplorationEventHandler(BaseEventHandler):
         stats_models.CompleteExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
-        stats_services.update_stats(
-            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_services.update_stats(
+                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class RateExplorationEventHandler(BaseEventHandler):

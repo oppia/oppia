@@ -65,7 +65,7 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_event_models(self):
         event_id = (
             stat_models.SolutionHitEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True))
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0))
 
         event_model = stat_models.SolutionHitEventLogEntryModel.get(
             event_id)
@@ -75,7 +75,6 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
-        self.assertEqual(event_model.is_solution_preceding_answer, True)
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateHitEventLogEntryModel class."""

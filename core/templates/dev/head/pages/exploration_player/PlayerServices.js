@@ -322,8 +322,7 @@ oppia.factory('oppiaPlayerService', [
             classificationResult.classificationCategorization);
 
           if (SolutionManagerService.hasSolutionBeenViewed()) {
-            StatsReportingService.recordSolutionHit(
-              oldStateName, true);
+            StatsReportingService.recordSolutionHit(oldStateName);
           }
         }
 
