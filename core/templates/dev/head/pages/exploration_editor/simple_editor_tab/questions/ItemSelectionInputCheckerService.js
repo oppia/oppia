@@ -34,7 +34,7 @@ oppia.factory('ItemSelectionInputCheckerService', [
         // - Each answer group should have choices within customizationArgs.
         var numChoices = customizationArgs.choices.value.length;
         var choices = customizationArgs.choices.value;
-        var coveredChoices = [];
+        var coveredSetsOfChoices = [];
         for (var i = 0; i < answerGroups.length; i++) {
           var rules = answerGroups[i].rules;
           if (rules.length !== 1 ||
@@ -44,19 +44,16 @@ oppia.factory('ItemSelectionInputCheckerService', [
           }
 
           // Check to make sure that the coverage is unique.
-          for (var j = 0; j < coveredChoices.length; j++) {
-            var matchedCoveredChoiceCount = 0;
-            var coveredChoice = coveredChoices[j];
-            rules[0].inputs.x.forEach(function(input) {
-              if (coveredChoice.indexOf(input) !== -1) {
-                matchedCoveredChoiceCount++;
-              }
-            });
-            if (matchedCoveredChoiceCount === coveredChoice.length) {
-              return false;
-            }
+          var sortedChoices = Array.prototype.slice.call(
+            rules[0].inputs.x).sort();
+          var matchFound = coveredSetsOfChoices.some(function(setOfChoices) {
+            return angular.equals(
+              Array.prototype.slice.call(setOfChoices).sort(), sortedChoices);
+          });
+          if (matchFound) {
+            return false;
           }
-          coveredChoices.push(rules[0].inputs.x);
+          coveredSetsOfChoices.push(rules[0].inputs.x);
 
           // Check to ensure that each answer group has choices within
           // customizationArgs.
