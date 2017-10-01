@@ -128,11 +128,12 @@ oppia.factory('oppiaPlayerService', [
       if (!_editorPreviewMode) {
         StatsReportingService.recordExplorationStarted(
           exploration.initStateName, newParams);
+        totalTimeStopwatch.reset();
+        $rootScope.$broadcast(
+          'sessionTime', totalTimeStopwatch.getTimeInSecs(), initialState.name);
       }
 
       $rootScope.$broadcast('playerStateChange', initialState.name);
-      $rootScope.$broadcast(
-        'sessionTime', totalTimeStopwatch.getTimeInSecs(), initialState.name);
       successCallback(exploration, questionHtml, newParams);
     };
 
@@ -392,12 +393,12 @@ oppia.factory('oppiaPlayerService', [
           StatsReportingService.recordStateTransition(
             oldStateName, newStateName, answer,
             LearnerParamsService.getAllParams());
+          $rootScope.$broadcast(
+            'sessionTime', totalTimeStopwatch.getTimeInSecs(), newStateName);
         }
 
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
         $rootScope.$broadcast('playerStateChange', newStateName);
-        $rootScope.$broadcast(
-          'sessionTime', totalTimeStopwatch.getTimeInSecs(), newStateName);
         successCallback(
           newStateName, refreshInteraction, feedbackHtml, questionHtml,
           newParams);
