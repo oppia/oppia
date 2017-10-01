@@ -32,7 +32,6 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
-from core.domain import rte_component_registry
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models

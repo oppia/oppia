@@ -37,7 +37,6 @@ from core.domain import fs_domain
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
-from core.domain import rte_component_registry
 from core.domain import search_services
 from core.domain import stats_services
 from core.domain import stats_services_old
