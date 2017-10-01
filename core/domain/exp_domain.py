@@ -1573,7 +1573,7 @@ class Exploration(object):
                  language_code, tags, blurb, author_notes,
                  states_schema_version, init_state_name, states_dict,
                  param_specs_dict, param_changes_list, version,
-                 created_on=None, last_updated=None, auto_tts_enabled=True):
+                 auto_tts_enabled, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -1667,7 +1667,8 @@ class Exploration(object):
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
+            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0,
+            feconf.DEAULT_AUTO_TTS_ENABLED)
 
     @classmethod
     def from_dict(

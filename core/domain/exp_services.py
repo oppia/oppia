@@ -167,7 +167,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
         exploration_model.param_specs, exploration_model.param_changes,
-        exploration_model.version, created_on=exploration_model.created_on,
+        exploration_model.version, exploration_model.auto_tts_enabled,
+        created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
 
 
@@ -817,6 +818,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         for (state_name, state) in exploration.states.iteritems()}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
+    exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
 
     exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
@@ -880,6 +882,7 @@ def _create_exploration(
             for (state_name, state) in exploration.states.iteritems()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
+        auto_tts_enabled=exploration.auto_tts_enabled
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
