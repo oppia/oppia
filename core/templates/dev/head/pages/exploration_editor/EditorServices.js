@@ -835,7 +835,7 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
     child.propertyName = 'auto_tts_enabled';
 
     child._isValid = function(value) {
-      return typeof(value) === "boolean";
+      return (typeof value === 'boolean');
     };
 
     child.isAutomaticTextToSpeechEnabled = function() {
