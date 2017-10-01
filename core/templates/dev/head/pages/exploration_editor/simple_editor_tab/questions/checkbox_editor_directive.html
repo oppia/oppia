@@ -6,7 +6,7 @@
     <ul>
       <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: disc;">
         <md-button ng-click="deleteChoice(choice)" class="btn-delete-option"
-                   ng-if="getChoices().length > 1">
+                   ng-if="getChoices().length > 2">
           <i class="material-icons md-18">&#xE5CD;</i>
         </md-button>
         <editor-html-field class="option-text"
@@ -58,25 +58,25 @@
 </editor-html-field>
 
 <style>
-  item-selection-editor .options-container {
+  checkbox-editor .options-container {
     background-color: #f0f0f0;
     margin-top: 20px;
     padding: 24px 0;
     width: 100%;
   }
-  item-selection-editor .option {
+  checkbox-editor .option {
     margin-left: 20px;
   }
-  item-selection-editor .option-text {
+  checkbox-editor .option-text {
     width: 90%;
   }
-  item-selection-editor .option-text .view-mode {
+  checkbox-editor .option-text .view-mode {
     padding: 10px;
   }
-  item-selection-editor .option-text .edit-mode {
+  checkbox-editor .option-text .edit-mode {
     width: 85%;
   }
-  item-selection-editor .btn-delete-option {
+  checkbox-editor .btn-delete-option {
     background: none;
     border: none;
     float: right;
@@ -84,23 +84,23 @@
     margin-top: 7px;
     width: 10%;
   }
-  item-selection-editor .btn-add-option {
+  checkbox-editor .btn-add-option {
     background: none;
     border: none;
     color: #888;
     height: 40px;
     margin-left: 35px;
   }
-  item-selection-editor .btn-add-option-icon {
+  checkbox-editor .btn-add-option-icon {
     margin-left: -3px;
     margin-right: 12px;
     vertical-align: text-bottom;
   }
 
-  item-selection-editor .correct-answer-picker-container {
+  checkbox-editor .correct-answer-picker-container {
     background-color: #ffffff;
   }
-  item-selection-editor .correct-answer-option {
+  checkbox-editor .correct-answer-option {
     background: none;
     border: none;
     margin: 10px 0;
@@ -109,12 +109,12 @@
     /* This is needed so that images stay bounded by the container in Firefox. */
     width: 100%;
   }
-  item-selection-editor .correct-answer-radio-button-container,
-  item-selection-editor .correct-answer-content-container {
+  checkbox-editor .correct-answer-radio-button-container,
+  checkbox-editor .correct-answer-content-container {
     display: table-cell;
     vertical-align: bottom;
   }
-  item-selection-editor .correct-answer-outer-radio-button {
+  checkbox-editor .correct-answer-outer-radio-button {
     border: 2px solid rgba(0,0,0,0.87);
     border-radius: 50%;
     display: inline-block;
@@ -123,22 +123,22 @@
     margin-right: 20px;
     width: 16px;
   }
-  item-selection-editor .correct-answer-option:hover .correct-answer-inner-radio-button,
-  item-selection-editor .correct-answer-option-selected .correct-answer-inner-radio-button {
+  checkbox-editor .correct-answer-option:hover .correct-answer-inner-radio-button,
+  checkbox-editor .correct-answer-option-selected .correct-answer-inner-radio-button {
     border-radius: 50%;
     display: block;
     height: 8px;
     margin: 2px;
     width: 8px;
   }
-  item-selection-editor .correct-answer-option:hover:not(.correct-answer-option-selected) .correct-answer-inner-radio-button {
+  checkbox-editor .correct-answer-option:hover:not(.correct-answer-option-selected) .correct-answer-inner-radio-button {
     background-color: rgba(0,0,0,0.87);
   }
-  item-selection-editor .correct-answer-option-selected {
+  checkbox-editor .correct-answer-option-selected {
     background: #c5e1a5;
   }
 
-  item-selection-editor md-checkbox {
+  checkbox-editor md-checkbox {
     display: inline;
   }
 </style>

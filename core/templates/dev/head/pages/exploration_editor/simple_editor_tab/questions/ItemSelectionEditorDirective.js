@@ -19,7 +19,7 @@
 // NOTE TO DEVELOPERS: This is meant to be a reusable directive, so its only
 // dependencies should be standard utility services. It should not have any
 // concept of "state in an exploration".
-oppia.directive('itemSelectionEditor', [
+oppia.directive('checkboxEditor', [
   'QuestionIdService', 'AnswerGroupObjectFactory','OutcomeObjectFactory',
   'RuleObjectFactory', 'StatusObjectFactory', 'UrlInterpolationService',
   function(QuestionIdService, AnswerGroupObjectFactory, OutcomeObjectFactory,
@@ -40,7 +40,7 @@ oppia.directive('itemSelectionEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/simple_editor_tab/questions/' +
-        'item_selection_editor_directive.html'),
+        'checkbox_editor_directive.html'),
       controller: [
         '$scope', '$timeout', 'alertsService',
         function($scope, $timeout, alertsService) {
@@ -83,9 +83,9 @@ oppia.directive('itemSelectionEditor', [
           $scope.isCorrectAnswer = function(value) {
             var answerGroups = $scope.getAnswerGroups();
             if (answerGroups.length > 0) {
-              return answerGroups[0].rules[0].inputs.x.indexOf(value) > -1;
+              return answerGroups[0].rules[0].inputs.x.indexOf(value) !== -1;
             }
-            return false;            
+            return false;
           };
 
           $scope.addChoice = function() {
