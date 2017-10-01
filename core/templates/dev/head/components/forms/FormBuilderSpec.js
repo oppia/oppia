@@ -156,7 +156,7 @@ describe('RTE helper service', function() {
   });
 
   beforeEach(inject(function($injector) {
-    rhs = $injector.get('rteHelperService');
+    rhs = $injector.get('RTEHelperService');
   }));
 
   it('should convert correctly between HTML and RTE', function() {
