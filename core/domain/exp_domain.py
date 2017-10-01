@@ -2233,7 +2233,7 @@ class Exploration(object):
 
         Args:
             auto_tts_enabled: bool. Boolean representing whether automatic
-                text-to-speech is enabled or not.        
+                text-to-speech is enabled or not.
         """
         self.auto_tts_enabled = auto_tts_enabled
 
