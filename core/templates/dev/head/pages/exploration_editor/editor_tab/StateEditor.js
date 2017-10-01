@@ -18,14 +18,14 @@
 
 oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'explorationStatesService',
-  'INTERACTION_SPECS', 'explorationAdvancedFeaturesService',
+  'INTERACTION_SPECS', 'ExplorationAdvancedFeaturesService',
   'UrlInterpolationService', 'stateContentService',
   function(
       $scope, $rootScope, editorContextService, explorationStatesService,
-      INTERACTION_SPECS, explorationAdvancedFeaturesService,
+      INTERACTION_SPECS, ExplorationAdvancedFeaturesService,
       UrlInterpolationService, stateContentService) {
     $scope.areParametersEnabled = (
-      explorationAdvancedFeaturesService.areParametersEnabled);
+      ExplorationAdvancedFeaturesService.areParametersEnabled);
 
     $scope.currentStateIsTerminal = false;
     $scope.interactionIdIsSet = false;

@@ -29,11 +29,11 @@ oppia.directive('threadTable', [
         '/pages/exploration_editor/' +
         'feedback_tab/thread_table_directive.html'),
       controller: [
-        '$scope', 'threadStatusDisplayService', 'oppiaDatetimeFormatter',
-        function($scope, threadStatusDisplayService, oppiaDatetimeFormatter) {
-          $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
+        '$scope', 'ThreadStatusDisplayService', 'oppiaDatetimeFormatter',
+        function($scope, ThreadStatusDisplayService, oppiaDatetimeFormatter) {
+          $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
           $scope.getHumanReadableStatus = (
-            threadStatusDisplayService.getHumanReadableStatus);
+            ThreadStatusDisplayService.getHumanReadableStatus);
           $scope.getLocaleAbbreviatedDatetimeString = (
             oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
         }
