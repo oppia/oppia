@@ -56,10 +56,9 @@ oppia.factory('StatsReportingService', [
         });
     };
 
-    $rootScope.$on('sessionTime', function(evt, totalTimeStopwatch, stateName) {
-      if (totalTimeStopwatch.getTimeInSecs() >= (
-          MIN_TIME_FOR_ACTUAL_START_SECS)) {
-        recordExplorationActuallyStarted(stateName, totalTimeStopwatch);
+    $rootScope.$on('sessionTime', function(evt, totalTime, stateName) {
+      if (totalTime >= MIN_TIME_FOR_ACTUAL_START_SECS) {
+        recordExplorationActuallyStarted(stateName, totalTime);
       }
     });
 
@@ -104,13 +103,12 @@ oppia.factory('StatsReportingService', [
         $rootScope.$broadcast(
           'sessionTime', totalTimeStopwatch.getTimeInSecs(), stateName);
       },
-      recordExplorationActuallyStarted: function(
-          stateName, totalTimeStopwatch) {
+      recordExplorationActuallyStarted: function(stateName, totalTime) {
         $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
           exploration_version: explorationVersion,
           state_name: stateName,
           session_id: sessionId,
-          client_time_spent_in_secs: totalTimeStopwatch
+          client_time_spent_in_secs: totalTime
         });
       },
       recordSolutionHit: function(stateName) {
