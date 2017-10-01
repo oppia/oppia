@@ -127,32 +127,33 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             # html file, a JS file, an icon .png file and a protractor.js file,
             # and an optional preview .png file.
             dir_contents = self._listdir_omit_ignored(component_dir)
-            self.assertLessEqual(len(dir_contents), 6)
+            self.assertLessEqual(len(dir_contents), 5)
 
+            directives_dir = os.path.join(component_dir, 'directives')
             py_file = os.path.join(component_dir, '%s.py' % component_id)
-            html_file = os.path.join(component_dir, '%s.html' % component_id)
-            js_file = os.path.join(component_dir, '%s.js' % component_id)
             png_file = os.path.join(component_dir, '%s.png' % component_id)
             preview_file = os.path.join(
                 component_dir, '%sPreview.png' % component_id)
             protractor_file = os.path.join(component_dir, 'protractor.js')
 
+            self.assertTrue(os.path.isdir(directives_dir))
             self.assertTrue(os.path.isfile(py_file))
-            self.assertTrue(os.path.isfile(html_file))
-            self.assertTrue(os.path.isfile(js_file))
             self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(protractor_file))
-            if len(dir_contents) == 6:
+            if len(dir_contents) == 5:
                 self.assertTrue(os.path.isfile(preview_file))
 
-            js_file_content = utils.get_file_contents(js_file)
-            html_file_content = utils.get_file_contents(html_file)
+            main_js_file = os.path.join(
+                directives_dir, '%sDirective.js' % component_id)
+            main_html_file = os.path.join(
+                directives_dir, '%s_directive.html' % component_id.lower())
+
+            self.assertTrue(os.path.isfile(main_js_file))
+            self.assertTrue(os.path.isfile(main_html_file))
+
+            js_file_content = utils.get_file_contents(main_js_file)
             self.assertIn(
                 'oppiaNoninteractive%s' % component_id, js_file_content)
-            self.assertIn(
-                '<script type="text/ng-template" '
-                'id="richTextComponent/%s"' % component_id,
-                html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
 
@@ -174,3 +175,25 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
             self._validate_customization_arg_specs(
                 component._customization_arg_specs)  # pylint: disable=protected-access
+
+    def test_html_contains_all_imports(self):
+        """Test that the rich_text_components.html contains script-imports for
+        all directives of all RTE components."""
+
+        js_files_paths = []
+        for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
+            component_dir = os.path.join(
+                feconf.RTE_EXTENSIONS_DIR, component_id)
+            directives_dir = os.path.join(component_dir, 'directives')
+            names = os.listdir(directives_dir)
+            js_files_paths.extend(
+                os.path.join(directives_dir, name) for name in names
+                if name.endswith('.js'))
+
+        rtc_html_file = os.path.join(
+            feconf.FRONTEND_TEMPLATES_DIR, 'pages', 'rich_text_components.html')
+        with open(rtc_html_file, 'r') as f:
+            rtc_html_file_contents = f.read()
+
+        for js_file_path in js_files_paths:
+            self.assertIn(js_file_path, rtc_html_file_contents)

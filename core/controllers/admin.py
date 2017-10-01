@@ -111,8 +111,6 @@ class AdminPage(base.BaseHandler):
                     utils.get_current_time_in_millisecs())),
             'one_off_job_specs': one_off_job_specs,
             'recent_job_data': recent_job_data,
-            'rte_components_html': jinja2.utils.Markup(
-                rte_component_registry.Registry.get_html_for_all_components()),
             'unfinished_job_data': unfinished_job_data,
             'value_generators_js': jinja2.utils.Markup(
                 editor.get_value_generators_js()),

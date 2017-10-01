@@ -131,7 +131,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/SpeechSynthesisChunkerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/AssetsBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
- 
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
@@ -228,6 +228,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
 
+  {% include 'pages/rich_text_components.html' %}
 
   {{ interaction_templates }}
   {{ dependencies_html }}

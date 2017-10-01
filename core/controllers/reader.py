@@ -84,7 +84,6 @@ def _get_exploration_player_data(
             dependency_ids))
 
     interaction_templates = (
-        rte_component_registry.Registry.get_html_for_all_components() +
         interaction_registry.Registry.get_interaction_html(
             interaction_ids))
 
