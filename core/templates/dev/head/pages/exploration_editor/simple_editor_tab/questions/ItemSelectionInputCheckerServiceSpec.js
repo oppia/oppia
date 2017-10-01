@@ -109,7 +109,7 @@ describe('Checkbox input checker service', function() {
     expect(isics.isValid(customizationArgs, answerGroupsTrue)).toBe(false);
   });
 
-  it('should return false for rule sets larger than number of choices', 
+  it('should return false for rules not included in customization args', 
   function() {
     var answerGroupsFalse = [{
       rules: [{
@@ -118,7 +118,6 @@ describe('Checkbox input checker service', function() {
           x: [
             '<p>Option 1</p>',
             '<p>Option 2</p>',
-            '<p>Option 3</p>',
             '<p>Option 4</p>',
           ]
         }

@@ -31,7 +31,9 @@ oppia.factory('ItemSelectionInputCheckerService', [
         //   argument for each of these rules should match a choice in
         //   customizationArgs.
         // - Each answer group corresponds to a different set of choices.
+        // - Each answer group should have choices within customizationArgs.
         var numChoices = customizationArgs.choices.value.length;
+        var choices = customizationArgs.choices.value;
         var coveredChoices = [];
         for (var i = 0; i < answerGroups.length; i++) {
           var rules = answerGroups[i].rules;
@@ -40,6 +42,8 @@ oppia.factory('ItemSelectionInputCheckerService', [
               rules[0].inputs.x.length > numChoices) {
             return false;
           }
+
+          // Check to make sure that the coverage is unique.
           for (var j = 0; j < coveredChoices.length; j++) {
             var matched = 0;
             for (var k = 0; k < rules[0].inputs.x.length; k++) {
@@ -52,6 +56,14 @@ oppia.factory('ItemSelectionInputCheckerService', [
             }
           }
           coveredChoices.push(rules[0].inputs.x);
+
+          // Check to ensure that each answer group has choices within
+          // customizationArgs.
+          for (var j = 0; j < rules[0].inputs.x.length; j++) {
+            if (choices.indexOf(rules[0].inputs.x[j]) === -1) {
+              return false;
+            }
+          }
         }
         return true;
       }
