@@ -77,7 +77,7 @@ describe('Library controller', function() {
       rootScope = $rootScope;
       ctrl = $controller('Library', {
         $scope: scope,
-        alertsService: null,
+        AlertsService: null,
         oppiaDatetimeFormatter: null
       });
     }));
