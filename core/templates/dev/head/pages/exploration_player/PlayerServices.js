@@ -26,8 +26,8 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // in the learner view, or whether it is being previewed in the editor view.
 oppia.factory('oppiaPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
-  'alertsService', 'AnswerClassificationService', 'explorationContextService',
-  'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
+  'AlertsService', 'AnswerClassificationService', 'ExplorationContextService',
+  'PAGE_CONTEXT', 'ExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService',
@@ -36,17 +36,17 @@ oppia.factory('oppiaPlayerService', [
   'LanguageUtilService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
-      alertsService, AnswerClassificationService, explorationContextService,
-      PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
+      AlertsService, AnswerClassificationService, ExplorationContextService,
+      PAGE_CONTEXT, ExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
       ExpressionInterpolationService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
       LanguageUtilService) {
-    var _explorationId = explorationContextService.getExplorationId();
+    var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
-      explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+      ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
     var _isLoggedIn = GLOBALS.userIsLoggedIn;
     var answerIsBeingProcessed = false;
 
@@ -109,13 +109,13 @@ oppia.factory('oppiaPlayerService', [
       var newParams = makeParams(
         oldParams, initialState.paramChanges, [oldParams]);
       if (newParams === null) {
-        alertsService.addWarning('Expression parsing error.');
+        AlertsService.addWarning('Expression parsing error.');
         return;
       }
 
       var questionHtml = makeQuestion(initialState, [newParams]);
       if (questionHtml === null) {
-        alertsService.addWarning('Expression parsing error.');
+        AlertsService.addWarning('Expression parsing error.');
         return;
       }
 
@@ -266,7 +266,7 @@ oppia.factory('oppiaPlayerService', [
           return null;
         }
 
-        return oppiaExplorationHtmlFormatterService.getInteractionHtml(
+        return ExplorationHtmlFormatterService.getInteractionHtml(
           interactionId,
           exploration.getInteractionCustomizationArgs(stateName),
           labelForFocusTarget);
@@ -333,7 +333,7 @@ oppia.factory('oppiaPlayerService', [
         var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
-          alertsService.addWarning('Expression parsing error.');
+          AlertsService.addWarning('Expression parsing error.');
           return;
         }
 
@@ -342,7 +342,7 @@ oppia.factory('oppiaPlayerService', [
             oldParams, newState.paramChanges, [oldParams]) : oldParams);
         if (newParams === null) {
           answerIsBeingProcessed = false;
-          alertsService.addWarning('Expression parsing error.');
+          AlertsService.addWarning('Expression parsing error.');
           return;
         }
 
@@ -351,7 +351,7 @@ oppia.factory('oppiaPlayerService', [
         }]);
         if (questionHtml === null) {
           answerIsBeingProcessed = false;
-          alertsService.addWarning('Expression parsing error.');
+          AlertsService.addWarning('Expression parsing error.');
           return;
         }
 

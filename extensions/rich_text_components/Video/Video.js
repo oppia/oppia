@@ -26,10 +26,10 @@ oppia.directive('oppiaNoninteractiveVideo', [
       scope: {},
       templateUrl: 'richTextComponent/Video',
       controller: [
-        '$scope', '$attrs', 'explorationContextService', '$element',
-        'autoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
-        function($scope, $attrs, explorationContextService, $element,
-          autoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
+        '$scope', '$attrs', 'ExplorationContextService', '$element',
+        'AutoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
+        function($scope, $attrs, ExplorationContextService, $element,
+          AutoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
           var start = (
             HtmlEscaperService.escapedJsonToObj($attrs.startWithValue));
           var end = HtmlEscaperService.escapedJsonToObj($attrs.endWithValue);
@@ -55,14 +55,14 @@ oppia.directive('oppiaNoninteractiveVideo', [
 
             // Autoplay if user is in learner view and creator has specified
             // to autoplay given video.
-            if (explorationContextService.getPageContext() ===
+            if (ExplorationContextService.getPageContext() ===
               PAGE_CONTEXT.LEARNER && autoplayVal) {
               // If it has been autoplayed then do not autoplay again.
               if (
-                !autoplayedVideosService.hasVideoBeenAutoplayed(
+                !AutoplayedVideosService.hasVideoBeenAutoplayed(
                   $scope.videoId) && isVisible) {
                 $scope.autoplaySuffix = '&autoplay=1';
-                autoplayedVideosService.addAutoplayedVideo($scope.videoId);
+                AutoplayedVideosService.addAutoplayedVideo($scope.videoId);
               }
             }
 
@@ -77,7 +77,7 @@ oppia.directive('oppiaNoninteractiveVideo', [
 
           // This following check disables the video in Editor being caught
           // by tabbing while in Exploration Editor mode.
-          if (explorationContextService.isInExplorationEditorMode()) {
+          if (ExplorationContextService.isInExplorationEditorMode()) {
             $scope.tabIndexVal = -1;
           }
         }]

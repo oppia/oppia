@@ -28,15 +28,17 @@ oppia.directive('editorNavigation', [
         'RouterService', 'explorationRightsService',
         'explorationWarningsService',
         'stateEditorTutorialFirstTimeService',
-        'ThreadDataService', 'siteAnalyticsService',
-        'explorationContextService', 'windowDimensionsService',
+        'threadDataService', 'siteAnalyticsService',
+        'ExplorationContextService', 'windowDimensionsService',
+
         function(
             $scope, $rootScope, $timeout, $modal,
             RouterService, explorationRightsService,
             explorationWarningsService,
             stateEditorTutorialFirstTimeService,
-            ThreadDataService, siteAnalyticsService,
-            explorationContextService, windowDimensionsService) {
+            threadDataService, siteAnalyticsService,
+            ExplorationContextService, windowDimensionsService) {
+
           $scope.postTutorialHelpPopoverIsShown = false;
           $scope.isLargeScreen = (windowDimensionsService.getWidth() >= 1024);
 
@@ -54,7 +56,7 @@ oppia.directive('editorNavigation', [
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
 
           $scope.showUserHelpModal = function() {
-            var explorationId = explorationContextService.getExplorationId();
+            var explorationId = ExplorationContextService.getExplorationId();
             siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
             var modalInstance = $modal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -63,12 +65,12 @@ oppia.directive('editorNavigation', [
               backdrop: true,
               controller: [
                 '$scope', '$modalInstance',
-                'siteAnalyticsService', 'explorationContextService',
+                'siteAnalyticsService', 'ExplorationContextService',
                 function(
                   $scope, $modalInstance,
-                  siteAnalyticsService, explorationContextService) {
+                  siteAnalyticsService, ExplorationContextService) {
                   var explorationId = (
-                    explorationContextService.getExplorationId());
+                    ExplorationContextService.getExplorationId());
 
                   $scope.beginTutorial = function() {
                     siteAnalyticsService

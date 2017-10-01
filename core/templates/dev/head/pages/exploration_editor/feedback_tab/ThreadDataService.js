@@ -17,10 +17,10 @@
  * feedback tab of the exploration editor.
  */
 
-oppia.factory('ThreadDataService', [
-  '$http', '$q', 'explorationData', 'alertsService', 'ACTION_ACCEPT_SUGGESTION',
+oppia.factory('threadDataService', [
+  '$http', '$q', 'explorationData', 'AlertsService', 'ACTION_ACCEPT_SUGGESTION',
   function(
-      $http, $q, explorationData, alertsService, ACTION_ACCEPT_SUGGESTION) {
+      $http, $q, explorationData, AlertsService, ACTION_ACCEPT_SUGGESTION) {
     var _expId = explorationData.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
@@ -102,7 +102,7 @@ oppia.factory('ThreadDataService', [
           }
         }, function() {
           _openThreadsCount -= 1;
-          alertsService.addWarning('Error creating new thread.');
+          AlertsService.addWarning('Error creating new thread.');
         });
       },
       markThreadAsSeen: function(threadId) {
