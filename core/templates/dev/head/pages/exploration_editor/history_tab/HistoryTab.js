@@ -46,7 +46,6 @@ oppia.controller('HistoryTab', [
      * comparison), and whose values are an object containing 'newestStateName',
      * 'originalStateName' and 'stateProperty'.
      */
-   
     $scope.explorationVersionMetadata = null;
     $scope.versionCheckboxArray = [];
     var explorationSnapshots = null;
@@ -103,14 +102,12 @@ oppia.controller('HistoryTab', [
       $rootScope.loadingMessage = 'Loading';
       explorationData.getData().then(function(data) {
         var currentVersion = data.version;
-
         /**
          * $scope.compareVersionMetadata is an object with keys
          * 'earlierVersion' and 'laterVersion' whose values are the metadata
          * of the compared versions, containing 'committerId', 'createdOn',
          * 'commitMessage', and 'versionNumber'.
-         */
-       
+         */    
         $scope.compareVersions = {};
         $scope.compareVersionMetadata = {};
 

@@ -52,8 +52,7 @@ describe('compare versions service', function() {
     //  - ruleDests: a list of strings which are state names of destinations of
     //    links
     // Only information accessed by getDiffGraphData is included in the return
-    // value
-    
+    // value  
     var _getStatesData = function(statesDetails) {
       var statesData = {};
       for (var stateName in statesDetails) {
