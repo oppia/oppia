@@ -61,8 +61,8 @@ FILEPATHS_NOT_TO_RENAME = (
 
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
-FILEPATHS_PROVIDED_TO_FRONTEND = ('images/*', 'i18n/*', '*_directive.html',
-                                  '*_modal.html', '*.png')
+FILEPATHS_PROVIDED_TO_FRONTEND = (
+    'images/*', 'i18n/*', '*_directive.html', '*.png')
 
 HASH_BLOCK_SIZE = 2**20
 

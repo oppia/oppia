@@ -69,7 +69,7 @@ oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
 oppia.controller('LearnerDashboard', [
   '$scope', '$rootScope', '$window', '$http', '$modal', 'alertsService',
   'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
-  'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES', 
+  'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
   'LEARNER_DASHBOARD_SECTION_I18N_IDS',
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'threadStatusDisplayService',

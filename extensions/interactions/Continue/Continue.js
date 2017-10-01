@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveContinue', [
-  'oppiaHtmlEscaper', 'continueRulesService',
-  function(oppiaHtmlEscaper, continueRulesService) {
+  'HtmlEscaperService', 'continueRulesService',
+  function(HtmlEscaperService, continueRulesService) {
     return {
       restrict: 'E',
       scope: {
@@ -29,7 +29,7 @@ oppia.directive('oppiaInteractiveContinue', [
       },
       templateUrl: 'interaction/Continue',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.buttonText = HtmlEscaperService.escapedJsonToObj(
           $attrs.buttonTextWithValue);
 
         var DEFAULT_BUTTON_TEXT = 'Continue';
@@ -62,9 +62,9 @@ oppia.directive('oppiaResponseContinue', [function() {
     scope: {},
     templateUrl: 'response/Continue',
     controller: [
-      '$scope', '$attrs', 'oppiaHtmlEscaper',
-      function($scope, $attrs, oppiaHtmlEscaper) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
   };
 }]);
@@ -75,9 +75,9 @@ oppia.directive('oppiaShortResponseContinue', [function() {
     scope: {},
     templateUrl: 'shortResponse/Continue',
     controller: [
-      '$scope', '$attrs', 'oppiaHtmlEscaper',
-      function($scope, $attrs, oppiaHtmlEscaper) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
   };
 }]);
