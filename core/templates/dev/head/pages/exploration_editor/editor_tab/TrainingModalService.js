@@ -15,6 +15,7 @@
 /**
  * @fileoverview Controllers for the graphical state editor.
  */
+ 
 // A service which handles opening and closing the training modal used for both
 // unresolved answers and answers within the training data of a classifier.
 oppia.factory('TrainingModalService', [
