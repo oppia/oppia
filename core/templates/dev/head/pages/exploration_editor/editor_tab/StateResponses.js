@@ -17,7 +17,6 @@
  * to a state's interaction and answer groups.
  */
 
-
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
   'editorContextService', 'alertsService', 'ResponsesService', 'routerService',

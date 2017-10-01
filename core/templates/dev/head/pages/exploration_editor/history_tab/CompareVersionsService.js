@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Services for the exploration history tab.
- * Service for handling all interactions with the version history tree.
+ * Service to compare versions of explorations
  */
 
 oppia.factory('CompareVersionsService', [
