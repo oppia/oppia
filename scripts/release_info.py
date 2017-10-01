@@ -22,9 +22,10 @@ import collections
 import os
 import re
 import subprocess
-import sys
 
-GIT_CMD_GET_CURRENT_VERSION = 'git describe --abbrev=0'
+GIT_CMD_GET_STATUS = 'git status'
+GIT_CMD_GET_TAGS = 'git tag'
+GIT_CMD_GET_LCA_WITH_DEVELOP = 'git merge-base develop %s'
 GIT_CMD_GET_LOGS_FORMAT_STRING = (
     'git log -z --no-color --pretty=format:%H{0}%aN{0}%aE{0}%B {1}..{2}')
 GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
@@ -35,29 +36,9 @@ GROUP_SEP = '\x1D'
 VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
 FECONF_VAR_NAMES = ['CURRENT_EXPLORATION_STATES_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
+FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
-
-
-class ChangedBranch(object):
-    def __init__(self, new_branch):
-        get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
-        self.old_branch = subprocess.check_output(get_branch_cmd).strip()
-        self.new_branch = new_branch
-        self.is_same_branch = self.old_branch == self.new_branch
-
-    def __enter__(self):
-        if not self.is_same_branch:
-            try:
-                subprocess.check_output(['git', 'checkout', self.new_branch])
-            except subprocess.CalledProcessError:
-                print ('\nCould not change to %s. This is most probably '
-                       'because you are in a dirty state' % self.new_branch)
-                sys.exit(1)
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if not self.is_same_branch:
-            subprocess.check_output(['git', 'checkout', self.old_branch])
 
 
 def _run_cmd(cmd_str):
@@ -72,6 +53,39 @@ def _run_cmd(cmd_str):
 
     """
     return subprocess.check_output(cmd_str.split(' ')).strip()
+
+
+def _get_current_branch():
+    """Retrieves the branch Git is currently in.
+
+    Returns:
+        (str): The name of the current Git branch.
+    """
+    branch_name_line = _run_cmd(GIT_CMD_GET_STATUS).splitlines()[0]
+    return branch_name_line.split(' ')[2]
+
+
+def _get_current_version_tag():
+    """Retrieves the most recent version tag.
+
+    Returns:
+        (str): The most recent version tag.
+    """
+    tags = _run_cmd(GIT_CMD_GET_TAGS).splitlines()
+    return tags[-1]
+
+
+def _get_base_commit_with_develop(reference):
+    """Retrieves the commit hash common between the develop branch and the
+    specified reference commit.
+
+    Args:
+        reference (str): Tag, Branch, or commit hash of reference commit.
+
+    Returns:
+        (str): The common commit hash.
+    """
+    return _run_cmd(GIT_CMD_GET_LCA_WITH_DEVELOP % reference)
 
 
 def _gather_logs(start, stop='HEAD'):
@@ -190,13 +204,19 @@ def _check_storage_models(current_release):
 
 def main():
     """Collects necessary info and dumps it to disk."""
-    with ChangedBranch('develop'):
-        current_release = _run_cmd(GIT_CMD_GET_CURRENT_VERSION)
-        logs = _gather_logs(current_release)
-        issue_links = _extract_issues(logs)
-        feconf_version_changes = _check_versions(current_release)
-        setup_changes = _check_setup_scripts(current_release)
-        storage_changes = _check_storage_models(current_release)
+    branch_name = _get_current_branch()
+    if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
+        raise Exception(
+            'This script should only be run from the latest release branch.')
+
+    current_release = _get_current_version_tag()
+    base_commit = _get_base_commit_with_develop(current_release)
+    new_release_logs = _gather_logs(base_commit)
+    past_logs = _gather_logs(FIRST_OPPIA_COMMIT, base_commit)
+    issue_links = _extract_issues(new_release_logs)
+    feconf_version_changes = _check_versions(current_release)
+    setup_changes = _check_setup_scripts(current_release)
+    storage_changes = _check_storage_models(current_release)
 
     summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
     with open(summary_file, 'w') as out:
@@ -218,14 +238,47 @@ def main():
             for item in storage_changes:
                 out.write('* %s  \n' % item)
 
-        out.write('\n### Authors:\n')
+        past_authors = {
+            log.email: log.author for log in past_logs
+        }
+        release_authors = {(log.author, log.email) for log in new_release_logs}
+
+        new_authors = sorted(set(
+            [(name, email) for name, email in release_authors
+             if email not in past_authors]))
+        existing_authors = sorted(set(
+            [(name, email) for name, email in release_authors
+             if email in past_authors]))
+        new_author_names = [name for name, _ in new_authors]
+        existing_author_names = [name for name, _ in existing_authors]
+
         # TODO: duplicate author handling due to email changes
-        for name, email in sorted({(log.author, log.email) for log in logs}):
-            out.write('%s <%s>  \n' % (name, email))
+        out.write('\n### New Authors:\n')
+        for name, email in new_authors:
+            out.write('* %s <%s>\n' % (name, email))
+
+        out.write('\n### Existing Authors:\n')
+        for name, email in existing_authors:
+            out.write('* %s <%s>\n' % (name, email))
+
+        # Generate the author sections of the email.
+        out.write('\n### Email C&P Blurbs about authors:\n')
+        new_author_comma_list = (
+            '%s, and %s' % (', '.join(
+                new_author_names[:-1]), new_author_names[-1]))
+        existing_author_comma_list = (
+            '%s, and %s' % (', '.join(
+                existing_author_names[:-1]), existing_author_names[-1]))
+        out.write(
+            '``Please welcome %s for whom this release marks their first '
+            'contribution to Oppia!``\n\n' % new_author_comma_list)
+        out.write(
+            '``Thanks to %s, our returning contributors who made this release '
+            'possible.``\n' % existing_author_comma_list)
 
         out.write('\n### Commit History:\n')
         for name, title in [(log.author, log.message.split('\n\n')[0])
-                            for log in logs]:
+                            for log in new_release_logs]:
             out.write('* %s\n' % title)
 
         if issue_links:

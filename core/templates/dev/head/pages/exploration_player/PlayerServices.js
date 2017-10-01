@@ -16,7 +16,6 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 // A service that provides a number of utility functions for JS used by
@@ -25,28 +24,26 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-//
-// TODO(sll): Make this read from a local client-side copy of the exploration
-// and audit it to ensure it behaves differently for learner mode and editor
-// mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
   'alertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
-  'expressionInterpolationService', 'StateClassifierMappingService',
+  'ExpressionInterpolationService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
+  'LanguageUtilService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
-      expressionInterpolationService, StateClassifierMappingService,
+      ExpressionInterpolationService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
-      EditableExplorationBackendApiService, AudioTranslationManagerService) {
+      EditableExplorationBackendApiService, AudioTranslationManagerService,
+      LanguageUtilService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -67,7 +64,7 @@ oppia.factory('oppiaPlayerService', [
     // Evaluate feedback.
     var makeFeedback = function(feedbacks, envs) {
       var feedbackHtml = feedbacks.length > 0 ? feedbacks[0] : '';
-      return expressionInterpolationService.processHtml(feedbackHtml, envs);
+      return ExpressionInterpolationService.processHtml(feedbackHtml, envs);
     };
 
     // Evaluate parameters. Returns null if any evaluation fails.
@@ -78,7 +75,7 @@ oppia.factory('oppiaPlayerService', [
           if (!pc.customizationArgs.parse_with_jinja) {
             newParams[pc.name] = pc.customizationArgs.value;
           } else {
-            var paramValue = expressionInterpolationService.processUnicode(
+            var paramValue = ExpressionInterpolationService.processUnicode(
               pc.customizationArgs.value, [newParams].concat(envs));
             if (paramValue === null) {
               return false;
@@ -101,7 +98,7 @@ oppia.factory('oppiaPlayerService', [
 
     // Evaluate question string.
     var makeQuestion = function(newState, envs) {
-      return expressionInterpolationService.processHtml(
+      return ExpressionInterpolationService.processHtml(
         newState.content.getHtml(), envs);
     };
 
@@ -136,12 +133,9 @@ oppia.factory('oppiaPlayerService', [
     // manual parameter changes (in editor preview mode).
     var initParams = function(manualParamChanges) {
       var baseParams = {};
-      for (var paramName in exploration.paramSpecs) {
-        // TODO(sll): This assumes all parameters are of type
-        // UnicodeString. We should generalize this to other default values
-        // for different types of parameters.
-        baseParams[paramName] = '';
-      }
+      exploration.paramSpecs.forEach(function(paramName, paramSpec) {
+        baseParams[paramName] = paramSpec.getType().createDefaultValue();
+      });
 
       var startingParams = makeParams(
         baseParams,
@@ -196,11 +190,12 @@ oppia.factory('oppiaPlayerService', [
             _explorationId).then(function(data) {
               exploration = ExplorationObjectFactory.createFromBackendDict(
                 data);
-
               exploration.setInitialStateName(initStateName);
               initParams(manualParamChanges);
               AudioTranslationManagerService.init(
-                exploration.getAllAudioLanguageCodes());
+                exploration.getAllAudioLanguageCodes(),
+                null,
+                exploration.getLanguageCode());
               _loadInitialState(successCallback);
             });
         } else {
@@ -225,9 +220,10 @@ oppia.factory('oppiaPlayerService', [
             StatsReportingService.initSession(
               _explorationId, version, data.session_id,
               GLOBALS.collectionId);
-
             AudioTranslationManagerService.init(
-              exploration.getAllAudioLanguageCodes());
+              exploration.getAllAudioLanguageCodes(),
+              data.preferred_audio_language_code,
+              exploration.getLanguageCode());
 
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
@@ -260,7 +256,9 @@ oppia.factory('oppiaPlayerService', [
       },
       isContentAudioTranslationAvailable: function(stateName) {
         return Object.keys(
-          exploration.getAudioTranslations(stateName)).length > 0;
+          exploration.getAudioTranslations(stateName)).length > 0 ||
+          LanguageUtilService.supportsAutogeneratedAudio(
+            exploration.languageCode);
       },
       getInteractionHtml: function(stateName, labelForFocusTarget) {
         var interactionId = exploration.getInteractionId(stateName);

@@ -17,34 +17,9 @@
  * to a state's interaction and answer groups.
  */
 
-// A state-specific cache for interaction handlers. It stores handlers
-// corresponding to an interaction id so that they can be restored if the
-// interaction is changed back while the user is still in this state. This
-// cache should be reset each time the state editor is initialized.
-oppia.factory('answerGroupsCache', [function() {
-  var _cache = {};
-  return {
-    reset: function() {
-      _cache = {};
-    },
-    contains: function(interactionId) {
-      return _cache.hasOwnProperty(interactionId);
-    },
-    set: function(interactionId, answerGroups) {
-      _cache[interactionId] = angular.copy(answerGroups);
-    },
-    get: function(interactionId) {
-      if (!_cache.hasOwnProperty(interactionId)) {
-        return null;
-      }
-      return angular.copy(_cache[interactionId]);
-    }
-  };
-}]);
-
 oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
-  'answerGroupsCache', 'editorContextService', 'changeListService',
+  'AnswerGroupsCacheService', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'alertsService',
   'explorationContextService', 'explorationWarningsService',
@@ -52,7 +27,7 @@ oppia.factory('responsesService', [
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
-      answerGroupsCache, editorContextService, changeListService,
+      AnswerGroupsCacheService, editorContextService, changeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, alertsService,
       explorationContextService, explorationWarningsService,
@@ -177,13 +152,13 @@ oppia.factory('responsesService', [
       // The 'data' arg is a list of interaction handlers for the
       // currently-active state.
       init: function(data) {
-        answerGroupsCache.reset();
+        AnswerGroupsCacheService.reset();
 
         _answerGroups = angular.copy(data.answerGroups);
         _defaultOutcome = angular.copy(data.defaultOutcome);
         _confirmedUnclassifiedAnswers = angular.copy(
           data.confirmedUnclassifiedAnswers);
-        answerGroupsCache.set(
+        AnswerGroupsCacheService.set(
           stateInteractionIdService.savedMemento, _answerGroups);
 
         _answerGroupsMemento = angular.copy(_answerGroups);
@@ -194,8 +169,8 @@ oppia.factory('responsesService', [
         _activeRuleIndex = 0;
       },
       onInteractionIdChanged: function(newInteractionId, callback) {
-        if (answerGroupsCache.contains(newInteractionId)) {
-          _answerGroups = answerGroupsCache.get(newInteractionId);
+        if (AnswerGroupsCacheService.contains(newInteractionId)) {
+          _answerGroups = AnswerGroupsCacheService.get(newInteractionId);
         } else {
           // Preserve the default outcome unless the interaction is terminal.
           // Recreate the default outcome if switching away from a terminal
@@ -215,7 +190,7 @@ oppia.factory('responsesService', [
         _saveAnswerGroups(_answerGroups);
         _saveDefaultOutcome(_defaultOutcome);
         _saveConfirmedUnclassifiedAnswers(_confirmedUnclassifiedAnswers);
-        answerGroupsCache.set(newInteractionId, _answerGroups);
+        AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
 
         _answerGroupsMemento = angular.copy(_answerGroups);
         _defaultOutcomeMemento = angular.copy(_defaultOutcome);
@@ -375,13 +350,13 @@ oppia.factory('responsesService', [
 
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
-  'editorContextService', 'alertsService', 'responsesService', 'routerService',
+  'editorContextService', 'alertsService', 'responsesService', 'RouterService',
   'explorationContextService', 'trainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
-      editorContextService, alertsService, responsesService, routerService,
+      editorContextService, alertsService, responsesService, RouterService,
       explorationContextService, trainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
@@ -503,7 +478,9 @@ oppia.controller('StateResponses', [
 
     $scope.isCurrentInteractionTrainable = function() {
       var interactionId = $scope.getCurrentInteractionId();
-      return interactionId && INTERACTION_SPECS[interactionId].is_trainable;
+      return (
+        interactionId &&
+        INTERACTION_SPECS[interactionId].is_trainable);
     };
 
     $scope.isCreatingNewState = function(outcome) {
@@ -875,7 +852,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.navigateToState = function(stateName) {
-      routerService.navigateToMainTab(stateName);
+      RouterService.navigateToMainTab(stateName);
     };
   }
 ]);

@@ -18,7 +18,6 @@
  */
 
 var forms = require('./forms.js');
-var gadgets = require('../../../extensions/gadgets/protractor.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
@@ -258,129 +257,6 @@ var expectInteractionToMatch = function(interactionId) {
 var expectCannotDeleteInteraction = function() {
   expect(element(by.css(
     '.protractor-test-delete-interaction')).isPresent()).toBeFalsy();
-};
-
-// GADGETS
-
-// Additional arguments may be sent to this function, and they will be
-// passed on to the relevant gadget editor.
-var addGadget = function(gadgetType, gadgetName) {
-  // Bring up the gadget insertion modal.
-  element(
-    by.css('.protractor-test-add-gadget-button'))
-    .click();
-
-  general.waitForSystem(2000);
-
-  // Select the desired gadgetType from the modal.
-  element(
-    by.css('.protractor-test-' + gadgetType + '-gadget-selection-modal'))
-    .click();
-
-  var gadgetNameInput = element(by.css('.protractor-test-gadget-name-input'));
-  gadgetNameInput.clear().then(function() {
-    gadgetNameInput.sendKeys(gadgetName);
-  });
-
-  // Locate the customization section and apply any customizations.
-  var elem = element(by.css('.protractor-test-gadget-customization-editor'));
-  var customizationArgs = [elem];
-
-  if (arguments.length > 2) {
-    for (var i = 2; i < arguments.length; i++) {
-      customizationArgs.push(arguments[i]);
-    }
-    gadgets.getGadget(gadgetType).customizeGadget.apply(
-      null, customizationArgs);
-  }
-
-  element(by.css('.protractor-test-save-gadget-button')).click();
-
-  // Wait for the customization modal to close.
-  general.waitForSystem(2000);
-};
-
-// Callers should ensure that a gadget with currentName exists.
-var renameGadget = function(currentName, newName) {
-  openGadgetEditorModal(currentName);
-  element(by.css('.protractor-test-open-gadget-name-editor'))
-    .click();
-  var gadgetNameInput = element(
-    by.css('.protractor-test-gadget-rename-text-input'));
-  gadgetNameInput.clear().then(function() {
-    gadgetNameInput.sendKeys(newName);
-  });
-  element(
-    by.css('.protractor-test-gadget-rename-confirmation-button')).click();
-  saveAndCloseGadgetEditorModal();
-};
-
-// Callers should ensure that a gadget with gadgetName exists.
-var deleteGadget = function(gadgetName) {
-  element(by.css('.protractor-test-delete-' + gadgetName + '-gadget-icon'))
-    .click();
-  // Wait for the modal popup to appear.
-  general.waitForSystem(2000);
-  element(by.css('.protractor-test-delete-gadget-button')).click();
-};
-
-var openGadgetEditorModal = function(gadgetName) {
-  element(by.css('.protractor-test-edit-' + gadgetName + '-gadget')).click();
-};
-
-var saveAndCloseGadgetEditorModal = function() {
-  element(by.css('.protractor-test-save-gadget-button')).click();
-  general.waitForSystem();
-};
-
-// Enables visibility for a given state.
-// openGadgetEditorModal must be called before this method.
-// Note: cssContainingText must be used as state names can contain spaces.
-var enableGadgetVisibilityForState = function(stateName) {
-  element(by.cssContainingText(
-    '.protractor-test-state-visibility-checkbox-label',
-    stateName)).all(by.css('.protractor-test-gadget-visibility-checkbox'))
-    .then(function(items) {
-      items[0].isSelected().then(function(selected) {
-        if (!selected) {
-          items[0].click();
-        }
-      });
-    });
-};
-
-// Disables visibility for a given state.
-// openGadgetEditorModal must be called before this method.
-var disableGadgetVisibilityForState = function(stateName) {
-  element(by.cssContainingText(
-    '.protractor-test-state-visibility-checkbox-label',
-    stateName)).all(by.css('.protractor-test-gadget-visibility-checkbox'))
-    .then(function(items) {
-      items[0].isSelected().then(function(selected) {
-        if (selected) {
-          items[0].click();
-        }
-      });
-    });
-};
-
-// Verifies a gadget's short description and name show up as expected
-// in the gadgets sidebar.
-var expectGadgetListNameToMatch = function(
-    gadgetType, gadgetShortDescription, gadgetName) {
-  var expectedListName;
-  if (gadgetShortDescription === gadgetName) {
-    expectedListName = gadgetName;
-  } else {
-    expectedListName = gadgetShortDescription + ' (' + gadgetName + ')';
-  }
-  expect(element(by.css('.protractor-test-' + gadgetType + '-list-item'))
-    .getText()).toBe(expectedListName);
-};
-
-var expectGadgetWithTypeDoesNotExist = function(gadgetType) {
-  expect(element.all(by.css('.protractor-test-' + gadgetType + '-list-item'))
-    .count()).toBe(0);
 };
 
 // PARAMETERS
@@ -820,130 +696,6 @@ var expectCannotAddResponse = function() {
     '.protractor-test-open-add-response-modal')).isPresent()).toBeFalsy();
 };
 
-// FALLBACKS
-
-// Fallbacks are zero-indexed.
-var FallbackEditor = function(fallbackNum) {
-  var headerElem = element.all(by.css('.protractor-test-fallback-tab')).get(
-    fallbackNum);
-
-  var fallbackBodyElem = element(
-    by.css('.protractor-test-fallback-body-' + fallbackNum));
-  fallbackBodyElem.isPresent().then(function(isVisible) {
-    if (!isVisible) {
-      headerElem.click();
-    }
-  });
-
-  return {
-    setFeedback: function(richTextInstructions) {
-      // Begin editing feedback.
-      element(by.css('.protractor-test-open-outcome-feedback-editor')).click();
-
-      // Set feedback contents.
-      var feedbackElement = element(by.css(
-        '.protractor-test-edit-outcome-feedback'));
-      _setOutcomeFeedback(feedbackElement, richTextInstructions);
-
-      // Save feedback.
-      element(by.css('.protractor-test-save-outcome-feedback')).click();
-    },
-    // This saves the rule after the destination is selected.
-    //  - destinationName: The name of the state to move to, or null to stay on
-    //    the same state.
-    //  - createState: whether the destination state is new and must be created
-    //    at this point.
-    setDestination: function(destinationName, createState) {
-      // Begin editing destination.
-      element(by.css('.protractor-test-open-outcome-dest-editor')).click();
-
-      // Set destination contents.
-      var destElement = element(by.css(
-        '.protractor-test-edit-outcome-dest'));
-      _setOutcomeDest(destElement, destinationName, createState);
-
-      // Save destination.
-      element(by.css('.protractor-test-save-outcome-dest')).click();
-    },
-    // eslint-disable-next-line quote-props
-    delete: function() {
-      headerElem.element(by.css('.protractor-test-delete-response')).click();
-      element(by.css('.protractor-test-confirm-delete-fallback')).click();
-    },
-    expectCannotChangeTriggerCondition: function() {
-      var triggerEditorElem = element(by.css(
-        '.protractor-test-open-trigger-editor'));
-      expect(triggerEditorElem.isPresent()).toBeFalsy();
-    },
-    expectCannotSetFeedback: function() {
-      var feedbackEditorElem = element(by.css(
-        '.protractor-test-open-outcome-feedback-editor'));
-      expect(feedbackEditorElem.isPresent()).toBeFalsy();
-    },
-    expectCannotSetDestination: function() {
-      var destEditorElem = element(by.css(
-        '.protractor-test-open-outcome-dest-editor'));
-      expect(destEditorElem.isPresent()).toBeFalsy();
-    },
-    expectCannotDeleteFallback: function() {
-      expect(headerElem.element(by.css(
-        '.protractor-test-delete-response')).isPresent()).toBeFalsy();
-    }
-  };
-};
-
-var expectCannotAddFallback = function() {
-  expect(element(by.css(
-    '.protractor-test-open-add-response-modal')).isPresent()).toBeFalsy();
-};
-
-// This clicks the "add new fallback" button and then selects the fallback
-// trigger, enters its feedback and destination, and closes the fallback
-// editor. It takes the following arguments:
-// - numSubmits: the number of incorrect submits needed to trigger the fallback.
-// - feedbackInstructions: a rich-text object containing feedback, or null.
-// - destStateName: the name of the destination state of the rule, or null if
-//     the rule loops to the current state.
-// - createState: true if the user creates a new state, else false.
-//
-// Note that feedbackInstructions may be null (which means 'specify no
-// feedback'), and only represents a single feedback element.
-var addFallback = function(
-    numSubmits, feedbackInstructions, destStateName, createState) {
-  // Open the "Add Feedback" modal if it is not already open.
-  var headerElem = element(by.css(
-    '.protractor-test-add-fallback-modal-header'));
-  headerElem.isPresent().then(function(isVisible) {
-    if (!isVisible) {
-      element(by.css('.protractor-test-open-add-fallback-modal')).click();
-      general.waitForSystem();
-    }
-  });
-
-  var fallbackElem = element(by.css('.protractor-test-add-fallback-details'));
-
-  // Set the fallback description.
-  var numSubmitsField = fallbackElem.element(
-    by.css('.protractor-test-fallback-num-submits'));
-  var intEditor = forms.getEditor('Real')(numSubmitsField);
-  intEditor.setValue(numSubmits);
-
-  if (feedbackInstructions) {
-    // Set feedback contents.
-    _setOutcomeFeedback(fallbackElem, feedbackInstructions);
-  }
-
-  // If the destination is being changed, open the corresponding editor.
-  if (destStateName) {
-    // Set destination contents.
-    _setOutcomeDest(fallbackElem, destStateName, createState);
-  }
-
-  // Close the modal.
-  element(by.css('.protractor-test-add-new-fallback')).click();
-  general.waitForSystem();
-};
-
 // STATE GRAPH
 
 // NOTE: if the state is not visible in the state graph this function will fail
@@ -1064,18 +816,6 @@ var setFirstState = function(stateName) {
 var enableParameters = function() {
   runFromSettingsTab(function() {
     element(by.css('.protractor-test-enable-parameters')).click();
-  });
-};
-
-var enableGadgets = function() {
-  runFromSettingsTab(function() {
-    element(by.css('.protractor-test-enable-gadgets')).click();
-  });
-};
-
-var enableFallbacks = function() {
-  runFromSettingsTab(function() {
-    element(by.css('.protractor-test-enable-fallbacks')).click();
   });
 };
 
@@ -1536,19 +1276,6 @@ exports.setRuleParametersInAddResponseModal = (
   setRuleParametersInAddResponseModal);
 exports.expectRuleParametersToBe = expectRuleParametersToBe;
 
-exports.addGadget = addGadget;
-exports.renameGadget = renameGadget;
-exports.deleteGadget = deleteGadget;
-
-exports.expectGadgetListNameToMatch = expectGadgetListNameToMatch;
-exports.expectGadgetWithTypeDoesNotExist = expectGadgetWithTypeDoesNotExist;
-
-exports.openGadgetEditorModal = openGadgetEditorModal;
-exports.saveAndCloseGadgetEditorModal = saveAndCloseGadgetEditorModal;
-
-exports.enableGadgetVisibilityForState = enableGadgetVisibilityForState;
-exports.disableGadgetVisibilityForState = disableGadgetVisibilityForState;
-
 exports.addParameterChange = addParameterChange;
 exports.addExplorationLevelParameterChange = addExplorationLevelParameterChange;
 
@@ -1563,10 +1290,6 @@ exports.addHint = addHint;
 
 exports.addSolution = addSolution;
 
-exports.addFallback = addFallback;
-exports.FallbackEditor = FallbackEditor;
-exports.expectCannotAddFallback = expectCannotAddFallback;
-
 exports.moveToState = moveToState;
 exports.deleteState = deleteState;
 exports.expectStateNamesToBe = expectStateNamesToBe;
@@ -1579,8 +1302,6 @@ exports.setLanguage = setLanguage;
 exports.expectAvailableFirstStatesToBe = expectAvailableFirstStatesToBe;
 exports.setFirstState = setFirstState;
 exports.enableParameters = enableParameters;
-exports.enableGadgets = enableGadgets;
-exports.enableFallbacks = enableFallbacks;
 exports.openAndClosePreviewSummaryTile = openAndClosePreviewSummaryTile;
 
 exports.saveChanges = saveChanges;

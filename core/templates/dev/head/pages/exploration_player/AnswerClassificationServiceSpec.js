@@ -24,7 +24,7 @@ describe('Answer classification service with string classifier disabled',
       module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           RuleTest: {
-            is_interaction_trainable: false
+            is_trainable: false
           }
         });
         $provide.constant('ENABLE_ML_CLASSIFIERS', false);
@@ -99,7 +99,6 @@ describe('Answer classification service with string classifier disabled',
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []
@@ -185,7 +184,6 @@ describe('Answer classification service with string classifier disabled',
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []
@@ -206,10 +204,10 @@ describe('Answer classification service with string classifier enabled',
       module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           TrainableInteraction: {
-            is_interaction_trainable: true
+            is_trainable: true
           },
           UntrainableInteraction: {
-            is_interaction_trainable: false
+            is_trainable: false
           }
         });
         $provide.constant('ENABLE_ML_CLASSIFIERS', true);
@@ -228,7 +226,7 @@ describe('Answer classification service with string classifier enabled',
     var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
       STATISTICAL_CLASSIFICATION;
     var acs, scms, sof, oof, acrof, $stateName, state, state2,
-      registryService, predictionService, stateClassifierMapping;
+      registryService, stateClassifierMapping;
     beforeEach(inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');
       scms = $injector.get('StateClassifierMappingService');
@@ -240,7 +238,6 @@ describe('Answer classification service with string classifier enabled',
         'DEFAULT_OUTCOME_CLASSIFICATION');
       STATISTICAL_CLASSIFICATION = $injector.get('STATISTICAL_CLASSIFICATION');
       registryService = $injector.get('PredictionAlgorithmRegistryService');
-      predictionService = $injector.get('PredictionSampleService');
 
       stateName = 'stateName';
       state = sof.createFromBackendDict(stateName, {
@@ -292,7 +289,6 @@ describe('Answer classification service with string classifier enabled',
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []
@@ -309,7 +305,7 @@ describe('Answer classification service with string classifier enabled',
 
       registryService.setMapping({
         LDAStringClassifier: {
-          1: predictionService
+          v1: 'PredictionSampleService'
         }
       });
 

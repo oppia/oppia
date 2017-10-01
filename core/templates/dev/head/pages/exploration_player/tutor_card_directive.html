@@ -11,9 +11,10 @@
         <div class="protractor-test-conversation-content"
              angular-html-bind="activeCard.contentHtml">
         </div>
-        <div ng-if="isContentAudioTranslationAvailable()" 
+        <div ng-if="isContentAudioTranslationAvailable()"
              class="conversation-skin-audio-controls">
-          <audio-controls audio-translations="contentAudioTranslations">
+          <audio-controls audio-translations="contentAudioTranslations"
+                          content-html="activeCard.contentHtml">
           </audio-controls>
         </div>
       </div>
@@ -140,6 +141,7 @@
   .conversation-skin-tutor-card .instructions-button {
     background: inherit;
     border: none;
+    white-space: normal;
   }
 
   .conversation-skin-tutor-card .hint-button {
@@ -177,10 +179,9 @@
     padding: 0 20px;
   }
 
-  .conversation-skin-tutor-card-top-content > p {
+  .conversation-skin-tutor-card-top-content p:not(:last-child) {
     line-height: 28px;
     margin-bottom: 18px;
-    margin-top: 18px;
   }
 
   .conversation-skin-tutor-card-top-content {
@@ -267,6 +268,7 @@
       background-color: #0D48A1;
       color: #ffffff;
       padding: 6px 12px;
+      white-space: normal;
     }
 
     .conversation-skin-tutor-card .hint-button {

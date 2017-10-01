@@ -79,7 +79,6 @@
       Dev Mode
     </div>
 
-    {% include 'components/forms/form_builder_templates.html' %}
     {% include 'pages/footer_js_libs.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
@@ -103,6 +102,8 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
@@ -118,9 +119,9 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionSyntaxTreeService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionEvaluatorService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionParserService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
 
     <script>

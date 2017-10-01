@@ -67,13 +67,10 @@ var GLOBALS = {
           'is equal to {{x|NormalizedString}}, taking case into account',
         Equals: 'is equal to {{x|NormalizedString}}'
       },
-      is_interaction_trainable: true,
       is_trainable: true,
       narrow_instructions: null
     }
   },
-  GADGET_SPECS: {},
-  PANEL_SPECS: {},
   SUPPORTED_SITE_LANGUAGES: [{
     id: 'id',
     text: 'Bahasa Indonesia'
@@ -82,7 +79,7 @@ var GLOBALS = {
     text: 'English'
   }],
   ASSET_DIR_PREFIX: '',
-  AUDIO_URL_TEMPLATE: '/assets/test/<exploration_id>/audio/<filename>',
+  GCS_RESOURCE_BUCKET_NAME: null,
   // This prefix is needed to correctly interpolate directive template URLs in
   // Karma tests. It is referenced by UrlInterpolationService.
   TEMPLATE_DIR_PREFIX: 'core/templates/dev/head'
@@ -96,10 +93,8 @@ var hashes = {
   '/assets_test/hash_test.json': '987654321',
   '/pages_test/hash_test.html': 'abcd12345',
   '/images/hash_test.png': '98765fghij',
-  '/gadgets/testType/static/images/testType.png': 'lmnopqrst',
   '/interactions/interTest/static/interTest.png' : '123654789'
 };
-
 
 /* This function overwrites the translationProvider for a dummy function
  * (customLoader). This is necessary to prevent the js test warnings about an

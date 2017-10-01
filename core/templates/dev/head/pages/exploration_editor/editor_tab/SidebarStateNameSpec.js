@@ -67,7 +67,6 @@ describe('Sidebar state name controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -84,7 +83,6 @@ describe('Sidebar state name controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -101,7 +99,6 @@ describe('Sidebar state name controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: [{
@@ -127,7 +124,7 @@ describe('Sidebar state name controller', function() {
         editorContextService: ecs,
         focusService: fs,
         explorationStatesService: ess,
-        routerService: {}
+        RouterService: {}
       });
     }));
 

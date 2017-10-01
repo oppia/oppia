@@ -13,20 +13,19 @@ param_changes:
 param_specs:
   guess:
     obj_type: UnicodeString
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   Continue Option:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Wow, you got through that really fast!<div><br></div><div>Would you like
+      audio_translations: {}
+      html: Wow, you got through that really fast!<div><br></div><div>Would you like
         to play around with the problem a bit more, and see how this exploration would
         have presented the material if you didn't figure it out yourself?</div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Two balls
           feedback: []
           param_changes: []
@@ -34,7 +33,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback: []
           param_changes: []
@@ -55,13 +55,15 @@ states:
         feedback:
         - This will never get hit and this message should not be necessary.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -69,19 +71,22 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Final challenge:
+    classifier_model_id: null
     content:
-    - type: text
-      value: 'Now here''s a final challenge: using what you''ve learned, can you figure
+      audio_translations: {}
+      html: 'Now here''s a final challenge: using what you''ve learned, can you figure
         out how many ways there are to arrange four balls in a row? Listing all the
         possibilities by hand is going to be tedious, but, by now, you''ve learned
         at least one way to calculate this number quickly and accurately.'
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - 'Yes, that is correct: the answer is 4 times the number of ways to arrange
@@ -94,7 +99,8 @@ states:
         - inputs:
             x: 24.0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - Ahem. That, I think, is a trick answer, surely? I am pretty sure there's
@@ -104,7 +110,8 @@ states:
         - inputs:
             x: 0.0
           rule_type: IsLessThanOrEqualTo
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - 'Hmm, that''s close-ish, but not quite. It feels like you may not have
@@ -124,7 +131,8 @@ states:
             a: 18.0
             b: 23.0
           rule_type: IsInclusivelyBetween
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - 'I think you''ve overcounted. This is quite common in counting problems,
@@ -141,7 +149,8 @@ states:
         - inputs:
             x: 24.0
           rule_type: IsGreaterThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - But we know you can arrange 3 balls in 6 ways. So for 4 balls, there couldn't
@@ -151,7 +160,8 @@ states:
         - inputs:
             x: 6.0
           rule_type: IsLessThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - So adding a fourth ball doesn't give you any more combinations than arranging
@@ -161,7 +171,8 @@ states:
         - inputs:
             x: 6.0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - "\_Interesting, 12 is twice as much as the number of ways to arrange 3\
@@ -186,17 +197,20 @@ states:
           been developing, so that you can get the answer with just one multiplication
           :-)
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Found all the ways:
+    classifier_model_id: null
     content:
-    - type: text
-      value: So, you've found that there are six ways to arrange these three balls.<br><br>Is
+      audio_translations: {}
+      html: So, you've found that there are six ways to arrange these three balls.<br><br>Is
         that the same as your first guess?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Introspection
           feedback:
           - Was it? I think you guessed {{guess}}, but there were actually 6 ways.
@@ -205,7 +219,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Introspection
           feedback:
           - Yes, you thought the number of ways was {{guess}}, but it was actually
@@ -225,13 +240,15 @@ states:
         dest: Introspection
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   General Theory:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "So: <br><br>There is 1 way to arrange 1 ball.<br>There are 2 ways to\
+      audio_translations: {}
+      html: "So: <br><br>There is 1 way to arrange 1 ball.<br>There are 2 ways to\
         \ arrange 2 balls.<br>There are\_6 ways to arrange 3 balls.<br><br>Let's give\
         \ these names. We will say F1 = 1, F2 = 2, F3 = 6. So, if you have n balls\
         \ (where n is 1, 2, 3, ...), then Fn is the number of ways to arrange them.<br><oppia-noninteractive-image\
@@ -254,7 +271,8 @@ states:
         \ move on to figuring out F4, which starts to become hard to compute manually.</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
@@ -265,7 +283,8 @@ states:
         - inputs:
             x: 2F1
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
@@ -276,7 +295,8 @@ states:
         - inputs:
             x: 2*F1
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
@@ -287,7 +307,8 @@ states:
         - inputs:
             x: F1*2
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
@@ -298,7 +319,8 @@ states:
         - inputs:
             x: 2 * F1
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Final challenge
           feedback:
           - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
@@ -323,23 +345,26 @@ states:
           ball, and F1 ways to pick the second one. This all works out because F1
           = 1, so F2 = 2 * 1 = 2.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   Guess a generalization:
+    classifier_model_id: null
     content:
-    - type: text
-      value: 'Now, let''s think about what happens if we had different numbers of
-        balls. We know that the answer for three balls is 6. What if we had four balls
-        to arrange?<br><br>Here''s a possible idea: 3 times 2 is 6, so the answer
-        for four balls must be 4 times 2, which is 8. Basically, we just multiply
-        the number of balls by 2, and get the answer. We''ve already shown that it
-        works for 3 balls; we can figure out exactly why later.<br><br>Do you believe
-        this reasoning? Do you agree that there are exactly 8 ways to arrange four
-        balls of different colours in a line?'
+      audio_translations: {}
+      html: 'Now, let''s think about what happens if we had different numbers of balls.
+        We know that the answer for three balls is 6. What if we had four balls to
+        arrange?<br><br>Here''s a possible idea: 3 times 2 is 6, so the answer for
+        four balls must be 4 times 2, which is 8. Basically, we just multiply the
+        number of balls by 2, and get the answer. We''ve already shown that it works
+        for 3 balls; we can figure out exactly why later.<br><br>Do you believe this
+        reasoning? Do you agree that there are exactly 8 ways to arrange four balls
+        of different colours in a line?'
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Two balls
           feedback:
           - All right! We have an answer. We could check it, I guess, by listing all
@@ -360,13 +385,15 @@ states:
         dest: Two balls
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Intro:
+    classifier_model_id: null
     content:
-    - type: text
-      value: '<div><oppia-noninteractive-image filepath-with-value="&amp;quot;3 balls.png&amp;quot;"></oppia-noninteractive-image><br></div>Suppose
+      audio_translations: {}
+      html: '<div><oppia-noninteractive-image filepath-with-value="&amp;quot;3 balls.png&amp;quot;"></oppia-noninteractive-image><br></div>Suppose
         you were given three balls: one red, one blue, and one yellow -- and one day,
         you are idly playing around with them. Soon, you discover that you can make
         patterns by arranging the balls in a straight line; let''s pretend you''re
@@ -375,7 +402,8 @@ states:
         line? Try to determine all of them.<br>'
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: correct but why
           feedback: []
           param_changes: []
@@ -383,7 +411,8 @@ states:
         - inputs:
             x: 6.0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Intro
           feedback:
           - Surely there's at least one? For example, you might have the red ball
@@ -401,13 +430,15 @@ states:
         dest: Not 6
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Introspection:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Can you think a little bit about why your answer was different from six?
+      audio_translations: {}
+      html: Can you think a little bit about why your answer was different from six?
         Did you count a particular arrangement twice, or did you miss one?<br><br>Making
         sure that you've counted everything can be tricky! Two common mistakes are
         counting one thing twice, and forgetting to count some of the things. These
@@ -419,7 +450,8 @@ states:
         and we'll show your jottings to you again at that point.
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Introspection
           feedback:
           - Come on, surely you have something...
@@ -438,13 +470,15 @@ states:
         dest: Guess a generalization
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   Not 6:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "OK, you found {{answer}} ways to do this. I'd be interested in seeing\
+      audio_translations: {}
+      html: "OK, you found {{answer}} ways to do this. I'd be interested in seeing\
         \ what you came up with; could you list the different ways?\_Write them as\
         \ three-character words, for example:<br><br><span>\_ \_ \_RBY<br></span><br>Means\
         \ put the red ball on the left, the blue ball in the middle, and the yellow\
@@ -453,7 +487,8 @@ states:
         \ you list all the ways you found?<br><br>\_ \_\_</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Not 6
           feedback:
           - Looks like you forgot to capitalize your answers. Sorry, but could you
@@ -470,7 +505,8 @@ states:
             - ybr
             - yrb
           rule_type: HasElementsIn
-      - outcome:
+      - correct: false
+        outcome:
           dest: Not 6
           feedback:
           - At least one of your list elements seems to be wrong. Can you check and
@@ -487,7 +523,8 @@ states:
             - YBR
             - YRB
           rule_type: HasElementsNotIn
-      - outcome:
+      - correct: false
+        outcome:
           dest: Not 6
           feedback:
           - You seem to have missed some arrangements with the red ball on the left...
@@ -499,7 +536,8 @@ states:
             - RBY
             - RYB
           rule_type: OmitsElementsIn
-      - outcome:
+      - correct: false
+        outcome:
           dest: Not 6
           feedback:
           - I think you're missing some! Make sure you've listed all the arrangements
@@ -513,7 +551,8 @@ states:
             - YBR
             - YRB
           rule_type: OmitsElementsIn
-      - outcome:
+      - correct: false
+        outcome:
           dest: Not 6
           feedback:
           - Have you found all the arrangements with a blue ball on the left?
@@ -525,7 +564,8 @@ states:
             - BRY
             - BYR
           rule_type: OmitsElementsIn
-      - outcome:
+      - correct: false
+        outcome:
           dest: Found all the ways
           feedback: []
           param_changes: []
@@ -547,8 +587,9 @@ states:
         - (Whoops! If you got here, this is a bug. Please leave some feedback and
           we'll fix it.)<br>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: SetInput
+      solution: null
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -556,9 +597,10 @@ states:
       generator_id: Copier
       name: guess
   Two balls:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Let's try to find (or validate) a general pattern by looking at small
+      audio_translations: {}
+      html: Let's try to find (or validate) a general pattern by looking at small
         cases. We do this because it's easy to compute the answers for small cases
         by hand, and they give us data which we can use to try and figure out a more
         general pattern.<br><br>The most obvious small case is 1 ball! There's one
@@ -567,7 +609,8 @@ states:
         filepath-with-value="&amp;quot;2balls.png&amp;quot;"></oppia-noninteractive-image><br></div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: General Theory
           feedback:
           - Yes! That is correct. If the balls are red and blue, either the red one
@@ -578,7 +621,8 @@ states:
         - inputs:
             x: 2.0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Two balls
           feedback:
           - 'Hm. Might you be thinking that, since the answer for 3 balls is 6, the
@@ -597,7 +641,8 @@ states:
         - inputs:
             x: 4.0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Two balls
           feedback:
           - Nah, that can't be right :-) There's at least one way to arrange two balls
@@ -610,7 +655,8 @@ states:
         - inputs:
             x: 0.0
           rule_type: IsLessThanOrEqualTo
-      - outcome:
+      - correct: false
+        outcome:
           dest: Two balls
           feedback:
           - There's at least one more way. Try swapping the balls?
@@ -627,16 +673,19 @@ states:
         - I think you may have counted something too many times. Try to remember the
           systematic approach you came up with earlier, and use it here...
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   correct but why:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Right! Why do you think it is 6?
+      audio_translations: {}
+      html: Right! Why do you think it is 6?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Continue Option
           feedback:
           - Yes, the question is asking for the number of permutations of 3 different
@@ -649,7 +698,8 @@ states:
         - inputs:
             x: permutation
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - Yes, the question is asking for the number of permutations of 3 different
@@ -662,7 +712,8 @@ states:
         - inputs:
             x: factorial
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - Yes, the question is asking for the number of permutations of 3 different
@@ -675,7 +726,8 @@ states:
         - inputs:
             x: 3!
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - "<span> <span><span>Yes,\n the question is asking for the number of permutations\
@@ -688,7 +740,8 @@ states:
         - inputs:
             x: 3*2*1
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - "<span> <span><span>Yes,\n the question is asking for the number of permutations\
@@ -706,7 +759,7 @@ states:
         placeholder:
           value: Type your answer here.
         rows:
-          value: '5'
+          value: 5
       default_outcome:
         dest: Final challenge
         feedback:
@@ -719,9 +772,10 @@ states:
           on the Internet, you''ll also be able to find more information about this
           topic.'
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Three Balls

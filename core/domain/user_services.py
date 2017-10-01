@@ -72,6 +72,7 @@ class UserSettings(object):
         preferred_language_codes: list(str) or None. Exploration language
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
+        preferred_audio_language_code: str or None. Audio language preference.
     """
     def __init__(
             self, user_id, email, role, username=None,
@@ -80,7 +81,8 @@ class UserSettings(object):
             last_edited_an_exploration=None, profile_picture_data_url=None,
             default_dashboard=None, user_bio='', subject_interests=None,
             first_contribution_msec=None, preferred_language_codes=None,
-            preferred_site_language_code=None
+            preferred_site_language_code=None,
+            preferred_audio_language_code=None
     ):
         """Constructs a UserSettings domain object.
 
@@ -111,6 +113,8 @@ class UserSettings(object):
                 preferences specified by the user.
             preferred_site_language_code: str or None. System language
                 preference.
+            preferred_audio_language_code: str or None. Default language used
+                for audio translations preference.
         """
         self.user_id = user_id
         self.email = email
@@ -131,6 +135,7 @@ class UserSettings(object):
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
+        self.preferred_audio_language_code = preferred_audio_language_code
 
     def validate(self):
         """Checks that user_id and email fields of this UserSettings domain
@@ -381,7 +386,9 @@ def get_users_settings(user_ids):
                 first_contribution_msec=model.first_contribution_msec,
                 preferred_language_codes=model.preferred_language_codes,
                 preferred_site_language_code=(
-                    model.preferred_site_language_code)
+                    model.preferred_site_language_code),
+                preferred_audio_language_code=(
+                    model.preferred_audio_language_code)
             ))
         else:
             result.append(None)
@@ -502,23 +509,62 @@ def get_user_role_from_id(user_id):
     Returns:
         str. Role of the user with given id.
     """
-    user_settings = get_user_settings(user_id)
+    user_settings = get_user_settings(user_id, strict=False)
     if user_settings is None:
         return feconf.ROLE_ID_GUEST
     return user_settings.role
 
 
 def get_usernames_by_role(role):
-    """Get usernames of all the users with given role Id.
+    """Get usernames of all the users with given role ID.
 
     Args:
-        role: str. The role Id of users requested.
+        role: str. The role ID of users requested.
 
     Returns:
-        list(str). List of usernames of users with given role Id.
+        list(str). List of usernames of users with given role ID.
     """
     user_settings = user_models.UserSettingsModel.get_by_role(role)
     return [user.username for user in user_settings]
+
+
+def get_user_ids_by_role(role):
+    """Get user ids of all the users with given role ID.
+
+    Args:
+        role: str. The role ID of users requested.
+
+    Returns:
+        list(str). List of user ids of users with given role ID.
+    """
+    user_settings = user_models.UserSettingsModel.get_by_role(role)
+    return [user.id for user in user_settings]
+
+
+class UserActionsInfo(object):
+
+    def __init__(self, user_id=None):
+        self._user_id = user_id
+        self._role = get_user_role_from_id(user_id)
+        self._actions = role_services.get_all_actions(self._role)
+
+    @property
+    def user_id(self):
+        return self._user_id
+
+    @property
+    def role(self):
+        return self._role
+
+    @property
+    def actions(self):
+        return self._actions
+
+
+def get_system_user():
+    """Returns user object with system committer user id."""
+    system_user = UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+    return system_user
 
 
 def _save_user_settings(user_settings):
@@ -548,7 +594,9 @@ def _save_user_settings(user_settings):
         first_contribution_msec=user_settings.first_contribution_msec,
         preferred_language_codes=user_settings.preferred_language_codes,
         preferred_site_language_code=(
-            user_settings.preferred_site_language_code)
+            user_settings.preferred_site_language_code),
+        preferred_audio_language_code=(
+            user_settings.preferred_audio_language_code)
     ).put()
 
 
@@ -808,6 +856,19 @@ def update_preferred_site_language_code(user_id, preferred_site_language_code):
         preferred_site_language_code)
     _save_user_settings(user_settings)
 
+def update_preferred_audio_language_code(
+        user_id, preferred_audio_language_code):
+    """Updates preferred_audio_language_code of user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        preferred_audio_language_code: str. New audio language preference
+            to set.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.preferred_audio_language_code = (
+        preferred_audio_language_code)
+    _save_user_settings(user_settings)
 
 def update_user_role(user_id, role):
     """Updates the role of the user with given user_id.
@@ -1429,3 +1490,18 @@ def update_dashboard_stats_log(user_id):
     }
     model.weekly_creator_stats_list.append(weekly_dashboard_stats)
     model.put()
+
+
+def is_at_least_moderator(user_id):
+    user_role = get_user_role_from_id(user_id)
+    if (user_role == feconf.ROLE_ID_MODERATOR or
+            user_role == feconf.ROLE_ID_ADMIN):
+        return True
+    return False
+
+
+def is_admin(user_id):
+    user_role = get_user_role_from_id(user_id)
+    if user_role == feconf.ROLE_ID_ADMIN:
+        return True
+    return False

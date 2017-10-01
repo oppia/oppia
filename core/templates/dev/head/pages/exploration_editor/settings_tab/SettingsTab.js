@@ -24,10 +24,9 @@ oppia.controller('SettingsTab', [
   'explorationInitStateNameService', 'explorationParamSpecsService',
   'changeListService', 'alertsService', 'explorationStatesService',
   'explorationParamChangesService', 'explorationWarningsService',
-  'explorationAdvancedFeaturesService', 'ALL_CATEGORIES',
+  'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
-  'ENABLE_FALLBACK_EDITOR',
   function(
       $scope, $http, $window, $modal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
@@ -36,10 +35,9 @@ oppia.controller('SettingsTab', [
       explorationInitStateNameService, explorationParamSpecsService,
       changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
-      explorationAdvancedFeaturesService, ALL_CATEGORIES,
+      ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
-      EditableExplorationBackendApiService, UrlInterpolationService,
-      ENABLE_FALLBACK_EDITOR) {
+      EditableExplorationBackendApiService, UrlInterpolationService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -166,19 +164,9 @@ oppia.controller('SettingsTab', [
     * Methods for enabling advanced features.
     ********************************************/
     $scope.areParametersEnabled = (
-      explorationAdvancedFeaturesService.areParametersEnabled);
-    $scope.areGadgetsEnabled = (
-      explorationAdvancedFeaturesService.areGadgetsEnabled);
-    $scope.areFallbacksEnabled = (
-      explorationAdvancedFeaturesService.areFallbacksEnabled);
-    $scope.fallbackEditorIsEnabled = ENABLE_FALLBACK_EDITOR;
-
+      ExplorationAdvancedFeaturesService.areParametersEnabled);
     $scope.enableParameters = (
-      explorationAdvancedFeaturesService.enableParameters);
-    $scope.enableGadgets = (
-      explorationAdvancedFeaturesService.enableGadgets);
-    $scope.enableFallbacks = (
-      explorationAdvancedFeaturesService.enableFallbacks);
+      ExplorationAdvancedFeaturesService.enableParameters);
 
     /********************************************
     * Methods for rights management.

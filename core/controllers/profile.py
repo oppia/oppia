@@ -144,6 +144,8 @@ class PreferencesHandler(base.BaseHandler):
             'preferred_language_codes': user_settings.preferred_language_codes,
             'preferred_site_language_code': (
                 user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
@@ -179,6 +181,9 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_preferred_language_codes(self.user_id, data)
         elif update_type == 'preferred_site_language_code':
             user_services.update_preferred_site_language_code(
+                self.user_id, data)
+        elif update_type == 'preferred_audio_language_code':
+            user_services.update_preferred_audio_language_code(
                 self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
@@ -281,6 +286,7 @@ class SignupHandler(base.BaseHandler):
         """Handles POST requests."""
         username = self.payload.get('username')
         agreed_to_terms = self.payload.get('agreed_to_terms')
+        default_dashboard = self.payload.get('default_dashboard')
         can_receive_email_updates = self.payload.get(
             'can_receive_email_updates')
 
@@ -317,6 +323,11 @@ class SignupHandler(base.BaseHandler):
             email_manager.send_post_signup_email(self.user_id)
 
         user_services.generate_initial_profile_picture(self.user_id)
+
+        if not has_ever_registered:
+            # Set the default dashboard for new users.
+            user_services.update_user_default_dashboard(
+                self.user_id, default_dashboard)
 
         self.render_json({})
 

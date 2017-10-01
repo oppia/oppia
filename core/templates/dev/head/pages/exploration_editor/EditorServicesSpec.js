@@ -17,6 +17,105 @@
  *   editor page.
  */
 
+
+describe('Exploration data service', function() {
+  beforeEach(module('oppia'));
+
+  describe('getData local save', function() {
+    var eds = null;
+    var mockBackendApiService = null;
+    var mockLocalStorageService = null;
+    var mockUrlService = null;
+    var responseWhenDraftChangesAreValid = null;
+    var responseWhenDraftChangesAreInvalid = null;
+    var $q = null;
+
+    beforeEach(function() {
+      module(function($provide) {
+        $provide.value(
+          'LocalStorageService', mockLocalStorageService);
+      });
+      module(function($provide) {
+        $provide.value(
+          'EditableExplorationBackendApiService', mockBackendApiService);
+      });
+      module(function($provide) {
+        $provide.value(
+          'urlService', mockUrlService);
+      });
+    });
+
+    beforeEach(function() {
+      mockUrlService = {
+        getPathname: function() {}
+      };
+
+      mockBackendApiService = {
+        fetchApplyDraftExploration: function() {}
+      };
+
+      mockLocalStorageService = {
+        getExplorationDraft: function() {},
+        removeExplorationDraft: function() {}
+      };
+      spyOn(mockUrlService, 'getPathname').and.returnValue('/create/exp_id');
+    });
+
+    beforeEach(inject(function($injector) {
+      eds = $injector.get('explorationData');
+      $q = $injector.get('$q');
+    }));
+
+    beforeEach(function() {
+      expDataResponse = {
+        draft_change_list_id: 3,
+      };
+
+      responseWhenDraftChangesAreValid = {
+        isValid: function() {
+          return true;
+        },
+        getChanges: function() {
+          return [];
+        }
+      };
+
+      responseWhenDraftChangesAreInvalid = {
+        isValid: function() {
+          return false;
+        },
+        getChanges: function() {
+          return [];
+        }
+      };
+
+      spyOn(mockBackendApiService, 'fetchApplyDraftExploration').
+        and.returnValue($q.when(expDataResponse));
+      spyOn(eds, 'autosaveChangeList');
+    });
+
+
+    it('should autosave draft changes when draft ids match', function() {
+      errorCallback = function() {};
+      spyOn(mockLocalStorageService, 'getExplorationDraft').
+        and.returnValue(responseWhenDraftChangesAreValid);
+      eds.getData(errorCallback).then(function(data) {
+        expect(eds.autosaveChangeList()).toHaveBeenCalled();
+      });
+    });
+
+    it('should call error callback when draft ids do not match', function() {
+      errorCallback = function() {};
+      spyOn(mockLocalStorageService, 'getExplorationDraft').
+        and.returnValue(responseWhenDraftChangesAreInvalid);
+      spyOn(window, 'errorCallback');
+      eds.getData(errorCallback).then(function(data) {
+        expect(errorCallback()).toHaveBeenCalled();
+      });
+    });
+  });
+});
+
 describe('Editor context service', function() {
   beforeEach(module('oppia'));
 
@@ -239,170 +338,6 @@ describe('Change list service', function() {
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
-
-    it('should correctly add a gadget', function() {
-      expect(cls.getChangeList()).toEqual([]);
-      cls.addState('newState1');
-      var gadgetDict = {
-        gadget_type: 'TestGadget',
-        gadget_name: 'TestGadget 1',
-        customization_args: {
-          adviceObjects: {
-            value: [{
-              adviceHtml: '<p>Tips</p>',
-              adviceTitle: 'R-Tip'
-            }]
-          },
-          title: {
-            value: 'Tips'
-          }
-        },
-        panel: 'right',
-        visible_in_states: ['newState1']
-      };
-      cls.addGadget(gadgetDict);
-      expect(cls.getChangeList()).toEqual([{
-        cmd: 'add_state',
-        state_name: 'newState1'
-      }, {
-        cmd: 'add_gadget',
-        gadget_dict: {
-          gadget_type: 'TestGadget',
-          gadget_name: 'TestGadget 1',
-          customization_args: {
-            adviceObjects: {
-              value: [{
-                adviceHtml: '<p>Tips</p>',
-                adviceTitle: 'R-Tip'
-              }]
-            },
-            title: {
-              value: 'Tips'
-            }
-          },
-          panel: 'right',
-          visible_in_states: ['newState1']
-        },
-        panel: 'right'
-      }]);
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
-      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
-
-    it('should correctly rename a gadget', function() {
-      expect(cls.getChangeList()).toEqual([]);
-      cls.renameGadget('oldName', 'newName');
-      expect(cls.getChangeList()).toEqual([{
-        cmd: 'rename_gadget',
-        old_gadget_name: 'oldName',
-        new_gadget_name: 'newName'
-      }]);
-      expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
-      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
-
-    it('should correctly delete a gadget', function() {
-      expect(cls.getChangeList()).toEqual([]);
-      cls.deleteGadget('gadgetName');
-      expect(cls.getChangeList()).toEqual([{
-        cmd: 'delete_gadget',
-        gadget_name: 'gadgetName'
-      }]);
-      expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
-      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
-
-    it('should correctly edit gadget customization args', function() {
-      expect(cls.getChangeList()).toEqual([]);
-      var oldCustomizationArgs = {
-        customization_args: {
-          adviceObjects: {
-            value: [{
-              adviceHtml: '<p>Html Data</p>',
-              adviceTitle: 'advice tip name'
-            }]
-          },
-          title: {
-            value: 'main Title'
-          }
-        }
-      };
-      var newCustomizationArgs = {
-        customization_args: {
-          adviceObjects: {
-            value: [{
-              adviceHtml: '<p>New Html Data</p>',
-              adviceTitle: 'New advice tip name'
-            }]
-          },
-          title: {
-            value: 'New main Title'
-          }
-        }
-      };
-      cls.editGadgetProperty(
-        'gadgetName',
-        'gadget_customization_args',
-        newCustomizationArgs,
-        oldCustomizationArgs
-      );
-      expect(cls.getChangeList()).toEqual([{
-        cmd: 'edit_gadget_property',
-        gadget_name: 'gadgetName',
-        property_name: 'gadget_customization_args',
-        new_value: {
-          customization_args: {
-            adviceObjects: {
-              value: [{
-                adviceHtml: '<p>New Html Data</p>',
-                adviceTitle: 'New advice tip name'
-              }]
-            },
-            title: {
-              value: 'New main Title'
-            }
-          }
-        },
-        old_value: {
-          customization_args: {
-            adviceObjects: {
-              value: [{
-                adviceHtml: '<p>Html Data</p>',
-                adviceTitle: 'advice tip name'
-              }]
-            },
-            title: {
-              value: 'main Title'
-            }
-          }
-        }
-      }]);
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
-      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
-
-    it('should correctly edit a gadget visibility property', function() {
-      expect(cls.getChangeList()).toEqual([]);
-      var oldVisibilityProp = ['old_state_name'];
-      var newVisibilityProp = ['new state name'];
-      cls.editGadgetProperty(
-        'gadgetName',
-        'gadget_visibility',
-        newVisibilityProp,
-        oldVisibilityProp
-      );
-      expect(cls.getChangeList()).toEqual([{
-        cmd: 'edit_gadget_property',
-        gadget_name: 'gadgetName',
-        property_name: 'gadget_visibility',
-        new_value: ['new state name'],
-        old_value: ['old_state_name']
-      }]);
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
-      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
   });
 });
 
@@ -433,6 +368,8 @@ describe('Exploration title service', function() {
     beforeEach(inject(function($injector) {
       ets = $injector.get('explorationTitleService');
       $httpBackend = $injector.get('$httpBackend');
+      
+      GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
     }));
 
     it('correctly initializes the service', function() {
@@ -523,16 +460,16 @@ describe('Exploration rights service', function() {
       ers.init(['abc'], [], [], 'public', '1234', true);
       expect(ers.isCloned()).toBe(true);
       expect(ers.clonedFrom()).toEqual('1234');
- 
+
       ers.init(['abc'], [], [], 'public', null, true);
       expect(ers.isCloned()).toBe(false);
       expect(ers.clonedFrom()).toBeNull();
     });
- 
+
     it('reports the correct community-owned status', function() {
       ers.init(['abc'], [], [], 'public', '1234', false);
       expect(ers.isCommunityOwned()).toBe(false);
- 
+
       ers.init(['abc'], [], [], 'public', '1234', true);
       expect(ers.isCommunityOwned()).toBe(true);
     });
@@ -541,265 +478,10 @@ describe('Exploration rights service', function() {
       ers.init(['abc'], [], [], 'private', 'e1234', true);
       expect(ers.isPrivate()).toBe(true);
       expect(ers.isPublic()).toBe(false);
-      
+
       ers.init(['abc'], [], [], 'public', 'e1234', true);
       expect(ers.isPrivate()).toBe(false);
       expect(ers.isPublic()).toBe(true);
     });
-  });
-});
-
-describe('Exploration gadgets service', function() {
-  beforeEach(module('oppia'));
-
-  describe('exploration gadgets service', function() {
-    var egs = null;
-    var $httpBackend = null;
-    var mockWarningsData;
-    var mockExplorationData;
-    var TEST_GADGET_NAME = 'TestGadget1';
-
-    var autosaveDraftUrl = 'createhandler/autosave_draft/0';
-    var validAutosaveResponse = {
-      is_version_of_draft_valid: true
-    };
-
-    var GADGET_SPECS = {
-      ScoreBar: {
-        type: 'ScoreBar',
-        width_px: 250,
-        panel: 'bottom',
-        customization_arg_specs: [{
-          name: 'title',
-          description: 'Optional title for the score bar (e.g. \'Score\')',
-          schema: {
-            type: 'unicode'
-          },
-          default_value: 'Score'
-        }, {
-          name: 'maxValue',
-          description: 'Maximum value (bar fills as a % of this value)',
-          schema: {
-            type: 'int'
-          },
-          default_value: 100
-        }, {
-          name: 'paramName',
-          description: 'The parameter name this score bar follows.',
-          schema: {
-            type: 'unicode'
-          },
-          default_value: ''
-        }],
-        height_px: 100,
-        description: 'A visual score bar.',
-        name: 'ScoreBar'
-      },
-      TestGadget: {
-        type: 'TestGadget',
-        width_px: 100,
-        panel: 'bottom',
-        customization_arg_specs: [{
-          name: 'title',
-          description: 'Optional title for the advice bar (e.g. \'Tips\')',
-          schema: {
-            type: 'unicode'
-          },
-          default_value: ''
-        }, {
-          name: 'adviceObjects',
-          description: 'Title and content for each tip.',
-          schema: {
-            type: 'list',
-            validators: [{
-              id: 'has_length_at_least',
-              min_value: 1
-            }, {
-              id: 'has_length_at_most',
-              max_value: 3
-            }],
-            items: {
-              properties: [{
-                name: 'adviceTitle',
-                description: 'Tip title (visible on advice bar)',
-                schema: {
-                  type: 'unicode',
-                  validators: [{
-                    id: 'is_nonempty'
-                  }]
-                }
-              }, {
-                name: 'adviceHtml',
-                description: 'Advice content (visible upon click)',
-                schema: {
-                  type: 'html'
-                }
-              }],
-              type: 'dict'
-            }
-          },
-          default_value: [{
-            adviceTitle: 'Tip title',
-            adviceHtml: ''
-          }]
-        }],
-        height_px: 300,
-        description: 'Allows learners to receive advice.',
-        name: 'TestGadget'
-      }
-    };
-    var skinCustomizationsData = {
-      panels_contents: {
-        bottom: [{
-          gadget_name: TEST_GADGET_NAME,
-          visible_in_states: [
-            'Example1',
-            'Example2'
-          ],
-          customization_args: {
-            title: {
-              value: 'TIP1'
-            },
-            adviceObjects: {
-              value: [{
-                adviceTitle: 'title1',
-                adviceHtml: 'content1'
-              }]
-            }
-          },
-          gadget_type: 'TestGadget'
-        }]
-      }
-    };
-    var gadgetData = {
-      gadget_type: 'TestGadget',
-      gadget_name: 'NewTestGadget',
-      panel: 'bottom',
-      customization_args: {
-        title: {
-          value: 'TIP3'
-        },
-        adviceObjects: {
-          value: [{
-            adviceTitle: 'title3',
-            adviceHtml: 'content3'
-          }]
-        }
-      },
-      visible_in_states: ['state1']
-    };
-
-    beforeEach(function() {
-      mockWarningsData = {
-        addWarning: function() {}
-      };
-      module(function($provide) {
-        $provide.value('alertsService', mockWarningsData);
-        $provide.constant('GADGET_SPECS', GADGET_SPECS);
-      });
-      spyOn(mockWarningsData, 'addWarning');
-      mockExplorationData = {
-        explorationId: 0,
-        autosaveChangeList: function() {}
-      };
-      module(function($provide) {
-        $provide.value('explorationData', mockExplorationData);
-      });
-      spyOn(mockExplorationData, 'autosaveChangeList');
-    });
-
-    beforeEach(inject(function($injector) {
-      egs = $injector.get('explorationGadgetsService');
-      $httpBackend = $injector.get('$httpBackend');
-      GLOBALS.PANEL_SPECS = {
-        bottom: {
-          stackable_axis: 'horizontal',
-          pixels_between_gadgets: 80,
-          max_gadgets: 1,
-          width: 350,
-          height: 100
-        }
-      };
-    }));
-
-    it('Update gadgets data when state is deleted', function() {
-      egs.init(skinCustomizationsData);
-      egs.handleStateDeletion('Example1');
-
-      expect(egs.getGadgets()[TEST_GADGET_NAME].visible_in_states).toEqual(
-        ['Example2']
-      );
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
-      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
-
-    it('Update gadgets data when state is renamed', function() {
-      egs.init(skinCustomizationsData);
-      egs.handleStateRenaming('Example2', 'newStateName');
-
-      expect(egs.getGadgets()[TEST_GADGET_NAME].visible_in_states).toEqual(
-        ['Example1', 'newStateName']
-      );
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
-      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
-
-    it('should detect invalid data passed for initialization', function() {
-      egs.init({
-        wrongObjectKey: 'value'
-      });
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'Gadget Initialization failed. Panel contents were not provided');
-    });
-
-    it('init on valid data', function() {
-      egs.init(skinCustomizationsData);
-      expect(egs.getPanels()).toEqual({
-        bottom: [TEST_GADGET_NAME]
-      });
-    });
-
-    it('add a new gadget with valid data', function() {
-      egs.init(skinCustomizationsData);
-      egs.addGadget(gadgetData, 'bottom');
-      expect(egs.getPanels()).toEqual({
-        bottom: [TEST_GADGET_NAME, 'NewTestGadget']
-      });
-    });
-
-    it('should detect non existent panel when adding gadget', function() {
-      egs.init(skinCustomizationsData);
-      gadgetData.panel = 'unknown_panel';
-      egs.addGadget(gadgetData);
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'Attempted add to a non-existent panel: unknown_panel');
-    });
-
-    it('should detect same gadget name before adding gadget', function() {
-      egs.init(skinCustomizationsData);
-      gadgetData.gadget_name = TEST_GADGET_NAME;
-      gadgetData.panel = 'bottom';
-      egs.addGadget(gadgetData);
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'A gadget with this name already exists.');
-    });
-
-    it('should detect unknown gadget name before updating gadget', function() {
-      egs.init(skinCustomizationsData);
-      egs.updateGadget('unknownGadgetName', {}, []);
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'Attempted to update a non-existent gadget: unknownGadgetName');
-    });
-
-    it('should detect if gadget is not visible in any state.', function() {
-      egs.init(skinCustomizationsData);
-      egs.updateGadget(TEST_GADGET_NAME, gadgetData[TEST_GADGET_NAME], []);
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'This gadget is not visible in any states.');
-    });
-
-    // TODO(vjoisar/sll): Add the test case when we delete the only state that
-    // contains the gadget.
-    // Also ensure right confirmation boxes show up in various cases.
   });
 });

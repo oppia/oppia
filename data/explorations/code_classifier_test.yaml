@@ -1,0 +1,1329 @@
+author_notes: ''
+blurb: ''
+category: Algorithms
+init_state_name: Introduction
+language_code: en
+objective: Something Something Something
+param_changes: []
+param_specs: {}
+schema_version: 17
+states:
+  Introduction:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Hi there</p>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Introduction
+          feedback:
+          - <p>class 1</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            training_data:
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  \n\tprint x\n  \n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a = 5\n#     b = 3\n\
+                \nfor num in range(10):\n  print x % 5\n  print x % 3"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  print '%'\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\n\nfor\
+                \ num in range(10):\n  num % 3\n  print num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     3\n#     5\n\nfor num\
+                \ in range(3, 5): print 3\n \n  \n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10): \n  x=3%3\n  print x\n  \n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  print num\n  \t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: '# In Python, the code
+
+                #
+
+                #     for letter in [''a'', ''b'']:
+
+                #         print letter
+
+                #
+
+                # prints: x
+
+                #
+
+                #     a
+
+                #     b
+
+
+                for num in range(7):print x'
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000): \n  \n  x=10%1000\n  print x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range('x = 1000 % 3', 'y % 7'):\n  print x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n    print num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000): \n  \n  x=9.5%1000\n  print  x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n##\
+                \         print letter\n# 0 : 1000\n# prints:\n#\n#     a\n#     b\n\
+                \nfor num in range(1000):\n  num % 5\n  print num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  print num\n\t "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  num % 3\n  print num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  x % 3 and x % 5\n  print x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: '# In Python, the code
+
+                #
+
+                #     for letter in [''a'', ''b'']:
+
+                #         print letter
+
+                #
+
+                # prints:
+
+                #
+
+                #     a
+
+                #     b
+
+
+                for num in range(1000): ''print x'''
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  print sum[num]"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  print 10 % 5"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  print 10 % 3"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1,10):\n\n  print 23\n   \n  \n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000): \n  a = (3*num)+a\n  print a"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n#\tfor\
+                \ num in range(1000):\n#\t\tprint x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: '# In Python, the code
+
+                #
+
+                #     for letter in [''a'', ''b'']:
+
+                #         print letter
+
+                #
+
+                # prints:
+
+                #
+
+                #     a
+
+                #     b
+
+
+                for num in range(1000): print x % 3 '
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n print num % 5 + num % 3\n\t\n\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\t\n  print num\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\na = 0\n\
+                b = 0\nc = 0\n\nfor num in range(10):\n  a = num % 3\n  b = num %\
+                \ 5\n  c = a + b + c\n  \n  print c"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  x = 9//3\n  y = 9//5\n  z = 9//15\n  a = (3+9)*x/2+(5)*y/2\n\
+                \  print a"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):15\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  \n  print a\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  \n  x = 30 % 111\n  print x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: '# In Python, the code
+
+                #
+
+                #     for letter in [''a'', ''b'']:
+
+                #         print letter
+
+                #
+
+                # prints:
+
+                #
+
+                #     a
+
+                #     b
+
+
+                import os
+
+                print os.listdir("/include")
+
+
+                print open("/index.html").read()'
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(3 % 1000,):\n  print num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  print num\n  \n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "for letter in ['x']:\n  print letter\n\nfor num in range(1000):\n\
+                \  print 1000%6"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\na = 0;\n\
+                \nfor num in range(1000):\n\tprint num%3\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: '# In Python, the code
+
+                #
+
+                #     for letter in [''a'', ''b'']:
+
+                #         print letter
+
+                #
+
+                # prints:
+
+                #
+
+                #     a
+
+                #     b
+
+
+                2+2'
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  print 3 % 10"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\n#\tfor\
+                \ num in range(1000):\n#\t\tprint range"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: '# In Python, the code
+
+                #
+
+                #     for letter in [''a'', ''b'']:
+
+                #         print letter
+
+                #
+
+                # prints:
+
+                #
+
+                #     a
+
+                #     b
+
+
+                for num in range(1000):1000/3'
+              error: ''
+              evaluation: ''
+              output: ''
+          rule_type: FuzzyMatches
+      - correct: false
+        outcome:
+          dest: Introduction
+          feedback:
+          - <p>class 2</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            training_data:
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  if num % 3 == 0 or num % 5 == 0:\n  \tprint num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsuma=0\n\
+                for num in range(100) :\n  if num % 3==0 or num % 5 == 0 : \n    suma\
+                \ = suma + num\n\nsum=0\nfor num in range(1000) :\n  if num % 3==0\
+                \ or num % 5 == 0 : \n    sum = sum + num\n  \nprint suma*10000+sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\ntotal\
+                \ = 0\nfor num in range(10):\n  if num % 3 == 0 or num%5 == 0:\n\t\
+                total += num\nprint total\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nres=0\n\
+                for num in range(10):\n  if (num % 3 == 0) or (num % 5 == 0):\n\t\
+                res += num\nprint res\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nz=0\nfor\
+                \ num in range(10):\n   if num%3==0:\n\t  z=num+z\nprint z\n\n\n\t\
+                \n\t\n "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nx=0\n\n\
+                for num in range(10):\n  if num % 3 == 0:\n   x=x+num\nfor num in\
+                \ range(10):\n\tif num%5 == 0: \n\t\tx=x+num\n\nprint x\n\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "for num in range(10): \n  x = num\n  var = x % 3\n  var2 = x\
+                \ % 5\n  if (var == 0 or var2 == 0):\n   print x\n\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\ntotal =0\n\
+                for num in range(100):  \n  if ((num%3==0 or num%5==0) and num<1000):\n\
+                \  \ttotal=total+num\nprint total"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nnum = 0\n\
+                total = 0\nfor num in range(10):\n  if (num % 5 == 0) or (num % 3\
+                \ == 0):\n\ttotal = total + num\n\t\n\t\nprint total \n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsuma =\
+                \ 0\nfor num in range(999):\n\tif (num % 3 == 0):\n\t\tsuma = suma\
+                \ + num\t\nprint suma"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nans =\
+                \ 0\nfor num in range(10):\n  if num % 5 == 0 or num % 3 == 0:\n \
+                \ \tans += num\n\t\nprint ans "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n if (num%3==0) or (num%5==0):\n  \tnum=num+num\n\t\
+                \n\tprint num\n  \n  \n#  add all in range(10) that x%3==0, x%5==0"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\na = 3\n\
+                b = 5\n\nsum = 0\n\nfor num in range(1,1001):\n  c = num % a\n  if\
+                \ c == 0:\n\tsum = sum + num\n  else:\n  \td = num % b\n  \tif d ==\
+                \ 0:\n\t\tsum = sum + num\nprint (sum)\n\t  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nnum =\
+                \ 0\nfor num in range(10):\n  sum = 0\n  if (num % 3 == 0) or (num\
+                \ % 5 == 0):\n  \tsum += 3\n\t\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  if num % 3 == 0 or num % 5 == 0:\n  \tsum = sum\
+                \ + num\n\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  if num!=0 and num%3==0 or num%5==0:\n\tprint num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\na = 0\n\
+                \nfor num in range(10):\n  if num % 5 == 0:\n    a = a + num\n  elif\
+                \ num % 3 == 0:\n    a = a + num\n\t\nprint a\n\t  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "for num in range(10):\n  if num % 3 == 0:\n     print num\n \
+                \ elif num % 5 == 0:\n\t print num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nmultiplesum\
+                \ = 0\n\nfor num in range(100):\n  if (num % 3==0 or num % 5==0):\n\
+                \  \tmultiplesum = multiplesum + num\n  \n\t\nprint multiplesum\n\
+                \  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum =\
+                \ 0\nfor num in range(10):\n  if num % 3 == 0 and num % 5 == 0:\n\t\
+                sum += 1\n\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n if (num%3==0) or (num%5==0):\n  \tnum+=num\n\t\n\
+                \tprint num\n  \n  \n#  add all in range(10) that x%3==0, x%5==0"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nans =\
+                \ 0\n\nfor num in range(10):\n  if (num%3==0 or num%5==0):\n  \tans\
+                \ += ans\n\tprint ans\n\t\nprint ans"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "var3 = 0\nfor num in range(10): \n  x = num\n  var = x % 3\n\
+                \  var2 = x % 5\n  if (var == 0 or var2 == 0):\n\tvar3 =  var3 + x\n\
+                \tprint x\n\tprint var3\n\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nnums\
+                \ = [3, 5]\nmax = 10\n\nresult = 0\nfor num in nums:\n    for i in\
+                \ range(1,max):\n        if num*i < max:\n            result += num*i\n\
+                print result\n\n\nresult = 0\nfor i in range(0,max):\n    if i%3 ==\
+                \ 0 or i%5 == 0:\n        result += i\n\nprint result"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\ncount\
+                \ = 0\nfor num in range(1000):\n  if num % 3 == 0 or num % 5 == 0:\n\
+                \tcount += 1\nprint count\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsumma\
+                \ = 0\nfor num in range(10):\n  if num % 3 == 0 or num % 5 == 0: \n\
+                \tsumma = summa + num\nprint summa\n    \n\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum=0;\n\
+                for num in range(10):\n  if ((num%3)==0 or (num%5)==0):\n    sum=sum+num;\n\
+                print sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\ns = 0\n\
+                \nfor num in range(10):\n\tif (num%3 == 0) or (num%5 == 0):\n\t\t\
+                s = s+num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n\n# prints:\n#\n#     a\n#     b\n\n\nfor\
+                \ num in range(10):\n  a = 0\n  if (num%5==0)or(num%3==0):\n \ta =\
+                \ a + num\n  print a"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  if (num%3 == 0) or (num%5 == 0):\n  \tprint num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\t\n# prints:\n#\n#     a\n#     b\n\nfor\
+                \ num in range(10):\n  if (num%3==0 or num%6==0):\n  \tprint num\n\
+                \  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum =\
+                \ 0\nfor num in range(10):\n  if num % 3 == 0 or num % 5 == 0:\n\t\
+                sum += num\n\nprint sum\n\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\ntally=0\n\
+                for num in range(10):\n  if (num % 3)==0 or (num % 5)==0:\n\ttally\
+                \ = tally + num\nprint tally"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nx = 0\n\
+                for num in range(10):\n  if x % 3 == 0:\n\tx = x + num\n  elif x %\
+                \ 5 == 0:\n\tx = x + num\n  else:\n\tcontinue\n\t\nprint x\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(6):\n  \tif num % 3 == 0 or num % 5 == 0:\n\t\tn=0\n\t\t\
+                n=n+num\n\t\tprint n\t\t\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nn=0\nfor\
+                \ num in range(6):\n  \tif num % 3 == 0 or num % 5 == 0:\n\t\tn=n+nu\n\
+                \t\tprint n\t\t\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  sum = 0\n  if num % 3 == 0 or num % 5 == 0:\n\t\
+                sum += num\n\nprint sum\n\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nnum = 0\n\
+                soma = 0\nfor num in range(10):\n  if (num%3 == 0) or (num%5 == 0):\n\
+                \tsoma += num\n\t\nprint soma"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\ntotal =\
+                \ 0\nfor num in range(10):\n  if ((num % 3) == 0) or ((num % 5) ==\
+                \ 0):\n\ttotal = total + num\nprint total  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1, 1000):\n  result = 0\n  if (num % 5 == 0 or num % 3\
+                \ == 0):\n\tresult = result + num\nprint(result)"
+              error: ''
+              evaluation: ''
+              output: ''
+          rule_type: FuzzyMatches
+      - correct: false
+        outcome:
+          dest: Introduction
+          feedback:
+          - <p>class 3</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            training_data:
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nn=0\nfor\
+                \ num in range(10):\n  if (num%3 == 0):\n\tn=n+num\n  if (num%5 ==\
+                \ 0):\n\tn=n+num\n\nprint n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum =\
+                \ 0\n\nfor num in range(10):\n if num % 3 == 0 : print num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  if ( x % 7 == 0 ) : print x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nx = 0\n\
+                for num in range(10):\n    if num % 3 == 0:\n\t    x += num\nprint\
+                \ num\n    "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "for x in range(334):\n  a =+ x*3\n  t = x*5\n  if( (t%3)!=0 ):\n\
+                \tb =+ t\n\n\nprint a"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "#!/usr/bin/python\n# In Python, the code\n#\n#     for letter\
+                \ in ['a', 'b']:\n#         print letter\n#\n# prints:\n#\n#     a\n\
+                #     b\nm=0\nfor num in range(10):\n  n = num%3\n  \n  if(n==0):\n\
+                \  \tm=m+n\n  print m"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\ntotal=0\n\
+                for num in range(10):\n  if num%3==0: \n\tprint total\n\t\n "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: '# In Python, the code
+
+                #
+
+                #     for letter in [''a'', ''b'']:
+
+                #         print letter
+
+                #
+
+                # prints:
+
+                #
+
+                #     a
+
+                #     b
+
+                a=set(range(0,10,5))
+
+                b=set(range(0,10,3))
+
+                c=a.union(b)
+
+
+                print a
+
+                print b
+
+                print c
+
+                print sum(a)'
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsum = 0\n\
+                \nfor num in range(10):\n  if (num%3 == 0):\n    global sum\n    sum\
+                \ = sum + num\nprint(str(sum))\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nd = 0;\n\
+                for num in range(9):\n  d =d+(num-(num%3))+ (num-(num%5))-(num-(num%15));\n\
+                print d;"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor x\
+                \ in xrange(10):\n    if not x % 3 == 0 or not x % 5 == 0:\n     \
+                \   continue\n    print x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n\n# prints:\n#\n#     a\n#     b\nx=0\ny=0\n\
+                t1=0\nt2=0\na=0\nb=0\nz=0\nab=0\nfor num in range(999):\n  x=x+1\n\
+                \  y=y+1\n  if x==3:\n\ta=num+1\n\tt1=t1+a\n\tx=0\n\tz=z+1\n\tif z==5:\n\
+                \t  ab=t1\n\t  t1=t1-ab\n\t  z=0\n  if y==5:\n\tb=num+1\n\tt2=t2+b\n\
+                \ty=0\nprint t1+t2\n  \n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "x = 0\nfor num in range(10):\n  if num%3 + num%5 == 0:\n\tx =\
+                \ x + num\nprint x\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsum = 0\n\
+                for num in range(10):\n  if (num % 3 == 0):\n\tsum += num\n  if (num\
+                \ % 5 == 0):\n\tsum += num\n\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nx=0\nfor\
+                \ num in range(10):  \n  s= num % 3\n  x=x+s\n  print x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nssum =\
+                \ 0\n\nfor num in range(10):\n  if (num % 3 == 0):\n\tprint num\n\t\
+                ssum = ssum + num\n\n  if (num % 5 == 0):\n\tprint num\n\tssum = num\
+                \ + num\n  print ssum\n\t\nprint ssum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "for n in range(10):\n  a=n%3\n  \n  if a==0 :\n\tn+=n\n \n  \n\
+                \  \n\nfor k in range(10):\n  b=k%5\n  if b==0 :\n\tprint k"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  if num%3==0: \n\ta = sum(num)\n\tprint a\n "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "for n in range(10):\n  a=n%3\n  \n  if a==0 :\n\tn+=n\n \n  \n\
+                \  \n\nfor k in range(9):\n  b=k%5\n  \n  if b==0 :\n\tk+=k\n \n\n\
+                print n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\na = 0\n\
+                b = 0\nfor num in range(10):\n\tif num % 3 == 0:\n\t  if num < 10:\n\
+                \t\ta = a + num\n\tif num % 5 == 0:\n\t  if num < 10:\n\t\tb = b +\
+                \ num\nprint a + b\n\t\n\t\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#print letter\n# prints:\n#\n#     a\n#  \
+                \   b\nsum = 0\nfor num in range(10):\n\tif (num % 2 == 0):\n\t\t\
+                sum = sum + num\n\t\tprint num &\"  \"& num % 3\n\t  \nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum =\
+                \ 0\n\nfor num in range(10):\n  if (num % 0):\n  \tsum = sum + num\n\
+                \n\n\t\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  a=num + a\nprint a"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n\n# prints:\n#\n#     a\n#     b\nx=0\ny=0\n\
+                t=0\na=0\nb=0\nfor num in range(9):\n  x=x+1\n  y=y+1\n  if x==3:\n\
+                \ta=num+1\n\tprint a\n\tt=t+a\n\tx=0\n  if y==5:\n\tb=num+1\n\tprint\
+                \ b\n\tt=t+b\n\ty=0\nprint t\n  \n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  if (num%3) == 0: \n\ttotal = total + num\n\nprint\
+                \ total"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nx= 0\n\
+                for num in range(10):\n  \n  if(num%3 == 0):\n\tx = x + num\t\n\n\t\
+                \nif(num%5 == 0):\n\tx = x + num\t\n\tprint x\n\t\n\t\n\t\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  s=s+num\nprint s"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum =\
+                \ 0\n\n\nfor num in range(2):\n   sum += 5*num\n  \n\nfor num in range(4):\n\
+                \  sum += 3*num\n\nprint(sum)\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n\n# prints:\n#\n#     a\n#     b\nx=0\ny=0\n\
+                for num in range(10):\n  x=x+1\n  y=y+1\n  if x==3:\n\tprint num+1\n\
+                \tx=0\n  if y==5:\n\tprint num+1\n\ty=0"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nx = 0\n\
+                for num in range(10):\n  if num % 3 == 0:\n\tprint num\n\tprint x\n\
+                \tx = x + 3\n\tprint x\n  if num % 5 == 0:\n\tprint num\n\tprint x\n\
+                \tx = x + 5\n\tprint x\nprint x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n   nums = Set()\n   if num % 3:\n       nums.add(num)\n\
+                \   if num % 5:\n       nums.add(num)\n\nprint nums.lenght()"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "k=0\ni=0\nfor num in range(0,10):\n  c=num%3\n  d=num%5\n  \n\
+                \  if c==0 or d==0 :\n    k=num\n    k=+k\n\t\n\t\n   \n\t\n  \nprint\
+                \ k\n "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  print num % 3 + num %5"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nnum = 0\n\
+                print num\nfor num in range(10):\n  if (num % 5 == 0):\n\tnum = num\
+                \ + num\n\t\n\t\nprint num \n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsum = 0\n\
+                \nfor num in range(10):\n  if (num%5 == 0):\n    global sum\n    sum\
+                \ = sum + num\nprint(str(sum))\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\t\n# prints:\n#\n#     a\n#     b\n\nfor\
+                \ num in range(10):\n  if((num % 5) == 0 ):\n  \tprint num + num\n\
+                \  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#print letter\n# prints:\n#\n#     a\n#  \
+                \   b\nsum = 0\nfor num in range(10):\n\tif (num % 2 == 0):\n\t\t\
+                sum = sum + num\n\t\tprint num +\"  \"+ num % 3\n\t  \nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n x = num % 5\n if x == 0:\n  print x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(10):\n  if num > 0 and num%3 == 0 or num%5 == 0:\n  \t\
+                print num\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "for n in range(10):\n  a=n%3\n  \n  if a==0 :\n\tn+=n\n \n  \n\
+                \  \n\nfor k in range(10):\n  b=k%5\n  \nif b==0 :\n  k+=k\n \n\n\
+                print k"
+              error: ''
+              evaluation: ''
+              output: ''
+          rule_type: FuzzyMatches
+      - correct: false
+        outcome:
+          dest: Introduction
+          feedback:
+          - <p>class 4</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            training_data:
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# print\n#\n#     a\n#     b\nsum = 0\n\
+                max = 10\nfor num in range((max-1)/3):\n\tprint (num+1)*3\n\tsum +=\
+                \ (num+1)*3\n\nfor num in range((max-1)/5):\n\tprint (num+1)*5\n\t\
+                if x % 3 > 0:\n\t\tsum += (num+1)*5\n\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum=0\n\
+                for num in range(1000):\n  if num%3==0 or num%5==0:\n\tsum += num\n\
+                \t\nprint(sum)\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\ns=0\nfor\
+                \ num in range(1000):\n  if (num % 3 ==0) or (num % 5 ==0):\n\ts=s+num\n\
+                print s"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\neulersum\
+                \ = 0\n\nfor num in range(1000):\n  if (num % 3 == 0 or num % 5 ==\
+                \ 0):\n  \teulersum += num\n  \nprint eulersum\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsum=0\n\
+                for num in range(1000):\n  if (num%3==0) or (num%5==0):\n\t sum +=\
+                \ num\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nres=0\n\
+                for num in range(1000): \n  if (((num%3) == 0 or ((num%5) ==0)) and\
+                \ (num>=3)): \n\tres+=num \nprint res"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\na=0;\n\
+                for num in range(1000):\n  if ((num % 5)==0) or ((num%3)==0):\n\t\
+                a += num\n\t\nprint a"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsum = 0\n\
+                for num in range(1000):\n  if num % 3 == 0:\n  \tsum = sum + num\n\
+                \  if num % 5 == 0:\n\tsum = sum + num\n  if num %  15 == 0:\n   \
+                \ sum = sum - num\t\n  \nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "sum = 0\nfor num in range(1000):\n  if num % 3 == 0 or num %\
+                \ 5 == 0:\n\tsum += num\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\na = 0\n\
+                for num in range(1000):\n  if num%3==0 or num%5==0:\n\ta = a+num\n\
+                \t\nprint a"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum=0\n\
+                for num in range(1000):\n  if num % 3 == 0 or num % 5 == 0:\n\tsum\
+                \ += num\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nx = 0\n\
+                for num in range(1000):\n  if num%3 == 0 or num%5 == 0: \n\tx += num\n\
+                print x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  if num%3==0 or num%5==0:\n  \tx=x+num\nprint\
+                \ x"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsum = 0\n\
+                for num in range(1000):\n  if num % 5 == 0:\n\tsum += num\n  elif\
+                \ num % 3 == 0:\n\tsum += num\n\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "x = 0\nnum = int\n\nfor num in range(1000):\n  if num % 3 ==\
+                \ 0 or num % 5 == 0:\n\tx = x + num\n\t\n\t\nprint(x)"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: '# In Python, the code
+
+                #
+
+                #     for letter in [''a'', ''b'']:
+
+                #         print letter
+
+                #
+
+                # prints:
+
+                #
+
+                #     a
+
+                #     b
+
+
+
+                print sum([x for x in range(1000) if x%3==0 or x%5==0])'
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\ntotal\
+                \ = 0\nfor num in range(1000):\n  if (num % 3 == 0) or (num % 5 ==\
+                \ 0): \n  \ttotal = total + num\nprint total\t\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: '# In Python, the code
+
+                #
+
+                #     for letter in [''a'', ''b'']:
+
+                #         print letter
+
+                #
+
+                # prints:
+
+                #
+
+                #     a
+
+                #     b
+
+                print (sum (i for i in range (1000) if i % 3 == 0 or i % 5 == 0))'
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nresult\
+                \ = 0\nfor num in range(1000):\n  if x % 3 == 0 or x % 5 == 0:\n \
+                \   result = result + x\n\nprint result"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\n#   for\
+                \ num in range(10):\n  \nnums = [3, 5]\nmax = 1000\n\nresult = 0\n\
+                for num in nums:\n    for i in range(1,max):\n        if num*i < max:\n\
+                \            result += num*i\nprint result\n\n\nresult = 0\nfor i\
+                \ in range(0,max):\n    if i%3 == 0 or i%5 == 0:\n        result +=\
+                \ i\n\nprint result"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nresul=0;\n\
+                for num in range(1000):\n  if num%3==0 or num%5==0:\n\tresul=resul+num;\n\
+                print resul;"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsumtotal\
+                \ = 0\nfor num in range(1000):\n   if num % 5 == 0:\n\t  sumtotal\
+                \ =  sumtotal + num\n   elif num % 3 == 0:\n\t  sumtotal =  sumtotal\
+                \ + num\nprint sumtotal\n\t  \n\t  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsum = 0\n\
+                \nfor num in range(1000):\n\tif num % 3 == 0:\n\t  sum += num\n\t\
+                elif num % 5 == 0:\n\t  sum += num\n\nprint sum\n\n\n"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\ns = 0\n\
+                for num in range(1000):\n  if (num % 3) == 0 or (num % 5) == 0:\n\t\
+                s += num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nx= 0\n\
+                for num in range(1000):\n  \n  if(num%3 == 0 or num%5 == 0):\n\tx\
+                \ = x + num\t;\n\n\nprint x\n\t\n\t\n\t\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum =\
+                \ 0\n\nfor num in range(1000):\n  \tif (num % 3 == 0):\n\t  sum +=\
+                \ num\n\telif (num % 5 == 0):\n\t  sum += num\n\t  \nprint sum\n\t\
+                \  \n\t\n\t"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  if num % 3 == 0 or num % 5 == 0:\n    sum +=\
+                \ num\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsoma\
+                \ = 0\nfor num in range(1000):\n  if (num%3==0) or (num%5==0):\n\t\
+                soma = soma + num\nprint soma\n  "
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "#!/usr/bin/python\n# In Python, the code\n#\n#     for letter\
+                \ in ['a', 'b']:\n#         print letter\n#\n# prints:\n#\n#     a\n\
+                #     b\nm=0\nfor num in range(1000):\n  n = num%3\n  s = num%5  \n\
+                \  if(n==0):\n  \tm = m+num\n  elif (s==0):\n\t  m=m+num\n\nprint\
+                \ m"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  if ((num % 3 == 0) or (num % 5 == 0)):\n    result\
+                \ = result + num\nprint result"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nholder\
+                \ = 0\nfor num in range(1000):\n  if (num % 3 == 0 or num % 5 == 0):\n\
+                \  \tholder += num\n\nprint holder"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\nsum = 0\n\
+                for num in range(1000):\n  if num%3==0 and num%5==0:\n\tsum = sum\
+                \ + num\n  else:\n\tif num%3 == 0:\n\t  sum = sum + num\n\tif num%5\
+                \ == 0:\n\t  sum = sum + num\nprint sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nsum =\
+                \ 0;\nfor num in range(1000):\n  if (num % 3) == 0 or (num % 5) ==\
+                \ 0:\n  \tsum += num;\nprint sum;"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nout =\
+                \ 0\nfor num in range(1000):\n  \tif num%5==0: out += num\n\telif\
+                \ num%3==0: out += num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: sum([x for x in range(1000) if x%3 == 0 or x%5 == 0])
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\ncount =\
+                \ 0\n\nfor num in range(10):\n  if num % 5 == 0 or num % 3 == 0:\n\
+                \tcount += num"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n\n\
+                #         print letter\n#\n# prints:\n#\n#     a\n#     b\ni = 0\n\
+                for num in range(1000):\n  if num % 3 == 0 or num % 5 == 0:\n\ti +=\
+                \ num\nprint i"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\na=0\n\
+                for num in range(1000):\n  if (num % 5 == 0) or (num % 3 == 0):\n\t\
+                a=a+num\n\nprint a"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nfor num\
+                \ in range(1000):\n  if num % 3 == 0 or num % 5 == 0:\n    sum +=\
+                \ num\n  print sum"
+              error: ''
+              evaluation: ''
+              output: ''
+            - code: "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#\
+                \         print letter\n#\n# prints:\n#\n#     a\n#     b\n\nyht =\
+                \ 0\nfor num in range(1000):\n  if not num % 3 or not num % 5: yht\
+                \ += num\nprint yht"
+              error: ''
+              evaluation: ''
+              output: ''
+          rule_type: FuzzyMatches
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# Type your code here.'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: exit
+        feedback: []
+        param_changes: []
+      hints: []
+      id: CodeRepl
+      solution: null
+    param_changes: []
+  exit:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Done</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Something

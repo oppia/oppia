@@ -56,7 +56,7 @@ describe('Solution Verification Service', function() {
     ess = $injector.get('explorationStatesService');
     siis = $injector.get('stateInteractionIdService');
     scas = $injector.get('stateCustomizationArgsService');
-    idc = $injector.get('interactionDetailsCache');
+    idc = $injector.get('InteractionDetailsCacheService');
     sof = $injector.get('SolutionObjectFactory');
     svs = $injector.get('SolutionVerificationService');
     IS = $injector.get('INTERACTION_SPECS');
@@ -87,7 +87,6 @@ describe('Solution Verification Service', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: [{
             hint_text: 'one'
           }, {
@@ -113,7 +112,6 @@ describe('Solution Verification Service', function() {
             feedback: [],
             param_changes: []
           },
-          fallbacks: [],
           hints: []
         },
         param_changes: []

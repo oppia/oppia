@@ -61,6 +61,10 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
 
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.system_user = user_services.get_system_user()
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
         editable."""
@@ -83,8 +87,9 @@ class EditorTest(BaseEditorControllerTest):
     def setUp(self):
         super(EditorTest, self).setUp()
         exp_services.load_demo('0')
+
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, '0')
+            self.system_user, '0')
 
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
@@ -233,7 +238,7 @@ class EditorTest(BaseEditorControllerTest):
             exp_id = '15'
             exp_services.load_demo(exp_id)
             rights_manager.release_ownership_of_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id)
+                self.system_user, exp_id)
 
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
@@ -427,7 +432,6 @@ interaction:
     dest: State A
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
   solution: null
@@ -449,7 +453,6 @@ interaction:
     dest: State B
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
   solution: null
@@ -471,7 +474,6 @@ interaction:
     dest: %s
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
   solution: null
@@ -495,7 +497,6 @@ interaction:
     dest: State A
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
   solution: null
@@ -613,7 +614,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id, unpublished_exp_id, self.editor_id,
+            self.owner, unpublished_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
         self.login(self.EDITOR_EMAIL)
@@ -642,9 +643,9 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id, published_exp_id, self.editor_id,
+            self.owner, published_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
-        rights_manager.publish_exploration(self.owner_id, published_exp_id)
+        rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.delete(
@@ -763,7 +764,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
 
         exp_services.load_demo(self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID)
+            self.system_user, self.EXP_ID)
 
         self.login(self.EDITOR_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -884,7 +885,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         exp_id = '0'
         exp_services.load_demo(exp_id)
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id)
+            self.system_user, exp_id)
 
         # Sign-up new editors Joe and Sandra.
         self.signup('joe@example.com', 'joe')
@@ -1145,6 +1146,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         super(ModeratorEmailsTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -1153,7 +1155,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title='My Exploration',
             end_state_name='END')
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         # Set the default email config.
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)

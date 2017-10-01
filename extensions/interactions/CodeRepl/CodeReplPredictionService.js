@@ -41,7 +41,7 @@ oppia.factory('CodeReplPredictionService', [
       'if', 'import', 'in', 'is', 'lambda', 'not', 'or', 'pass', 'print',
       'raise', 'return', 'try', 'while', 'with', 'yield'];
 
-    return {
+    var predictionService = {
       getTokenizedProgram: function(programTokens, tokenToId) {
         // Tokenize Python programs in dataset for winnowing.
         tokenizedProgram = [];
@@ -160,7 +160,7 @@ oppia.factory('CodeReplPredictionService', [
           multisetB.push(hash[0]);
         });
 
-        return this.calcJaccardIndex(multisetA, multisetB);
+        return predictionService.calcJaccardIndex(multisetA, multisetB);
       },
 
       findNearestNeighborsIndexes: function(knnData, program) {
@@ -178,7 +178,7 @@ oppia.factory('CodeReplPredictionService', [
         // Normalize program tokens for winnowing preprocessing. This removes
         // unnecessary tokens and normalizes variable and method name tokens.
 
-        var tokenizedProgram = this.getTokenizedProgram(
+        var tokenizedProgram = predictionService.getTokenizedProgram(
           pythonProgramTokens, tokenToId);
         // Find k-gram hashes from normalized program tokens.
 
@@ -194,8 +194,8 @@ oppia.factory('CodeReplPredictionService', [
         // classifier data for k nearest neighbor classification.
         similarityList = [];
         Object.keys(fingerprintData).forEach(function(index) {
-          var fingerprintA = fingerprintData.index.fingerprint;
-          var similarity = this.getProgramSimilarity(
+          var fingerprintA = fingerprintData[index].fingerprint;
+          var similarity = predictionService.getProgramSimilarity(
             fingerprintA, programFingerprint);
           similarityList.push([index, similarity]);
         });
@@ -210,17 +210,19 @@ oppia.factory('CodeReplPredictionService', [
         return nearestNeighborsIndexes;
       },
 
-      predict: function(classifierData, program) {
+      predict: function(classifierData, answer) {
+        // Get python code from the input answer.
+        var program = answer.code;
         var knnData = classifierData.KNN;
         var svmData = classifierData.SVM;
         var cvVocabulary = classifierData.cv_vocabulary;
 
-        var fingerprintData = knnData.fingerprintData;
+        var fingerprintData = knnData.fingerprint_data;
         var top = knnData.top;
         var occurrence = knnData.occurrence;
 
-        var nearestNeighborsIndexes = this.findNearestNeighborsIndexes(
-          knnData, program);
+        var nearestNeighborsIndexes = (
+          predictionService.findNearestNeighborsIndexes(knnData, program));
         var nearesNeighborsClasses = [];
         
         // Find classes of nearest neighbor programs.
@@ -229,7 +231,7 @@ oppia.factory('CodeReplPredictionService', [
           var outputClassPropertyName = 'class';
           var similarity = neighbor[1];
           nearesNeighborsClasses.push(
-            [fingerprintData.index[outputClassPropertyName]], similarity);
+            [fingerprintData[index][outputClassPropertyName]], similarity);
         });
 
         // Count how many times a class appears in nearest neighbors.
@@ -263,7 +265,7 @@ oppia.factory('CodeReplPredictionService', [
         var pythonProgramTokens = PythonProgramTokenizer.generateTokens(
           program.split('\n'));
 
-        var tokenizedProgram = this.getTokenizedProgramForCV(
+        var tokenizedProgram = predictionService.getTokenizedProgramForCV(
           pythonProgramTokens);
         var programVector = CountVectorizerService.vectorize(
           tokenizedProgram, cvVocabulary);
@@ -272,4 +274,6 @@ oppia.factory('CodeReplPredictionService', [
         return prediction;
       }
     };
+
+    return predictionService;
   }]);
