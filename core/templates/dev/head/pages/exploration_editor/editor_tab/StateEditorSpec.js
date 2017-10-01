@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the controller of the 'State Editor'. This also
- * includes unit tests for the training data service.
+ * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
 describe('State Editor controller', function() {
@@ -50,7 +49,6 @@ describe('State Editor controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -76,7 +74,6 @@ describe('State Editor controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -102,7 +99,6 @@ describe('State Editor controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: [{

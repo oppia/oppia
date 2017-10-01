@@ -13,11 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the graphical state editor.
+ * @fileoverview Service which handles opening and closing the training modal
+ * used for bothunresolved answers and answers within the training data of a classifier.
  */
- 
-// A service which handles opening and closing the training modal used for both
-// unresolved answers and answers within the training data of a classifier.
+
 oppia.factory('TrainingModalService', [
   '$rootScope', '$modal', 'alertsService',
   function($rootScope, $modal, alertsService) {
@@ -68,7 +67,6 @@ oppia.factory('TrainingModalService', [
                 var rulesServiceName =
                   angularNameService.getNameOfInteractionRulesService(
                     interactionId)
-
                 // Inject RulesService dynamically.
                 var rulesService = $injector.get(rulesServiceName);
 

@@ -54,7 +54,7 @@ describe('TrainingDataService', function() {
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
       rs = $injector.get('responsesService');
-      tds = $injector.get('TrainingDataService');
+      tds = $injector.get('trainingDataService');
       IS = $injector.get('INTERACTION_SPECS');
       RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
       rof = $injector.get('RuleObjectFactory');
@@ -90,7 +90,6 @@ describe('TrainingDataService', function() {
               dest: 'State',
               param_changes: []
             },
-            fallbacks: [],
             hints: [],
             confirmed_unclassified_answers: []
           },

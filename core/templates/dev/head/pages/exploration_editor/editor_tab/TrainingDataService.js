@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the graphical state editor.
+ * @fileoverview Service for traning data that, given an exploration ID 
+ * and state name, determines all of the answers which do not
+ * have certain classification and are not currently used
+ * as part of any classifier training models.
  */
  
-// A service that, given an exploration ID and state name, determines all of the
-// answers which do not have certain classification and are not currently used
-// as part of any classifier training models.
 oppia.factory('TrainingDataService', [
   '$rootScope', '$http', 'responsesService', 'RULE_TYPE_CLASSIFIER',
   'RuleObjectFactory',
