@@ -162,7 +162,7 @@ oppia.factory('oppiaPlayerService', [
         StatsReportingService.recordExplorationActuallyStarted(
           stateName, totalTimeSecs);
       }
-    }
+    };
 
     // Ensure the transition to a terminal state properly logs the end of the
     // exploration.
