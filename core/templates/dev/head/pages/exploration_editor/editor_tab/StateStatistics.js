@@ -62,7 +62,7 @@ oppia.controller('StateStatistics', [
     });
 
     $scope.openTrainUnresolvedAnswerModal = function(trainingDataIndex) {
-      return trainingModalService.openTrainUnresolvedAnswerModal(
+      return TrainingModalService.openTrainUnresolvedAnswerModal(
         trainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
     };
   }
