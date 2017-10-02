@@ -106,14 +106,15 @@ oppia.factory('StatsReportingService', [
       },
       // Note that this also resets the stopwatch.
       recordStateTransition: function(
-          oldStateName, newStateName, answer, oldParams) {
+          oldStateName, newStateName, answer, oldParams, isFirstHit) {
         $http.post(getFullStatsUrl('STATE_HIT'), {
           // This is the time spent since the last submission.
           client_time_spent_in_secs: stopwatch.getTimeInSecs(),
           exploration_version: explorationVersion,
           new_state_name: newStateName,
           old_params: oldParams,
-          session_id: sessionId
+          session_id: sessionId,
+          is_first_hit: isFirstHit
         });
 
         // Broadcast information about the state transition to listeners.

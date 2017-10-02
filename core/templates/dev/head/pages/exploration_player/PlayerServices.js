@@ -58,6 +58,8 @@ oppia.factory('oppiaPlayerService', [
 
     var totalTimeStopwatch = null;
 
+    var visitedStates = [];
+
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
     var initialStateName = null;
@@ -131,6 +133,7 @@ oppia.factory('oppiaPlayerService', [
         totalTimeStopwatch.reset();
         _checkTimeSinceStart(
           totalTimeStopwatch.getTimeInSecs(), initialState.name);
+        visitedStates.push(exploration.initStateName);
       }
 
       $rootScope.$broadcast('playerStateChange', initialState.name);
@@ -390,9 +393,14 @@ oppia.factory('oppiaPlayerService', [
           exploration.isInteractionInline(oldStateName));
 
         if (!_editorPreviewMode) {
+          var isFirstHit = false;
+          if (visitedStates.indexOf(newStateName) == -1) {
+            isFirstHit = true;
+          }
           StatsReportingService.recordStateTransition(
             oldStateName, newStateName, answer,
-            LearnerParamsService.getAllParams());
+            LearnerParamsService.getAllParams(), isFirstHit);
+          visitedStates.push(newStateName);
           _checkTimeSinceStart(
             totalTimeStopwatch.getTimeInSecs(), newStateName);
         }

@@ -19,6 +19,7 @@
 import inspect
 
 from core import jobs_registry
+from core.domain import exp_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
@@ -80,7 +81,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
             cls, exploration_id, exploration_version, state_name,
             interaction_id, answer_group_index, rule_spec_index,
             classification_categorization, session_id, time_spent_in_secs,
-            params, normalized_answer):
+            params, normalized_answer, is_answer_correct):
         """Records an event when an answer triggers a rule. The answer recorded
         here is a Python-representation of the actual answer submitted by the
         user.
@@ -92,6 +93,24 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
                 normalized_answer, interaction_id, answer_group_index,
                 rule_spec_index, classification_categorization, params,
                 session_id, time_spent_in_secs))
+
+        is_feedback_useful = True
+        if classification_categorization == (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
+            is_feedback_useful = False
+
+        stats_models.AnswerSubmittedEventLogEntryModel.create(
+            exploration_id, exploration_version, state_name, session_id,
+            time_spent_in_secs, is_feedback_useful, is_answer_correct)
+
+        update_params = {
+            'is_answer_correct': is_answer_correct,
+            'is_feedback_useful': is_feedback_useful
+        }
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_services.update_stats(
+                exploration_id, exploration_version, state_name, cls.EVENT_TYPE,
+                update_params)
 
 
 class ExplorationActualStartEventHandler(BaseEventHandler):
@@ -193,10 +212,16 @@ class StateHitEventHandler(BaseEventHandler):
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
-            params, play_type):
+            params, play_type, is_first_hit):
         stats_models.StateHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             params, play_type)
+        update_params = {
+            'is_first_hit': is_first_hit
+        }
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_services.update_stats(
+                exp_id, exp_version, state_name, cls.EVENT_TYPE, update_params)
 
 
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):

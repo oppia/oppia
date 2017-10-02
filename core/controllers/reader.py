@@ -281,11 +281,17 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
 
         normalized_answer = old_interaction_instance.normalize_answer(answer)
 
+        is_answer_correct = False
+        if answer == exploration.states[
+                old_state_name].interaction.solution.correct_answer:
+            is_answer_correct = True
+
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, version, old_state_name,
             exploration.states[old_state_name].interaction.id,
             answer_group_index, rule_spec_index, classification_categorization,
-            session_id, client_time_spent_in_secs, params, normalized_answer)
+            session_id, client_time_spent_in_secs, params, normalized_answer,
+            is_answer_correct)
         self.render_json({})
 
 
@@ -304,12 +310,13 @@ class StateHitEventHandler(base.BaseHandler):
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
+        is_first_hit = self.payload.get('is_first_hit')
 
         # Record the state hit, if it is not the END state.
         if new_state_name is not None:
             event_services.StateHitEventHandler.record(
                 exploration_id, exploration_version, new_state_name,
-                session_id, old_params, feconf.PLAY_TYPE_NORMAL)
+                session_id, old_params, feconf.PLAY_TYPE_NORMAL, is_first_hit)
         else:
             logging.error('Unexpected StateHit event for the END state.')
 
