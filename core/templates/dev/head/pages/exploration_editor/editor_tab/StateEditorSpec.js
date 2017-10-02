@@ -163,7 +163,7 @@ describe('State Editor controller', function() {
       ecs = $injector.get('editorContextService');
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
-      rs = $injector.get('responsesService');
+      rs = $injector.get('ResponsesService');
       tds = $injector.get('trainingDataService');
       IS = $injector.get('INTERACTION_SPECS');
       RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
