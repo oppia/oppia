@@ -21,12 +21,12 @@ oppia.controller('StateStatistics', [
   '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
   'explorationStatesService', 'trainingDataService',
   'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
-  'trainingModalService', 'INTERACTION_SPECS',
+  'TrainingModalService', 'INTERACTION_SPECS',
   function(
       $rootScope, $scope, $modal, explorationData, editorContextService,
       explorationStatesService, trainingDataService,
       stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
-      trainingModalService, INTERACTION_SPECS) {
+      TrainingModalService, INTERACTION_SPECS) {
     $scope.isInteractionTrainable = false;
 
     $scope.initStateStatistics = function(data) {
@@ -62,7 +62,7 @@ oppia.controller('StateStatistics', [
     });
 
     $scope.openTrainUnresolvedAnswerModal = function(trainingDataIndex) {
-      return trainingModalService.openTrainUnresolvedAnswerModal(
+      return TrainingModalService.openTrainUnresolvedAnswerModal(
         trainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
     };
   }
