@@ -282,9 +282,10 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         normalized_answer = old_interaction_instance.normalize_answer(answer)
 
         is_answer_correct = False
-        if answer == exploration.states[
-                old_state_name].interaction.solution.correct_answer:
-            is_answer_correct = True
+        if exploration.states[old_state_name].interaction.solution:
+            if answer == exploration.states[
+                    old_state_name].interaction.solution.correct_answer:
+                    is_answer_correct = True
 
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, version, old_state_name,
