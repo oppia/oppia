@@ -8,7 +8,7 @@ if (isMinificationNeeded) {
 module.exports = function(config) {
   config.set({
     basePath: '../../',
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine-jquery', 'jasmine'],
     files: [
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
@@ -33,6 +33,12 @@ module.exports = function(config) {
       {
         pattern: 'assets/i18n/**/*.json',
         watched: true,
+        served: true,
+        included: false
+      },
+      {
+        pattern: 'core/tests/data/**/*.json',
+        watched: false,
         served: true,
         included: false
       }

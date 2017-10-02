@@ -105,31 +105,40 @@ oppia.factory('CodeReplPredictionService', [
 
       calcJaccardIndex: function(multisetA, multisetB) {
         // Calculate jaccard index between two multisets.
-        multisetA.sort();
-        multisetB.sort();
+        multisetA.sort(function(x, y) {
+          return x > y ? 1 : -1
+        });
+        multisetB.sort(function(x, y) {
+          return x > y ? 1 : -1
+        });
 
         var smallSet = (
-          (multisetA.length <= multisetB.length) ?
+          (multisetA.length < multisetB.length) ?
           multisetA.slice() : multisetB.slice());
         var unionSet = (
-          (multisetA.length > multisetB.length) ?
-          multisetA.slice() : multisetB.slice());
+          (multisetA.length < multisetB.length) ?
+          multisetB.slice() : multisetA.slice());
         var index = 0;
         var extraElements = [];
 
-        smallSet.forEach(function(elem) {
+        for(var i = 0; i < smallSet.length; i++) {
+          var elem = smallSet[i];
           while (index < unionSet.length && elem > unionSet[index]) {
             index += 1;
           }
+
           if (index >= unionSet.length || elem < unionSet[index]) {
             extraElements.push(elem);
           }
-          else if (elem === unionSet[index]) {
+          else if (elem == unionSet[index]) {
             index += 1;
           }
-        });
+        }
 
         unionSet = unionSet.concat(extraElements);
+        if (unionSet.length == 0) {
+          return 0;
+        }
 
         index = 0;
         var intersectionSet = [];
@@ -203,7 +212,7 @@ oppia.factory('CodeReplPredictionService', [
         // Sort the programs according to their similairy with the
         // input program.
         similarityList.sort(function(x, y) {
-          return x[1] < y[1];
+          return x[1] > y[1] ? -1 : 1;
         });
 
         var nearestNeighborsIndexes = similarityList.slice(0, top);
@@ -231,7 +240,7 @@ oppia.factory('CodeReplPredictionService', [
           var outputClassPropertyName = 'class';
           var similarity = neighbor[1];
           nearesNeighborsClasses.push(
-            [fingerprintData[index][outputClassPropertyName]], similarity);
+            [fingerprintData[index][outputClassPropertyName], similarity]);
         });
 
         // Count how many times a class appears in nearest neighbors.
@@ -250,13 +259,24 @@ oppia.factory('CodeReplPredictionService', [
         var classCountArray = []
         Object.keys(classCount).forEach(function(k) {
           classCountArray.push([k, classCount[k]]);
-        })
+        });
 
         var predictedClass = classCountArray[0][0];
         var predictedClassOccurrence = classCountArray[0][1];
-        if (predictedClassOccurrence >= occurrence &&
-            predictedClassOccurrence != classCountArray[1][1]) {
-          return predictedClass;
+        var prediction = predictedClass;
+
+        if (predictedClassOccurrence >= occurrence) {
+          if (classCountArray.length > 1) {
+            if (predictedClassOccurrence != classCountArray[1][1]) {
+              // Check whether second most likely prediction does not have same
+              // occurrence count. If it does, then we assume that KNN has
+              // failed.
+              return predictedClass.toString();
+            }
+          }
+          else {
+            return predictedClass.toString();
+          }
         }
 
         // If KNN fails to predict then use SVM to predict the output class.
@@ -271,7 +291,7 @@ oppia.factory('CodeReplPredictionService', [
           tokenizedProgram, cvVocabulary);
 
         prediction = SVMPredictionService.predict(svmData, programVector);
-        return prediction;
+        return prediction.toString();
       }
     };
 
