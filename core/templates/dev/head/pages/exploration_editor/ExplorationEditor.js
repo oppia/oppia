@@ -62,7 +62,7 @@ oppia.controller('ExplorationEditor', [
       ExplorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
-      ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService
+      ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
       UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
