@@ -238,6 +238,7 @@
 	"I18N_MODAL_CONTINUE_BUTTON": "Continuar",
 	"I18N_ONE_SUBSCRIBER_TEXT": "Tienes 1 suscriptor.",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Idioma",
+	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Cargando el sonido…",
 	"I18N_PLAYER_BACK": "Volver",
 	"I18N_PLAYER_BACK_TO_COLLECTION": "Volver a la colección",
 	"I18N_PLAYER_BANDWIDTH_USAGE_WARNING_MODAL_TITLE": "Alerta de uso de datos",
