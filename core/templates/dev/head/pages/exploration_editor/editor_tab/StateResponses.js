@@ -19,13 +19,13 @@
 
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
-  'editorContextService', 'alertsService', 'ResponsesService', 'RouterService',
+  'editorContextService', 'alertsService', 'responsesService', 'RouterService',
   'explorationContextService', 'trainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
-      editorContextService, alertsService, ResponsesService, RouterService,
+      editorContextService, alertsService, responsesService, RouterService,
       explorationContextService, trainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
