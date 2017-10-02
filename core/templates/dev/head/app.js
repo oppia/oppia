@@ -468,15 +468,6 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
   };
 }]);
 
-// Service for generating random IDs.
-oppia.factory('IdGenerationService', [function() {
-  return {
-    generateNewId: function() {
-      return Math.random().toString(36).slice(2);
-    }
-  };
-}]);
-
 oppia.factory('rteHelperService', [
   '$filter', '$log', '$interpolate', 'explorationContextService',
   'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
