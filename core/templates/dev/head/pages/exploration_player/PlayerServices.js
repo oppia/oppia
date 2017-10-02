@@ -173,13 +173,6 @@ oppia.factory('oppiaPlayerService', [
       }
     });
 
-    $rootScope.$on('sessionTime', function(evt, totalTimeSecs, stateName) {
-      if (totalTimeSecs >= MIN_TIME_FOR_ACTUAL_START_SECS) {
-        StatsReportingService.recordExplorationActuallyStarted(
-          stateName, totalTimeSecs);
-      }
-    });
-
     return {
       // This should only be used in editor preview mode. It sets the
       // exploration data from what's currently specified in the editor, and
