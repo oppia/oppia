@@ -121,22 +121,20 @@ oppia.factory('CodeReplPredictionService', [
         var index = 0;
         var extraElements = [];
 
-        for(var i = 0; i < smallSet.length; i++) {
-          var elem = smallSet[i];
+        smallSet.forEach(function(elem) {
           while (index < unionSet.length && elem > unionSet[index]) {
             index += 1;
           }
-
           if (index >= unionSet.length || elem < unionSet[index]) {
             extraElements.push(elem);
           }
-          else if (elem == unionSet[index]) {
+          else if (elem === unionSet[index]) {
             index += 1;
           }
-        }
+        });
 
         unionSet = unionSet.concat(extraElements);
-        if (unionSet.length == 0) {
+        if (unionSet.length === 0) {
           return 0;
         }
 
