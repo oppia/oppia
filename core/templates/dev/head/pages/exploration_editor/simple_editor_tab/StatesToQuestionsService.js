@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@ oppia.factory('StatesToQuestionsService', [
     var SUPPORTED_INTERACTION_TYPES = [{
       id: 'MultipleChoiceInput',
       name: 'Multiple choice'
+    }, {
+      id: 'ItemSelectionInput',
+      name: 'Checkbox'
     }];
     var INTERACTION_ID_END_EXPLORATION = 'EndExploration';
 
@@ -164,7 +167,6 @@ oppia.factory('StatesToQuestionsService', [
           return null;
         }
       }
-
       return questions;
     };
 

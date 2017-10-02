@@ -1,0 +1,147 @@
+<anchor-header header-id="getSubfieldId('ItemSelectionInput')"
+               header-text="Checkbox Input">
+</anchor-header>
+<div class="options-container">
+  <div style="margin-bottom: 0;">
+    <ul>
+      <li ng-repeat="choice in getChoices() track by $index" class="option">
+        <button ng-click="deleteChoice(choice)" class="btn-delete-option"
+                   ng-if="getChoices().length > 2">
+          <i class="material-icons md-18">&#xE5CD;</i>
+        </button>
+        <editor-html-field class="option-text"
+                            original-value="choice"
+                            on-finish-editing="saveChoice($index, newValue)"
+                            field-id="<[getFieldId($index)]>"
+                            validator="isChoiceValid($index, newValue)">
+        </editor-html-field>
+      </li>
+    </ul>
+  </div>
+
+  <md-button ng-click="addChoice()" class="btn-add-option">
+    <i class="material-icons md-18 btn-add-option-icon">&#xE145;</i>
+    Add option
+  </md-button>
+</div>
+
+<anchor-header header-id="getSubfieldId('Correct answer')"
+               header-text="Pick the correct answers">
+</anchor-header>
+<div class="correct-answer-picker-container">
+  <md-button md-theme="primary" class="md-raised correct-answer-option"
+          ng-repeat="choice in getChoices() track by $index"
+          ng-click="toggleCorrectAnswer(choice)"
+          ng-class="{'correct-answer-option-selected': isCorrectAnswer(choice)}"
+          aria-label="<[choice]>">
+    <div class="correct-answer-content-container">
+      <span angular-html-bind="choice"></span>
+    </div>
+  </md-button>
+</div>
+
+<div ng-if="getAnswerGroups().length > 0">
+  <h3>Provide additional explanation for the correct answer</h3>
+  <editor-html-field original-value="getAnswerGroups()[0].outcome.feedback[0]"
+                     on-finish-editing="saveCorrectAnswerFeedback(newValue)"
+                     placeholder="Type something"
+                     field-id="<[getFieldId('correct-response')]>">
+  </editor-html-field>
+</div>
+
+<anchor-header header-id="getSubfieldId('Hints')"
+               header-text="Provide a hint for all other answers">
+</anchor-header>
+<editor-html-field original-value="getDefaultOutcome().feedback[0]"
+                   on-finish-editing="saveDefaultFeedback(newValue)"
+                   placeholder="Type something">
+</editor-html-field>
+
+<style>
+  checkbox-editor .options-container {
+    background-color: #f0f0f0;
+    margin-top: 20px;
+    padding: 24px 0;
+    width: 100%;
+  }
+  checkbox-editor .option {
+    display: list-item;
+    list-style: disc outside none;
+    margin: 0 0 5px 20px;
+  }
+  checkbox-editor .option-text {
+    display: inherit;
+    width: 100%;
+  }
+  checkbox-editor .option-text .view-mode {
+    padding: 10px;
+  }
+  checkbox-editor .option-text .edit-mode {
+    width: 85%;
+  }
+  checkbox-editor .btn-delete-option {
+    background: none;
+    border: none;
+    float: right;
+    margin-right: 20px;
+    margin-top: 7px;
+    width: 10%;
+  }
+  checkbox-editor .btn-add-option {
+    background: none;
+    border: none;
+    color: #888;
+    height: 40px;
+    margin-left: 35px;
+  }
+  checkbox-editor .btn-add-option-icon {
+    margin-left: -3px;
+    margin-right: 12px;
+    vertical-align: text-bottom;
+  }
+
+  checkbox-editor .correct-answer-picker-container {
+    background-color: #ffffff;
+  }
+  checkbox-editor .correct-answer-option {
+    background: none;
+    border: none;
+    margin: 10px 0;
+    padding: 10px 6px 10px 20px;
+    text-align: left;
+    /* This is needed so that images stay bounded by the container in Firefox. */
+    width: 100%;
+  }
+  checkbox-editor .correct-answer-radio-button-container,
+  checkbox-editor .correct-answer-content-container {
+    display: table-cell;
+    vertical-align: bottom;
+  }
+  checkbox-editor .correct-answer-outer-radio-button {
+    border: 2px solid rgba(0,0,0,0.87);
+    border-radius: 50%;
+    display: inline-block;
+    height: 16px;
+    margin-left: 35px;
+    margin-right: 20px;
+    width: 16px;
+  }
+  checkbox-editor .correct-answer-option:hover .correct-answer-inner-radio-button,
+  checkbox-editor .correct-answer-option-selected .correct-answer-inner-radio-button {
+    border-radius: 50%;
+    display: block;
+    height: 8px;
+    margin: 2px;
+    width: 8px;
+  }
+  checkbox-editor .correct-answer-option:hover:not(.correct-answer-option-selected) .correct-answer-inner-radio-button {
+    background-color: rgba(0,0,0,0.87);
+  }
+  checkbox-editor .correct-answer-option-selected {
+    background: #c5e1a5;
+  }
+
+  checkbox-editor md-checkbox {
+    display: inline;
+  }
+</style>
