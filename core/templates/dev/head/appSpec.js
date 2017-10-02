@@ -51,7 +51,7 @@ describe('Code Normalization', function() {
 
   var cns = null;
   beforeEach(inject(function($injector) {
-    cns = $injector.get('codeNormalizationService');
+    cns = $injector.get('CodeNormalizerService');
   }));
 
   it('should not modify contents of code', function() {
