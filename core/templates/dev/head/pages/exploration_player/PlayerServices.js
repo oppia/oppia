@@ -129,8 +129,8 @@ oppia.factory('oppiaPlayerService', [
         StatsReportingService.recordExplorationStarted(
           exploration.initStateName, newParams);
         totalTimeStopwatch.reset();
-        $rootScope.$broadcast(
-          'sessionTime', totalTimeStopwatch.getTimeInSecs(), initialState.name);
+        _checkTimeSinceStart(
+          totalTimeStopwatch.getTimeInSecs(), initialState.name);
       }
 
       $rootScope.$broadcast('playerStateChange', initialState.name);
@@ -157,6 +157,13 @@ oppia.factory('oppiaPlayerService', [
       LearnerParamsService.init(startingParams);
     };
 
+    var _checkTimeSinceStart = function(totalTimeSecs, stateName) {
+      if (totalTimeSecs >= MIN_TIME_FOR_ACTUAL_START_SECS) {
+        StatsReportingService.recordExplorationActuallyStarted(
+          stateName, totalTimeSecs);
+      }
+    }
+
     // Ensure the transition to a terminal state properly logs the end of the
     // exploration.
     $rootScope.$on('playerStateChange', function(evt, newStateName) {
@@ -166,10 +173,10 @@ oppia.factory('oppiaPlayerService', [
       }
     });
 
-    $rootScope.$on('sessionTime', function(evt, totalTime, stateName) {
-      if (totalTime >= MIN_TIME_FOR_ACTUAL_START_SECS) {
+    $rootScope.$on('sessionTime', function(evt, totalTimeSecs, stateName) {
+      if (totalTimeSecs >= MIN_TIME_FOR_ACTUAL_START_SECS) {
         StatsReportingService.recordExplorationActuallyStarted(
-          stateName, totalTime);
+          stateName, totalTimeSecs);
       }
     });
 
@@ -393,8 +400,8 @@ oppia.factory('oppiaPlayerService', [
           StatsReportingService.recordStateTransition(
             oldStateName, newStateName, answer,
             LearnerParamsService.getAllParams());
-          $rootScope.$broadcast(
-            'sessionTime', totalTimeStopwatch.getTimeInSecs(), newStateName);
+          _checkTimeSinceStart(
+            totalTimeStopwatch.getTimeInSecs(), newStateName);
         }
 
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);

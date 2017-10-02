@@ -88,12 +88,12 @@ oppia.factory('StatsReportingService', [
 
         stopwatch.reset();
       },
-      recordExplorationActuallyStarted: function(stateName, totalTime) {
+      recordExplorationActuallyStarted: function(stateName, totalTimeSecs) {
         $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
           exploration_version: explorationVersion,
           state_name: stateName,
           session_id: sessionId,
-          client_time_spent_in_secs: totalTime
+          client_time_spent_in_secs: totalTimeSecs
         });
       },
       recordSolutionHit: function(stateName) {
