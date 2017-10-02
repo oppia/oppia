@@ -431,12 +431,12 @@
 
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div ng-show="isEmpty(explorationParamSpecsService.savedMemento)">
+        <div ng-show="isEmpty(explorationParamSpecsService.savedMemento.getParamDict())">
           <em>No parameters used.</em>
         </div>
         <ol>
-          <li ng-repeat="(paramName, paramSpecValue) in explorationParamSpecsService.savedMemento">
-            <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
+          <li ng-repeat="(paramName, paramSpec) in explorationParamSpecsService.savedMemento.getParamDict()">
+            <b><[paramName]></b> (<[paramSpec.getType().getName()]>)
           </li>
         </ol>
       </div>

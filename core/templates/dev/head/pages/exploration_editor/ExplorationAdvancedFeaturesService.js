@@ -17,7 +17,7 @@
  *               the exploration editor.
  */
 
-oppia.factory('explorationAdvancedFeaturesService', [function() {
+oppia.factory('ExplorationAdvancedFeaturesService', [function() {
   var _settings = {
     areParametersEnabled: false
   };

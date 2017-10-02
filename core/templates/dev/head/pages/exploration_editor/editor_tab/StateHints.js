@@ -146,7 +146,8 @@ oppia.controller('StateHints', [
 
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_editor/editor_tab/delete_last_hint_modal.html'),
+          '/pages/exploration_editor/editor_tab/' +
+          'delete_last_hint_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance',

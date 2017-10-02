@@ -24,7 +24,7 @@ oppia.controller('SettingsTab', [
   'explorationInitStateNameService', 'explorationParamSpecsService',
   'changeListService', 'alertsService', 'explorationStatesService',
   'explorationParamChangesService', 'explorationWarningsService',
-  'explorationAdvancedFeaturesService', 'ALL_CATEGORIES',
+  'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
   'explorationAutomaticTextToSpeechService',
@@ -36,7 +36,7 @@ oppia.controller('SettingsTab', [
       explorationInitStateNameService, explorationParamSpecsService,
       changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
-      explorationAdvancedFeaturesService, ALL_CATEGORIES,
+      ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       EditableExplorationBackendApiService, UrlInterpolationService,
       explorationAutomaticTextToSpeechService) {
@@ -166,9 +166,9 @@ oppia.controller('SettingsTab', [
     * Methods for enabling advanced features.
     ********************************************/
     $scope.areParametersEnabled = (
-      explorationAdvancedFeaturesService.areParametersEnabled);
+      ExplorationAdvancedFeaturesService.areParametersEnabled);
     $scope.enableParameters = (
-      explorationAdvancedFeaturesService.enableParameters);
+      ExplorationAdvancedFeaturesService.enableParameters);
 
     $scope.isAutomaticTextToSpeechEnabled = (
       explorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled);
