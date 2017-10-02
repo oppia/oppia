@@ -35,11 +35,11 @@ oppia.directive('answerGroupEditor', [
         'answer_group_editor_directive.html'),
       controller: [
         '$scope', 'stateInteractionIdService', 'responsesService',
-        'editorContextService', 'alertsService', 'INTERACTION_SPECS',
+        'editorContextService', 'AlertsService', 'INTERACTION_SPECS',
         'RULE_TYPE_CLASSIFIER', 'RuleObjectFactory',
         function(
             $scope, stateInteractionIdService, responsesService,
-            editorContextService, alertsService, INTERACTION_SPECS,
+            editorContextService, AlertsService, INTERACTION_SPECS,
             RULE_TYPE_CLASSIFIER, RuleObjectFactory) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
@@ -203,7 +203,7 @@ oppia.directive('answerGroupEditor', [
             $scope.saveRules();
 
             if ($scope.rules.length === 0) {
-              alertsService.addWarning(
+              AlertsService.addWarning(
                 'All answer groups must have at least one rule.');
             }
           };
