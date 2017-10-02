@@ -106,8 +106,9 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
         stats_models.ExplorationActualStartEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             client_time_spent_in_secs)
-        stats_services.update_stats(
-            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_services.update_stats(
+                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class SolutionHitEventHandler(BaseEventHandler):
@@ -122,8 +123,9 @@ class SolutionHitEventHandler(BaseEventHandler):
         stats_models.SolutionHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             client_time_spent_in_secs)
-        stats_services.update_stats(
-            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_services.update_stats(
+                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class StartExplorationEventHandler(BaseEventHandler):
