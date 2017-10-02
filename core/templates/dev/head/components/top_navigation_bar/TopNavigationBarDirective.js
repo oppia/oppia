@@ -29,11 +29,11 @@ oppia.directive('topNavigationBar', [
       controller: [
         '$scope', '$http', '$window', '$timeout',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS',
-        'siteAnalyticsService', 'windowDimensionsService', 'oppiaDebouncer',
+        'siteAnalyticsService', 'windowDimensionsService', 'DebouncerService',
         function(
             $scope, $http, $window, $timeout,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
-            siteAnalyticsService, windowDimensionsService, oppiaDebouncer) {
+            siteAnalyticsService, windowDimensionsService, DebouncerService) {
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection'];
@@ -204,7 +204,7 @@ oppia.directive('topNavigationBar', [
           };
 
           var truncateNavbarDebounced =
-            oppiaDebouncer.debounce(truncateNavbar, 500);
+            DebouncerService.debounce(truncateNavbar, 500);
 
           // The function needs to be run after i18n. A timeout of 0 appears to
           // run after i18n in Chrome, but not other browsers. The function will

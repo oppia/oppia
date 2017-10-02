@@ -30,9 +30,9 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       templateUrl: 'interaction/MathExpressionInput',
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
-        'oppiaDebouncer', 'deviceInfoService',
+        'DebouncerService', 'deviceInfoService',
         function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
-          oppiaDebouncer, deviceInfoService) {
+          DebouncerService, deviceInfoService) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
           /**
@@ -112,7 +112,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             // Debounce clear/refill cycles to 1 per 100ms.
             $('#fakeInputForMathExpression').on(
               'input change compositionupdate keydown',
-              oppiaDebouncer.debounce(function() {
+              DebouncerService.debounce(function() {
                 setGuppyContentFromInput();
               }, 100)
             ).on('blur', function() {
