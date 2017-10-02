@@ -181,8 +181,6 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
-
-
 # Default title for a newly-minted exploration.
 DEFAULT_EXPLORATION_TITLE = ''
 # Default category for a newly-minted exploration.
@@ -197,7 +195,7 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
-DEAULT_AUTO_TTS_ENABLED = True
+DEFAULT_AUTO_TTS_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''

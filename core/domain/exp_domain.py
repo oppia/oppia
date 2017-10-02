@@ -1668,7 +1668,7 @@ class Exploration(object):
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
             feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0,
-            feconf.DEAULT_AUTO_TTS_ENABLED)
+            feconf.DEFAULT_AUTO_TTS_ENABLED)
 
     @classmethod
     def from_dict(
@@ -2232,8 +2232,8 @@ class Exploration(object):
         """Update whether automatic text-to-speech is enabled.
 
         Args:
-            auto_tts_enabled: bool. Boolean representing whether automatic
-                text-to-speech is enabled or not.
+            auto_tts_enabled: bool. Whether automatic text-to-speech
+                is enabled or not.
         """
         self.auto_tts_enabled = auto_tts_enabled
 
@@ -2834,7 +2834,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 17
+    CURRENT_EXP_SCHEMA_VERSION = 18
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
