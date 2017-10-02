@@ -107,7 +107,7 @@ oppia.controller('HistoryTab', [
          * 'earlierVersion' and 'laterVersion' whose values are the metadata
          * of the compared versions, containing 'committerId', 'createdOn',
          * 'commitMessage', and 'versionNumber'.
-         */    
+         */
         $scope.compareVersions = {};
         $scope.compareVersionMetadata = {};
 

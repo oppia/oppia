@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Versions Tree Service.
  */
 
-describe('versions tree service', function() {
+describe('Versions tree service', function() {
   beforeEach(module('oppia'));
 
   describe('versions tree service', function() {

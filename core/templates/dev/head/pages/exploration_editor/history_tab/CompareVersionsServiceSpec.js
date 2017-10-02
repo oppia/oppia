@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Compare versions Service.
  */
 
-describe('compare versions service', function() {
+describe('Compare versions service', function() {
   beforeEach(module('oppia'));
 
   describe('compare versions service', function() {
@@ -52,7 +52,7 @@ describe('compare versions service', function() {
     //  - ruleDests: a list of strings which are state names of destinations of
     //    links
     // Only information accessed by getDiffGraphData is included in the return
-    // value  
+    // value
     var _getStatesData = function(statesDetails) {
       var statesData = {};
       for (var stateName in statesDetails) {

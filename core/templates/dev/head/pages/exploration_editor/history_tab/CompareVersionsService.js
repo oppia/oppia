@@ -80,7 +80,7 @@ oppia.factory('CompareVersionsService', [
        *
        * Should be called after VersionTreeService.init() is called.
        * Should satisfy v1 < v2.
-       */    
+       */
       getDiffGraphData: function(v1, v2) {
         if (v1 > v2) {
           throw new Error('Tried to compare v1 > v2.');
