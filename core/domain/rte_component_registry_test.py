@@ -177,23 +177,30 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 component._customization_arg_specs)  # pylint: disable=protected-access
 
     def test_html_contains_all_imports(self):
-        """Test that the rich_text_components.html contains script-imports for
-        all directives of all RTE components."""
+        """Test that the rich_text_components.html file contains script-imports
+        for all directives of all RTE components."""
 
         js_files_paths = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')
-            names = os.listdir(directives_dir)
+            directive_filenames = os.listdir(directives_dir)
             js_files_paths.extend(
-                os.path.join(directives_dir, name) for name in names
-                if name.endswith('.js'))
+                os.path.join(directives_dir, filename) for filename
+                in directive_filenames if filename.endswith('.js'))
+
+        js_files_paths.sort()
+        prefix = '<script src="{{ASSET_DIR_PREFIX}}/'
+        suffix = '"></script>'
+        js_files_paths = [
+            '%s%s%s' % (prefix, path, suffix) for path in js_files_paths]
+        generated_html = '\n'.join(js_files_paths)
 
         rtc_html_file = os.path.join(
-            feconf.FRONTEND_TEMPLATES_DIR, 'pages', 'rich_text_components.html')
+            feconf.FRONTEND_TEMPLATES_DIR, 'components',
+            'rich_text_components.html')
         with open(rtc_html_file, 'r') as f:
             rtc_html_file_contents = f.read()
 
-        for js_file_path in js_files_paths:
-            self.assertIn(js_file_path, rtc_html_file_contents)
+        self.assertEqual(generated_html, rtc_html_file_contents.strip())

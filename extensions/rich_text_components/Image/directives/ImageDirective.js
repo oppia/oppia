@@ -22,8 +22,9 @@
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'explorationContextService',
   'UrlInterpolationService',
-  function($rootScope, $sce, HtmlEscaperService, explorationContextService,
-  UrlInterpolationService) {
+  function(
+      $rootScope, $sce, HtmlEscaperService, explorationContextService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
