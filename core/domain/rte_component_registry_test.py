@@ -193,9 +193,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         js_files_paths.sort()
         prefix = '<script src="{{ASSET_DIR_PREFIX}}/'
         suffix = '"></script>'
-        js_files_paths = [
+        html_script_tags = [
             '%s%s%s' % (prefix, path, suffix) for path in js_files_paths]
-        generated_html = '\n'.join(js_files_paths)
+        generated_html = '\n'.join(html_script_tags)
 
         rtc_html_file = os.path.join(
             feconf.FRONTEND_TEMPLATES_DIR, 'components',
