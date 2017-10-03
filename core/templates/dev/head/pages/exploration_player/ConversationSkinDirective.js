@@ -449,8 +449,8 @@ oppia.directive('conversationSkin', [
             $scope.recommendedExplorationSummaries = null;
 
             PlayerPositionService.init(_navigateToActiveCard);
-            ExplorationPlayerService.init(function(exploration, initHtml,
-            newParams) {
+            ExplorationPlayerService.init(function(
+              exploration, initHtml, newParams) {
               ExplorationPlayerStateService.setExploration(exploration);
               $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
               _nextFocusLabel = focusService.generateFocusLabel();
@@ -618,12 +618,12 @@ oppia.directive('conversationSkin', [
 
             $timeout(function() {
               var newInteractionHtml =
-              ExplorationPlayerService.getInteractionHtml(
+                ExplorationPlayerService.getInteractionHtml(
                 newStateName, _nextFocusLabel);
               // Note that newInteractionHtml may be null.
               if (newInteractionHtml) {
                 newInteractionHtml +=
-                ExplorationPlayerService.getRandomSuffix();
+                  ExplorationPlayerService.getRandomSuffix();
               }
 
               _addNewCard(

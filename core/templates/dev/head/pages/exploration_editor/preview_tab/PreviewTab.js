@@ -114,8 +114,8 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.loadPreviewState = function(stateName, manualParamChanges) {
-      ExplorationPlayerService.initSettingsFromEditor(stateName,
-      manualParamChanges);
+      ExplorationPlayerService.initSettingsFromEditor(
+        stateName, manualParamChanges);
       $scope.isExplorationPopulated = true;
     };
 
