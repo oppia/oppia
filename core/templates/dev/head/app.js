@@ -79,12 +79,12 @@ oppia.constant(
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$document', '$modal', '$timeout', 'focusService',
-    'taRegisterTool', 'RTEHelperService', 'alertsService',
+    'taRegisterTool', 'RteHelperService', 'alertsService',
     'explorationContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
       taOptions, $document, $modal, $timeout, focusService,
-      taRegisterTool, RTEHelperService, alertsService,
+      taRegisterTool, RteHelperService, alertsService,
       explorationContextService, PAGE_CONTEXT,
       UrlInterpolationService) {
       taOptions.disableSanitizer = true;
@@ -163,8 +163,8 @@ oppia.config(['$provide', function($provide) {
         modalDialog.result['finally'](refocusFn);
       };
 
-      RTEHelperService.getRichTextComponents().forEach(function(componentDefn) {
-        var buttonDisplay = RTEHelperService.createToolbarIcon(componentDefn);
+      RteHelperService.getRichTextComponents().forEach(function(componentDefn) {
+        var buttonDisplay = RteHelperService.createToolbarIcon(componentDefn);
         var canUseFs = explorationContextService.getPageContext() ===
           PAGE_CONTEXT.EDITOR;
 
@@ -207,10 +207,10 @@ oppia.config(['$provide', function($provide) {
               textAngular.$editor().$parent.isCustomizationModalOpen = true;
               _openCustomizationModal(
                 componentDefn.customizationArgSpecs,
-                RTEHelperService.createCustomizationArgDictFromAttrs(
+                RteHelperService.createCustomizationArgDictFromAttrs(
                   $element[0].attributes),
                 function(customizationArgsDict) {
-                  var el = RTEHelperService.createRteElement(
+                  var el = RteHelperService.createRteElement(
                     componentDefn, customizationArgsDict);
                   $element[0].parentNode.replaceChild(el, $element[0]);
                   textAngular.$editor().updateTaBindtaTextElement();
@@ -238,7 +238,7 @@ oppia.config(['$provide', function($provide) {
               componentDefn.customizationArgSpecs,
               {},
               function(customizationArgsDict) {
-                var el = RTEHelperService.createRteElement(
+                var el = RteHelperService.createRteElement(
                   componentDefn, customizationArgsDict);
                 var insertionPoint = (
                   textAngular.$editor().displayElements.text[0].querySelector(

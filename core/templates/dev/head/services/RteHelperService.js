@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview RTE Helper Service
+ * @fileoverview Rich Text Editor (RTE) Helper Service
  */
  
-oppia.factory('RTEHelperService', [
+oppia.factory('RteHelperService', [
   '$filter', '$log', '$interpolate', 'explorationContextService',
   'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
   function($filter, $log, $interpolate, explorationContextService,
