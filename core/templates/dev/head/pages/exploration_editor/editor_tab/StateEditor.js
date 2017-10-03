@@ -291,12 +291,12 @@ oppia.directive('trainingPanel', [function() {
     },
     templateUrl: 'teaching/trainingPanel',
     controller: [
-      '$scope', 'oppiaExplorationHtmlFormatterService',
+      '$scope', 'ExplorationHtmlFormatterService',
       'editorContextService', 'explorationStatesService',
       'trainingDataService', 'ResponsesService', 'stateInteractionIdService',
       'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
       'OutcomeObjectFactory',
-      function($scope, oppiaExplorationHtmlFormatterService,
+      function($scope, ExplorationHtmlFormatterService,
           editorContextService, explorationStatesService,
           trainingDataService, ResponsesService, stateInteractionIdService,
           stateCustomizationArgsService, AnswerGroupObjectFactory,
@@ -311,7 +311,7 @@ oppia.directive('trainingPanel', [function() {
 
         var _updateAnswerTemplate = function() {
           $scope.answerTemplate = (
-            oppiaExplorationHtmlFormatterService.getAnswerHtml(
+            ExplorationHtmlFormatterService.getAnswerHtml(
               $scope.answer, stateInteractionIdService.savedMemento,
               stateCustomizationArgsService.savedMemento));
         };
