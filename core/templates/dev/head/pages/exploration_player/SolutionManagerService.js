@@ -17,8 +17,11 @@
  */
 
 oppia.factory('SolutionManagerService', [
-  'StatsReportingService', 'playerPositionService', 'oppiaPlayerService',
-  function(StatsReportingService, playerPositionService, oppiaPlayerService) {
+  '$injector', 'StatsReportingService', 'playerPositionService',
+  function($injector, StatsReportingService, playerPositionService) {
+
+    var oppiaPlayerService = $injector.get('oppiaPlayerService');
+
     var solution = null;
     var solutionHasBeenViewed = false;
     var _getCurrentSolution = function() {
