@@ -28,7 +28,7 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_event_models(self):
         event_id = (
             stat_models.AnswerSubmittedEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True, False))
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True))
 
         event_model = stat_models.AnswerSubmittedEventLogEntryModel.get(
             event_id)
@@ -39,7 +39,6 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
         self.assertEqual(event_model.is_feedback_useful, True)
-        self.assertEqual(event_model.is_answer_correct, False)
 
 class ExplorationActualStartEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
@@ -93,6 +92,23 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+class StateFinishEventLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Test the StateFinishEventLogEntryModel class."""
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stat_models.StateFinishEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0))
+
+        event_model = stat_models.StateFinishEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exp_id, 'exp_id1')
+        self.assertEqual(event_model.exp_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
 
 class CompleteExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):

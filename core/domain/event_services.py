@@ -81,7 +81,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
             cls, exploration_id, exploration_version, state_name,
             interaction_id, answer_group_index, rule_spec_index,
             classification_categorization, session_id, time_spent_in_secs,
-            params, normalized_answer, is_answer_correct):
+            params, normalized_answer):
         """Records an event when an answer triggers a rule. The answer recorded
         here is a Python-representation of the actual answer submitted by the
         user.
@@ -101,10 +101,9 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
 
         stats_models.AnswerSubmittedEventLogEntryModel.create(
             exploration_id, exploration_version, state_name, session_id,
-            time_spent_in_secs, is_feedback_useful, is_answer_correct)
+            time_spent_in_secs, is_feedback_useful)
 
         update_params = {
-            'is_answer_correct': is_answer_correct,
             'is_feedback_useful': is_feedback_useful
         }
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
@@ -222,6 +221,23 @@ class StateHitEventHandler(BaseEventHandler):
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
             stats_services.update_stats(
                 exp_id, exp_version, state_name, cls.EVENT_TYPE, update_params)
+
+
+class StateFinishEventHandler(BaseEventHandler):
+    """Event handler for recording state finish events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_STATE_FINISH
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs):
+        stats_models.StateFinishEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs)
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_services.update_stats(
+                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):

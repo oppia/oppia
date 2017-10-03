@@ -340,10 +340,6 @@ oppia.factory('oppiaPlayerService', [
             classificationResult.answerGroupIndex,
             classificationResult.ruleIndex,
             classificationResult.classificationCategorization);
-
-          if (SolutionManagerService.hasSolutionBeenViewed()) {
-            StatsReportingService.recordSolutionHit(oldStateName);
-          }
         }
 
         // Use angular.copy() to clone the object

@@ -52,15 +52,15 @@ def update_stats(exp_id, exp_version, state_name, event_type, update_params):
         if update_params['is_feedback_useful']:
             exploration_stats.state_stats_mapping[
                 state_name].useful_feedback_count += 1
-        elif update_params['is_answer_correct']:
-            exploration_stats.state_stats_mapping[
-                state_name].learners_answered_correctly += 1
     elif event_type == feconf.EVENT_TYPE_STATE_HIT:
         exploration_stats.state_stats_mapping[
             state_name].total_hit_count += 1
         if update_params['is_first_hit']:
             exploration_stats.state_stats_mapping[
                 state_name].first_hit_count += 1
+    elif event_type == feconf.EVENT_TYPE_STATE_FINISH:
+        exploration_stats.state_stats_mapping[
+            state_name].total_finishes += 1
     elif event_type == feconf.EVENT_TYPE_SOLUTION:
         exploration_stats.state_stats_mapping[
             state_name].total_solutions_triggered_count += 1

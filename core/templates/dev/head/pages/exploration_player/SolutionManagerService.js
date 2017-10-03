@@ -17,7 +17,8 @@
  */
 
 oppia.factory('SolutionManagerService', [
-  function() {
+  'StatsReportingService', 'playerPositionService', 'oppiaPlayerService',
+  function(StatsReportingService, playerPositionService, oppiaPlayerService) {
     var solution = null;
     var solutionHasBeenViewed = false;
     var _getCurrentSolution = function() {
@@ -27,6 +28,15 @@ oppia.factory('SolutionManagerService', [
       viewSolution: function () {
         if (!solutionHasBeenViewed) {
           solutionHasBeenViewed = true;
+
+          // Check that the current card is an active card by checking whether
+          // the active card's solution is the same as the current solution.
+          var activeStateName = playerPositionService.getCurrentStateName();
+          var activeCardSolution = oppiaPlayerService.getSolution(
+            activeStateName);
+          if (activeCardSolution == _getCurrentSolution()) {
+            StatsReportingService.recordSolutionHit(activeStateName);
+          }
         }
         return _getCurrentSolution();
       },

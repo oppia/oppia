@@ -97,12 +97,12 @@ class StateStatsTests(test_utils.GenericTestBase):
         state_stats_dict = {
             'total_answers_count': 10,
             'useful_feedback_count': 4,
-            'learners_answered_correctly': 3,
             'total_hit_count': 18,
             'first_hit_count': 7,
-            'total_solutions_triggered_count': 2
+            'total_solutions_triggered_count': 2,
+            'total_finishes': 2
         }
-        state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
+        state_stats = stats_domain.StateStats(10, 4, 18, 7, 2, 2)
         expected_state_stats = stats_domain.StateStats.from_dict(
             state_stats_dict)
         self.assertEqual(
@@ -112,39 +112,38 @@ class StateStatsTests(test_utils.GenericTestBase):
             state_stats.useful_feedback_count,
             expected_state_stats.useful_feedback_count)
         self.assertEqual(
-            state_stats.learners_answered_correctly,
-            expected_state_stats.learners_answered_correctly)
-        self.assertEqual(
             state_stats.total_hit_count, expected_state_stats.total_hit_count)
         self.assertEqual(
             state_stats.first_hit_count, expected_state_stats.first_hit_count)
         self.assertEqual(
             state_stats.total_solutions_triggered_count,
             expected_state_stats.total_solutions_triggered_count)
+        self.assertEqual(
+            state_stats.total_finishes, expected_state_stats.total_finishes)
 
     def test_create_default(self):
         state_stats = stats_domain.StateStats.create_default()
         self.assertEqual(state_stats.total_answers_count, 0)
         self.assertEqual(state_stats.useful_feedback_count, 0)
-        self.assertEqual(state_stats.learners_answered_correctly, 0)
         self.assertEqual(state_stats.total_hit_count, 0)
         self.assertEqual(state_stats.total_answers_count, 0)
         self.assertEqual(state_stats.total_solutions_triggered_count, 0)
+        self.assertEqual(state_stats.total_finishes, 0)
 
     def test_to_dict(self):
         state_stats_dict = {
             'total_answers_count': 10,
             'useful_feedback_count': 4,
-            'learners_answered_correctly': 3,
             'total_hit_count': 18,
             'first_hit_count': 7,
-            'total_solutions_triggered_count': 2
+            'total_solutions_triggered_count': 2,
+            'total_finishes': 2
         }
-        state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
+        state_stats = stats_domain.StateStats(10, 4, 18, 7, 2, 2)
         self.assertEqual(state_stats_dict, state_stats.to_dict())
 
     def test_validation(self):
-        state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
+        state_stats = stats_domain.StateStats(10, 4, 18, 7, 2, 2)
         state_stats.validate()
 
         # Change total_answers_count to string.

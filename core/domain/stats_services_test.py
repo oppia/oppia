@@ -363,10 +363,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                 'Home': {
                     'total_answers_count': 0,
                     'useful_feedback_count': 0,
-                    'learners_answered_correctly': 0,
                     'total_hit_count': 0,
                     'first_hit_count': 0,
-                    'total_solutions_triggered_count': 0
+                    'total_solutions_triggered_count': 0,
+                    'total_finishes': 0
                 }
             })
 
@@ -474,42 +474,41 @@ class AnswerEventTests(test_utils.GenericTestBase):
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 0, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
-            self.PARAMS, 'answer1', False)
+            self.PARAMS, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 0, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid2', self.TIME_SPENT,
-            self.PARAMS, 'answer1', False)
+            self.PARAMS, 'answer1')
         # answer is a dict
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 1, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
-            self.PARAMS, {'x': 1.0, 'y': 5.0}, False)
+            self.PARAMS, {'x': 1.0, 'y': 5.0})
         # answer is a number
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 2, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
-            self.PARAMS, 10, False)
+            self.PARAMS, 10)
         # answer is a list of dicts
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 3, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
-            self.PARAMS, [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}],
-            False)
+            self.PARAMS, [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}])
         # answer is a list
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, second_state_name, 'TextInput', 2, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid3', self.TIME_SPENT,
-            self.PARAMS, [2, 4, 8], False)
+            self.PARAMS, [2, 4, 8])
         # answer is a unicode string
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, second_state_name, 'TextInput', 1, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', self.TIME_SPENT,
-            self.PARAMS, self.UNICODE_TEST_STRING, False)
+            self.PARAMS, self.UNICODE_TEST_STRING)
         # answer is None (such as for Continue)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, third_state_name, 'Continue', 1, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid5', self.TIME_SPENT,
-            self.PARAMS, None, False)
+            self.PARAMS, None)
 
         expected_submitted_answer_list1 = [{
             'answer': 'answer1', 'time_spent_in_sec': 5.0,

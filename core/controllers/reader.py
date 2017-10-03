@@ -281,18 +281,11 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
 
         normalized_answer = old_interaction_instance.normalize_answer(answer)
 
-        is_answer_correct = False
-        if exploration.states[old_state_name].interaction.solution:
-            if answer == exploration.states[
-                    old_state_name].interaction.solution.correct_answer:
-                is_answer_correct = True
-
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, version, old_state_name,
             exploration.states[old_state_name].interaction.id,
             answer_group_index, rule_spec_index, classification_categorization,
-            session_id, client_time_spent_in_secs, params, normalized_answer,
-            is_answer_correct)
+            session_id, client_time_spent_in_secs, params, normalized_answer)
         self.render_json({})
 
 
@@ -320,6 +313,20 @@ class StateHitEventHandler(base.BaseHandler):
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL, is_first_hit)
         else:
             logging.error('Unexpected StateHit event for the END state.')
+
+
+class StateFinishEventHandler(base.BaseHandler):
+    """Tracks a learner finishing a state."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        event_services.StateFinishEventHandler.record(
+            exploration_id, self.payload.get('exp_version'),
+            self.payload.get('state_name'), self.payload.get('session_id'),
+            self.payload.get('client_time_spent_in_secs'))
 
 
 class ClassifyHandler(base.BaseHandler):

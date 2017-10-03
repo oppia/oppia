@@ -82,7 +82,6 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
             event was recorded
         session_id: ID of current student's session
         is_feedback_useful: Whether the answer received useful feedback
-        is_answer_correct: Whether the answer is correct
     """
     # Which specific type of event this is
     event_type = ndb.StringProperty()
@@ -98,8 +97,6 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     client_time_spent_in_secs = ndb.FloatProperty()
     # Whether the submitted answer received useful feedback
     is_feedback_useful = ndb.BooleanProperty(indexed=True)
-    # Whether the submitted answer is the correct answer.
-    is_answer_correct = ndb.BooleanProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -113,8 +110,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
-               client_time_spent_in_secs, is_feedback_useful,
-               is_answer_correct):
+               client_time_spent_in_secs, is_feedback_useful):
         """Creates a new answer submitted event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -126,8 +122,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
             state_name=state_name,
             session_id=session_id,
             client_time_spent_in_secs=client_time_spent_in_secs,
-            is_feedback_useful=is_feedback_useful,
-            is_answer_correct=is_answer_correct)
+            is_feedback_useful=is_feedback_useful)
         answer_submitted_event_entity.put()
         return entity_id
 
@@ -230,7 +225,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                client_time_spent_in_secs):
-        """Creates a new answer submitted event."""
+        """Creates a new solution hit event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
         solution_hit_event_entity = cls(
@@ -722,6 +717,61 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
 
+class StateFinishEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student finishing a state.
+
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'state_finish'
+        exp_id: id of exploration currently being played
+        exp_version: version of exploration
+        state_name: Name of current state
+        client_time_spent_in_secs: Time since start of this state when this
+            event was recorded
+        session_id: ID of current student's session
+    """
+    # Which specific type of event this is
+    event_type = ndb.StringProperty()
+    # Id of exploration currently being played.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    client_time_spent_in_secs = ndb.FloatProperty()
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               client_time_spent_in_secs):
+        """Creates a new state finish event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        state_finish_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_STATE_FINISH,
+            exp_id=exp_id,
+            exp_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=client_time_spent_in_secs)
+        state_finish_event_entity.put()
+        return entity_id
+
+
 class ExplorationStatsModel(base_models.BaseModel):
     """Model for storing analytics data for an exploration.
 
@@ -741,10 +791,10 @@ class ExplorationStatsModel(base_models.BaseModel):
     # {state_name: {
     #   'total_answers_count': ...,
     #   'useful_feedback_count': ...,
-    #   'learners_answered_correctly': ...,
     #   'total_hit_count': ...,
     #   'first_hit_count': ...,
-    #   'total_solutions_triggered_count': ...}}
+    #   'total_solutions_triggered_count': ...,
+    #   'total_finishes': ...}}
     state_stats_mapping = ndb.JsonProperty(indexed=False)
 
     @classmethod
