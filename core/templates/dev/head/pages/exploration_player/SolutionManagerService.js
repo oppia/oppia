@@ -20,8 +20,6 @@ oppia.factory('SolutionManagerService', [
   '$injector', 'StatsReportingService', 'playerPositionService',
   function($injector, StatsReportingService, playerPositionService) {
 
-    var oppiaPlayerService = $injector.get('oppiaPlayerService');
-
     var solution = null;
     var solutionHasBeenViewed = false;
     var _getCurrentSolution = function() {
@@ -35,8 +33,8 @@ oppia.factory('SolutionManagerService', [
           // Check that the current card is an active card by checking whether
           // the active card's solution is the same as the current solution.
           var activeStateName = playerPositionService.getCurrentStateName();
-          var activeCardSolution = oppiaPlayerService.getSolution(
-            activeStateName);
+          var activeCardSolution = $injector.get(
+            'oppiaPlayerService').getSolution(activeStateName);
           if (activeCardSolution == _getCurrentSolution()) {
             StatsReportingService.recordSolutionHit(activeStateName);
           }
