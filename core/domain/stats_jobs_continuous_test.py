@@ -90,7 +90,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
     def _record_state_hit(self, exp_id, exp_version, state, session_id):
         event_services.StateHitEventHandler.record(
             exp_id, exp_version, state, session_id, {},
-            feconf.PLAY_TYPE_NORMAL)
+            feconf.PLAY_TYPE_NORMAL, False)
 
     def _create_state_counter(self, exp_id, state, first_entry_count):
         counter = stats_models.StateCounterModel.get_or_create(exp_id, state)
@@ -441,19 +441,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, 'answer1')
+                params, 'answer1', True)
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
-                params, 'answer1')
+                params, 'answer1', True)
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, 'answer2')
+                params, 'answer2', True)
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, second_state_name, 'MultipleChoiceInput',
                 0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2',
-                time_spent, params, 'answer3')
+                time_spent, params, 'answer3', True)
 
             # Run job on exploration with answers
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
@@ -540,7 +540,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, 'answer1')
+                params, 'answer1', True)
 
             # Run the answers aggregation job.
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
@@ -600,7 +600,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
-                params, 'answer1')
+                params, 'answer1', True)
 
             # Run the aggregator again.
             ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
@@ -687,15 +687,15 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, 1, init_state_name, 'TextInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, 'verb')
+                params, 'verb', False)
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, 1, init_state_name, 'TextInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, '2')
+                params, '2', False)
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, 1, init_state_name, 'TextInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, 'verb')
+                params, 'verb', False)
 
             # Change the interaction ID.
             exp_services.update_exploration('fake@user.com', exp_id, [{
@@ -709,7 +709,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, 2, init_state_name, 'NumericInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, 2)
+                params, 2, False)
 
             # Change back the interaction ID.
             exp_services.update_exploration('fake@user.com', exp_id, [{
@@ -723,7 +723,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, 3, init_state_name, 'TextInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, '2')
+                params, '2', False)
 
             # Create a 4th exploration version by changing the state's content.
             exp_services.update_exploration('fake@user.com', exp_id, [{
@@ -740,15 +740,15 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, 4, init_state_name, 'TextInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, 'noun')
+                params, 'noun', False)
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, 4, init_state_name, 'TextInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, 'verb')
+                params, 'verb', False)
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, 4, init_state_name, 'TextInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, 'noun')
+                params, 'noun', False)
 
             exp = exp_services.get_exploration_by_id(exp_id)
             self.assertEqual(exp.version, 4)
@@ -848,7 +848,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, first_state_name, 'SetInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
-                params, ['answer1', 'answer2'])
+                params, ['answer1', 'answer2'], False)
 
             # Run the aggregator job.
             ModifiedInteractionAnswerSummariesAggregator.start_computation()

@@ -232,7 +232,7 @@ class EditorTest(BaseEditorControllerTest):
                     exp_id, exp_version, state_name, interaction_id,
                     answer_group_index, rule_spec_index,
                     classification_categorization, session_id,
-                    time_spent_in_secs, {}, answer)
+                    time_spent_in_secs, {}, answer, True)
 
             # Load the string classifier demo exploration.
             exp_id = '15'

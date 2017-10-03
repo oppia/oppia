@@ -285,7 +285,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         if exploration.states[old_state_name].interaction.solution:
             if answer == exploration.states[
                     old_state_name].interaction.solution.correct_answer:
-                    is_answer_correct = True
+                is_answer_correct = True
 
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, version, old_state_name,
