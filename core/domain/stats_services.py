@@ -211,7 +211,7 @@ def save_stats_model(exploration_stats):
         for state_name in exploration_stats.state_stats_mapping
     }
 
-    exploration_stats_model = stats_models.get_model(
+    exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
         exploration_stats.exp_id, exploration_stats.exp_version)
 
     exploration_stats_model.num_actual_starts = (

@@ -42,6 +42,73 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.stats_model_id = (
             stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
 
+    def test_update_stats_method(self):
+        """Test the update_stats method."""
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        exploration_stats.state_stats_mapping = {
+            'Home': stats_domain.StateStats.create_default()
+        }
+        stats_services.save_stats_model(exploration_stats)
+
+        # Pass in exploration actual start event to stats model created in
+        # setup function.
+        stats_services.update_stats(
+            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+            {})
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.num_actual_starts, 1)
+
+        # Pass in exploration complete event.
+        stats_services.update_stats(
+            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+            {})
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.num_completions, 1)
+
+        # Pass in answer submitted event.
+        stats_services.update_stats(
+            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_ANSWER_SUBMITTED,
+            {'is_feedback_useful': True})
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].total_answers_count,
+            1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].useful_feedback_count,
+            1)
+
+        # Pass in state hit event.
+        stats_services.update_stats(
+            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_STATE_HIT,
+            {'is_first_hit': True})
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].total_hit_count, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].first_hit_count, 1)
+
+        # Pass in state finish event.
+        stats_services.update_stats(
+            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_STATE_FINISH, {})
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].total_finishes, 1)
+
+        # Pass in solution hit event.
+        stats_services.update_stats(
+            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_SOLUTION, {})
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].total_solutions_triggered_count, 1)
+
     def test_calls_to_stats_methods(self):
         """Test that calls are being made to the
         handle_stats_creation_for_new_exp_version and
@@ -369,6 +436,19 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                     'total_finishes': 0
                 }
             })
+
+    def test_save_stats_model(self):
+        """Test the save_stats_model method."""
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version)
+        exploration_stats.num_actual_starts += 5
+        exploration_stats.num_completions += 2
+        stats_services.save_stats_model(exploration_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version)
+        self.assertEqual(exploration_stats.num_actual_starts, 5)
+        self.assertEqual(exploration_stats.num_completions, 2)
 
 
 class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
