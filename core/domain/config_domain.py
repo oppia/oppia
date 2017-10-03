@@ -199,12 +199,11 @@ class Registry(object):
         schemas_dict = {}
 
         for (property_name, instance) in cls._config_registry.iteritems():
-            if instance.is_directly_settable:
-                schemas_dict[property_name] = {
-                    'schema': instance.schema,
-                    'description': instance.description,
-                    'value': instance.value
-                }
+            schemas_dict[property_name] = {
+                'schema': instance.schema,
+                'description': instance.description,
+                'value': instance.value
+            }
 
         return schemas_dict
 
