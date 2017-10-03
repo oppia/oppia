@@ -118,7 +118,7 @@ def _verify_target_version_is_consistent_with_latest_released_version():
             'ERROR: Failed to fetch latest release info from GitHub')
 
     data = json.load(response)
-    latest_release_tag_name = data['tag_name']  # Expect v2.5.4
+    latest_release_tag_name = data['tag_name']
 
     match_result = re.match(r'v(\d)\.(\d)\.(\d)', latest_release_tag_name)
     if match_result is None:
