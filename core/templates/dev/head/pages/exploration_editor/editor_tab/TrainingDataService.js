@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview service for training Data that, given an exploration ID
+ * @fileoverview Service for training Data that, given an exploration ID
  * and state name , determines all of the answers which do
  * not have certain classification and are not currently
  * used as part of any classifier training models.
