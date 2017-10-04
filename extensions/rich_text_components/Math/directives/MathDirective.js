@@ -13,24 +13,23 @@
 // limitations under the License.
 
 /**
- * Directive for the Collapsible rich-text component.
+ * Directive for the Math rich-text component.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaNoninteractiveCollapsible', [
-  '$rootScope', '$sce', 'HtmlEscaperService',
-  function($rootScope, $sce, HtmlEscaperService) {
+oppia.directive('oppiaNoninteractiveMath', [
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'richTextComponent/Collapsible',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/rich_text_components/Math/directives/math_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.heading = HtmlEscaperService.escapedJsonToObj(
-          $attrs.headingWithValue);
-        $scope.content = HtmlEscaperService.escapedJsonToObj(
-          $attrs.contentWithValue);
+        $scope.rawLatex = HtmlEscaperService.escapedJsonToObj(
+          $attrs.rawLatexWithValue);
       }]
     };
   }

@@ -91,7 +91,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/config_tab/AdminConfigTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/jobs_tab/AdminJobsTabDirective.js"></script>
-    
+
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/roles_tab/RolesTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/roles_tab/RoleGraphDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/StateGraphLayoutService.js"></script>
@@ -125,10 +125,10 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionParserService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
 
+    {% include 'components/rich_text_components.html' %}
+
     <script>
       {{ value_generators_js }}
     </script>
-
-    {{ rte_components_html }}
   </body>
 </html>

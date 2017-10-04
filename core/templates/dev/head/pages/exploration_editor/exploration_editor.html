@@ -224,7 +224,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParameterMetadataService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ValueGeneratorEditorDirective.js"></script>
-  
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/AnswerGroupsCacheService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/ExplorationGraph.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SidebarStateName.js"></script>
@@ -324,6 +324,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/LocalStorageService.js"></script>
 
+  {% include 'components/rich_text_components.html' %}
   {{ interaction_templates }}
   {{ visualizations_html }}
   {{ dependencies_html }}

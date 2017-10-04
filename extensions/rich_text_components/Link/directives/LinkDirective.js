@@ -20,11 +20,13 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveLink', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'richTextComponent/Link',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/rich_text_components/Link/directives/link_directive.html'),
       controller: [
         '$scope', '$attrs', 'explorationContextService',
         function($scope, $attrs, explorationContextService) {
