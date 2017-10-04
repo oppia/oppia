@@ -109,12 +109,12 @@ oppia.directive('trainingPanel', [function() {
     controller: [
       '$scope', 'oppiaExplorationHtmlFormatterService',
       'editorContextService', 'explorationStatesService',
-      'TrainingDataService', 'responsesService', 'stateInteractionIdService',
+      'TrainingDataService', 'ResponsesService', 'stateInteractionIdService',
       'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
       'OutcomeObjectFactory',
       function($scope, oppiaExplorationHtmlFormatterService,
           editorContextService, explorationStatesService,
-          TrainingDataService, responsesService, stateInteractionIdService,
+          TrainingDataService, ResponsesService, stateInteractionIdService,
           stateCustomizationArgsService, AnswerGroupObjectFactory,
           OutcomeObjectFactory) {
         $scope.changingAnswerGroupIndex = false;
@@ -152,7 +152,7 @@ oppia.directive('trainingPanel', [function() {
         $scope.confirmAnswerGroupIndex = function(index) {
           $scope.classification.answerGroupIndex = index;
 
-          if (index === responsesService.getAnswerGroupCount()) {
+          if (index === ResponsesService.getAnswerGroupCount()) {
             TrainingDataService.trainDefaultResponse($scope.answer);
           } else {
             TrainingDataService.trainAnswerGroup(index, $scope.answer);
@@ -163,14 +163,14 @@ oppia.directive('trainingPanel', [function() {
         $scope.confirmNewFeedback = function() {
           if ($scope.classification.newOutcome) {
             // Create a new answer group with the given feedback.
-            var answerGroups = responsesService.getAnswerGroups();
+            var answerGroups = ResponsesService.getAnswerGroups();
             answerGroups.push(AnswerGroupObjectFactory.createNew(
               [], angular.copy($scope.classification.newOutcome), false));
-            responsesService.save(
-              answerGroups, responsesService.getDefaultOutcome());
+            ResponsesService.save(
+              answerGroups, ResponsesService.getDefaultOutcome());
 
             // Train the group with the answer.
-            var index = responsesService.getAnswerGroupCount() - 1;
+            var index = ResponsesService.getAnswerGroupCount() - 1;
             TrainingDataService.trainAnswerGroup(index, $scope.answer);
           }
 
