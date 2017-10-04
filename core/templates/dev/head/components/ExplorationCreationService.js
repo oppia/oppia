@@ -19,10 +19,10 @@
 
 oppia.factory('ExplorationCreationService', [
   '$http', '$modal', '$timeout', '$rootScope', '$window',
-  'alertsService', 'siteAnalyticsService', 'UrlInterpolationService',
+  'AlertsService', 'siteAnalyticsService', 'UrlInterpolationService',
   function(
       $http, $modal, $timeout, $rootScope, $window,
-      alertsService, siteAnalyticsService, UrlInterpolationService) {
+      AlertsService, siteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
     var explorationCreationInProgress = false;
@@ -34,7 +34,7 @@ oppia.factory('ExplorationCreationService', [
         }
 
         explorationCreationInProgress = true;
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating exploration';
 
         $http.post('/contributehandler/create_new', {
@@ -55,7 +55,7 @@ oppia.factory('ExplorationCreationService', [
         });
       },
       showUploadExplorationModal: function() {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         $modal.open({
           backdrop: true,
@@ -68,7 +68,7 @@ oppia.factory('ExplorationCreationService', [
                 var returnObj = {};
                 var file = document.getElementById('newFileInput').files[0];
                 if (!file || !file.size) {
-                  alertsService.addWarning('Empty file detected.');
+                  AlertsService.addWarning('Empty file detected.');
                   return;
                 }
                 returnObj.yamlFile = file;
@@ -78,7 +78,7 @@ oppia.factory('ExplorationCreationService', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                AlertsService.clearWarnings();
               };
             }
           ]
@@ -112,7 +112,7 @@ oppia.factory('ExplorationCreationService', [
           }).fail(function(data) {
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);
-            alertsService.addWarning(
+            AlertsService.addWarning(
               parsedResponse.error || 'Error communicating with server.');
             $rootScope.loadingMessage = '';
             $scope.$apply();
