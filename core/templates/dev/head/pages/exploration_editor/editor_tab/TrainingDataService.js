@@ -20,10 +20,10 @@
  */
 
 oppia.factory('TrainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'RULE_TYPE_CLASSIFIER',
+  '$rootScope', '$http', 'ResponsesService', 'RULE_TYPE_CLASSIFIER',
   'RuleObjectFactory',
   function(
-      $rootScope, $http, responsesService, RULE_TYPE_CLASSIFIER,
+      $rootScope, $http, ResponsesService, RULE_TYPE_CLASSIFIER,
       RuleObjectFactory) {
     var _trainingDataAnswers = [];
     var _trainingDataFrequencies = [];
@@ -55,9 +55,9 @@ oppia.factory('TrainingDataService', [
     // from the training data being presented to the user so that it does not
     // show up again.
     var _removeAnswer = function(answer) {
-      var answerGroups = responsesService.getAnswerGroups();
+      var answerGroups = ResponsesService.getAnswerGroups();
       var confirmedUnclassifiedAnswers = (
-        responsesService.getConfirmedUnclassifiedAnswers());
+        ResponsesService.getConfirmedUnclassifiedAnswers());
       var updatedAnswerGroups = false;
       var updatedConfirmedUnclassifiedAnswers = false;
 
@@ -92,12 +92,12 @@ oppia.factory('TrainingDataService', [
         answer, confirmedUnclassifiedAnswers) !== -1);
 
       if (updatedAnswerGroups) {
-        responsesService.save(
-          answerGroups, responsesService.getDefaultOutcome());
+        ResponsesService.save(
+          answerGroups, ResponsesService.getDefaultOutcome());
       }
 
       if (updatedConfirmedUnclassifiedAnswers) {
-        responsesService.updateConfirmedUnclassifiedAnswers(
+        ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
       }
 
@@ -152,7 +152,7 @@ oppia.factory('TrainingDataService', [
       trainAnswerGroup: function(answerGroupIndex, answer) {
         _removeAnswer(answer);
 
-        var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
+        var answerGroup = ResponsesService.getAnswerGroup(answerGroupIndex);
         var rules = answerGroup.rules;
 
         // Ensure the answer group has a classifier rule.
@@ -177,7 +177,7 @@ oppia.factory('TrainingDataService', [
           classifierRule.inputs.training_data.push(answer);
         }
 
-        responsesService.updateAnswerGroup(answerGroupIndex, {
+        ResponsesService.updateAnswerGroup(answerGroupIndex, {
           rules: rules
         });
       },
@@ -186,14 +186,14 @@ oppia.factory('TrainingDataService', [
         _removeAnswer(answer);
 
         var confirmedUnclassifiedAnswers = (
-          responsesService.getConfirmedUnclassifiedAnswers());
+          ResponsesService.getConfirmedUnclassifiedAnswers());
 
         if (_getIndexOfTrainingData(
               answer, confirmedUnclassifiedAnswers) === -1) {
           confirmedUnclassifiedAnswers.push(answer);
         }
 
-        responsesService.updateConfirmedUnclassifiedAnswers(
+        ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
       }
     };
