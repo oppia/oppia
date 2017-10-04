@@ -313,6 +313,7 @@ class StateHitEventHandler(base.BaseHandler):
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL, is_first_hit)
         else:
             logging.error('Unexpected StateHit event for the END state.')
+        self.render_json({})
 
 
 class StateFinishEventHandler(base.BaseHandler):
@@ -327,6 +328,7 @@ class StateFinishEventHandler(base.BaseHandler):
             exploration_id, self.payload.get('exp_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
             self.payload.get('client_time_spent_in_secs'))
+        self.render_json({})
 
 
 class ClassifyHandler(base.BaseHandler):
@@ -395,6 +397,7 @@ class ExplorationStartEventHandler(base.BaseHandler):
             self.payload.get('session_id'),
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
+        self.render_json({})
 
 
 class ExplorationActualStartEventHandler(base.BaseHandler):
@@ -409,6 +412,7 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
             self.payload.get('client_time_spent_in_secs'))
+        self.render_json({})
 
 
 class SolutionHitEventHandler(base.BaseHandler):
@@ -423,6 +427,7 @@ class SolutionHitEventHandler(base.BaseHandler):
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
             self.payload.get('client_time_spent_in_secs'))
+        self.render_json({})
 
 
 class ExplorationCompleteEventHandler(base.BaseHandler):
