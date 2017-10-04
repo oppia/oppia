@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview service for responses corresponding to a state's interaction 
- * and answer groups.
+ * @fileoverview Service responses corresponding to a state's interaction and
+ * answer groups.
  */
 
 oppia.factory('ResponsesService', [
@@ -347,4 +347,3 @@ oppia.factory('ResponsesService', [
     };
   }
 ]);
-

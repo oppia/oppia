@@ -192,7 +192,7 @@ oppia.directive('answerGroupEditor', [
             $scope.rulesMemento = angular.copy($scope.rules);
 
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
-            // move it to responsesService in StateResponses.js to properly
+            // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
             $scope.rules.push(RuleObjectFactory.createNew(ruleType, inputs));
             $scope.changeActiveRuleIndex($scope.rules.length - 1);
