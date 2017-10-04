@@ -26,6 +26,128 @@ from core.platform import models
 ])
 
 
+class RecomputeStateHitStatistics(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for recomputing the statistics for the
+    StateHitEvent.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateHitEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        yield ((item.exploration_id, item.exploration_version, item.state_name),
+               item.session_id)
+
+    @staticmethod
+    def reduce(key, values):
+        key = ast.literal_eval(key)
+        total_hit_count = len(values)
+        # Only count the first session in which a user submits
+        # the correct answer.
+        first_hit_count = 0
+        for idx, session_id in enumerate(values):
+            if idx == values.index(session_id):
+                first_hit_count += 1
+
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(key[0],
+                                                                    key[1])
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        state_stats = model.state_stats_mapping[key[2]]
+        state_stats['total_hit_count'] = total_hit_count
+        state_stats['first_hit_count'] = first_hit_count
+        model.state_stats_mapping[key[2]] = state_stats
+        model.put()
+
+
+class RecomputeSolutionHitStatistics(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for recomputing the statistics for the
+    SolutionHitEvent.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.SolutionHitEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        yield ((item.exp_id, item.exp_version, item.state_name),
+               [item.is_solution_preceding_answer, item.session_id])
+
+    @staticmethod
+    def reduce(key, values):
+        key = ast.literal_eval(key)
+        values = [ast.literal_eval(event) for event in values]
+        session_ids = [event[1] for event in values]
+        # Only count the first session in which a user triggers
+        # the solution.
+        solution_triggered = 0
+        for idx, event in enumerate(values):
+            if (idx == session_ids.index(event[1])
+                    and event[0]):
+                solution_triggered += 1
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(key[0],
+                                                                    key[1])
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        state_stats = model.state_stats_mapping[key[2]]
+        state_stats['total_solution_triggered_count'] = solution_triggered
+        model.state_stats_mapping[key[2]] = state_stats
+        model.put()
+
+
+class RecomputeActualStartStatistics(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for recomputing the statistics for the
+    ExplorationActualStartEvent.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.ExplorationActualStartEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        yield ((item.exp_id, item.exp_version),
+               1)
+
+    @staticmethod
+    def reduce(key, values):
+        key = ast.literal_eval(key)
+        num_actual_starts = len(values)
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(key[0],
+                                                                    key[1])
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        model.num_actual_starts = num_actual_starts
+        model.put()
+
+
+class RecomputeCompleteEventStatistics(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for recomputing the statistics for the
+    CompleteExplorationEvent.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.CompleteExplorationEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        yield ((item.exploration_id, item.exploration_version),
+               1)
+
+    @staticmethod
+    def reduce(key, values):
+        key = ast.literal_eval(key)
+        num_completions = len(values)
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(key[0],
+                                                                    key[1])
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        model.num_completions = num_completions
+        model.put()
+
+
 class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
     """A one-off statistics audit.
 

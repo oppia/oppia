@@ -24,6 +24,7 @@ from core.domain import acl_decorators
 from core.domain import activity_jobs_one_off
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
+from core.domain import stats_jobs_one_off
 from core.domain import user_jobs_one_off
 from core.platform import models
 import utils
@@ -104,6 +105,22 @@ class CronActivitySearchRankHandler(base.BaseHandler):
         """Handles GET requests."""
         activity_jobs_one_off.IndexAllActivitiesJobManager.enqueue(
             activity_jobs_one_off.IndexAllActivitiesJobManager.create_new())
+
+
+class CronRecomputeStatisticsHandler(base.BaseHandler):
+    """Handler for recomputing statistics from datastore."""
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        stats_jobs_one_off.RecomputeStateHitStatistics.enqueue(
+            stats_jobs_one_off.RecomputeStateHitStatistics.create_new())
+        stats_jobs_one_off.RecomputeSolutionHitStatistics.enqueue(
+            stats_jobs_one_off.RecomputeSolutionHitStatistics.create_new())
+        stats_jobs_one_off.RecomputeActualStartStatistics.enqueue(
+            stats_jobs_one_off.RecomputeActualStartStatistics.create_new())
+        stats_jobs_one_off.RecomputeCompleteEventStatistics.enqueue(
+            stats_jobs_one_off.RecomputeCompleteEventStatistics.create_new())
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
