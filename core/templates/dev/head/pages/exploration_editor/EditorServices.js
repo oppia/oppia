@@ -1462,12 +1462,12 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'ExpressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'INTERACTION_SPECS',
+  'ParameterMetadataService', 'INTERACTION_SPECS',
   'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       ExpressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, INTERACTION_SPECS,
+      ParameterMetadataService, INTERACTION_SPECS,
       WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
@@ -1553,7 +1553,7 @@ oppia.factory('explorationWarningsService', [
     // have been set beforehand.
     var _verifyParameters = function(initNodeIds) {
       var unsetParametersInfo = (
-        parameterMetadataService.getUnsetParametersInfo(initNodeIds));
+        ParameterMetadataService.getUnsetParametersInfo(initNodeIds));
 
       var paramWarningsList = [];
       unsetParametersInfo.forEach(function(unsetParameterData) {

@@ -468,15 +468,6 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
   };
 }]);
 
-// Service for generating random IDs.
-oppia.factory('IdGenerationService', [function() {
-  return {
-    generateNewId: function() {
-      return Math.random().toString(36).slice(2);
-    }
-  };
-}]);
-
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 
 // Service for setting focus. This broadcasts a 'focusOn' event which sets

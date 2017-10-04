@@ -16,7 +16,7 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
-oppia.factory('parameterMetadataService', [
+oppia.factory('ParameterMetadataService', [
   'explorationStatesService', 'ExpressionInterpolationService',
   'explorationParamChangesService', 'graphDataService',
   function(
