@@ -88,10 +88,10 @@ oppia.controller('StateEditor', [
 // answers which do not have certain classification and are not currently used
 // as part of any classifier training models.
 oppia.factory('trainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'RULE_TYPE_CLASSIFIER',
+  '$rootScope', '$http', 'ResponsesService', 'RULE_TYPE_CLASSIFIER',
   'RuleObjectFactory',
   function(
-      $rootScope, $http, responsesService, RULE_TYPE_CLASSIFIER,
+      $rootScope, $http, ResponsesService, RULE_TYPE_CLASSIFIER,
       RuleObjectFactory) {
     var _trainingDataAnswers = [];
     var _trainingDataFrequencies = [];
@@ -123,9 +123,9 @@ oppia.factory('trainingDataService', [
     // from the training data being presented to the user so that it does not
     // show up again.
     var _removeAnswer = function(answer) {
-      var answerGroups = responsesService.getAnswerGroups();
+      var answerGroups = ResponsesService.getAnswerGroups();
       var confirmedUnclassifiedAnswers = (
-        responsesService.getConfirmedUnclassifiedAnswers());
+        ResponsesService.getConfirmedUnclassifiedAnswers());
       var updatedAnswerGroups = false;
       var updatedConfirmedUnclassifiedAnswers = false;
 
@@ -160,12 +160,12 @@ oppia.factory('trainingDataService', [
         answer, confirmedUnclassifiedAnswers) !== -1);
 
       if (updatedAnswerGroups) {
-        responsesService.save(
-          answerGroups, responsesService.getDefaultOutcome());
+        ResponsesService.save(
+          answerGroups, ResponsesService.getDefaultOutcome());
       }
 
       if (updatedConfirmedUnclassifiedAnswers) {
-        responsesService.updateConfirmedUnclassifiedAnswers(
+        ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
       }
 
@@ -220,7 +220,7 @@ oppia.factory('trainingDataService', [
       trainAnswerGroup: function(answerGroupIndex, answer) {
         _removeAnswer(answer);
 
-        var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
+        var answerGroup = ResponsesService.getAnswerGroup(answerGroupIndex);
         var rules = answerGroup.rules;
 
         // Ensure the answer group has a classifier rule.
@@ -245,7 +245,7 @@ oppia.factory('trainingDataService', [
           classifierRule.inputs.training_data.push(answer);
         }
 
-        responsesService.updateAnswerGroup(answerGroupIndex, {
+        ResponsesService.updateAnswerGroup(answerGroupIndex, {
           rules: rules
         });
       },
@@ -254,14 +254,14 @@ oppia.factory('trainingDataService', [
         _removeAnswer(answer);
 
         var confirmedUnclassifiedAnswers = (
-          responsesService.getConfirmedUnclassifiedAnswers());
+          ResponsesService.getConfirmedUnclassifiedAnswers());
 
         if (_getIndexOfTrainingData(
               answer, confirmedUnclassifiedAnswers) === -1) {
           confirmedUnclassifiedAnswers.push(answer);
         }
 
-        responsesService.updateConfirmedUnclassifiedAnswers(
+        ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
       }
     };
@@ -293,12 +293,12 @@ oppia.directive('trainingPanel', [function() {
     controller: [
       '$scope', 'oppiaExplorationHtmlFormatterService',
       'editorContextService', 'explorationStatesService',
-      'trainingDataService', 'responsesService', 'stateInteractionIdService',
+      'trainingDataService', 'ResponsesService', 'stateInteractionIdService',
       'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
       'OutcomeObjectFactory',
       function($scope, oppiaExplorationHtmlFormatterService,
           editorContextService, explorationStatesService,
-          trainingDataService, responsesService, stateInteractionIdService,
+          trainingDataService, ResponsesService, stateInteractionIdService,
           stateCustomizationArgsService, AnswerGroupObjectFactory,
           OutcomeObjectFactory) {
         $scope.changingAnswerGroupIndex = false;
@@ -336,7 +336,7 @@ oppia.directive('trainingPanel', [function() {
         $scope.confirmAnswerGroupIndex = function(index) {
           $scope.classification.answerGroupIndex = index;
 
-          if (index === responsesService.getAnswerGroupCount()) {
+          if (index === ResponsesService.getAnswerGroupCount()) {
             trainingDataService.trainDefaultResponse($scope.answer);
           } else {
             trainingDataService.trainAnswerGroup(index, $scope.answer);
@@ -347,14 +347,14 @@ oppia.directive('trainingPanel', [function() {
         $scope.confirmNewFeedback = function() {
           if ($scope.classification.newOutcome) {
             // Create a new answer group with the given feedback.
-            var answerGroups = responsesService.getAnswerGroups();
+            var answerGroups = ResponsesService.getAnswerGroups();
             answerGroups.push(AnswerGroupObjectFactory.createNew(
               [], angular.copy($scope.classification.newOutcome), false));
-            responsesService.save(
-              answerGroups, responsesService.getDefaultOutcome());
+            ResponsesService.save(
+              answerGroups, ResponsesService.getDefaultOutcome());
 
             // Train the group with the answer.
-            var index = responsesService.getAnswerGroupCount() - 1;
+            var index = ResponsesService.getAnswerGroupCount() - 1;
             trainingDataService.trainAnswerGroup(index, $scope.answer);
           }
 
