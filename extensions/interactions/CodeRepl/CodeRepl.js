@@ -267,28 +267,28 @@ oppia.directive('oppiaShortResponseCodeRepl', [
 ]);
 
 oppia.factory('codeReplRulesService', [
-  '$filter', 'codeNormalizationService',
-  function($filter, codeNormalizationService) {
+  '$filter', 'CodeNormalizerService',
+  function($filter, CodeNormalizerService) {
     return {
       CodeEquals: function(answer, inputs) {
         var normalizedCode =
-          codeNormalizationService.getNormalizedCode(answer.code);
+          CodeNormalizerService.getNormalizedCode(answer.code);
         var normalizedExpectedCode =
-          codeNormalizationService.getNormalizedCode(inputs.x);
+          CodeNormalizerService.getNormalizedCode(inputs.x);
         return normalizedCode === normalizedExpectedCode;
       },
       CodeContains: function(answer, inputs) {
         var normalizedCode =
-          codeNormalizationService.getNormalizedCode(answer.code);
+          CodeNormalizerService.getNormalizedCode(answer.code);
         var normalizedSnippet =
-          codeNormalizationService.getNormalizedCode(inputs.x);
+          CodeNormalizerService.getNormalizedCode(inputs.x);
         return normalizedCode.indexOf(normalizedSnippet) !== -1;
       },
       CodeDoesNotContain: function(answer, inputs) {
         var normalizedCode =
-          codeNormalizationService.getNormalizedCode(answer.code);
+          CodeNormalizerService.getNormalizedCode(answer.code);
         var normalizedSnippet =
-          codeNormalizationService.getNormalizedCode(inputs.x);
+          CodeNormalizerService.getNormalizedCode(inputs.x);
         return normalizedCode.indexOf(normalizedSnippet) === -1;
       },
       OutputContains: function(answer, inputs) {
