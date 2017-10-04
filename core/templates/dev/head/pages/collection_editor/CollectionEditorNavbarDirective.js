@@ -22,14 +22,14 @@ oppia.directive('collectionEditorNavbar', [
       restrict: 'E',
       templateUrl: 'inline/collection_editor_navbar_directive',
       controller: [
-        '$scope', '$modal', 'alertsService', 'routerService', 'UndoRedoService',
+        '$scope', '$modal', 'alertsService', 'RouterService', 'UndoRedoService',
         'CollectionEditorStateService', 'CollectionValidationService',
         'CollectionRightsBackendApiService',
         'EditableCollectionBackendApiService',
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $modal, alertsService, routerService, UndoRedoService,
+            $scope, $modal, alertsService, RouterService, UndoRedoService,
             CollectionEditorStateService, CollectionValidationService,
             CollectionRightsBackendApiService,
             EditableCollectionBackendApiService,
@@ -46,12 +46,12 @@ oppia.directive('collectionEditorNavbar', [
           $scope.isSaveInProgress = (
             CollectionEditorStateService.isSavingCollection);
 
-          $scope.getTabStatuses = routerService.getTabStatuses;
-          $scope.selectMainTab = routerService.navigateToMainTab;
-          $scope.selectPreviewTab = routerService.navigateToPreviewTab;
-          $scope.selectSettingsTab = routerService.navigateToSettingsTab;
-          $scope.selectStatsTab = routerService.navigateToStatsTab;
-          $scope.selectHistoryTab = routerService.navigateToHistoryTab;
+          $scope.getTabStatuses = RouterService.getTabStatuses;
+          $scope.selectMainTab = RouterService.navigateToMainTab;
+          $scope.selectPreviewTab = RouterService.navigateToPreviewTab;
+          $scope.selectSettingsTab = RouterService.navigateToSettingsTab;
+          $scope.selectStatsTab = RouterService.navigateToStatsTab;
+          $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
 
           var _validateCollection = function() {
             if ($scope.collectionRights.isPrivate()) {

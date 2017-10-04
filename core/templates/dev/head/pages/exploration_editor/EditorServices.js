@@ -285,6 +285,7 @@ oppia.factory('changeListService', [
       default_outcome: true,
       hints: true,
       param_changes: true,
+      param_specs: true,
       solution: true,
       state_name: true,
       widget_customization_args: true,
@@ -606,7 +607,10 @@ oppia.factory('explorationPropertyService', [
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
         });
-      }
+      },
+      param_specs: function(paramSpecs) {
+        return paramSpecs.toBackendDict();
+      },
     }
 
     return {
@@ -871,6 +875,9 @@ oppia.factory('explorationStatesService', [
           return paramChange.toBackendDict();
         });
       },
+      param_specs: function(paramSpecs) {
+        return paramSpecs.toBackendDict();
+      },
       solution: function(solution) {
         if (solution) {
           return solution.toBackendDict();
@@ -888,6 +895,7 @@ oppia.factory('explorationStatesService', [
       content: ['content'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
+      param_specs: ['paramSpecs'],
       hints: ['interaction', 'hints'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
@@ -1454,12 +1462,12 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'ExpressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'INTERACTION_SPECS',
+  'ParameterMetadataService', 'INTERACTION_SPECS',
   'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       ExpressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, INTERACTION_SPECS,
+      ParameterMetadataService, INTERACTION_SPECS,
       WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
@@ -1545,7 +1553,7 @@ oppia.factory('explorationWarningsService', [
     // have been set beforehand.
     var _verifyParameters = function(initNodeIds) {
       var unsetParametersInfo = (
-        parameterMetadataService.getUnsetParametersInfo(initNodeIds));
+        ParameterMetadataService.getUnsetParametersInfo(initNodeIds));
 
       var paramWarningsList = [];
       unsetParametersInfo.forEach(function(unsetParameterData) {

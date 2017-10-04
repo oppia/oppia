@@ -18,14 +18,14 @@
 
 oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'explorationStatesService',
-  'INTERACTION_SPECS', 'explorationAdvancedFeaturesService',
+  'INTERACTION_SPECS', 'ExplorationAdvancedFeaturesService',
   'UrlInterpolationService', 'stateContentService',
   function(
       $scope, $rootScope, editorContextService, explorationStatesService,
-      INTERACTION_SPECS, explorationAdvancedFeaturesService,
+      INTERACTION_SPECS, ExplorationAdvancedFeaturesService,
       UrlInterpolationService, stateContentService) {
     $scope.areParametersEnabled = (
-      explorationAdvancedFeaturesService.areParametersEnabled);
+      ExplorationAdvancedFeaturesService.areParametersEnabled);
 
     $scope.currentStateIsTerminal = false;
     $scope.interactionIdIsSet = false;
@@ -84,106 +84,14 @@ oppia.controller('StateEditor', [
   }
 ]);
 
-// A service which handles opening and closing the training modal used for both
-// unresolved answers and answers within the training data of a classifier.
-oppia.factory('trainingModalService', [
-  '$rootScope', '$modal', 'alertsService',
-  function($rootScope, $modal, alertsService) {
-    return {
-      openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
-        alertsService.clearWarnings();
-        if (externalSave) {
-          $rootScope.$broadcast('externalSave');
-        }
-
-        $modal.open({
-          templateUrl: 'modals/trainUnresolvedAnswer',
-          backdrop: true,
-          controller: [
-            '$scope', '$injector', '$modalInstance',
-            'explorationStatesService', 'editorContextService',
-            'AnswerClassificationService', 'explorationContextService',
-            'stateInteractionIdService', 'angularNameService',
-            function($scope, $injector, $modalInstance,
-                explorationStatesService, editorContextService,
-                AnswerClassificationService, explorationContextService,
-                stateInteractionIdService, angularNameService) {
-              $scope.trainingDataAnswer = '';
-              $scope.trainingDataFeedback = '';
-              $scope.trainingDataOutcomeDest = '';
-
-              // See the training panel directive in StateEditor for an
-              // explanation on the structure of this object.
-              $scope.classification = {
-                answerGroupIndex: 0,
-                newOutcome: null
-              };
-
-              $scope.finishTraining = function() {
-                $modalInstance.close();
-              };
-
-              $scope.init = function() {
-                var explorationId =
-                  explorationContextService.getExplorationId();
-                var currentStateName =
-                  editorContextService.getActiveStateName();
-                var state = explorationStatesService.getState(currentStateName);
-
-                // Retrieve the interaction ID.
-                var interactionId = stateInteractionIdService.savedMemento;
-
-                var rulesServiceName =
-                  angularNameService.getNameOfInteractionRulesService(
-                    interactionId)
-
-                // Inject RulesService dynamically.
-                var rulesService = $injector.get(rulesServiceName);
-
-                var classificationResult = (
-                  AnswerClassificationService.getMatchingClassificationResult(
-                    explorationId, currentStateName, state, unhandledAnswer,
-                    true, rulesService));
-                var feedback = 'Nothing';
-                var dest = classificationResult.outcome.dest;
-                if (classificationResult.outcome.feedback.length > 0) {
-                  feedback = classificationResult.outcome.feedback[0];
-                }
-                if (dest === currentStateName) {
-                  dest = '<em>(try again)</em>';
-                }
-
-                // $scope.trainingDataAnswer, $scope.trainingDataFeedback
-                // $scope.trainingDataOutcomeDest are intended to be local
-                // to this modal and should not be used to populate any
-                // information in the active exploration (including the
-                // feedback). The feedback here refers to a representation
-                // of the outcome of an answer group, rather than the
-                // specific feedback of the outcome (for instance, it
-                // includes the destination state within the feedback).
-                $scope.trainingDataAnswer = unhandledAnswer;
-                $scope.trainingDataFeedback = feedback;
-                $scope.trainingDataOutcomeDest = dest;
-                $scope.classification.answerGroupIndex = (
-                  classificationResult.answerGroupIndex);
-              };
-
-              $scope.init();
-            }]
-        });
-      }
-    };
-  }
-]);
-
 // A service that, given an exploration ID and state name, determines all of the
 // answers which do not have certain classification and are not currently used
 // as part of any classifier training models.
 oppia.factory('trainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'RULE_TYPE_CLASSIFIER',
+  '$rootScope', '$http', 'ResponsesService', 'RULE_TYPE_CLASSIFIER',
   'RuleObjectFactory',
   function(
-      $rootScope, $http, responsesService, RULE_TYPE_CLASSIFIER,
+      $rootScope, $http, ResponsesService, RULE_TYPE_CLASSIFIER,
       RuleObjectFactory) {
     var _trainingDataAnswers = [];
     var _trainingDataFrequencies = [];
@@ -215,9 +123,9 @@ oppia.factory('trainingDataService', [
     // from the training data being presented to the user so that it does not
     // show up again.
     var _removeAnswer = function(answer) {
-      var answerGroups = responsesService.getAnswerGroups();
+      var answerGroups = ResponsesService.getAnswerGroups();
       var confirmedUnclassifiedAnswers = (
-        responsesService.getConfirmedUnclassifiedAnswers());
+        ResponsesService.getConfirmedUnclassifiedAnswers());
       var updatedAnswerGroups = false;
       var updatedConfirmedUnclassifiedAnswers = false;
 
@@ -252,12 +160,12 @@ oppia.factory('trainingDataService', [
         answer, confirmedUnclassifiedAnswers) !== -1);
 
       if (updatedAnswerGroups) {
-        responsesService.save(
-          answerGroups, responsesService.getDefaultOutcome());
+        ResponsesService.save(
+          answerGroups, ResponsesService.getDefaultOutcome());
       }
 
       if (updatedConfirmedUnclassifiedAnswers) {
-        responsesService.updateConfirmedUnclassifiedAnswers(
+        ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
       }
 
@@ -312,7 +220,7 @@ oppia.factory('trainingDataService', [
       trainAnswerGroup: function(answerGroupIndex, answer) {
         _removeAnswer(answer);
 
-        var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
+        var answerGroup = ResponsesService.getAnswerGroup(answerGroupIndex);
         var rules = answerGroup.rules;
 
         // Ensure the answer group has a classifier rule.
@@ -337,7 +245,7 @@ oppia.factory('trainingDataService', [
           classifierRule.inputs.training_data.push(answer);
         }
 
-        responsesService.updateAnswerGroup(answerGroupIndex, {
+        ResponsesService.updateAnswerGroup(answerGroupIndex, {
           rules: rules
         });
       },
@@ -346,14 +254,14 @@ oppia.factory('trainingDataService', [
         _removeAnswer(answer);
 
         var confirmedUnclassifiedAnswers = (
-          responsesService.getConfirmedUnclassifiedAnswers());
+          ResponsesService.getConfirmedUnclassifiedAnswers());
 
         if (_getIndexOfTrainingData(
               answer, confirmedUnclassifiedAnswers) === -1) {
           confirmedUnclassifiedAnswers.push(answer);
         }
 
-        responsesService.updateConfirmedUnclassifiedAnswers(
+        ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
       }
     };
@@ -385,12 +293,12 @@ oppia.directive('trainingPanel', [function() {
     controller: [
       '$scope', 'oppiaExplorationHtmlFormatterService',
       'editorContextService', 'explorationStatesService',
-      'trainingDataService', 'responsesService', 'stateInteractionIdService',
+      'trainingDataService', 'ResponsesService', 'stateInteractionIdService',
       'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
       'OutcomeObjectFactory',
       function($scope, oppiaExplorationHtmlFormatterService,
           editorContextService, explorationStatesService,
-          trainingDataService, responsesService, stateInteractionIdService,
+          trainingDataService, ResponsesService, stateInteractionIdService,
           stateCustomizationArgsService, AnswerGroupObjectFactory,
           OutcomeObjectFactory) {
         $scope.changingAnswerGroupIndex = false;
@@ -428,7 +336,7 @@ oppia.directive('trainingPanel', [function() {
         $scope.confirmAnswerGroupIndex = function(index) {
           $scope.classification.answerGroupIndex = index;
 
-          if (index === responsesService.getAnswerGroupCount()) {
+          if (index === ResponsesService.getAnswerGroupCount()) {
             trainingDataService.trainDefaultResponse($scope.answer);
           } else {
             trainingDataService.trainAnswerGroup(index, $scope.answer);
@@ -439,14 +347,14 @@ oppia.directive('trainingPanel', [function() {
         $scope.confirmNewFeedback = function() {
           if ($scope.classification.newOutcome) {
             // Create a new answer group with the given feedback.
-            var answerGroups = responsesService.getAnswerGroups();
+            var answerGroups = ResponsesService.getAnswerGroups();
             answerGroups.push(AnswerGroupObjectFactory.createNew(
               [], angular.copy($scope.classification.newOutcome), false));
-            responsesService.save(
-              answerGroups, responsesService.getDefaultOutcome());
+            ResponsesService.save(
+              answerGroups, ResponsesService.getDefaultOutcome());
 
             // Train the group with the answer.
-            var index = responsesService.getAnswerGroupCount() - 1;
+            var index = ResponsesService.getAnswerGroupCount() - 1;
             trainingDataService.trainAnswerGroup(index, $scope.answer);
           }
 

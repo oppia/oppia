@@ -13,350 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers, services and filters for responses corresponding
+ * @fileoverview Controllers and filters for responses corresponding
  * to a state's interaction and answer groups.
  */
 
-oppia.factory('responsesService', [
-  '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'editorContextService', 'changeListService',
-  'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
-  'stateSolutionService', 'SolutionVerificationService', 'alertsService',
-  'explorationContextService', 'explorationWarningsService',
-  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
-  function(
-      $rootScope, stateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, editorContextService, changeListService,
-      explorationStatesService, graphDataService, OutcomeObjectFactory,
-      stateSolutionService, SolutionVerificationService, alertsService,
-      explorationContextService, explorationWarningsService,
-      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
-    var _answerGroupsMemento = null;
-    var _defaultOutcomeMemento = null;
-    var _confirmedUnclassifiedAnswersMemento = null;
-    // Represents the current selected answer group, starting at index 0. If the
-    // index equal to the number of answer groups (answerGroups.length), then it
-    // is referring to the default outcome.
-    var _activeAnswerGroupIndex = null;
-    var _activeRuleIndex = -1;
-    var _answerGroups = null;
-    var _defaultOutcome = null;
-    var _confirmedUnclassifiedAnswers = null;
-    var _answerChoices = null;
-
-    var _saveAnswerGroups = function(newAnswerGroups) {
-      var oldAnswerGroups = _answerGroupsMemento;
-      if (newAnswerGroups && oldAnswerGroups &&
-          !angular.equals(newAnswerGroups, oldAnswerGroups)) {
-        _answerGroups = newAnswerGroups;
-        $rootScope.$broadcast('answerGroupChanged');
-        explorationStatesService.saveInteractionAnswerGroups(
-          editorContextService.getActiveStateName(),
-          angular.copy(newAnswerGroups));
-
-        // To check if the solution is valid once a rule has been changed or
-        // added.
-        var currentInteractionId = stateInteractionIdService.savedMemento;
-        var interactionCanHaveSolution = (
-          currentInteractionId &&
-          INTERACTION_SPECS[currentInteractionId].can_have_solution);
-        var solutionExists = (
-          stateSolutionService.savedMemento &&
-          stateSolutionService.savedMemento.correctAnswer !== null);
-
-        if (interactionCanHaveSolution && solutionExists) {
-          var currentStateName = editorContextService.getActiveStateName();
-          var solutionWasPreviouslyValid = (
-            explorationStatesService.isSolutionValid(
-              editorContextService.getActiveStateName()));
-          SolutionVerificationService.verifySolution(
-            explorationContextService.getExplorationId(),
-            explorationStatesService.getState(currentStateName),
-            stateSolutionService.savedMemento.correctAnswer,
-            function() {
-              explorationStatesService.updateSolutionValidity(
-                currentStateName, true);
-              explorationWarningsService.updateWarnings();
-              if (!solutionWasPreviouslyValid) {
-                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
-              }
-            },
-            function() {
-              explorationStatesService.updateSolutionValidity(
-                currentStateName, false);
-              explorationWarningsService.updateWarnings();
-              if (solutionWasPreviouslyValid) {
-                alertsService.addInfoMessage(
-                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
-              } else {
-                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
-              }
-            }
-          );
-        }
-
-        graphDataService.recompute();
-        _answerGroupsMemento = angular.copy(newAnswerGroups);
-      }
-    };
-
-    var _updateAnswerGroup = function(index, updates) {
-      var answerGroup = _answerGroups[index];
-      if (updates.rules) {
-        answerGroup.rules = updates.rules;
-      }
-      if (updates.feedback) {
-        answerGroup.outcome.feedback = updates.feedback;
-      }
-      if (updates.dest) {
-        answerGroup.outcome.dest = updates.dest;
-      }
-      answerGroup.correct = false;
-      _saveAnswerGroups(_answerGroups);
-    };
-
-    var _saveDefaultOutcome = function(newDefaultOutcome) {
-      var oldDefaultOutcome = _defaultOutcomeMemento;
-      if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
-        _defaultOutcome = newDefaultOutcome;
-
-        explorationStatesService.saveInteractionDefaultOutcome(
-          editorContextService.getActiveStateName(),
-          angular.copy(newDefaultOutcome));
-
-        graphDataService.recompute();
-        _defaultOutcomeMemento = angular.copy(newDefaultOutcome);
-      }
-    };
-
-    var _saveConfirmedUnclassifiedAnswers = function(
-        newConfirmedUnclassifiedAnswers) {
-      var oldConfirmedUnclassifiedAnswers = (
-        _confirmedUnclassifiedAnswersMemento);
-      if (!angular.equals(
-          newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
-        _confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
-
-        explorationStatesService.saveConfirmedUnclassifiedAnswers(
-          editorContextService.getActiveStateName(),
-          angular.copy(newConfirmedUnclassifiedAnswers));
-
-        _confirmedUnclassifiedAnswersMemento = angular.copy(
-          newConfirmedUnclassifiedAnswers);
-      }
-    };
-
-    return {
-      // The 'data' arg is a list of interaction handlers for the
-      // currently-active state.
-      init: function(data) {
-        AnswerGroupsCacheService.reset();
-
-        _answerGroups = angular.copy(data.answerGroups);
-        _defaultOutcome = angular.copy(data.defaultOutcome);
-        _confirmedUnclassifiedAnswers = angular.copy(
-          data.confirmedUnclassifiedAnswers);
-        AnswerGroupsCacheService.set(
-          stateInteractionIdService.savedMemento, _answerGroups);
-
-        _answerGroupsMemento = angular.copy(_answerGroups);
-        _defaultOutcomeMemento = angular.copy(_defaultOutcome);
-        _confirmedUnclassifiedAnswersMemento = angular.copy(
-          _confirmedUnclassifiedAnswers);
-        _activeAnswerGroupIndex = -1;
-        _activeRuleIndex = 0;
-      },
-      onInteractionIdChanged: function(newInteractionId, callback) {
-        if (AnswerGroupsCacheService.contains(newInteractionId)) {
-          _answerGroups = AnswerGroupsCacheService.get(newInteractionId);
-        } else {
-          // Preserve the default outcome unless the interaction is terminal.
-          // Recreate the default outcome if switching away from a terminal
-          // interaction.
-          _answerGroups = [];
-          _confirmedUnclassifiedAnswers = [];
-          if (newInteractionId) {
-            if (INTERACTION_SPECS[newInteractionId].is_terminal) {
-              _defaultOutcome = null;
-            } else if (!_defaultOutcome) {
-              _defaultOutcome = OutcomeObjectFactory.createNew(
-                editorContextService.getActiveStateName(), [], []);
-            }
-          }
-        }
-
-        _saveAnswerGroups(_answerGroups);
-        _saveDefaultOutcome(_defaultOutcome);
-        _saveConfirmedUnclassifiedAnswers(_confirmedUnclassifiedAnswers);
-        AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
-
-        _answerGroupsMemento = angular.copy(_answerGroups);
-        _defaultOutcomeMemento = angular.copy(_defaultOutcome);
-        _confirmedUnclassifiedAnswersMemento = angular.copy(
-          _confirmedUnclassifiedAnswers);
-        _activeAnswerGroupIndex = -1;
-        _activeRuleIndex = 0;
-
-        if (callback) {
-          callback();
-        }
-      },
-      getActiveAnswerGroupIndex: function() {
-        return _activeAnswerGroupIndex;
-      },
-      changeActiveAnswerGroupIndex: function(newIndex) {
-        // If the current group is being clicked on again, close it.
-        if (newIndex === _activeAnswerGroupIndex) {
-          _activeAnswerGroupIndex = -1;
-        } else {
-          _activeAnswerGroupIndex = newIndex;
-        }
-
-        _activeRuleIndex = -1;
-      },
-      getActiveRuleIndex: function() {
-        return _activeRuleIndex;
-      },
-      changeActiveRuleIndex: function(newIndex) {
-        _activeRuleIndex = newIndex;
-      },
-      getAnswerChoices: function() {
-        return angular.copy(_answerChoices);
-      },
-      updateAnswerGroup: function(index, updates) {
-        _updateAnswerGroup(index, updates);
-      },
-      deleteAnswerGroup: function(index) {
-        _answerGroupsMemento = angular.copy(_answerGroups);
-        _answerGroups.splice(index, 1);
-        _activeAnswerGroupIndex = -1;
-        _saveAnswerGroups(_answerGroups);
-      },
-      updateActiveAnswerGroup: function(updates) {
-        _updateAnswerGroup(_activeAnswerGroupIndex, updates);
-      },
-      updateDefaultOutcome: function(updates) {
-        var outcome = _defaultOutcome;
-        if (updates.feedback) {
-          outcome.feedback = updates.feedback;
-        }
-        if (updates.dest) {
-          outcome.dest = updates.dest;
-        }
-        _saveDefaultOutcome(outcome);
-      },
-      updateConfirmedUnclassifiedAnswers: function(
-          confirmedUnclassifiedAnswers) {
-        _saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
-      },
-      // Updates answer choices when the interaction requires it -- for
-      // example, the rules for multiple choice need to refer to the multiple
-      // choice interaction's customization arguments.
-      updateAnswerChoices: function(newAnswerChoices) {
-        var oldAnswerChoices = angular.copy(_answerChoices);
-        _answerChoices = newAnswerChoices;
-
-        // If the interaction is ItemSelectionInput, update the answer groups
-        // to refer to the new answer options.
-        if (stateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
-            oldAnswerChoices) {
-          // We use an approximate algorithm here. If the length of the answer
-          // choices array remains the same, and no choice is replicated at
-          // different indices in both arrays (which indicates that some
-          // moving-around happened), then replace any old choice with its
-          // corresponding new choice. Otherwise, we simply remove any answer
-          // that has not been changed. This is not foolproof, but it should
-          // cover most cases.
-          //
-          // TODO(sll): Find a way to make this fully deterministic. This can
-          // probably only occur after we support custom editors for
-          // interactions.
-          var onlyEditsHappened = false;
-          if (oldAnswerChoices.length === newAnswerChoices.length) {
-            onlyEditsHappened = true;
-
-            // Check that no answer choice appears to have been moved.
-            var numAnswerChoices = oldAnswerChoices.length;
-            for (var i = 0; i < numAnswerChoices; i++) {
-              for (var j = 0; j < numAnswerChoices; j++) {
-                if (i !== j &&
-                    oldAnswerChoices[i].val === newAnswerChoices[j].val) {
-                  onlyEditsHappened = false;
-                  break;
-                }
-              }
-            }
-          }
-
-          var oldChoiceStrings = oldAnswerChoices.map(function(choice) {
-            return choice.val;
-          });
-          var newChoiceStrings = newAnswerChoices.map(function(choice) {
-            return choice.val;
-          });
-
-          _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-            var newRules = angular.copy(answerGroup.rules);
-            newRules.forEach(function(rule) {
-              for (var key in rule.inputs) {
-                var newInputValue = [];
-                rule.inputs[key].forEach(function(item) {
-                  var newIndex = newChoiceStrings.indexOf(item);
-                  if (newIndex !== -1) {
-                    newInputValue.push(item);
-                  } else if (onlyEditsHappened) {
-                    var oldIndex = oldChoiceStrings.indexOf(item);
-                    if (oldIndex !== -1) {
-                      newInputValue.push(newAnswerChoices[oldIndex].val);
-                    }
-                  }
-                });
-                rule.inputs[key] = newInputValue;
-              }
-            });
-
-            _updateAnswerGroup(answerGroupIndex, {
-              rules: newRules
-            });
-          });
-        }
-      },
-      getAnswerGroups: function() {
-        return angular.copy(_answerGroups);
-      },
-      getAnswerGroup: function(index) {
-        return angular.copy(_answerGroups[index]);
-      },
-      getAnswerGroupCount: function() {
-        return _answerGroups.length;
-      },
-      getDefaultOutcome: function() {
-        return angular.copy(_defaultOutcome);
-      },
-      getConfirmedUnclassifiedAnswers: function() {
-        return angular.copy(_confirmedUnclassifiedAnswers);
-      },
-      // This registers the change to the handlers in the list of changes, and
-      // also updates the states object in explorationStatesService.
-      save: function(newAnswerGroups, defaultOutcome) {
-        _saveAnswerGroups(newAnswerGroups);
-        _saveDefaultOutcome(defaultOutcome);
-      }
-    };
-  }
-]);
-
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
-  'editorContextService', 'alertsService', 'responsesService', 'routerService',
+  'editorContextService', 'alertsService', 'ResponsesService', 'RouterService',
   'explorationContextService', 'trainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
-      editorContextService, alertsService, responsesService, routerService,
+      editorContextService, alertsService, ResponsesService, RouterService,
       explorationContextService, trainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
@@ -374,7 +43,7 @@ oppia.controller('StateResponses', [
 
     $scope.suppressDefaultAnswerGroupWarnings = function() {
       var interactionId = $scope.getCurrentInteractionId();
-      var answerGroups = responsesService.getAnswerGroups();
+      var answerGroups = ResponsesService.getAnswerGroups();
       // This array contains the text of each of the possible answers
       // for the interaction.
       var answerChoices = [];
@@ -467,9 +136,9 @@ oppia.controller('StateResponses', [
 
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
       $rootScope.$broadcast('externalSave');
-      responsesService.changeActiveAnswerGroupIndex(newIndex);
+      ResponsesService.changeActiveAnswerGroupIndex(newIndex);
       $scope.activeAnswerGroupIndex = (
-        responsesService.getActiveAnswerGroupIndex());
+        ResponsesService.getActiveAnswerGroupIndex());
     };
 
     $scope.getCurrentInteractionId = function() {
@@ -515,36 +184,36 @@ oppia.controller('StateResponses', [
     };
 
     $scope.$on('initializeAnswerGroups', function(evt, data) {
-      responsesService.init(data);
-      $scope.answerGroups = responsesService.getAnswerGroups();
-      $scope.defaultOutcome = responsesService.getDefaultOutcome();
+      ResponsesService.init(data);
+      $scope.answerGroups = ResponsesService.getAnswerGroups();
+      $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
       // If the creator selects an interaction which has only one possible
       // answer, automatically expand the default response. Otherwise, default
       // to having no responses initially selected.
       if ($scope.isCurrentInteractionLinear()) {
-        responsesService.changeActiveAnswerGroupIndex(0);
+        ResponsesService.changeActiveAnswerGroupIndex(0);
       }
 
       // Initialize training data for these answer groups.
       _initializeTrainingData();
 
       $scope.activeAnswerGroupIndex = (
-        responsesService.getActiveAnswerGroupIndex());
+        ResponsesService.getActiveAnswerGroupIndex());
       $rootScope.$broadcast('externalSave');
     });
 
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
       $rootScope.$broadcast('externalSave');
-      responsesService.onInteractionIdChanged(newInteractionId, function() {
-        $scope.answerGroups = responsesService.getAnswerGroups();
-        $scope.defaultOutcome = responsesService.getDefaultOutcome();
+      ResponsesService.onInteractionIdChanged(newInteractionId, function() {
+        $scope.answerGroups = ResponsesService.getAnswerGroups();
+        $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
         // Reinitialize training data if the interaction ID is changed.
         _initializeTrainingData();
 
         $scope.activeAnswerGroupIndex = (
-          responsesService.getActiveAnswerGroupIndex());
+          ResponsesService.getActiveAnswerGroupIndex());
       });
 
       // Prompt the user to create a new response if it is not a linear or
@@ -565,14 +234,14 @@ oppia.controller('StateResponses', [
     });
 
     $scope.$on('answerGroupChanged', function() {
-      $scope.answerGroups = responsesService.getAnswerGroups();
-      $scope.defaultOutcome = responsesService.getDefaultOutcome();
+      $scope.answerGroups = ResponsesService.getAnswerGroups();
+      $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
       $scope.activeAnswerGroupIndex = (
-        responsesService.getActiveAnswerGroupIndex());
+        ResponsesService.getActiveAnswerGroupIndex());
     });
 
     $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-      responsesService.updateAnswerChoices(newAnswerChoices);
+      ResponsesService.updateAnswerChoices(newAnswerChoices);
     });
 
     $scope.openTeachOppiaModal = function() {
@@ -693,11 +362,11 @@ oppia.controller('StateResponses', [
         // Clicking outside this modal should not dismiss it.
         backdrop: 'static',
         controller: [
-          '$scope', '$modalInstance', 'responsesService',
+          '$scope', '$modalInstance', 'ResponsesService',
           'editorContextService', 'editorFirstTimeEventsService',
           'RuleObjectFactory', 'OutcomeObjectFactory',
           function(
-              $scope, $modalInstance, responsesService,
+              $scope, $modalInstance, ResponsesService,
               editorContextService, editorFirstTimeEventsService,
               RuleObjectFactory, OutcomeObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
@@ -755,7 +424,7 @@ oppia.controller('StateResponses', [
         // Create a new answer group.
         $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
           [result.tmpRule], result.tmpOutcome, false));
-        responsesService.save($scope.answerGroups, $scope.defaultOutcome);
+        ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
 
         // After saving it, check if the modal should be reopened right away.
@@ -782,7 +451,7 @@ oppia.controller('StateResponses', [
         ui.placeholder.height(ui.item.height());
       },
       stop: function() {
-        responsesService.save($scope.answerGroups, $scope.defaultOutcome);
+        ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
       }
     };
 
@@ -808,42 +477,42 @@ oppia.controller('StateResponses', [
           }
         ]
       }).result.then(function() {
-        responsesService.deleteAnswerGroup(index);
+        ResponsesService.deleteAnswerGroup(index);
       });
     };
 
     $scope.saveActiveAnswerGroupFeedback = function(updatedOutcome) {
-      responsesService.updateActiveAnswerGroup({
+      ResponsesService.updateActiveAnswerGroup({
         feedback: updatedOutcome.feedback
       });
     };
 
     $scope.saveActiveAnswerGroupDest = function(updatedOutcome) {
-      responsesService.updateActiveAnswerGroup({
+      ResponsesService.updateActiveAnswerGroup({
         dest: updatedOutcome.dest
       });
     };
 
     $scope.saveActiveAnswerGroupRules = function(updatedRules) {
-      responsesService.updateActiveAnswerGroup({
+      ResponsesService.updateActiveAnswerGroup({
         rules: updatedRules
       });
     };
 
     $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
-      responsesService.updateDefaultOutcome({
+      ResponsesService.updateDefaultOutcome({
         feedback: updatedOutcome.feedback
       });
     };
 
     $scope.saveDefaultOutcomeDest = function(updatedOutcome) {
-      responsesService.updateDefaultOutcome({
+      ResponsesService.updateDefaultOutcome({
         dest: updatedOutcome.dest
       });
     };
 
     $scope.getAnswerChoices = function() {
-      return responsesService.getAnswerChoices();
+      return ResponsesService.getAnswerChoices();
     };
 
     $scope.isOutcomeLooping = function(outcome) {
@@ -852,7 +521,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.navigateToState = function(stateName) {
-      routerService.navigateToMainTab(stateName);
+      RouterService.navigateToMainTab(stateName);
     };
   }
 ]);

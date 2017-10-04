@@ -16,7 +16,7 @@
  * @fileoverview Service that handles routing for the exploration editor page.
  */
 
-oppia.factory('routerService', [
+oppia.factory('RouterService', [
   '$rootScope', '$location', '$window', '$timeout', '$interval',
   'explorationInitStateNameService', 'editorContextService',
   'explorationStatesService',
@@ -140,7 +140,7 @@ oppia.factory('routerService', [
       $window.scrollTo(0, 0);
     };
 
-    var routerService = {
+    var RouterService = {
       savePendingChanges: function() {
         _savePendingChanges();
       },
@@ -206,6 +206,6 @@ oppia.factory('routerService', [
       }
     };
 
-    return routerService;
+    return RouterService;
   }
 ]);

@@ -25,10 +25,10 @@ oppia.directive('editorNavbarBreadcrumb', [
         '/pages/exploration_editor/' +
         'editor_navbar_breadcrumb_directive.html'),
       controller: [
-        '$scope', 'explorationTitleService', 'routerService',
+        '$scope', 'explorationTitleService', 'RouterService',
         'focusService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
         function(
-            $scope, explorationTitleService, routerService,
+            $scope, explorationTitleService, RouterService,
             focusService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
           $scope.navbarTitle = null;
           $scope.$on('explorationPropertyChanged', function() {
@@ -41,7 +41,7 @@ oppia.directive('editorNavbarBreadcrumb', [
           });
 
           $scope.editTitle = function() {
-            routerService.navigateToSettingsTab();
+            RouterService.navigateToSettingsTab();
             focusService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
           };
 
@@ -55,11 +55,11 @@ oppia.directive('editorNavbarBreadcrumb', [
           };
 
           $scope.getCurrentTabName = function() {
-            if (!routerService.getTabStatuses()) {
+            if (!RouterService.getTabStatuses()) {
               return '';
             } else {
               return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-                routerService.getTabStatuses().active];
+                RouterService.getTabStatuses().active];
             }
           };
         }

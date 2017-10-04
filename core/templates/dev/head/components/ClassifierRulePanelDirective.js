@@ -30,10 +30,10 @@ oppia.directive('classifierRulePanel', [
       controller: [
         '$scope', '$modal', 'oppiaExplorationHtmlFormatterService',
         'stateInteractionIdService', 'stateCustomizationArgsService',
-        'trainingModalService',
+        'TrainingModalService',
         function($scope, $modal, oppiaExplorationHtmlFormatterService,
             stateInteractionIdService, stateCustomizationArgsService,
-            trainingModalService) {
+            TrainingModalService) {
           $scope.trainingDataHtmlList = [];
           var trainingData = $scope.ruleInputs.training_data;
           for (var i = 0; i < trainingData.length; i++) {
@@ -44,7 +44,7 @@ oppia.directive('classifierRulePanel', [
           }
 
           $scope.openRetrainAnswerModal = function(trainingDataIndex) {
-            trainingModalService.openTrainUnresolvedAnswerModal(
+            TrainingModalService.openTrainUnresolvedAnswerModal(
               trainingData[trainingDataIndex], false);
           };
         }

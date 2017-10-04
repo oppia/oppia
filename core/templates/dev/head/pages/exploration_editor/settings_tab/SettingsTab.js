@@ -24,7 +24,7 @@ oppia.controller('SettingsTab', [
   'explorationInitStateNameService', 'explorationParamSpecsService',
   'changeListService', 'alertsService', 'explorationStatesService',
   'explorationParamChangesService', 'explorationWarningsService',
-  'explorationAdvancedFeaturesService', 'ALL_CATEGORIES',
+  'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
   function(
@@ -35,7 +35,7 @@ oppia.controller('SettingsTab', [
       explorationInitStateNameService, explorationParamSpecsService,
       changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
-      explorationAdvancedFeaturesService, ALL_CATEGORIES,
+      ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       EditableExplorationBackendApiService, UrlInterpolationService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
@@ -164,9 +164,9 @@ oppia.controller('SettingsTab', [
     * Methods for enabling advanced features.
     ********************************************/
     $scope.areParametersEnabled = (
-      explorationAdvancedFeaturesService.areParametersEnabled);
+      ExplorationAdvancedFeaturesService.areParametersEnabled);
     $scope.enableParameters = (
-      explorationAdvancedFeaturesService.enableParameters);
+      ExplorationAdvancedFeaturesService.enableParameters);
 
     /********************************************
     * Methods for rights management.
