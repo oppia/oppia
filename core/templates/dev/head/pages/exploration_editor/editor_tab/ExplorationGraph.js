@@ -18,12 +18,13 @@
 
 oppia.controller('ExplorationGraph', [
   '$scope', '$modal', 'editorContextService', 'alertsService',
-  'explorationStatesService', 'editabilityService', 'routerService',
+  'explorationStatesService', 'editabilityService', 'RouterService',
   'graphDataService', 'UrlInterpolationService',
   function(
       $scope, $modal, editorContextService, alertsService,
-      explorationStatesService, editabilityService, routerService,
+      explorationStatesService, editabilityService, RouterService,
       graphDataService, UrlInterpolationService) {
+
     $scope.getGraphData = graphDataService.getGraphData;
     $scope.isEditable = editabilityService.isEditable;
 
@@ -39,7 +40,7 @@ oppia.controller('ExplorationGraph', [
     };
 
     $scope.onClickStateInMinimap = function(stateName) {
-      routerService.navigateToMainTab(stateName);
+      RouterService.navigateToMainTab(stateName);
     };
 
     $scope.getActiveStateName = function() {

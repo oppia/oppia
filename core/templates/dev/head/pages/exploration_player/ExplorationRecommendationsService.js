@@ -17,7 +17,7 @@
  * exploration.
  */
 
-oppia.factory('explorationRecommendationsService', [
+oppia.factory('ExplorationRecommendationsService', [
   '$http', 'urlService', 'explorationContextService', 'PAGE_CONTEXT',
   'EDITOR_TAB_CONTEXT',
   function(

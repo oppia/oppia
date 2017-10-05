@@ -16,14 +16,14 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
-oppia.factory('explorationSaveService', [
+oppia.factory('ExplorationSaveService', [
   '$modal', '$timeout', '$rootScope', '$log', '$q',
   'alertsService', 'explorationData', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationWarningsService', 'ExplorationDiffService',
-  'explorationInitStateNameService', 'routerService',
+  'explorationInitStateNameService', 'RouterService',
   'focusService', 'changeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   function(
@@ -33,7 +33,7 @@ oppia.factory('explorationSaveService', [
       explorationObjectiveService, explorationCategoryService,
       explorationLanguageCodeService, explorationRightsService,
       explorationWarningsService, ExplorationDiffService,
-      explorationInitStateNameService, routerService,
+      explorationInitStateNameService, RouterService,
       focusService, changeListService, siteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService) {
     // Whether or not a save action is currently in progress
@@ -445,7 +445,7 @@ oppia.factory('explorationSaveService', [
         // controller 'saveIsInProgress' back to false.
         var whenModalClosed = $q.defer();
 
-        routerService.savePendingChanges();
+        RouterService.savePendingChanges();
 
         if (!explorationRightsService.isPrivate() &&
             explorationWarningsService.countWarnings() > 0) {

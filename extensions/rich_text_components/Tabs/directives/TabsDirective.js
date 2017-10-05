@@ -20,11 +20,13 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveTabs', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'richTextComponent/Tabs',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/rich_text_components/Tabs/directives/tabs_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.tabContents = HtmlEscaperService.escapedJsonToObj(
           $attrs.tabContentsWithValue);

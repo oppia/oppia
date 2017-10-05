@@ -18,21 +18,21 @@
 
 oppia.controller('FeedbackTab', [
   '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
-  'oppiaDatetimeFormatter', 'threadStatusDisplayService',
-  'threadDataService', 'explorationStatesService', 'explorationData',
+  'oppiaDatetimeFormatter', 'ThreadStatusDisplayService',
+  'ThreadDataService', 'explorationStatesService', 'explorationData',
   'changeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
     $scope, $http, $modal, $timeout, $rootScope, alertsService,
-    oppiaDatetimeFormatter, threadStatusDisplayService,
-    threadDataService, explorationStatesService, explorationData,
+    oppiaDatetimeFormatter, ThreadStatusDisplayService,
+    ThreadDataService, explorationStatesService, explorationData,
     changeListService, StateObjectFactory, UrlInterpolationService,
     ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
-    $scope.STATUS_CHOICES = threadStatusDisplayService.STATUS_CHOICES;
-    $scope.threadData = threadDataService.data;
-    $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
+    $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
+    $scope.threadData = ThreadDataService.data;
+    $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
-      threadStatusDisplayService.getHumanReadableStatus);
+      ThreadStatusDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
@@ -87,7 +87,7 @@ oppia.controller('FeedbackTab', [
           };
         }]
       }).result.then(function(result) {
-        threadDataService.createNewThread(
+        ThreadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
             $scope.clearActiveThread();
             alertsService.addSuccessMessage('Feedback thread created.');
@@ -212,11 +212,11 @@ oppia.controller('FeedbackTab', [
           }
         ]
       }).result.then(function(result) {
-        threadDataService.resolveSuggestion(
+        ThreadDataService.resolveSuggestion(
           $scope.activeThread.thread_id, result.action, result.commitMessage,
           result.audioUpdateRequired,
           function() {
-            threadDataService.fetchThreads(function() {
+            ThreadDataService.fetchThreads(function() {
               $scope.setActiveThread($scope.activeThread.thread_id);
             });
             // Immediately update editor to reflect accepted suggestion.
@@ -254,7 +254,7 @@ oppia.controller('FeedbackTab', [
       }
 
       $scope.messageSendingInProgress = true;
-      threadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
+      ThreadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
         _resetTmpMessageFields();
         $scope.messageSendingInProgress = false;
       }, function() {
@@ -263,8 +263,8 @@ oppia.controller('FeedbackTab', [
     };
 
     $scope.setActiveThread = function(threadId) {
-      threadDataService.fetchMessages(threadId);
-      threadDataService.markThreadAsSeen(threadId);
+      ThreadDataService.fetchMessages(threadId);
+      ThreadDataService.markThreadAsSeen(threadId);
 
       var allThreads = [].concat(
         $scope.threadData.feedbackThreads, $scope.threadData.suggestionThreads);
@@ -280,8 +280,8 @@ oppia.controller('FeedbackTab', [
 
     // Initial load of the thread list on page load.
     $scope.clearActiveThread();
-    threadDataService.fetchFeedbackStats();
-    threadDataService.fetchThreads(function() {
+    ThreadDataService.fetchFeedbackStats();
+    ThreadDataService.fetchThreads(function() {
       $timeout(function() {
         $rootScope.loadingMessage = '';
       }, 500);

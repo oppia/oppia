@@ -13,22 +13,13 @@
 // limitations under the License.
 
 /**
- * Directive for the Math rich-text component.
- *
- * IMPORTANT NOTE: The naming convention for customization args that are passed
- * into the directive is: the name of the parameter, followed by 'With',
- * followed by the name of the arg.
+ * @fileoverview Service for generating random IDs.
  */
-oppia.directive('oppiaNoninteractiveMath', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: 'richTextComponent/Math',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.rawLatex = HtmlEscaperService.escapedJsonToObj(
-          $attrs.rawLatexWithValue);
-      }]
-    };
-  }
-]);
+
+oppia.factory('IdGenerationService', [function() {
+  return {
+    generateNewId: function() {
+      return Math.random().toString(36).slice(2);
+    }
+  };
+}]);
