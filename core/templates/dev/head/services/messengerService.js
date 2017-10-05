@@ -27,6 +27,10 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
     return typeof b === 'boolean';
   };
 
+  var SUPPORTED_HASHDICT_VERSIONS = [
+    '0.0.0', '0.0.1', '0.0.2', '0.0.3'
+  ];
+
   MESSAGE_VALIDATORS = {
     heightChange: function(payload) {
       return isPositiveInteger(payload.height) && isBoolean(payload.scroll);
@@ -124,8 +128,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
           return;
         }
 
-        if (hashDict.version === '0.0.0' || hashDict.version === '0.0.1' ||
-            hashDict.version === '0.0.2' || hashDict.version === '0.0.3' ) {
+        if (SUPPORTED_HASHDICT_VERSIONS.indexOf(hashDict.version) !== -1) {
           $log.info('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);
