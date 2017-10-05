@@ -502,6 +502,9 @@ DISABLED_EXPLORATION_IDS = ['5']
 EMBEDDED_GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/embed/?place=forum/oppia')
 
+# External URL for the Foundation site
+FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
+
 # Whether to allow YAML file uploads.
 ALLOW_YAML_FILE_UPLOAD = False
 
