@@ -2318,7 +2318,7 @@ title: Title
 """)
 
     YAML_CONTENT_V18 = ("""author_notes: ''
-auto_tts_enabled: True
+auto_tts_enabled: true
 blurb: ''
 category: Category
 init_state_name: (untitled state)

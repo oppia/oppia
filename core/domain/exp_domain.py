@@ -1700,6 +1700,7 @@ class Exploration(object):
         exploration.tags = exploration_dict['tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
+        exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -1892,6 +1893,11 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected param_specs to be a dict, received %s'
                 % self.param_specs)
+
+        if not isinstance(self.auto_tts_enabled, bool):
+            raise utils.ValidationError(
+                'Expected auto_tts_enabled to be a dict, received %s'
+                % self.auto_tts_enabled)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, basestring):
@@ -3424,6 +3430,7 @@ class Exploration(object):
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
             'tags': self.tags,
+            'auto_tts_enabled': self.auto_tts_enabled,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()}
         })
