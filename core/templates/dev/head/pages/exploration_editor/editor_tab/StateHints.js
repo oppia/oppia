@@ -84,7 +84,9 @@ oppia.controller('StateHints', [
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
-        templateUrl: 'modals/addHint',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'add_hint_modal_directive.html'),
         backdrop: 'static',
         controller: [
           '$scope', '$modalInstance', 'editorContextService',
@@ -176,7 +178,9 @@ oppia.controller('StateHints', [
 
       alertsService.clearWarnings();
       $modal.open({
-        templateUrl: 'modals/deleteHint',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'delete_hint_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {

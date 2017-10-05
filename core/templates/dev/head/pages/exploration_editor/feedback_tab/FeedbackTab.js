@@ -20,14 +20,14 @@ oppia.controller('FeedbackTab', [
   '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
   'oppiaDatetimeFormatter', 'threadStatusDisplayService',
   'threadDataService', 'explorationStatesService', 'explorationData',
-  'changeListService', 'StateObjectFactory', 'ACTION_ACCEPT_SUGGESTION',
-  'ACTION_REJECT_SUGGESTION',
+  'changeListService', 'StateObjectFactory', 'UrlInterpolationService',
+  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
     $scope, $http, $modal, $timeout, $rootScope, alertsService,
     oppiaDatetimeFormatter, threadStatusDisplayService,
     threadDataService, explorationStatesService, explorationData,
-    changeListService, StateObjectFactory, ACTION_ACCEPT_SUGGESTION,
-    ACTION_REJECT_SUGGESTION) {
+    changeListService, StateObjectFactory, UrlInterpolationService,
+    ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = threadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = threadDataService.data;
     $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
@@ -56,7 +56,9 @@ oppia.controller('FeedbackTab', [
 
     $scope.showCreateThreadModal = function() {
       $modal.open({
-        templateUrl: 'modals/editorFeedbackCreateThread',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/feedback_tab/' +
+          'editor_create_feedback_thread_modal_directive.html'),
         backdrop: true,
         resolve: {},
         controller: ['$scope', '$modalInstance', function(
@@ -114,7 +116,9 @@ oppia.controller('FeedbackTab', [
     // TODO(Allan): Implement ability to edit suggestions before applying.
     $scope.showSuggestionModal = function() {
       $modal.open({
-        templateUrl: 'modals/editorViewSuggestion',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/feedback_tab/' +
+          'editor_view_suggestion_modal_directive.html'),
         backdrop: true,
         size: 'lg',
         resolve: {

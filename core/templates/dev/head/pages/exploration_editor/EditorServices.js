@@ -835,12 +835,14 @@ oppia.factory('explorationStatesService', [
   'editorContextService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'angularNameService',
   'AnswerClassificationService', 'explorationContextService',
+  'UrlInterpolationService',
   function(
       $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, angularNameService,
-      AnswerClassificationService, explorationContextService) {
+      AnswerClassificationService, explorationContextService,
+      UrlInterpolationService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -1104,7 +1106,9 @@ oppia.factory('explorationStatesService', [
         }
 
         $modal.open({
-          templateUrl: 'modals/deleteState',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/editor_tab/' +
+            'confirm_delete_state_modal_directive.html'),
           backdrop: true,
           resolve: {
             deleteStateName: function() {

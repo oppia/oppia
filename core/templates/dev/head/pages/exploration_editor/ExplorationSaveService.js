@@ -202,7 +202,9 @@ oppia.factory('explorationSaveService', [
 
       discardChanges: function() {
         $modal.open({
-          templateUrl: 'modals/confirmDiscardChanges',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'confirm_discard_changes_modal_directive.html'),
           backdrop: 'static',
           keyboard: false,
           controller: [
