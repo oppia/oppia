@@ -27,8 +27,8 @@
 // The state-name argument is optional. If it is not provided, the feedback is
 // assumed to apply to the exploration as a whole.
 oppia.directive('feedbackPopup', [
-  'oppiaPlayerService', 'UrlInterpolationService',
-  function(oppiaPlayerService, UrlInterpolationService) {
+  'ExplorationPlayerService', 'UrlInterpolationService',
+  function(ExplorationPlayerService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -36,15 +36,15 @@ oppia.directive('feedbackPopup', [
         '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
         '$scope', '$element', '$http', '$timeout', 'focusService',
-        'alertsService', 'BackgroundMaskService', 'playerPositionService',
+        'alertsService', 'BackgroundMaskService', 'PlayerPositionService',
         'windowDimensionsService',
         function(
             $scope, $element, $http, $timeout, focusService,
-            alertsService, BackgroundMaskService, playerPositionService,
+            alertsService, BackgroundMaskService, PlayerPositionService,
             windowDimensionsService) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
-          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+          $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
           $scope.feedbackSubmitted = false;
           // We generate a random id since there may be multiple popover
           // elements on the same page.
@@ -59,7 +59,7 @@ oppia.directive('feedbackPopup', [
 
           var feedbackUrl = (
             '/explorehandler/give_feedback/' +
-            oppiaPlayerService.getExplorationId());
+            ExplorationPlayerService.getExplorationId());
 
           var getTriggerElt = function() {
             // Find the popover trigger node (the one with a popover-template
@@ -112,7 +112,7 @@ oppia.directive('feedbackPopup', [
                 feedback: $scope.feedbackText,
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),
-                state_name: playerPositionService.getCurrentStateName()
+                state_name: PlayerPositionService.getCurrentStateName()
               });
             }
 
