@@ -37,6 +37,7 @@ import utils
 # utils.dict_from_yaml can isolate differences quickly.
 
 SAMPLE_YAML_CONTENT = ("""author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: Category
 init_state_name: %s
