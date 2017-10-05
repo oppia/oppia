@@ -20,9 +20,10 @@ oppia.constant(
 
 oppia.controller('LearnerLocalNav', [
   '$scope', '$modal', '$http', 'ExplorationPlayerService', 'alertsService',
-  'UrlInterpolationService', 'focusService', 'FLAG_EXPLORATION_URL_TEMPLATE',
-  function($scope, $modal, $http, ExplorationPlayerService, alertsService,
-    UrlInterpolationService, focusService, FLAG_EXPLORATION_URL_TEMPLATE) {
+  'UrlInterpolationService', 'FocusManagerService',
+  'FLAG_EXPLORATION_URL_TEMPLATE', function($scope, $modal, $http,
+    ExplorationPlayerService, alertsService, UrlInterpolationService,
+    FocusManagerService, FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
       $modal.open({
@@ -99,7 +100,7 @@ oppia.controller('LearnerLocalNav', [
             $scope.showFlagMessageTextarea = function(value) {
               if (value) {
                 $scope.flagMessageTextareaIsShown = true;
-                focusService.setFocus('flagMessageTextarea');
+                FocusManagerService.setFocus('flagMessageTextarea');
               }
             };
 

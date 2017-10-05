@@ -24,7 +24,7 @@ oppia.factory('ExplorationSaveService', [
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'RouterService',
-  'focusService', 'changeListService', 'siteAnalyticsService',
+  'FocusManagerService', 'changeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   function(
       $modal, $timeout, $rootScope, $log, $q,
@@ -34,7 +34,7 @@ oppia.factory('ExplorationSaveService', [
       explorationLanguageCodeService, explorationRightsService,
       explorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, RouterService,
-      focusService, changeListService, siteAnalyticsService,
+      FocusManagerService, changeListService, siteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
@@ -542,7 +542,7 @@ oppia.factory('ExplorationSaveService', [
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
-              focusService.setFocus('saveChangesModalOpened');
+              FocusManagerService.setFocus('saveChangesModalOpened');
             });
           });
 
