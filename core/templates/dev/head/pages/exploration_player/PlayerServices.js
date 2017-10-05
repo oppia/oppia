@@ -24,11 +24,11 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-oppia.factory('oppiaPlayerService', [
+oppia.factory('ExplorationPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
   'alertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
-  'playerTranscriptService', 'ExplorationObjectFactory',
+  'PlayerTranscriptService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
@@ -38,7 +38,7 @@ oppia.factory('oppiaPlayerService', [
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
-      playerTranscriptService, ExplorationObjectFactory,
+      PlayerTranscriptService, ExplorationObjectFactory,
       ExpressionInterpolationService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
@@ -183,7 +183,7 @@ oppia.factory('oppiaPlayerService', [
        */
       init: function(successCallback) {
         answerIsBeingProcessed = false;
-        playerTranscriptService.init();
+        PlayerTranscriptService.init();
 
         if (_editorPreviewMode) {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
@@ -302,7 +302,7 @@ oppia.factory('oppiaPlayerService', [
         }
 
         answerIsBeingProcessed = true;
-        var oldStateName = playerTranscriptService.getLastStateName();
+        var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
@@ -360,7 +360,7 @@ oppia.factory('oppiaPlayerService', [
 
         answerIsBeingProcessed = false;
 
-        oldStateName = playerTranscriptService.getLastStateName();
+        oldStateName = PlayerTranscriptService.getLastStateName();
         var refreshInteraction = (
           oldStateName !== newStateName ||
           exploration.isInteractionInline(oldStateName));
