@@ -1,6 +1,5 @@
 <div class="conversation-skin-tutor-card"
-     ng-class="{'animate-card-width': startCardChangeAnimation,
-                'has-shadow': isViewportNarrow() && !isInteractionInline}">
+     ng-class="{'animate-card-width': startCardChangeAnimation}">
   <div class="conversation-skin-tutor-card-content conversation-skin-animate-tutor-card-content"
        ng-class="{'animate-card-change': startCardChangeAnimation}">
     <div class="conversation-skin-tutor-card-top-section">
@@ -103,11 +102,11 @@
         <[interactionInstructions]>
         <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
       </div>
-      <div ng-if="isViewportNarrow()">
+<!--       <div ng-if="isViewportNarrow()">
         <md-button class="instructions-button" ng-click="onDismiss()">
           <[interactionInstructions]>
         </md-button>
-      </div>
+      </div> -->
     </div>
 
     <div ng-if="!activeCard.interactionHtml && !isOnTerminalCard()">
@@ -192,7 +191,6 @@
   .conversation-skin-future-tutor-card {
     background: #fff;
     border-radius: 2px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
     padding-top: 20px;
     text-align: left;
   }

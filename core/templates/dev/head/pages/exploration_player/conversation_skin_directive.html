@@ -21,11 +21,6 @@
         <[upcomingInteractionInstructions]>
         <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
       </div>
-      <div ng-if="isViewportNarrow()">
-        <md-button class="instructions-button">
-          <[upcomingInteractionInstructions]>
-        </md-button>
-      </div>
     </div>
   </div>
 </div>
@@ -38,26 +33,23 @@
        ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
     <div class="conversation-skin-tutor-card-container"
-         ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
          ng-class="{'conversation-skin-animate-tutor-card-on-narrow':
                       isViewportNarrow() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
                       isViewportNarrow() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card on-click-continue-button="showUpcomingCard()"
                   on-submit-answer="submitAnswer(answer, rulesService)"
-                  on-dismiss="showSupplementalCardIfScreenIsNarrow()"
                   start-card-change-animation="startCardChangeAnimation">
       </tutor-card>
+      <div ng-if="isCurrentSupplementalCardNonempty() && isViewportNarrow()">
+        <supplemental-card on-click-continue-button="showUpcomingCard()"
+                           on-submit-answer="submitAnswer(answer, rulesService)">
+        </supplemental-card>
+      </div>
     </div>
 
-    <div ng-if="isCurrentSupplementalCardNonempty()"
+    <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
          class="conversation-skin-supplemental-card-container">
-      <img class="conversation-skin-oppia-avatar show-tutor-card"
-           ng-if="isScreenNarrowAndShowingSupplementalCard()"
-           ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>"
-           ng-click="showTutorCardIfScreenIsNarrow()" alt="">
-
-      <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
       <supplemental-card on-click-continue-button="showUpcomingCard()"
                          on-submit-answer="submitAnswer(answer, rulesService)">
       </supplemental-card>
@@ -383,7 +375,7 @@ otherwise they will interfere with the iframed conversation skin directive.
     }
 
     .conversation-skin-tutor-card-container {
-      position: absolute;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
       left: 0px;
       margin: 0 auto;
       right: 0px;
@@ -404,17 +396,6 @@ otherwise they will interfere with the iframed conversation skin directive.
       min-width: 360px;
       position: absolute;
       transform: translateX(-50%);
-    }
-
-    .conversation-skin-supplemental-card-container .supplemental-mask {
-      background-color: #ccc;
-      height: 100%;
-      left: 0px;
-      opacity: 0.7;
-      position: absolute;
-      top: 0px;
-      width: 100%;
-      z-index: 14;
     }
 
     .conversation-skin-user-avatar,
