@@ -17,8 +17,8 @@
  */
 
 oppia.factory('ExplorationEmbedButtonService', [
-  '$modal', 'siteAnalyticsService', 'UrlInterpolationService',
-  function($modal, siteAnalyticsService, UrlInterpolationService) {
+  '$modal', 'SiteAnalyticsService', 'UrlInterpolationService',
+  function($modal, SiteAnalyticsService, UrlInterpolationService) {
     return {
       showModal: function(explorationId) {
         $modal.open({
@@ -55,7 +55,7 @@ oppia.factory('ExplorationEmbedButtonService', [
           ]
         });
 
-        siteAnalyticsService.registerOpenEmbedInfoEvent(explorationId);
+        SiteAnalyticsService.registerOpenEmbedInfoEvent(explorationId);
       }
     };
   }

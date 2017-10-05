@@ -23,10 +23,10 @@ oppia.directive('createActivityButton', [
       templateUrl: 'components/createActivityButton',
       controller: [
         '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
-        'CollectionCreationService', 'siteAnalyticsService', 'urlService',
+        'CollectionCreationService', 'SiteAnalyticsService', 'urlService',
         function(
             $scope, $timeout, $window, $modal, ExplorationCreationService,
-            CollectionCreationService, siteAnalyticsService, urlService) {
+            CollectionCreationService, SiteAnalyticsService, urlService) {
           $scope.creationInProgress = false;
 
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
@@ -36,7 +36,7 @@ oppia.directive('createActivityButton', [
             ExplorationCreationService.showUploadExplorationModal);
 
           $scope.onRedirectToLogin = function(destinationUrl) {
-            siteAnalyticsService.registerStartLoginEvent(
+            SiteAnalyticsService.registerStartLoginEvent(
               'createActivityButton');
             $timeout(function() {
               $window.location = destinationUrl;

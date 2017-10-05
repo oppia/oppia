@@ -17,9 +17,9 @@
  */
 
 oppia.controller('Splash', [
-  '$scope', '$timeout', '$window', 'siteAnalyticsService',
+  '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService',
-  function($scope, $timeout, $window, siteAnalyticsService,
+  function($scope, $timeout, $window, SiteAnalyticsService,
     UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.getStaticSubjectImageUrl = function(subjectName) {
@@ -28,7 +28,7 @@ oppia.controller('Splash', [
     };
 
     $scope.onRedirectToLogin = function(destinationUrl) {
-      siteAnalyticsService.registerStartLoginEvent(
+      SiteAnalyticsService.registerStartLoginEvent(
         'splashPageCreateExplorationButton');
       $timeout(function() {
         $window.location = destinationUrl;
@@ -37,7 +37,7 @@ oppia.controller('Splash', [
     };
 
     $scope.onClickBrowseLibraryButton = function() {
-      siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+      SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
       $timeout(function() {
         $window.location = '/library';
       }, 150);
@@ -45,7 +45,7 @@ oppia.controller('Splash', [
     };
 
     $scope.onClickCreateExplorationButton = function() {
-      siteAnalyticsService.registerClickCreateExplorationButtonEvent();
+      SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
       $timeout(function() {
         $window.location = '/creator_dashboard?mode=create';
       }, 150);

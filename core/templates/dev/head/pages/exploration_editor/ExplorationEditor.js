@@ -45,7 +45,7 @@ oppia.controller('ExplorationEditor', [
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
-  'autosaveInfoModalsService', 'siteAnalyticsService',
+  'autosaveInfoModalsService', 'SiteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'UrlInterpolationService',
   function(
@@ -59,7 +59,7 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       ExplorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService,
+      autosaveInfoModalsService, SiteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
@@ -347,12 +347,12 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.onSkipTutorial = function() {
-      siteAnalyticsService.registerSkipTutorialEvent($scope.explorationId);
+      SiteAnalyticsService.registerSkipTutorialEvent($scope.explorationId);
       leaveTutorial();
     };
 
     $scope.onFinishTutorial = function() {
-      siteAnalyticsService.registerFinishTutorialEvent($scope.explorationId);
+      SiteAnalyticsService.registerFinishTutorialEvent($scope.explorationId);
       leaveTutorial();
     };
 
@@ -375,22 +375,22 @@ oppia.controller('ExplorationEditor', [
           'welcome_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'siteAnalyticsService',
+          '$scope', '$modalInstance', 'SiteAnalyticsService',
           'explorationContextService',
-          function($scope, $modalInstance, siteAnalyticsService,
+          function($scope, $modalInstance, SiteAnalyticsService,
           explorationContextService) {
             var explorationId = explorationContextService.getExplorationId();
 
-            siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
+            SiteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
 
             $scope.beginTutorial = function() {
-              siteAnalyticsService.registerAcceptTutorialModalEvent(
+              SiteAnalyticsService.registerAcceptTutorialModalEvent(
                 explorationId);
               $modalInstance.close();
             };
 
             $scope.cancel = function() {
-              siteAnalyticsService.registerDeclineTutorialModalEvent(
+              SiteAnalyticsService.registerDeclineTutorialModalEvent(
                 explorationId);
               $modalInstance.dismiss('cancel');
             };
