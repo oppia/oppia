@@ -20,8 +20,8 @@
 // A service that provides a number of utility functions useful to both the
 // editor and player.
 oppia.factory('oppiaExplorationHtmlFormatterService', [
-  '$filter', 'extensionTagAssemblerService', 'HtmlEscaperService',
-  function($filter, extensionTagAssemblerService, HtmlEscaperService) {
+  '$filter', 'ExtensionTagAssemblerService', 'HtmlEscaperService',
+  function($filter, ExtensionTagAssemblerService, HtmlEscaperService) {
     return {
       getInteractionHtml: function(
           interactionId, interactionCustomizationArgSpecs,
@@ -30,7 +30,7 @@ oppia.factory('oppiaExplorationHtmlFormatterService', [
         var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
         element = (
-          extensionTagAssemblerService.formatCustomizationArgAttrs(
+          ExtensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
         element.attr('on-submit', 'submitAnswer(answer, rulesService);');
         if (labelForFocusTarget) {
