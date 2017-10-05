@@ -21,10 +21,9 @@ oppia.controller('ExplorationGraph', [
   'explorationStatesService', 'editabilityService', 'RouterService',
   'graphDataService', 'UrlInterpolationService',
   function(
-      $scope, $modal, editorContextService, alertsService,
-      explorationStatesService, editabilityService, RouterService,
-      graphDataService, UrlInterpolationService) {
-
+    $scope, $modal, editorContextService, alertsService,
+    explorationStatesService, editabilityService, RouterService,
+    graphDataService, UrlInterpolationService) {
     $scope.getGraphData = graphDataService.getGraphData;
     $scope.isEditable = editabilityService.isEditable;
 
