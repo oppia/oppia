@@ -20,9 +20,10 @@ oppia.constant(
 
 oppia.controller('LearnerLocalNav', [
   '$scope', '$modal', '$http', 'oppiaPlayerService', 'alertsService',
-  'UrlInterpolationService', 'FocusManagerService', 'FLAG_EXPLORATION_URL_TEMPLATE',
-  function($scope, $modal, $http, oppiaPlayerService, alertsService,
-    UrlInterpolationService, FocusManagerService, FLAG_EXPLORATION_URL_TEMPLATE) {
+  'UrlInterpolationService', 'FocusManagerService',
+  'FLAG_EXPLORATION_URL_TEMPLATE', function($scope, $modal, $http,
+    oppiaPlayerService, alertsService, UrlInterpolationService,
+    FocusManagerService, FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = oppiaPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
       $modal.open({

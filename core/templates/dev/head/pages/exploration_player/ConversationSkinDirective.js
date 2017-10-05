@@ -247,22 +247,22 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        'messengerService', 'oppiaPlayerService', 'urlService', 'FocusManagerService',
-        'LearnerViewRatingService', 'windowDimensionsService',
-        'playerTranscriptService', 'LearnerParamsService',
-        'playerPositionService', 'explorationRecommendationsService',
-        'StatsReportingService',
+        'messengerService', 'oppiaPlayerService', 'urlService',
+        'FocusManagerService', 'LearnerViewRatingService',
+        'windowDimensionsService', 'playerTranscriptService',
+        'LearnerParamsService', 'playerPositionService',
+        'explorationRecommendationsService', 'StatsReportingService',
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'FatigueDetectionService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            messengerService, oppiaPlayerService, urlService, FocusManagerService,
-            LearnerViewRatingService, windowDimensionsService,
-            playerTranscriptService, LearnerParamsService,
-            playerPositionService, explorationRecommendationsService,
-            StatsReportingService,
+            messengerService, oppiaPlayerService, urlService,
+            FocusManagerService, LearnerViewRatingService,
+            windowDimensionsService, playerTranscriptService,
+            LearnerParamsService, playerPositionService,
+            explorationRecommendationsService, StatsReportingService,
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
@@ -544,7 +544,8 @@ oppia.directive('conversationSkin', [
                     if (refreshInteraction) {
                       // Replace the previous interaction with another of the
                       // same type.
-                      _nextFocusLabel = FocusManagerService.generateFocusLabel();
+                      _nextFocusLabel =
+                      FocusManagerService.generateFocusLabel();
                       playerTranscriptService.updateLatestInteractionHtml(
                         oppiaPlayerService.getInteractionHtml(
                           newStateName, _nextFocusLabel) +
