@@ -35,11 +35,11 @@ oppia.directive('feedbackPopup', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
-        '$scope', '$element', '$http', '$timeout', 'focusService',
+        '$scope', '$element', '$http', '$timeout', 'FocusManagerService',
         'alertsService', 'BackgroundMaskService', 'playerPositionService',
         'windowDimensionsService',
         function(
-            $scope, $element, $http, $timeout, focusService,
+            $scope, $element, $http, $timeout, FocusManagerService,
             alertsService, BackgroundMaskService, playerPositionService,
             windowDimensionsService) {
           $scope.feedbackText = '';
@@ -55,7 +55,7 @@ oppia.directive('feedbackPopup', [
             BackgroundMaskService.activateMask();
           }
 
-          focusService.setFocus($scope.feedbackPopoverId);
+          FocusManagerService.setFocus($scope.feedbackPopoverId);
 
           var feedbackUrl = (
             '/explorehandler/give_feedback/' +

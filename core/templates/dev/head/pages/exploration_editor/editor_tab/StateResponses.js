@@ -588,7 +588,7 @@ oppia.controller('StateResponses', [
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
-          'AnswerClassificationService', 'focusService',
+          'AnswerClassificationService', 'FocusManagerService',
           'angularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $modalInstance,
@@ -596,7 +596,7 @@ oppia.controller('StateResponses', [
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
-              AnswerClassificationService, focusService,
+              AnswerClassificationService, FocusManagerService,
               angularNameService, RULE_TYPE_CLASSIFIER) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
@@ -632,7 +632,7 @@ oppia.controller('StateResponses', [
               newOutcome: null
             };
 
-            focusService.setFocus('testInteractionInput');
+            FocusManagerService.setFocus('testInteractionInput');
 
             $scope.finishTeaching = function(reopen) {
               $modalInstance.close({

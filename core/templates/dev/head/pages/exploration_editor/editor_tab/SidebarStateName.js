@@ -18,11 +18,11 @@
 
 oppia.controller('SidebarStateName', [
   '$scope', '$filter', '$rootScope', 'editabilityService',
-  'editorContextService', 'focusService', 'explorationStatesService',
+  'editorContextService', 'FocusManagerService', 'explorationStatesService',
   'routerService',
   function(
       $scope, $filter, $rootScope, editabilityService,
-      editorContextService, focusService, explorationStatesService,
+      editorContextService, FocusManagerService, explorationStatesService,
       routerService) {
     $scope.editabilityService = editabilityService;
 
@@ -42,7 +42,7 @@ oppia.controller('SidebarStateName', [
       $scope.stateNameEditorIsShown = true;
       $scope.tmpStateName = $scope.stateName;
       _stateNameMemento = $scope.stateName;
-      focusService.setFocus('stateNameEditorOpened');
+      FocusManagerService.setFocus('stateNameEditorOpened');
     };
 
     $scope.saveStateName = function(newStateName) {

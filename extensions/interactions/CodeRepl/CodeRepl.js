@@ -239,13 +239,13 @@ oppia.directive('oppiaResponseCodeRepl', [
       scope: {},
       templateUrl: 'response/CodeRepl',
       controller: [
-        '$scope', '$attrs', 'focusService',
-        function($scope, $attrs, focusService) {
+        '$scope', '$attrs', 'FocusManagerService',
+        function($scope, $attrs, FocusManagerService) {
           $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
           if ($scope.answer.error) {
-            $scope.errorFocusLabel = focusService.generateFocusLabel();
-            focusService.setFocus($scope.errorFocusLabel);
+            $scope.errorFocusLabel = FocusManagerService.generateFocusLabel();
+            FocusManagerService.setFocus($scope.errorFocusLabel);
           }
         }
       ]

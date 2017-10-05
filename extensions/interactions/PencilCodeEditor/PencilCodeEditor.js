@@ -30,9 +30,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       templateUrl: 'interaction/PencilCodeEditor',
       controller: [
         '$scope', '$attrs', '$element', '$timeout', '$modal',
-        'focusService', 'pencilCodeEditorRulesService',
+        'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $modal,
-          focusService, pencilCodeEditorRulesService) {
+          FocusManagerService, pencilCodeEditorRulesService) {
           $scope.initialCode = HtmlEscaperService.escapedJsonToObj(
             $attrs.initialCodeWithValue);
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
@@ -65,7 +65,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 
             // Pencil Code automatically takes the focus on load, so we clear
             // it.
-            focusService.clearFocus();
+            FocusManagerService.clearFocus();
           });
 
           $scope.reset = function() {
