@@ -125,7 +125,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
         }
 
         if (hashDict.version === '0.0.0' || hashDict.version === '0.0.1' ||
-            hashDict.version === '0.0.2') {
+            hashDict.version === '0.0.2' || hashDict.version === '0.0.3' ) {
           $log.info('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);
