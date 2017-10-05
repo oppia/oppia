@@ -1896,7 +1896,7 @@ class Exploration(object):
 
         if not isinstance(self.auto_tts_enabled, bool):
             raise utils.ValidationError(
-                'Expected auto_tts_enabled to be a dict, received %s'
+                'Expected auto_tts_enabled to be a bool, received %s'
                 % self.auto_tts_enabled)
 
         for param_name in self.param_specs:
