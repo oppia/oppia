@@ -19,12 +19,12 @@
 
 oppia.controller('StateStatistics', [
   '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
-  'explorationStatesService', 'trainingDataService',
+  'explorationStatesService', 'TrainingDataService',
   'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
   'TrainingModalService', 'INTERACTION_SPECS',
   function(
       $rootScope, $scope, $modal, explorationData, editorContextService,
-      explorationStatesService, trainingDataService,
+      explorationStatesService, TrainingDataService,
       stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
       TrainingModalService, INTERACTION_SPECS) {
     $scope.isInteractionTrainable = false;
@@ -39,9 +39,9 @@ oppia.controller('StateStatistics', [
       $rootScope.$on('updatedTrainingData', function() {
         $scope.trainingDataButtonContentsList = [];
 
-        var trainingDataAnswers = trainingDataService.getTrainingDataAnswers();
+        var trainingDataAnswers = TrainingDataService.getTrainingDataAnswers();
         var trainingDataFrequencies = (
-          trainingDataService.getTrainingDataFrequencies());
+          TrainingDataService.getTrainingDataFrequencies());
         for (var i = 0; i < trainingDataAnswers.length; i++) {
           var answerHtml = (
             oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
@@ -63,7 +63,7 @@ oppia.controller('StateStatistics', [
 
     $scope.openTrainUnresolvedAnswerModal = function(trainingDataIndex) {
       return TrainingModalService.openTrainUnresolvedAnswerModal(
-        trainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
+        TrainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
     };
   }
 ]);
