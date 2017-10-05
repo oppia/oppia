@@ -206,7 +206,7 @@
           case 'explorationLoaded':
             that.explorationHasLoaded = true;
             window.OPPIA_PLAYER.onExplorationLoaded(
-              iframeNode, data.payload.explorationName);
+              iframeNode, data.payload.explorationTitle);
             break;
           case 'heightChange':
             window.OPPIA_PLAYER.onHeightChange(
@@ -283,7 +283,7 @@
 
       window.OPPIA_PLAYER.onHeightChangePostHook(iframeNode, newHeight);
     },
-    onExplorationLoaded: function(iframeNode, explorationName) {
+    onExplorationLoaded: function(iframeNode, explorationTitle) {
       setTimeout(function() {
         // Show the oppia contents after making sure the rendering happened.
         iframeNode.style.position = 'inherit';
@@ -291,7 +291,7 @@
         iframeNode.style.top = 'inherit';
       }, 0);
       window.OPPIA_PLAYER.onExplorationLoadedPostHook(
-        iframeNode, explorationName);
+        iframeNode, explorationTitle);
     },
     onStateTransition: function(
         iframeNode, oldStateName, jsonAnswer, newStateName) {
@@ -324,9 +324,10 @@ window.OPPIA_PLAYER.onHeightChangePostHook = function(iframeNode, newHeight) {
  * Called when the exploration is loaded.
  * @param {object} iframeNode The iframe node that is the source of the
  *     postMessage call.
+ * @param {string} explorationTitle The title of the exploration.
  */
 window.OPPIA_PLAYER.onExplorationLoadedPostHook = function(
-  iframeNode, explorationName) {
+  iframeNode, explorationTitle) {
 
 };
 

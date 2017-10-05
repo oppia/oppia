@@ -59,7 +59,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
     explorationLoaded: function(data) {
       return {
         explorationVersion: data.explorationVersion,
-        explorationName: data.explorationName
+        explorationTitle: data.explorationTitle
       };
     },
     stateTransition: function(data) {
