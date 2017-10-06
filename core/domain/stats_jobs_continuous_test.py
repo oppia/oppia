@@ -710,9 +710,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # Run the answers aggregation job.
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
 
@@ -800,7 +804,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'new_value': {
                     'html': 'New content',
-                    'audio_translations': []
+                    'audio_translations': {}
                 },
             }], 'Change state content')
 
@@ -809,9 +813,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # Run the answers aggregation job.
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
 
