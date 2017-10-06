@@ -135,7 +135,7 @@
 	"I18N_FOOTER_FORUM": "Text shown in the footer. - Link to the forum page.\n{{Identical|Forum}}",
 	"I18N_FOOTER_GET_INVOLVED": "Text shown in the footer. - Link to the contact page that explains how to contribute to the Oppia foundation.\n{{Identical|Get involved}}",
 	"I18N_FOOTER_GET_STARTED": "Text shown in the footer. - Link to the get started page. See I18N_GET_STARTED_PAGE_TITLE\n{{Identical|Get started}}",
-	"I18N_FOOTER_OPPIA_FOUNDATION": "Text shown in the footer. - Link to the Oppia Foundation website. See I18N_ABOUT_PAGE_TITLE\n\nDon't translate this message!",
+	"I18N_FOOTER_OPPIA_FOUNDATION": "Text shown in the footer. - Link to the Oppia Foundation website. See I18N_ABOUT_PAGE_TITLE.",
 	"I18N_FOOTER_PARTICIPATION_PLAYBOOK": "Text shown in the footer. - Link to the participation playbook page that explains the community guidelines.",
 	"I18N_FOOTER_PRIVACY_POLICY": "Text shown in the footer. - Link to a page that contains Oppia's privacy policy.\n{{Identical|Privacy policy}}",
 	"I18N_FOOTER_TEACH": "Text shown in the footer. - Link to the Teach with Oppia page that contains more information for teachers that want to use Oppia.",
