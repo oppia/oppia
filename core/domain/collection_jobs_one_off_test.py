@@ -131,6 +131,13 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             'category': collection_category,
         }])
 
+        # Save a collection summary object for indexing. The explicit commit
+        # does not create a summary object, which is needed for the
+        # job to update the index after updating the collection.
+        collection_summary = collection_services.compute_summary_of_collection(
+            model, self.albert_id)
+        collection_services.save_collection_summary(collection_summary)
+
         # Start migration job on sample collection.
         job_id = (
             collection_jobs_one_off.CollectionMigrationJob.create_new())
@@ -166,13 +173,24 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             objective='An objective',
             tags=[],
             schema_version=2,
-            nodes=[node.to_dict()],
+            nodes=[{
+                'exploration_id': self.EXP_ID,
+                'prerequisite_skills': [],
+                'acquired_skills': []
+            }],
         )
         model.commit(self.albert_id, 'Made a new collection!', [{
             'cmd': collection_services.CMD_CREATE_NEW,
             'title': collection_title,
             'category': collection_category,
         }])
+
+        # Save a collection summary object for indexing. The explicit commit
+        # does not create a summary object, which is needed for the
+        # job to update the index after updating the collection.
+        collection_summary = collection_services.compute_summary_of_collection(
+            model, self.albert_id)
+        collection_services.save_collection_summary(collection_summary)
 
         # Check that collection_contents is empty
         self.assertEqual(model.collection_contents, {})
@@ -185,4 +203,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
         self.assertEqual(
-            new_model.collection_contents, {'nodes': [node.to_dict()]})
+            new_model.collection_contents, {
+                'nodes': [node.to_dict()],
+                'skills': {},
+                'next_skill_id': 0
+            })

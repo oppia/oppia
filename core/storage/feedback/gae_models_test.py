@@ -25,6 +25,104 @@ DELETED_FIELD = 'deleted'
 FIELDS_NOT_REQUIRED = [CREATED_ON_FIELD, LAST_UPDATED_FIELD, DELETED_FIELD]
 
 
+class FeedbackThreadModelTest(test_utils.GenericTestBase):
+    """Tests for the FeedbackThreadModel class."""
+
+    def test_put_function(self):
+        feedback_thread_model = feedback_models.FeedbackThreadModel(
+            exploration_id='exp_id_1')
+        feedback_thread_model.put()
+
+        last_updated = feedback_thread_model.last_updated
+
+        # If we do not wish to update the last_updated time, we should set
+        # the update_last_updated_time argument to False in the put function.
+        feedback_thread_model.put(update_last_updated_time=False)
+        self.assertEqual(feedback_thread_model.last_updated, last_updated)
+
+        # If we do wish to change it however, we can simply use the put function
+        # as the default value of update_last_updated_time is True.
+        feedback_thread_model.put()
+        self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
+
+    def test_get_exploration_and_thread_ids(self):
+        # Generate some full thread ids.
+        full_thread_id_1 = (
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                'exp_id_1', 'thread_id_1'))
+        full_thread_id_2 = (
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                'exp_id_2', 'thread_id_2'))
+
+        exploration_ids, thread_ids = (
+            feedback_models.FeedbackThreadModel.get_exploration_and_thread_ids(
+                [full_thread_id_1, full_thread_id_2]))
+
+        self.assertEqual(exploration_ids, ('exp_id_1', 'exp_id_2'))
+        self.assertEqual(thread_ids, ('thread_id_1', 'thread_id_2'))
+
+
+class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
+    """Tests for the FeedbackThreadUserModel class."""
+
+    def test_create_new_object(self):
+        feedback_models.FeedbackThreadUserModel.create(
+            'user_id', 'exp_id', 'thread_id')
+        feedback_thread_user_model = (
+            feedback_models.FeedbackThreadUserModel.get(
+                'user_id', 'exp_id', 'thread_id'))
+
+        self.assertEqual(
+            feedback_thread_user_model.id, 'user_id.exp_id.thread_id')
+        self.assertEqual(
+            feedback_thread_user_model.message_ids_read_by_user, [])
+
+    def test_get_object(self):
+        feedback_models.FeedbackThreadUserModel.create(
+            'user_id', 'exp_id', 'thread_id')
+        expected_model = feedback_models.FeedbackThreadUserModel(
+            id='user_id.exp_id.thread_id',
+            message_ids_read_by_user=[])
+
+        actual_model = (
+            feedback_models.FeedbackThreadUserModel.get(
+                'user_id', 'exp_id', 'thread_id'))
+
+        self.assertEqual(actual_model.id, expected_model.id)
+        self.assertEqual(
+            actual_model.message_ids_read_by_user,
+            expected_model.message_ids_read_by_user)
+
+    def test_get_multi(self):
+        feedback_models.FeedbackThreadUserModel.create(
+            'user_id', 'exp_id', 'thread_id_1')
+        feedback_models.FeedbackThreadUserModel.create(
+            'user_id', 'exp_id', 'thread_id_2')
+
+        expected_model_1 = feedback_models.FeedbackThreadUserModel(
+            id='user_id.exp_id.thread_id_1',
+            message_ids_read_by_user=[])
+        expected_model_2 = feedback_models.FeedbackThreadUserModel(
+            id='user_id.exp_id.thread_id_2',
+            message_ids_read_by_user=[])
+
+        actual_models = feedback_models.FeedbackThreadUserModel.get_multi(
+            'user_id', ['exp_id', 'exp_id'], ['thread_id_1', 'thread_id_2'])
+
+        actual_model_1 = actual_models[0]
+        actual_model_2 = actual_models[1]
+
+        self.assertEqual(actual_model_1.id, expected_model_1.id)
+        self.assertEqual(
+            actual_model_1.message_ids_read_by_user,
+            expected_model_1.message_ids_read_by_user)
+
+        self.assertEqual(actual_model_2.id, expected_model_2.id)
+        self.assertEqual(
+            actual_model_2.message_ids_read_by_user,
+            expected_model_2.message_ids_read_by_user)
+
+
 class SuggestionModelTest(test_utils.GenericTestBase):
     """Tests the SuggestionModel class."""
 

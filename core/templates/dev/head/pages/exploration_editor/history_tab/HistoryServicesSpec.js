@@ -82,11 +82,11 @@ describe('Versions tree service', function() {
         state_name: 'D',
         new_value: {
           html: 'Some text',
-          audio_translations: []
+          audio_translations: {}
         },
         old_value: {
           html: '',
-          audio_translations: []
+          audio_translations: {}
         }
       }],
       version_number: 8
@@ -151,11 +151,11 @@ describe('Versions tree service', function() {
         state_name: 'D',
         new_value: {
           html: 'Some text',
-          audio_translations: []
+          audio_translations: {}
         },
         old_value: {
           html: '',
-          audio_translations: []
+          audio_translations: {}
         }
       }]);
     });
@@ -205,7 +205,7 @@ describe('Compare versions service', function() {
         var newStateData = {
           content: {
             html: statesDetails[stateName].contentStr,
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             answer_groups: [],
@@ -214,7 +214,6 @@ describe('Compare versions service', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -250,11 +249,11 @@ describe('Compare versions service', function() {
         state_name: 'A',
         new_value: {
           html: 'Some text',
-          audio_translations: []
+          audio_translations: {}
         },
         old_value: {
           html: '',
-          audio_translations: []
+          audio_translations: {}
         }
       }],
       version_number: 2
@@ -296,11 +295,11 @@ describe('Compare versions service', function() {
         state_name: 'C',
         new_value: {
           html: 'More text',
-          audio_translations: []
+          audio_translations: {}
         },
         old_value: {
           html: '',
-          audio_translations: []
+          audio_translations: {}
         }
       }],
       version_number: 7
@@ -332,11 +331,11 @@ describe('Compare versions service', function() {
         state_name: 'A',
         new_value: {
           html: '',
-          audio_translations: []
+          audio_translations: {}
         },
         old_value: {
           html: 'Some text',
-          audio_translations: []
+          audio_translations: {}
         }
       }],
       version_number: 11
@@ -759,11 +758,11 @@ describe('Compare versions service', function() {
         state_name: 'D',
         new_value: {
           html: 'Some text',
-          audio_translations: []
+          audio_translations: {}
         },
         old_value: {
           html: '',
-          audio_translations: []
+          audio_translations: {}
         }
       }],
       version_number: 8

@@ -1,12 +1,20 @@
-<md-card class="oppia-activity-summary-tile">
+<learner-dashboard-icons ng-if="showLearnerDashboardIconsIfPossible() && userIsLoggedIn"
+                         activity-type="ACTIVITY_TYPE_COLLECTION"
+                         activity-id="getCollectionId()"
+                         activity-title="getCollectionTitle()"
+                         activity-active="collectionIsCurrentlyHoveredOver">
+</learner-dashboard-icons>
+<md-card class="oppia-activity-summary-tile"
+         ng-class="{'oppia-activity-playlist-tile': isPlaylistTile()}"
+         style="position: relative; z-index: 5;">
   <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
-      <img class="collection-corner-image" ng-src="/assets/images/general/collection_corner.svg" alt="">
-      <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>" alt="<[getCategory()]>">
-      <h3 class="activity-title protractor-test-collection-summary-tile-title"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
+      <img class="collection-corner-image" ng-src="<[getStaticImageUrl('/general/collection_corner.svg')]>" alt="">
+      <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistTile() && {'top': '6px', 'width': '60px'}">
+      <h3 class="activity-title protractor-test-collection-summary-tile-title" ng-style="isPlaylistTile() && {'width': '93%', 'text-align': 'center'}"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
     </div>
 
-    <div> 
+    <div ng-style="isPlaylistTile() && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
       <div class="objective">
         <[getObjective() | truncateAndCapitalize: 95]>
         <span ng-if="!getObjective()">No objective specified.</span>
@@ -25,7 +33,8 @@
         </li>
       </ul>
     </div>
-    <div class="title-section-mask"></div>
+    <div ng-if="!isPlaylistTile()" class="title-section-mask"
+         ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"></div>
   </a>
 </md-card>
 

@@ -19,8 +19,8 @@
 describe('Collection update service', function() {
   var CollectionUpdateService = null;
   var CollectionObjectFactory = null;
+  var CollectionSkillObjectFactory = null;
   var UndoRedoService = null;
-  var SkillListObjectFactory = null;
   var _sampleCollection = null;
   var _sampleExplorationSummaryBackendObject = {
     title: 'Title',
@@ -32,8 +32,9 @@ describe('Collection update service', function() {
   beforeEach(inject(function($injector) {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
+    CollectionSkillObjectFactory = $injector.get(
+      'CollectionSkillObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
-    SkillListObjectFactory = $injector.get('SkillListObjectFactory');
 
     var sampleCollectionBackendObject = {
       id: 'collection_id',
@@ -45,10 +46,18 @@ describe('Collection update service', function() {
       version: '1',
       nodes: [{
         exploration_id: 'exp_id0',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration: {}
-      }]
+      }],
+      next_skill_id: 1,
+      skills: {
+        skill0: {
+          id: 'skill0',
+          name: 'skill0',
+          question_ids: []
+        }
+      }
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
@@ -217,26 +226,26 @@ describe('Collection update service', function() {
   it('should set/unset changes to a collection\'s prerequisite skills',
     function() {
       var collectionNode = _getCollectionNode('exp_id0');
-      var prerequisiteSkillList = collectionNode.getPrerequisiteSkillList();
+      var prerequisiteSkillIds = collectionNode.getPrerequisiteSkillIds();
 
-      expect(prerequisiteSkillList.getSkills()).toEqual([]);
-      CollectionUpdateService.setPrerequisiteSkills(
+      expect(prerequisiteSkillIds).toEqual([]);
+      CollectionUpdateService.setPrerequisiteSkillIds(
         _sampleCollection, 'exp_id0', ['new prereq skill']);
-      expect(prerequisiteSkillList.getSkills()).toEqual(['new prereq skill']);
+      expect(prerequisiteSkillIds).toEqual(['new prereq skill']);
 
       UndoRedoService.undoChange(_sampleCollection);
-      expect(prerequisiteSkillList.getSkills()).toEqual([]);
+      expect(prerequisiteSkillIds).toEqual([]);
     }
   );
 
   it('should create a proper backend change dict for changing prerequisite ' +
       'skills', function() {
-    CollectionUpdateService.setPrerequisiteSkills(
+    CollectionUpdateService.setPrerequisiteSkillIds(
       _sampleCollection, 'exp_id0', ['new prereq skill']);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'edit_collection_node_property',
       exploration_id: 'exp_id0',
-      property_name: 'prerequisite_skills',
+      property_name: 'prerequisite_skill_ids',
       new_value: ['new prereq skill'],
       old_value: []
     }]);
@@ -244,27 +253,87 @@ describe('Collection update service', function() {
 
   it('should set/unset changes to a collection\'s acquired skills', function() {
     var collectionNode = _getCollectionNode('exp_id0');
-    var acquiredSkillList = collectionNode.getAcquiredSkillList();
+    var acquiredSkillIds = collectionNode.getAcquiredSkillIds();
 
-    expect(acquiredSkillList.getSkills()).toEqual([]);
-    CollectionUpdateService.setAcquiredSkills(
+    expect(acquiredSkillIds).toEqual([]);
+    CollectionUpdateService.setAcquiredSkillIds(
       _sampleCollection, 'exp_id0', ['new acq skill']);
-    expect(acquiredSkillList.getSkills()).toEqual(['new acq skill']);
+    expect(acquiredSkillIds).toEqual(['new acq skill']);
 
     UndoRedoService.undoChange(_sampleCollection);
-    expect(acquiredSkillList.getSkills()).toEqual([]);
+    expect(acquiredSkillIds).toEqual([]);
   });
 
   it('should create a proper backend change dict for changing acquired skills',
     function() {
-      CollectionUpdateService.setAcquiredSkills(
+      CollectionUpdateService.setAcquiredSkillIds(
         _sampleCollection, 'exp_id0', ['new acq skill']);
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'edit_collection_node_property',
         exploration_id: 'exp_id0',
-        property_name: 'acquired_skills',
+        property_name: 'acquired_skill_ids',
         new_value: ['new acq skill'],
         old_value: []
+      }]);
+    }
+  );
+
+  it('should add/remove a new skill', function() {
+    var oldCollectionSkill = CollectionSkillObjectFactory.createFromIdAndName(
+      'skill0', 'skill0');
+    var newCollectionSkill = CollectionSkillObjectFactory.createFromIdAndName(
+      'skill1', 'skill1');
+
+    expect(_sampleCollection.getCollectionSkills()).toEqual({
+      skill0: oldCollectionSkill
+    });
+
+    CollectionUpdateService.addCollectionSkill(_sampleCollection, 'skill1');
+    expect(_sampleCollection.getCollectionSkills()).toEqual({
+      skill0: oldCollectionSkill,
+      skill1: newCollectionSkill
+    });
+
+    UndoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getCollectionSkills()).toEqual({
+      skill0: oldCollectionSkill
+    });
+  });
+
+  it('should create a proper backend change dict for adding a skill',
+    function() {
+      CollectionUpdateService.addCollectionSkill(_sampleCollection, 'skill1');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'add_collection_skill',
+        name: 'skill1'
+      }]);
+    }
+  );
+
+  it('should remove/add a new skill', function() {
+    var oldCollectionSkill = CollectionSkillObjectFactory.createFromIdAndName(
+      'skill0', 'skill0');
+
+    expect(_sampleCollection.getCollectionSkills()).toEqual({
+      skill0: oldCollectionSkill
+    });
+
+    CollectionUpdateService.deleteCollectionSkill(_sampleCollection, 'skill0');
+    expect(_sampleCollection.getCollectionSkills()).toEqual({});
+
+    UndoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getCollectionSkills()).toEqual({
+      skill0: oldCollectionSkill
+    });
+  });
+
+  it('should create a proper backend change dict for removing a skill',
+    function() {
+      CollectionUpdateService.deleteCollectionSkill(
+        _sampleCollection, 'skill0');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'delete_collection_skill',
+        skill_id: 'skill0'
       }]);
     }
   );

@@ -4,6 +4,7 @@
 *.swo
 gae_runtime/*
 third_party/*
+backend_prod_files/*
 core/templates/prod/*
 .coverage*
 .viminfo

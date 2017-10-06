@@ -6,20 +6,14 @@
   <p>
     Just a few more things before you publish:
   </p>
-  <p ng-if="requireTitleToBeSpecified">
-    Add a title: what should your exploration be called?
-    <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
-           placeholder="Music in the 19th Century" maxlength="40">
-  </p>
-  <form name="objectiveForm">
-    <p ng-if="requireObjectiveToBeSpecified"
-       ng-class="{'has-error': (objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15}">
-      Add a goal: what does the exploration help people to do?
-      <input name="objectiveInput" type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
-             placeholder="Learn how to ...">
-      <span class="help-block" ng-show="(objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15" style="font-size: smaller; color: #a94442">Please provide a complete sentence that describes what this exploration is about.</span>
-    </p>
-  </form>
+  <exploration-title-editor ng-if="requireTitleToBeSpecified"
+                            label-text="Add a title: what should your exploration be called?"
+                            form-style="{'font-weight':'normal'}">
+  </exploration-title-editor>
+  <exploration-objective-editor ng-if="requireObjectiveToBeSpecified"
+                                label-text="Add a goal: what does the exploration help people to do?"
+                                form-style="{'font-weight': 'normal'}">
+  </exploration-objective-editor>
   <p ng-if="requireCategoryToBeSpecified">
     Add a category: how would you categorize your exploration?
     <select2-dropdown item="explorationCategoryService.displayed"
@@ -39,12 +33,12 @@
   <p ng-if="askForTags">
     Add tags to help learners discover your exploration.
     <select2-dropdown item="explorationTagsService.displayed"
-                      tag-mode="true"
+                      choices="explorationTagsService.displayed"
                       allow-multiple-choices="true"
                       invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
                       new-choice-regex="<[::TAG_REGEX]>"
                       width="100%"
-                      placeholder="Skills, concepts, topics, ..."
+                      placeholder="Skills, concepts, topics..."
                       on-selection-change="saveExplorationTags()">
     </select2-dropdown>
   </p>

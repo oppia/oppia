@@ -17,9 +17,10 @@
  * feedback tab of the exploration editor.
  */
 
-oppia.factory('threadDataService', [
-  '$http', '$q', 'explorationData', 'alertsService',
-  function($http, $q, explorationData, alertsService) {
+oppia.factory('ThreadDataService', [
+  '$http', '$q', 'explorationData', 'alertsService', 'ACTION_ACCEPT_SUGGESTION',
+  function(
+      $http, $q, explorationData, alertsService, ACTION_ACCEPT_SUGGESTION) {
     var _expId = explorationData.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
@@ -105,8 +106,9 @@ oppia.factory('threadDataService', [
         });
       },
       markThreadAsSeen: function(threadId) {
-        $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL, {
-          exploration_id: _expId,
+        var requestUrl = (
+          _FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + _expId);
+        $http.post(requestUrl, {
           thread_id: threadId
         });
       },
@@ -166,12 +168,14 @@ oppia.factory('threadDataService', [
         });
       },
       resolveSuggestion: function(
-        threadId, action, commitMsg, onSuccess, onFailure) {
+        threadId, action, commitMsg, audioUpdateRequired, onSuccess,
+        onFailure) {
         var payload = {
           action: action
         };
-        if (commitMsg) {
+        if (action === ACTION_ACCEPT_SUGGESTION) {
           payload.commit_message = commitMsg;
+          payload.audio_update_required = audioUpdateRequired;
         }
         _openThreadsCount -= 1;
         $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(

@@ -20,12 +20,14 @@ oppia.directive('searchResults', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: 'components/searchResults',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/library/search_results_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
         function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.someResultsExist = true;
+          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
 
           // Called when the first batch of search results is retrieved from the
           // server.

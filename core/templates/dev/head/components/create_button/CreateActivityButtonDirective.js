@@ -29,6 +29,9 @@ oppia.directive('createActivityButton', [
             CollectionCreationService, siteAnalyticsService, urlService) {
           $scope.creationInProgress = false;
 
+          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+          $scope.allowYamlFileUpload = GLOBALS.allowYamlFileUpload;
+
           $scope.showUploadExplorationModal = (
             ExplorationCreationService.showUploadExplorationModal);
 
@@ -70,6 +73,10 @@ oppia.directive('createActivityButton', [
                       CollectionCreationService.createNewCollection();
                       $modalInstance.close();
                     };
+
+                    $scope.canCreateCollections = (
+                      GLOBALS.can_create_collections
+                    );
 
                     $scope.cancel = function() {
                       $modalInstance.dismiss('cancel');

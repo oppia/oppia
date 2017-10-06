@@ -6,18 +6,17 @@ language_code: en
 objective: Dummy exploration for testing all interactions
 param_changes: []
 param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   Code Editor:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Code Editor. Write a program which prints hello to me.</p>
+      audio_translations: {}
+      html: <p>Code Editor. Write a program which prints hello to me.</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pencil Code Editor
           feedback:
           - <p>Hello! Let's move onto another interaction.</p>
@@ -42,13 +41,15 @@ states:
         - <p>I'm looking for a particular 'Hello Oppia' message. Don't you want to
           say hello?</p>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: CodeRepl
+      solution: null
     param_changes: []
   Continue:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Continue. Please press the continue button.</p>
+      audio_translations: {}
+      html: <p>Continue. Please press the continue button.</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -60,13 +61,15 @@ states:
         feedback:
         - <p>Moving onward!</p>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   End Exploration:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -74,16 +77,19 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Graph Theory:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Graph Theory. Please create a pentagon.</p>
+      audio_translations: {}
+      html: <p>Graph Theory. Please create a pentagon.</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Logic Proof
           feedback:
           - <p>Penta-penta-pentagon!</p>
@@ -127,7 +133,8 @@ states:
                 x: 155.0
                 y: 112.5625
           rule_type: IsIsomorphicTo
-      - outcome:
+      - correct: false
+        outcome:
           dest: Graph Theory
           feedback:
           - <p>That's a triangle. Your shape needs more sides.</p>
@@ -159,7 +166,8 @@ states:
                 x: 132.0
                 y: 204.5625
           rule_type: IsIsomorphicTo
-      - outcome:
+      - correct: false
+        outcome:
           dest: Graph Theory
           feedback:
           - <p>Your shape is missing one side!</p>
@@ -230,29 +238,32 @@ states:
             isWeighted: false
             vertices:
             - label: ''
-              x: 129
-              y: 41
+              x: 129.0
+              y: 41.0
             - label: ''
-              x: 200
-              y: 50
+              x: 200.0
+              y: 50.0
             - label: ''
-              x: 246
-              y: 168
+              x: 246.0
+              y: 168.0
       default_outcome:
         dest: Graph Theory
         feedback:
         - <p>That's not quite a pentagon. Please try again!</p>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: GraphInput
+      solution: null
     param_changes: []
   Image Region:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Image Region. Please click on the constructor in the Python code shown.</p>
+      audio_translations: {}
+      html: <p>Image Region. Please click on the constructor in the Python code shown.</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Image Region
           feedback:
           - <p>That's the class definition. Try again.</p>
@@ -261,7 +272,8 @@ states:
         - inputs:
             x: classdef
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: Image Region
           feedback:
           - <p>That's the class's docstring. Try again.</p>
@@ -270,7 +282,8 @@ states:
         - inputs:
             x: docstring
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: Image Region
           feedback:
           - <p>That's a function, which is close to what you're looking for. Try again!</p>
@@ -279,7 +292,8 @@ states:
         - inputs:
             x: instancefunc
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: Image Region
           feedback:
           - <p>That's a classmethod. It does execute code, but it doesn't construct
@@ -289,7 +303,8 @@ states:
         - inputs:
             x: classfunc
           rule_type: IsInRegion
-      - outcome:
+      - correct: false
+        outcome:
           dest: Continue
           feedback:
           - <p>You found it! This is the code responsible for constructing a new class
@@ -353,16 +368,19 @@ states:
         - "<p>Constructors <i>initialize</i>\_an object, or <i>init</i>\_it.Constructors\
           \ are also functions themselves.</p>"
         param_changes: []
-      fallbacks: []
+      hints: []
       id: ImageClickInput
+      solution: null
     param_changes: []
   Item Selection:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Item selection. Please select the good options.</p>
+      audio_translations: {}
+      html: <p>Item selection. Please select the good options.</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Image Region
           feedback:
           - <p>That's right!</p>
@@ -373,7 +391,8 @@ states:
             - <p>Good option A.</p>
             - <p>Good option C.</p>
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Item Selection
           feedback:
           - <p>That's not a good option!</p>
@@ -383,7 +402,8 @@ states:
             x:
             - <p>Bad option B.</p>
           rule_type: ContainsAtLeastOneOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Item Selection
           feedback:
           - <p>That's not all of the good options!</p>
@@ -408,16 +428,19 @@ states:
         feedback:
         - <p>The two good options actually have the word 'good' in them.</p>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: ItemSelectionInput
+      solution: null
     param_changes: []
   Logic Proof:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Logic Proof. From p we have what?</p>
+      audio_translations: {}
+      html: <p>Logic Proof. From p we have what?</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Number Input
           feedback:
           - <p>You proved p!</p>
@@ -445,18 +468,21 @@ states:
         feedback:
         - <p>Given p, we have p. Try again.</p>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: LogicProof
+      solution: null
     param_changes: []
   Math Expression Input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Math Expression Input. Provide a general equation of a 2D line in
-        a 2D space. Let y be an independent variable which depends on the dependent
+      audio_translations: {}
+      html: <p>Math Expression Input. Provide a general equation of a 2D line in a
+        2D space. Let y be an independent variable which depends on the dependent
         variable x.</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Code Editor
           feedback:
           - <p>That is the normal form of a line. Good job!</p>
@@ -465,7 +491,8 @@ states:
         - inputs:
             x: ax+by+c=0
           rule_type: IsMathematicallyEquivalentTo
-      - outcome:
+      - correct: false
+        outcome:
           dest: Code Editor
           feedback:
           - <p>That's slope-intercept form. A popular form!</p>
@@ -474,7 +501,8 @@ states:
         - inputs:
             x: y=mx+b
           rule_type: IsMathematicallyEquivalentTo
-      - outcome:
+      - correct: false
+        outcome:
           dest: Code Editor
           feedback:
           - <p>That's point-slope form! Great!</p>
@@ -491,54 +519,30 @@ states:
         - <p>There are three specific equations I'm looking for. Be aware that these
           can each be derived from each other.</p>
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: Math Expression Input
-          feedback:
-          - <p>If you start with two points, p0=(x0, y0) and p1=(x1, y1), you can
-            find the slope between them as such:</p><p><br></p><p><oppia-noninteractive-math
-            raw_latex-with-value="&amp;quot;m=\\frac{y0-y1}{x0-x1}&amp;quot;"></oppia-noninteractive-math><br></p><p><br></p><p>This,
-            combined with one of the points, can create a linear relationship between
-            x and y.</p>
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 3
-          trigger_type: NthResubmission
-      - outcome:
-          dest: Math Expression Input
-          feedback:
-          - <p>It's possible to use the slope and first point of the line to form
-            a relationship:</p><p><br></p><p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;y-y0=m(x-x0)&amp;quot;"></oppia-noninteractive-math><br></p>
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 4
-          trigger_type: NthResubmission
-      - outcome:
-          dest: Math Expression Input
-          feedback:
-          - "<p>Which yields a final, common line equation:</p><p><br></p><p><oppia-noninteractive-math\
-            \ raw_latex-with-value=\"&amp;quot;y=mx+b&amp;quot;\"></oppia-noninteractive-math><br></p><p><br></p><p>Where\_\
-            <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;b=y0-m*x0&amp;quot;\"\
-            ></oppia-noninteractive-math></p>"
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 5
-          trigger_type: NthResubmission
+      hints:
+      - hint_text: <p>If you start with two points, p0=(x0, y0) and p1=(x1, y1), you
+          can find the slope between them as such:</p><p><br></p><p><oppia-noninteractive-math
+          raw_latex-with-value="&amp;quot;m=\\frac{y0-y1}{x0-x1}&amp;quot;"></oppia-noninteractive-math><br></p><p><br></p><p>This,
+          combined with one of the points, can create a linear relationship between
+          x and y.</p>
+      - hint_text: <p>It's possible to use the slope and first point of the line to
+          form a relationship:</p><p><br></p><p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;y-y0=m(x-x0)&amp;quot;"></oppia-noninteractive-math><br></p>
+      - hint_text: "<p>Which yields a final, common line equation:</p><p><br></p><p><oppia-noninteractive-math\
+          \ raw_latex-with-value=\"&amp;quot;y=mx+b&amp;quot;\"></oppia-noninteractive-math><br></p><p><br></p><p>Where\_\
+          <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;b=y0-m*x0&amp;quot;\"\
+          ></oppia-noninteractive-math></p>"
       id: MathExpressionInput
+      solution: null
     param_changes: []
   Multiple Choice:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Multiple Choice. Select "Second choice" below.</p>
+      audio_translations: {}
+      html: <p>Multiple Choice. Select "Second choice" below.</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Item Selection
           feedback:
           - <p>Nice choice!</p>
@@ -547,7 +551,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Multiple Choice
           feedback:
           - <p>Hmm, not quite. Perhaps the right option is below this one.</p>
@@ -556,7 +561,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Multiple Choice
           feedback:
           - <p>Hmm, not quite. Perhaps the answer is above this one.</p>
@@ -576,17 +582,20 @@ states:
         dest: Multiple Choice
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Music Notes Input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Music Notes Input. One C note is given. Can you find the next C in
+      audio_translations: {}
+      html: <p>Music Notes Input. One C note is given. Can you find the next C in
         the scale?</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: World Map
           feedback:
           - <p>You found the next C! Excellent.</p>
@@ -614,27 +623,21 @@ states:
         feedback:
         - <p>That's not the next C. Try again?</p>
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: Music Notes Input
-          feedback:
-          - '<p>Hint: The acronym ''FACE'' is very helpful for remembering notes on
-            the C major scale.</p>'
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 3
-          trigger_type: NthResubmission
+      hints:
+      - hint_text: '<p>Hint: The acronym ''FACE'' is very helpful for remembering
+          notes on the C major scale.</p>'
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Number Input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Number Input. Enter a two or higher digit number.</p>
+      audio_translations: {}
+      html: <p>Number Input. Enter a two or higher digit number.</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Set Input
           feedback:
           - <p>That number has more than one digit. Right!</p>
@@ -650,17 +653,20 @@ states:
         feedback:
         - <p>That's only one digit! Try again.</p>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Pencil Code Editor:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Pencil Code Editor. Similar to before, but instead write a goodbye
+      audio_translations: {}
+      html: <p>Pencil Code Editor. Similar to before, but instead write a goodbye
         message to me.</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Music Notes Input
           feedback:
           - <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
@@ -669,7 +675,8 @@ states:
         - inputs:
             x: Bye Oppia
           rule_type: OutputEquals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Music Notes Input
           feedback:
           - <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
@@ -688,17 +695,20 @@ states:
         - <p>Where are your manners? You should say goodbye to me. We've explored
           so much, together!</p>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: PencilCodeEditor
+      solution: null
     param_changes: []
   Set Input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Set Input. Try entering a word which has nearly no rhymes. I am specifically
+      audio_translations: {}
+      html: <p>Set Input. Try entering a word which has nearly no rhymes. I am specifically
         looking for any of three popular ones.</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Math Expression Input
           feedback:
           - <p>Nice! Orange, purple, and silver are all words that are exceptionally
@@ -718,47 +728,23 @@ states:
         feedback:
         - <p>Not quite.</p>
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: Set Input
-          feedback:
-          - '<p>Hint #1: One of them is a precious metal and another is a color.<br></p>'
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 1
-          trigger_type: NthResubmission
-      - outcome:
-          dest: Set Input
-          feedback:
-          - <p>A third one is both a color and a fruit. This fruit is of particular
-            importance to the state of Florida.<br></p>
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 2
-          trigger_type: NthResubmission
-      - outcome:
-          dest: Set Input
-          feedback:
-          - <p>Try orange. :) There are still two others, however!<br></p>
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 3
-          trigger_type: NthResubmission
+      hints:
+      - hint_text: '<p>Hint #1: One of them is a precious metal and another is a color.<br></p>'
+      - hint_text: <p>A third one is both a color and a fruit. This fruit is of particular
+          importance to the state of Florida.<br></p>
+      - hint_text: <p>Try orange. :) There are still two others, however!<br></p>
       id: SetInput
+      solution: null
     param_changes: []
   "Text Input state name with unicode \u0105\u0142":
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>Text input. Please add a word containing "ate".</p>
+      audio_translations: {}
+      html: <p>Text input. Please add a word containing "ate".</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Multiple Choice
           feedback:
           - <p>Omnomnom.</p>
@@ -778,17 +764,20 @@ states:
         feedback:
         - <p>The answer needs to contain "ate".</p>
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   World Map:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <p>World Map. Can you find the capitals of Canada, Mexico, or the United
+      audio_translations: {}
+      html: <p>World Map. Can you find the capitals of Canada, Mexico, or the United
         States?</p>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: End Exploration
           feedback:
           - <p>That's Washington, D.C., the capital of the United States.</p>
@@ -800,7 +789,8 @@ states:
             - 38.89103282648846
             - -76.90361022949219
           rule_type: Within
-      - outcome:
+      - correct: false
+        outcome:
           dest: End Exploration
           feedback:
           - <p>Ottawa, the capital of Canada!</p>
@@ -812,7 +802,8 @@ states:
             - 45.42929873257377
             - -75.62919616699219
           rule_type: Within
-      - outcome:
+      - correct: false
+        outcome:
           dest: End Exploration
           feedback:
           - <p>Mexico City, Mexico. The capital of Mexico.</p>
@@ -829,28 +820,20 @@ states:
         latitude:
           value: 39.16
         longitude:
-          value: -103
+          value: -103.0
         zoom:
-          value: 3
+          value: 3.0
       default_outcome:
         dest: World Map
         feedback:
         - <p>Not quite. Try again!</p>
         param_changes: []
-      fallbacks:
-      - outcome:
-          dest: World Map
-          feedback:
-          - '<p>Hint: Try looking in the middle of Mexico. Capitals also have special
-            markings on a map.</p>'
-          param_changes: []
-        trigger:
-          customization_args:
-            num_submits:
-              value: 3
-          trigger_type: NthResubmission
+      hints:
+      - hint_text: '<p>Hint: Try looking in the middle of Mexico. Capitals also have
+          special markings on a map.</p>'
       id: InteractiveMap
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Test of all interactions

@@ -29,21 +29,21 @@ oppia.directive('inputResponsePair', [
         '/pages/exploration_player/' +
         'input_response_pair_directive.html'),
       controller: [
-        '$scope', 'oppiaPlayerService', 'playerTranscriptService',
+        '$scope', 'ExplorationPlayerService', 'PlayerTranscriptService',
         'oppiaExplorationHtmlFormatterService', 'INTERACTION_SPECS',
-        'playerPositionService',
+        'PlayerPositionService',
         function(
-            $scope, oppiaPlayerService, playerTranscriptService,
+            $scope, ExplorationPlayerService, PlayerTranscriptService,
             oppiaExplorationHtmlFormatterService, INTERACTION_SPECS,
-            playerPositionService) {
+            PlayerPositionService) {
           $scope.isCurrentCardAtEndOfTranscript = function() {
-            return playerTranscriptService.isLastCard(
-              playerPositionService.getActiveCardIndex());
+            return PlayerTranscriptService.isLastCard(
+              PlayerPositionService.getActiveCardIndex());
           };
 
           $scope.getAnswerHtml = function() {
-            var interaction = oppiaPlayerService.getInteraction(
-              playerPositionService.getCurrentStateName());
+            var interaction = ExplorationPlayerService.getInteraction(
+              PlayerPositionService.getCurrentStateName());
             if ($scope.data) {
               return oppiaExplorationHtmlFormatterService.getAnswerHtml(
                 $scope.data.learnerInput, interaction.id,
@@ -54,8 +54,8 @@ oppia.directive('inputResponsePair', [
           // Returns a HTML string representing a short summary of the answer
           // , or null if the answer does not have to be summarized.
           $scope.getShortAnswerHtml = function() {
-            var interaction = oppiaPlayerService.getInteraction(
-              playerPositionService.getCurrentStateName());
+            var interaction = ExplorationPlayerService.getInteraction(
+              PlayerPositionService.getCurrentStateName());
             var shortAnswerHtml = '';
             if ($scope.data && interaction.id &&
                 INTERACTION_SPECS[interaction.id].needs_summary) {

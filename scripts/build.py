@@ -14,56 +14,151 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 
+import fnmatch
+import hashlib
+import json
 import os
 import re
 import shutil
 import subprocess
 import sys
-import yaml
 
+ASSETS_SRC_DIR = os.path.join('assets', '')
+ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
-HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
-OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
+THIRD_PARTY_GENERATED_STAGING_DIR = os.path.join(
+    'backend_prod_files', 'third_party', 'generated', '')
+THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
+    'build', 'third_party', 'generated', '')
+
+EXTENSIONS_DEV_DIR = os.path.join('extensions', '')
+EXTENSIONS_STAGING_DIR = (
+    os.path.join('backend_prod_files', 'extensions', ''))
+EXTENSIONS_OUT_DIR = os.path.join('build', 'extensions', '')
+
+TEMPLATES_DEV_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
+TEMPLATES_STAGING_DIR = (
+    os.path.join('backend_prod_files', 'templates', 'head', ''))
+TEMPLATES_OUT_DIR = os.path.join('build', 'templates', 'head', '')
+
+HASHES_JSON = os.path.join('build', 'assets', 'hashes.js')
+
 REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 
-FILE_EXTENSIONS_TO_IGNORE = ['.py']
+# Files with this extension shouldn't be moved to build directory.
+FILE_EXTENSIONS_TO_IGNORE = ('.py')
 
+# Files with this paths should be moved to build directory but shouldn't be
+# renamed (i.e. the filepath shouldn't contain hash)
+# This is because these files are referenced from third party files or don't
+# need cache invalidation.
+FILEPATHS_NOT_TO_RENAME = (
+    'backend_prod_files/third_party/generated/fonts/*',
+    'backend_prod_files/third_party/generated/js/third_party.min.js.map',
+    'backend_prod_files/third_party/generated/css/third_party.min.css.map')
+
+# Hashes for files with these paths should be provided to the frontend in
+# JS hashes object.
+FILEPATHS_PROVIDED_TO_FRONTEND = (
+    'images/*', 'i18n/*', '*_directive.html', '*.png')
+
+HASH_BLOCK_SIZE = 2**20
 
 def _minify(source_path, target_path):
-    """Runs the given file through a minifier and outputs it to target_path."""
+    """Runs the given file through a minifier and outputs it to target_path.
+
+    Args:
+        source_path: str. Absolute path to file to be minified.
+        target_path: str. Absolute path to location where to copy
+            the minified file.
+    """
     cmd = 'java -jar %s %s -o %s' % (
         YUICOMPRESSOR_DIR, source_path, target_path)
     subprocess.check_call(cmd, shell=True)
 
+def _insert_hash(filepath, file_hash):
+    """Inserts hash into filepath before the file extension.
 
-def ensure_directory_exists(f):
-    d = os.path.dirname(f)
-    if not os.path.exists(d):
-        os.makedirs(d)
+    Args:
+        filepath: str. Path where the hash should be inserted.
+        file_hash: str. Hash to be inserted into the path.
+
+    Returns:
+        str. Filepath with hash inserted.
+    """
+    filepath, file_extension = os.path.splitext(filepath)
+    return '%s.%s%s' % (filepath, file_hash, file_extension)
+
+def ensure_directory_exists(filepath):
+    """Ensures if directory tree exists, if not creates the directories.
+
+    Args:
+        filepath: str. Path to file located in directory that we want to
+            ensure exists.
+    """
+    directory = os.path.dirname(filepath)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
-def process_html(filename, target):
-    f = open(filename, 'r')
+def process_html(source_path, target_path, file_hashes):
+    """Copies contents of HTML file, while removing whitespace and
+    replacing paths inside the file with paths with hashes.
+
+    Args:
+        source_path: str. Absolute path to file to be processed.
+        target_path: str. Absolute path to location where to copy
+            the processed file.
+        file_hashes: dict(str, str). Dictionary of file hashes.
+    """
+    f = open(source_path, 'r')
     content = f.read()
+    for filepath, file_hash in file_hashes.iteritems():
+        # We are adding hash in all file paths except for html paths.
+        # This is because html paths are used by backend and we work with paths
+        # without hash part in backend.
+        if filepath.endswith('.html'):
+            continue
+        filepath_with_hash = _insert_hash(filepath, file_hash)
+        content = content.replace(filepath, filepath_with_hash)
     content = REMOVE_WS(' ', content)
-    ensure_directory_exists(target)
-    d = open(target, 'w+')
+    ensure_directory_exists(target_path)
+    d = open(target_path, 'w+')
     d.write(content)
 
 
 def process_css(source_path, target_path):
+    """Runs the given CSS file through a minifier and outputs it to target_path.
+
+    Args:
+        source_path: str. Absolute path to file to be minified.
+        target_path: str. Absolute path to location where to copy
+            the minified file.
+    """
     ensure_directory_exists(target_path)
     _minify(source_path, target_path)
 
 
 def process_js(source_path, target_path):
+    """Runs the given JS file through a minifier and outputs it to target_path.
+
+    Args:
+        source_path: str. Absolute path to file to be minified.
+        target_path: str. Absolute path to location where to copy
+            the minified file.
+    """
     ensure_directory_exists(target_path)
     _minify(source_path, target_path)
 
 
 def build_minified_third_party_libs(output_directory):
+    """Generates third party files via Gulp.
+
+    Args:
+        output_directory: str. Path to directory where to generate files.
+    """
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
@@ -83,8 +178,31 @@ def build_minified_third_party_libs(output_directory):
         sys.exit(1)
 
 
-def copy_files_source_to_target(source, target):
-    """Copies all files in source directory to target."""
+def hash_should_be_inserted(filepath):
+    """Returns if the file should be renamed to include hash in
+    the path.
+
+    Args:
+        filepath: str. Path relative to directory we are currently building.
+
+    Returns:
+        bool. True if filepath should contain hash else False.
+    """
+    return not any(fnmatch.fnmatch(filepath, pattern) for pattern
+                   in FILEPATHS_NOT_TO_RENAME)
+
+
+def copy_files_source_to_target(source, target, file_hashes):
+    """Copies all files in source directory to target directory and renames
+    them to include hash in their name.
+
+    Args:
+        source: str. Path relative to /oppia directory of directory
+            containing files and directories to be copied.
+        target: str. Path relative to /oppia directory of directory where
+            to copy the files and directories.
+        file_hashes: dict(str, str). Dictionary of file hashes.
+    """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Copying into %s' % os.path.join(os.getcwd(), target)
 
@@ -100,17 +218,148 @@ def copy_files_source_to_target(source, target):
                 continue
             if source not in source_path:
                 continue
-            target_path = source_path.replace(
-                source, target)
+
+            # Ignore files with certain extensions
+            if any(source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                continue
+
+            target_path = source_path
+            relative_path = os.path.relpath(source_path, source)
+            if hash_should_be_inserted(source + relative_path):
+                relative_path = (
+                    _insert_hash(relative_path, file_hashes[relative_path]))
+
+            target_path = os.path.join(os.getcwd(), target, relative_path)
             ensure_directory_exists(target_path)
             shutil.copyfile(source_path, target_path)
 
 
-def build_files(source, target):
-    """Minifies all css and js files, and removes whitespace from html in source
+def is_file_hash_provided_to_frontend(filepath):
+    """Returns if the hash for the filepath should be provided to the frontend.
+
+    Args:
+        filepath: str. Relative path to the file.
+
+    Returns:
+        bool. True if file hash should be provided to the frontend else False.
+    """
+    return any(fnmatch.fnmatch(filepath, pattern) for pattern
+               in FILEPATHS_PROVIDED_TO_FRONTEND)
+
+
+def generate_md5_hash(filepath):
+    """Returns md5 hash of file.
+
+    Args:
+        filepath: str. Absolute path to the file.
+
+    Returns:
+        str. Hexadecimal hash of specified file.
+    """
+    m = hashlib.md5()
+    with open(filepath, 'rb') as f:
+        while True:
+            buf = f.read(HASH_BLOCK_SIZE)
+            if not buf:
+                break
+            m.update(buf)
+    return m.hexdigest()
+
+
+def get_file_hashes(directory_path):
+    """Returns hashes of all files in directory tree.
+
+    Args:
+        directory_path: str. Root directory of the tree.
+
+    Returns:
+        dict(str, str). Dictionary with keys specifying file paths and values
+        specifying file hashes.
+    """
+    file_hashes = dict()
+
+    print('Computing hashes for files in %s'
+          % os.path.join(os.getcwd(), directory_path))
+
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), directory_path)):
+        for directory in dirs:
+            print('Computing hashes for files in %s'
+                  % os.path.join(root, directory))
+        for filename in files:
+            filepath = os.path.join(root, filename)
+            relative_filepath = os.path.relpath(filepath, directory_path)
+            file_hashes[relative_filepath] = generate_md5_hash(filepath)
+
+    return file_hashes
+
+
+def filter_hashes(file_hashes):
+    """Filters hashes that should be provided to the frontend
+    and prefixes / in front of the keys.
+
+    Args:
+        file_hashes: dict(str, str). Dictionary of file hashes.
+
+    Returns:
+        dict(str, str). Filtered dictionary of file hashes.
+    """
+    filtered_hashes = dict()
+    for filepath, file_hash in file_hashes.iteritems():
+        if is_file_hash_provided_to_frontend(filepath):
+            filtered_hashes['/' + filepath] = file_hash
+    return filtered_hashes
+
+
+def get_hashes_json_file_contents(file_hashes):
+    """Return JS code that loads hashes needed for frontend into variable.
+
+    Args:
+        file_hashes: dict(str, str). Dictionary of file hashes.
+
+    Returns:
+        str. JS code loading hashes as JSON into variable.
+    """
+    # Only some of the hashes are needed in the frontend.
+    filtered_hashes = filter_hashes(file_hashes)
+
+    hashes_json = json.dumps(filtered_hashes)
+    return 'var hashes = JSON.parse(\'%s\');' % (hashes_json)
+
+
+def save_hashes_as_json(target_filepath, file_hashes):
+    """Save hashes in JS file containing JSON for files that
+    are to be interpolated in the frontend.
+
+    Args:
+        target_filepath: str. Path relative to /oppia directory defining
+            location where to save the JS file with hashes. The final location
+            path would also contain hash.
+        file_hashes: dict(str, str). Dictionary of file hashes.
+    """
+
+    with open(target_filepath, 'w') as f:
+        f.write(get_hashes_json_file_contents(file_hashes))
+
+    file_hash = generate_md5_hash(target_filepath)
+    relative_filepath = os.path.relpath(
+        target_filepath, os.path.join(os.path.curdir, 'build'))
+    filepath_with_hash = _insert_hash(target_filepath, file_hash)
+    os.rename(target_filepath, filepath_with_hash)
+
+    file_hashes[relative_filepath] = file_hash
+
+
+def build_files(source, target, file_hashes):
+    """Minifies all CSS and JS files, removes whitespace from HTML and
+    interpolates paths in HTML to include hashes in source
     directory and copies it to target.
-    Arguments:
-        source, target: strings
+
+    Args:
+        source: str. Path relative to /oppia directory of directory
+            containing files and directories to be copied.
+        target: str. Path relative to /oppia directory of directory where
+            to copy the files and directories.
+        file_hashes: dict(str, str). Dictionary of file hashes.
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
@@ -128,12 +377,8 @@ def build_files(source, target):
                 continue
             target_path = source_path.replace(source, target)
 
-            # Ignore files with certain extensions
-            if any(source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                continue
-
             if filename.endswith('.html'):
-                process_html(source_path, target_path)
+                process_html(source_path, target_path, file_hashes)
             elif filename.endswith('.css'):
                 process_css(source_path, target_path)
             elif filename.endswith('.js'):
@@ -142,50 +387,45 @@ def build_files(source, target):
                 ensure_directory_exists(target_path)
                 shutil.copyfile(source_path, target_path)
 
-def get_cache_slug():
-    """Returns the cache slug read from file."""
-    with open('cache_slug.yaml', 'r') as cache_slug_file:
-        content = cache_slug_file.read()
-    retrieved_dict = yaml.safe_load(content)
-    assert isinstance(retrieved_dict, dict)
-    return retrieved_dict['cache_slug']
+
+def generate_build_directory():
+    """Generates hashes for files. Minifies files and interpolates paths
+    in HTMLs to include hashes. Renames the files to include hashes and copies
+    them into build directory.
+    """
+    hashes = dict()
+
+    # Create hashes for assets, copy directories and files to build/assets
+    hashes.update(get_file_hashes(ASSETS_SRC_DIR))
+    copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR, hashes)
+
+    # Process third_party resources, create hashes for them and copy them into
+    # build/third_party/generated
+    build_minified_third_party_libs(THIRD_PARTY_GENERATED_STAGING_DIR)
+    hashes.update(get_file_hashes(THIRD_PARTY_GENERATED_STAGING_DIR))
+    copy_files_source_to_target(
+        THIRD_PARTY_GENERATED_STAGING_DIR,
+        THIRD_PARTY_GENERATED_OUT_DIR, hashes)
+
+    # Minify extension static resources, create hashes for them and copy them
+    # into build/extensions
+    hashes.update(get_file_hashes(EXTENSIONS_DEV_DIR))
+    build_files(EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes)
+    copy_files_source_to_target(
+        EXTENSIONS_STAGING_DIR, EXTENSIONS_OUT_DIR, hashes)
+
+    # Create hashes for all template files
+    hashes.update(get_file_hashes(TEMPLATES_DEV_DIR))
+
+    # Save hashes as JSON and write the JSON into JS file
+    # to make the hashes available to the frontend.
+    save_hashes_as_json(HASHES_JSON, hashes)
+
+    # Minify all template files copy them into build/templates/head
+    build_files(TEMPLATES_DEV_DIR, TEMPLATES_STAGING_DIR, hashes)
+    copy_files_source_to_target(
+        TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 
 
 if __name__ == '__main__':
-    CACHE_SLUG = get_cache_slug()
-    BUILD_DIR = os.path.join('build', CACHE_SLUG)
-
-    # os.path.dirname(path)(in ensure_directory_exists()) returns parent
-    # directory of a path passed as an argument to it. This is as intended
-    # for file paths, but for directory paths we do not want this to happen,
-    # hence we append a trailing slash to it.
-    # Process assets, copy it to build/[cache_slug]/assets
-    ASSETS_SRC_DIR = os.path.join('assets', '')
-    ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
-    copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR)
-
-    # Process third_party resources, copy it to
-    # build/[cache_slug]/third_party/generated
-    THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
-        BUILD_DIR, 'third_party', 'generated')
-    build_minified_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
-
-    # Minify extension static resources, copy it to
-    # build/[cache_slug]/extensions
-    EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
-    EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
-    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR)
-
-    TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
-    TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
-    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR)
-
-    # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
-    CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
-    CSS_OUT_DIR = os.path.join(BUILD_DIR, 'css', '')
-    copy_files_source_to_target(CSS_SRC_DIR, CSS_OUT_DIR)
-
-    # Copy core/templates/prod/head/ to build/[cache_slug]/templates/head/
-    TEMPLATES_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
-    TEMPLATES_OUT_DIR = os.path.join(BUILD_DIR, 'templates', 'head', '')
-    copy_files_source_to_target(TEMPLATES_SRC_DIR, TEMPLATES_OUT_DIR)
+    generate_build_directory()

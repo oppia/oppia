@@ -24,19 +24,15 @@ var collectionEditor = require('../protractor_utils/collectionEditor.js');
 describe('Collections', function() {
   beforeAll(function() {
     var USERNAME = 'aliceCollections';
-    users.createAndLoginAdminUser('alice@collections.com', USERNAME);
+    users.createUser('alice@collections.com', USERNAME);
+    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
     browser.get(general.ADMIN_URL_SUFFIX);
     element.all(by.css(
       '.protractor-test-reload-collection-button')).first().click();
     general.acceptAlert();
     browser.waitForAngular();
     admin.reloadAllExplorations();
-    admin.editConfigProperty(
-      'Names of users allowed to use the collection editor',
-      'List', function(listEditor) {
-        listEditor.addItem('Unicode').setValue(USERNAME);
-      }
-    );
+    admin.updateRole(USERNAME, 'collection editor');
     users.logout();
   });
 

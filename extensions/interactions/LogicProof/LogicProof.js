@@ -13,7 +13,7 @@
 // limitations under the License.
 
 oppia.directive('oppiaInteractiveLogicProof', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {
@@ -23,7 +23,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
       controller: [
         '$scope', '$attrs', '$modal', 'logicProofRulesService',
         function($scope, $attrs, $modal, logicProofRulesService) {
-          $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj(
+          $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
             $attrs.questionWithValue);
 
           // This is the information about how to mark a question (e.g. the
@@ -260,26 +260,26 @@ oppia.directive('oppiaInteractiveLogicProof', [
 ]);
 
 oppia.directive('oppiaResponseLogicProof', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/LogicProof',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }
 ]);
 
 oppia.directive('oppiaShortResponseLogicProof', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/LogicProof',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }

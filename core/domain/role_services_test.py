@@ -17,8 +17,6 @@
 """Test functions relating to roles and actions."""
 
 from core.domain import role_services
-from core.domain import config_domain
-from core.domain import config_services
 from core.tests import test_utils
 import feconf
 
@@ -113,79 +111,3 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(set(collection_editor_actions),
                          set(role_services.get_all_actions(
                              feconf.ROLE_ID_COLLECTION_EDITOR)))
-
-    def test_get_role_changes(self):
-        # Case with user belonging to multiple config lists. User should
-        # get role with higher priority.
-        user_emails = [
-            'user1@example.com', 'user2@example.com',
-            'use3@example.com', 'user4@example.com',
-            'user5@example.com'
-        ]
-        usernames = ['user1', 'user2', 'user3', 'user4', 'user5']
-
-        for name, email in zip(usernames, user_emails):
-            self.signup(email, name)
-
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-
-        moderator_usernames = ['user1', 'user2', 'user3']
-        collection_editor_usernames = ['user4', 'user5', 'user3']
-
-        old_config_properties = (
-            config_domain.Registry.get_config_property_schemas())
-        config_services.set_property(
-            admin_id, 'moderator_usernames', moderator_usernames)
-        config_services.set_property(
-            admin_id, 'collection_editor_whitelist',
-            collection_editor_usernames)
-
-        new_config_properties = (
-            config_domain.Registry.get_config_property_schemas())
-
-        role_changes = role_services.get_role_changes(
-            {
-                name: value['value']
-                for name, value in old_config_properties.iteritems()
-            },
-            {
-                name: value['value']
-                for name, value in new_config_properties.iteritems()
-            })
-
-        expected_role_changes = {
-            'user1': feconf.ROLE_ID_MODERATOR,
-            'user2': feconf.ROLE_ID_MODERATOR,
-            'user3': feconf.ROLE_ID_MODERATOR,
-            'user4': feconf.ROLE_ID_COLLECTION_EDITOR,
-            'user5': feconf.ROLE_ID_COLLECTION_EDITOR
-        }
-
-        self.assertEqual(expected_role_changes, role_changes)
-
-        # Reverting moderator names should change the role of user3 to
-        # collection editor.
-        old_config_properties = (
-            config_domain.Registry.get_config_property_schemas())
-        config_services.revert_property(admin_id, 'moderator_usernames')
-        new_config_properties = (
-            config_domain.Registry.get_config_property_schemas())
-
-        role_changes = role_services.get_role_changes(
-            {
-                name: value['value']
-                for name, value in old_config_properties.iteritems()
-            },
-            {
-                name: value['value']
-                for name, value in new_config_properties.iteritems()
-            })
-        expected_role_changes = {
-            'user1': feconf.ROLE_ID_EXPLORATION_EDITOR,
-            'user2': feconf.ROLE_ID_EXPLORATION_EDITOR,
-            'user3': feconf.ROLE_ID_COLLECTION_EDITOR,
-            'user4': feconf.ROLE_ID_COLLECTION_EDITOR,
-            'user5': feconf.ROLE_ID_COLLECTION_EDITOR
-        }
-        self.assertEqual(expected_role_changes, role_changes)

@@ -20,6 +20,7 @@ import random
 
 import jinja2
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import classifier_services
@@ -30,15 +31,14 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
-from core.domain import rte_component_registry
 from core.domain import summary_services
+from core.domain import user_services
 import feconf
 import utils
 
@@ -74,7 +74,6 @@ def _get_exploration_player_data(
     version = exploration.version
 
     # TODO(sll): Cache these computations.
-    gadget_types = exploration.get_gadget_types()
     interaction_ids = exploration.get_interaction_ids()
     dependency_ids = (
         interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -83,15 +82,11 @@ def _get_exploration_player_data(
         dependency_registry.Registry.get_deps_html_and_angular_modules(
             dependency_ids))
 
-    gadget_templates = (
-        gadget_registry.Registry.get_gadget_html(gadget_types))
     interaction_templates = (
-        rte_component_registry.Registry.get_html_for_all_components() +
         interaction_registry.Registry.get_interaction_html(
             interaction_ids))
 
     return {
-        'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
         'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
             DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
@@ -103,7 +98,6 @@ def _get_exploration_player_data(
         'exploration_version': version,
         'collection_id': collection_id,
         'collection_title': collection_title,
-        'gadget_templates': jinja2.utils.Markup(gadget_templates),
         'interaction_templates': jinja2.utils.Markup(
             interaction_templates),
         'is_private': rights_manager.is_exploration_private(
@@ -124,15 +118,14 @@ class ExplorationPageEmbed(base.BaseHandler):
         """Handles GET requests."""
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = (
-            bool(self.username) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user, exploration_rights)
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
@@ -163,6 +156,8 @@ class ExplorationPage(base.BaseHandler):
         """Handles GET requests."""
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
 
         if self.request.get('iframed'):
             redirect_url = '/embed/exploration/%s' % exploration_id
@@ -174,11 +169,8 @@ class ExplorationPage(base.BaseHandler):
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = (
-            bool(self.username) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user, exploration_rights)
 
         try:
             # If the exploration does not exist, a 404 error is raised.
@@ -198,6 +190,7 @@ class ExplorationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
         version = self.request.get('v')
@@ -209,16 +202,44 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        user_settings = user_services.get_user_settings(self.user_id)
+
+        preferred_audio_language_code = None
+        if user_settings is not None:
+            preferred_audio_language_code = (
+                user_settings.preferred_audio_language_code)
+
+        # Retrieve all classifiers for the exploration.
+        state_classifier_mapping = {}
+        classifier_training_jobs = (
+            classifier_services.get_classifier_training_jobs(
+                exploration_id, exploration.version, exploration.states))
+        for index, state_name in enumerate(exploration.states):
+            if classifier_training_jobs[index] is not None:
+                classifier_data = classifier_training_jobs[
+                    index].classifier_data
+                algorithm_id = classifier_training_jobs[index].algorithm_id
+                data_schema_version = (
+                    classifier_training_jobs[index].data_schema_version)
+                state_classifier_mapping[state_name] = {
+                    'algorithm_id': algorithm_id,
+                    'classifier_data': classifier_data,
+                    'data_schema_version': data_schema_version
+                }
+
         self.values.update({
             'can_edit': (
-                self.user_id and
-                rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
+                rights_manager.check_can_edit_activity(
+                    self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
-            'version': exploration.version
+            'version': exploration.version,
+            'preferred_audio_language_code': preferred_audio_language_code,
+            'state_classifier_mapping': state_classifier_mapping
         })
         self.render_json(self.values)
 
@@ -441,31 +462,19 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class RemoveExpFromIncompleteListHandler(base.BaseHandler):
-    """Handles operations related to removing an exploration from the partially
-    completed list of a user.
+class LearnerIncompleteActivityHandler(base.BaseHandler):
+    """Handles operations related to the activities in the incomplete list of
+    the user.
     """
+    @acl_decorators.can_access_learner_dashboard
+    def delete(self, activity_type, activity_id):
+        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+            learner_progress_services.remove_exp_from_incomplete_list(
+                self.user_id, activity_id)
+        elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+            learner_progress_services.remove_collection_from_incomplete_list(
+                self.user_id, activity_id)
 
-    @base.require_user
-    def post(self):
-        """Handles POST requests."""
-        exploration_id = self.payload.get('exploration_id')
-        learner_progress_services.remove_exp_from_incomplete_list(
-            self.user_id, exploration_id)
-        self.render_json(self.values)
-
-
-class RemoveCollectionFromIncompleteListHandler(base.BaseHandler):
-    """Handles operations related to removing a collection from the partially
-    completed list of a user.
-    """
-
-    @base.require_user
-    def post(self):
-        """Handles POST requests."""
-        collection_id = self.payload.get('collection_id')
-        learner_progress_services.remove_collection_from_incomplete_list(
-            self.user_id, collection_id)
         self.render_json(self.values)
 
 
@@ -491,7 +500,7 @@ class RatingHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @base.require_user
+    @acl_decorators.can_rate_exploration
     def put(self, exploration_id):
         """Handles PUT requests for submitting ratings at the end of an
         exploration.
@@ -566,7 +575,7 @@ class RecommendationsHandler(base.BaseHandler):
 class FlagExplorationHandler(base.BaseHandler):
     """Handles operations relating to learner flagging of explorations."""
 
-    @base.require_user
+    @acl_decorators.can_flag_exploration
     def post(self, exploration_id):
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,

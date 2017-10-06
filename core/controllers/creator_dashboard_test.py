@@ -25,6 +25,7 @@ from core.domain import rights_manager
 from core.domain import stats_jobs_continuous_test
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_continuous_test
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -90,6 +91,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
 
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
+        self.owner_1 = user_services.UserActionsInfo(self.owner_id_1)
 
     def _record_start(self, exp_id, exp_version, state):
         """Record start event to an exploration.
@@ -118,13 +120,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
          start_computation())
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            0)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         self.process_and_flush_pending_tasks()
 
     def _run_stats_aggregator_jobs(self):
@@ -132,13 +132,11 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
          .start_computation())
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            0)
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         self.process_and_flush_pending_tasks()
 
     def test_stats_no_explorations(self):
@@ -319,7 +317,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id_1, self.EXP_ID_1, self.owner_id_2,
+            self.owner_1, self.EXP_ID_1, self.owner_id_2,
             rights_manager.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_1)
@@ -369,10 +367,10 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id_1, self.EXP_ID_1, self.owner_id_2,
+            self.owner_1, self.EXP_ID_1, self.owner_id_2,
             rights_manager.ROLE_OWNER)
         rights_manager.assign_role_for_exploration(
-            self.owner_id_1, self.EXP_ID_2, self.owner_id_2,
+            self.owner_1, self.EXP_ID_2, self.owner_id_2,
             rights_manager.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_2)
@@ -461,6 +459,8 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner_1 = user_services.UserActionsInfo(self.owner_id_1)
         self.collaborator_id = self.get_user_id_from_email(
             self.COLLABORATOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
@@ -536,26 +536,20 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PRIVATE)
 
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PUBLIC)
 
-        rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-        self.assertEqual(
-            response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLICIZED)
         self.logout()
 
     def test_collaborators_can_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
-            self.owner_id, self.EXP_ID, self.collaborator_id,
+            self.owner, self.EXP_ID, self.collaborator_id,
             rights_manager.ROLE_EDITOR)
         self.set_admins([self.OWNER_USERNAME])
 
@@ -566,19 +560,12 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PRIVATE)
 
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PUBLIC)
-
-        rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-        self.assertEqual(
-            response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLICIZED)
 
         self.logout()
 
@@ -586,7 +573,7 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
-            self.owner_id, self.EXP_ID, self.viewer_id,
+            self.owner, self.EXP_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         self.set_admins([self.OWNER_USERNAME])
 
@@ -594,13 +581,10 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
 
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
 
-        rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(response['explorations_list'], [])
         self.logout()
 
     def test_can_see_feedback_thread_counts(self):
@@ -732,20 +716,5 @@ class CreationButtonsTest(test_utils.GenericTestBase):
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
         )[creator_dashboard.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
-
-        self.logout()
-
-    def test_exploration_upload_button(self):
-        """Test that the exploration upload button appears when appropriate."""
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
-
-        with self.swap(feconf, 'ALLOW_YAML_FILE_UPLOAD', True):
-            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
-            self.assertEqual(response.status_int, 200)
-            response.mustcontain('ng-click="showUploadExplorationModal()"')
 
         self.logout()

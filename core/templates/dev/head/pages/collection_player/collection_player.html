@@ -128,34 +128,35 @@
                 stroke-linecap="round"
                 stroke-width="12"
                 ng-attr-d="<[pathSvgParameters]>"/>
-          <image ng-if="!collectionPlaythrough.hasStartedCollection()" 
+          <image ng-if="!collectionPlaythrough.hasStartedCollection()"
                  x="175"
                  y="100"
                  height="100"
                  width="100"
-                 ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>" 
+                 ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>"
                  xlink:href=""></image>
-          <text ng-if="!collectionPlaythrough.hasStartedCollection()" 
-                x="200"
-                y="155"
+          <text ng-if="!collectionPlaythrough.hasStartedCollection()"
+                x="210"
+                y="170"
                 alignment-baseline="middle"
                 font-family="Capriola, Roboto, Arial, sans-serif"
-                font-size="20"
+                font-size="15"
                 fill="#E14738"
                 text-anchor="middle"
                 translate="I18N_START_HERE"></text>
         </svg>
 
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-mascot">
-        <a ng-repeat="node in collection.getCollectionNodes()" href="<[getExplorationUrl(node.getExplorationId())]>">
-          <svg width="100"
+        <a ng-repeat="node in collection.getCollectionNodes()"
+           ng-href="<[getExplorationUrl(node.getExplorationId())]>"
+           ng-style="{position: 'absolute', left: '<[pathIconParameters[$index].left]>', top: '<[pathIconParameters[$index].top]>'}">
+          <svg class="protractor-test-collection-exploration"
+               width="100"
                height="125"
                xmlns="http://www.w3.org/2000/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
                version="1.1"
-               style="position: absolute;
-                    left: <[pathIconParameters[$index].left]>;
-                    top: <[pathIconParameters[$index].top]>;">
+               class="protractor-test-collection-node">
             <defs>
               <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
                 <circle cx="50"
@@ -174,7 +175,7 @@
                        y="30"
                        height="80"
                        width="80"
-                       ng-attr-xlink:href="<[pathIconParameters[$index].thumbnailIconUrl]>"
+                       ng-attr-xlink:href="<[getStaticImageUrl(pathIconParameters[$index].thumbnailIconUrl)]>"
                        xlink:href=""></image>
               </pattern>
             </defs>
@@ -221,27 +222,27 @@
       <div ng-if="collection" class="oppia-collection-table hidden-md hidden-lg hidden-xl">
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
         <div class="mobile-path-segment" ng-repeat="node in collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
-          <a href="<[getExplorationUrl(node.getExplorationId())]>">
-            <svg width="100"
+          <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;">
+            <svg class="protractor-test-collection-exploration"
+                 width="100"
                  height="150"
                  xmlns="http://www.w3.org/2000/svg"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
                  version="1.1"
-                 style="position: absolute; left: 50%; transform: translate(-50%, 195px);"
                  ng-click="scrollToLocation('mobile-path-anchor-' + $index); updateExplorationPreview(node.getExplorationId());">
               <image ng-if="!collectionPlaythrough.hasStartedCollection() && $index===0"
                      x="0"
                      y="83"
                      height="80"
                      width="100"
-                     ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>" 
+                     ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>"
                      xlink:href=""></image>
               <text ng-if="!collectionPlaythrough.hasStartedCollection() && $index===0"
-                    x="51"
-                    y="143"
+                    x="50"
+                    y="140"
                     alignment-baseline="middle"
                     font-family="Capriola, Roboto, Arial, sans-serif"
-                    font-size="19"
+                    font-size="11"
                     fill="#E14738"
                     text-anchor="middle"
                     translate="I18N_START_HERE"></text>
@@ -263,7 +264,7 @@
                          y="30"
                          height="80"
                          width="80"
-                         ng-attr-xlink:href="<[pathIconParameters[$index].thumbnailIconUrl]>"
+                         ng-attr-xlink:href="<[getStaticImageUrl(pathIconParameters[$index].thumbnailIconUrl)]>"
                          xlink:href=""></image>
                 </pattern>
               </defs>
@@ -321,10 +322,10 @@
 
       </div>
 
-      <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">
+      <div ng-if="collection && collectionSummary" class="oppia-card-preview-panel hidden-sm hidden-xs">
         <md-card class="oppia-activity-summary-tile md-default-theme">
           <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
-            <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
+            <img ng-src="<[getStaticImageUrl(collectionSummary.thumbnail_icon_url)]>" class="thumbnail-image">
           </div>
           <div class="title-section-mask objective oppia-activity-summary-tile-pre-hover-preview">
             <span>Hover over an icon to preview an exploration.</span>
@@ -364,8 +365,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionSkillObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/collectionFooterDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>

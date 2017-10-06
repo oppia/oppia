@@ -37,9 +37,34 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_LOADING: 'Loading'
 });
 
+oppia.factory('I18nFileHashLoader', [
+  '$http', '$q', 'UrlInterpolationService',
+  function($http, $q, UrlInterpolationService) {
+    /* Options object contains:
+     *  prefix: added before key, defined by developer
+     *  key: language key, determined internally by i18n library
+     *  suffix: added after key, defined by developer
+     */
+    return function(options) {
+      var fileUrl = [
+        options.prefix,
+        options.key,
+        options.suffix
+      ].join('');
+      return $http.get(
+        UrlInterpolationService.getTranslateJsonUrl(fileUrl)
+      ).then(function(result) {
+        return result.data;
+      }, function () {
+        return $q.reject(options.key);
+      });
+    };
+  }
+]);
+
 oppia.controller('I18nFooter', [
-  '$http', '$rootScope', '$scope', '$translate', '$timeout',
-  function($http, $rootScope, $scope, $translate, $timeout) {
+  '$http', '$rootScope', '$scope', '$translate', '$timeout', '$cookies',
+  function($http, $rootScope, $scope, $translate, $timeout, $cookies) {
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
@@ -65,6 +90,16 @@ oppia.controller('I18nFooter', [
         $http.put(siteLanguageUrl, {
           site_language_code: $scope.currentLanguageCode
         });
+      } else {
+        // $translate.use() sets a cookie for the translation language, but does
+        // so using the page's base URL as the cookie path. However, the base
+        // URL is modified in pages like /library, thus causing the cookie path
+        // to change; in such cases, the user's preferences are not picked up by
+        // other pages. To avoid this, we manually set the cookie using the '/'
+        // path each time a non-logged-in user changes their site language.
+        $cookies.put(
+          'NG_TRANSLATE_LANG_KEY',
+          '"' + $scope.currentLanguageCode + '"', {path: '/'});
       }
     };
   }
@@ -84,8 +119,8 @@ oppia.config([
     $translateProvider
       .registerAvailableLanguageKeys(
         availableLanguageKeys, availableLanguageKeysMap)
-      .useStaticFilesLoader({
-        prefix: GLOBALS.ASSET_DIR_PREFIX + '/assets/i18n/',
+      .useLoader('I18nFileHashLoader', {
+        prefix: '/i18n/',
         suffix: '.json'
       })
       // The use of default translation improves the loading time when English
