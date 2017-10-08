@@ -17,9 +17,9 @@
  * tests.
  */
 
-var CreatorDashboard = function() {
+var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator_dashboard';
-  var feedbackCount =
+  var explorationFeedbackCount =
     element(by.css('.protractor-test-exploration-feedback-count'));
   var explorationDashboardCard =
     element(by.css('.protractor-test-exploration-dashboard-card'));
@@ -29,7 +29,7 @@ var CreatorDashboard = function() {
   };
 
   this.getNumberOfFeedbackMessages = function() {
-    return feedbackCount.getText().then(function(text) {
+    return explorationFeedbackCount.getText().then(function(text) {
       return parseInt(text);
     });
   };

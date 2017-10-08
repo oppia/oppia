@@ -23,7 +23,7 @@
  * in an e2e test.
  */
 
-var creatorDashboard = require('../protractor_utils/creatorDashboard.js');
+var CreatorDashboardPage = require('../protractor_utils/CreatorDashboardPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');
@@ -47,7 +47,7 @@ describe('ExplorationFeedback', function() {
   it('adds feedback to an exploration', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
-    var creatorDashboard = new CreatorDashboard();
+    var CreatorDashboardPage = new CreatorDashboardPage();
 
     // Creator creates and publishes an exploration
     users.login('user1@ExplorationFeedback.com');
@@ -55,9 +55,9 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
-    creatorDashboard.get();
+    CreatorDashboardPage.get();
     var numberOfFeedbackMessages = (
-      creatorDashboard.getNumberOfFeedbackMessages());
+      CreatorDashboardPage.getNumberOfFeedbackMessages());
     expect(numberOfFeedbackMessages).toEqual(0);
     users.logout();
 
@@ -70,10 +70,11 @@ describe('ExplorationFeedback', function() {
 
     // Creator reads the feedback and responds
     users.login('user1@ExplorationFeedback.com');
-    creatorDashboard.get();
-    numberOfFeedbackMessages = creatorDashboard.getNumberOfFeedbackMessages();
+    CreatorDashboardPage.get();
+    numberOfFeedbackMessages =
+      CreatorDashboardPage.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(1);
-    creatorDashboard.navigateToExplorationEditor();
+    CreatorDashboardPage.navigateToExplorationEditor();
 
     editor.readFeedbackMessages().then(function(messages) {
       expect(messages.length).toEqual(1);
