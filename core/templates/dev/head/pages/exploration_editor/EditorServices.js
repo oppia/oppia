@@ -839,12 +839,14 @@ oppia.factory('explorationStatesService', [
   'editorContextService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'angularNameService',
   'AnswerClassificationService', 'explorationContextService',
+  'UrlInterpolationService',
   function(
       $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, angularNameService,
-      AnswerClassificationService, explorationContextService) {
+      AnswerClassificationService, explorationContextService,
+      UrlInterpolationService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -1112,7 +1114,9 @@ oppia.factory('explorationStatesService', [
         }
 
         $modal.open({
-          templateUrl: 'modals/deleteState',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/editor_tab/' +
+            'confirm_delete_state_modal_directive.html'),
           backdrop: true,
           resolve: {
             deleteStateName: function() {
@@ -1462,12 +1466,12 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'ExpressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'INTERACTION_SPECS',
+  'ParameterMetadataService', 'INTERACTION_SPECS',
   'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       ExpressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, INTERACTION_SPECS,
+      ParameterMetadataService, INTERACTION_SPECS,
       WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
@@ -1553,7 +1557,7 @@ oppia.factory('explorationWarningsService', [
     // have been set beforehand.
     var _verifyParameters = function(initNodeIds) {
       var unsetParametersInfo = (
-        parameterMetadataService.getUnsetParametersInfo(initNodeIds));
+        ParameterMetadataService.getUnsetParametersInfo(initNodeIds));
 
       var paramWarningsList = [];
       unsetParametersInfo.forEach(function(unsetParameterData) {

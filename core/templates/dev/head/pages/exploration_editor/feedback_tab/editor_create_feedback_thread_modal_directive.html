@@ -1,0 +1,13 @@
+<div class="modal-header">
+  <h3>Start New Feedback Thread</h3>
+</div>
+
+<div class="modal-body">
+  <p>Thread subject: <input type="text" ng-model="newThreadSubject"></p>
+  <p>Message text <textarea ng-model="newThreadText" rows="6"></textarea></p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)" ng-disabled="!newThreadSubject || !newThreadText">Create Thread</button>
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>

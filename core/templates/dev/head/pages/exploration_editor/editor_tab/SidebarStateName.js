@@ -19,11 +19,11 @@
 oppia.controller('SidebarStateName', [
   '$scope', '$filter', '$rootScope', 'editabilityService',
   'editorContextService', 'focusService', 'explorationStatesService',
-  'routerService',
+  'RouterService',
   function(
       $scope, $filter, $rootScope, editabilityService,
       editorContextService, focusService, explorationStatesService,
-      routerService) {
+      RouterService) {
     $scope.editabilityService = editabilityService;
 
     var _stateNameMemento = null;
@@ -86,7 +86,7 @@ oppia.controller('SidebarStateName', [
       var normalizedStateName = $scope._getNormalizedStateName(newStateName);
       var valid = $scope.saveStateName(normalizedStateName);
       if (valid) {
-        routerService.navigateToMainTab(normalizedStateName);
+        RouterService.navigateToMainTab(normalizedStateName);
       }
     };
   }

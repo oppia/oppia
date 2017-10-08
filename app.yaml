@@ -81,9 +81,9 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
-- url: /extensions/rich_text_components/(.*)/static/(.*)
-  static_files: extensions/rich_text_components/\1/static/\2
-  upload: extensions/rich_text_components/(.*)/static/(.*)
+- url: /extensions/rich_text_components/(.*)/directives/(.*\.(html))
+  static_files: extensions/rich_text_components/\1/directives/\2
+  upload: extensions/rich_text_components/(.*)/directives/(.*\.(html))
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
