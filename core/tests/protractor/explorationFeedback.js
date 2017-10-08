@@ -48,7 +48,7 @@ describe('ExplorationFeedback', function() {
   it('adds feedback to an exploration', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
-    var CreatorDashboardPage = new CreatorDashboardPage();
+    var creatorDashboardPage = new CreatorDashboardPage();
 
     // Creator creates and publishes an exploration
     users.login('user1@ExplorationFeedback.com');
@@ -56,9 +56,9 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
-    CreatorDashboardPage.get();
+    creatorDashboardPage.get();
     var numberOfFeedbackMessages = (
-      CreatorDashboardPage.getNumberOfFeedbackMessages());
+      creatorDashboardPage.getNumberOfFeedbackMessages());
     expect(numberOfFeedbackMessages).toEqual(0);
     users.logout();
 
@@ -71,11 +71,11 @@ describe('ExplorationFeedback', function() {
 
     // Creator reads the feedback and responds
     users.login('user1@ExplorationFeedback.com');
-    CreatorDashboardPage.get();
+    creatorDashboardPage.get();
     numberOfFeedbackMessages =
-      CreatorDashboardPage.getNumberOfFeedbackMessages();
+      creatorDashboardPage.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(1);
-    CreatorDashboardPage.navigateToExplorationEditor();
+    creatorDashboardPage.navigateToExplorationEditor();
 
     editor.readFeedbackMessages().then(function(messages) {
       expect(messages.length).toEqual(1);
