@@ -47,6 +47,7 @@ describe('ExplorationFeedback', function() {
   it('adds feedback to an exploration', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
+    var creatorDashboard = new CreatorDashboard();
 
     // Creator creates and publishes an exploration
     users.login('user1@ExplorationFeedback.com');
@@ -54,7 +55,7 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
-    browser.get(general.CREATOR_DASHBOARD_URL);
+    creatorDashboard.get();
     var numberOfFeedbackMessages = (
       creatorDashboard.getNumberOfFeedbackMessages());
     expect(numberOfFeedbackMessages).toEqual(0);
@@ -69,7 +70,7 @@ describe('ExplorationFeedback', function() {
 
     // Creator reads the feedback and responds
     users.login('user1@ExplorationFeedback.com');
-    browser.get(general.CREATOR_DASHBOARD_URL);
+    creatorDashboard.get();
     numberOfFeedbackMessages = creatorDashboard.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(1);
     creatorDashboard.navigateToExplorationEditor();

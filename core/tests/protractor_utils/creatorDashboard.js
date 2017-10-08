@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for interacting with the creator dashboard page,
- * for use in Protractor tests.
+ * @fileoverview Page object for the creator dashboard, for use in Protractor
+ * tests.
  */
 
-var getNumberOfFeedbackMessages = function() {
-  return element(by.css('.protractor-test-exploration-feedback-count')).
-    getText().then(function(text) {
+var CreatorDashboard = function() {
+  var CREATOR_DASHBOARD_URL = '/creator_dashboard';
+  var feedbackCount =
+    element(by.css('.protractor-test-exploration-feedback-count'));
+  var explorationDashboardCard =
+    element(by.css('.protractor-test-exploration-dashboard-card'));
+
+  this.get = function() {
+    return browser.get(CREATOR_DASHBOARD_URL);
+  };
+
+  this.getNumberOfFeedbackMessages = function() {
+    return feedbackCount.getText().then(function(text) {
       return parseInt(text);
     });
-};
+  };
 
-var navigateToExplorationEditor = function() {
-  element(by.css('.protractor-test-exploration-dashboard-card')).click();
+  this.navigateToExplorationEditor = function() {
+    explorationDashboardCard.click();
+  };
 };
-
-exports.getNumberOfFeedbackMessages = getNumberOfFeedbackMessages;
-exports.navigateToExplorationEditor = navigateToExplorationEditor;
