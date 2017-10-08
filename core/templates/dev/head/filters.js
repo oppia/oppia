@@ -120,9 +120,9 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
 }]);
 
 oppia.filter('wrapTextWithEllipsis', [
-  '$filter', 'utilsService', function($filter, utilsService) {
+  '$filter', 'UtilsService', function($filter, UtilsService) {
     return function(input, characterCount) {
-      if (utilsService.isString(input)) {
+      if (UtilsService.isString(input)) {
         input = $filter('normalizeWhitespace')(input);
         if (input.length <= characterCount || characterCount < 3) {
           // String fits within the criteria; no wrapping is necessary.
@@ -256,9 +256,9 @@ oppia.filter('parameterizeRuleDescription', [
 
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.
-oppia.filter('normalizeWhitespace', ['utilsService', function(utilsService) {
+oppia.filter('normalizeWhitespace', ['UtilsService', function(UtilsService) {
   return function(input) {
-    if (utilsService.isString(input)) {
+    if (UtilsService.isString(input)) {
       // Remove whitespace from the beginning and end of the string, and
       // replace interior whitespace with a single space character.
       input = input.trim();

@@ -17,7 +17,7 @@
  * used at multiple places in the codebase.
  */
 
-oppia.factory('utilsService', [function() {
+oppia.factory('UtilsService', [function() {
   var utils = {
     isEmpty: function(obj) {
       for (var property in obj) {

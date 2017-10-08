@@ -247,23 +247,21 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        'messengerService', 'ExplorationPlayerService', 'urlService',
-        'FocusManagerService', 'LearnerViewRatingService',
-        'windowDimensionsService', 'PlayerTranscriptService',
-        'LearnerParamsService', 'PlayerPositionService',
-        'ExplorationRecommendationsService', 'StatsReportingService',
-        'siteAnalyticsService', 'ExplorationPlayerStateService',
-        'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
-        'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
+        'MessengerService', 'ExplorationPlayerService', 'urlService',
+        'FocusManagerService', 'LearnerViewRatingService', 'windowDimensionsService',
+        'PlayerTranscriptService', 'LearnerParamsService',
+        'PlayerPositionService', 'ExplorationRecommendationsService',
+        'StatsReportingService', 'siteAnalyticsService',
+        'ExplorationPlayerStateService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
+        'alertsService', 'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'FatigueDetectionService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            messengerService, ExplorationPlayerService, urlService,
-            FocusManagerService, LearnerViewRatingService,
-            windowDimensionsService, PlayerTranscriptService,
-            LearnerParamsService, PlayerPositionService,
-            ExplorationRecommendationsService, StatsReportingService,
-            siteAnalyticsService, ExplorationPlayerStateService,
+            MessengerService, ExplorationPlayerService, urlService,
+            FocusManagerService, LearnerViewRatingService, windowDimensionsService,
+            PlayerTranscriptService, LearnerParamsService,
+            PlayerPositionService, ExplorationRecommendationsService,
+            StatsReportingService, siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             FatigueDetectionService) {
@@ -320,7 +318,7 @@ oppia.directive('conversationSkin', [
                 // Sometimes setting iframe height to the exact content height
                 // still produces scrollbar, so adding 50 extra px.
                 newHeight += 50;
-                messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
+                MessengerService.sendMessage(MessengerService.HEIGHT_CHANGE, {
                   height: newHeight,
                   scroll: scroll
                 });

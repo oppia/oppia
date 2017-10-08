@@ -23,7 +23,7 @@ describe('Expression type parser service', function() {
     etps = $injector.get('ExpressionTypeParserService');
     eps = $injector.get('ExpressionParserService');
     ests = $injector.get('ExpressionSyntaxTreeService');
-    isString = $injector.get('utilsService').isString;
+    isString = $injector.get('UtilsService').isString;
   }));
 
   var ENVS = [
