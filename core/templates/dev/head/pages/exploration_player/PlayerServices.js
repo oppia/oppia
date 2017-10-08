@@ -16,8 +16,6 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-oppia.constant('MIN_TIME_FOR_ACTUAL_START_SECS', 60);
-
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 // A service that provides a number of utility functions for JS used by
@@ -35,8 +33,7 @@ oppia.factory('oppiaPlayerService', [
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
-  'LanguageUtilService', 'SolutionManagerService', 'StopwatchObjectFactory',
-  'MIN_TIME_FOR_ACTUAL_START_SECS',
+  'LanguageUtilService', 'SolutionManagerService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
@@ -46,8 +43,7 @@ oppia.factory('oppiaPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, SolutionManagerService, StopwatchObjectFactory,
-      MIN_TIME_FOR_ACTUAL_START_SECS) {
+      LanguageUtilService, SolutionManagerService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);

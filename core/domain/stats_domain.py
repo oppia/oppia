@@ -45,13 +45,14 @@ class ExplorationStats(object):
     """Domain object representing analytics data for an exploration."""
 
     def __init__(
-            self, exp_id, exp_version, num_actual_starts, num_completions,
-            state_stats_mapping):
+            self, exp_id, exp_version, num_starts, num_actual_starts,
+            num_completions, state_stats_mapping):
         """Constructs an ExplorationStats domain object.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
+            num_starts: int. Number of learners who started the exploration.
             num_actual_starts: int. Number of learners who actually attempted
                 the exploration. Theses are the learners who spent some
                 minimum fixed time on the exploration.
@@ -62,6 +63,7 @@ class ExplorationStats(object):
         """
         self.exp_id = exp_id
         self.exp_version = exp_version
+        self.num_starts = num_starts
         self.num_actual_starts = num_actual_starts
         self.num_completions = num_completions
         self.state_stats_mapping = state_stats_mapping
@@ -71,6 +73,7 @@ class ExplorationStats(object):
         exploration_stats_dict = {
             'exp_id': self.exp_id,
             'exp_version': self.exp_version,
+            'num_starts': self.num_starts,
             'num_actual_starts': self.num_actual_starts,
             'num_completions': self.num_completions,
             'state_stats_mapping': self.state_stats_mapping
@@ -88,6 +91,11 @@ class ExplorationStats(object):
             raise utils.ValidationError(
                 'Expected exp_version to be an int, received %s' % (
                     self.exp_version))
+
+        if not isinstance(self.num_starts, int):
+            raise utils.ValidationError(
+                'Expected num_starts to be an int, received %s' % (
+                    self.num_starts))
 
         if not isinstance(self.num_actual_starts, int):
             raise utils.ValidationError(

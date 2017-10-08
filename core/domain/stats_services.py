@@ -42,7 +42,9 @@ def update_stats(exp_id, exp_version, state_name, event_type, update_params):
     exploration_stats = get_exploration_stats_by_id(
         exp_id, exp_version)
 
-    if event_type == feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION:
+    if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
+        exploration_stats.num_starts += 1
+    elif event_type == feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION:
         exploration_stats.num_actual_starts += 1
     elif event_type == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
         exploration_stats.num_completions += 1
@@ -83,7 +85,7 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
     }
 
     exploration_stats = stats_domain.ExplorationStats(
-        exp_id, exp_version, 0, 0, state_stats_mapping)
+        exp_id, exp_version, 0, 0, 0, state_stats_mapping)
     create_stats_model(exploration_stats)
 
 
@@ -168,6 +170,7 @@ def get_exploration_stats_from_model(exploration_stats_model):
     return stats_domain.ExplorationStats(
         exploration_stats_model.exp_id,
         exploration_stats_model.exp_version,
+        exploration_stats_model.num_starts,
         exploration_stats_model.num_actual_starts,
         exploration_stats_model.num_completions,
         new_state_stats_mapping)
@@ -191,6 +194,7 @@ def create_stats_model(exploration_stats):
     instance_id = stats_models.ExplorationStatsModel.create(
         exploration_stats.exp_id,
         exploration_stats.exp_version,
+        exploration_stats.num_starts,
         exploration_stats.num_actual_starts,
         exploration_stats.num_completions,
         new_state_stats_mapping
@@ -214,6 +218,7 @@ def save_stats_model(exploration_stats):
     exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
         exploration_stats.exp_id, exploration_stats.exp_version)
 
+    exploration_stats_model.num_starts = exploration_stats.num_starts
     exploration_stats_model.num_actual_starts = (
         exploration_stats.num_actual_starts)
     exploration_stats_model.num_completions = exploration_stats.num_completions

@@ -155,6 +155,9 @@ class StartExplorationEventHandler(BaseEventHandler):
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_services.update_stats(
+                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class MaybeLeaveExplorationEventHandler(BaseEventHandler):

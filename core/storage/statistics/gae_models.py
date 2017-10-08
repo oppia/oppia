@@ -285,6 +285,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type)
         start_event_entity.put()
+        return entity_id
 
 
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
@@ -716,6 +717,8 @@ class ExplorationStatsModel(base_models.BaseModel):
     exp_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
+    # Number of learners starting the exploration.
+    num_starts = ndb.IntegerProperty(indexed=True)
     # Number of students who actually attempted the exploration. Only learners
     # who spent a minimum time on the exploration are considered to have
     # actually started the exploration.
@@ -764,14 +767,15 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, num_actual_starts, num_completions,
-            state_stats_mapping):
+            cls, exp_id, exp_version, num_starts, num_actual_starts,
+            num_completions, state_stats_mapping):
         """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
+            num_starts: int. Number of learners who started the exploration.
             num_actual_starts: int. Number of learners who attempted the
                 exploration.
             num_completions: int. Number of learners who completed the
@@ -785,6 +789,7 @@ class ExplorationStatsModel(base_models.BaseModel):
         instance_id = cls.get_entity_id(exp_id, exp_version)
         stats_instance = cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
+            num_starts=num_starts,
             num_actual_starts=num_actual_starts,
             num_completions=num_completions,
             state_stats_mapping=state_stats_mapping)

@@ -130,12 +130,31 @@ class CompleteExplorationEventLogEntryModelUnitTests(
         self.assertEqual(event_model.params, {})
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
+class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Test the StartExplorationEventLogEntryModel class."""
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stat_models.StartExplorationEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', {},
+                feconf.PLAY_TYPE_NORMAL))
+
+        event_model = stat_models.StartExplorationEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exploration_id, 'exp_id1')
+        self.assertEqual(event_model.exploration_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.params, {})
+        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationStatsModel class."""
 
     def test_create_and_get_analytics_model(self):
         model_id = (
-            stat_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
+            stat_models.ExplorationStatsModel.create('exp_id1', 1, 1, 0, 0, {}))
 
         model = stat_models.ExplorationStatsModel.get_model(
             'exp_id1', 1)
@@ -143,6 +162,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
+        self.assertEqual(model.num_starts, 1)
         self.assertEqual(model.num_actual_starts, 0)
         self.assertEqual(model.num_completions, 0)
         self.assertEqual(model.state_stats_mapping, {})

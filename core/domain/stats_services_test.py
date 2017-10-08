@@ -40,7 +40,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.exp_id = 'exp_id1'
         self.exp_version = 1
         self.stats_model_id = (
-            stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
+            stats_models.ExplorationStatsModel.create(
+                'exp_id1', 1, 0, 0, 0, {}))
 
     def test_update_stats_method(self):
         """Test the update_stats method."""
@@ -51,8 +52,15 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         }
         stats_services.save_stats_model(exploration_stats)
 
-        # Pass in exploration actual start event to stats model created in
-        # setup function.
+        # Pass in exploration start event to stats model created in setup
+        # function.
+        stats_services.update_stats(
+            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_START_EXPLORATION, {})
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.num_starts, 1)
+
+        # Pass in exploration actual start event.
         stats_services.update_stats(
             'exp_id1', 1, 'Home', feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
             {})
@@ -178,6 +186,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_id, exp_id)
         self.assertEqual(exploration_stats.exp_version, 1)
+        self.assertEqual(exploration_stats.num_starts, 0)
         self.assertEqual(exploration_stats.num_actual_starts, 0)
         self.assertEqual(exploration_stats.num_completions, 0)
         self.assertEqual(
@@ -386,6 +395,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             model)
         self.assertEqual(exploration_stats.exp_id, 'exp_id1')
         self.assertEqual(exploration_stats.exp_version, 1)
+        self.assertEqual(exploration_stats.num_starts, 0)
         self.assertEqual(exploration_stats.num_actual_starts, 0)
         self.assertEqual(exploration_stats.num_completions, 0)
         self.assertEqual(exploration_stats.state_stats_mapping, {})
@@ -396,6 +406,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version)
         self.assertEqual(exploration_stats.exp_id, 'exp_id1')
         self.assertEqual(exploration_stats.exp_version, 1)
+        self.assertEqual(exploration_stats.num_starts, 0)
         self.assertEqual(exploration_stats.num_actual_starts, 0)
         self.assertEqual(exploration_stats.num_completions, 0)
         self.assertEqual(exploration_stats.state_stats_mapping, {})
@@ -410,6 +421,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version+1)
         self.assertEqual(exploration_stats.exp_id, 'exp_id1')
         self.assertEqual(exploration_stats.exp_version, 2)
+        self.assertEqual(exploration_stats.num_starts, 0)
         self.assertEqual(exploration_stats.num_actual_starts, 0)
         self.assertEqual(exploration_stats.num_completions, 0)
         self.assertEqual(exploration_stats.state_stats_mapping, {})
@@ -423,6 +435,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 3)
+        self.assertEqual(exploration_stats.num_starts, 0)
         self.assertEqual(model.num_actual_starts, 0)
         self.assertEqual(model.num_completions, 0)
         self.assertEqual(
@@ -441,12 +454,14 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         """Test the save_stats_model method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
+        exploration_stats.num_starts += 15
         exploration_stats.num_actual_starts += 5
         exploration_stats.num_completions += 2
         stats_services.save_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
+        self.assertEqual(exploration_stats.num_starts, 15)
         self.assertEqual(exploration_stats.num_actual_starts, 5)
         self.assertEqual(exploration_stats.num_completions, 2)
 

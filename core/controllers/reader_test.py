@@ -817,7 +817,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self.state_name: stats_domain.StateStats.create_default()
         }
         exploration_stats = stats_domain.ExplorationStats(
-            self.exp_id, self.exp_version, 0, 0, state_stats_mapping)
+            self.exp_id, self.exp_version, 0, 0, 0, state_stats_mapping)
         stats_services.create_stats_model(exploration_stats)
 
     def test_answer_submitted_handler(self):
@@ -939,3 +939,19 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
         self.assertEqual(exploration_stats.num_completions, 1)
+
+    def test_exploration_start_handler(self):
+        """Test the handler for recording exploration start events."""
+        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
+            self.post_json('/explorehandler/exploration_start_event/%s' % (
+                self.exp_id), {
+                    'state_name': self.state_name,
+                    'params': {},
+                    'version': self.exp_version,
+                    'session_id': self.session_id,
+                })
+
+        # Check that the models are updated.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version)
+        self.assertEqual(exploration_stats.num_starts, 1)

@@ -28,6 +28,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         return stats_domain.ExplorationStats(
             exploration_stats_dict['exp_id'],
             exploration_stats_dict['exp_version'],
+            exploration_stats_dict['num_starts'],
             exploration_stats_dict['num_actual_starts'],
             exploration_stats_dict['num_completions'],
             exploration_stats_dict['state_stats_mapping'])
@@ -36,6 +37,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         expected_exploration_stats_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 1,
+            'num_starts': 30,
             'num_actual_starts': 10,
             'num_completions': 5,
             'state_stats_mapping': {
@@ -52,6 +54,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         exploration_stats_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 1,
+            'num_starts': 30,
             'num_actual_starts': 10,
             'num_completions': 5,
             'state_stats_mapping': {
