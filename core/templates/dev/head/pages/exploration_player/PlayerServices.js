@@ -218,8 +218,8 @@ oppia.factory('ExplorationPlayerService', [
             StateClassifierMappingService.init(data.state_classifier_mapping);
 
             StatsReportingService.initSession(
-              _explorationId, version, data.session_id,
-              GLOBALS.collectionId);
+              _explorationId, exploration.title,
+              version, data.session_id, GLOBALS.collectionId);
             AudioTranslationManagerService.init(
               exploration.getAllAudioLanguageCodes(),
               data.preferred_audio_language_code,

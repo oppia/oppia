@@ -25,3 +25,6 @@ The features supported in each version of the embedding script are as follows:
     button.
 - v0.0.2: simple embedding; embedding a particular version of an exploration;
     embedding with event hooks.
+- v0.0.3: simple embedding; embedding a particular version of an exploration;
+    embedding with event hooks; access exploration title on load.
+
