@@ -20,7 +20,7 @@
 // are shown, what answers have been given, etc. Note that this service does
 // not maintain the currently-active card -- it's more like a log of what the
 // learner has 'discovered' so far.
-oppia.factory('playerTranscriptService', ['$log', function($log) {
+oppia.factory('PlayerTranscriptService', ['$log', function($log) {
   // Each element of this array represents a 'card' in the learner view,
   // represented as a JavaScript object with the following keys:
   // - stateName: the name of the state

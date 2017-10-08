@@ -34,6 +34,7 @@ ACTION_ACCESS_LEARNER_DASHBOARD = 'ACCESS_LEARNER_DASHBOARD'
 ACTION_ACCESS_MODERATOR_PAGE = 'ACCESS_MODERATOR_PAGE'
 ACTION_CREATE_COLLECTION = 'CREATE_COLLECTION'
 ACTION_CREATE_EXPLORATION = 'CREATE_EXPLORATION'
+ACTION_DELETE_ANY_ACTIVITY = 'DELETE_ANY_ACTIVITY'
 ACTION_DELETE_ANY_PUBLIC_ACTIVITY = 'DELETE_ANY_PUBLIC_ACTIVITY'
 ACTION_DELETE_OWNED_PRIVATE_ACTIVITY = 'DELETE_OWNED_PRIVATE_ACTIVITY'
 ACTION_EDIT_ANY_ACTIVITY = 'EDIT_ANY_ACTIVITY'
@@ -82,21 +83,6 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_MODERATOR: 'moderator',
 }
 
-# This dict gives the priority number (an integer value to chose for looking
-# at priority of a role over other). This is used for keeping sync in config
-# lists and new roles.
-# Eg: Suppose a user is in both moderator_usernames and whitelisted_collection
-# _editor_usernames. The priority number in this dict will be used to select
-# whether the user will have role moderator or collection editor in new system.
-# TODO (1995YogeshSharma): Remove this dict once the new system takes over.
-PRIORITY_NUMBER_DICT = {
-    feconf.ROLE_ID_EXPLORATION_EDITOR: 0,
-    feconf.ROLE_ID_BANNED_USER: 1,
-    feconf.ROLE_ID_COLLECTION_EDITOR: 2,
-    feconf.ROLE_ID_MODERATOR: 3,
-    feconf.ROLE_ID_ADMIN: 4
-}
-
 # This dict represents how the actions are inherited among different
 # roles in the site.
 #   key -> name of role
@@ -135,6 +121,7 @@ PARENT_ROLES = {
 #   this dict.
 ROLE_ACTIONS = {
     feconf.ROLE_ID_ADMIN: [
+        ACTION_DELETE_ANY_ACTIVITY,
         ACTION_EDIT_ANY_ACTIVITY,
         ACTION_MANAGE_EMAIL_DASHBOARD,
         ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY,

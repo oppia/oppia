@@ -27,13 +27,13 @@ oppia.directive('oppiaInteractiveEndExploration', [function() {
     controller: [
       '$scope', '$http', '$attrs', '$q', 'urlService',
       'explorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
-      'oppiaHtmlEscaper', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+      'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
       function(
           $scope, $http, $attrs, $q, urlService,
           explorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
-          oppiaHtmlEscaper, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+          HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
         var authorRecommendedExplorationIds = (
-          oppiaHtmlEscaper.escapedJsonToObj(
+          HtmlEscaperService.escapedJsonToObj(
             $attrs.recommendedExplorationIdsWithValue));
 
         $scope.isIframed = urlService.isIframed();

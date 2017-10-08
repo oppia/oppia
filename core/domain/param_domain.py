@@ -27,6 +27,10 @@ import utils
 class ParamSpec(object):
     """Value object for an exploration parameter specification."""
 
+    SUPPORTED_OBJ_TYPES = {
+        'UnicodeString',
+    }
+
     def __init__(self, obj_type):
         """Initializes a ParamSpec object with the specified object type.
 
@@ -71,15 +75,12 @@ class ParamSpec(object):
         # Ensure that this object class exists.
         obj_services.Registry.get_object_class_by_type(self.obj_type)
 
-        # Ensure the obj_type is UnicodeString, since that is the only supported
-        # type of ParamSpec.
-        # TODO(bhenning): Expand parameter support in the editor to multiple
-        # types, then validate all changes and rule inputs to properly match the
-        # type of the parameter.
-        if self.obj_type != 'UnicodeString':
+        # Ensure the obj_type is among the supported ParamSpec types.
+        if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
             raise utils.ValidationError(
-                'Only \'UnicodeString\' is the supported object type for '
-                'parameters, not: %s' % self.obj_type)
+                ('%s is not among the supported object types for parameters: '
+                 '{%s}.') %
+                (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
 
 
 class ParamChange(object):

@@ -31,10 +31,10 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
         '/pages/collection_editor/' +
         'collection_editor_navbar_breadcrumb_directive.html'),
       controller: [
-        '$scope', 'routerService', 'CollectionEditorStateService',
+        '$scope', 'RouterService', 'CollectionEditorStateService',
         'focusService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
         function(
-            $scope, routerService, CollectionEditorStateService,
+            $scope, RouterService, CollectionEditorStateService,
             focusService, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
           var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
             main: 'Edit',
@@ -48,11 +48,11 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
 
           $scope.getCurrentTabName = function() {
             return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-              routerService.getTabStatuses().active];
+              RouterService.getTabStatuses().active];
           };
 
           $scope.editCollectionTitle = function() {
-            routerService.navigateToSettingsTab();
+            RouterService.navigateToSettingsTab();
             focusService.setFocus(COLLECTION_TITLE_INPUT_FOCUS_LABEL);
           };
         }

@@ -52,7 +52,7 @@ notifications:
     recipients:
     - sean@seanlip.org
     - henning.benmax@gmail.com
-    - wxy.xinyu@gmail.com
+    - tzjiang1@gmail.com
     on_success: change
     on_failure: change
   irc:

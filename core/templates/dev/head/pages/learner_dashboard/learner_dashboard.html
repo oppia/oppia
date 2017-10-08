@@ -663,7 +663,7 @@
               <tr ng-repeat="message in messageSummaries" style="padding: 13px 8px 7px 8px;">
                 <td>
                   <div class="row">
-                    <div class="col-sm-12">
+                    <div class="col-sm-9">
                       <span class="feedback-message-header">
                         <span ng-if="message.authorPictureDataUrl" style="display: inline-block;">
                           <img ng-src="<[message.authorPictureDataUrl]>"
@@ -685,7 +685,11 @@
                             translate-values="{threadStatus: getHumanReadableStatus(message.updatedStatus)}"></em>
                       </span>
                     </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3">
+                      <span><[getLocaleAbbreviatedDatetimeString(message.createdOn)]></span>
+                    </div>
                   </div>
+
                   <div class="row">
                     <div class="col-sm-2 feedback-message-spacing" style="width: 8%;"></div>
                     <div class="col-sm-10 feedback-thread-message-body">

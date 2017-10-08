@@ -17,7 +17,7 @@
  * feedback tab of the exploration editor.
  */
 
-oppia.factory('threadDataService', [
+oppia.factory('ThreadDataService', [
   '$http', '$q', 'explorationData', 'alertsService', 'ACTION_ACCEPT_SUGGESTION',
   function(
       $http, $q, explorationData, alertsService, ACTION_ACCEPT_SUGGESTION) {

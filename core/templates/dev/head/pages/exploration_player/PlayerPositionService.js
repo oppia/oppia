@@ -16,8 +16,8 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
-oppia.factory('playerPositionService', [
-  'playerTranscriptService', function(playerTranscriptService) {
+oppia.factory('PlayerPositionService', [
+  'PlayerTranscriptService', function(PlayerTranscriptService) {
     var activeCardIndex = null;
     var onChangeCallback = null;
 
@@ -27,7 +27,7 @@ oppia.factory('playerPositionService', [
         onChangeCallback = callback;
       },
       getCurrentStateName: function() {
-        return playerTranscriptService.getCard(activeCardIndex).stateName;
+        return PlayerTranscriptService.getCard(activeCardIndex).stateName;
       },
       setActiveCardIndex: function(index) {
         var oldIndex = activeCardIndex;

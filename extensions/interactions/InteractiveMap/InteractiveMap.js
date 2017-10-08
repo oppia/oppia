@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveInteractiveMap', [
-  'oppiaHtmlEscaper', 'interactiveMapRulesService', function(
-  oppiaHtmlEscaper, interactiveMapRulesService) {
+  'HtmlEscaperService', 'interactiveMapRulesService', function(
+  HtmlEscaperService, interactiveMapRulesService) {
     return {
       restrict: 'E',
       scope: {
@@ -31,9 +31,10 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
       controller: [
         '$scope', '$attrs', '$timeout', function($scope, $attrs, $timeout) {
           $scope.coords = [
-            oppiaHtmlEscaper.escapedJsonToObj($attrs.latitudeWithValue),
-            oppiaHtmlEscaper.escapedJsonToObj($attrs.longitudeWithValue)];
-          $scope.zoom = oppiaHtmlEscaper.escapedJsonToObj($attrs.zoomWithValue);
+            HtmlEscaperService.escapedJsonToObj($attrs.latitudeWithValue),
+            HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
+          $scope.zoom = (
+            HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
 
           $scope.$on('showInteraction', function() {
             refreshMap();
@@ -82,13 +83,13 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
 ]);
 
 oppia.directive('oppiaResponseInteractiveMap', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/InteractiveMap',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
         var latLongPair = _answer[0] + ',' + _answer[1];
         $scope.staticMapUrl =
@@ -102,13 +103,13 @@ oppia.directive('oppiaResponseInteractiveMap', [
 ]);
 
 oppia.directive('oppiaShortResponseInteractiveMap', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/InteractiveMap',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
         $scope.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
         $scope.formattedCoords += ', ';

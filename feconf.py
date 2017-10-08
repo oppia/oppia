@@ -162,6 +162,9 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 4
 
+# The current version of the question schema.
+CURRENT_QUESTION_SCHEMA_VERSION = 1
+
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
@@ -499,6 +502,9 @@ DISABLED_EXPLORATION_IDS = ['5']
 EMBEDDED_GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/embed/?place=forum/oppia')
 
+# External URL for the Foundation site
+FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
+
 # Whether to allow YAML file uploads.
 ALLOW_YAML_FILE_UPLOAD = False
 
@@ -619,6 +625,7 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
+COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
@@ -631,6 +638,9 @@ OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
+
+# Bool to enable update of analytics models.
+ENABLE_NEW_STATS_FRAMEWORK = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'

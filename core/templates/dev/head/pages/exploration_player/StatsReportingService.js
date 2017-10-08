@@ -34,6 +34,7 @@ oppia.factory('StatsReportingService', [
       $http, StopwatchObjectFactory, messengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService) {
     var explorationId = null;
+    var explorationTitle = null;
     var explorationVersion = null;
     var sessionId = null;
     var stopwatch = null;
@@ -50,9 +51,10 @@ oppia.factory('StatsReportingService', [
 
     return {
       initSession: function(
-          newExplorationId, newExplorationVersion, newSessionId,
-          collectionId) {
+          newExplorationId, newExplorationTitle, newExplorationVersion, 
+          newSessionId, collectionId) {
         explorationId = newExplorationId;
+        explorationTitle = newExplorationTitle;
         explorationVersion = newExplorationVersion;
         sessionId = newSessionId;
         stopwatch = StopwatchObjectFactory.create();
@@ -76,7 +78,8 @@ oppia.factory('StatsReportingService', [
         });
 
         messengerService.sendMessage(messengerService.EXPLORATION_LOADED, {
-          explorationVersion: explorationVersion
+          explorationVersion: explorationVersion,
+          explorationTitle: explorationTitle
         });
 
         statesVisited[stateName] = true;

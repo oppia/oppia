@@ -213,6 +213,15 @@ class AboutRedirectPage(base.BaseHandler):
         self.redirect('/about')
 
 
+class FoundationRedirectPage(base.BaseHandler):
+    """A page that redirects to the separate Oppia Foundation site."""
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.FOUNDATION_SITE_URL)
+        return
+
+
 class TeachRedirectPage(base.BaseHandler):
     """A page that redirects to the main Teach page."""
 
