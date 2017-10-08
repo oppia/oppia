@@ -28,6 +28,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import urllib
 
 import common # pylint: disable=relative-import
@@ -51,7 +52,8 @@ else:
 
 # Construct the new branch name.
 NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
-NEW_APP_YAML_VERSION = TARGET_VERSION.replace('-', '.')
+NEW_APP_YAML_VERSION = TARGET_VERSION.replace('.', '-')
+assert '.' not in NEW_APP_YAML_VERSION
 
 
 def _get_remote_alias():
@@ -151,6 +153,20 @@ def _execute_branch_cut():
 
     _verify_target_branch_does_not_already_exist(remote_alias)
     _verify_target_version_is_consistent_with_latest_released_version()
+
+    # The release coordinator should verify that tests are passing on develop
+    # before checking out the release branch.
+    while True:
+        print (
+            'Please confirm: are Travis checks are passing on develop? (y/n) ')
+        answer = raw_input().lower()
+        if answer in ['y', 'ye', 'yes', 'Y']:
+            break
+        else:
+            print (
+                'Tests should pass on develop before this script is run. '
+                'Exiting.')
+            sys.exit()
 
     # Cut a new release branch.
     print 'Cutting a new release branch: %s' % NEW_BRANCH_NAME
