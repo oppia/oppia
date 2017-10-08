@@ -37,7 +37,7 @@ import common # pylint: disable=relative-import
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
     if not pattern.match(arg):
         raise argparse.ArgumentTypeError(
-            'The format of \'new_version\' should be: x.x.x')
+            'The format of "new_version" should be: x.x.x')
     return arg
 
 _PARSER = argparse.ArgumentParser()
@@ -48,7 +48,7 @@ PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.new_version:
     TARGET_VERSION = PARSED_ARGS.new_version
 else:
-    raise Exception('ERROR: A \'new_version\' arg must be specified.')
+    raise Exception('ERROR: A "new_version" arg must be specified.')
 
 # Construct the new branch name.
 NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
@@ -158,11 +158,11 @@ def _execute_branch_cut():
     # before checking out the release branch.
     while True:
         print (
-            'Please confirm: are Travis checks are passing on develop? (y/n) ')
+            'Please confirm: are Travis checks passing on develop? (y/n) ')
         answer = raw_input().lower()
-        if answer in ['y', 'ye', 'yes', 'Y']:
+        if answer in ['y', 'ye', 'yes']:
             break
-        else:
+        elif answer:
             print (
                 'Tests should pass on develop before this script is run. '
                 'Exiting.')
