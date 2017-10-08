@@ -546,7 +546,7 @@ oppia.directive('conversationSkin', [
                       // Replace the previous interaction with another of the
                       // same type.
                       _nextFocusLabel =
-                      FocusManagerService.generateFocusLabel();
+                        FocusManagerService.generateFocusLabel();
                       PlayerTranscriptService.updateLatestInteractionHtml(
                         ExplorationPlayerService.getInteractionHtml(
                           newStateName, _nextFocusLabel) +

@@ -39,7 +39,7 @@ oppia.directive('schemaBasedFloatEditor', [
           $scope.hasFocusedAtLeastOnce = false;
 
           $scope.labelForErrorFocusTarget =
-          FocusManagerService.generateFocusLabel();
+            FocusManagerService.generateFocusLabel();
 
           $scope.validate = function(localValue) {
             return $filter('isFloat')(localValue) !== undefined;
