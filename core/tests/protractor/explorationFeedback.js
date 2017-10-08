@@ -57,9 +57,9 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
     creatorDashboardPage.get();
-    var numberOfFeedbackMessages = (
-      creatorDashboardPage.getNumberOfFeedbackMessages());
-    expect(numberOfFeedbackMessages).toEqual(0);
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(0);
     users.logout();
 
     // Learner plays the exploration and submits a feedback
@@ -72,9 +72,9 @@ describe('ExplorationFeedback', function() {
     // Creator reads the feedback and responds
     users.login('user1@ExplorationFeedback.com');
     creatorDashboardPage.get();
-    numberOfFeedbackMessages =
-      creatorDashboardPage.getNumberOfFeedbackMessages();
-    expect(numberOfFeedbackMessages).toEqual(1);
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(1);
     creatorDashboardPage.navigateToExplorationEditor();
 
     editor.readFeedbackMessages().then(function(messages) {
