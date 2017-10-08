@@ -114,11 +114,13 @@ class ExplorationStats(object):
 
 
 class StateStats(object):
-    """Domain object representing analytics data for an exploration's state."""
+    """Domain object representing analytics data for an exploration's state.
+    Instances of these domain objects pertain to the exploration ID and version
+    as well."""
 
     def __init__(
             self, total_answers_count, useful_feedback_count, total_hit_count,
-            first_hit_count, total_solutions_triggered_count, total_finishes):
+            first_hit_count, num_times_solution_viewed, total_completions):
         """Constructs a StateStats domain object.
 
         Args:
@@ -129,16 +131,16 @@ class StateStats(object):
             total_hit_count: int. Total number of times the state was entered.
             first_hit_count: int. Number of times the state was entered for the
                 first time.
-            total_solutions_triggered_count: int. Number of times the solution
+            num_times_solution_viewed: int. Number of times the solution
                 button was triggered to answer a state.
-            total_finishes: int. Number of times the state was finished.
+            total_completions: int. Number of times the state was finished.
         """
         self.total_answers_count = total_answers_count
         self.useful_feedback_count = useful_feedback_count
         self.total_hit_count = total_hit_count
         self.first_hit_count = first_hit_count
-        self.total_solutions_triggered_count = total_solutions_triggered_count
-        self.total_finishes = total_finishes
+        self.num_times_solution_viewed = num_times_solution_viewed
+        self.total_completions = total_completions
 
     @classmethod
     def create_default(cls):
@@ -152,9 +154,9 @@ class StateStats(object):
             'useful_feedback_count': self.useful_feedback_count,
             'total_hit_count': self.total_hit_count,
             'first_hit_count': self.first_hit_count,
-            'total_solutions_triggered_count': (
-                self.total_solutions_triggered_count),
-            'total_finishes': self.total_finishes
+            'num_times_solution_viewed': (
+                self.num_times_solution_viewed),
+            'total_completions': self.total_completions
         }
         return state_stats_dict
 
@@ -166,8 +168,8 @@ class StateStats(object):
             state_stats_dict['useful_feedback_count'],
             state_stats_dict['total_hit_count'],
             state_stats_dict['first_hit_count'],
-            state_stats_dict['total_solutions_triggered_count'],
-            state_stats_dict['total_finishes']
+            state_stats_dict['num_times_solution_viewed'],
+            state_stats_dict['total_completions']
         )
 
     def validate(self):
@@ -178,8 +180,8 @@ class StateStats(object):
             'useful_feedback_count',
             'total_hit_count',
             'first_hit_count',
-            'total_solutions_triggered_count',
-            'total_finishes'
+            'num_times_solution_viewed',
+            'total_completions'
         ]
 
         state_stats_dict = self.to_dict()

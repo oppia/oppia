@@ -56,9 +56,9 @@ oppia.factory('oppiaPlayerService', [
 
     var exploration = null;
 
-    var totalTimeStopwatch = null;
+    var visitedStateNames = [];
 
-    var visitedStates = [];
+    var explorationActuallyStarted = false;
 
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
@@ -130,10 +130,7 @@ oppia.factory('oppiaPlayerService', [
       if (!_editorPreviewMode) {
         StatsReportingService.recordExplorationStarted(
           exploration.initStateName, newParams);
-        totalTimeStopwatch.reset();
-        _checkTimeSinceStart(
-          totalTimeStopwatch.getTimeInSecs(), initialState.name);
-        visitedStates.push(exploration.initStateName);
+        visitedStateNames.push(exploration.initStateName);
       }
 
       $rootScope.$broadcast('playerStateChange', initialState.name);
@@ -158,13 +155,6 @@ oppia.factory('oppiaPlayerService', [
         [baseParams]);
 
       LearnerParamsService.init(startingParams);
-    };
-
-    var _checkTimeSinceStart = function(totalTimeSecs, stateName) {
-      if (totalTimeSecs >= MIN_TIME_FOR_ACTUAL_START_SECS) {
-        StatsReportingService.recordExplorationActuallyStarted(
-          stateName, totalTimeSecs);
-      }
     };
 
     // Ensure the transition to a terminal state properly logs the end of the
@@ -242,7 +232,6 @@ oppia.factory('oppiaPlayerService', [
             StatsReportingService.initSession(
               _explorationId, version, data.session_id,
               GLOBALS.collectionId);
-            totalTimeStopwatch = StopwatchObjectFactory.create();
             AudioTranslationManagerService.init(
               exploration.getAllAudioLanguageCodes(),
               data.preferred_audio_language_code,
@@ -389,16 +378,19 @@ oppia.factory('oppiaPlayerService', [
           exploration.isInteractionInline(oldStateName));
 
         if (!_editorPreviewMode) {
-          var isFirstHit = false;
-          if (visitedStates.indexOf(newStateName) == -1) {
-            isFirstHit = true;
-          }
+          var isFirstHit = Boolean(visitedStateNames.indexOf(
+            newStateName) === -1);
           StatsReportingService.recordStateTransition(
             oldStateName, newStateName, answer,
             LearnerParamsService.getAllParams(), isFirstHit);
-          visitedStates.push(newStateName);
-          _checkTimeSinceStart(
-            totalTimeStopwatch.getTimeInSecs(), newStateName);
+          visitedStateNames.push(newStateName);
+
+          if (oldStateName == exploration.initStateName && (
+              !explorationActuallyStarted)) {
+            StatsReportingService.recordExplorationActuallyStarted(
+              oldStateName);
+            explorationActuallyStarted = true;
+          }
         }
 
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
@@ -434,6 +426,28 @@ oppia.factory('oppiaPlayerService', [
           deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
         }
         return deferred.promise;
+      },
+      recordSolutionHit: function() {
+        // Check that the current card is an active card by checking whether
+        // the active card's solution is the same as the current solution.
+        var activeStateName = playerPositionService.getCurrentStateName();
+        var activeCardSolution = exploration.getInteraction(
+          activeStateName).solution;
+        if (activeCardSolution == SolutionManagerService_getCurrentSolution()) {
+          StatsReportingService.recordSolutionHit(activeStateName);
+        }
+      },
+      recordStateFinished: function(activeCardIndex) {
+        var _editorPreviewMode = (
+          explorationContextService.getPageContext() === (
+            PAGE_CONTEXT.EDITOR));
+
+        if (!_editorPreviewMode && activeCardIndex - 1 >= 0) {
+          var lastActiveCard = playerTranscriptService.getCard(
+            activeCardIndex - 1);
+          StatsReportingService.recordStateFinished(
+            lastActiveCard.stateName);
+        }
       }
     };
   }

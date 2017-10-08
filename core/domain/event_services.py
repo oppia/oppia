@@ -94,19 +94,18 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
                 rule_spec_index, classification_categorization, params,
                 session_id, time_spent_in_secs))
 
-        is_feedback_useful = True
-        if classification_categorization == (
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
-            is_feedback_useful = False
-
-        stats_models.AnswerSubmittedEventLogEntryModel.create(
-            exploration_id, exploration_version, state_name, session_id,
-            time_spent_in_secs, is_feedback_useful)
-
-        update_params = {
-            'is_feedback_useful': is_feedback_useful
-        }
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            feedback_is_useful = (
+                classification_categorization != (
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION))
+
+            stats_models.AnswerSubmittedEventLogEntryModel.create(
+                exploration_id, exploration_version, state_name, session_id,
+                time_spent_in_secs, feedback_is_useful)
+
+            update_params = {
+                'feedback_is_useful': feedback_is_useful
+            }
             stats_services.update_stats(
                 exploration_id, exploration_version, state_name, cls.EVENT_TYPE,
                 update_params)
@@ -119,12 +118,10 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(
-            cls, exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs):
-        stats_models.ExplorationActualStartEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs)
+            cls, exp_id, exp_version, state_name, session_id):
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_models.ExplorationActualStartEventLogEntryModel.create(
+                exp_id, exp_version, state_name, session_id)
             stats_services.update_stats(
                 exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
@@ -132,16 +129,16 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
 class SolutionHitEventHandler(BaseEventHandler):
     """Event handler for recording solution hit events."""
 
-    EVENT_TYPE = feconf.EVENT_TYPE_SOLUTION
+    EVENT_TYPE = feconf.EVENT_TYPE_SOLUTION_HIT
 
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs):
-        stats_models.SolutionHitEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs)
+            time_spent_in_state_secs):
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_models.SolutionHitEventLogEntryModel.create(
+                exp_id, exp_version, state_name, session_id,
+                time_spent_in_state_secs)
             stats_services.update_stats(
                 exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
@@ -231,11 +228,11 @@ class StateFinishEventHandler(BaseEventHandler):
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs):
-        stats_models.StateFinishEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs)
+            time_spent_in_state_secs):
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            stats_models.StateFinishEventLogEntryModel.create(
+                exp_id, exp_version, state_name, session_id,
+                time_spent_in_state_secs)
             stats_services.update_stats(
                 exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 

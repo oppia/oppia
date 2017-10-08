@@ -317,7 +317,8 @@ class StateHitEventHandler(base.BaseHandler):
 
 
 class StateFinishEventHandler(base.BaseHandler):
-    """Tracks a learner finishing a state."""
+    """Tracks a learner finishing a state. Here, 'finishing' means completing
+    the active card and moving on to a new active card."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
@@ -327,7 +328,7 @@ class StateFinishEventHandler(base.BaseHandler):
         event_services.StateFinishEventHandler.record(
             exploration_id, self.payload.get('exp_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
-            self.payload.get('client_time_spent_in_secs'))
+            self.payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 
@@ -401,7 +402,8 @@ class ExplorationStartEventHandler(base.BaseHandler):
 
 
 class ExplorationActualStartEventHandler(base.BaseHandler):
-    """Tracks a learner actually starting an exploration."""
+    """Tracks a learner actually starting an exploration. These are the learners
+    who traverse past the initial state."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
@@ -410,13 +412,12 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
         """Handles POST requests."""
         event_services.ExplorationActualStartEventHandler.record(
             exploration_id, self.payload.get('exploration_version'),
-            self.payload.get('state_name'), self.payload.get('session_id'),
-            self.payload.get('client_time_spent_in_secs'))
+            self.payload.get('state_name'), self.payload.get('session_id'))
         self.render_json({})
 
 
 class SolutionHitEventHandler(base.BaseHandler):
-    """Tracks a learner using solutions to answer."""
+    """Tracks a learner clicking on the 'View Solution' button."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
@@ -426,7 +427,7 @@ class SolutionHitEventHandler(base.BaseHandler):
         event_services.SolutionHitEventHandler.record(
             exploration_id, self.payload.get('exploration_version'),
             self.payload.get('state_name'), self.payload.get('session_id'),
-            self.payload.get('client_time_spent_in_secs'))
+            self.payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 

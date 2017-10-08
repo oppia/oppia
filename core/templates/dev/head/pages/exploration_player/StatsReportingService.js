@@ -40,7 +40,7 @@ oppia.factory('StatsReportingService', [
     var explorationId = null;
     var explorationVersion = null;
     var sessionId = null;
-    var stopwatch = null;
+    var stateStopwatch = null;
     var optionalCollectionId = undefined;
     var statesVisited = {};
     var numStatesVisited = 0;
@@ -59,10 +59,10 @@ oppia.factory('StatsReportingService', [
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
         sessionId = newSessionId;
-        stopwatch = StopwatchObjectFactory.create();
+        stateStopwatch = StopwatchObjectFactory.create();
         optionalCollectionId = collectionId;
       },
-      // Note that this also resets the stopwatch.
+      // Note that this also resets the stateStopwatch.
       recordExplorationStarted: function(stateName, params) {
         $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
           params: params,
@@ -87,14 +87,13 @@ oppia.factory('StatsReportingService', [
         numStatesVisited = 1;
         siteAnalyticsService.registerNewCard(1);
 
-        stopwatch.reset();
+        stateStopwatch.reset();
       },
-      recordExplorationActuallyStarted: function(stateName, totalTimeSecs) {
+      recordExplorationActuallyStarted: function(stateName) {
         $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
           exploration_version: explorationVersion,
           state_name: stateName,
           session_id: sessionId,
-          client_time_spent_in_secs: totalTimeSecs
         });
       },
       recordSolutionHit: function(stateName) {
@@ -102,15 +101,15 @@ oppia.factory('StatsReportingService', [
           exploration_version: explorationVersion,
           state_name: stateName,
           session_id: sessionId,
-          client_time_spent_in_secs: stopwatch.getTimeInSecs()
+          time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
         });
       },
-      // Note that this also resets the stopwatch.
+      // Note that this also resets the stateStopwatch.
       recordStateTransition: function(
           oldStateName, newStateName, answer, oldParams, isFirstHit) {
         $http.post(getFullStatsUrl('STATE_HIT'), {
           // This is the time spent since the last submission.
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
           exploration_version: explorationVersion,
           new_state_name: newStateName,
           old_params: oldParams,
@@ -133,11 +132,11 @@ oppia.factory('StatsReportingService', [
           siteAnalyticsService.registerNewCard(numStatesVisited);
         }
 
-        stopwatch.reset();
+        stateStopwatch.reset();
       },
       recordStateFinished: function(stateName) {
         $http.post(getFullStatsUrl('STATE_FINISH'), {
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          time_spent_in_state_secs: stateStopwatch.getTimeInSecs(),
           exp_version: explorationVersion,
           state_name: stateName,
           session_id: sessionId
@@ -145,7 +144,7 @@ oppia.factory('StatsReportingService', [
       },
       recordExplorationCompleted: function(stateName, params) {
         $http.post(getFullStatsUrl('EXPLORATION_COMPLETED'), {
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
           collection_id: optionalCollectionId,
           params: params,
           session_id: sessionId,
@@ -168,7 +167,7 @@ oppia.factory('StatsReportingService', [
           params: params,
           version: explorationVersion,
           session_id: sessionId,
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
           old_state_name: stateName,
           answer_group_index: answerGroupIndex,
           rule_spec_index: ruleIndex,
@@ -177,7 +176,7 @@ oppia.factory('StatsReportingService', [
       },
       recordMaybeLeaveEvent: function(stateName, params) {
         $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
           collection_id: optionalCollectionId,
           params: params,
           session_id: sessionId,

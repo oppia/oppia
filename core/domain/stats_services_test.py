@@ -71,7 +71,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         # Pass in answer submitted event.
         stats_services.update_stats(
             'exp_id1', 1, 'Home', feconf.EVENT_TYPE_ANSWER_SUBMITTED,
-            {'is_feedback_useful': True})
+            {'feedback_is_useful': True})
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         self.assertEqual(
@@ -98,16 +98,16 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].total_finishes, 1)
+            exploration_stats.state_stats_mapping['Home'].total_completions, 1)
 
         # Pass in solution hit event.
         stats_services.update_stats(
-            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_SOLUTION, {})
+            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_SOLUTION_HIT, {})
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Home'].total_solutions_triggered_count, 1)
+                'Home'].num_times_solution_viewed, 1)
 
     def test_calls_to_stats_methods(self):
         """Test that calls are being made to the
@@ -432,8 +432,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                     'useful_feedback_count': 0,
                     'total_hit_count': 0,
                     'first_hit_count': 0,
-                    'total_solutions_triggered_count': 0,
-                    'total_finishes': 0
+                    'num_times_solution_viewed': 0,
+                    'total_completions': 0
                 }
             })
 

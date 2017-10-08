@@ -878,7 +878,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                     'state_name': self.state_name,
                     'exp_version': self.exp_version,
                     'session_id': self.session_id,
-                    'client_time_spent_in_secs': 0,
+                    'time_spent_in_state_secs': 0,
                 })
 
         # Check that the models are updated.
@@ -886,7 +886,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].total_finishes, 1)
+                self.state_name].total_completions, 1)
 
     def test_exploration_actual_start_handler(self):
         """Test the handler for recording exploration actual start events."""
@@ -897,7 +897,6 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                         'state_name': self.state_name,
                         'exploration_version': self.exp_version,
                         'session_id': self.session_id,
-                        'client_time_spent_in_secs': 0,
                     })
 
         # Check that the models are updated.
@@ -913,7 +912,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                     'state_name': self.state_name,
                     'exploration_version': self.exp_version,
                     'session_id': self.session_id,
-                    'client_time_spent_in_secs': 0,
+                    'time_spent_in_state_secs': 0,
                 })
 
         # Check that the models are updated.
@@ -921,7 +920,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].total_solutions_triggered_count, 1)
+                self.state_name].num_times_solution_viewed, 1)
 
     def test_exploration_complete_handler(self):
         """Test the handler for recording exploration complete events."""

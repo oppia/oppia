@@ -37,7 +37,7 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
         self.assertEqual(event_model.is_feedback_useful, True)
 
 class ExplorationActualStartEventLogEntryModelUnitTests(
@@ -47,7 +47,7 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
     def test_create_and_get_event_models(self):
         event_id = (
             stat_models.ExplorationActualStartEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0))
+                'exp_id1', 1, 'state_name1', 'session_id1'))
 
         event_model = stat_models.ExplorationActualStartEventLogEntryModel.get(
             event_id)
@@ -56,7 +56,6 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
 
 class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the SolutionHitEventLogEntryModel class."""
@@ -73,7 +72,7 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateHitEventLogEntryModel class."""
@@ -108,7 +107,7 @@ class StateFinishEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
 
 class CompleteExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
