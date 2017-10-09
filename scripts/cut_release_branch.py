@@ -28,6 +28,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import urllib
 
 import common # pylint: disable=relative-import
@@ -36,7 +37,7 @@ import common # pylint: disable=relative-import
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
     if not pattern.match(arg):
         raise argparse.ArgumentTypeError(
-            'The format of \'new_version\' should be: x.x.x')
+            'The format of "new_version" should be: x.x.x')
     return arg
 
 _PARSER = argparse.ArgumentParser()
@@ -47,11 +48,12 @@ PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.new_version:
     TARGET_VERSION = PARSED_ARGS.new_version
 else:
-    raise Exception('ERROR: A \'new_version\' arg must be specified.')
+    raise Exception('ERROR: A "new_version" arg must be specified.')
 
 # Construct the new branch name.
 NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
-NEW_APP_YAML_VERSION = TARGET_VERSION.replace('-', '.')
+NEW_APP_YAML_VERSION = TARGET_VERSION.replace('.', '-')
+assert '.' not in NEW_APP_YAML_VERSION
 
 
 def _get_remote_alias():
@@ -151,6 +153,20 @@ def _execute_branch_cut():
 
     _verify_target_branch_does_not_already_exist(remote_alias)
     _verify_target_version_is_consistent_with_latest_released_version()
+
+    # The release coordinator should verify that tests are passing on develop
+    # before checking out the release branch.
+    while True:
+        print (
+            'Please confirm: are Travis checks passing on develop? (y/n) ')
+        answer = raw_input().lower()
+        if answer in ['y', 'ye', 'yes']:
+            break
+        elif answer:
+            print (
+                'Tests should pass on develop before this script is run. '
+                'Exiting.')
+            sys.exit()
 
     # Cut a new release branch.
     print 'Cutting a new release branch: %s' % NEW_BRANCH_NAME
