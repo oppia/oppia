@@ -52,7 +52,7 @@ oppia.factory('oppiaPlayerService', [
 
     var exploration = null;
 
-    //This list may contain duplicates. A state name is added to it each time
+    // This list may contain duplicates. A state name is added to it each time
     // the learner moves to a new card.
     var visitedStateNames = [];
 

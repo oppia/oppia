@@ -54,8 +54,9 @@ class ExplorationStats(object):
             exp_version: int. Version of the exploration.
             num_starts: int. Number of learners who started the exploration.
             num_actual_starts: int. Number of learners who actually attempted
-                the exploration. Theses are the learners who spent some
-                minimum fixed time on the exploration.
+                the exploration. Theses are the learners who have completed
+                the initial state of the exploration and traversed to the next
+                state.
             num_completions: int. Number of learners who completed the
                 exploration.
             state_stats_mapping: dict. A dictionary mapping the state names of
@@ -124,7 +125,8 @@ class ExplorationStats(object):
 class StateStats(object):
     """Domain object representing analytics data for an exploration's state.
     Instances of these domain objects pertain to the exploration ID and version
-    as well."""
+    as well.
+    """
 
     def __init__(
             self, total_answers_count, useful_feedback_count, total_hit_count,

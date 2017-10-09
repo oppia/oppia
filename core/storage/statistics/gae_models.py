@@ -676,7 +676,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
