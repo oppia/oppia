@@ -141,7 +141,7 @@ class StateStats(object):
                 first time.
             num_times_solution_viewed: int. Number of times the solution
                 button was triggered to answer a state.
-            total_completions: int. Number of times the state was finished.
+            total_completions: int. Number of times the state was completed.
         """
         self.total_answers_count = total_answers_count
         self.useful_feedback_count = useful_feedback_count

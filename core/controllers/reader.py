@@ -316,9 +316,9 @@ class StateHitEventHandler(base.BaseHandler):
         self.render_json({})
 
 
-class StateFinishEventHandler(base.BaseHandler):
-    """Tracks a learner finishing a state. Here, 'finishing' means completing
-    the active card and moving on to a new active card."""
+class StateCompleteEventHandler(base.BaseHandler):
+    """Tracks a learner complete a state. Here, 'completing' means answering
+    the state and progressing to a new state."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
@@ -326,7 +326,7 @@ class StateFinishEventHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Handles POST requests."""
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            event_services.StateFinishEventHandler.record(
+            event_services.StateCompleteEventHandler.record(
                 exploration_id, self.payload.get('exp_version'),
                 self.payload.get('state_name'), self.payload.get('session_id'),
                 self.payload.get('time_spent_in_state_secs'))

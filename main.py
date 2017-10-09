@@ -312,8 +312,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
     get_redirect_route(
-        r'/explorehandler/state_finish_event/<exploration_id>',
-        reader.StateFinishEventHandler),
+        r'/explorehandler/state_complete_event/<exploration_id>',
+        reader.StateCompleteEventHandler),
     get_redirect_route(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),

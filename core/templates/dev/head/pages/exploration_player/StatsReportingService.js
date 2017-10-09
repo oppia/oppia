@@ -25,7 +25,7 @@ oppia.constant('STATS_REPORTING_URLS', {
   EXPLORATION_STARTED: (
     '/explorehandler/exploration_start_event/<exploration_id>'),
   STATE_HIT: '/explorehandler/state_hit_event/<exploration_id>',
-  STATE_FINISH: '/explorehandler/state_finish_event/<exploration_id>',
+  STATE_COMPLETED: '/explorehandler/state_complete_event/<exploration_id>',
   EXPLORATION_ACTUALLY_STARTED: (
     '/explorehandler/exploration_actual_start_event/<exploration_id>'),
   SOLUTION_HIT: '/explorehandler/solution_hit_event/<exploration_id>'
@@ -134,8 +134,8 @@ oppia.factory('StatsReportingService', [
 
         stateStopwatch.reset();
       },
-      recordStateFinished: function(stateName) {
-        $http.post(getFullStatsUrl('STATE_FINISH'), {
+      recordStateCompleted: function(stateName) {
+        $http.post(getFullStatsUrl('STATE_COMPLETED'), {
           time_spent_in_state_secs: stateStopwatch.getTimeInSecs(),
           exp_version: explorationVersion,
           state_name: stateName,

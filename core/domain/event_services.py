@@ -221,16 +221,16 @@ class StateHitEventHandler(BaseEventHandler):
                 exp_id, exp_version, state_name, cls.EVENT_TYPE, update_params)
 
 
-class StateFinishEventHandler(BaseEventHandler):
-    """Event handler for recording state finish events."""
+class StateCompleteEventHandler(BaseEventHandler):
+    """Event handler for recording state complete events."""
 
-    EVENT_TYPE = feconf.EVENT_TYPE_STATE_FINISHED
+    EVENT_TYPE = feconf.EVENT_TYPE_STATE_COMPLETED
 
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs):
-        stats_models.StateFinishEventLogEntryModel.create(
+        stats_models.StateCompleteEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs)
         stats_services.update_stats(

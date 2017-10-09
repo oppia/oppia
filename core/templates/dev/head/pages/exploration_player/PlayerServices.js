@@ -381,6 +381,7 @@ oppia.factory('oppiaPlayerService', [
           StatsReportingService.recordStateTransition(
             oldStateName, newStateName, answer,
             LearnerParamsService.getAllParams(), isFirstHit);
+          StatsReportingService.recordStateCompleted(oldStateName);
           visitedStateNames.push(newStateName);
 
           if (oldStateName === exploration.initStateName && (
@@ -427,18 +428,6 @@ oppia.factory('oppiaPlayerService', [
       },
       recordSolutionHit: function(stateName) {
         StatsReportingService.recordSolutionHit(stateName);
-      },
-      recordStateFinished: function(activeCardIndex) {
-        var _editorPreviewMode = (
-          explorationContextService.getPageContext() === (
-            PAGE_CONTEXT.EDITOR));
-
-        if (!_editorPreviewMode) {
-          var lastActiveCard = playerTranscriptService.getCard(
-            activeCardIndex - 1);
-          StatsReportingService.recordStateFinished(
-            lastActiveCard.stateName);
-        }
       }
     };
   }

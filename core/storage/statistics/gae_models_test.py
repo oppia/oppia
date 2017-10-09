@@ -92,15 +92,15 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
-class StateFinishEventLogEntryModelUnitTests(test_utils.GenericTestBase):
-    """Test the StateFinishEventLogEntryModel class."""
+class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Test the StateCompleteEventLogEntryModel class."""
 
     def test_create_and_get_event_models(self):
         event_id = (
-            stat_models.StateFinishEventLogEntryModel.create(
+            stat_models.StateCompleteEventLogEntryModel.create(
                 'exp_id1', 1, 'state_name1', 'session_id1', 0.0))
 
-        event_model = stat_models.StateFinishEventLogEntryModel.get(
+        event_model = stat_models.StateCompleteEventLogEntryModel.get(
             event_id)
 
         self.assertEqual(event_model.exp_id, 'exp_id1')

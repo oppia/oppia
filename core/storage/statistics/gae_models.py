@@ -668,8 +668,8 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
 
-class StateFinishEventLogEntryModel(base_models.BaseModel):
-    """An event triggered by a student finishing a state."""
+class StateCompleteEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student completing a state."""
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -694,7 +694,7 @@ class StateFinishEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                time_spent_in_state_secs):
-        """Creates a new state finish event."""
+        """Creates a new state complete event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
         state_finish_event_entity = cls(

@@ -870,10 +870,10 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 self.state_name].first_hit_count, 1)
 
-    def test_state_finish_handler(self):
-        """Test the handler for recording state finish events."""
+    def test_state_complete_handler(self):
+        """Test the handler for recording state complete events."""
         with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json('/explorehandler/state_finish_event/%s' % (
+            self.post_json('/explorehandler/state_complete_event/%s' % (
                 self.exp_id), {
                     'state_name': self.state_name,
                     'exp_version': self.exp_version,
