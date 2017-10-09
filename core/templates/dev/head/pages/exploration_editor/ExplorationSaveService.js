@@ -16,15 +16,15 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
-oppia.factory('explorationSaveService', [
+oppia.factory('ExplorationSaveService', [
   '$modal', '$timeout', '$rootScope', '$log', '$q',
   'alertsService', 'explorationData', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationWarningsService', 'ExplorationDiffService',
-  'explorationInitStateNameService', 'routerService',
-  'focusService', 'changeListService', 'siteAnalyticsService',
+  'explorationInitStateNameService', 'RouterService',
+  'FocusManagerService', 'changeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   function(
       $modal, $timeout, $rootScope, $log, $q,
@@ -33,8 +33,8 @@ oppia.factory('explorationSaveService', [
       explorationObjectiveService, explorationCategoryService,
       explorationLanguageCodeService, explorationRightsService,
       explorationWarningsService, ExplorationDiffService,
-      explorationInitStateNameService, routerService,
-      focusService, changeListService, siteAnalyticsService,
+      explorationInitStateNameService, RouterService,
+      FocusManagerService, changeListService, siteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
@@ -202,7 +202,9 @@ oppia.factory('explorationSaveService', [
 
       discardChanges: function() {
         $modal.open({
-          templateUrl: 'modals/confirmDiscardChanges',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'confirm_discard_changes_modal_directive.html'),
           backdrop: 'static',
           keyboard: false,
           controller: [
@@ -443,7 +445,7 @@ oppia.factory('explorationSaveService', [
         // controller 'saveIsInProgress' back to false.
         var whenModalClosed = $q.defer();
 
-        routerService.savePendingChanges();
+        RouterService.savePendingChanges();
 
         if (!explorationRightsService.isPrivate() &&
             explorationWarningsService.countWarnings() > 0) {
@@ -542,7 +544,7 @@ oppia.factory('explorationSaveService', [
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
-              focusService.setFocus('saveChangesModalOpened');
+              FocusManagerService.setFocus('saveChangesModalOpened');
             });
           });
 

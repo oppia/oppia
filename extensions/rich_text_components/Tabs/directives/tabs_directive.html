@@ -1,0 +1,8 @@
+<tabset>
+  <tab ng-repeat="tabContent in tabContents" heading="<[tabContent.title]>">
+    <br>
+    <span ng-bind-html="tabContent.content"></span>
+  </tab>
+</tabset>
+
+<hr>

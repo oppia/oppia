@@ -15,28 +15,32 @@
 /**
  * @fileoverview Controller for the local navigation in the learner view.
  */
+
 oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$modal', '$http', 'oppiaPlayerService', 'alertsService',
-  'UrlInterpolationService', 'focusService', 'FLAG_EXPLORATION_URL_TEMPLATE',
-  function($scope, $modal, $http, oppiaPlayerService, alertsService,
-    UrlInterpolationService, focusService, FLAG_EXPLORATION_URL_TEMPLATE) {
-    $scope.explorationId = oppiaPlayerService.getExplorationId();
+  '$scope', '$modal', '$http', 'ExplorationPlayerService', 'alertsService',
+  'UrlInterpolationService', 'FocusManagerService',
+  'FLAG_EXPLORATION_URL_TEMPLATE',
+  function(
+    $scope, $modal, $http, ExplorationPlayerService, alertsService,
+    UrlInterpolationService, FocusManagerService,
+    FLAG_EXPLORATION_URL_TEMPLATE) {
+    $scope.explorationId = ExplorationPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
       $modal.open({
         templateUrl: 'modals/learnerViewSuggestion',
         backdrop: 'static',
         resolve: {},
         controller: [
-          '$scope', '$modalInstance', '$timeout', 'playerPositionService',
-          'oppiaPlayerService',
+          '$scope', '$modalInstance', '$timeout', 'PlayerPositionService',
+          'ExplorationPlayerService',
           function(
-              $scope, $modalInstance, $timeout, playerPositionService,
-              oppiaPlayerService) {
-            var stateName = playerPositionService.getCurrentStateName();
-            $scope.originalHtml = oppiaPlayerService.getStateContentHtml(
+              $scope, $modalInstance, $timeout, PlayerPositionService,
+              ExplorationPlayerService) {
+            var stateName = PlayerPositionService.getCurrentStateName();
+            $scope.originalHtml = ExplorationPlayerService.getStateContentHtml(
               stateName);
             $scope.description = '';
             $scope.suggestionHtml = $scope.originalHtml;
@@ -52,8 +56,8 @@ oppia.controller('LearnerLocalNav', [
 
             $scope.submitSuggestion = function() {
               $modalInstance.close({
-                id: oppiaPlayerService.getExplorationId(),
-                version: oppiaPlayerService.getExplorationVersion(),
+                id: ExplorationPlayerService.getExplorationId(),
+                version: ExplorationPlayerService.getExplorationVersion(),
                 stateName: stateName,
                 description: $scope.description,
                 suggestionHtml: $scope.suggestionHtml
@@ -91,15 +95,15 @@ oppia.controller('LearnerLocalNav', [
             '/pages/exploration_player/flag_exploration_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'playerPositionService',
-          function($scope, $modalInstance, playerPositionService) {
+          '$scope', '$modalInstance', 'PlayerPositionService',
+          function($scope, $modalInstance, PlayerPositionService) {
             $scope.flagMessageTextareaIsShown = false;
-            var stateName = playerPositionService.getCurrentStateName();
+            var stateName = PlayerPositionService.getCurrentStateName();
 
             $scope.showFlagMessageTextarea = function(value) {
               if (value) {
                 $scope.flagMessageTextareaIsShown = true;
-                focusService.setFocus('flagMessageTextarea');
+                FocusManagerService.setFocus('flagMessageTextarea');
               }
             };
 

@@ -18,12 +18,12 @@
 
 oppia.controller('ExplorationGraph', [
   '$scope', '$modal', 'editorContextService', 'alertsService',
-  'explorationStatesService', 'editabilityService', 'routerService',
-  'graphDataService',
+  'explorationStatesService', 'editabilityService', 'RouterService',
+  'graphDataService', 'UrlInterpolationService',
   function(
-      $scope, $modal, editorContextService, alertsService,
-      explorationStatesService, editabilityService, routerService,
-      graphDataService) {
+    $scope, $modal, editorContextService, alertsService,
+    explorationStatesService, editabilityService, RouterService,
+    graphDataService, UrlInterpolationService) {
     $scope.getGraphData = graphDataService.getGraphData;
     $scope.isEditable = editabilityService.isEditable;
 
@@ -39,7 +39,7 @@ oppia.controller('ExplorationGraph', [
     };
 
     $scope.onClickStateInMinimap = function(stateName) {
-      routerService.navigateToMainTab(stateName);
+      RouterService.navigateToMainTab(stateName);
     };
 
     $scope.getActiveStateName = function() {
@@ -50,7 +50,8 @@ oppia.controller('ExplorationGraph', [
       alertsService.clearWarnings();
 
       $modal.open({
-        templateUrl: 'modals/stateGraph',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/exploration_graph_modal_directive.html'),
         backdrop: true,
         resolve: {
           isEditable: function() {

@@ -78,13 +78,15 @@ oppia.constant(
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$document', '$modal', '$timeout', 'focusService',
+    '$delegate', '$document', '$modal', '$timeout', 'FocusManagerService',
     'taRegisterTool', 'rteHelperService', 'alertsService',
     'explorationContextService', 'PAGE_CONTEXT',
+    'UrlInterpolationService',
     function(
-      taOptions, $document, $modal, $timeout, focusService,
+      taOptions, $document, $modal, $timeout, FocusManagerService,
       taRegisterTool, rteHelperService, alertsService,
-      explorationContextService, PAGE_CONTEXT) {
+      explorationContextService, PAGE_CONTEXT,
+      UrlInterpolationService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -102,7 +104,8 @@ oppia.config(['$provide', function($provide) {
         onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $modal.open({
-          templateUrl: 'modals/customizeRteComponent',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/customize_rte_component_modal_directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
@@ -117,7 +120,7 @@ oppia.config(['$provide', function($provide) {
               // TODO(sll): Make this switch to the first input field in the
               // modal instead.
               $scope.modalIsLoading = true;
-              focusService.setFocus('tmpFocusPoint');
+              FocusManagerService.setFocus('tmpFocusPoint');
               $timeout(function() {
                 $scope.modalIsLoading = false;
               });
@@ -430,39 +433,6 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
-// Service for HTML serialization and escaping.
-oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
-  var htmlEscaper = {
-    objToEscapedJson: function(obj) {
-      return this.unescapedStrToEscapedStr(JSON.stringify(obj));
-    },
-    escapedJsonToObj: function(json) {
-      if (!json) {
-        $log.error('Empty string was passed to JSON decoder.');
-        return '';
-      }
-      return JSON.parse(this.escapedStrToUnescapedStr(json));
-    },
-    unescapedStrToEscapedStr: function(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    },
-    escapedStrToUnescapedStr: function(value) {
-      return String(value)
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, '\'')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&');
-    }
-  };
-  return htmlEscaper;
-}]);
-
 // Service for converting dates in milliseconds since the Epoch to
 // human-readable dates.
 oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
@@ -498,20 +468,11 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
   };
 }]);
 
-// Service for generating random IDs.
-oppia.factory('IdGenerationService', [function() {
-  return {
-    generateNewId: function() {
-      return Math.random().toString(36).slice(2);
-    }
-  };
-}]);
-
 oppia.factory('rteHelperService', [
   '$filter', '$log', '$interpolate', 'explorationContextService',
-  'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
+  'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
   function($filter, $log, $interpolate, explorationContextService,
-           RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+           RTE_COMPONENT_SPECS, HtmlEscaperService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -544,7 +505,7 @@ oppia.factory('rteHelperService', [
           continue;
         }
         var argName = attr.name.substring(0, separatorLocation);
-        customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(
+        customizationArgsDict[argName] = HtmlEscaperService.escapedJsonToObj(
           attr.value);
       }
       return customizationArgsDict;
@@ -591,7 +552,8 @@ oppia.factory('rteHelperService', [
         for (var attrName in customizationArgsDict) {
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
-            oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+            HtmlEscaperService.objToEscapedJson(
+              customizationArgsDict[attrName]));
         }
 
         return el.get(0);
@@ -669,45 +631,6 @@ oppia.factory('rteHelperService', [
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 
-// Service for setting focus. This broadcasts a 'focusOn' event which sets
-// focus to the element in the page with the corresponding focusOn attribute.
-// Note: This requires LABEL_FOR_CLEARING_FOCUS to exist somewhere in the HTML
-// page.
-oppia.factory('focusService', [
-  '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
-  'IdGenerationService',
-  function(
-      $rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS,
-      IdGenerationService) {
-    var _nextLabelToFocusOn = null;
-    return {
-      clearFocus: function() {
-        this.setFocus(LABEL_FOR_CLEARING_FOCUS);
-      },
-      setFocus: function(name) {
-        if (_nextLabelToFocusOn) {
-          return;
-        }
-
-        _nextLabelToFocusOn = name;
-        $timeout(function() {
-          $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
-          _nextLabelToFocusOn = null;
-        });
-      },
-      setFocusIfOnDesktop: function(newFocusLabel) {
-        if (!deviceInfoService.isMobileDevice()) {
-          this.setFocus(newFocusLabel);
-        }
-      },
-      // Generates a random string (to be used as a focus label).
-      generateFocusLabel: function() {
-        return IdGenerationService.generateNewId();
-      }
-    };
-  }
-]);
-
 // Service for manipulating the page URL.
 oppia.factory('urlService', ['$window', function($window) {
   return {
@@ -754,23 +677,6 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
     }
   };
 }]);
-
-// Service for enabling a background mask that leaves navigation visible.
-oppia.factory('BackgroundMaskService', function() {
-  var maskIsActive = false;
-
-  return {
-    isMaskActive: function() {
-      return maskIsActive;
-    },
-    activateMask: function() {
-      maskIsActive = true;
-    },
-    deactivateMask: function() {
-      maskIsActive = false;
-    }
-  };
-});
 
 // Service for sending events to Google Analytics.
 //
@@ -947,46 +853,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
   };
 }]);
 
-// Service for debouncing function calls.
-oppia.factory('oppiaDebouncer', [function() {
-  return {
-    // Returns a function that will not be triggered as long as it continues to
-    // be invoked. The function only gets executed after it stops being called
-    // for `wait` milliseconds.
-    debounce: function(func, millisecsToWait) {
-      var timeout;
-      var context = this;
-      var args = arguments;
-      var timestamp;
-      var result;
-
-      var later = function() {
-        var last = new Date().getTime() - timestamp;
-        if (last < millisecsToWait) {
-          timeout = setTimeout(later, millisecsToWait - last);
-        } else {
-          timeout = null;
-          result = func.apply(context, args);
-          if (!timeout) {
-            context = null;
-            args = null;
-          }
-        }
-      };
-
-      return function() {
-        context = this;
-        args = arguments;
-        timestamp = new Date().getTime();
-        if (!timeout) {
-          timeout = setTimeout(later, millisecsToWait);
-        }
-        return result;
-      };
-    }
-  };
-}]);
-
 // Shim service for functions on $window that allows these functions to be
 // mocked in unit tests.
 oppia.factory('currentLocationService', ['$window', function($window) {
@@ -1002,14 +868,14 @@ oppia.factory('currentLocationService', ['$window', function($window) {
 
 // Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
-  '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
+  '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
     return {
       formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
         for (var caSpecName in customizationArgSpecs) {
           var caSpecValue = customizationArgSpecs[caSpecName].value;
           element.attr(
             $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-            oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+            HtmlEscaperService.objToEscapedJson(caSpecValue));
         }
         return element;
       }
@@ -1043,94 +909,3 @@ if (typeof Object.create !== 'function') {
     };
   })();
 }
-
-// Service for code normalization. Used by the code REPL and pencil code
-// interactions.
-oppia.factory('codeNormalizationService', [function() {
-  var removeLeadingWhitespace = function(str) {
-    return str.replace(/^\s+/g, '');
-  };
-  var removeTrailingWhitespace = function(str) {
-    return str.replace(/\s+$/g, '');
-  };
-  var removeIntermediateWhitespace = function(str) {
-    return str.replace(/\s+/g, ' ');
-  };
-  return {
-    getNormalizedCode: function(codeString) {
-      /*
-       * Normalizes a code string (which is assumed not to contain tab
-       * characters). In particular:
-       *
-       * - Strips out lines that start with '#' (comments), possibly preceded by
-       *     whitespace.
-       * - Trims trailing whitespace on each line, and normalizes multiple
-       *     whitespace characters within a single line into one space
-       *     character.
-       * - Removes blank newlines.
-       * - Make the indentation level four spaces.
-       */
-      // TODO(sll): Augment this function to strip out comments that occur at
-      // the end of a line. However, be careful with lines where '#' is
-      // contained in quotes or the character is escaped.
-      var FOUR_SPACES = '    ';
-      // Maps the number of spaces at the beginning of a line to an int
-      // specifying the desired indentation level.
-      var numSpacesToDesiredIndentLevel = {
-        0: 0
-      };
-
-      var codeLines = removeTrailingWhitespace(codeString).split('\n');
-      var normalizedCodeLines = [];
-      codeLines.forEach(function(line) {
-        if (removeLeadingWhitespace(line).indexOf('#') === 0) {
-          return;
-        }
-        line = removeTrailingWhitespace(line);
-        if (!line) {
-          return;
-        }
-
-        var numSpaces = line.length - removeLeadingWhitespace(line).length;
-
-        var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-        var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
-        if (numSpaces > maxNumSpaces) {
-          // Add a new indentation level
-          numSpacesToDesiredIndentLevel[numSpaces] = existingNumSpaces.length;
-        }
-
-        // This is set when the indentation level of the current line does not
-        // start a new scope, and also does not match any previous indentation
-        // level. This case is actually invalid, but for now, we take the
-        // largest indentation level that is less than this one.
-        // TODO(sll): Bad indentation should result in an error nearer the
-        // source.
-        var isShortfallLine =
-          !numSpacesToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
-          numSpaces < maxNumSpaces;
-
-        // Clear all existing indentation levels to the right of this one.
-        for (var indentLength in numSpacesToDesiredIndentLevel) {
-          if (Number(indentLength) > numSpaces) {
-            delete numSpacesToDesiredIndentLevel[indentLength];
-          }
-        }
-
-        if (isShortfallLine) {
-          existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-          numSpaces = Math.max.apply(null, existingNumSpaces);
-        }
-
-        var normalizedLine = '';
-        for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
-          normalizedLine += FOUR_SPACES;
-        }
-        normalizedLine += removeIntermediateWhitespace(
-          removeLeadingWhitespace(line));
-        normalizedCodeLines.push(normalizedLine);
-      });
-      return normalizedCodeLines.join('\n');
-    }
-  };
-}]);

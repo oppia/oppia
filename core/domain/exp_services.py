@@ -40,11 +40,13 @@ from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
 
+datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
@@ -310,6 +312,39 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 
     result.update(db_results_dict)
     return result
+
+
+def get_exploration_and_exploration_rights_by_id(exploration_id):
+    """Returns a tuple for exploration domain object and exploration rights
+    object.
+
+    Args:
+        exploration_id: str. Id of the exploration.
+
+    Returns:
+        tuple(Exploration|None, ExplorationRights|None). The exploration and
+        exploration rights object, respectively.
+    """
+    exploration_and_rights = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [
+                ('ExplorationModel', [exploration_id]),
+                ('ExplorationRightsModel', [exploration_id])
+            ]))
+
+    exploration = None
+    if exploration_and_rights[0][0] is not None:
+        exploration = get_exploration_from_model(
+            exploration_and_rights[0][0])
+
+    exploration_rights = None
+    if exploration_and_rights[1][0] is not None:
+        exploration_rights = (
+            rights_manager.get_activity_rights_from_model(
+                exploration_and_rights[1][0],
+                constants.ACTIVITY_TYPE_EXPLORATION))
+
+    return (exploration, exploration_rights)
 
 
 def get_new_exploration_id():
@@ -788,6 +823,12 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
+    # Trigger statistics model update.
+    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+        stats_services.handle_stats_creation_for_new_exp_version(
+            exploration.id, exploration.version, exploration.states,
+            change_list)
+
     if feconf.ENABLE_ML_CLASSIFIERS:
         new_to_old_state_names = exploration.get_state_names_mapping(
             change_list)
@@ -847,6 +888,11 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
+
+    # Trigger statistics model creation.
+    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+        stats_services.handle_stats_creation_for_new_exploration(
+            exploration.id, exploration.version, exploration.states)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.

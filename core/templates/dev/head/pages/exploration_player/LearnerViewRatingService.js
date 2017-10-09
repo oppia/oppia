@@ -17,9 +17,9 @@
  */
 
 oppia.factory('LearnerViewRatingService', [
-  '$http', '$rootScope', 'oppiaPlayerService',
-  function($http, $rootScope, oppiaPlayerService) {
-    var explorationId = oppiaPlayerService.getExplorationId();
+  '$http', '$rootScope', 'ExplorationPlayerService',
+  function($http, $rootScope, ExplorationPlayerService) {
+    var explorationId = ExplorationPlayerService.getExplorationId();
     var ratingsUrl = '/explorehandler/rating/' + explorationId;
     var userRating;
     return {

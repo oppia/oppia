@@ -19,20 +19,22 @@
 
 oppia.controller('PreviewTab', [
   '$scope', '$modal', '$q', '$timeout', 'LearnerParamsService',
-  'explorationData', 'explorationAdvancedFeaturesService',
+  'explorationData', 'ExplorationAdvancedFeaturesService',
   'explorationCategoryService', 'editorContextService',
   'explorationInitStateNameService', 'explorationParamChangesService',
   'explorationParamSpecsService', 'explorationStatesService',
-  'explorationTitleService', 'oppiaPlayerService', 'parameterMetadataService',
-  'ParamChangeObjectFactory', 'UrlInterpolationService',
+  'explorationTitleService', 'ExplorationPlayerService',
+  'ParameterMetadataService', 'ParamChangeObjectFactory',
+  'UrlInterpolationService',
   function(
       $scope, $modal, $q, $timeout, LearnerParamsService,
-      explorationData, explorationAdvancedFeaturesService,
+      explorationData, ExplorationAdvancedFeaturesService,
       explorationCategoryService, editorContextService,
       explorationInitStateNameService, explorationParamChangesService,
       explorationParamSpecsService, explorationStatesService,
-      explorationTitleService, oppiaPlayerService, parameterMetadataService,
-      ParamChangeObjectFactory, UrlInterpolationService) {
+      explorationTitleService, ExplorationPlayerService,
+      ParameterMetadataService, ParamChangeObjectFactory,
+      UrlInterpolationService) {
     $scope.isExplorationPopulated = false;
     explorationData.getData().then(function() {
       var initStateNameForPreview = editorContextService.getActiveStateName();
@@ -58,7 +60,7 @@ oppia.controller('PreviewTab', [
     $scope.getManualParamChanges = function(initStateNameForPreview) {
       var deferred = $q.defer();
 
-      var unsetParametersInfo = parameterMetadataService.getUnsetParametersInfo(
+      var unsetParametersInfo = ParameterMetadataService.getUnsetParametersInfo(
         [initStateNameForPreview]);
 
       // Construct array to hold required parameter changes
@@ -82,7 +84,7 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.showParameterSummary = function() {
-      return (explorationAdvancedFeaturesService.areParametersEnabled() &&
+      return (ExplorationAdvancedFeaturesService.areParametersEnabled() &&
               !angular.equals({}, $scope.allParams));
     };
 
@@ -94,13 +96,13 @@ oppia.controller('PreviewTab', [
         backdrop: 'static',
         windowClass: 'oppia-preview-set-params-modal',
         controller: [
-          '$scope', '$modalInstance', 'routerService',
-          function($scope, $modalInstance, routerService) {
+          '$scope', '$modalInstance', 'RouterService',
+          function($scope, $modalInstance, RouterService) {
             $scope.manualParamChanges = manualParamChanges;
             $scope.previewParamModalOk = $modalInstance.close;
             $scope.previewParamModalCancel = function() {
               $modalInstance.dismiss('cancel');
-              routerService.navigateToMainTab();
+              RouterService.navigateToMainTab();
             };
           }
         ]
@@ -112,7 +114,8 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.loadPreviewState = function(stateName, manualParamChanges) {
-      oppiaPlayerService.initSettingsFromEditor(stateName, manualParamChanges);
+      ExplorationPlayerService.initSettingsFromEditor(
+        stateName, manualParamChanges);
       $scope.isExplorationPopulated = true;
     };
 

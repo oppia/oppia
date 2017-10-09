@@ -1,0 +1,49 @@
+<div class="modal-header protractor-test-add-response-modal-header">
+  <h3>Add Response</h3>
+</div>
+
+<div class="modal-body">
+  <form name="addAnswerGroupForm.outcomeDetailsForm" class="form-inline protractor-test-add-response-details">
+    <div class="oppia-rule-details-header">
+      <strong>If the learner's answer...</strong>
+    </div>
+
+    <rule-editor rule="tmpRule" is-editable="editabilityService.isEditable()" is-editing-rule-inline="false">
+    </rule-editor>
+
+    <br>
+
+    <div ng-if="!feedbackEditorIsOpen && !isLinearWithNoFeedback(tmpOutcome)"
+         title="Edit feedback"
+         style="height: 100%; margin-right: 22px;">
+      <div class="oppia-rule-details-header oppia-editable-section">
+        <div class="oppia-rule-preview oppia-transition-200">
+          <div class="oppia-click-to-start-editing protractor-test-open-feedback-editor" ng-click="openFeedbackEditor()">
+            <i class="material-icons oppia-editor-edit-icon pull-right" title="Edit Feedback">&#xE254;</i>
+          </div>
+          <strong>Oppia tells the learner...</strong>
+          <div style="position: relative;">
+            <span style="color: #888">
+              <em>Nothing</em>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="feedbackEditorIsOpen">
+      <outcome-feedback-editor outcome="tmpOutcome">
+      </outcome-feedback-editor>
+    </div>
+    <br>
+
+    <outcome-destination-editor outcome="tmpOutcome" outcome-has-feedback="!isLinearWithNoFeedback(tmpOutcome)">
+    </outcome-destination-editor>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default protractor-test-close-add-response-modal" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save Response</button>
+  <button class="btn btn-success" ng-click="saveResponse(true)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save and Add Another</button>
+</div>

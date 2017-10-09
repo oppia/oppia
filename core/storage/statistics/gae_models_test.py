@@ -115,3 +115,20 @@ class CompleteExplorationEventLogEntryModelUnitTests(
         self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
         self.assertEqual(event_model.params, {})
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
+    """Test the ExplorationStatsModel class."""
+
+    def test_create_and_get_analytics_model(self):
+        model_id = (
+            stat_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
+
+        model = stat_models.ExplorationStatsModel.get_model(
+            'exp_id1', 1)
+
+        self.assertEqual(model.id, model_id)
+        self.assertEqual(model.exp_id, 'exp_id1')
+        self.assertEqual(model.exp_version, 1)
+        self.assertEqual(model.num_actual_starts, 0)
+        self.assertEqual(model.num_completions, 0)
+        self.assertEqual(model.state_stats_mapping, {})

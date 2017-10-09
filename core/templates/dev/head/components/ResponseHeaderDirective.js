@@ -33,10 +33,10 @@ oppia.directive('responseHeader', [
         '/components/' +
         'response_header_directive.html'),
       controller: [
-        '$scope', 'editabilityService', 'editorContextService', 'routerService',
+        '$scope', 'editabilityService', 'editorContextService', 'RouterService',
         'PLACEHOLDER_OUTCOME_DEST',
         function(
-            $scope, editabilityService, editorContextService, routerService,
+            $scope, editabilityService, editorContextService, RouterService,
             PLACEHOLDER_OUTCOME_DEST) {
           $scope.editabilityService = editabilityService;
 
@@ -52,7 +52,7 @@ oppia.directive('responseHeader', [
           };
 
           $scope.navigateToState = function(stateName) {
-            routerService.navigateToMainTab(stateName);
+            RouterService.navigateToMainTab(stateName);
           };
 
           $scope.deleteResponse = function(evt) {
