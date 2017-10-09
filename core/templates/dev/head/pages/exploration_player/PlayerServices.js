@@ -33,7 +33,7 @@ oppia.factory('oppiaPlayerService', [
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
-  'LanguageUtilService', 'SolutionManagerService',
+  'LanguageUtilService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
@@ -43,7 +43,7 @@ oppia.factory('oppiaPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, SolutionManagerService) {
+      LanguageUtilService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -52,7 +52,7 @@ oppia.factory('oppiaPlayerService', [
 
     var exploration = null;
 
-    //This list may contain duplicates; a state name is added to it each time
+    //This list may contain duplicates. A state name is added to it each time
     // the learner moves to a new card.
     var visitedStateNames = [];
 
