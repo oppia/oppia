@@ -15,6 +15,7 @@
 """Common utility functions and classes used by multiple Python scripts."""
 
 import os
+import subprocess
 
 
 def ensure_directory_exists(d):
@@ -40,6 +41,15 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
         return
 
     raise Exception('Please run this script from the oppia/ directory.')
+
+
+def open_new_tab_in_browser(url):
+    """Opens a new tab in a browser, if possible."""
+    browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
+    for cmd in browser_cmds:
+        if subprocess.call(['which', cmd]) == 0:
+            subprocess.call([cmd, url])
+            return
 
 
 class CD(object):
