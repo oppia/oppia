@@ -17,10 +17,10 @@
  */
 
 oppia.directive('schemaBasedListEditor', [
-  'schemaDefaultValueService', 'recursionHelper', 'focusService',
+  'schemaDefaultValueService', 'recursionHelper', 'FocusManagerService',
   'schemaUndefinedLastElementService', 'IdGenerationService',
   'UrlInterpolationService', function(
-    schemaDefaultValueService, recursionHelper, focusService,
+    schemaDefaultValueService, recursionHelper, FocusManagerService,
     schemaUndefinedLastElementService, IdGenerationService,
     UrlInterpolationService) {
     return {
@@ -122,7 +122,7 @@ oppia.directive('schemaBasedListEditor', [
 
             $scope.localValue.push(
               schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-            focusService.setFocus(
+            FocusManagerService.setFocus(
               $scope.getFocusLabel($scope.localValue.length - 1));
           };
 
