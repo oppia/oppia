@@ -55,6 +55,8 @@ NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
 NEW_APP_YAML_VERSION = TARGET_VERSION.replace('.', '-')
 assert '.' not in NEW_APP_YAML_VERSION
 
+BRANCH_IS_CLEAN_MESSAGE = 'nothing to commit, working directory clean'
+
 
 def _get_remote_alias():
     # Find the correct alias for the remote branch.
@@ -75,9 +77,7 @@ def _verify_local_repo_is_clean():
     """Checks that the local Git repo is clean."""
     git_status_output = subprocess.check_output(
         ['git', 'status']).strip().split('\n')
-    branch_is_clean = (
-        git_status_output[1] == 'nothing to commit, working directory clean')
-    if len(git_status_output) > 2 or not branch_is_clean:
+    if not BRANCH_IS_CLEAN_MESSAGE in git_status_output:
         raise Exception(
             'ERROR: This script should be run from a clean branch.')
 
@@ -156,6 +156,7 @@ def _execute_branch_cut():
 
     # The release coordinator should verify that tests are passing on develop
     # before checking out the release branch.
+    common.open_new_tab_in_browser('https://github.com/oppia/oppia#oppia---')
     while True:
         print (
             'Please confirm: are Travis checks passing on develop? (y/n) ')
