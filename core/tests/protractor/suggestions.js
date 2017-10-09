@@ -33,7 +33,7 @@ describe('Suggestions on Explorations', function() {
   var EXPLORATION_LANGUAGE = 'English';
   var creatorDashboardPage = null;
 
-  beforeAll(function() {
+  beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 

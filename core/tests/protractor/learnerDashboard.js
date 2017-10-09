@@ -29,7 +29,7 @@ var users = require('../protractor_utils/users.js');
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
 
-  beforeAll(function() {
+  beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 

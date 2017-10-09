@@ -25,7 +25,7 @@ var workflow = require('../protractor_utils/workflow.js');
 describe('Subscriptions functionality', function() {
   var creatorDashboardPage = null;
 
-  beforeAll(function() {
+  beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 
