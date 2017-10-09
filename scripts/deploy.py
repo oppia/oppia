@@ -77,8 +77,11 @@ else:
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
-RELEASE_DIR_NAME = 'deploy-%s-%s' % (
+CURRENT_BRANCH_NAME = common.get_current_branch_name()
+
+RELEASE_DIR_NAME = 'deploy-%s-%s-%s' % (
     '-'.join('-'.join(APP_NAME.split('.')).split(':')),
+    CURRENT_BRANCH_NAME,
     CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
@@ -106,8 +109,22 @@ def _ensure_release_scripts_folder_exists_and_is_up_to_date():
     # If the release-scripts folder does not exist, set it up.
     if not os.path.isdir(release_scripts_dirpath):
         with common.CD(parent_dirpath):
+            # Taken from the "Check your SSH section" at
+            # https://help.github.com/articles/error-repository-not-found/
+            _, stderr = subprocess.Popen(
+                ['ssh', '-T', 'git@github.com'],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE).communicate()
+            if 'You\'ve successfully authenticated' not in stderr:
+                raise Exception(
+                    'You need SSH access to GitHub. See the '
+                    '"Check your SSH access" section here and follow the '
+                    'instructions: '
+                    'https://help.github.com/articles/'
+                    'error-repository-not-found/#check-your-ssh-access')
             subprocess.call([
-                'git', 'clone', 'https://github.com/oppia/release-scripts'])
+                'git', 'clone',
+                'git@github.com:oppia/release-scripts.git'])
 
     with common.CD(release_scripts_dirpath):
         common.verify_local_repo_is_clean()
@@ -115,7 +132,7 @@ def _ensure_release_scripts_folder_exists_and_is_up_to_date():
 
         # Update the local repo.
         remote_alias = common.get_remote_alias(
-            'https://github.com/oppia/release-scripts')
+            'git@github.com:oppia/release-scripts.git')
         subprocess.call(['git', 'pull', remote_alias])
 
 

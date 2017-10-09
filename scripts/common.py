@@ -79,12 +79,19 @@ def verify_local_repo_is_clean():
             'ERROR: This script should be run from a clean branch.')
 
 
-def verify_current_branch_name(expected_branch_name):
-    """Checks that the user is on the expected branch."""
+def get_current_branch_name():
+    """Get the current branch name."""
     git_status_output = subprocess.check_output(
         ['git', 'status']).strip().split('\n')
-    expected_status_message = 'On branch %s' % expected_branch_name
-    if git_status_output[0] != expected_status_message:
+    branch_message_prefix = 'On branch '
+    git_status_first_line = git_status_output[0]
+    assert git_status_first_line.startswith(branch_message_prefix)
+    return git_status_first_line[branch_message_prefix:]
+
+
+def verify_current_branch_name(expected_branch_name):
+    """Checks that the user is on the expected branch."""
+    if get_current_branch_name() != expected_branch_name:
         raise Exception(
             'ERROR: This script can only be run from the "%s" branch.' %
             expected_branch_name)
