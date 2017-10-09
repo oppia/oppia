@@ -23,6 +23,8 @@ var CreatorDashboardPage = function() {
     element(by.css('.protractor-test-exploration-feedback-count'));
   var explorationDashboardCard =
     element(by.css('.protractor-test-exploration-dashboard-card'));
+  var collectionCard = element(by.css('.protractor-test-collection-card'));
+  var subscriptionTab = element(by.css('.protractor-test-subscription-tab'));
 
   this.get = function() {
     return browser.get(CREATOR_DASHBOARD_URL);
@@ -37,4 +39,14 @@ var CreatorDashboardPage = function() {
   this.navigateToExplorationEditor = function() {
     explorationDashboardCard.click();
   };
+
+  this.navigateToCollectionEditor = function() {
+    collectionCard.click();
+  };
+
+  this.navigateToSubscriptionDashboard = function() {
+    subscriptionTab.click();
+  };
 };
+
+exports.CreatorDashboardPage = CreatorDashboardPage;

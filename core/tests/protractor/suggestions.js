@@ -16,7 +16,8 @@
  * @fileoverview End-to-end tests for suggestions on explorations
  */
 
-var creatorDashboard = require('../protractor_utils/creatorDashboard.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
@@ -30,6 +31,11 @@ describe('Suggestions on Explorations', function() {
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
   var EXPLORATION_LANGUAGE = 'English';
+  var creatorDashboardPage = null;
+
+  beforeAll(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+  });
 
   beforeEach(function() {
     users.createUser('user1@ExplorationSuggestions.com',
@@ -62,8 +68,8 @@ describe('Suggestions on Explorations', function() {
 
     // Exploration author reviews the suggestion and accepts it
     users.login('user1@ExplorationSuggestions.com');
-    browser.get(general.CREATOR_DASHBOARD_URL);
-    creatorDashboard.navigateToExplorationEditor();
+    creatorDashboardPage.get();
+    creatorDashboardPage.navigateToExplorationEditor();
     editor.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);

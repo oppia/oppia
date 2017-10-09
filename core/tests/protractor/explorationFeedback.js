@@ -23,8 +23,8 @@
  * in an e2e test.
  */
 
-var CreatorDashboardPage = require(
-  '../protractor_utils/CreatorDashboardPage.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');
@@ -37,6 +37,11 @@ describe('ExplorationFeedback', function() {
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
+  var creatorDashboardPage = null;
+
+  beforeAll(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+  });
 
   beforeEach(function() {
     users.createUser('user1@ExplorationFeedback.com',
@@ -48,7 +53,6 @@ describe('ExplorationFeedback', function() {
   it('adds feedback to an exploration', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
-    var creatorDashboardPage = new CreatorDashboardPage();
 
     // Creator creates and publishes an exploration
     users.login('user1@ExplorationFeedback.com');
