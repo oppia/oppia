@@ -16,11 +16,19 @@
  * @fileoverview End-to-end tests for entire subscriptions functionality.
  */
 
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Subscriptions functionality', function() {
+  var creatorDashboardPage = null;
+
+  beforeEach(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+  });
+
   it('handle subscriptions to creators correctly', function() {
     // Create two creators.
     users.createUser('creator1@subscriptions.com', 'creator1subscriptions');
@@ -73,9 +81,9 @@ describe('Subscriptions functionality', function() {
     users.logout();
 
     users.login('creator1@subscriptions.com');
-    browser.get(general.CREATOR_DASHBOARD_URL);
+    creatorDashboardPage.get();
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-tab')).click();
+    creatorDashboardPage.navigateToSubscriptionDashboard();
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).first().getText()).toMatch(
       'learner...');
@@ -85,9 +93,9 @@ describe('Subscriptions functionality', function() {
     users.logout();
 
     users.login('creator2@subscriptions.com');
-    browser.get(general.CREATOR_DASHBOARD_URL);
+    creatorDashboardPage.get();
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-tab')).click();
+    creatorDashboardPage.navigateToSubscriptionDashboard();
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).count()).toEqual(1);
     expect(element.all(by.css(

@@ -23,7 +23,8 @@
  * in an e2e test.
  */
 
-var creatorDashboard = require('../protractor_utils/creatorDashboard.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');
@@ -36,6 +37,11 @@ describe('ExplorationFeedback', function() {
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
+  var creatorDashboardPage = null;
+
+  beforeEach(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+  });
 
   beforeEach(function() {
     users.createUser('user1@ExplorationFeedback.com',
@@ -54,10 +60,10 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
-    browser.get(general.CREATOR_DASHBOARD_URL);
-    var numberOfFeedbackMessages = (
-      creatorDashboard.getNumberOfFeedbackMessages());
-    expect(numberOfFeedbackMessages).toEqual(0);
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(0);
     users.logout();
 
     // Learner plays the exploration and submits a feedback
@@ -69,10 +75,11 @@ describe('ExplorationFeedback', function() {
 
     // Creator reads the feedback and responds
     users.login('user1@ExplorationFeedback.com');
-    browser.get(general.CREATOR_DASHBOARD_URL);
-    numberOfFeedbackMessages = creatorDashboard.getNumberOfFeedbackMessages();
-    expect(numberOfFeedbackMessages).toEqual(1);
-    creatorDashboard.navigateToExplorationEditor();
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(1);
+    creatorDashboardPage.navigateToExplorationEditor();
 
     editor.readFeedbackMessages().then(function(messages) {
       expect(messages.length).toEqual(1);
