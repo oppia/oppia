@@ -96,7 +96,6 @@ var hashes = {
   '/interactions/interTest/static/interTest.png' : '123654789'
 };
 
-
 /* This function overwrites the translationProvider for a dummy function
  * (customLoader). This is necessary to prevent the js test warnings about an
  * 'unexpected GET request' when the translationProvider tries to load the

@@ -60,7 +60,7 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
 
 ## Keeping in touch
 
-  * [Blog](https://oppiablog.blogspot.com/)
+  * [Blog](https://medium.com/oppia-org)
   * [Discussion forum](http://groups.google.com/group/oppia)
   * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
   * Social media: [G+](https://plus.google.com/109898456505810251700/about), [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)

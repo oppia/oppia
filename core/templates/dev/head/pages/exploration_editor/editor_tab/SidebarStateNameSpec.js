@@ -124,7 +124,7 @@ describe('Sidebar state name controller', function() {
         editorContextService: ecs,
         focusService: fs,
         explorationStatesService: ess,
-        routerService: {}
+        RouterService: {}
       });
     }));
 

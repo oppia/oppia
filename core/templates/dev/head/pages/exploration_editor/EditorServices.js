@@ -285,6 +285,7 @@ oppia.factory('changeListService', [
       default_outcome: true,
       hints: true,
       param_changes: true,
+      param_specs: true,
       solution: true,
       state_name: true,
       widget_customization_args: true,
@@ -606,7 +607,10 @@ oppia.factory('explorationPropertyService', [
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
         });
-      }
+      },
+      param_specs: function(paramSpecs) {
+        return paramSpecs.toBackendDict();
+      },
     }
 
     return {
@@ -835,12 +839,14 @@ oppia.factory('explorationStatesService', [
   'editorContextService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'angularNameService',
   'AnswerClassificationService', 'explorationContextService',
+  'UrlInterpolationService',
   function(
       $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, angularNameService,
-      AnswerClassificationService, explorationContextService) {
+      AnswerClassificationService, explorationContextService,
+      UrlInterpolationService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -871,6 +877,9 @@ oppia.factory('explorationStatesService', [
           return paramChange.toBackendDict();
         });
       },
+      param_specs: function(paramSpecs) {
+        return paramSpecs.toBackendDict();
+      },
       solution: function(solution) {
         if (solution) {
           return solution.toBackendDict();
@@ -888,6 +897,7 @@ oppia.factory('explorationStatesService', [
       content: ['content'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
+      param_specs: ['paramSpecs'],
       hints: ['interaction', 'hints'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
@@ -1104,7 +1114,9 @@ oppia.factory('explorationStatesService', [
         }
 
         $modal.open({
-          templateUrl: 'modals/deleteState',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/editor_tab/' +
+            'confirm_delete_state_modal_directive.html'),
           backdrop: true,
           resolve: {
             deleteStateName: function() {
@@ -1454,12 +1466,12 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 oppia.factory('explorationWarningsService', [
   '$injector', 'graphDataService', 'explorationStatesService',
   'ExpressionInterpolationService', 'explorationParamChangesService',
-  'parameterMetadataService', 'INTERACTION_SPECS',
+  'ParameterMetadataService', 'INTERACTION_SPECS',
   'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $injector, graphDataService, explorationStatesService,
       ExpressionInterpolationService, explorationParamChangesService,
-      parameterMetadataService, INTERACTION_SPECS,
+      ParameterMetadataService, INTERACTION_SPECS,
       WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
@@ -1545,7 +1557,7 @@ oppia.factory('explorationWarningsService', [
     // have been set beforehand.
     var _verifyParameters = function(initNodeIds) {
       var unsetParametersInfo = (
-        parameterMetadataService.getUnsetParametersInfo(initNodeIds));
+        ParameterMetadataService.getUnsetParametersInfo(initNodeIds));
 
       var paramWarningsList = [];
       unsetParametersInfo.forEach(function(unsetParameterData) {
@@ -2037,7 +2049,7 @@ oppia.factory('autosaveInfoModalsService', [
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
-            'save_validation_fail_modal.html'),
+            'save_validation_fail_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: [
@@ -2063,7 +2075,7 @@ oppia.factory('autosaveInfoModalsService', [
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
-            'save_version_mismatch_modal.html'),
+            'save_version_mismatch_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', function($scope) {
@@ -2096,8 +2108,7 @@ oppia.factory('autosaveInfoModalsService', [
       showLostChangesModal: function(lostChanges, explorationId) {
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'lost_changes_modal.html'),
+            '/pages/exploration_editor/lost_changes_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', '$modalInstance', function(
