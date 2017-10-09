@@ -732,7 +732,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     #   'total_hit_count': ...,
     #   'first_hit_count': ...,
     #   'num_times_solution_viewed': ...,
-    #   'total_completions': ...}}
+    #   'num_completions': ...}}
     state_stats_mapping = ndb.JsonProperty(indexed=False)
 
     @classmethod

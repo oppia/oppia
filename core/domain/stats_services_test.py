@@ -106,7 +106,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].total_completions, 1)
+            exploration_stats.state_stats_mapping['Home'].num_completions, 1)
 
         # Pass in solution hit event.
         stats_services.update_stats(
@@ -446,7 +446,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                     'total_hit_count': 0,
                     'first_hit_count': 0,
                     'num_times_solution_viewed': 0,
-                    'total_completions': 0
+                    'num_completions': 0
                 }
             })
 

@@ -130,7 +130,7 @@ class StateStats(object):
 
     def __init__(
             self, total_answers_count, useful_feedback_count, total_hit_count,
-            first_hit_count, num_times_solution_viewed, total_completions):
+            first_hit_count, num_times_solution_viewed, num_completions):
         """Constructs a StateStats domain object.
 
         Args:
@@ -143,14 +143,14 @@ class StateStats(object):
                 first time.
             num_times_solution_viewed: int. Number of times the solution
                 button was triggered to answer a state.
-            total_completions: int. Number of times the state was completed.
+            num_completions: int. Number of times the state was completed.
         """
         self.total_answers_count = total_answers_count
         self.useful_feedback_count = useful_feedback_count
         self.total_hit_count = total_hit_count
         self.first_hit_count = first_hit_count
         self.num_times_solution_viewed = num_times_solution_viewed
-        self.total_completions = total_completions
+        self.num_completions = num_completions
 
     @classmethod
     def create_default(cls):
@@ -166,7 +166,7 @@ class StateStats(object):
             'first_hit_count': self.first_hit_count,
             'num_times_solution_viewed': (
                 self.num_times_solution_viewed),
-            'total_completions': self.total_completions
+            'num_completions': self.num_completions
         }
         return state_stats_dict
 
@@ -179,7 +179,7 @@ class StateStats(object):
             state_stats_dict['total_hit_count'],
             state_stats_dict['first_hit_count'],
             state_stats_dict['num_times_solution_viewed'],
-            state_stats_dict['total_completions']
+            state_stats_dict['num_completions']
         )
 
     def validate(self):
@@ -191,7 +191,7 @@ class StateStats(object):
             'total_hit_count',
             'first_hit_count',
             'num_times_solution_viewed',
-            'total_completions'
+            'num_completions'
         ]
 
         state_stats_dict = self.to_dict()

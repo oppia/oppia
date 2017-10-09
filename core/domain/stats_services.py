@@ -62,7 +62,7 @@ def update_stats(exp_id, exp_version, state_name, event_type, update_params):
                 state_name].first_hit_count += 1
     elif event_type == feconf.EVENT_TYPE_STATE_COMPLETED:
         exploration_stats.state_stats_mapping[
-            state_name].total_completions += 1
+            state_name].num_completions += 1
     elif event_type == feconf.EVENT_TYPE_SOLUTION_HIT:
         exploration_stats.state_stats_mapping[
             state_name].num_times_solution_viewed += 1

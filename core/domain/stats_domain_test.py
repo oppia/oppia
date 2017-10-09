@@ -103,7 +103,7 @@ class StateStatsTests(test_utils.GenericTestBase):
             'total_hit_count': 18,
             'first_hit_count': 7,
             'num_times_solution_viewed': 2,
-            'total_completions': 2
+            'num_completions': 2
         }
         state_stats = stats_domain.StateStats(10, 4, 18, 7, 2, 2)
         expected_state_stats = stats_domain.StateStats.from_dict(
@@ -122,8 +122,8 @@ class StateStatsTests(test_utils.GenericTestBase):
             state_stats.num_times_solution_viewed,
             expected_state_stats.num_times_solution_viewed)
         self.assertEqual(
-            state_stats.total_completions,
-            expected_state_stats.total_completions)
+            state_stats.num_completions,
+            expected_state_stats.num_completions)
 
     def test_create_default(self):
         state_stats = stats_domain.StateStats.create_default()
@@ -132,7 +132,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         self.assertEqual(state_stats.total_hit_count, 0)
         self.assertEqual(state_stats.total_answers_count, 0)
         self.assertEqual(state_stats.num_times_solution_viewed, 0)
-        self.assertEqual(state_stats.total_completions, 0)
+        self.assertEqual(state_stats.num_completions, 0)
 
     def test_to_dict(self):
         state_stats_dict = {
@@ -141,7 +141,7 @@ class StateStatsTests(test_utils.GenericTestBase):
             'total_hit_count': 18,
             'first_hit_count': 7,
             'num_times_solution_viewed': 2,
-            'total_completions': 2
+            'num_completions': 2
         }
         state_stats = stats_domain.StateStats(10, 4, 18, 7, 2, 2)
         self.assertEqual(state_stats_dict, state_stats.to_dict())

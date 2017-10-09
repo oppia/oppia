@@ -318,7 +318,8 @@ class StateHitEventHandler(base.BaseHandler):
 
 class StateCompleteEventHandler(base.BaseHandler):
     """Tracks a learner complete a state. Here, 'completing' means answering
-    the state and progressing to a new state."""
+    the state and progressing to a new state.
+    """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
@@ -404,7 +405,8 @@ class ExplorationStartEventHandler(base.BaseHandler):
 
 class ExplorationActualStartEventHandler(base.BaseHandler):
     """Tracks a learner actually starting an exploration. These are the learners
-    who traverse past the initial state."""
+    who traverse past the initial state.
+    """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
