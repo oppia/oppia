@@ -276,6 +276,12 @@ var constants = {
     "id": "hi-en",
     "text": "Hinglish",
     "related_languages": ["hi", "en"]
-  }]
+  }],
+  
+  "//" : "Types of view in creator dashboard page.",
+  "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
+    "CARD": "card",
+    "LIST": "list"
+  }
 
 };

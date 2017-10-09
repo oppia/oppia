@@ -55,9 +55,10 @@ oppia.controller('CreatorDashboard', [
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $http, $window, oppiaDatetimeFormatter, alertsService,
-      CreatorDashboardBackendApiService, RatingComputationService,
-      ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
+      $scope, $rootScope, $http, $window, oppiaDatetimeFormatter,
+      alertsService, CreatorDashboardBackendApiService,
+      RatingComputationService, ExplorationCreationService,
+      UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
@@ -124,7 +125,8 @@ oppia.controller('CreatorDashboard', [
 
     $scope.updatesGivenScreenWidth = function() {
       if ($scope.checkMobileView()) {
-        $scope.myExplorationsView = 'card';
+        $scope.myExplorationsView = 
+        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.get('CARD');
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
         $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;

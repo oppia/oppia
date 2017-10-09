@@ -807,7 +807,3 @@ ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
 VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'
-
-# Types of display in creatod dashboard
-CREATOR_DASHBOARD_DISPLAY_PREF_CARD = 'card'
-CREATOR_DASHBOARD_DISPLAY_PREF_LIST = 'list'

@@ -80,9 +80,9 @@ class UserSettings(object):
             last_logged_in=None, last_created_an_exploration=None,
             last_edited_an_exploration=None, profile_picture_data_url=None,
             default_dashboard=None,
-            creator_dashboard_display=(
-                feconf.CREATOR_DASHBOARD_DISPLAY_PREF_CARD), user_bio='',
-            subject_interests=None, first_contribution_msec=None,
+            creator_dashboard_display_pref=(
+                constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
+            user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
             preferred_audio_language_code=None):
         """Constructs a UserSettings domain object.
@@ -129,7 +129,7 @@ class UserSettings(object):
         self.last_created_an_exploration = last_created_an_exploration
         self.profile_picture_data_url = profile_picture_data_url
         self.default_dashboard = default_dashboard
-        self.creator_dashboard_display = creator_dashboard_display
+        self.creator_dashboard_display_pref = creator_dashboard_display_pref
         self.user_bio = user_bio
         self.subject_interests = (
             subject_interests if subject_interests else [])
@@ -172,17 +172,15 @@ class UserSettings(object):
         if self.role not in role_services.PARENT_ROLES:
             raise utils.ValidationError('Role %s does not exist.' % self.role)
 
-        if not isinstance(self.creator_dashboard_display, basestring):
+        if not isinstance(self.creator_dashboard_display_pref, basestring):
             raise utils.ValidationError(
                 'Expected dashboard display preference to be a string, '
-                'received %s' % self.creator_dashboard_display)
-        if (self.creator_dashboard_display !=
-                feconf.CREATOR_DASHBOARD_DISPLAY_PREF_CARD and
-                self.creator_dashboard_display !=
-                feconf.CREATOR_DASHBOARD_DISPLAY_PREF_LIST):
+                'received %s' % self.creator_dashboard_display_pref)
+        if (self.creator_dashboard_display_pref not in
+                constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()):
             raise utils.ValidationError(
-                'Dashboard display preferences %s does not exist.'
-                % self.creator_dashboard_display)
+                '%s is not a valid value for the dashboard display'
+                'preferences.' % (self.creator_dashboard_display_pref))
 
     @property
     def truncated_email(self):
@@ -395,7 +393,8 @@ def get_users_settings(user_ids):
                     model.last_created_an_exploration),
                 profile_picture_data_url=model.profile_picture_data_url,
                 default_dashboard=model.default_dashboard,
-                creator_dashboard_display=model.creator_dashboard_display,
+                creator_dashboard_display_pref=(
+                    model.creator_dashboard_display_pref),
                 user_bio=model.user_bio,
                 subject_interests=model.subject_interests,
                 first_contribution_msec=model.first_contribution_msec,
@@ -604,7 +603,8 @@ def _save_user_settings(user_settings):
             user_settings.last_created_an_exploration),
         profile_picture_data_url=user_settings.profile_picture_data_url,
         default_dashboard=user_settings.default_dashboard,
-        creator_dashboard_display=user_settings.creator_dashboard_display,
+        creator_dashboard_display_pref=(
+            user_settings.creator_dashboard_display_pref),
         user_bio=user_settings.user_bio,
         subject_interests=user_settings.subject_interests,
         first_contribution_msec=user_settings.first_contribution_msec,
@@ -787,16 +787,18 @@ def update_user_default_dashboard(user_id, default_dashboard):
     _save_user_settings(user_settings)
 
 
-def update_user_creator_dashboard_display(user_id, creator_dashboard_display):
+def update_user_creator_dashboard_display(
+        user_id, creator_dashboard_display_pref):
     """Updates the creator dashboard preference of user with given user id.
 
     Args:
         user_id: str. The user id.
-        creator_dashboard_display: str. The creator dashboard preference the
-            user wants.
+        creator_dashboard_display_pref: str. The creator dashboard preference
+            the user wants.
     """
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.creator_dashboard_display = creator_dashboard_display
+    user_settings.creator_dashboard_display_pref = (
+        creator_dashboard_display_pref)
     _save_user_settings(user_settings)
 
 

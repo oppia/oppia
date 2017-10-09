@@ -235,7 +235,8 @@ class CreatorDashboardHandler(base.BaseHandler):
 
         user_settings = user_services.get_user_settings(
             self.user_id, strict=False)
-        display_preference = user_settings.creator_dashboard_display
+        creator_dashboard_display_pref = (
+            user_settings.creator_dashboard_display_pref)
 
         self.values.update({
             'explorations_list': exp_summary_dicts,
@@ -243,14 +244,14 @@ class CreatorDashboardHandler(base.BaseHandler):
             'dashboard_stats': dashboard_stats,
             'last_week_stats': last_week_stats,
             'subscribers_list': subscribers_list,
-            'display_preference': display_preference,
+            'display_preference': creator_dashboard_display_pref,
         })
         self.render_json(self.values)
 
     def post(self):
-        user_creator_dashboard_display = self.payload.get('display_preference')
+        creator_dashboard_display_pref = self.payload.get('display_preference')
         user_services.update_user_creator_dashboard_display(
-            self.user_id, user_creator_dashboard_display)
+            self.user_id, creator_dashboard_display_pref)
 
 
 class NotificationsHandler(base.BaseHandler):
