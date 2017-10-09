@@ -25,11 +25,11 @@ oppia.directive('explorationSaveAndPublishButtons', [
       controller: [
         '$scope', 'changeListService', 'editabilityService',
         'explorationRightsService', 'explorationWarningsService',
-        'explorationSaveService',
+        'ExplorationSaveService',
         function(
             $scope, changeListService, editabilityService,
             explorationRightsService, explorationWarningsService,
-            explorationSaveService) {
+            ExplorationSaveService) {
           $scope.saveIsInProcess = false;
           $scope.publishIsInProcess = false;
           $scope.loadingDotsAreShown = false;
@@ -51,7 +51,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.discardChanges = function() {
-            explorationSaveService.discardChanges();
+            ExplorationSaveService.discardChanges();
           };
 
           $scope.getChangeListLength = function() {
@@ -59,7 +59,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.isExplorationSaveable = function() {
-            return explorationSaveService.isExplorationSaveable();
+            return ExplorationSaveService.isExplorationSaveable();
           };
 
           $scope.getPublishExplorationButtonTooltip = function() {
@@ -94,7 +94,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
             $scope.publishIsInProcess = true;
             $scope.loadingDotsAreShown = true;
 
-            explorationSaveService.showPublishExplorationModal(
+            ExplorationSaveService.showPublishExplorationModal(
               showLoadingDots, hideLoadingDots)
               .then(function() {
                 $scope.publishIsInProcess = false;
@@ -106,7 +106,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
             $scope.saveIsInProcess = true;
             $scope.loadingDotsAreShown = true;
 
-            explorationSaveService.saveChanges(showLoadingDots, hideLoadingDots)
+            ExplorationSaveService.saveChanges(showLoadingDots, hideLoadingDots)
               .then(function() {
                 $scope.saveIsInProcess = false;
                 $scope.loadingDotsAreShown = false;

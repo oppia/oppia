@@ -2327,8 +2327,10 @@ class Exploration(object):
 
         for change_dict in reversed(change_list):
             if change_dict['cmd'] == CMD_RENAME_STATE:
-                old_to_new_state_names[change_dict['old_state_name']] = (
-                    old_to_new_state_names.pop(change_dict['new_state_name']))
+                if change_dict['new_state_name'] in old_to_new_state_names:
+                    old_to_new_state_names[change_dict['old_state_name']] = (
+                        old_to_new_state_names.pop(change_dict[
+                            'new_state_name']))
 
         new_to_old_state_names = {
             value: key for key, value in old_to_new_state_names.iteritems()

@@ -142,6 +142,11 @@ class StateStats(object):
         self.first_hit_count = first_hit_count
         self.total_solutions_triggered_count = total_solutions_triggered_count
 
+    @classmethod
+    def create_default(cls):
+        """Creates a StateStats domain object and sets all properties to 0."""
+        return cls(0, 0, 0, 0, 0, 0)
+
     def to_dict(self):
         """Returns a dict representation of the domain oject."""
         state_stats_dict = {

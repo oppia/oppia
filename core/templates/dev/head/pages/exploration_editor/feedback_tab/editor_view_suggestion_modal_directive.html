@@ -1,0 +1,34 @@
+<div class="modal-header">
+  <h3>Review Suggestion</h3>
+</div>
+
+<div class="modal-body">
+  <section class="oppia-suggestion-review-container">
+    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+      <strong>Current:</strong>
+      <div class="oppia-suggestion-review-panel">
+        <div ng-if="currentContent" angular-html-bind="currentContent"></div>
+        <div ng-if="!currentContent" style="color: red;">Oops! This state no longer exists!</div>
+      </div>
+    </div>
+    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+      <strong>Suggested:</strong>
+      <div class="oppia-suggestion-review-panel">
+        <div angular-html-bind="newContent"></div>
+      </div>
+    </div>
+  </section>
+  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
+    Brief Description of Changes (required if accepting):
+    <input type="text" ng-model="commitMessage" style="width: 100%">
+  </div>
+</div>
+
+<div class="modal-footer">
+  <div ng-show="errorMessage" class="oppia-suggestion-review-error">
+    <[ errorMessage ]>
+  </div>
+  <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
+  <button class="btn btn-danger" ng-show="canEdit && isOpen" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
+  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isOpen" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+</div>

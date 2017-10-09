@@ -17,6 +17,8 @@
  */
 
 var admin = require('../protractor_utils/admin.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
@@ -25,6 +27,12 @@ var player = require('../protractor_utils/player.js');
 var users = require('../protractor_utils/users.js');
 
 describe('Learner dashboard functionality', function() {
+  var creatorDashboardPage = null;
+
+  beforeEach(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+  });
+
   beforeAll(function() {
     // Create a new learner.
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
@@ -165,10 +173,10 @@ describe('Learner dashboard functionality', function() {
     users.logout();
 
     users.login('creator1@learnerDashboard.com');
-    browser.get(general.CREATOR_DASHBOARD_URL);
+    creatorDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
-    element(by.css('.protractor-test-collection-card')).click();
+    creatorDashboardPage.navigateToCollectionEditor();
     browser.waitForAngular();
     general.waitForSystem();
     collectionEditor.addExistingExploration('0');
