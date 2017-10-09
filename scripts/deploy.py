@@ -91,7 +91,8 @@ APPCFG_PATH = os.path.join(
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
+DEPLOY_DATA_PATH = os.path.join(
+    os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', APP_NAME)
 
 FILES_AT_ROOT_IN_COMMON = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
@@ -143,7 +144,7 @@ def preprocess_release():
     does the following:
 
     (1) Changes the app name in app.yaml to APP_NAME.
-    (2) Substitutes image files in the images/ directory.
+    (2) Substitutes files from the per-app deployment data.
     """
     # Change the app name in app.yaml.
     f = open('app.yaml', 'r')

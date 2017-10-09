@@ -86,7 +86,7 @@ def get_current_branch_name():
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)
-    return git_status_first_line[branch_message_prefix:]
+    return git_status_first_line[len(branch_message_prefix):]
 
 
 def verify_current_branch_name(expected_branch_name):
