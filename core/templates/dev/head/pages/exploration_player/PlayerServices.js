@@ -52,6 +52,8 @@ oppia.factory('oppiaPlayerService', [
 
     var exploration = null;
 
+    //This list may contain duplicates; a state name is added to it each time
+    // the learner moves to a new card.
     var visitedStateNames = [];
 
     var explorationActuallyStarted = false;
@@ -381,7 +383,7 @@ oppia.factory('oppiaPlayerService', [
             LearnerParamsService.getAllParams(), isFirstHit);
           visitedStateNames.push(newStateName);
 
-          if (oldStateName == exploration.initStateName && (
+          if (oldStateName === exploration.initStateName && (
               !explorationActuallyStarted)) {
             StatsReportingService.recordExplorationActuallyStarted(
               oldStateName);
@@ -423,22 +425,15 @@ oppia.factory('oppiaPlayerService', [
         }
         return deferred.promise;
       },
-      recordSolutionHit: function() {
-        // Check that the current card is an active card by checking whether
-        // the active card's solution is the same as the current solution.
-        var activeStateName = playerPositionService.getCurrentStateName();
-        var activeCardSolution = exploration.getInteraction(
-          activeStateName).solution;
-        if (activeCardSolution == SolutionManagerService_getCurrentSolution()) {
-          StatsReportingService.recordSolutionHit(activeStateName);
-        }
+      recordSolutionHit: function(stateName) {
+        StatsReportingService.recordSolutionHit(stateName);
       },
       recordStateFinished: function(activeCardIndex) {
         var _editorPreviewMode = (
           explorationContextService.getPageContext() === (
             PAGE_CONTEXT.EDITOR));
 
-        if (!_editorPreviewMode && activeCardIndex - 1 >= 0) {
+        if (!_editorPreviewMode) {
           var lastActiveCard = playerTranscriptService.getCard(
             activeCardIndex - 1);
           StatsReportingService.recordStateFinished(

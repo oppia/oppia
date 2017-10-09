@@ -102,7 +102,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
 
         # Pass in state finish event.
         stats_services.update_stats(
-            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_STATE_FINISH, {})
+            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_STATE_FINISHED, {})
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         self.assertEqual(

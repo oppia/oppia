@@ -119,11 +119,10 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id):
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            stats_models.ExplorationActualStartEventLogEntryModel.create(
-                exp_id, exp_version, state_name, session_id)
-            stats_services.update_stats(
-                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
+        stats_models.ExplorationActualStartEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id)
+        stats_services.update_stats(
+            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class SolutionHitEventHandler(BaseEventHandler):
@@ -135,12 +134,11 @@ class SolutionHitEventHandler(BaseEventHandler):
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs):
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            stats_models.SolutionHitEventLogEntryModel.create(
-                exp_id, exp_version, state_name, session_id,
-                time_spent_in_state_secs)
-            stats_services.update_stats(
-                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
+        stats_models.SolutionHitEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs)
+        stats_services.update_stats(
+            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class StartExplorationEventHandler(BaseEventHandler):
@@ -226,18 +224,17 @@ class StateHitEventHandler(BaseEventHandler):
 class StateFinishEventHandler(BaseEventHandler):
     """Event handler for recording state finish events."""
 
-    EVENT_TYPE = feconf.EVENT_TYPE_STATE_FINISH
+    EVENT_TYPE = feconf.EVENT_TYPE_STATE_FINISHED
 
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs):
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            stats_models.StateFinishEventLogEntryModel.create(
-                exp_id, exp_version, state_name, session_id,
-                time_spent_in_state_secs)
-            stats_services.update_stats(
-                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
+        stats_models.StateFinishEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs)
+        stats_services.update_stats(
+            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):
