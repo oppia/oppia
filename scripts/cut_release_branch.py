@@ -121,7 +121,8 @@ def _execute_branch_cut():
 
     # The release coordinator should verify that tests are passing on develop
     # before checking out the release branch.
-    common.open_new_tab_in_browser('https://github.com/oppia/oppia#oppia---')
+    common.open_new_tab_in_browser_if_possible(
+        'https://github.com/oppia/oppia#oppia---')
     while True:
         print (
             'Please confirm: are Travis checks passing on develop? (y/n) ')
