@@ -246,11 +246,11 @@ def _execute_deployment():
     # If this is a test server deployment, open the library page (for sanity
     # checking) and the GAE error logs.
     if APP_NAME == APP_NAME_OPPIATESTSERVER:
-        common.open_new_tab_in_browser(
+        common.open_new_tab_in_browser_if_possible(
             'https://console.cloud.google.com/logs/viewer?'
             'project=%s&key1=default&minLogLevel=500'
             % APP_NAME_OPPIATESTSERVER)
-        common.open_new_tab_in_browser(
+        common.open_new_tab_in_browser_if_possible(
             'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
 
     print 'Done!'
