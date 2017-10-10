@@ -44,7 +44,6 @@ You can help with Oppia's development in many ways, including art, coding, desig
   * **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
 
-In addition, if you'd like to make contributions to the codebase, please follow [these instructions](https://github.com/oppia/oppia/blob/develop/CONTRIBUTING.md#setting-things-up), which will walk you through setting things up, signing the CLA, and joining the developer mailing list. Thanks!
 
 ## Support
 
