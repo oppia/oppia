@@ -28,6 +28,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         return stats_domain.ExplorationStats(
             exploration_stats_dict['exp_id'],
             exploration_stats_dict['exp_version'],
+            exploration_stats_dict['num_starts'],
             exploration_stats_dict['num_actual_starts'],
             exploration_stats_dict['num_completions'],
             exploration_stats_dict['state_stats_mapping'])
@@ -36,6 +37,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         expected_exploration_stats_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 1,
+            'num_starts': 30,
             'num_actual_starts': 10,
             'num_completions': 5,
             'state_stats_mapping': {
@@ -52,6 +54,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         exploration_stats_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 1,
+            'num_starts': 30,
             'num_actual_starts': 10,
             'num_completions': 5,
             'state_stats_mapping': {
@@ -97,12 +100,12 @@ class StateStatsTests(test_utils.GenericTestBase):
         state_stats_dict = {
             'total_answers_count': 10,
             'useful_feedback_count': 4,
-            'learners_answered_correctly': 3,
             'total_hit_count': 18,
             'first_hit_count': 7,
-            'total_solutions_triggered_count': 2
+            'num_times_solution_viewed': 2,
+            'num_completions': 2
         }
-        state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
+        state_stats = stats_domain.StateStats(10, 4, 18, 7, 2, 2)
         expected_state_stats = stats_domain.StateStats.from_dict(
             state_stats_dict)
         self.assertEqual(
@@ -112,39 +115,39 @@ class StateStatsTests(test_utils.GenericTestBase):
             state_stats.useful_feedback_count,
             expected_state_stats.useful_feedback_count)
         self.assertEqual(
-            state_stats.learners_answered_correctly,
-            expected_state_stats.learners_answered_correctly)
-        self.assertEqual(
             state_stats.total_hit_count, expected_state_stats.total_hit_count)
         self.assertEqual(
             state_stats.first_hit_count, expected_state_stats.first_hit_count)
         self.assertEqual(
-            state_stats.total_solutions_triggered_count,
-            expected_state_stats.total_solutions_triggered_count)
+            state_stats.num_times_solution_viewed,
+            expected_state_stats.num_times_solution_viewed)
+        self.assertEqual(
+            state_stats.num_completions,
+            expected_state_stats.num_completions)
 
     def test_create_default(self):
         state_stats = stats_domain.StateStats.create_default()
         self.assertEqual(state_stats.total_answers_count, 0)
         self.assertEqual(state_stats.useful_feedback_count, 0)
-        self.assertEqual(state_stats.learners_answered_correctly, 0)
         self.assertEqual(state_stats.total_hit_count, 0)
         self.assertEqual(state_stats.total_answers_count, 0)
-        self.assertEqual(state_stats.total_solutions_triggered_count, 0)
+        self.assertEqual(state_stats.num_times_solution_viewed, 0)
+        self.assertEqual(state_stats.num_completions, 0)
 
     def test_to_dict(self):
         state_stats_dict = {
             'total_answers_count': 10,
             'useful_feedback_count': 4,
-            'learners_answered_correctly': 3,
             'total_hit_count': 18,
             'first_hit_count': 7,
-            'total_solutions_triggered_count': 2
+            'num_times_solution_viewed': 2,
+            'num_completions': 2
         }
-        state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
+        state_stats = stats_domain.StateStats(10, 4, 18, 7, 2, 2)
         self.assertEqual(state_stats_dict, state_stats.to_dict())
 
     def test_validation(self):
-        state_stats = stats_domain.StateStats(10, 4, 3, 18, 7, 2)
+        state_stats = stats_domain.StateStats(10, 4, 18, 7, 2, 2)
         state_stats.validate()
 
         # Change total_answers_count to string.

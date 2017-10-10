@@ -601,12 +601,13 @@ NAV_MODE_THANKS = 'thanks'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
+EVENT_TYPE_STATE_COMPLETED = 'state_complete'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
-EVENT_TYPE_SOLUTION = 'solution'
+EVENT_TYPE_SOLUTION_HIT = 'solution_hit'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'

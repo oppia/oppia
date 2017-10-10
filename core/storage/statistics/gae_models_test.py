@@ -28,7 +28,7 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_event_models(self):
         event_id = (
             stat_models.AnswerSubmittedEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True, False))
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True))
 
         event_model = stat_models.AnswerSubmittedEventLogEntryModel.get(
             event_id)
@@ -37,9 +37,8 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
         self.assertEqual(event_model.is_feedback_useful, True)
-        self.assertEqual(event_model.is_answer_correct, False)
 
 class ExplorationActualStartEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
@@ -48,7 +47,7 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
     def test_create_and_get_event_models(self):
         event_id = (
             stat_models.ExplorationActualStartEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0))
+                'exp_id1', 1, 'state_name1', 'session_id1'))
 
         event_model = stat_models.ExplorationActualStartEventLogEntryModel.get(
             event_id)
@@ -57,7 +56,6 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
 
 class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the SolutionHitEventLogEntryModel class."""
@@ -65,7 +63,7 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_event_models(self):
         event_id = (
             stat_models.SolutionHitEventLogEntryModel.create(
-                'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True))
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0))
 
         event_model = stat_models.SolutionHitEventLogEntryModel.get(
             event_id)
@@ -74,8 +72,7 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
-        self.assertEqual(event_model.is_solution_preceding_answer, True)
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateHitEventLogEntryModel class."""
@@ -94,6 +91,23 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Test the StateCompleteEventLogEntryModel class."""
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stat_models.StateCompleteEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', 0.0))
+
+        event_model = stat_models.StateCompleteEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exp_id, 'exp_id1')
+        self.assertEqual(event_model.exp_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
 
 class CompleteExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
@@ -116,12 +130,31 @@ class CompleteExplorationEventLogEntryModelUnitTests(
         self.assertEqual(event_model.params, {})
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
+class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Test the StartExplorationEventLogEntryModel class."""
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stat_models.StartExplorationEventLogEntryModel.create(
+                'exp_id1', 1, 'state_name1', 'session_id1', {},
+                feconf.PLAY_TYPE_NORMAL))
+
+        event_model = stat_models.StartExplorationEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exploration_id, 'exp_id1')
+        self.assertEqual(event_model.exploration_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.params, {})
+        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationStatsModel class."""
 
     def test_create_and_get_analytics_model(self):
         model_id = (
-            stat_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, {}))
+            stat_models.ExplorationStatsModel.create('exp_id1', 1, 1, 0, 0, {}))
 
         model = stat_models.ExplorationStatsModel.get_model(
             'exp_id1', 1)
@@ -129,6 +162,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
+        self.assertEqual(model.num_starts, 1)
         self.assertEqual(model.num_actual_starts, 0)
         self.assertEqual(model.num_completions, 0)
         self.assertEqual(model.state_stats_mapping, {})
