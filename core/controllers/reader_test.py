@@ -886,7 +886,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].total_completions, 1)
+                self.state_name].num_completions, 1)
 
     def test_exploration_actual_start_handler(self):
         """Test the handler for recording exploration actual start events."""
