@@ -1765,7 +1765,7 @@ oppia.factory('explorationWarningsService', [
   }
 ]);
 
-oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
+oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
   var CMD_ADD_STATE = 'add_state';
   var CMD_RENAME_STATE = 'rename_state';
   var CMD_DELETE_STATE = 'delete_state';
@@ -1808,13 +1808,13 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
         'added' : (newValue.length === oldValue.length) ?
         'edited' : 'deleted';
     } else {
-      if (!utilsService.isEmpty(oldValue)) {
-        if (!utilsService.isEmpty(newValue)) {
+      if (!UtilsService.isEmpty(oldValue)) {
+        if (!UtilsService.isEmpty(newValue)) {
           result = 'edited';
         } else {
           result = 'deleted';
         }
-      } else if (!utilsService.isEmpty(newValue)) {
+      } else if (!UtilsService.isEmpty(newValue)) {
         result = 'added';
       }
     }
@@ -1895,9 +1895,9 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 
             case 'widget_customization_args':
               var lostChangeValue = '';
-              if (utilsService.isEmpty(oldValue)) {
+              if (UtilsService.isEmpty(oldValue)) {
                 lostChangeValue = 'Added Interaction Customizations';
-              } else if (utilsService.isEmpty(newValue)) {
+              } else if (UtilsService.isEmpty(newValue)) {
                 lostChangeValue = 'Removed Interaction Customizations';
               } else {
                 lostChangeValue = 'Edited Interaction Customizations';

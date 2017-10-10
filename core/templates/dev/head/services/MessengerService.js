@@ -19,7 +19,7 @@
  * be attempted due to cross-domain security issues.)
  */
 
-oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
+oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
   var isPositiveInteger = function(n) {
     return (typeof n === 'number' && n % 1 === 0 && n > 0);
   };

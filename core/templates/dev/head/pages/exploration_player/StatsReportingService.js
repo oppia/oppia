@@ -28,10 +28,10 @@ oppia.constant('STATS_REPORTING_URLS', {
 });
 
 oppia.factory('StatsReportingService', [
-  '$http', 'StopwatchObjectFactory', 'messengerService',
+  '$http', 'StopwatchObjectFactory', 'MessengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
   function(
-      $http, StopwatchObjectFactory, messengerService,
+      $http, StopwatchObjectFactory, MessengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService) {
     var explorationId = null;
     var explorationTitle = null;
@@ -77,7 +77,7 @@ oppia.factory('StatsReportingService', [
           session_id: sessionId
         });
 
-        messengerService.sendMessage(messengerService.EXPLORATION_LOADED, {
+        MessengerService.sendMessage(MessengerService.EXPLORATION_LOADED, {
           explorationVersion: explorationVersion,
           explorationTitle: explorationTitle
         });
@@ -101,7 +101,7 @@ oppia.factory('StatsReportingService', [
         });
 
         // Broadcast information about the state transition to listeners.
-        messengerService.sendMessage(messengerService.STATE_TRANSITION, {
+        MessengerService.sendMessage(MessengerService.STATE_TRANSITION, {
           explorationVersion: explorationVersion,
           jsonAnswer: JSON.stringify(answer),
           newStateName: newStateName,
@@ -127,7 +127,7 @@ oppia.factory('StatsReportingService', [
           version: explorationVersion
         });
 
-        messengerService.sendMessage(messengerService.EXPLORATION_COMPLETED, {
+        MessengerService.sendMessage(MessengerService.EXPLORATION_COMPLETED, {
           explorationVersion: explorationVersion,
           paramValues: params
         });

@@ -247,7 +247,7 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        'messengerService', 'ExplorationPlayerService', 'urlService',
+        'MessengerService', 'ExplorationPlayerService', 'urlService',
         'FocusManagerService', 'LearnerViewRatingService',
         'windowDimensionsService', 'PlayerTranscriptService',
         'LearnerParamsService', 'PlayerPositionService',
@@ -258,7 +258,7 @@ oppia.directive('conversationSkin', [
         'FatigueDetectionService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            messengerService, ExplorationPlayerService, urlService,
+            MessengerService, ExplorationPlayerService, urlService,
             FocusManagerService, LearnerViewRatingService,
             windowDimensionsService, PlayerTranscriptService,
             LearnerParamsService, PlayerPositionService,
@@ -320,7 +320,7 @@ oppia.directive('conversationSkin', [
                 // Sometimes setting iframe height to the exact content height
                 // still produces scrollbar, so adding 50 extra px.
                 newHeight += 50;
-                messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
+                MessengerService.sendMessage(MessengerService.HEIGHT_CHANGE, {
                   height: newHeight,
                   scroll: scroll
                 });
