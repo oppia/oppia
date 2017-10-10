@@ -56,41 +56,6 @@ NEW_APP_YAML_VERSION = TARGET_VERSION.replace('.', '-')
 assert '.' not in NEW_APP_YAML_VERSION
 
 
-def _get_remote_alias():
-    # Find the correct alias for the remote branch.
-    git_remote_output = subprocess.check_output(
-        ['git', 'remote', '-v']).split('\n')
-    remote_alias = None
-    for line in git_remote_output:
-        if 'https://github.com/oppia/oppia' in line:
-            remote_alias = line.split()[0]
-    if remote_alias is None:
-        raise Exception(
-            'ERROR: There is no existing remote alias for the Oppia repo.')
-
-    return remote_alias
-
-
-def _verify_local_repo_is_clean():
-    """Checks that the local Git repo is clean."""
-    git_status_output = subprocess.check_output(
-        ['git', 'status']).strip().split('\n')
-    branch_is_clean = (
-        git_status_output[1] == 'nothing to commit, working directory clean')
-    if len(git_status_output) > 2 or not branch_is_clean:
-        raise Exception(
-            'ERROR: This script should be run from a clean branch.')
-
-
-def _verify_current_branch_is_develop():
-    """Checks that the user is on the develop branch."""
-    git_status_output = subprocess.check_output(
-        ['git', 'status']).strip().split('\n')
-    if git_status_output[0] != 'On branch develop':
-        raise Exception(
-            'ERROR: This script can only be run from the "develop" branch.')
-
-
 def _verify_target_branch_does_not_already_exist(remote_alias):
     """Checks that the new release branch doesn't already exist locally or
     remotely.
@@ -142,13 +107,13 @@ def _verify_target_version_is_consistent_with_latest_released_version():
 
 
 def _execute_branch_cut():
-    # Check that the current directory is correct.
+    # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
-    _verify_local_repo_is_clean()
-    _verify_current_branch_is_develop()
+    common.verify_local_repo_is_clean()
+    common.verify_current_branch_name('develop')
 
     # Update the local repo.
-    remote_alias = _get_remote_alias()
+    remote_alias = common.get_remote_alias('https://github.com/oppia/oppia')
     subprocess.call(['git', 'pull', remote_alias])
 
     _verify_target_branch_does_not_already_exist(remote_alias)
@@ -156,6 +121,7 @@ def _execute_branch_cut():
 
     # The release coordinator should verify that tests are passing on develop
     # before checking out the release branch.
+    common.open_new_tab_in_browser('https://github.com/oppia/oppia#oppia---')
     while True:
         print (
             'Please confirm: are Travis checks passing on develop? (y/n) ')
