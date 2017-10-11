@@ -641,7 +641,10 @@ SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # Bool to enable update of analytics models.
 ENABLE_NEW_STATS_FRAMEWORK = False
-# Current event models schema version.
+# Current event models schema version. All event models with
+# event_schema_version as 1 are the events collected before the rework of the
+# statistics framework which brought about the recording of new event models.
+# This tentatively includes all models recorded before Nov 2017.
 CURRENT_EVENT_MODELS_SCHEMA_VERSION = 1
 
 # Output formats of downloaded explorations.

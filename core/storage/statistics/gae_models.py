@@ -83,7 +83,6 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     # Whether the submitted answer received useful feedback
     is_feedback_useful = ndb.BooleanProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
@@ -129,7 +128,6 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     # ID of current student's session
     session_id = ndb.StringProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
@@ -171,7 +169,6 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
@@ -240,7 +237,6 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
@@ -351,7 +347,6 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
@@ -456,7 +451,6 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
@@ -530,7 +524,6 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     # user rates an exploration for the first time.
     old_rating = ndb.IntegerProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
@@ -610,7 +603,6 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
@@ -678,7 +670,6 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
@@ -718,15 +709,17 @@ class ExplorationStatsModel(base_models.BaseModel):
     exp_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
-    # Number of learners starting the exploration (v1 - historical data).
+    # Number of learners starting the exploration (v1 - data collected before
+    # Nov 2017).
     num_starts_v1 = ndb.IntegerProperty(indexed=True)
     num_starts_v2 = ndb.IntegerProperty(indexed=True)
     # Number of students who actually attempted the exploration. Only learners
     # who spent a minimum time on the exploration are considered to have
-    # actually started the exploration (v1 - historical data).
+    # actually started the exploration (v1 - data collected before Nov 2017)
     num_actual_starts_v1 = ndb.IntegerProperty(indexed=False)
     num_actual_starts_v2 = ndb.IntegerProperty(indexed=False)
-    # Number of students who completed the exploration (v1 - historical data).
+    # Number of students who completed the exploration (v1 - data collected
+    # before Nov 2017).
     num_completions_v1 = ndb.IntegerProperty(indexed=False)
     num_completions_v2 = ndb.IntegerProperty(indexed=False)
     # Keyed by state name that describes the analytics for that state.
@@ -785,17 +778,14 @@ class ExplorationStatsModel(base_models.BaseModel):
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
-            num_starts_v1: int. Number of learners who started the exploration (
-                historical data).
-            num_starts_v2: int. Number of learners who started the exploration.
+            num_starts_v1: int. Number of learners who started the exploration.
+            num_starts_v2: int. As above, but for events with version 2.
             num_actual_starts_v1: int. Number of learners who attempted the
-                exploration (historical data).
-            num_actual_starts_v2: int. Number of learners who attempted the
                 exploration.
+            num_actual_starts_v2: int. As above, but for events with version 2.
             num_completions_v1: int. Number of learners who completed the
-                exploration (historical data).
-            num_completions_v2: int. Number of learners who completed the
                 exploration.
+            num_completions_v2: int. As above, but for events with version 2.
             state_stats_mapping: dict. Mapping from state names to state stats
                 dicts.
 

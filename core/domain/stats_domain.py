@@ -53,14 +53,16 @@ class ExplorationStats(object):
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
-            num_starts_v1, num_starts_v2: int. Number of learners who started
-                the exploration.
-            num_actual_starts_v1, num_actual_starts_v2: int. Number of learners
-                who actually attempted the exploration. These are the learners
-                who have completed the initial state of the exploration and
-                traversed to the next state.
-            num_completions_v1, num_completions_v2: int. Number of learners who
-                completed the exploration.
+            num_starts_v1: int. Number of learners who started the exploration.
+            num_starts_v2: int. As above, but for events with version 2.
+            num_actual_starts_v1: int. Number of learners who actually attempted
+                the exploration. These are the learners who have completed the
+                initial state of the exploration and traversed to the next
+                state.
+            num_actual_starts_v2: int. As above, but for events with version 2.
+            num_completions_v1: int. Number of learners who completed the
+                exploration.
+            num_completions_v2: int. As above, but for events with version 2.
             state_stats_mapping: dict. A dictionary mapping the state names of
                 an exploration to the corresponding StateStats domain object.
         """
@@ -92,6 +94,15 @@ class ExplorationStats(object):
     def validate(self):
         """Validates the ExplorationStats domain object."""
 
+        exploration_stats_properties = [
+            'num_starts_v1',
+            'num_starts_v2',
+            'num_actual_starts_v1',
+            'num_actual_starts_v2',
+            'num_completions_v1',
+            'num_completions_v2',
+        ]
+
         if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % (self.exp_id))
@@ -101,51 +112,16 @@ class ExplorationStats(object):
                 'Expected exp_version to be an int, received %s' % (
                     self.exp_version))
 
-        if not isinstance(self.num_starts_v1, int):
-            raise utils.ValidationError(
-                'Expected num_starts_v1 to be an int, received %s' % (
-                    self.num_starts_v1))
+        exploration_stats_dict = self.to_dict()
 
-        if not isinstance(self.num_starts_v2, int):
-            raise utils.ValidationError(
-                'Expected num_starts_v2 to be an int, received %s' % (
-                    self.num_starts_v2))
-
-        if not isinstance(self.num_actual_starts_v1, int):
-            raise utils.ValidationError(
-                'Expected num_actual_starts_v1 to be an int, received %s' % (
-                    self.num_actual_starts_v1))
-
-        if self.num_actual_starts_v1 < 0:
-            raise utils.ValidationError(
-                '%s cannot have negative values' % ('num_actual_starts_v1'))
-
-        if not isinstance(self.num_actual_starts_v2, int):
-            raise utils.ValidationError(
-                'Expected num_actual_starts_v2 to be an int, received %s' % (
-                    self.num_actual_starts_v2))
-
-        if self.num_actual_starts_v2 < 0:
-            raise utils.ValidationError(
-                '%s cannot have negative values' % ('num_actual_starts_v2'))
-
-        if not isinstance(self.num_completions_v1, int):
-            raise utils.ValidationError(
-                'Expected num_completions_v1 to be an int, received %s' % (
-                    self.num_completions_v1))
-
-        if self.num_completions_v1 < 0:
-            raise utils.ValidationError(
-                '%s cannot have negative values' % ('num_completions_v1'))
-
-        if not isinstance(self.num_completions_v2, int):
-            raise utils.ValidationError(
-                'Expected num_completions_v2 to be an int, received %s' % (
-                    self.num_completions_v2))
-
-        if self.num_completions_v2 < 0:
-            raise utils.ValidationError(
-                '%s cannot have negative values' % ('num_completions_v2'))
+        for stat_property in exploration_stats_properties:
+            if not isinstance(exploration_stats_dict[stat_property], int):
+                raise utils.ValidationError(
+                    'Expected %s to be an int, received %s' % (
+                        stat_property, exploration_stats_dict[stat_property]))
+            if exploration_stats_dict[stat_property] < 0:
+                raise utils.ValidationError(
+                    '%s cannot have negative values' % (stat_property))
 
         if not isinstance(self.state_stats_mapping, dict):
             raise utils.ValidationError(
@@ -168,18 +144,24 @@ class StateStats(object):
         """Constructs a StateStats domain object.
 
         Args:
-            total_answers_count_v1, total_answers_count_v2: int. Total number of
-                answers submitted to this state.
-            useful_feedback_count_v1, useful_feedback_count_v2: int. Total
-                number of answers that received useful feedback.
-            total_hit_count_v1, total_hit_count_v2: int. Total number of times
-                the state was entered.
-            first_hit_count_v1, first_hit_count_v2: int. Number of times the
-                state was entered for the first time.
+            total_answers_count_v1: int. Total number of answers submitted to
+                this state.
+            total_answers_count_v2: int. As above, but for events with version
+                2.
+            useful_feedback_count_v1: int. Total number of answers that received
+                useful feedback.
+            useful_feedback_count_v2: int. As above, but for events with version
+                2.
+            total_hit_count_v1: int. Total number of times the state was
+                entered.
+            total_hit_count_v2: int. As above, but for events with version 2.
+            first_hit_count_v1: int. Number of times the state was entered for
+                the first time.
+            first_hit_count_v2: int. As above, but for events with version 2.
             num_times_solution_viewed_v2: int. Number of times the solution
-                button was triggered to answer a state.
-            num_completions_v1, num_completions_v2: int. Number of times the
-                state was completed.
+                button was triggered to answer a state (only for version 2).
+            num_completions_v1: int. Number of times the state was completed.
+            num_completions_v2: int. As above, but for events with version 2.
         """
         self.total_answers_count_v1 = total_answers_count_v1
         self.total_answers_count_v2 = total_answers_count_v2
@@ -189,6 +171,9 @@ class StateStats(object):
         self.total_hit_count_v2 = total_hit_count_v2
         self.first_hit_count_v1 = first_hit_count_v1
         self.first_hit_count_v2 = first_hit_count_v2
+        # There is no version 1 for the solution viewed count because
+        # solutions were introduced recently and there are no existing event
+        # models that record solution viewed events.
         self.num_times_solution_viewed_v2 = num_times_solution_viewed_v2
         self.num_completions_v1 = num_completions_v1
         self.num_completions_v2 = num_completions_v2
@@ -257,7 +242,6 @@ class StateStats(object):
                 raise utils.ValidationError(
                     'Expected %s to be an int, received %s' % (
                         stat_property, state_stats_dict[stat_property]))
-
             if state_stats_dict[stat_property] < 0:
                 raise utils.ValidationError(
                     '%s cannot have negative values' % (stat_property))
