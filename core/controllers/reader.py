@@ -31,14 +31,12 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
-from core.domain import rte_component_registry
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
@@ -76,7 +74,6 @@ def _get_exploration_player_data(
     version = exploration.version
 
     # TODO(sll): Cache these computations.
-    gadget_types = exploration.get_gadget_types()
     interaction_ids = exploration.get_interaction_ids()
     dependency_ids = (
         interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -85,15 +82,11 @@ def _get_exploration_player_data(
         dependency_registry.Registry.get_deps_html_and_angular_modules(
             dependency_ids))
 
-    gadget_templates = (
-        gadget_registry.Registry.get_gadget_html(gadget_types))
     interaction_templates = (
-        rte_component_registry.Registry.get_html_for_all_components() +
         interaction_registry.Registry.get_interaction_html(
             interaction_ids))
 
     return {
-        'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
         'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
             DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
@@ -105,7 +98,6 @@ def _get_exploration_player_data(
         'exploration_version': version,
         'collection_id': collection_id,
         'collection_title': collection_title,
-        'gadget_templates': jinja2.utils.Markup(gadget_templates),
         'interaction_templates': jinja2.utils.Markup(
             interaction_templates),
         'is_private': rights_manager.is_exploration_private(
@@ -310,14 +302,34 @@ class StateHitEventHandler(base.BaseHandler):
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
+        is_first_hit = self.payload.get('is_first_hit')
 
         # Record the state hit, if it is not the END state.
         if new_state_name is not None:
             event_services.StateHitEventHandler.record(
                 exploration_id, exploration_version, new_state_name,
-                session_id, old_params, feconf.PLAY_TYPE_NORMAL)
+                session_id, old_params, feconf.PLAY_TYPE_NORMAL, is_first_hit)
         else:
             logging.error('Unexpected StateHit event for the END state.')
+        self.render_json({})
+
+
+class StateCompleteEventHandler(base.BaseHandler):
+    """Tracks a learner complete a state. Here, 'completing' means answering
+    the state and progressing to a new state.
+    """
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            event_services.StateCompleteEventHandler.record(
+                exploration_id, self.payload.get('exp_version'),
+                self.payload.get('state_name'), self.payload.get('session_id'),
+                self.payload.get('time_spent_in_state_secs'))
+        self.render_json({})
 
 
 class ClassifyHandler(base.BaseHandler):
@@ -386,6 +398,40 @@ class ExplorationStartEventHandler(base.BaseHandler):
             self.payload.get('session_id'),
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
+        self.render_json({})
+
+
+class ExplorationActualStartEventHandler(base.BaseHandler):
+    """Tracks a learner actually starting an exploration. These are the learners
+    who traverse past the initial state.
+    """
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            event_services.ExplorationActualStartEventHandler.record(
+                exploration_id, self.payload.get('exploration_version'),
+                self.payload.get('state_name'), self.payload.get('session_id'))
+        self.render_json({})
+
+
+class SolutionHitEventHandler(base.BaseHandler):
+    """Tracks a learner clicking on the 'View Solution' button."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            event_services.SolutionHitEventHandler.record(
+                exploration_id, self.payload.get('exploration_version'),
+                self.payload.get('state_name'), self.payload.get('session_id'),
+                self.payload.get('time_spent_in_state_secs'))
+        self.render_json({})
 
 
 class ExplorationCompleteEventHandler(base.BaseHandler):

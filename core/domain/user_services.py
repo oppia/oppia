@@ -179,7 +179,7 @@ class UserSettings(object):
         if (self.creator_dashboard_display_pref not in
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()):
             raise utils.ValidationError(
-                '%s is not a valid value for the dashboard display'
+                '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
 
     @property

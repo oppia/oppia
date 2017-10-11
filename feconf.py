@@ -56,7 +56,6 @@ EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if (IS_MINIFIED or not DEV_MODE) else '')
 INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
-GADGETS_DIR = os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 
@@ -82,6 +81,10 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'LDAStringClassifier',
+        'current_data_schema_version': 1
+    },
+    'CodeRepl': {
+        'algorithm_id': 'CodeClassifier',
         'current_data_schema_version': 1
     }
 }
@@ -159,6 +162,9 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 4
 
+# The current version of the question schema.
+CURRENT_QUESTION_SCHEMA_VERSION = 1
+
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
@@ -226,9 +232,6 @@ for ind in range(32):
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A regular expression for alphanumeric words separated by single spaces.
-# Ex.: 'valid name', 'another valid name', 'invalid   name'.
-ALPHANUMERIC_SPACE_REGEX = r'^[0-9A-Za-z]+(?:[ ]?[0-9A-Za-z]+)*$'
 # A regular expression for tags.
 TAG_REGEX = r'^[a-z ]+$'
 
@@ -360,18 +363,6 @@ VALID_MODERATOR_ACTIONS = {
     },
 }
 
-# Panel properties and other constants for the default skin.
-GADGET_PANEL_AXIS_HORIZONTAL = 'horizontal'
-PANELS_PROPERTIES = {
-    'bottom': {
-        'width': 350,
-        'height': 100,
-        'stackable_axis': GADGET_PANEL_AXIS_HORIZONTAL,
-        'pixels_between_gadgets': 80,
-        'max_gadgets': 1
-    }
-}
-
 # When the site terms were last updated, in UTC.
 REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 
@@ -385,10 +376,6 @@ MAX_FILE_SIZE_BYTES = 1048576
 
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
-
-# The id of the default skin.
-# TODO(sll): Deprecate this; it is no longer used.
-DEFAULT_SKIN_ID = 'conversation_v1'
 
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
@@ -473,15 +460,6 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 # test in extensions.interactions.base_test.
 LINEAR_INTERACTION_IDS = ['Continue']
 
-ALLOWED_GADGETS = {
-    'ScoreBar': {
-        'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
-    },
-}
-
-# Gadgets subclasses must specify a valid panel option from this list.
-ALLOWED_GADGET_PANELS = ['bottom']
-
 # Demo explorations to load through the admin panel. The id assigned to each
 # exploration is based on the key of the exploration in this dict, so ensure it
 # doesn't change once it's in the list. Only integer-based indices should be
@@ -509,6 +487,7 @@ DEMO_EXPLORATIONS = {
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
     u'17': 'audio_test',
+    u'18': 'code_classifier_test.yaml',
 }
 
 DEMO_COLLECTIONS = {
@@ -522,6 +501,9 @@ DISABLED_EXPLORATION_IDS = ['5']
 # Google Group embed URL for the Forum page.
 EMBEDDED_GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/embed/?place=forum/oppia')
+
+# External URL for the Foundation site
+FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
 # Whether to allow YAML file uploads.
 ALLOW_YAML_FILE_UPLOAD = False
@@ -570,6 +552,7 @@ FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
+LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
@@ -602,7 +585,6 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_GET_STARTED = 'get_started'
-NAV_MODE_BLOG = 'blog'
 NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
@@ -619,14 +601,17 @@ NAV_MODE_THANKS = 'thanks'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
+EVENT_TYPE_STATE_COMPLETED = 'state_complete'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
+EVENT_TYPE_SOLUTION_HIT = 'solution_hit'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
+EVENT_TYPE_ACTUAL_START_EXPLORATION = 'actual_start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
@@ -640,6 +625,7 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
+COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
@@ -648,10 +634,13 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with base.js
+# NOTE TO DEVELOPERS: This should be synchronized with app.js
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
+
+# Bool to enable update of analytics models.
+ENABLE_NEW_STATS_FRAMEWORK = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
@@ -705,8 +694,6 @@ LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
 # The i18n id for the header of the "Recently Published" category in the
 # library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
-# group_name param for GET request in Splash.js
-LIBRARY_CATEGORY_SPLASH_PAGE_FEATURED = 'splash_page_featured'
 
 # The group name that appears at the end of the url for the recently published
 # page.
@@ -740,8 +727,6 @@ ABOUT_PAGE_DESCRIPTION = (
     'scenarios for others.')
 GET_STARTED_PAGE_DESCRIPTION = (
     'Learn how to get started using Oppia.')
-BLOG_PAGE_DESCRIPTION = (
-    'Keep up to date with Oppia news and updates via our blog.')
 CONTACT_PAGE_DESCRIPTION = (
     'Contact the Oppia team, submit feedback, and learn how to get involved '
     'with the Oppia project.')

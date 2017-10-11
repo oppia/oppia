@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <h3>Add Hint</h3>
+</div>
+
+<div class="modal-body">
+  <form name="addHintForm.hintTextForm"
+        class="form-inline">
+    <div class="oppia-rule-details-header">
+      <strong>Hint #<[hintIndex]> is...</strong>
+      <schema-based-editor class="protractor-test-hint-text"
+                           schema="HINT_FORM_SCHEMA"
+                           local-value="tmpHint">
+      </schema-based-editor>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default protractor-test-cancel-hint" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success protractor-test-save-hint" ng-click="saveHint()" ng-disabled="!tmpHint">Save Hint</button>
+</div>

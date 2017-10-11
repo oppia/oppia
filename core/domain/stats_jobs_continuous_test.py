@@ -90,7 +90,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
     def _record_state_hit(self, exp_id, exp_version, state, session_id):
         event_services.StateHitEventHandler.record(
             exp_id, exp_version, state, session_id, {},
-            feconf.PLAY_TYPE_NORMAL)
+            feconf.PLAY_TYPE_NORMAL, False)
 
     def _create_state_counter(self, exp_id, state, first_entry_count):
         counter = stats_models.StateCounterModel.get_or_create(exp_id, state)

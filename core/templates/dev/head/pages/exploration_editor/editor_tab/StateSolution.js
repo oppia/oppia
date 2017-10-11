@@ -79,7 +79,7 @@ oppia.controller('StateSolution', [
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
-          'add_or_update_solution_modal.html'),
+          'add_or_update_solution_modal_directive.html'),
         backdrop: 'static',
         controller: [
           '$scope', '$modalInstance', 'stateSolutionService',
@@ -154,7 +154,8 @@ oppia.controller('StateSolution', [
       alertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_editor/editor_tab/delete_solution_modal.html'),
+          '/pages/exploration_editor/editor_tab/' +
+          'delete_solution_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance',

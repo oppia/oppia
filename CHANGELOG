@@ -3,6 +3,90 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.5.4 (22 Sep 2017)
+--------------------
+Learner Dashboard:
+* Learner dashboard 3.2 (#3759)
+* Handle anonymous feedback usernames. Learner Dashboard Hotfix. (#3762)
+* Address the bugs in learner dashboard. (#3720)
+* Fix #3695: Pull the load tests apart from the main test. (#3729)
+* Assign the default dashboard to all the users of the site. (#3760)
+* Add user default dashboards job to job registry (#3779)
+* Set default dashboard for users and fix a bug in preferences for default dashboard. (#3781)
+
+Site-Wide ACL refactor (new roles/permissions system):
+* Fixes #3742: function added for fetching list of exploration rights based on ids. (#3796)
+* SiteWide ACl: removing the old system for authorization. (#3696)
+
+Hints:
+* Fix #3645: Introduce new Solution Editor and Learner View (#3703)
+* Fix #3771: Remove fallbacks (#3772)
+* Fixes '0' issue for solutions (#3770)
+
+Machine Learning:
+* Fixes for end to end working between Oppia and Oppia-ml. (#3824)
+* Enable code classifier for code interaction. (#3767)
+* Make answer classification work synchronously. (#3765)
+* Code classifier frontend prediction API services. (#3719)
+* Fix #3469: Introduce PredictionAlgorithmRegistryService and a sample prediction service. (#3716)
+* Fix #3693: Deprecate ClassifierDataModel and update ClassifierTrainingJobModel (#3734)
+* Fix #3514: Next job controller (#3658)
+
+Learner View:
+* Fix #3612: In embedded explorations, the learner avatars are too large. (#3736)
+* Fix #3725: Message bubble triangle (#3749)
+* Fix #3258: Add share-to-classroom Button (#3743)
+
+Audio:
+* Add audio language preferences (#3766)
+* Test uploading audio file with an mpeg container. (#3752)
+* Handle audio files with MPEG container with mutagen (#3735)
+* Preloading of audio and bandwidth confirmation (#3727)
+* Fix issue with inter-paragraph spacing in content field being unintentionally reduced. (#3775)
+
+Editor:
+* Remove gadgets functionality and update the exploration schema version accordingly. (#3801)
+* Fix part of #3400: Update title field in Publish Modal (#3690)
+
+Collections:
+* Fix 'Empty path passed in method' error on the collection page. (#3827)
+* Fix #3707 Change the start text of collection learner view (#3816)
+
+Misc:
+* Deprecate splash page experiment (#3829)
+* Remove extraneous period (#3780)
+* Routine update of translations. (#3785)
+* Fix #3558: Browser specific alignment (#3768)
+* Removed I18N_PLAYER_CONTINUE_NEXT_CARD from the translation files (#3737)
+* Eliminates stray tick mark (#3731)
+* Fix #3726: prevent graph SVG from overlapping modal footer buttons. (#3728)
+* remove data-toggle Fixes #3750 (#3754)
+* Fix #3789: Space out the profile drop down icons (#3789). (#3817)
+
+Infrastructure:
+* Make the range used for generating IDs much larger. (#3799)
+* Derive GCS bucket name automatically. (#3798)
+* Simple fix to prevent the last updated field on running the count job. (#3761)
+* Fix #2036: Introduces and uses configuration point for assigning a job to a specific queue. (#3745)
+* Fix call to base class (#3751)
+* Add a one-off job to list which explorations use gadgets; remove old fallbacks job. (#3717)
+* Improvements and bug fixes to changes introduced by PR #3671 (#3684)
+
+Code health:
+* Fixes #3748 - Changed file names of EmailDashboardService according t… (#3758)
+* Code refactor: removed publicize status. (#3739)
+
+Speed:
+* Fix part of #3453: Removed jinja template in editor_navigation_directive (#3732)
+* Fix #3453: Removed jinja template in collection editor navigation bar directive (#3723)
+* Removed jinja template logics in search_results_directive (#3733)
+* Remove jinja template in create_activity_modal_directive (#3724)
+* Fix #3453: remove Jinja template in create activity button directive (#3722)
+
+Questions:
+* Fix #2998 implement collection skills update commands (#3710)
+
+
 v2.5.3 (15 Aug 2017)
 --------------------
 Learner dashboard:
@@ -1559,7 +1643,7 @@ Security:
 Infrastructure:
 * Adjust backend tests to not use datetime.datetime.now(), since it gives different results in different locales.
 * Add a hook for inserting custom HTML before the end of the 'body' tag.
-* Broadcast parameter values to the messengerService for explorationCompleted and stateTransition events.
+* Broadcast parameter values to the MessengerService for explorationCompleted and stateTransition events.
 * Speed up the recommendations job by making fewer calls to the datastore.
 * Update FontAwesome to version 4.4.0.
 * Add created_on and last_updated fields to reconstituted version snapshots.

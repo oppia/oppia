@@ -156,7 +156,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_admin, exp_rights))
-        self.assertFalse(rights_manager.check_can_delete_activity(
+        self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_admin, exp_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
@@ -487,7 +487,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_admin, collection_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_admin, collection_rights))
-        self.assertFalse(rights_manager.check_can_delete_activity(
+        self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_admin, collection_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(

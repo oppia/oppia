@@ -125,8 +125,8 @@ oppia.controller('CreatorDashboard', [
 
     $scope.updatesGivenScreenWidth = function() {
       if ($scope.checkMobileView()) {
-        $scope.myExplorationsView = 
-        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.get('CARD');
+        $scope.myExplorationsView = (
+          constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
         $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;

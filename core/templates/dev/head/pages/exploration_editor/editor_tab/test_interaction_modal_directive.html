@@ -1,0 +1,33 @@
+<div class="form-inline" style="margin-bottom: 20px;">
+  <table class="preview-conversation-skin-card-row-container">
+    <tr class="preview-conversation-skin-card-row">
+      <td class="preview-conversation-skin-row-avatar" valign="top">
+        <img class="preview-conversation-skin-row-avatar-img" ng-src="<[userBlackImgUrl]>">
+      </td>
+      <td class="preview-conversation-skin-oppia-content">
+        <div angular-html-bind="stateContent()"></div>
+      </td>
+    </tr>
+  </table>
+  <div ng-if="interactionIsInline">
+    <div class="preview-conversation-skin-inline-interaction">
+      <table class="preview-conversation-skin-card-row-container" style="margin-bottom: 0;">
+        <tr class="preview-conversation-skin-card-row">
+          <td class="preview-conversation-skin-row-avatar" valign="top">
+            <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="<[userBlueImgUrl]>" >
+          </td>
+          <td class="preview-conversation-skin-learner-input" angular-html-bind="inputTemplate()">
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="preview-conversation-skin-supplemental-interaction" ng-if="!interactionIsInline">
+    <div>
+      <md-card class="preview-conversation-skin-supplemental-card">
+        <div angular-html-bind="inputTemplate()">
+        </div>
+      </md-card>
+    </div>
+  </div>
+</div>

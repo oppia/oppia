@@ -21,7 +21,7 @@
  */
 
 oppia.directive('oppiaInteractivePencilCodeEditor', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {
@@ -30,10 +30,10 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       templateUrl: 'interaction/PencilCodeEditor',
       controller: [
         '$scope', '$attrs', '$element', '$timeout', '$modal',
-        'focusService', 'pencilCodeEditorRulesService',
+        'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $modal,
-          focusService, pencilCodeEditorRulesService) {
-          $scope.initialCode = oppiaHtmlEscaper.escapedJsonToObj(
+          FocusManagerService, pencilCodeEditorRulesService) {
+          $scope.initialCode = HtmlEscaperService.escapedJsonToObj(
             $attrs.initialCodeWithValue);
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
@@ -65,7 +65,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 
             // Pencil Code automatically takes the focus on load, so we clear
             // it.
-            focusService.clearFocus();
+            FocusManagerService.clearFocus();
           });
 
           $scope.reset = function() {
@@ -166,13 +166,13 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 ]);
 
 oppia.directive('oppiaResponsePencilCodeEditor', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/PencilCodeEditor',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answerCode = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).code;
       }]
     };
@@ -180,13 +180,13 @@ oppia.directive('oppiaResponsePencilCodeEditor', [
 ]);
 
 oppia.directive('oppiaShortResponsePencilCodeEditor', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/PencilCodeEditor',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answerCode = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).code;
       }]
     };
@@ -194,28 +194,28 @@ oppia.directive('oppiaShortResponsePencilCodeEditor', [
 ]);
 
 oppia.factory('pencilCodeEditorRulesService', [
-  '$filter', 'codeNormalizationService',
-  function($filter, codeNormalizationService) {
+  '$filter', 'CodeNormalizerService',
+  function($filter, CodeNormalizerService) {
     return {
       CodeEquals: function(answer, inputs) {
         var normalizedCode =
-          codeNormalizationService.getNormalizedCode(answer.code);
+          CodeNormalizerService.getNormalizedCode(answer.code);
         var normalizedExpectedCode =
-          codeNormalizationService.getNormalizedCode(inputs.x);
+          CodeNormalizerService.getNormalizedCode(inputs.x);
         return normalizedCode === normalizedExpectedCode;
       },
       CodeContains: function(answer, inputs) {
         var normalizedCode =
-          codeNormalizationService.getNormalizedCode(answer.code);
+          CodeNormalizerService.getNormalizedCode(answer.code);
         var normalizedSnippet =
-          codeNormalizationService.getNormalizedCode(inputs.x);
+          CodeNormalizerService.getNormalizedCode(inputs.x);
         return normalizedCode.indexOf(normalizedSnippet) !== -1;
       },
       CodeDoesNotContain: function(answer, inputs) {
         var normalizedCode =
-          codeNormalizationService.getNormalizedCode(answer.code);
+          CodeNormalizerService.getNormalizedCode(answer.code);
         var normalizedSnippet =
-          codeNormalizationService.getNormalizedCode(inputs.x);
+          CodeNormalizerService.getNormalizedCode(inputs.x);
         return normalizedCode.indexOf(normalizedSnippet) === -1;
       },
       OutputEquals: function(answer, inputs) {

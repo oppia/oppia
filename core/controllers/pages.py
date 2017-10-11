@@ -14,7 +14,6 @@
 
 """Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
 
-import random
 import urllib
 import urlparse
 
@@ -48,11 +47,7 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            random_number = random.choice([0, 5, 6])
-            if random_number == 0:
-                self.render_template('pages/splash/splash.html')
-            else:
-                self.redirect('/splash?c=nv%d' % random_number)
+            self.render_template('pages/splash/splash.html')
         else:
             try:
                 self.render_template('pages/splash/splash_%s.html' % c_value)
@@ -109,19 +104,6 @@ class TeachPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_TEACH,
         })
         self.render_template('pages/teach/teach.html')
-
-
-class BlogPage(base.BaseHandler):
-    """Page embedding the Oppia blog."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.BLOG_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_BLOG,
-        })
-        self.render_template('pages/blog/blog.html')
 
 
 class ContactPage(base.BaseHandler):
@@ -216,6 +198,15 @@ class AboutRedirectPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.redirect('/about')
+
+
+class FoundationRedirectPage(base.BaseHandler):
+    """A page that redirects to the separate Oppia Foundation site."""
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.FOUNDATION_SITE_URL)
+        return
 
 
 class TeachRedirectPage(base.BaseHandler):

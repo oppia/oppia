@@ -43,10 +43,6 @@ oppia.factory('ExplorationPlayerStateService', [function() {
       return exploration.getAuthorRecommendedExpIds(stateName);
     },
 
-    getGadgetPanelsContents: function() {
-      return exploration.getGadgetPanelsContents();
-    },
-
     getLanguageCode: function() {
       return exploration.getLanguageCode();
     },
