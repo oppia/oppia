@@ -26,6 +26,64 @@ from core.platform import models
 ])
 
 
+class RecomputeStateCompleteStatistics(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for recomputing the statistics for the
+    StateCompleteEvent.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateCompleteEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        yield ((item.exp_id, item.exp_version, item.state_name),
+               1)
+
+    @staticmethod
+    def reduce(key, values):
+        key = ast.literal_eval(key)
+        num_completions = len(values)
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            key[0], key[1])
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        state_stats = model.state_stats_mapping[key[2]]
+        state_stats['num_completions'] = num_completions
+        model.state_stats_mapping[key[2]] = state_stats
+        model.put()
+
+
+class RecomputeAnswerSubmittedStatistics(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for recomputing the statistics for the
+    AnswerSubmittedEvent.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.AnswerSubmittedEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        yield ((item.exp_id, item.exp_version, item.state_name),
+               item.is_feedback_useful)
+
+    @staticmethod
+    def reduce(key, values):
+        key = ast.literal_eval(key)
+        total_answers_count = len(values)
+        useful_feedback_count = sum([1 for useful_feedback in values
+                                     if useful_feedback == 'True'])
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            key[0], key[1])
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        state_stats = model.state_stats_mapping[key[2]]
+        state_stats['total_answers_count'] = total_answers_count
+        state_stats['useful_feedback_count'] = useful_feedback_count
+        model.state_stats_mapping[key[2]] = state_stats
+        model.put()
+
+
 class RecomputeStateHitStatistics(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for recomputing the statistics for the
     StateHitEvent.
@@ -52,8 +110,8 @@ class RecomputeStateHitStatistics(jobs.BaseMapReduceOneOffJobManager):
                 first_hit_count += 1
 
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(key[0],
-                                                                    key[1])
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[key[2]]
         state_stats['total_hit_count'] = total_hit_count
@@ -74,26 +132,23 @@ class RecomputeSolutionHitStatistics(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         yield ((item.exp_id, item.exp_version, item.state_name),
-               [item.is_solution_preceding_answer, item.session_id])
+               item.session_id)
 
     @staticmethod
     def reduce(key, values):
         key = ast.literal_eval(key)
-        values = [ast.literal_eval(event) for event in values]
-        session_ids = [event[1] for event in values]
         # Only count the first session in which a user triggers
         # the solution.
         solution_triggered = 0
         for idx, event in enumerate(values):
-            if (idx == session_ids.index(event[1])
-                    and event[0]):
+            if idx == values.index(event):
                 solution_triggered += 1
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(key[0],
-                                                                    key[1])
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[key[2]]
-        state_stats['total_solution_triggered_count'] = solution_triggered
+        state_stats['num_times_solution_viewed'] = solution_triggered
         model.state_stats_mapping[key[2]] = state_stats
         model.put()
 
@@ -116,8 +171,8 @@ class RecomputeActualStartStatistics(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         key = ast.literal_eval(key)
         num_actual_starts = len(values)
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(key[0],
-                                                                    key[1])
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
         model.num_actual_starts = num_actual_starts
         model.put()
@@ -141,8 +196,8 @@ class RecomputeCompleteEventStatistics(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         key = ast.literal_eval(key)
         num_completions = len(values)
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(key[0],
-                                                                    key[1])
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
         model.num_completions = num_completions
         model.put()

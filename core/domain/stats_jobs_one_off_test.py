@@ -26,6 +26,86 @@ from core.tests import test_utils
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
+class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
+    exp_id = 'exp_id'
+    exp_version = 1
+    state = 'state_1'
+    session_id_1 = 'session_id_1'
+    session_id_2 = 'session_id_2'
+
+    def setUp(self):
+        super(RecomputeStateCompleteStatisticsTest, self).setUp()
+
+        stats_models.StateCompleteEventLogEntryModel.create(
+            self.exp_id, self.exp_version, self.state, self.session_id_1,
+            1.0)
+        stats_models.StateCompleteEventLogEntryModel.create(
+            self.exp_id, self.exp_version, self.state, self.session_id_1,
+            1.0)
+
+        stats_models.ExplorationStatsModel.create(
+            self.exp_id, self.exp_version, 0, 0, 0, {self.state: {}})
+
+
+    def test_standard_operation(self):
+        job_id = (
+            stats_jobs_one_off.RecomputeStateCompleteStatistics.create_new())
+        stats_jobs_one_off.RecomputeStateCompleteStatistics.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.exp_id, str(self.exp_version))
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        state_stats = model.state_stats_mapping[self.state]
+        self.assertEqual(state_stats['num_completions'], 2)
+
+
+class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
+    exp_id = 'exp_id'
+    exp_version = 1
+    state = 'state_1'
+    session_id_1 = 'session_id_1'
+    session_id_2 = 'session_id_2'
+
+    def setUp(self):
+        super(RecomputeAnswerSubmittedStatisticsTest, self).setUp()
+
+        stats_models.AnswerSubmittedEventLogEntryModel.create(
+            self.exp_id, self.exp_version, self.state, self.session_id_1,
+            1.0, True)
+        stats_models.AnswerSubmittedEventLogEntryModel.create(
+            self.exp_id, self.exp_version, self.state, self.session_id_1,
+            1.0, True)
+        stats_models.AnswerSubmittedEventLogEntryModel.create(
+            self.exp_id, self.exp_version, self.state, self.session_id_2,
+            1.0, False)
+
+        stats_models.ExplorationStatsModel.create(
+            self.exp_id, self.exp_version, 0, 0, 0, {self.state: {}})
+
+
+    def test_standard_operation(self):
+        job_id = (
+            stats_jobs_one_off.RecomputeAnswerSubmittedStatistics.create_new())
+        stats_jobs_one_off.RecomputeAnswerSubmittedStatistics.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.exp_id, str(self.exp_version))
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        state_stats = model.state_stats_mapping[self.state]
+        self.assertEqual(state_stats['total_answers_count'], 3)
+        self.assertEqual(state_stats['useful_feedback_count'], 2)
+
+
 class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     exp_version = 1
@@ -47,7 +127,7 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
             {}, feconf.PLAY_TYPE_NORMAL)
 
         stats_models.ExplorationStatsModel.create(
-            self.exp_id, self.exp_version, 0, 0, {self.state: {}})
+            self.exp_id, self.exp_version, 0, 0, 0, {self.state: {}})
 
 
     def test_standard_operation(self):
@@ -81,20 +161,20 @@ class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
 
         stats_models.SolutionHitEventLogEntryModel.create(
             self.exp_id, self.exp_version, self.state, self.session_id_1,
-            1.0, True)
+            1.0)
         stats_models.SolutionHitEventLogEntryModel.create(
             self.exp_id, self.exp_version, self.state, self.session_id_1,
-            1.0, True)
+            1.0)
         stats_models.SolutionHitEventLogEntryModel.create(
             self.exp_id, self.exp_version, self.state, self.session_id_2,
-            1.0, True)
+            1.0)
         stats_models.SolutionHitEventLogEntryModel.create(
             self.exp_id, self.exp_version, self.state, self.session_id_3,
-            1.0, False)
+            1.0)
 
 
         stats_models.ExplorationStatsModel.create(
-            self.exp_id, self.exp_version, 0, 0, {self.state: {}})
+            self.exp_id, self.exp_version, 0, 0, 0, {self.state: {}})
 
 
     def test_standard_operation(self):
@@ -111,7 +191,7 @@ class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
             self.exp_id, str(self.exp_version))
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[self.state]
-        self.assertEqual(state_stats['total_solution_triggered_count'], 2)
+        self.assertEqual(state_stats['num_times_solution_viewed'], 3)
 
 
 class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
@@ -124,13 +204,11 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
         super(RecomputeActualStartStatisticsTest, self).setUp()
 
         stats_models.ExplorationActualStartEventLogEntryModel.create(
-            self.exp_id, self.exp_version, self.state, self.session_id_1,
-            1.0)
+            self.exp_id, self.exp_version, self.state, self.session_id_1)
         stats_models.ExplorationActualStartEventLogEntryModel.create(
-            self.exp_id, self.exp_version, self.state, self.session_id_1,
-            1.0)
+            self.exp_id, self.exp_version, self.state, self.session_id_1)
         stats_models.ExplorationStatsModel.create(
-            self.exp_id, self.exp_version, 0, 0, {self.state: {}})
+            self.exp_id, self.exp_version, 0, 0, 0, {self.state: {}})
 
 
     def test_standard_operation(self):
@@ -165,7 +243,7 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version, self.state, self.session_id_1,
             1.0, {}, feconf.PLAY_TYPE_NORMAL)
         stats_models.ExplorationStatsModel.create(
-            self.exp_id, self.exp_version, 0, 0, {self.state: {}})
+            self.exp_id, self.exp_version, 0, 0, 0, {self.state: {}})
 
 
     def test_standard_operation(self):
