@@ -1643,7 +1643,7 @@ Security:
 Infrastructure:
 * Adjust backend tests to not use datetime.datetime.now(), since it gives different results in different locales.
 * Add a hook for inserting custom HTML before the end of the 'body' tag.
-* Broadcast parameter values to the messengerService for explorationCompleted and stateTransition events.
+* Broadcast parameter values to the MessengerService for explorationCompleted and stateTransition events.
 * Speed up the recommendations job by making fewer calls to the datastore.
 * Update FontAwesome to version 4.4.0.
 * Add created_on and last_updated fields to reconstituted version snapshots.

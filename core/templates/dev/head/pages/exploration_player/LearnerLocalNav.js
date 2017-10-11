@@ -15,14 +15,18 @@
 /**
  * @fileoverview Controller for the local navigation in the learner view.
  */
+
 oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
   '$scope', '$modal', '$http', 'ExplorationPlayerService', 'alertsService',
-  'UrlInterpolationService', 'focusService', 'FLAG_EXPLORATION_URL_TEMPLATE',
-  function($scope, $modal, $http, ExplorationPlayerService, alertsService,
-    UrlInterpolationService, focusService, FLAG_EXPLORATION_URL_TEMPLATE) {
+  'UrlInterpolationService', 'FocusManagerService',
+  'FLAG_EXPLORATION_URL_TEMPLATE',
+  function(
+    $scope, $modal, $http, ExplorationPlayerService, alertsService,
+    UrlInterpolationService, FocusManagerService,
+    FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
       $modal.open({
@@ -99,7 +103,7 @@ oppia.controller('LearnerLocalNav', [
             $scope.showFlagMessageTextarea = function(value) {
               if (value) {
                 $scope.flagMessageTextareaIsShown = true;
-                focusService.setFocus('flagMessageTextarea');
+                FocusManagerService.setFocus('flagMessageTextarea');
               }
             };
 

@@ -26,10 +26,10 @@ oppia.directive('editorNavbarBreadcrumb', [
         'editor_navbar_breadcrumb_directive.html'),
       controller: [
         '$scope', 'explorationTitleService', 'RouterService',
-        'focusService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+        'FocusManagerService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
         function(
             $scope, explorationTitleService, RouterService,
-            focusService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
+            FocusManagerService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
           $scope.navbarTitle = null;
           $scope.$on('explorationPropertyChanged', function() {
             var _MAX_TITLE_LENGTH = 20;
@@ -42,7 +42,7 @@ oppia.directive('editorNavbarBreadcrumb', [
 
           $scope.editTitle = function() {
             RouterService.navigateToSettingsTab();
-            focusService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+            FocusManagerService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
           };
 
           var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {

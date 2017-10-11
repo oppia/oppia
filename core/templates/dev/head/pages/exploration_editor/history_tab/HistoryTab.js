@@ -18,11 +18,11 @@
 
 oppia.controller('HistoryTab', [
   '$scope', '$http', '$rootScope', '$log', '$modal', 'explorationData',
-  'versionsTreeService', 'compareVersionsService', 'graphDataService',
+  'VersionTreeService', 'CompareVersionsService', 'graphDataService',
   'oppiaDatetimeFormatter',
   function(
       $scope, $http, $rootScope, $log, $modal, explorationData,
-      versionsTreeService, compareVersionsService, graphDataService,
+      VersionTreeService, CompareVersionsService, graphDataService,
       oppiaDatetimeFormatter) {
     $scope.explorationId = explorationData.explorationId;
     $scope.explorationAllSnapshotsUrl =
@@ -127,7 +127,7 @@ oppia.controller('HistoryTab', [
 
         $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
           explorationSnapshots = response.data.snapshots;
-          versionsTreeService.init(explorationSnapshots);
+          VersionTreeService.init(explorationSnapshots);
 
           // Re-populate versionCheckboxArray and explorationVersionMetadata
           // when history is refreshed.
@@ -179,7 +179,7 @@ oppia.controller('HistoryTab', [
       $scope.compareVersionMetadata.laterVersion =
         $scope.explorationVersionMetadata[laterComparedVersion];
 
-      compareVersionsService.getDiffGraphData(earlierComparedVersion,
+      CompareVersionsService.getDiffGraphData(earlierComparedVersion,
           laterComparedVersion).then(
         function(response) {
           $log.info('Retrieved version comparison data');

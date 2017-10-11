@@ -257,7 +257,7 @@ oppia.controller('StateResponses', [
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'TrainingDataService',
-          'AnswerClassificationService', 'focusService',
+          'AnswerClassificationService', 'FocusManagerService',
           'angularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $modalInstance,
@@ -265,7 +265,7 @@ oppia.controller('StateResponses', [
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, TrainingDataService,
-              AnswerClassificationService, focusService,
+              AnswerClassificationService, FocusManagerService,
               angularNameService, RULE_TYPE_CLASSIFIER) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
@@ -301,7 +301,7 @@ oppia.controller('StateResponses', [
               newOutcome: null
             };
 
-            focusService.setFocus('testInteractionInput');
+            FocusManagerService.setFocus('testInteractionInput');
 
             $scope.finishTeaching = function(reopen) {
               $modalInstance.close({
@@ -358,7 +358,9 @@ oppia.controller('StateResponses', [
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
-        templateUrl: 'modals/addAnswerGroup',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'add_answer_group_modal_directive.html'),
         // Clicking outside this modal should not dismiss it.
         backdrop: 'static',
         controller: [
@@ -462,7 +464,9 @@ oppia.controller('StateResponses', [
 
       alertsService.clearWarnings();
       $modal.open({
-        templateUrl: 'modals/deleteAnswerGroup',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'delete_answer_group_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
