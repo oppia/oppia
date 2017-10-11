@@ -45,28 +45,33 @@ class ExplorationStats(object):
     """Domain object representing analytics data for an exploration."""
 
     def __init__(
-            self, exp_id, exp_version, num_starts, num_actual_starts,
-            num_completions, state_stats_mapping):
+            self, exp_id, exp_version, num_starts_v1, num_starts_v2,
+            num_actual_starts_v1, num_actual_starts_v2, num_completions_v1,
+            num_completions_v2, state_stats_mapping):
         """Constructs an ExplorationStats domain object.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
-            num_starts: int. Number of learners who started the exploration.
-            num_actual_starts: int. Number of learners who actually attempted
-                the exploration. Theses are the learners who have completed
-                the initial state of the exploration and traversed to the next
-                state.
-            num_completions: int. Number of learners who completed the
-                exploration.
+            num_starts_v1, num_starts_v2: int. Number of learners who started
+                the exploration.
+            num_actual_starts_v1, num_actual_starts_v2: int. Number of learners
+                who actually attempted the exploration. These are the learners
+                who have completed the initial state of the exploration and
+                traversed to the next state.
+            num_completions_v1, num_completions_v2: int. Number of learners who
+                completed the exploration.
             state_stats_mapping: dict. A dictionary mapping the state names of
                 an exploration to the corresponding StateStats domain object.
         """
         self.exp_id = exp_id
         self.exp_version = exp_version
-        self.num_starts = num_starts
-        self.num_actual_starts = num_actual_starts
-        self.num_completions = num_completions
+        self.num_starts_v1 = num_starts_v1
+        self.num_starts_v2 = num_starts_v2
+        self.num_actual_starts_v1 = num_actual_starts_v1
+        self.num_actual_starts_v2 = num_actual_starts_v2
+        self.num_completions_v1 = num_completions_v1
+        self.num_completions_v2 = num_completions_v2
         self.state_stats_mapping = state_stats_mapping
 
     def to_dict(self):
@@ -74,9 +79,12 @@ class ExplorationStats(object):
         exploration_stats_dict = {
             'exp_id': self.exp_id,
             'exp_version': self.exp_version,
-            'num_starts': self.num_starts,
-            'num_actual_starts': self.num_actual_starts,
-            'num_completions': self.num_completions,
+            'num_starts_v1': self.num_starts_v1,
+            'num_starts_v2': self.num_starts_v2,
+            'num_actual_starts_v1': self.num_actual_starts_v1,
+            'num_actual_starts_v2': self.num_actual_starts_v2,
+            'num_completions_v1': self.num_completions_v1,
+            'num_completions_v2': self.num_completions_v2,
             'state_stats_mapping': self.state_stats_mapping
         }
         return exploration_stats_dict
@@ -93,28 +101,51 @@ class ExplorationStats(object):
                 'Expected exp_version to be an int, received %s' % (
                     self.exp_version))
 
-        if not isinstance(self.num_starts, int):
+        if not isinstance(self.num_starts_v1, int):
             raise utils.ValidationError(
-                'Expected num_starts to be an int, received %s' % (
-                    self.num_starts))
+                'Expected num_starts_v1 to be an int, received %s' % (
+                    self.num_starts_v1))
 
-        if not isinstance(self.num_actual_starts, int):
+        if not isinstance(self.num_starts_v2, int):
             raise utils.ValidationError(
-                'Expected num_actual_starts to be an int, received %s' % (
-                    self.num_actual_starts))
+                'Expected num_starts_v2 to be an int, received %s' % (
+                    self.num_starts_v2))
 
-        if self.num_actual_starts < 0:
+        if not isinstance(self.num_actual_starts_v1, int):
             raise utils.ValidationError(
-                '%s cannot have negative values' % ('num_actual_starts'))
+                'Expected num_actual_starts_v1 to be an int, received %s' % (
+                    self.num_actual_starts_v1))
 
-        if not isinstance(self.num_completions, int):
+        if self.num_actual_starts_v1 < 0:
             raise utils.ValidationError(
-                'Expected num_completions to be an int, received %s' % (
-                    self.num_completions))
+                '%s cannot have negative values' % ('num_actual_starts_v1'))
 
-        if self.num_completions < 0:
+        if not isinstance(self.num_actual_starts_v2, int):
             raise utils.ValidationError(
-                '%s cannot have negative values' % ('num_completions'))
+                'Expected num_actual_starts_v2 to be an int, received %s' % (
+                    self.num_actual_starts_v2))
+
+        if self.num_actual_starts_v2 < 0:
+            raise utils.ValidationError(
+                '%s cannot have negative values' % ('num_actual_starts_v2'))
+
+        if not isinstance(self.num_completions_v1, int):
+            raise utils.ValidationError(
+                'Expected num_completions_v1 to be an int, received %s' % (
+                    self.num_completions_v1))
+
+        if self.num_completions_v1 < 0:
+            raise utils.ValidationError(
+                '%s cannot have negative values' % ('num_completions_v1'))
+
+        if not isinstance(self.num_completions_v2, int):
+            raise utils.ValidationError(
+                'Expected num_completions_v2 to be an int, received %s' % (
+                    self.num_completions_v2))
+
+        if self.num_completions_v2 < 0:
+            raise utils.ValidationError(
+                '%s cannot have negative values' % ('num_completions_v2'))
 
         if not isinstance(self.state_stats_mapping, dict):
             raise utils.ValidationError(
@@ -129,44 +160,59 @@ class StateStats(object):
     """
 
     def __init__(
-            self, total_answers_count, useful_feedback_count, total_hit_count,
-            first_hit_count, num_times_solution_viewed, num_completions):
+            self, total_answers_count_v1, total_answers_count_v2,
+            useful_feedback_count_v1, useful_feedback_count_v2,
+            total_hit_count_v1, total_hit_count_v2, first_hit_count_v1,
+            first_hit_count_v2, num_times_solution_viewed_v2,
+            num_completions_v1, num_completions_v2):
         """Constructs a StateStats domain object.
 
         Args:
-            total_answers_count: int. Total number of answers submitted to this
-                state.
-            useful_feedback_count: int. Total number of answers that received
-                useful feedback.
-            total_hit_count: int. Total number of times the state was entered.
-            first_hit_count: int. Number of times the state was entered for the
-                first time.
-            num_times_solution_viewed: int. Number of times the solution
+            total_answers_count_v1, total_answers_count_v2: int. Total number of
+                answers submitted to this state.
+            useful_feedback_count_v1, useful_feedback_count_v2: int. Total
+                number of answers that received useful feedback.
+            total_hit_count_v1, total_hit_count_v2: int. Total number of times
+                the state was entered.
+            first_hit_count_v1, first_hit_count_v2: int. Number of times the
+                state was entered for the first time.
+            num_times_solution_viewed_v2: int. Number of times the solution
                 button was triggered to answer a state.
-            num_completions: int. Number of times the state was completed.
+            num_completions_v1, num_completions_v2: int. Number of times the
+                state was completed.
         """
-        self.total_answers_count = total_answers_count
-        self.useful_feedback_count = useful_feedback_count
-        self.total_hit_count = total_hit_count
-        self.first_hit_count = first_hit_count
-        self.num_times_solution_viewed = num_times_solution_viewed
-        self.num_completions = num_completions
+        self.total_answers_count_v1 = total_answers_count_v1
+        self.total_answers_count_v2 = total_answers_count_v2
+        self.useful_feedback_count_v1 = useful_feedback_count_v1
+        self.useful_feedback_count_v2 = useful_feedback_count_v2
+        self.total_hit_count_v1 = total_hit_count_v1
+        self.total_hit_count_v2 = total_hit_count_v2
+        self.first_hit_count_v1 = first_hit_count_v1
+        self.first_hit_count_v2 = first_hit_count_v2
+        self.num_times_solution_viewed_v2 = num_times_solution_viewed_v2
+        self.num_completions_v1 = num_completions_v1
+        self.num_completions_v2 = num_completions_v2
 
     @classmethod
     def create_default(cls):
         """Creates a StateStats domain object and sets all properties to 0."""
-        return cls(0, 0, 0, 0, 0, 0)
+        return cls(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     def to_dict(self):
         """Returns a dict representation of the domain oject."""
         state_stats_dict = {
-            'total_answers_count': self.total_answers_count,
-            'useful_feedback_count': self.useful_feedback_count,
-            'total_hit_count': self.total_hit_count,
-            'first_hit_count': self.first_hit_count,
-            'num_times_solution_viewed': (
-                self.num_times_solution_viewed),
-            'num_completions': self.num_completions
+            'total_answers_count_v1': self.total_answers_count_v1,
+            'total_answers_count_v2': self.total_answers_count_v2,
+            'useful_feedback_count_v1': self.useful_feedback_count_v1,
+            'useful_feedback_count_v2': self.useful_feedback_count_v2,
+            'total_hit_count_v1': self.total_hit_count_v1,
+            'total_hit_count_v2': self.total_hit_count_v2,
+            'first_hit_count_v1': self.first_hit_count_v1,
+            'first_hit_count_v2': self.first_hit_count_v2,
+            'num_times_solution_viewed_v2': (
+                self.num_times_solution_viewed_v2),
+            'num_completions_v1': self.num_completions_v1,
+            'num_completions_v2': self.num_completions_v2
         }
         return state_stats_dict
 
@@ -174,24 +220,34 @@ class StateStats(object):
     def from_dict(cls, state_stats_dict):
         """Constructs a StateStats domain object from a dict."""
         return cls(
-            state_stats_dict['total_answers_count'],
-            state_stats_dict['useful_feedback_count'],
-            state_stats_dict['total_hit_count'],
-            state_stats_dict['first_hit_count'],
-            state_stats_dict['num_times_solution_viewed'],
-            state_stats_dict['num_completions']
+            state_stats_dict['total_answers_count_v1'],
+            state_stats_dict['total_answers_count_v2'],
+            state_stats_dict['useful_feedback_count_v1'],
+            state_stats_dict['useful_feedback_count_v2'],
+            state_stats_dict['total_hit_count_v1'],
+            state_stats_dict['total_hit_count_v2'],
+            state_stats_dict['first_hit_count_v1'],
+            state_stats_dict['first_hit_count_v2'],
+            state_stats_dict['num_times_solution_viewed_v2'],
+            state_stats_dict['num_completions_v1'],
+            state_stats_dict['num_completions_v2']
         )
 
     def validate(self):
         """Validates the StateStats domain object."""
 
         state_stats_properties = [
-            'total_answers_count',
-            'useful_feedback_count',
-            'total_hit_count',
-            'first_hit_count',
-            'num_times_solution_viewed',
-            'num_completions'
+            'total_answers_count_v1',
+            'total_answers_count_v2',
+            'useful_feedback_count_v1',
+            'useful_feedback_count_v2',
+            'total_hit_count_v1',
+            'total_hit_count_v2',
+            'first_hit_count_v1',
+            'first_hit_count_v2',
+            'num_times_solution_viewed_v2',
+            'num_completions_v1',
+            'num_completions_v2'
         ]
 
         state_stats_dict = self.to_dict()

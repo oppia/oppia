@@ -641,6 +641,8 @@ SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # Bool to enable update of analytics models.
 ENABLE_NEW_STATS_FRAMEWORK = False
+# Current event models schema version.
+CURRENT_EVENT_MODELS_SCHEMA_VERSION = 1
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
