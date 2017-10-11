@@ -44,6 +44,8 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    stats_jobs_one_off.RecomputeAnswerSubmittedStatistics,
+    stats_jobs_one_off.RecomputeStateCompleteStatistics,
     stats_jobs_one_off.RecomputeStateHitStatistics,
     stats_jobs_one_off.RecomputeCompleteEventStatistics,
     stats_jobs_one_off.RecomputeActualStartStatistics,
