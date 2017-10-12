@@ -43,29 +43,29 @@ def update_stats(exp_id, exp_version, state_name, event_type, update_params):
         exp_id, exp_version)
 
     if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
-        exploration_stats.num_starts += 1
+        exploration_stats.num_starts_v2 += 1
     elif event_type == feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION:
-        exploration_stats.num_actual_starts += 1
+        exploration_stats.num_actual_starts_v2 += 1
     elif event_type == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
-        exploration_stats.num_completions += 1
+        exploration_stats.num_completions_v2 += 1
     elif event_type == feconf.EVENT_TYPE_ANSWER_SUBMITTED:
         exploration_stats.state_stats_mapping[
-            state_name].total_answers_count += 1
+            state_name].total_answers_count_v2 += 1
         if update_params['feedback_is_useful']:
             exploration_stats.state_stats_mapping[
-                state_name].useful_feedback_count += 1
+                state_name].useful_feedback_count_v2 += 1
     elif event_type == feconf.EVENT_TYPE_STATE_HIT:
         exploration_stats.state_stats_mapping[
-            state_name].total_hit_count += 1
+            state_name].total_hit_count_v2 += 1
         if update_params['is_first_hit']:
             exploration_stats.state_stats_mapping[
-                state_name].first_hit_count += 1
+                state_name].first_hit_count_v2 += 1
     elif event_type == feconf.EVENT_TYPE_STATE_COMPLETED:
         exploration_stats.state_stats_mapping[
-            state_name].num_completions += 1
+            state_name].num_completions_v2 += 1
     elif event_type == feconf.EVENT_TYPE_SOLUTION_HIT:
         exploration_stats.state_stats_mapping[
-            state_name].num_times_solution_viewed += 1
+            state_name].num_times_solution_viewed_v2 += 1
 
     save_stats_model(exploration_stats)
 
@@ -85,7 +85,7 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
     }
 
     exploration_stats = stats_domain.ExplorationStats(
-        exp_id, exp_version, 0, 0, 0, state_stats_mapping)
+        exp_id, exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping)
     create_stats_model(exploration_stats)
 
 
@@ -170,9 +170,12 @@ def get_exploration_stats_from_model(exploration_stats_model):
     return stats_domain.ExplorationStats(
         exploration_stats_model.exp_id,
         exploration_stats_model.exp_version,
-        exploration_stats_model.num_starts,
-        exploration_stats_model.num_actual_starts,
-        exploration_stats_model.num_completions,
+        exploration_stats_model.num_starts_v1,
+        exploration_stats_model.num_starts_v2,
+        exploration_stats_model.num_actual_starts_v1,
+        exploration_stats_model.num_actual_starts_v2,
+        exploration_stats_model.num_completions_v1,
+        exploration_stats_model.num_completions_v2,
         new_state_stats_mapping)
 
 
@@ -194,9 +197,12 @@ def create_stats_model(exploration_stats):
     instance_id = stats_models.ExplorationStatsModel.create(
         exploration_stats.exp_id,
         exploration_stats.exp_version,
-        exploration_stats.num_starts,
-        exploration_stats.num_actual_starts,
-        exploration_stats.num_completions,
+        exploration_stats.num_starts_v1,
+        exploration_stats.num_starts_v2,
+        exploration_stats.num_actual_starts_v1,
+        exploration_stats.num_actual_starts_v2,
+        exploration_stats.num_completions_v1,
+        exploration_stats.num_completions_v2,
         new_state_stats_mapping
     )
     return instance_id
@@ -218,10 +224,16 @@ def save_stats_model(exploration_stats):
     exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
         exploration_stats.exp_id, exploration_stats.exp_version)
 
-    exploration_stats_model.num_starts = exploration_stats.num_starts
-    exploration_stats_model.num_actual_starts = (
-        exploration_stats.num_actual_starts)
-    exploration_stats_model.num_completions = exploration_stats.num_completions
+    exploration_stats_model.num_starts_v1 = exploration_stats.num_starts_v1
+    exploration_stats_model.num_starts_v2 = exploration_stats.num_starts_v2
+    exploration_stats_model.num_actual_starts_v1 = (
+        exploration_stats.num_actual_starts_v1)
+    exploration_stats_model.num_actual_starts_v2 = (
+        exploration_stats.num_actual_starts_v2)
+    exploration_stats_model.num_completions_v1 = (
+        exploration_stats.num_completions_v1)
+    exploration_stats_model.num_completions_v2 = (
+        exploration_stats.num_completions_v2)
     exploration_stats_model.state_stats_mapping = new_state_stats_mapping
 
     exploration_stats_model.put()
