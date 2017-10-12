@@ -715,7 +715,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     num_starts_v2 = ndb.IntegerProperty(indexed=True)
     # Number of students who actually attempted the exploration. Only learners
     # who spent a minimum time on the exploration are considered to have
-    # actually started the exploration (v1 - data collected before Nov 2017)
+    # actually started the exploration (v1 - data collected before Nov 2017).
     num_actual_starts_v1 = ndb.IntegerProperty(indexed=False)
     num_actual_starts_v2 = ndb.IntegerProperty(indexed=False)
     # Number of students who completed the exploration (v1 - data collected

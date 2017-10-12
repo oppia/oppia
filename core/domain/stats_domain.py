@@ -171,9 +171,8 @@ class StateStats(object):
         self.total_hit_count_v2 = total_hit_count_v2
         self.first_hit_count_v1 = first_hit_count_v1
         self.first_hit_count_v2 = first_hit_count_v2
-        # There is no version 1 for the solution viewed count because
-        # solutions were introduced recently and there are no existing event
-        # models that record solution viewed events.
+        # Solution view analytics were only introduced in v2, and there are no
+        # existing event models in v1 that record solution viewed events.
         self.num_times_solution_viewed_v2 = num_times_solution_viewed_v2
         self.num_completions_v1 = num_completions_v1
         self.num_completions_v2 = num_completions_v2
