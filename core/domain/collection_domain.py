@@ -852,7 +852,7 @@ class Collection(object):
             list(str). A list of exploration IDs for which the prerequisite
             skills are satisfied.
         """
-        acquired_skill_ids = self.get_acquired_skills_from_explorations(
+        acquired_skill_ids = self.get_acquired_skill_ids_from_exploration_ids(
             completed_exploration_ids)
         next_exp_ids = []
         for node in self.nodes:
@@ -1066,7 +1066,7 @@ class Collection(object):
             skill_name: str. The name of the skill.
 
         Returns
-            Id of the new skill.
+            str. The id of the new skill.
         """
         for _, skill in self.skills.iteritems():
             if skill.name == skill_name:
@@ -1105,7 +1105,7 @@ class Collection(object):
 
         del self.skills[skill_id]
 
-    def get_acquired_skills_from_explorations(self, exploration_ids):
+    def get_acquired_skill_ids_from_exploration_ids(self, exploration_ids):
         """Returns a list of skill ids acquired by completing the explorations
         of the collection.
 
