@@ -378,13 +378,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_setting = user_services.get_user_settings(user_id)
         self.assertEqual(user_setting.creator_dashboard_display_pref,
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'])
+                         constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']) # pylint: disable=line-too-long
 
         user_services.update_user_creator_dashboard_display(
             user_id, constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
         user_setting = user_services.get_user_settings(user_id)
         self.assertEqual(user_setting.creator_dashboard_display,
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
+                         constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST']) # pylint: disable=line-too-long
 
     def test_update_user_role(self):
         user_id = 'test_id'
