@@ -18,6 +18,7 @@ import datetime
 import logging
 import os
 
+from constants import constants
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_services
@@ -376,14 +377,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.set_username(user_id, username)
 
         user_setting = user_services.get_user_settings(user_id)
-        self.assertEqual(user_setting.creator_dashboard_display,
-                         feconf.CREATOR_DASHBOARD_DISPLAY_PREF_CARD)
+        self.assertEqual(user_setting.creator_dashboard_display_pref,
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'])
 
         user_services.update_user_creator_dashboard_display(
-            user_id, feconf.CREATOR_DASHBOARD_DISPLAY_PREF_LIST)
+            user_id, constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
         user_setting = user_services.get_user_settings(user_id)
         self.assertEqual(user_setting.creator_dashboard_display,
-                         feconf.CREATOR_DASHBOARD_DISPLAY_PREF_LIST)
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
 
     def test_update_user_role(self):
         user_id = 'test_id'
