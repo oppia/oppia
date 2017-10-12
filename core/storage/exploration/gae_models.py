@@ -16,6 +16,7 @@
 
 """Model for an Oppia exploration."""
 
+import copy
 import datetime
 
 from constants import constants
@@ -515,3 +516,93 @@ class ExpSummaryModel(base_models.BaseModel):
         ).order(
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
+
+
+class StateIdMappingModel(base_models.BaseModel):
+    """State ID model for Oppia explorations.
+
+    This model maps each exploration version's state to a unique id.
+    Note: use the state id only for derived data, but not for data that’s
+    regarded as the source of truth, as the rules for assigning state id may
+    change in future.
+
+    The key of each instance if combination of exploration id and version.
+    """
+
+    # The exploration id whose states are mapped.
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+
+    # The version of the exploration.
+    exploration_version = ndb.IntegerProperty(required=True)
+
+    # A dict which maps each state name to a unique id.
+    state_name_to_ids = ndb.JsonProperty(required=True)
+
+    # Latest state id that has been assigned to any of the states in any of
+    # of the  versions of given exploration. New state IDs should be assigned
+    # from this value + 1.
+    latest_state_id_used = ndb.IntegerProperty(required=True)
+
+    @classmethod
+    def _generate_instance_id(cls, exp_id, exp_version):
+        """Generates ID of the state id mapping model instance.
+
+        Args:
+            exp_id: str. The exploration id that whose states are mapped.
+            exp_version: int. The version of exploration.
+        """
+        return '%s.%d' % (exp_id, exp_version)
+
+    @classmethod
+    def create(
+            cls, exp_id, exp_version, state_name_to_ids, latest_state_id_used):
+        """Creates a new instance of state id mapping model.
+
+        Args:
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of that exploration.
+            state_name_to_ids: dict. A dict storing state name to ids mapping.
+            latest_state_id_used: int. Latest state id that has been assigned to
+                any of the states in of the versions of given exploration.
+
+        Returns:
+            StateIdMappingModel. Instance of the state id mapping model.
+        """
+        instance_id = cls._generate_instance_id(exp_id, exp_version)
+        if cls.get_by_id(instance_id):
+            raise Exception(
+                'State id mapping model already exists for given exploration'
+                ' version')
+        model = cls(
+            id=instance_id, exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_name_to_ids=state_name_to_ids,
+            latest_state_id_used=latest_state_id_used)
+        model.put()
+
+        return model
+
+    @classmethod
+    def get_state_id_mapping_model(cls, exp_id, exp_version, strict=False):
+        """Retrieve state id mapping model from the datastore.
+
+        Args:
+            exp_id: str. The exploration id.
+            exp_version: int. The exploration version.
+            strict: bool. Whether to raise an error if no StateIdMappingModel
+                entry is found for the given exploration id and version.
+
+        Returns:
+            StateIdMappingModel. The model retrieved from the datastore.
+        """
+        instance_id = cls._generate_instance_id(exp_id, exp_version)
+        instance = cls.get(instance_id, strict)
+        return instance
+
+    def get_all_state_name_ids(self):
+        """Get state name to id mapping dict.
+
+        Returns:
+            dict. A dictionary mapping state names to unique ids.
+        """
+        return copy.deepcopy(self.state_name_to_ids)

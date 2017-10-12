@@ -846,6 +846,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exploration, state_names_with_unchanged_answer_groups,
                 new_to_old_state_names)
 
+    # Save state id mapping model for exploration.
+    save_state_id_mapping_model(exploration, change_list)
+
 
 def _create_exploration(
         committer_id, exploration, commit_message, commit_cmds):
@@ -906,6 +909,8 @@ def _create_exploration(
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
 
+    # Save state id mapping model for new exploration.
+    save_state_id_mapping_model(exploration, commit_cmds)
     create_exploration_summary(exploration.id, committer_id)
 
 
@@ -1912,3 +1917,54 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
         exp_user_data.put()
+
+
+def get_state_id_mapping_model(exp_id, exp_version, strict=False):
+    """Retrieve state id mapping model instance from the datastore.
+
+    Args:
+        exp_id: str. The exploration id.
+        exp_version: int. The exploration version.
+
+    Returnes:
+        StateIdMapping. Domain object for state id mapping model instance.
+    """
+    model = exp_models.StateIdMappingModel.get_state_id_mapping_model(
+        exp_id, exp_version, strict)
+    state_id_mapping = (
+        exp_domain.StateIdMapping.get_state_id_mapping_from_model(
+            model))
+    return state_id_mapping
+
+
+def save_state_id_mapping_model(exploration, change_list):
+    """Stores StateIdMappingModel instance in the datastore.
+
+    Args:
+        exploration: Exploration. Exploration for whose state names are to be
+            mapped.
+        change_list: list(dict). A list of changes made in the exploration.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    if exploration.version > 1:
+        # Get state id mapping for new exploration from old exploration with
+        # the help of change list.
+        old_exploration = get_exploration_by_id(
+            exploration.id, version=exploration.version - 1)
+        state_id_mapping = exp_domain.StateIdMapping.get_state_id_mapping(
+            old_exploration, exploration, change_list)
+    elif exploration.version == 1:
+        # Get state id mapping for first version of exploration.
+        state_id_mapping = (
+            exp_domain.StateIdMapping.get_state_id_mapping_for_new_exploration(
+                exploration))
+
+    model = exp_models.StateIdMappingModel.create(
+        state_id_mapping.exploration_id,
+        state_id_mapping.exploration_version,
+        state_id_mapping.state_name_to_ids,
+        state_id_mapping.latest_state_id_used)
+
+    return model

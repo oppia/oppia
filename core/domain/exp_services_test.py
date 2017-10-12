@@ -2743,3 +2743,51 @@ class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
                 'fake_id'))
         self.assertIsNone(exp)
         self.assertIsNone(exp_rights)
+
+
+class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
+    """Tests for functions associated with creating and updating state id
+    mapping."""
+
+    EXP_ID = 'eid'
+
+    def setUp(self):
+        """Initialize owner before each test case."""
+        super(ExplorationStateIdMappingTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_that_correct_state_id_mapping_model_is_stored(self):
+        """Test that correct mapping model is stored for new and edited
+        exploration."""
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+        mapping = exp_services.get_state_id_mapping_model(
+            self.EXP_ID, exploration.version)
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 1)
+        self.assertEqual(
+            mapping.latest_state_id_used, 0)
+        self.assertDictEqual(mapping.state_name_to_ids, expected_mapping)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping_model(
+            self.EXP_ID, new_exploration.version)
+
+        expected_mapping = {
+            new_exploration.init_state_name: 0,
+            'new state': 1
+        }
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_name_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.latest_state_id_used, 1)
