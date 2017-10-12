@@ -82,6 +82,9 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     time_spent_in_state_secs = ndb.FloatProperty()
     # Whether the submitted answer received useful feedback
     is_feedback_useful = ndb.BooleanProperty(indexed=True)
+    # The version of the event schema used to describe an event of this type.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -124,6 +127,9 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     state_name = ndb.StringProperty(indexed=True)
     # ID of current student's session
     session_id = ndb.StringProperty(indexed=True)
+    # The version of the event schema used to describe an event of this type.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -162,6 +168,9 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
+    # The version of the event schema used to describe an event of this type.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -207,9 +216,6 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         params: Current parameter values, in the form of a map of parameter
             name to value.
     """
-    # This value should be updated in the event of any event schema change.
-    CURRENT_EVENT_SCHEMA_VERSION = 1
-
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -231,9 +237,8 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -318,9 +323,6 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         client_time_spent_in_secs: Time spent in this state before the event
             was triggered.
     """
-    # This value should be updated in the event of any event schema change.
-    CURRENT_EVENT_SCHEMA_VERSION = 1
-
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -345,9 +347,8 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -426,9 +427,6 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     have the wrong 'last updated' timestamp. However, the 'created_on'
     timestamp is the same as that of the original model.
     """
-    # This value should be updated in the event of any event schema change.
-    CURRENT_EVENT_SCHEMA_VERSION = 1
-
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -453,9 +451,8 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -517,9 +514,6 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         exploration_id: ID of exploration which is being rated.
         rating: Value of rating assigned to exploration.
     """
-    # This value should be updated in the event of any event schema change.
-    CURRENT_EVENT_SCHEMA_VERSION = 1
-
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration which has been rated.
@@ -530,9 +524,8 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     # user rates an exploration for the first time.
     old_rating = ndb.IntegerProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
@@ -591,9 +584,6 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     amount of time between this event (i.e., the learner entering the
     state) and the other event.
     """
-    # This value should be updated in the event of any event schema change.
-    CURRENT_EVENT_SCHEMA_VERSION = 1
-
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -613,9 +603,8 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
-        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -680,6 +669,9 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
+    # The version of the event schema used to describe an event of this type.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -717,22 +709,32 @@ class ExplorationStatsModel(base_models.BaseModel):
     exp_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
-    # Number of learners starting the exploration.
-    num_starts = ndb.IntegerProperty(indexed=True)
+    # Number of learners starting the exploration (v1 - data collected before
+    # Nov 2017).
+    num_starts_v1 = ndb.IntegerProperty(indexed=True)
+    num_starts_v2 = ndb.IntegerProperty(indexed=True)
     # Number of students who actually attempted the exploration. Only learners
     # who spent a minimum time on the exploration are considered to have
-    # actually started the exploration.
-    num_actual_starts = ndb.IntegerProperty(indexed=False)
-    # Number of students who completed the exploration.
-    num_completions = ndb.IntegerProperty(indexed=False)
+    # actually started the exploration (v1 - data collected before Nov 2017).
+    num_actual_starts_v1 = ndb.IntegerProperty(indexed=False)
+    num_actual_starts_v2 = ndb.IntegerProperty(indexed=False)
+    # Number of students who completed the exploration (v1 - data collected
+    # before Nov 2017).
+    num_completions_v1 = ndb.IntegerProperty(indexed=False)
+    num_completions_v2 = ndb.IntegerProperty(indexed=False)
     # Keyed by state name that describes the analytics for that state.
     # {state_name: {
-    #   'total_answers_count': ...,
-    #   'useful_feedback_count': ...,
-    #   'total_hit_count': ...,
-    #   'first_hit_count': ...,
-    #   'num_times_solution_viewed': ...,
-    #   'num_completions': ...}}
+    #   'total_answers_count_v1': ...,
+    #   'total_answers_count_v2': ...,
+    #   'useful_feedback_count_v1': ...,
+    #   'useful_feedback_count_v2': ...,
+    #   'total_hit_count_v1': ...,
+    #   'total_hit_count_v2': ...,
+    #   'first_hit_count_v1': ...,
+    #   'first_hit_count_v2': ...,
+    #   'num_times_solution_viewed_v2': ...,
+    #   'num_completions_v1': ...,
+    #   'num_completions_v2': ...}}
     state_stats_mapping = ndb.JsonProperty(indexed=False)
 
     @classmethod
@@ -767,19 +769,23 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, num_starts, num_actual_starts,
-            num_completions, state_stats_mapping):
+            cls, exp_id, exp_version, num_starts_v1, num_starts_v2,
+            num_actual_starts_v1, num_actual_starts_v2, num_completions_v1,
+            num_completions_v2, state_stats_mapping):
         """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
-            num_starts: int. Number of learners who started the exploration.
-            num_actual_starts: int. Number of learners who attempted the
+            num_starts_v1: int. Number of learners who started the exploration.
+            num_starts_v2: int. As above, but for events with version 2.
+            num_actual_starts_v1: int. Number of learners who attempted the
                 exploration.
-            num_completions: int. Number of learners who completed the
+            num_actual_starts_v2: int. As above, but for events with version 2.
+            num_completions_v1: int. Number of learners who completed the
                 exploration.
+            num_completions_v2: int. As above, but for events with version 2.
             state_stats_mapping: dict. Mapping from state names to state stats
                 dicts.
 
@@ -789,9 +795,12 @@ class ExplorationStatsModel(base_models.BaseModel):
         instance_id = cls.get_entity_id(exp_id, exp_version)
         stats_instance = cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
-            num_starts=num_starts,
-            num_actual_starts=num_actual_starts,
-            num_completions=num_completions,
+            num_starts_v1=num_starts_v1,
+            num_starts_v2=num_starts_v2,
+            num_actual_starts_v1=num_actual_starts_v1,
+            num_actual_starts_v2=num_actual_starts_v2,
+            num_completions_v1=num_completions_v1,
+            num_completions_v2=num_completions_v2,
             state_stats_mapping=state_stats_mapping)
         stats_instance.put()
         return instance_id
