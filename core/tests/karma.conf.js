@@ -9,6 +9,7 @@ module.exports = function(config) {
   config.set({
     basePath: '../../',
     frameworks: ['jasmine-jquery', 'jasmine'],
+    // jasmine-jquery is used to load contents of external JSON files in tests.
     files: [
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
