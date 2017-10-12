@@ -248,6 +248,7 @@ class CreatorDashboardHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
+    @acl_decorators.can_access_creator_dashboard
     def post(self):
         creator_dashboard_display_pref = self.payload.get('display_preference')
         user_services.update_user_creator_dashboard_display(
