@@ -255,5 +255,7 @@ class Question(object):
             bool. A boolean representing True or False.
         """
         question_skills = self.get_skills()
-        user_skills = collection_services.get_acquired_skills_of_user_given_collection_id(user_id, collection_id)
+        user_skills = (
+            collection_services.get_acquired_skills_of_user_given_collection_id(
+                user_id, collection_id))
         return set(question_skills) < set(user_skills)

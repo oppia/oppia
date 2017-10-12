@@ -238,7 +238,9 @@ def get_questions_batch(
     Returns:
         list. A list of Question objects.
     """
-    user_skill_ids = collection_services.get_acquired_skills_of_user_given_collection_id(user_id, collection_id)
+    user_skill_ids = (
+        collection_services.get_acquired_skills_of_user_given_collection_id(
+            user_id, collection_id))
     question_skill_ids = list(set(user_skill_ids) & set(skill_ids))
 
     collection = collection_services.get_collection_by_id(collection_id)
@@ -255,5 +257,4 @@ def get_questions_batch(
     questions_batch = []
     for question_id in random_question_ids:
         questions_batch.append(get_question_by_id(question_id))
-        question_play_counts[question_id] += 1
     return questions_batch
