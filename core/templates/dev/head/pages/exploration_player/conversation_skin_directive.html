@@ -58,6 +58,9 @@
   </div>
 </div>
 
+<!-- This prevents overlapping with the attribution guide on mobile. -->
+<div ng-if="isViewportNarrow()" style="height: 10vh;"></div>
+
 <div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
      class="conversation-skin-final-summary">
   <div ng-if="isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
