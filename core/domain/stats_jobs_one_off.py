@@ -186,9 +186,9 @@ class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
             # Compute total_hit_count and first_hit_count for the states.
             for value in values_state_hit_versioned:
                 state_name = value['state_name']
-                state_stats_mapping[state_name].total_hit_count += 1
+                state_stats_mapping[state_name].total_hit_count_v1 += 1
                 if value['session_id'] not in state_session_ids[state_name]:
-                    state_stats_mapping[state_name].first_hit_count += 1
+                    state_stats_mapping[state_name].first_hit_count_v1 += 1
                     state_session_ids[state_name].append(value['session_id'])
                     session_ids_set.add(value['session_id'])
 
@@ -204,33 +204,33 @@ class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
                 if session_id not in completed_session_ids:
                     for value in values_state_hit_sessioned[:-1]:
                         state_stats_mapping[value[
-                            'state_name']].num_completions += 1
+                            'state_name']].num_completions_v1 += 1
                 else:
                     for value in values_state_hit_sessioned:
                         state_stats_mapping[value[
-                            'state_name']].num_completions += 1
+                            'state_name']].num_completions_v1 += 1
 
             # Compute total_answers_count and useful_feedback_count.
             for value in values_state_answer_versioned:
                 for answer in value['submitted_answer_list']:
                     state_stats_mapping[value[
-                        'state_name']].total_answers_count += 1
+                        'state_name']].total_answers_count_v1 += 1
                     if answer['classification_categorization'] != (
                             exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
                         state_stats_mapping[value[
-                            'state_name']].useful_feedback_count += 1
+                            'state_name']].useful_feedback_count_v1 += 1
 
         # Now that the stats for the complete exploration are computed,
         # calculate num_actual_starts.
         num_actual_starts = state_stats_mapping[
             exploration.states[
                 exploration.init_state_name].interaction.answer_groups[
-                    0].outcome.dest].first_hit_count
+                    0].outcome.dest].first_hit_count_v1
 
         # Create the ExplorationStatsModel instance.
         exploration_stats = stats_domain.ExplorationStats(
-            exp_id, latest_exp_version, num_starts, num_actual_starts,
-            num_completions, state_stats_mapping)
+            exp_id, latest_exp_version, num_starts, 0, num_actual_starts, 0,
+            num_completions, 0, state_stats_mapping)
         stats_services.create_stats_model(exploration_stats)
 
 

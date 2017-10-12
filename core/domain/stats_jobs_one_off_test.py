@@ -131,49 +131,50 @@ class MigrateStatisticsTest(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exploration.version)
-        self.assertEqual(exploration_stats.num_starts, 3)
-        self.assertEqual(exploration_stats.num_completions, 2)
-        self.assertEqual(exploration_stats.num_actual_starts, 2)
+        self.assertEqual(exploration_stats.num_starts_v1, 3)
+        self.assertEqual(exploration_stats.num_completions_v1, 2)
+        self.assertEqual(exploration_stats.num_actual_starts_v1, 2)
 
         self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].first_hit_count, 3)
+            exploration_stats.state_stats_mapping['Home'].first_hit_count_v1, 3)
         self.assertEqual(
-            exploration_stats.state_stats_mapping['End'].first_hit_count, 2)
+            exploration_stats.state_stats_mapping['End'].first_hit_count_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].first_hit_count, 1)
+                'Renamed state'].first_hit_count_v1, 1)
 
         self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].total_hit_count, 4)
+            exploration_stats.state_stats_mapping['Home'].total_hit_count_v1, 4)
         self.assertEqual(
-            exploration_stats.state_stats_mapping['End'].total_hit_count, 2)
+            exploration_stats.state_stats_mapping['End'].total_hit_count_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].total_hit_count, 1)
+                'Renamed state'].total_hit_count_v1, 1)
 
         self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].num_completions, 3)
+            exploration_stats.state_stats_mapping['Home'].num_completions_v1, 3)
         self.assertEqual(
-            exploration_stats.state_stats_mapping['End'].num_completions, 2)
+            exploration_stats.state_stats_mapping['End'].num_completions_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].first_hit_count, 1)
+                'Renamed state'].num_completions_v1, 1)
 
-        self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].total_answers_count,
-            3)
-        self.assertEqual(
-            exploration_stats.state_stats_mapping['End'].total_answers_count, 0)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].total_answers_count, 2)
-
+                'Home'].total_answers_count_v1, 3)
         self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].useful_feedback_count,
-            1)
-        self.assertEqual(
-            exploration_stats.state_stats_mapping['End'].useful_feedback_count,
+            exploration_stats.state_stats_mapping['End'].total_answers_count_v1,
             0)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].useful_feedback_count, 1)
+                'Renamed state'].total_answers_count_v1, 2)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].useful_feedback_count_v1, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'End'].useful_feedback_count_v1, 0)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Renamed state'].useful_feedback_count_v1, 1)
