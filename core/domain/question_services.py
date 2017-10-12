@@ -257,4 +257,5 @@ def get_questions_batch(
     questions_batch = []
     for question_id in random_question_ids:
         questions_batch.append(get_question_by_id(question_id))
+        question_play_counts[question_id] += 1
     return questions_batch
