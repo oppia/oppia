@@ -389,6 +389,30 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.SetOfHtmlString, mappings, invalid_values)
 
+    def test_fraction(self):
+        """Tests objects of type Fraction"""
+        mappings = [(self._create_fraction_dict(True, 0, 0, 0),
+            self._create_fraction_dict(True, 0, 0, 0),
+            (self._create_fraction_dict(False, 1, 2, 3),
+            self._create_fraction_dict(False, 1, 2, 3)))]
+
+        invalid_values = [self._create_fraction_dict('non-boolean', 1, 2, 3),
+            self._create_fraction_dict(True, 'non-int', 2, 3),
+            self._create_fraction_dict(None, None, None, None),
+            {},
+            '1/3',
+            1]
+
+        self.check_normalization(objects.Fraction, mappings, invalid_values)
+
+    def _create_fraction_dict(
+        self, is_negative, whole_number, numerator, denominator):
+        return {
+            "is_negative": is_negative,
+            "whole_number": whole_number,
+            "numerator": numerator,
+            "denominator": denominator
+        }
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 
@@ -400,7 +424,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 30)
+        self.assertEquals(count, 31)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
