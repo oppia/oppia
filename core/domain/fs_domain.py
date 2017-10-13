@@ -34,8 +34,17 @@ CHANGE_LIST_SAVE = [{'cmd': 'save'}]
 
 
 class FileMetadata(object):
-    """A class representing the metadata of a file."""
+    """A class representing the metadata of a file.
+
+    Attributes:
+        size: int. The size of the file.
+    """
     def __init__(self, metadata):
+        """Constructs an FileMetadata object.
+
+        Args:
+            metadata: FileMetadataModel. The file metadata model object.
+        """
         self._size = metadata.size if (metadata is not None) else None
 
     @property
@@ -44,16 +53,31 @@ class FileMetadata(object):
 
 
 class FileStreamWithMetadata(object):
-    """A class that wraps a file stream, but adds extra attributes to it."""
+    """A class that wraps a file stream, but adds extra attributes to it.
+
+    Attributes:
+        content: blob. The content of the file snapshots.
+        version: int. The version number of the file.
+        metadata: FileMetadata. The file metadata domain object
+    """
 
     def __init__(self, content, version, metadata):
-        """The args are a file content blob and a metadata model object."""
+        """The args are a file content blob and a metadata model object.
+
+        Args:
+            content: blob. The content of the file snapshots.
+            version: int. The version number of the file.
+            metadata: FileMetadataModel. The file metadata model object.
+        """
         self._content = content
         self._version = version
         self._metadata = FileMetadata(metadata)
 
     def read(self):
-        """Emulates stream.read(). Returns all bytes and emulates EOF."""
+        """Emulates stream.read(). Returns all bytes and emulates EOF.
+        Returns:
+            content: blob. The content of the file snapshots.
+        """
         content = self._content
         self._content = ''
         return content
@@ -83,6 +107,9 @@ class ExplorationFileSystem(object):
     In general, assets should be retrieved only within the context of the
     exploration that contains them, and should not be retrieved outside this
     context.
+
+    Args:
+        exploration_id: str. The id of the exploration.
     """
 
     _DEFAULT_VERSION_NUMBER = 1
@@ -98,6 +125,16 @@ class ExplorationFileSystem(object):
         """Return the desired file metadata.
 
         Returns None if the file does not exist.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            version: int. The version number of the file whose metadata is to be
+            returned.
+
+        Returns:
+            FileMetadataModel or None: The model object representing the file
+            metadata with the given exploration_id, filepath and version or None
+            if the file does not exist.
         """
         if version is None:
             return file_models.FileMetadataModel.get_model(
@@ -110,6 +147,15 @@ class ExplorationFileSystem(object):
         """Return the desired file content.
 
         Returns None if the file does not exist.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            version: int. The version number of the file to be returned.
+
+        Returns:
+            FileModel or None: The model object representing the file with the
+            given exploration_id, filepath and version  or None if the file does
+            not exist.
         """
         if version is None:
             return file_models.FileModel.get_model(
@@ -119,7 +165,17 @@ class ExplorationFileSystem(object):
                 self._exploration_id, 'assets/%s' % filepath, version)
 
     def _save_file(self, user_id, filepath, raw_bytes):
-        """Create or update a file."""
+        """Create or update a file.
+
+        Args:
+            user_id: str. The user_id of the user who wants to create or update
+            a file.
+            filepath: str. The path to the relevant file within the exploration.
+            raw_bytes: blob. The content to be stored in file.
+
+        Raises:
+            Exception: The maximum allowed file size is 1MB.
+        """
         if len(raw_bytes) > feconf.MAX_FILE_SIZE_BYTES:
             raise Exception('The maximum allowed file size is 1 MB.')
 
@@ -146,6 +202,15 @@ class ExplorationFileSystem(object):
 
         The 'mode' argument is unused. It is included so that this method
         signature matches that of other file systems.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            version: int or None. Optional version number of the file.
+            mode: str. Unused argument
+
+        Returns:
+            FileStreamWithMetadata or None: It returns FileStreamWithMetadata
+            domain object if the file exists otherwise None.
         """
         metadata = self._get_file_metadata(filepath, version)
         if metadata:
@@ -163,11 +228,25 @@ class ExplorationFileSystem(object):
             return None
 
     def commit(self, user_id, filepath, raw_bytes, unused_mimetype):
-        """Saves a raw bytestring as a file in the database."""
+        """Saves a raw bytestring as a file in the database.
+
+        Args:
+            user_id: str. The user_id of the user who wants to create or update
+            a file.
+            filepath: str. The path to the relevant file within the exploration.
+            raw_bytes: blob. The content to be stored in file.
+            unused_mimetype: Unused argument
+        """
         self._save_file(user_id, filepath, raw_bytes)
 
     def delete(self, user_id, filepath):
-        """Marks the current version of a file as deleted."""
+        """Marks the current version of a file as deleted.
+
+        Args:
+            user_id: str. The user_id of the user who wants to create or update
+            a file.
+            filepath: str. The path to the relevant file within the exploration.
+        """
 
         metadata = self._get_file_metadata(filepath, None)
         if metadata:
@@ -178,7 +257,14 @@ class ExplorationFileSystem(object):
             data.delete(user_id, '')
 
     def isfile(self, filepath):
-        """Checks the existence of a file."""
+        """Checks the existence of a file.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+
+        Returns:
+            bool: True if file exists and False if it doesn't.
+        """
         metadata = self._get_file_metadata(filepath, None)
         return bool(metadata)
 
@@ -214,6 +300,10 @@ class DiskBackedFileSystem(object):
     """Implementation for a disk-backed file system.
 
     This implementation ignores versioning and is used only by tests.
+
+    Attributes:
+        root: the path to append to the oppia/ directory.
+        exploration_id: str. The id of the exploration.
     """
 
     def __init__(self, root):
@@ -230,11 +320,28 @@ class DiskBackedFileSystem(object):
         return self._exploration_id
 
     def isfile(self, filepath):
-        """Checks if a file exists."""
+        """Checks if a file exists.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+
+        Returns:
+            bool: True if file exists and False if it doesn't.
+        """
         return os.path.isfile(os.path.join(self._root, filepath))
 
     def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
-        """Returns a bytestring with the file content, but no metadata."""
+        """Returns a bytestring with the file content, but no metadata.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            version: int or None. Optional version number of the file.
+            mode: str. Optional value in which mode to open a file read/write.
+
+        Returns:
+            FileStreamWithMetadata: It returns FileStreamWithMetadata domain
+            object.
+        """
         content = utils.get_file_contents(
             os.path.join(self._root, filepath), raw_bytes=True, mode=mode)
         return FileStreamWithMetadata(content, None, None)
@@ -253,9 +360,15 @@ class GcsFileSystem(object):
     """Wrapper for a file system based on GCS.
 
     This implementation ignores versioning.
+
+    Attributes:
+        exploration_id: str. The id of the exploration.
     """
 
     def __init__(self, exploration_id):
+        """Args:
+            exploration_id: str. The id of the exploration.
+        """
         self._exploration_id = exploration_id
 
     @property
@@ -269,6 +382,12 @@ class GcsFileSystem(object):
         raise NotImplementedError
 
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
+        """Args:
+            unused_user_id: str. Unused argument
+            filepath: str. The path to the relevant file within the exploration.
+            raw_bytes: blob. The content to be stored in file.
+            mimetype: str. The content-type of the cloud file.
+        """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
 
         # Upload to GCS bucket with filepath
@@ -299,7 +418,14 @@ class AbstractFileSystem(object):
         return self._impl
 
     def _check_filepath(self, filepath):
-        """Raises an error if a filepath is invalid."""
+        """Raises an error if a filepath is invalid.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+
+        Raises:
+            IOError: Invalid filepath.
+        """
         base_dir = utils.vfs_construct_path(
             '/', self.impl.exploration_id, 'assets')
         absolute_path = utils.vfs_construct_path(base_dir, filepath)
@@ -310,17 +436,45 @@ class AbstractFileSystem(object):
             raise IOError('Invalid filepath: %s' % filepath)
 
     def isfile(self, filepath):
-        """Checks if a file exists. Similar to os.path.isfile(...)."""
+        """Checks if a file exists. Similar to os.path.isfile(...).
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+
+        Returns:
+            bool: True if file exists and False if it doesn't.
+        """
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
 
     def open(self, filepath, version=None, mode='r'):
-        """Returns a stream with the file content. Similar to open(...)."""
+        """Returns a stream with the file content. Similar to open(...).
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            version: int or None. Optional version number of the file.
+            mode: str. Optional value in which mode to open a file read/write.
+
+        Returns:
+            FileStreamWithMetadata: The file stream domain object.
+        """
         self._check_filepath(filepath)
         return self._impl.get(filepath, version=version, mode=mode)
 
     def get(self, filepath, version=None, mode='r'):
-        """Returns a bytestring with the file content, but no metadata."""
+        """Returns a bytestring with the file content, but no metadata.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            version: int or None. Optional version number of the file.
+            mode: str. Optional value in which mode to open a file read/write.
+
+        Returns:
+            FileStreamWithMetadata: The file stream domain object.
+
+        Raises:
+            IOError: File stream latest versions not found.
+        """
         file_stream = self.open(filepath, version=version, mode=mode)
         if file_stream is None:
             raise IOError(
@@ -329,17 +483,40 @@ class AbstractFileSystem(object):
         return file_stream.read()
 
     def commit(self, user_id, filepath, raw_bytes, mimetype=None):
-        """Replaces the contents of the file with the given bytestring."""
+        """Replaces the contents of the file with the given by test string.
+
+        Args:
+            user_id: str. The user_id of the user who wants to create or update
+            a file.
+            filepath: str. The path to the relevant file within the exploration.
+            raw_bytes: blob. The content to be stored in file.
+            mimetype: str. The content-type of the file.
+        """
         raw_bytes = str(raw_bytes)
         self._check_filepath(filepath)
         self._impl.commit(user_id, filepath, raw_bytes, mimetype)
 
     def delete(self, user_id, filepath):
-        """Deletes a file and the metadata associated with it."""
+        """Deletes a file and the metadata associated with it.
+
+        Args:
+            user_id: str. The user_id of the user who wants to create or update
+            a file.
+            filepath: str. The path to the relevant file within the exploration.
+        """
         self._check_filepath(filepath)
         self._impl.delete(user_id, filepath)
 
     def listdir(self, dir_name):
-        """Lists all the files in a directory. Similar to os.listdir(...)."""
+        """Lists all the files in a directory. Similar to os.listdir(...).
+
+        Args:
+            dir_name: The directory whose files should be listed. This should
+                not start with '/' or end with '/'.
+
+        Returns:
+            List of str. This is a lexicographically-sorted list of filenames,
+            each of which is prefixed with dir_name.
+        """
         self._check_filepath(dir_name)
         return self._impl.listdir(dir_name)
