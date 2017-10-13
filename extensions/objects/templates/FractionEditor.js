@@ -51,34 +51,34 @@
 
      Fraction.parse = function(rawInput) {
       // TODO(aa): Perform error checking on the input using regexes.
-      var isNegative = false;
-      var wholeNumber = 0;
-      var numerator = 0;
-      var denominator = 0;
-      rawInput = rawInput.trim();
-      if (rawInput.charAt(0) === '-') {
-        isNegative = true;
-        // Remove the negative char from the string.
-        rawInput = rawInput.substring(1);
-      }
-      // Filter result from split to remove empty strings.
-      var numbers = rawInput.split(/\/|\s/g).filter(function(token) {
-        // The empty string will evaluate to false.
-        return token;
-      });
-      
-      if (numbers.length == 1) {
-        wholeNumber = parseInt(numbers[0]);
-      } else if (numbers.length == 2) {
-        numerator = parseInt(numbers[0]);
-        denominator = parseInt(numbers[1]);
-      } else {
-        // numbers.length == 3
-        wholeNumber = parseInt(numbers[0]);
-        numerator = parseInt(numbers[1]);
-        denominator = parseInt(numbers[2]);
-      }
-      return new Fraction(isNegative, wholeNumber, numerator, denominator);
+       var isNegative = false;
+       var wholeNumber = 0;
+       var numerator = 0;
+       var denominator = 0;
+       rawInput = rawInput.trim();
+       if (rawInput.charAt(0) === '-') {
+         isNegative = true;
+         // Remove the negative char from the string.
+         rawInput = rawInput.substring(1);
+       }
+       // Filter result from split to remove empty strings.
+       var numbers = rawInput.split(/\/|\s/g).filter(function(token) {
+         // The empty string will evaluate to false.
+         return token;
+       });
+
+       if (numbers.length == 1) {
+         wholeNumber = parseInt(numbers[0]);
+       } else if (numbers.length == 2) {
+         numerator = parseInt(numbers[0]);
+         denominator = parseInt(numbers[1]);
+       } else {
+         // numbers.length == 3
+         wholeNumber = parseInt(numbers[0]);
+         numerator = parseInt(numbers[1]);
+         denominator = parseInt(numbers[2]);
+       }
+       return new Fraction(isNegative, wholeNumber, numerator, denominator);
     };
 
      Fraction.fromDict = function(fractionDict) {
