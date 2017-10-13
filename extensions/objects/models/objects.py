@@ -779,3 +779,38 @@ class MathExpression(BaseObject):
             'schema': UnicodeString.SCHEMA,
         }]
     }
+
+class Fraction(BaseObject):
+    """Fraction class."""
+
+    description = 'A fraction type'
+    edit_html_filename = 'unicode_string_editor'
+    edit_js_filename = 'FractionEditor'
+    default_value = {False, 0, 0, 1}
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'is_negative',
+            'schema': {
+                'type': 'bool'
+            }
+        }, {
+            'name': 'whole_number',
+            'schema': {
+                'type': 'int'
+            }
+
+        }, {
+            'name': 'numerator',
+            'schema': {
+                'type': 'int'
+            }
+
+        }, {
+            'name': 'denominator',
+            'schema': {
+                'type': 'int'
+            }
+        }]
+    }
