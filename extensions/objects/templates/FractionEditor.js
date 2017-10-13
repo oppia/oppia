@@ -79,21 +79,21 @@ oppia.factory('FractionObjectFactory', [
        denominator = parseInt(numbers[2]);
      }
      return new Fraction(isNegative, wholeNumber, numerator, denominator);
-     };
+   };
 
-     Fraction.fromDict = function(fractionDict) {
-       return new Fraction(
-         fractionDict.isNegative,
-         fractionDict.wholeNumber,
-         fractionDict.numerator,
-         fractionDict.denominator);
-     };
+   Fraction.fromDict = function(fractionDict) {
+     return new Fraction(
+       fractionDict.isNegative,
+       fractionDict.wholeNumber,
+       fractionDict.numerator,
+       fractionDict.denominator);
+   };
 
      return Fraction;
-  }
+ }
 ]);
 
- oppia.directive('fractionEditor', [
+oppia.directive('fractionEditor', [
   '$compile', 'FractionObjectFactory', 'OBJECT_EDITOR_URL_PREFIX',
   function($compile, FractionObjectFactory, OBJECT_EDITOR_URL_PREFIX) {
     return {
