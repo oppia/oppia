@@ -786,7 +786,12 @@ class Fraction(BaseObject):
     description = 'A fraction type'
     edit_html_filename = 'unicode_string_editor'
     edit_js_filename = 'FractionEditor'
-    default_value = {False, 0, 0, 1}
+    default_value = {
+        'is_negative': False,
+        'whole_number': 0,
+        'numerator': 0,
+        'denominator': 1
+    }
 
     SCHEMA = {
         'type': 'dict',
