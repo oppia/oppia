@@ -89,7 +89,7 @@ oppia.factory('FractionObjectFactory', [
        fractionDict.denominator);
    };
 
-     return Fraction;
+   return Fraction;
  }
 ]);
 
