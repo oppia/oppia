@@ -17,69 +17,69 @@
  * domain objects.
  */
 
- oppia.factory('FractionObjectFactory', [
-   function() {
-     var Fraction = function(isNegative, wholeNumber, numerator, denominator) {
-       this.isNegative = isNegative;
-       this.wholeNumber = wholeNumber;
-       this.numerator = numerator;
-       this.denominator = denominator;
+oppia.factory('FractionObjectFactory', [
+ function() {
+   var Fraction = function(isNegative, wholeNumber, numerator, denominator) {
+     this.isNegative = isNegative;
+     this.wholeNumber = wholeNumber;
+     this.numerator = numerator;
+     this.denominator = denominator;
+   };
+
+   Fraction.prototype.toString = function () {
+     var fractionSring = '';
+     if (this.numerator !== 0) {
+       fractionSring += this.numerator + '/' + this.denominator;
+     }
+     if (this.wholeNumber !== 0) {
+       fractionSring = this.wholeNumber + ' ' + fractionSring;
+     }
+     if (this.isNegative && fractionSring !== '') {
+       fractionSring = '-' + fractionSring;
+     }
+     return fractionSring === '' ? '0' : fractionSring;
+   };
+
+   Fraction.prototype.toDict = function() {
+     return {
+       isNegative: this.isNegative,
+       wholeNumber: this.wholeNumber,
+       numerator: this.numerator,
+       denominator: this.denominator
      };
+   };
 
-     Fraction.prototype.toString = function () {
-       var fractionSring = '';
-       if (this.numerator !== 0) {
-         fractionSring += this.numerator + '/' + this.denominator;
-       }
-       if (this.wholeNumber !== 0) {
-         fractionSring = this.wholeNumber + ' ' + fractionSring;
-       }
-       if (this.isNegative && fractionSring !== '') {
-         fractionSring = '-' + fractionSring;
-       }
-       return fractionSring === '' ? '0' : fractionSring;
+   Fraction.parse = function(rawInput) {
+    // TODO(aa): Perform error checking on the input using regexes.
+     var isNegative = false;
+     var wholeNumber = 0;
+     var numerator = 0;
+     var denominator = 0;
+     rawInput = rawInput.trim();
+     if (rawInput.charAt(0) === '-') {
+       isNegative = true;
+       // Remove the negative char from the string.
+       rawInput = rawInput.substring(1);
+     }
+     // Filter result from split to remove empty strings.
+     var numbers = rawInput.split(/\/|\s/g).filter(function(token) {
+       // The empty string will evaluate to false.
+       return token;
+     });
+
+     if (numbers.length == 1) {
+       wholeNumber = parseInt(numbers[0]);
+     } else if (numbers.length == 2) {
+       numerator = parseInt(numbers[0]);
+       denominator = parseInt(numbers[1]);
+     } else {
+       // numbers.length == 3
+       wholeNumber = parseInt(numbers[0]);
+       numerator = parseInt(numbers[1]);
+       denominator = parseInt(numbers[2]);
+     }
+     return new Fraction(isNegative, wholeNumber, numerator, denominator);
      };
-
-     Fraction.prototype.toDict = function() {
-       return {
-         isNegative: this.isNegative,
-         wholeNumber: this.wholeNumber,
-         numerator: this.numerator,
-         denominator: this.denominator
-       };
-     };
-
-     Fraction.parse = function(rawInput) {
-      // TODO(aa): Perform error checking on the input using regexes.
-       var isNegative = false;
-       var wholeNumber = 0;
-       var numerator = 0;
-       var denominator = 0;
-       rawInput = rawInput.trim();
-       if (rawInput.charAt(0) === '-') {
-         isNegative = true;
-         // Remove the negative char from the string.
-         rawInput = rawInput.substring(1);
-       }
-       // Filter result from split to remove empty strings.
-       var numbers = rawInput.split(/\/|\s/g).filter(function(token) {
-         // The empty string will evaluate to false.
-         return token;
-       });
-
-       if (numbers.length == 1) {
-         wholeNumber = parseInt(numbers[0]);
-       } else if (numbers.length == 2) {
-         numerator = parseInt(numbers[0]);
-         denominator = parseInt(numbers[1]);
-       } else {
-         // numbers.length == 3
-         wholeNumber = parseInt(numbers[0]);
-         numerator = parseInt(numbers[1]);
-         denominator = parseInt(numbers[2]);
-       }
-       return new Fraction(isNegative, wholeNumber, numerator, denominator);
-    };
 
      Fraction.fromDict = function(fractionDict) {
        return new Fraction(
@@ -90,10 +90,10 @@
      };
 
      return Fraction;
-   }
- ]);
+  }
+]);
 
-oppia.directive('fractionEditor', [
+ oppia.directive('fractionEditor', [
   '$compile', 'FractionObjectFactory', 'OBJECT_EDITOR_URL_PREFIX',
   function($compile, FractionObjectFactory, OBJECT_EDITOR_URL_PREFIX) {
     return {

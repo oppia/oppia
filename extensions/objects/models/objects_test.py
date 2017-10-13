@@ -394,7 +394,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(self._create_fraction_dict(True, 0, 0, 0),
                      self._create_fraction_dict(True, 0, 0, 0),
                      (self._create_fraction_dict(False, 1, 2, 3),
-                     self._create_fraction_dict(False, 1, 2, 3)))]
+                      self._create_fraction_dict(False, 1, 2, 3)))]
 
         invalid_values = [self._create_fraction_dict('non-boolean', 1, 2, 3),
                           self._create_fraction_dict(True, 'non-int', 2, 3),
