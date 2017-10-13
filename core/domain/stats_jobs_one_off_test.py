@@ -19,6 +19,7 @@ import os
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import stats_domain
 from core.domain import stats_jobs_one_off
 from core.domain import stats_services
 from core.platform import models

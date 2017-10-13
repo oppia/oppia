@@ -45,6 +45,7 @@ ONE_OFF_JOB_MANAGERS = [
     feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     stats_jobs_one_off.MigrateStatistics,
+    stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
