@@ -62,7 +62,11 @@
         rawInput = rawInput.substring(1);
       }
       // Filter result from split to remove empty strings.
-      var numbers = rawInput.split(/\/|\s/g).filter((token) => token);
+      var numbers = rawInput.split(/\/|\s/g).filter(function(token) {
+        // The empty string will evaluate to false.
+        return token;
+      });
+      
       if (numbers.length == 1) {
         wholeNumber = parseInt(numbers[0]);
       } else if (numbers.length == 2) {
