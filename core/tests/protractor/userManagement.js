@@ -17,16 +17,23 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Account creation', function() {
+  var libraryPage = null;
+  
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+  });
+
   it('should create users', function() {
     users.createUser(
       'ordinaryuser@userManagement.com', 'ordinaryUserManagement');
 
     users.login('ordinaryuser@userManagement.com');
-    browser.get(general.LIBRARY_URL_SUFFIX);
+    libraryPage.get();
     general.checkForConsoleErrors([]);
 
     browser.get(general.MODERATOR_URL_SUFFIX);
