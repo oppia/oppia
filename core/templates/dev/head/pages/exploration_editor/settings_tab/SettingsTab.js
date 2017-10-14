@@ -18,7 +18,7 @@
 
 oppia.controller('SettingsTab', [
   '$scope', '$http', '$window', '$modal', '$rootScope',
-  'explorationData', 'explorationTitleService', 'explorationCategoryService',
+  'ExplorationDataService', 'explorationTitleService', 'explorationCategoryService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationTagsService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationParamSpecsService',
@@ -29,7 +29,7 @@ oppia.controller('SettingsTab', [
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
   function(
       $scope, $http, $window, $modal, $rootScope,
-      explorationData, explorationTitleService, explorationCategoryService,
+      ExplorationDataService, explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService,
       explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService,
@@ -74,7 +74,7 @@ oppia.controller('SettingsTab', [
       $scope.explorationParamChangesService = explorationParamChangesService;
       $scope.UserEmailPreferencesService = UserEmailPreferencesService;
 
-      explorationData.getData().then(function() {
+      ExplorationDataService.getData().then(function() {
         $scope.refreshSettingsTab();
         $scope.hasPageLoaded = true;
       });

@@ -36,7 +36,7 @@ oppia.constant(
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
-  'explorationData', 'editorContextService', 'explorationTitleService',
+  'ExplorationDataService', 'EditorStateService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
@@ -50,7 +50,7 @@ oppia.controller('ExplorationEditor', [
   'ParamSpecsObjectFactory', 'UrlInterpolationService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
-      explorationData, editorContextService, explorationTitleService,
+      ExplorationDataService, EditorStateService, explorationTitleService,
       explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, explorationTagsService,
@@ -63,7 +63,7 @@ oppia.controller('ExplorationEditor', [
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
-    $scope.editorContextService = editorContextService;
+    $scope.EditorStateService = EditorStateService;
 
     /**********************************************************
      * Called on initial load of the exploration editor page.
@@ -100,7 +100,7 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      explorationData.getData(function(explorationId, lostChanges) {
+      ExplorationDataService.getData(function(explorationId, lostChanges) {
         if (!autosaveInfoModalsService.isModalOpen()) {
           autosaveInfoModalsService.showLostChangesModal(
             lostChanges, explorationId);
@@ -148,10 +148,10 @@ oppia.controller('ExplorationEditor', [
 
         graphDataService.recompute();
 
-        if (!editorContextService.getActiveStateName() ||
+        if (!EditorStateService.getActiveStateName() ||
             !explorationStatesService.getState(
-              editorContextService.getActiveStateName())) {
-          editorContextService.setActiveStateName(
+              EditorStateService.getActiveStateName())) {
+          EditorStateService.setActiveStateName(
             explorationInitStateNameService.displayed);
         }
 
@@ -184,7 +184,7 @@ oppia.controller('ExplorationEditor', [
         });
 
         if (explorationStatesService.getState(
-              editorContextService.getActiveStateName())) {
+              EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
         }
 

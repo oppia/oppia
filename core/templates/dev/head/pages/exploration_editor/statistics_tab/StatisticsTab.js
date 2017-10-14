@@ -21,12 +21,12 @@ oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
-  'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
+  'ExplorationDataService', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
-      explorationData, computeGraphService, oppiaDatetimeFormatter,
+      ExplorationDataService, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
@@ -48,7 +48,7 @@ oppia.controller('StatisticsTab', [
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
       $scope.explorationVersionUrl = (
-        '/createhandler/statisticsversion/' + explorationData.explorationId);
+        '/createhandler/statisticsversion/' + ExplorationDataService.explorationId);
       $http.get($scope.explorationVersionUrl).then(function(response) {
         $scope.versions = response.data.versions;
         $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
@@ -58,11 +58,11 @@ oppia.controller('StatisticsTab', [
     $scope.hasExplorationBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {
       $scope.explorationStatisticsUrl = (
-        '/createhandler/statistics/' + explorationData.explorationId +
+        '/createhandler/statistics/' + ExplorationDataService.explorationId +
         '/' + version);
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
-          explorationData.explorationId).then(function(response) {
+          ExplorationDataService.explorationId).then(function(response) {
             var statesDict = response.exploration.states;
             var states = StatesObjectFactory.createFromBackendDict(statesDict);
             var initStateName = response.exploration.init_state_name;

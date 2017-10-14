@@ -19,8 +19,8 @@
 
 oppia.controller('PreviewTab', [
   '$scope', '$modal', '$q', '$timeout', 'LearnerParamsService',
-  'explorationData', 'ExplorationAdvancedFeaturesService',
-  'explorationCategoryService', 'editorContextService',
+  'ExplorationDataService', 'ExplorationAdvancedFeaturesService',
+  'explorationCategoryService', 'EditorStateService',
   'explorationInitStateNameService', 'explorationParamChangesService',
   'explorationParamSpecsService', 'explorationStatesService',
   'explorationTitleService', 'ExplorationPlayerService',
@@ -28,16 +28,16 @@ oppia.controller('PreviewTab', [
   'UrlInterpolationService',
   function(
       $scope, $modal, $q, $timeout, LearnerParamsService,
-      explorationData, ExplorationAdvancedFeaturesService,
-      explorationCategoryService, editorContextService,
+      ExplorationDataService, ExplorationAdvancedFeaturesService,
+      explorationCategoryService, EditorStateService,
       explorationInitStateNameService, explorationParamChangesService,
       explorationParamSpecsService, explorationStatesService,
       explorationTitleService, ExplorationPlayerService,
       ParameterMetadataService, ParamChangeObjectFactory,
       UrlInterpolationService) {
     $scope.isExplorationPopulated = false;
-    explorationData.getData().then(function() {
-      var initStateNameForPreview = editorContextService.getActiveStateName();
+    ExplorationDataService.getData().then(function() {
+      var initStateNameForPreview = EditorStateService.getActiveStateName();
       var manualParamChanges = [];
 
       // Show a warning message if preview doesn't start from the first state
@@ -129,7 +129,7 @@ oppia.controller('PreviewTab', [
     // preview mode, ensuring that the state does not change when toggling
     // between editor and preview.
     $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
-      editorContextService.setActiveStateName(stateName);
+      EditorStateService.setActiveStateName(stateName);
     });
 
     $scope.allParams = {};

@@ -18,22 +18,22 @@
 
 oppia.factory('SolutionVerificationService', [
   '$injector', 'stateInteractionIdService', 'explorationContextService',
-  'editorContextService', 'angularNameService', 'AnswerClassificationService',
+  'EditorStateService', 'AngularNameService', 'AnswerClassificationService',
   function(
     $injector, stateInteractionIdService, explorationContextService,
-    editorContextService, angularNameService, AnswerClassificationService) {
+    EditorStateService, AngularNameService, AnswerClassificationService) {
     return {
       verifySolution: function(
         explorationId, state, correctAnswer, successCallback, errorCallback) {
         var interactionId = stateInteractionIdService.savedMemento;
         var rulesServiceName = (
-          angularNameService.getNameOfInteractionRulesService(interactionId));
+          AngularNameService.getNameOfInteractionRulesService(interactionId));
         var rulesService = $injector.get(rulesServiceName);
         var result = (
           AnswerClassificationService.getMatchingClassificationResult(
             explorationId, state.name, state, correctAnswer, true, rulesService
           ));
-        if (editorContextService.getActiveStateName() !== result.outcome.dest) {
+        if (EditorStateService.getActiveStateName() !== result.outcome.dest) {
           successCallback();
         } else {
           errorCallback();

@@ -18,14 +18,14 @@
 
 oppia.directive('solutionEditor', [
   '$modal', 'UrlInterpolationService', 'stateSolutionService',
-  'editorContextService', 'explorationStatesService',
+  'EditorStateService', 'explorationStatesService',
   'explorationWarningsService', 'alertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
   'explorationContextService', 'oppiaExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function($modal, UrlInterpolationService, stateSolutionService,
-           editorContextService, explorationStatesService,
+           EditorStateService, explorationStatesService,
            explorationWarningsService, alertsService,
            SolutionObjectFactory, SolutionVerificationService,
            explorationContextService, oppiaExplorationHtmlFormatterService,
@@ -64,11 +64,11 @@ oppia.directive('solutionEditor', [
               backdrop: 'static',
               controller: [
                 '$scope', '$modalInstance', 'stateInteractionIdService',
-                'stateSolutionService', 'editorContextService',
+                'stateSolutionService', 'EditorStateService',
                 'oppiaExplorationHtmlFormatterService',
                 'explorationStatesService',
                 function($scope, $modalInstance, stateInteractionIdService,
-                         stateSolutionService, editorContextService,
+                         stateSolutionService, EditorStateService,
                          oppiaExplorationHtmlFormatterService,
                          explorationStatesService) {
                   $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
@@ -79,7 +79,7 @@ oppia.directive('solutionEditor', [
                       stateInteractionIdService.savedMemento,
                       /* eslint-disable max-len */
                       explorationStatesService.getInteractionCustomizationArgsMemento(
-                        editorContextService.getActiveStateName()),
+                        EditorStateService.getActiveStateName()),
                       /* eslint-enable max-len */
                       $scope.SOLUTION_EDITOR_FOCUS_LABEL));
                   $scope.EXPLANATION_FORM_SCHEMA = {
@@ -119,7 +119,7 @@ oppia.directive('solutionEditor', [
               ]
             }).result.then(function(result) {
               var correctAnswer = result.solution.correctAnswer;
-              var currentStateName = editorContextService.getActiveStateName();
+              var currentStateName = EditorStateService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
               SolutionVerificationService.verifySolution(
                 explorationContextService.getExplorationId(),

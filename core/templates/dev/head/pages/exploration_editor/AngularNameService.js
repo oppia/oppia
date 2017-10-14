@@ -13,18 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the state parameter changes section
- * of the editor sidebar.
+ * @fileoverview A service that maps IDs to Angular names
  */
 
-oppia.controller('StateParamChangesEditor', [
-  '$scope', 'EditorStateService', 'stateParamChangesService',
-  function($scope, EditorStateService, stateParamChangesService) {
-    $scope.stateParamChangesService = stateParamChangesService;
+oppia.factory('AngularNameService', [function() {
+  var angularName = null;
 
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
-      stateParamChangesService.init(
-        EditorStateService.getActiveStateName(), stateData.paramChanges);
-    });
-  }
-]);
+  return {
+    getNameOfInteractionRulesService: function(interactionId) {
+      angularName = interactionId.charAt(0).toLowerCase() +
+        interactionId.slice(1) + 'RulesService';
+      return angularName
+    }
+  };
+}]);

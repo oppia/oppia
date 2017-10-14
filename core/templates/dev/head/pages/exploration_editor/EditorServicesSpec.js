@@ -17,147 +17,6 @@
  *   editor page.
  */
 
-
-describe('Exploration data service', function() {
-  beforeEach(module('oppia'));
-
-  describe('getData local save', function() {
-    var eds = null;
-    var mockBackendApiService = null;
-    var mockLocalStorageService = null;
-    var mockUrlService = null;
-    var responseWhenDraftChangesAreValid = null;
-    var responseWhenDraftChangesAreInvalid = null;
-    var $q = null;
-
-    beforeEach(function() {
-      module(function($provide) {
-        $provide.value(
-          'LocalStorageService', mockLocalStorageService);
-      });
-      module(function($provide) {
-        $provide.value(
-          'EditableExplorationBackendApiService', mockBackendApiService);
-      });
-      module(function($provide) {
-        $provide.value(
-          'urlService', mockUrlService);
-      });
-    });
-
-    beforeEach(function() {
-      mockUrlService = {
-        getPathname: function() {}
-      };
-
-      mockBackendApiService = {
-        fetchApplyDraftExploration: function() {}
-      };
-
-      mockLocalStorageService = {
-        getExplorationDraft: function() {},
-        removeExplorationDraft: function() {}
-      };
-      spyOn(mockUrlService, 'getPathname').and.returnValue('/create/exp_id');
-    });
-
-    beforeEach(inject(function($injector) {
-      eds = $injector.get('explorationData');
-      $q = $injector.get('$q');
-    }));
-
-    beforeEach(function() {
-      expDataResponse = {
-        draft_change_list_id: 3,
-      };
-
-      responseWhenDraftChangesAreValid = {
-        isValid: function() {
-          return true;
-        },
-        getChanges: function() {
-          return [];
-        }
-      };
-
-      responseWhenDraftChangesAreInvalid = {
-        isValid: function() {
-          return false;
-        },
-        getChanges: function() {
-          return [];
-        }
-      };
-
-      spyOn(mockBackendApiService, 'fetchApplyDraftExploration').
-        and.returnValue($q.when(expDataResponse));
-      spyOn(eds, 'autosaveChangeList');
-    });
-
-
-    it('should autosave draft changes when draft ids match', function() {
-      errorCallback = function() {};
-      spyOn(mockLocalStorageService, 'getExplorationDraft').
-        and.returnValue(responseWhenDraftChangesAreValid);
-      eds.getData(errorCallback).then(function(data) {
-        expect(eds.autosaveChangeList()).toHaveBeenCalled();
-      });
-    });
-
-    it('should call error callback when draft ids do not match', function() {
-      errorCallback = function() {};
-      spyOn(mockLocalStorageService, 'getExplorationDraft').
-        and.returnValue(responseWhenDraftChangesAreInvalid);
-      spyOn(window, 'errorCallback');
-      eds.getData(errorCallback).then(function(data) {
-        expect(errorCallback()).toHaveBeenCalled();
-      });
-    });
-  });
-});
-
-describe('Editor context service', function() {
-  beforeEach(module('oppia'));
-
-  describe('editor context service', function() {
-    var ecs = null;
-
-    beforeEach(inject(function($injector) {
-      ecs = $injector.get('editorContextService');
-    }));
-
-    it('should correctly set and get state names', function() {
-      ecs.setActiveStateName('A State');
-      expect(ecs.getActiveStateName()).toBe('A State');
-    });
-
-    it('should not allow invalid state names to be set', function() {
-      ecs.setActiveStateName('');
-      expect(ecs.getActiveStateName()).toBeNull();
-
-      ecs.setActiveStateName(null);
-      expect(ecs.getActiveStateName()).toBeNull();
-    });
-  });
-});
-
-describe('Angular names service', function() {
-  beforeEach(module('oppia'));
-
-  describe('angular name service', function() {
-    var ans = null;
-
-    beforeEach(inject(function($injector) {
-      ans = $injector.get('angularNameService');
-    }));
-
-    it('should map interaction ID to correct RulesService', function() {
-      expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
-        'textInputRulesService');
-    });
-  });
-});
-
 describe('Change list service', function() {
   beforeEach(module('oppia'));
 
@@ -186,7 +45,7 @@ describe('Change list service', function() {
         discardDraft: function() {}
       };
       module(function($provide) {
-        $provide.value('explorationData', mockExplorationData);
+        $provide.value('ExplorationDataService', mockExplorationData);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
@@ -360,7 +219,7 @@ describe('Exploration title service', function() {
         autosaveChangeList: function() {}
       };
       module(function($provide) {
-        $provide.value('explorationData', mockExplorationData);
+        $provide.value('ExplorationDataService', mockExplorationData);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });

@@ -35,7 +35,7 @@ describe('State content editor directive', function() {
       autosaveChangeList: function() {}
     };
     module(function($provide) {
-      $provide.value('explorationData', mockExplorationData);
+      $provide.value('ExplorationDataService', mockExplorationData);
     });
   });
 

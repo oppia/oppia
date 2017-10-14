@@ -13,18 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the state parameter changes section
- * of the editor sidebar.
+ * @fileoverview A service that maintains a record of which state in the exploration is
+ * currently active
  */
 
-oppia.controller('StateParamChangesEditor', [
-  '$scope', 'EditorStateService', 'stateParamChangesService',
-  function($scope, EditorStateService, stateParamChangesService) {
-    $scope.stateParamChangesService = stateParamChangesService;
+oppia.factory('EditorStateService', ['$log', function($log) {
+  var activeStateName = null;
 
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
-      stateParamChangesService.init(
-        EditorStateService.getActiveStateName(), stateData.paramChanges);
-    });
-  }
-]);
+  return {
+    getActiveStateName: function() {
+      return activeStateName;
+    },
+    setActiveStateName: function(newActiveStateName) {
+      if (newActiveStateName === '' || newActiveStateName === null) {
+        $log.error('Invalid active state name: ' + newActiveStateName);
+        return;
+      }
+      activeStateName = newActiveStateName;
+    }
+  };
+}]);

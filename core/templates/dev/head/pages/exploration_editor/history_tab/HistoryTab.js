@@ -17,14 +17,14 @@
  */
 
 oppia.controller('HistoryTab', [
-  '$scope', '$http', '$rootScope', '$log', '$modal', 'explorationData',
+  '$scope', '$http', '$rootScope', '$log', '$modal', 'ExplorationDataService',
   'VersionTreeService', 'CompareVersionsService', 'graphDataService',
   'oppiaDatetimeFormatter',
   function(
-      $scope, $http, $rootScope, $log, $modal, explorationData,
+      $scope, $http, $rootScope, $log, $modal, ExplorationDataService,
       VersionTreeService, CompareVersionsService, graphDataService,
       oppiaDatetimeFormatter) {
-    $scope.explorationId = explorationData.explorationId;
+    $scope.explorationId = ExplorationDataService.explorationId;
     $scope.explorationAllSnapshotsUrl =
         '/createhandler/snapshots/' + $scope.explorationId;
 
@@ -100,7 +100,7 @@ oppia.controller('HistoryTab', [
     // Refreshes the displayed version history log.
     $scope.refreshVersionHistory = function() {
       $rootScope.loadingMessage = 'Loading';
-      explorationData.getData().then(function(data) {
+      ExplorationDataService.getData().then(function(data) {
         var currentVersion = data.version;
         /**
          * $scope.compareVersionMetadata is an object with keys
@@ -227,13 +227,13 @@ oppia.controller('HistoryTab', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'version', 'explorationData',
-          function($scope, $modalInstance, version, explorationData) {
+          '$scope', '$modalInstance', 'version', 'ExplorationDataService',
+          function($scope, $modalInstance, version, ExplorationDataService) {
             $scope.version = version;
 
             $scope.getExplorationUrl = function(version) {
               return (
-                '/explore/' + explorationData.explorationId + '?v=' + version);
+                '/explore/' + ExplorationDataService.explorationId + '?v=' + version);
             };
 
             $scope.revert = function() {
@@ -247,7 +247,7 @@ oppia.controller('HistoryTab', [
         ]
       }).result.then(function(version) {
         $http.post($scope.revertExplorationUrl, {
-          current_version: explorationData.data.version,
+          current_version: ExplorationDataService.data.version,
           revert_to_version: version
         }).then(function() {
           location.reload();
