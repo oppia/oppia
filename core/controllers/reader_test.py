@@ -817,7 +817,8 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self.state_name: stats_domain.StateStats.create_default()
         }
         exploration_stats = stats_domain.ExplorationStats(
-            self.exp_id, self.exp_version, 0, 0, 0, state_stats_mapping)
+            self.exp_id, self.exp_version, 0, 0, 0, 0, 0, 0,
+            state_stats_mapping)
         stats_services.create_stats_model(exploration_stats)
 
     def test_answer_submitted_handler(self):
@@ -842,10 +843,10 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].total_answers_count, 1)
+                self.state_name].total_answers_count_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].useful_feedback_count, 0)
+                self.state_name].useful_feedback_count_v2, 0)
 
     def test_state_hit_handler(self):
         """Test the handler for recording state hit events."""
@@ -865,10 +866,10 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].total_hit_count, 1)
+                self.state_name].total_hit_count_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].first_hit_count, 1)
+                self.state_name].first_hit_count_v2, 1)
 
     def test_state_complete_handler(self):
         """Test the handler for recording state complete events."""
@@ -886,7 +887,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].num_completions, 1)
+                self.state_name].num_completions_v2, 1)
 
     def test_exploration_actual_start_handler(self):
         """Test the handler for recording exploration actual start events."""
@@ -902,7 +903,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         # Check that the models are updated.
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
-        self.assertEqual(exploration_stats.num_actual_starts, 1)
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
 
     def test_solution_hit_handler(self):
         """Test the handler for recording solution hit events."""
@@ -920,7 +921,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].num_times_solution_viewed, 1)
+                self.state_name].num_times_solution_viewed_v2, 1)
 
     def test_exploration_complete_handler(self):
         """Test the handler for recording exploration complete events."""
@@ -938,7 +939,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         # Check that the models are updated.
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
-        self.assertEqual(exploration_stats.num_completions, 1)
+        self.assertEqual(exploration_stats.num_completions_v2, 1)
 
     def test_exploration_start_handler(self):
         """Test the handler for recording exploration start events."""
@@ -954,4 +955,4 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         # Check that the models are updated.
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
-        self.assertEqual(exploration_stats.num_starts, 1)
+        self.assertEqual(exploration_stats.num_starts_v2, 1)
