@@ -22,22 +22,15 @@
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard, 'with-supplementary-card': isCurrentSupplementalCardNonempty()}">
 
       <div class="conversation-skin-main-tutor-card-embed"
-           ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
            ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}">
         <tutor-card on-click-continue-button="showUpcomingCard()"
                     on-submit-answer="submitAnswer(answer, rulesService)"
-                    on-dismiss="showSupplementalCardIfScreenIsNarrow()"
                     start-card-change-animation="startCardChangeAnimation">
         </tutor-card>
       </div>
 
-      <div ng-if="isCurrentSupplementalCardNonempty()"
+      <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
            class="conversation-skin-supplemental-card-container">
-        <img class="conversation-skin-oppia-avatar show-tutor-card"
-             ng-if="isScreenNarrowAndShowingSupplementalCard() && isCurrentSupplementalCardNonempty()"
-             ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>"
-             ng-click="showTutorCardIfScreenIsNarrow()" alt="">
-        <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
