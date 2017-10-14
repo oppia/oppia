@@ -26,7 +26,7 @@ oppia.controller('Error', [
     $scope.ErrorCode = $('[name=errorCode]').data().name;
 
     $scope.ErrorCodeIs400 = function () {
-      if($scope.ErrorCode == "400"){
+      if($scope.ErrorCode == '400'){
         return true;
       }
       else {
