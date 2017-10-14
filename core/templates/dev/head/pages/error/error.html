@@ -15,6 +15,7 @@
   {% endif %}
 {% endblock maintitle %}
 
+
 {% block content %}
   <div class="oppia-content oppia-error-page-main-content" ng-controller="Error">
     <br>
@@ -22,10 +23,11 @@
     <div class="oppia-wide-panel oppia-error-wide-container">
       <div class="oppia-wide-panel-content protractor-test-error-container">
         <h1 class="oppia-error-h1">
-          {% if code == 400 %}
+          <div ng-if="ErrorCodeIs400()">
             <span translate="I18N_ERROR_HEADER_400"></span>
             - Bad Request
-          {% elif code == 401 %}
+          </div>
+          {% if code == 401 %}
             <span translate="I18N_ERROR_HEADER_401"></span>
             - Unauthorized
           {% elif code == 404 %}
@@ -41,9 +43,10 @@
 
         <img ng-src="<[oopsMintImgUrl]>" alt="Oops!" width="299" height="142"/>
         <p>
-          {% if code == 400 %}
+          <div ng-if="ErrorCodeIs400()">
             <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_400"></h2>
-          {% elif code == 401 %}
+          </div>
+          {% if code == 401 %}
             <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_401"></h2>
           {% elif code == 404 %}
             <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_404"></h2>
