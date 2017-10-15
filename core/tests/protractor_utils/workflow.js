@@ -32,7 +32,7 @@ var createExploration = function() {
 var createExplorationAndStartTutorial = function() {
   libraryPage = new LibraryPage.LibraryPage();
   libraryPage.get();
-  element(by.css('.protractor-test-create-activity')).click();
+  libraryPage.clickCreateActivity(); 
 
   // Wait for the dashboard to transition the creator into the editor page.
   browser.waitForAngular();

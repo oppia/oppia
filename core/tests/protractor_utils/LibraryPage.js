@@ -30,6 +30,7 @@ var LibraryPage = function(){
     forms.MultiSelectEditor(
       element(by.css('.protractor-test-search-bar-category-selector'))
     );
+  var createActivityButton = element(by.css('.protractor-test-create-activity'));
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {
@@ -111,6 +112,10 @@ var LibraryPage = function(){
         expect(value).toBe(ratingValue);
       });
     });
+  };
+
+  this.clickCreateActivity = function(){
+    createActivityButton.click();
   };
 };
 
