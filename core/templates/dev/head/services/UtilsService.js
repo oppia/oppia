@@ -13,20 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for interacting with the creator dashboard page,
- * for use in Protractor tests.
+ * @fileoverview Service for storing all generic functions which have to be
+ * used at multiple places in the codebase.
  */
 
-var getNumberOfFeedbackMessages = function() {
-  return element(by.css('.protractor-test-exploration-feedback-count')).
-    getText().then(function(text) {
-      return parseInt(text);
-    });
-};
+oppia.factory('UtilsService', [function() {
+  var utils = {
+    isEmpty: function(obj) {
+      for (var property in obj) {
+        if (obj.hasOwnProperty(property)) {
+          return false;
+        }
+      }
+      return true;
+    },
 
-var navigateToExplorationEditor = function() {
-  element(by.css('.protractor-test-exploration-dashboard-card')).click();
-};
-
-exports.getNumberOfFeedbackMessages = getNumberOfFeedbackMessages;
-exports.navigateToExplorationEditor = navigateToExplorationEditor;
+    // http://stackoverflow.com/questions/203739
+    isString: function(input) {
+      return (typeof input === 'string' || input instanceof String);
+    }
+  };
+  return utils;
+}]);

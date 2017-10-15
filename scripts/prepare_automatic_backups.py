@@ -48,31 +48,34 @@ def update_cron_dict(cron_dict):
     module_class_names = [
         module_name for module_name in sys_args[2:]
         if module_name not in _OMITTED_MODELS]
-    backup_url = generate_backup_url(
-        cloud_storage_bucket_name, module_class_names)
-    print 'Generating URL to backup %d models (%d were skipped)' % (
-        len(module_class_names), len(sys_args[2:]) - len(module_class_names))
 
-    average_model_name_length = (
-        sum([len(model_name) for model_name in module_class_names])
-        / len(module_class_names))
-    warning_threshold = _MAX_BACKUP_URL_LENGTH - average_model_name_length * 3
-    if len(backup_url) > warning_threshold:
-        print (
-            'IMPORTANT: Bad things are going to happen in the next release if '
-            'a permanent solution to backups is not found for this release. '
-            'Bring this up at the TL meeting.')
-    if len(backup_url) > _MAX_BACKUP_URL_LENGTH:
-        raise Exception(
-            'Backup URL exceeds app engine limit by %d: %s' % (
-                len(backup_url) - _MAX_BACKUP_URL_LENGTH, backup_url))
+    # TODO(bhenning): Consider improving this to avoid generating a backup URL
+    # for each tested subset of module_class_names.
+    bucketed_module_class_names = []
+    backup_urls = []
+    for module_class_name in module_class_names:
+        latest_bucket = []
+        potential_bucket = [module_class_name]
+        if bucketed_module_class_names:
+            latest_bucket = bucketed_module_class_names[-1]
+        backup_url = generate_backup_url(
+            cloud_storage_bucket_name, latest_bucket + potential_bucket)
+        if not bucketed_module_class_names or len(
+                backup_url) >= _MAX_BACKUP_URL_LENGTH:
+            bucketed_module_class_names.append(potential_bucket)
+            backup_urls.append(backup_url)
+        else:
+            bucketed_module_class_names[-1] += potential_bucket
+            backup_urls[-1] = backup_url
 
-    cron_dict['cron'].append({
-        'description': 'weekly backup',
-        'url': '%s' % backup_url,
-        'schedule': 'every thursday 09:00',
-        'target': 'ah-builtin-python-bundle'
-    })
+    for idx, backup_url in enumerate(backup_urls):
+        cron_dict['cron'].append({
+            'description': 'weekly backup (part %d/%d)' % (
+                idx + 1, len(backup_urls)),
+            'url': '%s' % backup_url,
+            'schedule': 'every thursday 09:00',
+            'target': 'ah-builtin-python-bundle'
+        })
 
 
 def get_cron_dict():

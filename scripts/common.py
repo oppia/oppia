@@ -15,6 +15,7 @@
 """Common utility functions and classes used by multiple Python scripts."""
 
 import os
+import subprocess
 
 
 def ensure_directory_exists(d):
@@ -40,6 +41,60 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
         return
 
     raise Exception('Please run this script from the oppia/ directory.')
+
+
+def open_new_tab_in_browser_if_possible(url):
+    """Opens the given URL in a new browser tab, if possible."""
+    browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
+    for cmd in browser_cmds:
+        if subprocess.call(['which', cmd]) == 0:
+            subprocess.call([cmd, url])
+            return
+
+
+def get_remote_alias(remote_url):
+    """Finds the correct alias for the given remote repository URL."""
+    git_remote_output = subprocess.check_output(
+        ['git', 'remote', '-v']).split('\n')
+    remote_alias = None
+    for line in git_remote_output:
+        if remote_url in line:
+            remote_alias = line.split()[0]
+    if remote_alias is None:
+        raise Exception(
+            'ERROR: There is no existing remote alias for the %s repo.'
+            % remote_url)
+
+    return remote_alias
+
+
+def verify_local_repo_is_clean():
+    """Checks that the local Git repo is clean."""
+    git_status_output = subprocess.check_output(
+        ['git', 'status']).strip().split('\n')
+
+    branch_is_clean_message = 'nothing to commit, working directory clean'
+    if not branch_is_clean_message in git_status_output:
+        raise Exception(
+            'ERROR: This script should be run from a clean branch.')
+
+
+def get_current_branch_name():
+    """Get the current branch name."""
+    git_status_output = subprocess.check_output(
+        ['git', 'status']).strip().split('\n')
+    branch_message_prefix = 'On branch '
+    git_status_first_line = git_status_output[0]
+    assert git_status_first_line.startswith(branch_message_prefix)
+    return git_status_first_line[len(branch_message_prefix):]
+
+
+def verify_current_branch_name(expected_branch_name):
+    """Checks that the user is on the expected branch."""
+    if get_current_branch_name() != expected_branch_name:
+        raise Exception(
+            'ERROR: This script can only be run from the "%s" branch.' %
+            expected_branch_name)
 
 
 class CD(object):

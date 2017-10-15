@@ -52,6 +52,12 @@ oppia.factory('ExplorationPlayerService', [
 
     var exploration = null;
 
+    // This list may contain duplicates. A state name is added to it each time
+    // the learner moves to a new card.
+    var visitedStateNames = [];
+
+    var explorationActuallyStarted = false;
+
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
     var initialStateName = null;
@@ -122,6 +128,7 @@ oppia.factory('ExplorationPlayerService', [
       if (!_editorPreviewMode) {
         StatsReportingService.recordExplorationStarted(
           exploration.initStateName, newParams);
+        visitedStateNames.push(exploration.initStateName);
       }
 
       $rootScope.$broadcast('playerStateChange', initialState.name);
@@ -366,9 +373,20 @@ oppia.factory('ExplorationPlayerService', [
           exploration.isInteractionInline(oldStateName));
 
         if (!_editorPreviewMode) {
+          var isFirstHit = Boolean(visitedStateNames.indexOf(
+            newStateName) === -1);
           StatsReportingService.recordStateTransition(
             oldStateName, newStateName, answer,
-            LearnerParamsService.getAllParams());
+            LearnerParamsService.getAllParams(), isFirstHit);
+          StatsReportingService.recordStateCompleted(oldStateName);
+          visitedStateNames.push(newStateName);
+
+          if (oldStateName === exploration.initStateName && (
+              !explorationActuallyStarted)) {
+            StatsReportingService.recordExplorationActuallyStarted(
+              oldStateName);
+            explorationActuallyStarted = true;
+          }
         }
 
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
@@ -404,6 +422,9 @@ oppia.factory('ExplorationPlayerService', [
           deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
         }
         return deferred.promise;
+      },
+      recordSolutionHit: function(stateName) {
+        StatsReportingService.recordSolutionHit(stateName);
       }
     };
   }

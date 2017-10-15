@@ -17,11 +17,11 @@
  */
 
 describe('Search service', function() {
-  var searchService;
+  var SearchService;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
-    searchService = $injector.get('searchService');
+    SearchService = $injector.get('SearchService');
   }));
 
   it('should find two categories and two languages if given in url search',
@@ -46,7 +46,7 @@ describe('Search service', function() {
       };
       var urlComponent = '?q=test&category=("Architecture"%20OR%20' +
                          '"Mathematics")&language_code=("en"%20OR%20"ar")';
-      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
@@ -80,7 +80,7 @@ describe('Search service', function() {
       };
       var urlComponent = '?q=test&category=("Mathematics")&' +
                          'language_code=("en"%20OR%20"ar")';
-      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
@@ -114,7 +114,7 @@ describe('Search service', function() {
       };
       var urlComponent =
         '?q=test&category=("Mathematics")&language_code=("en")';
-      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         en: true
@@ -146,7 +146,7 @@ describe('Search service', function() {
         }
       };
       var urlComponent = '?q=test&language_code=("en")';
-      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         en: true
@@ -176,7 +176,7 @@ describe('Search service', function() {
         }
       };
       var urlComponent = '?q=protractor%20test&language_code=("en")';
-      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('protractor test');
       expect(results.languageCodes.selections).toEqual({
         en: true
@@ -207,7 +207,7 @@ describe('Search service', function() {
       };
       var urlComponent = '?q=protractor%20test%26category=("Mathematics")' +
                          '%26language_code=("en"%20OR%20"ar")';
-      expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('protractor test&category=("Mathematics")' +
                        '&language_code=("en" OR "ar")');
       expect(results.languageCodes.selections).toEqual({});
@@ -238,7 +238,7 @@ describe('Search service', function() {
       var urlComponent = '?q=protractor&test&category=("Mathematics")' +
                          '&language_code=("en"%20OR%20"ar")';
       expect(function() {
-        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       }).toThrow(new Error(
         'Invalid search query url: protractor&test&category=("Mathematics")' +
         '&language_code=("en"%20OR%20"ar")'));
@@ -268,7 +268,7 @@ describe('Search service', function() {
       var urlComponent = '?q=protractor%20test&category=(("Mathematics")' +
                          '&language_code=("en"%20OR%20"ar")';
       expect(function() {
-        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       }).toThrow(new Error('Invalid search query url fragment for ' +
                            'categories: category=(("Mathematics")'));
       expect(results.languageCodes.selections).toEqual({});
@@ -277,7 +277,7 @@ describe('Search service', function() {
       var urlComponent = '?q=protractor%20test&category=("Mathematics"' +
                          '&language_code=("en"%20OR%20"ar")';
       expect(function() {
-        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       }).toThrow(new Error('Invalid search query url fragment for ' +
                            'categories: category=("Mathematics"'));
       expect(results.languageCodes.selections).toEqual({});
@@ -308,7 +308,7 @@ describe('Search service', function() {
       var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
                          '&language_code="en" OR "ar")';
       expect(function() {
-        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       }).toThrow(new Error('Invalid search query url fragment for ' +
                            'languageCodes: language_code="en" OR "ar")'));
       expect(results.languageCodes.selections).toEqual({});
@@ -319,7 +319,7 @@ describe('Search service', function() {
       var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
                          '&language_code="en" OR "ar"';
       expect(function() {
-        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
       }).toThrow(new Error('Invalid search query url fragment for ' +
                            'languageCodes: language_code="en" OR "ar"'));
       expect(results.languageCodes.selections).toEqual({});

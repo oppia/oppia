@@ -1,0 +1,31 @@
+<div class="modal-header">
+  <h3 translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></h3>
+</div>
+
+<div class="modal-body">
+  <section class="oppia-suggestion-review-container">
+    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+      <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER"></strong>
+      <div class="oppia-suggestion-review-panel">
+        <div ng-if="oldContent" angular-html-bind="oldContent"></div>
+        <div ng-if="!oldContent" style="color: red;" translate="I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE"></div>
+      </div>
+    </div>
+    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+      <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER"></strong>
+      <div class="oppia-suggestion-review-panel">
+        <div angular-html-bind="newContent"></div>
+      </div>
+    </div>
+  </section>
+  <div style="margin-top: 20px; margin-left: 10px;">
+    <span translate="I18N_LEARNER_DASHBOARD_SUGGESTION_DESCRIPTION"></span>
+    <div class="oppia-suggestion-review-panel">
+      <div angular-html-bind="description"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
+</div>

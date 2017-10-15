@@ -127,6 +127,8 @@ oppia.directive('tutorCard', [
             var responseHtml = solution.getOppiaResponseHtml(interaction);
             PlayerTranscriptService.addNewResponse(responseHtml);
             $scope.helpCardHtml = responseHtml;
+            oppiaPlayerService.recordSolutionHit(
+              playerPositionService.getCurrentStateName());
           };
 
           $scope.isHintAvailable = function() {

@@ -18,7 +18,7 @@
 
 oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
 
-oppia.factory('searchService', [
+oppia.factory('SearchService', [
   '$http', '$rootScope', '$translate', 'SEARCH_DATA_URL',
   function($http, $rootScope, $translate, SEARCH_DATA_URL) {
     var _lastQuery = null;

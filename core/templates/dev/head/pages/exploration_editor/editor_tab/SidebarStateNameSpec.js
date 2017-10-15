@@ -48,7 +48,7 @@ describe('Sidebar state name controller', function() {
       filter = $filter;
       rootScope = $rootScope;
       ecs = $injector.get('editorContextService');
-      fs = $injector.get('focusService');
+      fs = $injector.get('FocusManagerService');
       ess = $injector.get('explorationStatesService');
       $httpBackend = $injector.get('$httpBackend');
 
@@ -122,7 +122,7 @@ describe('Sidebar state name controller', function() {
           }
         },
         editorContextService: ecs,
-        focusService: fs,
+        FocusManagerService: fs,
         explorationStatesService: ess,
         RouterService: {}
       });
