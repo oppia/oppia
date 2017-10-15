@@ -23,8 +23,7 @@ oppia.controller('Error', [
     $scope.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/oops_mint.png');
 
-    $scope.ErrorCode = $('[name=errorCode]').data().name;
-
+    $scope.ErrorCode = GLOBALS.errorCode;
     $scope.ErrorCodeIs400 = function () {
       if($scope.ErrorCode == '400'){
         return true;
