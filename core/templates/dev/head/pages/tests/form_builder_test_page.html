@@ -96,18 +96,6 @@
     </div>
   </div>
 
-  <script type="text/ng-template" id="formOverlay/entryPoint">
-    <ng-form name="schemaForm">
-      <schema-based-editor local-value="localValue" schema="definition" is-disabled="isDisabled()">
-      </schema-based-editor>
-    </ng-form>
-
-    <div ng-if="!isDisabled()">
-      <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
-      <button ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
-    </div>
-  </script>
-
 {% endblock %}
 
 {% block footer_js %}
