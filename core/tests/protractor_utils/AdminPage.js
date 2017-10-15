@@ -34,9 +34,11 @@ var AdminPage = function(){
   var explorationElements = element.all(by.css(
     '.protractor-test-reload-exploration-row'
   ));
-  var reloadAllExplorationsButton = element.all(by.css(
+  var reloadAllExplorationsButtons = element.all(by.css(
       '.protractor-test-reload-all-explorations-button'
   ));
+  var reloadCollectionButton = element.all(by.css(
+    '.protractor-test-reload-collection-button')).first();
 
   var roleOption = function(role){
     return roleSelect.element(by.cssContainingText('option', role));
@@ -101,7 +103,11 @@ var AdminPage = function(){
     updateFormSubmit.click();
     general.waitForSystem();
     return true;
-  }
+  };
+
+  this.reloadCollection = function() {
+    reloadCollectionButton.click();
+  };
 
   // The name should be as given in the admin page (including '.yaml' if
   // necessary).
@@ -125,7 +131,7 @@ var AdminPage = function(){
   // Imports all the demo explorations.
   this.reloadAllExplorations = function(name) {
     this.get();
-    reloadAllExplorationsButton.click();
+    reloadAllExplorationsButtons.click();
     general.acceptAlert();
     browser.waitForAngular();
   };

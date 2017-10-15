@@ -31,8 +31,7 @@ describe('Collections', function() {
     users.createUser('alice@collections.com', USERNAME);
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
     adminPage.get();
-    element.all(by.css(
-      '.protractor-test-reload-collection-button')).first().click();
+    adminPage.reloadCollection();
     general.acceptAlert();
     browser.waitForAngular();
     adminPage.reloadAllExplorations();
