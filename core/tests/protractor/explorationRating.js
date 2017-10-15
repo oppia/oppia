@@ -19,8 +19,8 @@
 var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
-var player = require('../protractor_utils/player.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var player = require('../protractor_utils/player.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -30,6 +30,11 @@ describe('Library index page', function() {
   var LANGUAGE_ENGLISH = 'English';
   var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
   var libraryPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+  });
+  
   var addRating = function(userEmail, userName, explorationName, ratingValue) {
     users.createUser(userEmail, userName);
     users.login(userEmail);
@@ -40,10 +45,6 @@ describe('Library index page', function() {
 
     users.logout();
   };
-
-  beforeEach(function() {
-    libraryPage = new LibraryPage.LibraryPage();
-  });
 
   it('should display ratings on exploration when minimum ratings have been ' +
      'submitted', function() {

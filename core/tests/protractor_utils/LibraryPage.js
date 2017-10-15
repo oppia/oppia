@@ -22,15 +22,15 @@ var forms = require('./forms.js');
 
 var LibraryPage = function(){
   var LIBRARY_URL_SUFFIX = '/library';
-  var languageSelector = 
-    forms.MultiSelectEditor(
-      element(by.css('.protractor-test-search-bar-language-selector'))
-    );
-  var categorySelector = 
-    forms.MultiSelectEditor(
-      element(by.css('.protractor-test-search-bar-category-selector'))
-    );
-  var createActivityButton = element(by.css('.protractor-test-create-activity'));
+  var languageSelector = forms.MultiSelectEditor(
+    element(by.css('.protractor-test-search-bar-language-selector'))
+  );
+  var categorySelector = forms.MultiSelectEditor(
+    element(by.css('.protractor-test-search-bar-category-selector'))
+  );
+  var createActivityButton = element(
+    by.css('.protractor-test-create-activity')
+  );
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {

@@ -31,6 +31,11 @@ describe('Library pages tour', function() {
   var EXPLORATION_RATING = 4;
   var SEARCH_TERM = 'python';
   var libraryPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+  });
+  
   var visitLibraryPage = function() {
     libraryPage.get();
   };
@@ -38,10 +43,6 @@ describe('Library pages tour', function() {
   var visitRecentlyPublishedPage = function() {
     browser.get('library/recently_published');
   }
-
-  beforeEach(function() {
-    libraryPage = new LibraryPage.LibraryPage();
-  });
 
   it('visits the library index page', function() {
     visitLibraryPage();

@@ -22,6 +22,7 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
@@ -32,9 +33,11 @@ var _selectLanguage = function(language) {
 
 describe('Site language', function() {
   var adminPage = null;
+  var libraryPage = null;
 
   beforeEach(function() {
     adminPage = new AdminPage.AdminPage();
+    libraryPage = new LibraryPage.LibraryPage();
 
     // Starting language is English
     browser.get('/about');
@@ -51,7 +54,7 @@ describe('Site language', function() {
   it('should change after selecting a different language', function() {
     browser.get('/about');
     _selectLanguage('Español');
-    browser.get('/library');
+    libraryPage.get();
     expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
     general.ensurePageHasNoTranslationIds();
   });
@@ -80,7 +83,7 @@ describe('Site language', function() {
       users.login('feanor@example.com');
       browser.get('/about');
       _selectLanguage('Español');
-      browser.get('/library');
+      libraryPage.get();
       expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
 
       // The preference page shows the last selected language
