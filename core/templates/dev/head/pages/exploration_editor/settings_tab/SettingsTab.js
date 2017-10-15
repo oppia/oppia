@@ -218,7 +218,9 @@ oppia.controller('SettingsTab', [
     $scope.previewSummaryTile = function() {
       alertsService.clearWarnings();
       $modal.open({
-        templateUrl: 'modals/previewSummaryTile',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/settings_tab/' +
+          'preview_summary_tile_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
@@ -260,7 +262,9 @@ oppia.controller('SettingsTab', [
     $scope.showTransferExplorationOwnershipModal = function() {
       alertsService.clearWarnings();
       $modal.open({
-        templateUrl: 'modals/transferExplorationOwnership',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/settings_tab/' +
+          'transfer_exploration_ownership_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
@@ -281,7 +285,9 @@ oppia.controller('SettingsTab', [
       alertsService.clearWarnings();
 
       $modal.open({
-        templateUrl: 'modals/deleteExploration',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/settings_tab/' +
+          'delete_exploration_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
@@ -312,7 +318,9 @@ oppia.controller('SettingsTab', [
         var draftEmailBody = response.data.draft_email_body;
 
         $modal.open({
-          templateUrl: 'modals/takeModeratorAction',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/settings_tab/' +
+            'take_moderator_action_modal_directive.html'),
           backdrop: true,
           resolve: {
             draftEmailBody: function() {

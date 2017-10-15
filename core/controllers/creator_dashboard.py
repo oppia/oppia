@@ -233,14 +233,26 @@ class CreatorDashboardHandler(base.BaseHandler):
 
             subscribers_list.append(subscriber_summary)
 
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=False)
+        creator_dashboard_display_pref = (
+            user_settings.creator_dashboard_display_pref)
+
         self.values.update({
             'explorations_list': exp_summary_dicts,
             'collections_list': collection_summary_dicts,
             'dashboard_stats': dashboard_stats,
             'last_week_stats': last_week_stats,
-            'subscribers_list': subscribers_list
+            'subscribers_list': subscribers_list,
+            'display_preference': creator_dashboard_display_pref,
         })
         self.render_json(self.values)
+
+    @acl_decorators.can_access_creator_dashboard
+    def post(self):
+        creator_dashboard_display_pref = self.payload.get('display_preference')
+        user_services.update_user_creator_dashboard_display(
+            self.user_id, creator_dashboard_display_pref)
 
 
 class NotificationsHandler(base.BaseHandler):
