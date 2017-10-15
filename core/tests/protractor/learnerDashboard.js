@@ -32,10 +32,10 @@ describe('Learner dashboard functionality', function() {
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    adminPage = new AdminPage.AdminPage();
   });
 
   beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     // Create a new learner.
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
     users.createUser(
@@ -45,12 +45,7 @@ describe('Learner dashboard functionality', function() {
 
     var USERNAME = 'creator1learnerDashboard';
     users.createAndLoginAdminUser('creator1@learnerDashboard.com', USERNAME);
-    adminPage.get();
-    // Load all the demo explorations.
-    element.all(by.css(
-      '.protractor-test-reload-all-explorations-button')).first().click();
-    general.acceptAlert();
-    browser.waitForAngular();
+    adminPage.reloadAllExplorations();
     adminPage.updateRole(USERNAME, 'collection editor');
     browser.get(general.SERVER_URL_PREFIX);
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
