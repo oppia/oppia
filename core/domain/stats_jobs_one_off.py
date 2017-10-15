@@ -130,6 +130,12 @@ class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
         exploration = exp_services.get_exploration_by_id(exp_id)
         latest_exp_version = exploration.version
 
+        # Check if model already exists. If it does, delete it.
+        exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
+            exp_id, latest_exp_version)
+        if exploration_stats_model is not None:
+            exploration_stats_model.delete()
+
         # The list of state hit events in stringified_values.
         values_state_hit = []
         # The list of state answers instances in stringified_values.
