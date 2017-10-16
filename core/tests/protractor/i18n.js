@@ -22,8 +22,8 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
 var workflow = require('../protractor_utils/workflow.js');
-var editor  = require('../protractor_utils/editor.js');
-var forms   = require('../protractor_utils/forms.js');
+var editor = require('../protractor_utils/editor.js');
+var forms = require('../protractor_utils/forms.js');
 
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
@@ -114,7 +114,7 @@ describe('Site language', function() {
     editor.setContent(forms.toRichText('Misc testing'));
     // Set it with numeric input.
     editor.setInteraction('NumericInput');
-    
+
     var placeholder = element(by.css('.protractor-test-float-form-input'))
       .getAttribute('placeholder');
     expect(placeholder).toEqual('Ingresa un número');
