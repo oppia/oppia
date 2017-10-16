@@ -37,13 +37,13 @@ class FileMetadata(object):
     """A class representing the metadata of a file.
 
     Attributes:
-        size: int. The size of the file.
+        size: int. The size of the file, in bytes.
     """
     def __init__(self, metadata):
-        """Constructs an FileMetadata object.
+        """Constructs a FileMetadata object.
 
         Args:
-            metadata: FileMetadataModel. The file metadata model object.
+            metadata: FileMetadataModel. The file metadata model instance.
         """
         self._size = metadata.size if (metadata is not None) else None
 
@@ -56,18 +56,15 @@ class FileStreamWithMetadata(object):
     """A class that wraps a file stream, but adds extra attributes to it.
 
     Attributes:
-        content: blob. The content of the file snapshots.
+        content: str. The content of the file snapshot.
         version: int. The version number of the file.
-        metadata: FileMetadata. The file metadata domain object
+        metadata: FileMetadata. The file metadata domain instance.
     """
 
     def __init__(self, content, version, metadata):
-        """The args are a file content blob and a metadata model object.
+        """Constructs a FileStreamWithMetadata object.
 
-        Args:
-            content: blob. The content of the file snapshots.
-            version: int. The version number of the file.
-            metadata: FileMetadataModel. The file metadata model object.
+        The args are a file content blob and a metadata model instance.
         """
         self._content = content
         self._version = version
@@ -75,8 +72,9 @@ class FileStreamWithMetadata(object):
 
     def read(self):
         """Emulates stream.read(). Returns all bytes and emulates EOF.
+
         Returns:
-            content: blob. The content of the file snapshots.
+            content: str. The content of the file snapshot.
         """
         content = self._content
         self._content = ''
@@ -115,6 +113,11 @@ class ExplorationFileSystem(object):
     _DEFAULT_VERSION_NUMBER = 1
 
     def __init__(self, exploration_id):
+        """Constructs a ExplorationFileSystem object.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         self._exploration_id = exploration_id
 
     @property
@@ -129,12 +132,12 @@ class ExplorationFileSystem(object):
         Args:
             filepath: str. The path to the relevant file within the exploration.
             version: int. The version number of the file whose metadata is to be
-            returned.
+                returned.
 
         Returns:
-            FileMetadataModel or None: The model object representing the file
-            metadata with the given exploration_id, filepath and version or None
-            if the file does not exist.
+            FileMetadataModel or None. The model instance representing the file
+                metadata with the given exploration_id, filepath, and version,
+                or None if the file does not exist.
         """
         if version is None:
             return file_models.FileMetadataModel.get_model(
@@ -153,9 +156,9 @@ class ExplorationFileSystem(object):
             version: int. The version number of the file to be returned.
 
         Returns:
-            FileModel or None: The model object representing the file with the
-            given exploration_id, filepath and version  or None if the file does
-            not exist.
+            FileModel or None. The model instance representing the file with the
+                given exploration_id, filepath, and version; or None if the file
+                does not exist.
         """
         if version is None:
             return file_models.FileModel.get_model(
@@ -169,9 +172,9 @@ class ExplorationFileSystem(object):
 
         Args:
             user_id: str. The user_id of the user who wants to create or update
-            a file.
+                a file.
             filepath: str. The path to the relevant file within the exploration.
-            raw_bytes: blob. The content to be stored in file.
+            raw_bytes: str. The content to be stored in file.
 
         Raises:
             Exception: The maximum allowed file size is 1MB.
@@ -205,12 +208,13 @@ class ExplorationFileSystem(object):
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
-            version: int or None. Optional version number of the file.
-            mode: str. Unused argument
+            version: int or None. The version number of the file. None indicates
+                the latest version of the file.
+            mode: str. Unused argument.
 
         Returns:
-            FileStreamWithMetadata or None: It returns FileStreamWithMetadata
-            domain object if the file exists otherwise None.
+            FileStreamWithMetadata or None. It returns FileStreamWithMetadata
+                domain object if the file exists. Otherwise, it returns None.
         """
         metadata = self._get_file_metadata(filepath, version)
         if metadata:
@@ -232,10 +236,10 @@ class ExplorationFileSystem(object):
 
         Args:
             user_id: str. The user_id of the user who wants to create or update
-            a file.
+                a file.
             filepath: str. The path to the relevant file within the exploration.
-            raw_bytes: blob. The content to be stored in file.
-            unused_mimetype: Unused argument
+            raw_bytes: str. The content to be stored in file.
+            unused_mimetype: str. Unused argument.
         """
         self._save_file(user_id, filepath, raw_bytes)
 
@@ -244,7 +248,7 @@ class ExplorationFileSystem(object):
 
         Args:
             user_id: str. The user_id of the user who wants to create or update
-            a file.
+                a file.
             filepath: str. The path to the relevant file within the exploration.
         """
 
@@ -263,7 +267,7 @@ class ExplorationFileSystem(object):
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool: True if file exists and False if it doesn't.
+            bool: True if the file exists and False if it doesn't.
         """
         metadata = self._get_file_metadata(filepath, None)
         return bool(metadata)
@@ -272,12 +276,12 @@ class ExplorationFileSystem(object):
         """Lists all files in a directory.
 
         Args:
-            dir_name: The directory whose files should be listed. This should
-                not start with '/' or end with '/'.
+            dir_name: str. The directory whose files should be listed. This
+                should not start with '/' or end with '/'.
 
         Returns:
-            List of str. This is a lexicographically-sorted list of filenames,
-            each of which is prefixed with dir_name.
+            list(str). A lexicographically-sorted list of filenames,
+                each of which is prefixed with dir_name.
         """
         # The trailing slash is necessary to prevent non-identical directory
         # names with the same prefix from matching, e.g. /abcd/123.png should
@@ -326,7 +330,7 @@ class DiskBackedFileSystem(object):
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool: True if file exists and False if it doesn't.
+            bool. True if the file exists and False if it doesn't.
         """
         return os.path.isfile(os.path.join(self._root, filepath))
 
@@ -335,12 +339,13 @@ class DiskBackedFileSystem(object):
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
-            version: int or None. Optional version number of the file.
-            mode: str. Optional value in which mode to open a file read/write.
+            version: int or None. The version number of the file. None indicates
+                the latest version of the file.
+            mode: str. The mode with which to open the file.
 
         Returns:
-            FileStreamWithMetadata: It returns FileStreamWithMetadata domain
-            object.
+            FileStreamWithMetadata. It returns FileStreamWithMetadata domain
+                object.
         """
         content = utils.get_file_contents(
             os.path.join(self._root, filepath), raw_bytes=True, mode=mode)
@@ -366,7 +371,9 @@ class GcsFileSystem(object):
     """
 
     def __init__(self, exploration_id):
-        """Args:
+        """Constructs a GcsFileSystem object.
+
+        Args:
             exploration_id: str. The id of the exploration.
         """
         self._exploration_id = exploration_id
@@ -385,7 +392,7 @@ class GcsFileSystem(object):
         """Args:
             unused_user_id: str. Unused argument
             filepath: str. The path to the relevant file within the exploration.
-            raw_bytes: blob. The content to be stored in file.
+            raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the cloud file.
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
@@ -411,6 +418,7 @@ class AbstractFileSystem(object):
     """Interface for a file system."""
 
     def __init__(self, impl):
+        """Constructs a AbstractFileSystem object."""
         self._impl = impl
 
     @property
@@ -442,7 +450,7 @@ class AbstractFileSystem(object):
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool: True if file exists and False if it doesn't.
+            bool. True if the file exists and False if it doesn't.
         """
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
@@ -452,11 +460,12 @@ class AbstractFileSystem(object):
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
-            version: int or None. Optional version number of the file.
-            mode: str. Optional value in which mode to open a file read/write.
+            version: int or None. The version number of the file. None indicates
+                the latest version of the file.
+            mode: str. The mode with which to open the file.
 
         Returns:
-            FileStreamWithMetadata: The file stream domain object.
+            FileStreamWithMetadata. The file stream domain object.
         """
         self._check_filepath(filepath)
         return self._impl.get(filepath, version=version, mode=mode)
@@ -466,14 +475,16 @@ class AbstractFileSystem(object):
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
-            version: int or None. Optional version number of the file.
-            mode: str. Optional value in which mode to open a file read/write.
+            version: int or None. The version number of the file. None indicates
+                the latest version of the file.
+            mode: str. The mode with which to open the file.
 
         Returns:
-            FileStreamWithMetadata: The file stream domain object.
+            FileStreamWithMetadata. The file stream domain object.
 
         Raises:
-            IOError: File stream latest versions not found.
+            IOError: The given (or latest) version of this file stream does not
+                exist.
         """
         file_stream = self.open(filepath, version=version, mode=mode)
         if file_stream is None:
@@ -487,9 +498,9 @@ class AbstractFileSystem(object):
 
         Args:
             user_id: str. The user_id of the user who wants to create or update
-            a file.
+                a file.
             filepath: str. The path to the relevant file within the exploration.
-            raw_bytes: blob. The content to be stored in file.
+            raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the file.
         """
         raw_bytes = str(raw_bytes)
@@ -501,7 +512,7 @@ class AbstractFileSystem(object):
 
         Args:
             user_id: str. The user_id of the user who wants to create or update
-            a file.
+                a file.
             filepath: str. The path to the relevant file within the exploration.
         """
         self._check_filepath(filepath)
@@ -511,11 +522,11 @@ class AbstractFileSystem(object):
         """Lists all the files in a directory. Similar to os.listdir(...).
 
         Args:
-            dir_name: The directory whose files should be listed. This should
-                not start with '/' or end with '/'.
+            dir_name: str. The directory whose files should be listed. This
+                should not start with '/' or end with '/'.
 
         Returns:
-            List of str. This is a lexicographically-sorted list of filenames,
+            list(str). A lexicographically-sorted list of filenames,
             each of which is prefixed with dir_name.
         """
         self._check_filepath(dir_name)
