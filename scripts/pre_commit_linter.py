@@ -50,6 +50,7 @@ Note that the root folder MUST be named 'oppia'.
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
 import argparse
+from bs4 import BeautifulSoup
 import fnmatch
 import multiprocessing
 import os
@@ -123,6 +124,12 @@ EXCLUDED_PATHS = (
     'scripts/pre_commit_linter.py', 'integrations/*',
     'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
     '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
+
+WHITELISTED_DIRECTIVE_IDS = [
+    'modals/teachOppia',
+    'popover/feedback',
+    'popover/answer'
+]
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -505,6 +512,54 @@ def _check_newline_character(all_files):
     return summary_messages
 
 
+def _check_directives_directly_referenced(all_files):
+    """This function is used to check that the directives which don't use jinja templating
+    are directly referenced in js files.
+    """
+
+    print 'Starting directives-directly-referenced check'
+    print '-----------------------------------------'
+
+    check_failed = 0
+    file_pattern = re.compile(".*\.html$")
+    all_files = [
+        file_name for file_name in all_files
+        if file_pattern.match(file_name) is not None ]
+    total_files_checked = len(all_files)
+    total_error_count = 0
+
+    for file_name in all_files:
+        soup = BeautifulSoup(open(file_name, 'rb'), 'html.parser')
+        directives = soup.find_all(attrs={'type': 'text/ng-template'})
+
+        for i in directives:
+            if i.attrs['id'] not in WHITELISTED_DIRECTIVE_IDS:
+                print (
+                    '%s ng-template in %s file should be directly referenced'
+                    ' in js file.' % (i.attrs['id'], file_name))
+                total_error_count += 1 
+
+
+    if total_error_count > 0:
+        summary_message = [
+            '%s Directives Directly Referenced check failed.' % (
+                _MESSAGE_TYPE_FAILED)]
+    else:
+        summary_message = [
+            '%s Directives Directly Referenced check passed.' % (
+                _MESSAGE_TYPE_SUCCESS)]
+    
+    print '\n----------------------------------------\n'
+    if total_files_checked == 0:
+        print 'There are no files to be checked.'
+    else:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
+        print summary_message
+
+    return summary_message
+
+
 def _check_bad_patterns(all_files):
     """This function is used for detecting bad patterns.
     """
@@ -572,7 +627,10 @@ def main():
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
-    all_messages = linter_messages + newline_messages + pattern_messages
+    check_directive_messages = _check_directives_directly_referenced(all_files)
+    all_messages = (
+        linter_messages + newline_messages + pattern_messages +
+        check_directive_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
