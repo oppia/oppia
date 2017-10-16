@@ -16,7 +16,6 @@
 
 """Model for an Oppia exploration."""
 
-import copy
 import datetime
 
 from constants import constants
@@ -518,7 +517,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(limit)
 
 
-class StateIdMappingModel(base_models.BaseModel):
+class StateIDMappingModel(base_models.BaseModel):
     """State ID model for Oppia explorations.
 
     This model maps each exploration version's state to a unique id.
@@ -526,7 +525,7 @@ class StateIdMappingModel(base_models.BaseModel):
     regarded as the source of truth, as the rules for assigning state id may
     change in future.
 
-    The key of each instance if combination of exploration id and version.
+    The key of each instance is a combination of exploration id and version.
     """
 
     # The exploration id whose states are mapped.
@@ -536,73 +535,66 @@ class StateIdMappingModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(required=True)
 
     # A dict which maps each state name to a unique id.
-    state_name_to_ids = ndb.JsonProperty(required=True)
+    state_names_to_ids = ndb.JsonProperty(required=True)
 
     # Latest state id that has been assigned to any of the states in any of
-    # of the  versions of given exploration. New state IDs should be assigned
+    # of the versions of given exploration. New state IDs should be assigned
     # from this value + 1.
-    latest_state_id_used = ndb.IntegerProperty(required=True)
+    largest_state_id_used = ndb.IntegerProperty(required=True)
 
     @classmethod
     def _generate_instance_id(cls, exp_id, exp_version):
         """Generates ID of the state id mapping model instance.
 
         Args:
-            exp_id: str. The exploration id that whose states are mapped.
-            exp_version: int. The version of exploration.
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of the exploration.
         """
         return '%s.%d' % (exp_id, exp_version)
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name_to_ids, latest_state_id_used):
+            cls, exp_id, exp_version, state_names_to_ids,
+            largest_state_id_used):
         """Creates a new instance of state id mapping model.
 
         Args:
             exp_id: str. The exploration id whose states are mapped.
             exp_version: int. The version of that exploration.
-            state_name_to_ids: dict. A dict storing state name to ids mapping.
-            latest_state_id_used: int. Latest state id that has been assigned to
-                any of the states in of the versions of given exploration.
+            state_names_to_ids: dict. A dict storing state name to ids mapping.
+            largest_state_id_used: int. The largest integer so far that has been
+                used as a state ID for this exploration.
 
         Returns:
-            StateIdMappingModel. Instance of the state id mapping model.
+            StateIDMappingModel. Instance of the state id mapping model.
         """
         instance_id = cls._generate_instance_id(exp_id, exp_version)
         if cls.get_by_id(instance_id):
             raise Exception(
-                'State id mapping model already exists for given exploration'
-                ' version')
+                'State id mapping model already exists for exploration %s,'
+                ' version %d' % (exp_id, exp_version))
         model = cls(
             id=instance_id, exploration_id=exp_id,
             exploration_version=exp_version,
-            state_name_to_ids=state_name_to_ids,
-            latest_state_id_used=latest_state_id_used)
+            state_names_to_ids=state_names_to_ids,
+            largest_state_id_used=largest_state_id_used)
         model.put()
 
         return model
 
     @classmethod
-    def get_state_id_mapping_model(cls, exp_id, exp_version, strict=False):
+    def get_state_id_mapping_model(cls, exp_id, exp_version):
         """Retrieve state id mapping model from the datastore.
 
         Args:
             exp_id: str. The exploration id.
             exp_version: int. The exploration version.
-            strict: bool. Whether to raise an error if no StateIdMappingModel
+            strict: bool. Whether to raise an error if no StateIDMappingModel
                 entry is found for the given exploration id and version.
 
         Returns:
-            StateIdMappingModel. The model retrieved from the datastore.
+            StateIDMappingModel. The model retrieved from the datastore.
         """
         instance_id = cls._generate_instance_id(exp_id, exp_version)
-        instance = cls.get(instance_id, strict)
+        instance = cls.get(instance_id)
         return instance
-
-    def get_all_state_name_ids(self):
-        """Get state name to id mapping dict.
-
-        Returns:
-            dict. A dictionary mapping state names to unique ids.
-        """
-        return copy.deepcopy(self.state_name_to_ids)

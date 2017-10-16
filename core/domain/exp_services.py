@@ -847,7 +847,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 new_to_old_state_names)
 
     # Save state id mapping model for exploration.
-    save_state_id_mapping_model(exploration, change_list)
+    create_and_save_state_id_mapping_model(exploration, change_list)
 
 
 def _create_exploration(
@@ -910,7 +910,7 @@ def _create_exploration(
                 exploration, state_names_to_train)
 
     # Save state id mapping model for new exploration.
-    save_state_id_mapping_model(exploration, commit_cmds)
+    create_and_save_state_id_mapping_model(exploration, commit_cmds)
     create_exploration_summary(exploration.id, committer_id)
 
 
@@ -1348,6 +1348,10 @@ def revert_exploration(
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
+
+    # Save state id mapping model for the new exploration version.
+    create_and_save_state_id_mapping_model_for_reverted_exploration(
+        exploration_id, current_version, revert_to_version)
 
 
 # Creation and deletion methods.
@@ -1919,7 +1923,7 @@ def discard_draft(exp_id, user_id):
         exp_user_data.put()
 
 
-def get_state_id_mapping_model(exp_id, exp_version, strict=False):
+def get_state_id_mapping(exp_id, exp_version):
     """Retrieve state id mapping model instance from the datastore.
 
     Args:
@@ -1927,44 +1931,91 @@ def get_state_id_mapping_model(exp_id, exp_version, strict=False):
         exp_version: int. The exploration version.
 
     Returnes:
-        StateIdMapping. Domain object for state id mapping model instance.
+        StateIDMapping. Domain object for state id mapping model instance.
     """
-    model = exp_models.StateIdMappingModel.get_state_id_mapping_model(
-        exp_id, exp_version, strict)
-    state_id_mapping = (
-        exp_domain.StateIdMapping.get_state_id_mapping_from_model(
-            model))
+    model = exp_models.StateIDMappingModel.get_state_id_mapping_model(
+        exp_id, exp_version)
+    state_id_mapping = exp_domain.StateIDMapping(
+        model.exploration_id, model.exploration_version,
+        copy.deepcopy(model.state_names_to_ids), model.largest_state_id_used)
     return state_id_mapping
 
 
-def save_state_id_mapping_model(exploration, change_list):
-    """Stores StateIdMappingModel instance in the datastore.
+def _save_state_id_mapping(state_id_mapping):
+    """Stores state id mapping instance in datastore.
 
     Args:
-        exploration: Exploration. Exploration for whose state names are to be
-            mapped.
+        state_id_mapping: StateIDMapping. State ID mapping which is to be
+            stored in database.
+    """
+    exp_models.StateIDMappingModel.create(
+        state_id_mapping.exploration_id,
+        state_id_mapping.exploration_version,
+        state_id_mapping.state_names_to_ids,
+        state_id_mapping.largest_state_id_used)
+
+
+def create_and_save_state_id_mapping_model(exploration, change_list):
+    """Create and store state id mapping for new exploration.
+
+    Args:
+        exploration: Exploration. Exploration for which state id mapping is
+            to be stored.
         change_list: list(dict). A list of changes made in the exploration.
 
     Returns:
-        StateIdMapping. Domain object of StateIdMappingModel instance.
+        StateIDMapping. Domain object of StateIDMappingModel instance.
     """
     if exploration.version > 1:
         # Get state id mapping for new exploration from old exploration with
         # the help of change list.
         old_exploration = get_exploration_by_id(
             exploration.id, version=exploration.version - 1)
-        state_id_mapping = exp_domain.StateIdMapping.get_state_id_mapping(
-            old_exploration, exploration, change_list)
+        old_state_id_mapping = get_state_id_mapping(
+            old_exploration.id, old_exploration.version)
+        new_state_id_mapping = (
+            old_state_id_mapping.create_mapping_for_new_version(
+                old_exploration, exploration, change_list))
     elif exploration.version == 1:
         # Get state id mapping for first version of exploration.
-        state_id_mapping = (
-            exp_domain.StateIdMapping.get_state_id_mapping_for_new_exploration(
+        new_state_id_mapping = (
+            exp_domain.StateIDMapping.create_mapping_for_new_exploration(
                 exploration))
+    else:
+        raise Exception(
+            'Failed to store state id mapping for exploration %s,'
+            ' version %d.' % (exploration.id, exploration.version))
 
-    model = exp_models.StateIdMappingModel.create(
-        state_id_mapping.exploration_id,
-        state_id_mapping.exploration_version,
-        state_id_mapping.state_name_to_ids,
-        state_id_mapping.latest_state_id_used)
+    _save_state_id_mapping(new_state_id_mapping)
+    return new_state_id_mapping
 
-    return model
+
+def create_and_save_state_id_mapping_model_for_reverted_exploration(
+        exploration_id, current_version, revert_to_version):
+    """Create and save state id mapping model for when exploration is reverted.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        current_version: str. The current version of the exploration.
+        revert_to_version: int. The version to which the given exploration
+            is to be reverted.
+
+    Returns:
+        StateIDMapping. Domain object of StateIDMappingModel instance.
+    """
+    old_state_id_mapping = get_state_id_mapping(
+        exploration_id, revert_to_version)
+    previous_state_id_mapping = get_state_id_mapping(
+        exploration_id, current_version)
+
+    # Note: when an exploration is reverted state id mapping should
+    # be same as reverted version of the exploration but largest
+    # state id used should be kept as it is as in old exploration.
+    new_version = current_version + 1
+    new_state_id_mapping = exp_domain.StateIDMapping(
+        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
+        previous_state_id_mapping.largest_state_id_used)
+    new_state_id_mapping.validate()
+
+    _save_state_id_mapping(new_state_id_mapping)
+    return new_state_id_mapping

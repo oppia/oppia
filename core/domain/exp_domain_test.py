@@ -2620,21 +2620,21 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertNotIn('END', exploration.states)
 
 
-class StateIdMappingTests(test_utils.GenericTestBase):
-    """Tests for StateIdMapping domain class."""
+class StateIDMappingTests(test_utils.GenericTestBase):
+    """Tests for StateIDMapping domain class."""
 
     EXP_ID = 'eid'
 
     def setUp(self):
         """Initialize owner and store default exploration before each test case.
         """
-        super(StateIdMappingTests, self).setUp()
+        super(StateIDMappingTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         # Create a default exploration.
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id)
-        self.mapping = exp_services.get_state_id_mapping_model(
+        self.mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, self.exploration.version)
 
     def test_that_correct_mapping_is_stored_for_new_exp(self):
@@ -2646,8 +2646,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         self.assertEqual(self.mapping.exploration_id, self.EXP_ID)
         self.assertEqual(self.mapping.exploration_version, 1)
         self.assertEqual(
-            self.mapping.latest_state_id_used, 0)
-        self.assertDictEqual(self.mapping.state_name_to_ids, expected_mapping)
+            self.mapping.largest_state_id_used, 0)
+        self.assertDictEqual(self.mapping.state_names_to_ids, expected_mapping)
 
     def test_that_mapping_remains_same_when_exp_params_changes(self):
         """Test that state id mapping is unchanged when exploration params are
@@ -2659,7 +2659,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
                 'new_value': 'New title'
             }], 'Changes.')
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping_model(
+        new_mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, new_exploration.version)
 
         expected_mapping = {
@@ -2667,8 +2667,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_name_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.latest_state_id_used, 0)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 0)
 
     def test_that_mapping_is_correct_when_new_state_is_added(self):
         """Test that new state id is added in state id mapping when new state is
@@ -2679,7 +2679,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
                 'state_name': 'new state',
             }], 'Add state name')
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping_model(
+        new_mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, new_exploration.version)
 
         expected_mapping = {
@@ -2688,8 +2688,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_name_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.latest_state_id_used, 1)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_is_correct_when_old_state_is_deleted(self):
         """Test that state id is removed from state id mapping when the
@@ -2706,7 +2706,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
             }], 'delete state')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping_model(
+        new_mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, new_exploration.version)
 
         expected_mapping = {
@@ -2714,8 +2714,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_name_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.latest_state_id_used, 1)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_remains_when_state_is_renamed(self):
         """Test that state id mapping is changed accordingly when a state
@@ -2733,7 +2733,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }], 'Change state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping_model(
+        new_mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, new_exploration.version)
 
         expected_mapping = {
@@ -2742,8 +2742,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_name_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.latest_state_id_used, 1)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_is_changed_when_interaction_id_is_changed(self):
         """Test that state id mapping is changed accordingly when interaction
@@ -2757,7 +2757,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
             }], 'Update interaction.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping_model(
+        new_mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, new_exploration.version)
 
         expected_mapping = {
@@ -2766,8 +2766,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_name_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.latest_state_id_used, 1)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_is_correct_for_series_of_changes(self):
         """Test that state id mapping is changed accordingly for series
@@ -2804,7 +2804,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
             }], 'Heavy changes')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping_model(
+        new_mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, new_exploration.version)
 
         expected_mapping = {
@@ -2815,8 +2815,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_name_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.latest_state_id_used, 3)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 3)
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [{
@@ -2846,7 +2846,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
             }], 'Heavy changes 2')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping_model(
+        new_mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, new_exploration.version)
 
         expected_mapping = {
@@ -2857,5 +2857,28 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_name_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.latest_state_id_used, 5)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 5)
+
+    def test_that_mapping_is_correct_when_exploration_is_reverted(self):
+        """Test that state id mapping is correct when exploration is reverted
+        to old version."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
+
+        # Revert exploration to version 1.
+        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 2, 1)
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        # Expected mapping is same as initial version's mapping.
+        expected_mapping = self.mapping.state_names_to_ids
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
