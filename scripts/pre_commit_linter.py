@@ -521,7 +521,7 @@ def _check_directives_directly_referenced(all_files):
     print '-----------------------------------------'
 
     check_failed = 0
-    file_pattern = re.compile(".*\.html$")
+    file_pattern = re.compile(".*\/core.*\.html$")
     all_files = [
         file_name for file_name in all_files
         if file_pattern.match(file_name) is not None ]
