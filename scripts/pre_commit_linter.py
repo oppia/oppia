@@ -50,7 +50,6 @@ Note that the root folder MUST be named 'oppia'.
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
 import argparse
-from bs4 import BeautifulSoup
 import fnmatch
 import multiprocessing
 import os
@@ -512,6 +511,35 @@ def _check_newline_character(all_files):
     return summary_messages
 
 
+def _get_ng_template_id(line):
+    """This function returns the id of the ng-template, if present.
+    The function assumes id is writted as id="id_name" i.e there is no space
+    before and after '=' and id_name is wrapped in '\"'
+
+    Args:
+        line: str. Line to search for ng-template.
+
+    Returns:
+        str or None. Id of the tag or None.
+    """
+    template_pattern = re.compile(".*text\/ng-template")
+    line = template_pattern.match(line)
+
+    if line is not None:
+        line = line.string
+    else:
+        return None
+
+    line = line.split(' ')
+    for attr in line:
+        attr_value = attr.split('=')
+
+        if attr_value[0] == 'id':
+            return attr_value[1].strip().strip('\"\>')
+
+    return None
+
+
 def _check_directives_directly_referenced(all_files):
     """This function is used to check that the directives which don't use jinja templating
     are directly referenced in js files.
@@ -519,9 +547,8 @@ def _check_directives_directly_referenced(all_files):
 
     print 'Starting directives-directly-referenced check'
     print '-----------------------------------------'
-
     check_failed = 0
-    file_pattern = re.compile(".*\/core.*\.html$")
+    file_pattern = re.compile(".*core.*\.html$")
     all_files = [
         file_name for file_name in all_files
         if file_pattern.match(file_name) is not None ]
@@ -529,16 +556,17 @@ def _check_directives_directly_referenced(all_files):
     total_error_count = 0
 
     for file_name in all_files:
-        soup = BeautifulSoup(open(file_name, 'rb'), 'html.parser')
-        directives = soup.find_all(attrs={'type': 'text/ng-template'})
+        f = open(file_name, 'rb')
 
-        for i in directives:
-            if i.attrs['id'] not in WHITELISTED_DIRECTIVE_IDS:
-                print (
-                    '%s ng-template in %s file should be directly referenced'
-                    ' in js file.' % (i.attrs['id'], file_name))
-                total_error_count += 1 
+        for line in f.readlines():
+            template_id = _get_ng_template_id(line)
 
+            if template_id is not None:
+                if template_id not in WHITELISTED_DIRECTIVE_IDS:
+                    print (
+                        'ng-template with id %s in %s file should be directly'
+                        ' referenced in js file.' % (template_id, file_name))
+                    total_error_count += 1
 
     if total_error_count > 0:
         summary_message = [
