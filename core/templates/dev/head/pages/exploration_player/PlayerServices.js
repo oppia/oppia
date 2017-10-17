@@ -379,6 +379,9 @@ oppia.factory('ExplorationPlayerService', [
             oldStateName, newStateName, answer,
             LearnerParamsService.getAllParams(), isFirstHit);
           StatsReportingService.recordStateCompleted(oldStateName);
+          if (exploration.isStateTerminal(newStateName)) {
+            StatsReportingService.recordStateCompleted(newStateName);
+          }
           visitedStateNames.push(newStateName);
 
           if (oldStateName === exploration.initStateName && (

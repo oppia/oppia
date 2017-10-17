@@ -41,6 +41,10 @@ def get_exploration_stats(exp_id, exp_version):
     """
     exploration_stats = get_exploration_stats_by_id(exp_id, exp_version)
 
+    if exploration_stats is None:
+        exploration_stats = stats_domain.ExplorationStats(
+            exp_id, exp_version, 0, 0, 0, 0, 0, 0, {})
+
     return exploration_stats.to_dict()
 
 def update_stats(exp_id, exp_version, state_name, event_type, update_params):

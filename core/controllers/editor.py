@@ -702,6 +702,8 @@ class ExplorationStatisticsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            if exploration_version == 'all':
+                exploration_version = current_exploration.version
             self.render_json(stats_services.get_exploration_stats(
                 exploration_id, exploration_version))
         else:

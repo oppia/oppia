@@ -36,15 +36,15 @@ oppia.directive('pieChart', [function() {
 
       var redrawChart = function() {
         chart.draw(google.visualization.arrayToDataTable($scope.data()), {
+          title: options.title,
           pieHole: options.pieHole,
           pieSliceTextStyle: {
             color: options.pieSliceTextStyleColor,
           },
           pieSliceBorderColor: options.pieSliceBorderColor,
           pieSliceText: 'none',
-          reverseCategories: true,
           chartArea: {
-            left: 230,
+            left: options.left,
             width: options.chartAreaWidth
           },
           colors: options.colors,

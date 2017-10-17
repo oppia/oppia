@@ -39,11 +39,13 @@ oppia.controller('StatisticsTab', [
       width: 500
     };
     $scope.COMPLETION_RATE_PIE_CHART_OPTIONS = {
+      title: '',
+      left: 230,
       pieHole: 0.6,
       pieSliceTextStyleColor: 'black',
       pieSliceBorderColor: 'black',
       chartAreaWidth: 500,
-      colors: ['#d8d8d8', '#008808'],
+      colors: ['#d8d8d8', '#008808', 'blue'],
       height: 300,
       legendPosition: 'right',
       width: 600
@@ -87,55 +89,76 @@ oppia.controller('StatisticsTab', [
                 states, $scope.stateStats));
             $scope.highlightStates = {};
             improvements.forEach(function(impItem) {
-              // TODO(bhenning): This is the feedback for improvement types and
-              // should be included with the definitions of the improvement
-              // types.
+              // TODO(bhenning): This is the feedback for improvement types
+              // and should be included with the definitions of the
+              // improvement types.
               if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
-                $scope.highlightStates[impItem.stateName] = 'May be confusing';
+                $scope.highlightStates[impItem.stateName] = (
+                  'May be confusing');
               }
             });
           }
         );
-        var data = response.data;
-        var numVisits = data.num_starts;
-        var numCompletions = data.num_completions;
-        var improvements = data.improvements;
-        $scope.stateStats = data.state_stats;
-        $scope.lastUpdated = data.last_updated;
+        if (!$scope.enableNewFramework) {
+          var data = response.data;
+          var numVisits = data.num_starts;
+          var numCompletions = data.num_completions;
+          var improvements = data.improvements;
+          $scope.stateStats = data.state_stats;
+          $scope.lastUpdated = data.last_updated;
 
-        if (numVisits > 0) {
-          $scope.hasExplorationBeenVisited = true;
+          if (numVisits > 0) {
+            $scope.hasExplorationBeenVisited = true;
+          }
+
+          $scope.chartData = [
+            ['', 'Completions', 'Non-completions'],
+            ['', numCompletions, numVisits - numCompletions]
+          ];
+
+          $scope.statsGraphOpacities = {
+            legend: 'Students entering state'
+          };
+          // TODO(bhenning): before, there was a special opacity computed for
+          // the ending (numCompletions/numVisits), should we do this for all
+          // terminal nodes, instead? If so, explorationStatesService needs to
+          // be able to provide whether given states are terminal
+
+          explorationStatesService.getStateNames().forEach(function(stateName) {
+            var visits = 0;
+            if ($scope.stateStats.hasOwnProperty(stateName)) {
+              visits = $scope.stateStats[stateName].first_entry_count;
+            }
+            $scope.statsGraphOpacities[stateName] = Math.max(
+              visits / numVisits, 0.05);
+          });
+
+          $scope.hasTabLoaded = true;
         }
 
-        $scope.chartData = [
-          ['', 'Completions', 'Non-completions'],
-          ['', numCompletions, numVisits - numCompletions]
-        ];
+        // From this point on, all computation done is for the new stats
+        // framework under a development flag.
+        if ($scope.enableNewFramework) {
+          var data = response.data;
+          console.log(data);
+          var numStarts = data.num_starts_v1 + data.num_starts_v2;
+          var numActualStarts = (
+            data.num_actual_starts_v1 + data.num_actual_starts_v2);
+          var numCompletions = (
+            data.num_completions_v1 + data.num_completions_v2);
+          $scope.stateStats = data.state_stats_mapping;
 
-        $scope.pieChartData = [
-          ['Type', 'Number'],
-          ['Completions', numCompletions],
-          ['Non-Completions', numVisits - numCompletions]
-        ];
-
-        $scope.statsGraphOpacities = {
-          legend: 'Students entering state'
-        };
-        // TODO(bhenning): before, there was a special opacity computed for the
-        // ending (numCompletions/numVisits), should we do this for all
-        // terminal nodes, instead? If so, explorationStatesService needs to be
-        // able to provide whether given states are terminal
-
-        explorationStatesService.getStateNames().forEach(function(stateName) {
-          var visits = 0;
-          if ($scope.stateStats.hasOwnProperty(stateName)) {
-            visits = $scope.stateStats[stateName].first_entry_count;
+          if (numStarts > 0) {
+            $scope.hasExplorationBeenVisited = true;
           }
-          $scope.statsGraphOpacities[stateName] = Math.max(
-            visits / numVisits, 0.05);
-        });
 
-        $scope.hasTabLoaded = true;
+          $scope.pieChartData = [
+            ['Type', 'Number'],
+            ['Passerby', numStarts - numActualStarts],
+            ['Completions', numCompletions],
+            ['Non-Completions', numActualStarts - numCompletions]
+          ];
+        }
       });
     };
 
@@ -172,11 +195,62 @@ oppia.controller('StatisticsTab', [
           controller: [
             '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
             'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
+            'ENABLE_NEW_STATS_FRAMEWORK',
             function($scope, $modalInstance, $filter, stateName, stateStats,
-                improvementType, visualizationsInfo, HtmlEscaperService) {
+                improvementType, visualizationsInfo, HtmlEscaperService,
+                ENABLE_NEW_STATS_FRAMEWORK) {
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = {
+                title: 'Answer feedback statistics',
+                left: 0,
+                pieHole: 0.6,
+                pieSliceTextStyleColor: 'black',
+                pieSliceBorderColor: 'black',
+                chartAreaWidth: 240,
+                colors: ['#d8d8d8', '#008808', 'blue'],
+                height: 270,
+                legendPosition: 'right',
+                width: 240
+              };
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = {
+                title: 'Solution usage statistics',
+                left: 0,
+                pieHole: 0.6,
+                pieSliceTextStyleColor: 'black',
+                pieSliceBorderColor: 'black',
+                chartAreaWidth: 240,
+                colors: ['#d8d8d8', '#008808', 'blue'],
+                height: 270,
+                legendPosition: 'right',
+                width: 240
+              };
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
+
+              $scope.enableNewFramework = ENABLE_NEW_STATS_FRAMEWORK;
+
+              var usefulFeedbackCount = (
+                $scope.stateStats.useful_feedback_count_v1 + (
+                  $scope.stateStats.useful_feedback_count_v2));
+              var totalAnswersCount = (
+                $scope.stateStats.total_answers_count_v1 + (
+                  $scope.stateStats.total_answers_count_v2));
+              if (totalAnswersCount > 0) {
+                $scope.hasExplorationBeenAnswered = true;
+              }
+              $scope.pieChartData1 = [
+                ['Type', 'Number'],
+                ['Default feedback', totalAnswersCount - usefulFeedbackCount],
+                ['Useful feedback', usefulFeedbackCount],
+              ];
+
+              var numTimesSolutionViewed = (
+                $scope.stateStats.num_times_solution_viewed_v2);
+              $scope.pieChartData2 = [
+                ['Type', 'Number'],
+                ['Solutions used to answer', numTimesSolutionViewed],
+                ['Solutions not used', totalAnswersCount - numTimesSolutionViewed]
+              ];
 
               var _getVisualizationsHtml = function() {
                 var htmlSnippets = [];
