@@ -1,9 +1,9 @@
 <div class="modal-header">
-  <h3 ng-if="action === 'unpublish_exploration'">Unpublish exploration (as moderator)</h3>
+  <h3>Unpublish exploration (as moderator)</h3>
 </div>
 
 <div class="modal-body">
-  <p ng-if="action === 'unpublish_exploration'">
+  <p>
     You are about to unpublish this exploration.
   </p>
 
@@ -24,6 +24,6 @@
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success" ng-click="reallyTakeAction()">
-    <span ng-if="action === 'unpublish_exploration'">Unpublish Exploration</span>
+    <span>Unpublish Exploration</span>
   </button>
 </div>

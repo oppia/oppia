@@ -374,39 +374,32 @@ def require_valid_intent(intent):
         raise Exception('Unrecognized email intent: %s' % intent)
 
 
-def _get_email_config(intent):
-    """Return the default body for the email type matching the given moderator
-    action intent.
-
-    Args:
-        intent: str. The intent string (cause/purpose) of the email.
+def _get_email_config():
+    """Return the default body for the email.
 
     Returns:
-        str. The default body for the email type matching the given moderator
-            action intent.
+        str. The default body for the email.
     """
 
+    intent = feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION
     require_valid_intent(intent)
     return config_domain.Registry.get_config_property(
         feconf.VALID_MODERATOR_ACTIONS[intent]['email_config'])
 
 
-def get_draft_moderator_action_email(intent):
+def moderator_unpublish_exploration_email():
     """Returns a draft of the text of the body for an email sent immediately
-    following a moderator action. An empty body is a signal to the frontend
-    that no email will be sent.
-
-    Args:
-        intent: str. The intent string (cause/purpose) of the email.
+    when a moderator unpublishes an exploration. An empty body is a signal to
+    the frontend that no email will be sent.
 
     Returns:
-        str. Draft of the email body for an email sent after a moderator action,
-            or an empty string if no email should be sent.
+        str. Draft of the email body for an email sent after the moderator
+            unpublishes an, or an empty string if no email should be sent.
     """
 
     try:
         require_moderator_email_prereqs_are_satisfied()
-        return _get_email_config(intent).value
+        return _get_email_config().value
     except Exception:
         return ''
 
