@@ -26,7 +26,7 @@ describe('Collections', function() {
   var adminPage = null;
 
   beforeAll(function() {
-    adminPage = new AdminPage.AdminPage()
+    adminPage = new AdminPage.AdminPage();
     var USERNAME = 'aliceCollections';
     users.createUser('alice@collections.com', USERNAME);
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
