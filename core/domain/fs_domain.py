@@ -64,7 +64,10 @@ class FileStreamWithMetadata(object):
     def __init__(self, content, version, metadata):
         """Constructs a FileStreamWithMetadata object.
 
-        The args are a file content blob and a metadata model instance.
+        Args:
+            content: str. The content of the file snapshots.
+            version: int. The version number of the file.
+            metadata: FileMetadataModel. The file metadata model instance.
         """
         self._content = content
         self._version = version
@@ -238,7 +241,7 @@ class ExplorationFileSystem(object):
             user_id: str. The user_id of the user who wants to create or update
                 a file.
             filepath: str. The path to the relevant file within the exploration.
-            raw_bytes: str. The content to be stored in file.
+            raw_bytes: str. The content to be stored in the file.
             unused_mimetype: str. Unused argument.
         """
         self._save_file(user_id, filepath, raw_bytes)
@@ -267,7 +270,7 @@ class ExplorationFileSystem(object):
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool: True if the file exists and False if it doesn't.
+            bool. Whether the file exists.
         """
         metadata = self._get_file_metadata(filepath, None)
         return bool(metadata)
@@ -306,7 +309,7 @@ class DiskBackedFileSystem(object):
     This implementation ignores versioning and is used only by tests.
 
     Attributes:
-        root: the path to append to the oppia/ directory.
+        root: str. the path to append to the oppia/ directory.
         exploration_id: str. The id of the exploration.
     """
 
@@ -314,7 +317,7 @@ class DiskBackedFileSystem(object):
         """Constructor for this class.
 
         Args:
-            root: the path to append to the oppia/ directory.
+            root: str. the path to append to the oppia/ directory.
         """
         self._root = os.path.join(os.getcwd(), root)
         self._exploration_id = 'test'
@@ -330,7 +333,7 @@ class DiskBackedFileSystem(object):
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool. True if the file exists and False if it doesn't.
+            bool. Whether the file exists.
         """
         return os.path.isfile(os.path.join(self._root, filepath))
 
@@ -344,8 +347,8 @@ class DiskBackedFileSystem(object):
             mode: str. The mode with which to open the file.
 
         Returns:
-            FileStreamWithMetadata. It returns FileStreamWithMetadata domain
-                object.
+            FileStreamWithMetadata. A FileStreamWithMetadata domain object that
+                contains only the content of the file, but no metadata.
         """
         content = utils.get_file_contents(
             os.path.join(self._root, filepath), raw_bytes=True, mode=mode)
@@ -390,7 +393,7 @@ class GcsFileSystem(object):
 
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
         """Args:
-            unused_user_id: str. Unused argument
+            unused_user_id: str. Unused argument.
             filepath: str. The path to the relevant file within the exploration.
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the cloud file.
@@ -450,7 +453,7 @@ class AbstractFileSystem(object):
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool. True if the file exists and False if it doesn't.
+            bool. Whether the file exists.
         """
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
