@@ -24,17 +24,29 @@ oppia.controller('StatisticsTab', [
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'IMPROVE_TYPE_INCOMPLETE',
+  'ENABLE_NEW_STATS_FRAMEWORK',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
-      ReadOnlyExplorationBackendApiService, IMPROVE_TYPE_INCOMPLETE) {
+      ReadOnlyExplorationBackendApiService, IMPROVE_TYPE_INCOMPLETE,
+      ENABLE_NEW_STATS_FRAMEWORK) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
       height: 100,
       legendPosition: 'right',
       width: 500
+    };
+    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS = {
+      pieHole: 0.6,
+      pieSliceTextStyleColor: 'black',
+      pieSliceBorderColor: 'black',
+      chartAreaWidth: 500,
+      colors: ['#d8d8d8', '#008808'],
+      height: 300,
+      legendPosition: 'right',
+      width: 600
     };
     var _EXPLORATION_STATS_VERSION_ALL = 'all';
     $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
@@ -44,6 +56,7 @@ oppia.controller('StatisticsTab', [
         millisSinceEpoch);
     };
 
+    $scope.enableNewFramework = ENABLE_NEW_STATS_FRAMEWORK;
     $scope.hasTabLoaded = false;
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
@@ -97,6 +110,12 @@ oppia.controller('StatisticsTab', [
         $scope.chartData = [
           ['', 'Completions', 'Non-completions'],
           ['', numCompletions, numVisits - numCompletions]
+        ];
+
+        $scope.pieChartData = [
+          ['Type', 'Number'],
+          ['Completions', numCompletions],
+          ['Non-Completions', numVisits - numCompletions]
         ];
 
         $scope.statsGraphOpacities = {

@@ -29,6 +29,20 @@ import feconf
 # Counts contributions from all versions.
 VERSION_ALL = 'all'
 
+def get_exploration_stats(exp_id, exp_version):
+    """Retrieves the ExplorationStatsModel and returns it in dict format.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+
+    Returns:
+        dict. The ExplorationStatsModel's dict format.
+    """
+    exploration_stats = get_exploration_stats_by_id(exp_id, exp_version)
+
+    return exploration_stats.to_dict()
+
 def update_stats(exp_id, exp_version, state_name, event_type, update_params):
     """Updates ExplorationStatsModel according to the incoming event model.
 

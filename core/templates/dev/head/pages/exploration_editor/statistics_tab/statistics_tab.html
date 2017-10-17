@@ -1,6 +1,32 @@
 <div ng-controller="StatisticsTab" ng-cloak>
   <md-card class="oppia-editor-card" ng-if="!loadingMessage">
-    <div ng-if="hasExplorationBeenVisited">
+    <div ng-if="hasExplorationBeenVisited && enableNewFramework">
+      <div class="oppia-statistics-display">
+        <h3>Exploration Completion Rate</h3>
+        <pie-chart data="pieChartData"
+                   options="COMPLETION_RATE_PIE_CHART_OPTIONS">
+        </pie-chart>
+
+        <h3>State wise statistics</h3>
+        <div style="font-size: smaller" ng-if="lastUpdated">
+          <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
+        </div>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <div state-graph-viz graph-data="statsGraphData"
+                   node-fill="darkseagreen"
+                   highlight-states="highlightStates"
+                   state-stats="stateStats"
+                   on-click-function="onClickStateInStatsGraph">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="hasExplorationBeenVisited && !enableNewFramework">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
         <bar-chart data="chartData"
@@ -16,7 +42,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12">
               <div state-graph-viz graph-data="statsGraphData"
                    node-fill="darkseagreen"
-                   opacity-map="statsGraphOpacities" 
+                   opacity-map="statsGraphOpacities"
                    highlight-states="highlightStates"
                    state-stats="stateStats"
                    on-click-function="onClickStateInStatsGraph">
