@@ -23,14 +23,14 @@ oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
-  'ReadOnlyExplorationBackendApiService', 'IMPROVE_TYPE_INCOMPLETE',
-  'ENABLE_NEW_STATS_FRAMEWORK',
+  'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
+  'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
-      ReadOnlyExplorationBackendApiService, IMPROVE_TYPE_INCOMPLETE,
-      ENABLE_NEW_STATS_FRAMEWORK) {
+      ReadOnlyExplorationBackendApiService, UrlInterpolationService,
+      IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -151,7 +151,9 @@ oppia.controller('StatisticsTab', [
         encodeURIComponent(stateName)
       ).then(function(response) {
         $modal.open({
-          templateUrl: 'modals/stateStats',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/statistics_tab/' +
+            'state_stats_modal_directive.html'),
           backdrop: true,
           resolve: {
             stateName: function() {
