@@ -13,25 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for storing all generic functions which have to be
- * used at multiple places in the codebase.
+ * @fileoverview Service for enabling a background mask that leaves navigation
+ * visible.
  */
+ 
+oppia.factory('BackgroundMaskService', function() {
+  var maskIsActive = false;
 
-oppia.factory('utilsService', [function() {
-  var utils = {
-    isEmpty: function(obj) {
-      for (var property in obj) {
-        if (obj.hasOwnProperty(property)) {
-          return false;
-        }
-      }
-      return true;
+  return {
+    isMaskActive: function() {
+      return maskIsActive;
     },
-
-    // http://stackoverflow.com/questions/203739
-    isString: function(input) {
-      return (typeof input === 'string' || input instanceof String);
+    activateMask: function() {
+      maskIsActive = true;
+    },
+    deactivateMask: function() {
+      maskIsActive = false;
     }
   };
-  return utils;
-}]);
+});

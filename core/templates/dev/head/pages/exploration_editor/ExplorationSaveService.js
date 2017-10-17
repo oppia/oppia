@@ -24,7 +24,7 @@ oppia.factory('ExplorationSaveService', [
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'RouterService',
-  'focusService', 'changeListService', 'SiteAnalyticsService',
+  'FocusManagerService', 'changeListService', 'SiteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   function(
       $modal, $timeout, $rootScope, $log, $q,
@@ -34,7 +34,7 @@ oppia.factory('ExplorationSaveService', [
       explorationLanguageCodeService, explorationRightsService,
       explorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, RouterService,
-      focusService, changeListService, SiteAnalyticsService,
+      FocusManagerService, changeListService, SiteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
@@ -202,7 +202,9 @@ oppia.factory('ExplorationSaveService', [
 
       discardChanges: function() {
         $modal.open({
-          templateUrl: 'modals/confirmDiscardChanges',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'confirm_discard_changes_modal_directive.html'),
           backdrop: 'static',
           keyboard: false,
           controller: [
@@ -542,7 +544,7 @@ oppia.factory('ExplorationSaveService', [
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
-              focusService.setFocus('saveChangesModalOpened');
+              FocusManagerService.setFocus('saveChangesModalOpened');
             });
           });
 

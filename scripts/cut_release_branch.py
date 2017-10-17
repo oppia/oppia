@@ -28,6 +28,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import urllib
 
 import common # pylint: disable=relative-import
@@ -36,7 +37,7 @@ import common # pylint: disable=relative-import
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
     if not pattern.match(arg):
         raise argparse.ArgumentTypeError(
-            'The format of \'new_version\' should be: x.x.x')
+            'The format of "new_version" should be: x.x.x')
     return arg
 
 _PARSER = argparse.ArgumentParser()
@@ -47,46 +48,12 @@ PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.new_version:
     TARGET_VERSION = PARSED_ARGS.new_version
 else:
-    raise Exception('ERROR: A \'new_version\' arg must be specified.')
+    raise Exception('ERROR: A "new_version" arg must be specified.')
 
 # Construct the new branch name.
 NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
-NEW_APP_YAML_VERSION = TARGET_VERSION.replace('-', '.')
-
-
-def _get_remote_alias():
-    # Find the correct alias for the remote branch.
-    git_remote_output = subprocess.check_output(
-        ['git', 'remote', '-v']).split('\n')
-    remote_alias = None
-    for line in git_remote_output:
-        if 'https://github.com/oppia/oppia' in line:
-            remote_alias = line.split()[0]
-    if remote_alias is None:
-        raise Exception(
-            'ERROR: There is no existing remote alias for the Oppia repo.')
-
-    return remote_alias
-
-
-def _verify_local_repo_is_clean():
-    """Checks that the local Git repo is clean."""
-    git_status_output = subprocess.check_output(
-        ['git', 'status']).strip().split('\n')
-    branch_is_clean = (
-        git_status_output[1] == 'nothing to commit, working directory clean')
-    if len(git_status_output) > 2 or not branch_is_clean:
-        raise Exception(
-            'ERROR: This script should be run from a clean branch.')
-
-
-def _verify_current_branch_is_develop():
-    """Checks that the user is on the develop branch."""
-    git_status_output = subprocess.check_output(
-        ['git', 'status']).strip().split('\n')
-    if git_status_output[0] != 'On branch develop':
-        raise Exception(
-            'ERROR: This script can only be run from the "develop" branch.')
+NEW_APP_YAML_VERSION = TARGET_VERSION.replace('.', '-')
+assert '.' not in NEW_APP_YAML_VERSION
 
 
 def _verify_target_branch_does_not_already_exist(remote_alias):
@@ -140,17 +107,33 @@ def _verify_target_version_is_consistent_with_latest_released_version():
 
 
 def _execute_branch_cut():
-    # Check that the current directory is correct.
+    # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
-    _verify_local_repo_is_clean()
-    _verify_current_branch_is_develop()
+    common.verify_local_repo_is_clean()
+    common.verify_current_branch_name('develop')
 
     # Update the local repo.
-    remote_alias = _get_remote_alias()
+    remote_alias = common.get_remote_alias('https://github.com/oppia/oppia')
     subprocess.call(['git', 'pull', remote_alias])
 
     _verify_target_branch_does_not_already_exist(remote_alias)
     _verify_target_version_is_consistent_with_latest_released_version()
+
+    # The release coordinator should verify that tests are passing on develop
+    # before checking out the release branch.
+    common.open_new_tab_in_browser_if_possible(
+        'https://github.com/oppia/oppia#oppia---')
+    while True:
+        print (
+            'Please confirm: are Travis checks passing on develop? (y/n) ')
+        answer = raw_input().lower()
+        if answer in ['y', 'ye', 'yes']:
+            break
+        elif answer:
+            print (
+                'Tests should pass on develop before this script is run. '
+                'Exiting.')
+            sys.exit()
 
     # Cut a new release branch.
     print 'Cutting a new release branch: %s' % NEW_BRANCH_NAME

@@ -361,7 +361,9 @@ oppia.controller('LearnerDashboard', [
 
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
       $modal.open({
-        templateUrl: 'modals/learnerViewSuggestion',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/learner_dashboard/' +
+          'learner_view_suggestion_modal_directive.html'),
         backdrop: true,
         resolve: {
           newContent: function() {

@@ -78,12 +78,12 @@ oppia.constant(
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$document', '$modal', '$timeout', 'focusService',
+    '$delegate', '$document', '$modal', '$timeout', 'FocusManagerService',
     'taRegisterTool', 'rteHelperService', 'alertsService',
     'explorationContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
-      taOptions, $document, $modal, $timeout, focusService,
+      taOptions, $document, $modal, $timeout, FocusManagerService,
       taRegisterTool, rteHelperService, alertsService,
       explorationContextService, PAGE_CONTEXT,
       UrlInterpolationService) {
@@ -120,7 +120,7 @@ oppia.config(['$provide', function($provide) {
               // TODO(sll): Make this switch to the first input field in the
               // modal instead.
               $scope.modalIsLoading = true;
-              focusService.setFocus('tmpFocusPoint');
+              FocusManagerService.setFocus('tmpFocusPoint');
               $timeout(function() {
                 $scope.modalIsLoading = false;
               });
@@ -631,45 +631,6 @@ oppia.factory('rteHelperService', [
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 
-// Service for setting focus. This broadcasts a 'focusOn' event which sets
-// focus to the element in the page with the corresponding focusOn attribute.
-// Note: This requires LABEL_FOR_CLEARING_FOCUS to exist somewhere in the HTML
-// page.
-oppia.factory('focusService', [
-  '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
-  'IdGenerationService',
-  function(
-      $rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS,
-      IdGenerationService) {
-    var _nextLabelToFocusOn = null;
-    return {
-      clearFocus: function() {
-        this.setFocus(LABEL_FOR_CLEARING_FOCUS);
-      },
-      setFocus: function(name) {
-        if (_nextLabelToFocusOn) {
-          return;
-        }
-
-        _nextLabelToFocusOn = name;
-        $timeout(function() {
-          $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
-          _nextLabelToFocusOn = null;
-        });
-      },
-      setFocusIfOnDesktop: function(newFocusLabel) {
-        if (!deviceInfoService.isMobileDevice()) {
-          this.setFocus(newFocusLabel);
-        }
-      },
-      // Generates a random string (to be used as a focus label).
-      generateFocusLabel: function() {
-        return IdGenerationService.generateNewId();
-      }
-    };
-  }
-]);
-
 // Service for manipulating the page URL.
 oppia.factory('urlService', ['$window', function($window) {
   return {
@@ -716,23 +677,6 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
     }
   };
 }]);
-
-// Service for enabling a background mask that leaves navigation visible.
-oppia.factory('BackgroundMaskService', function() {
-  var maskIsActive = false;
-
-  return {
-    isMaskActive: function() {
-      return maskIsActive;
-    },
-    activateMask: function() {
-      maskIsActive = true;
-    },
-    deactivateMask: function() {
-      maskIsActive = false;
-    }
-  };
-});
 
 // Shim service for functions on $window that allows these functions to be
 // mocked in unit tests.

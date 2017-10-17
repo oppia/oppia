@@ -18,10 +18,10 @@
 
 oppia.controller('Signup', [
   '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
-  'focusService', 'SiteAnalyticsService',
+  'FocusManagerService', 'SiteAnalyticsService', 'UrlInterpolationService',
   function(
       $scope, $http, $rootScope, $modal, alertsService, urlService,
-      focusService, SiteAnalyticsService) {
+      FocusManagerService, SiteAnalyticsService, UrlInterpolationService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
@@ -35,7 +35,7 @@ oppia.controller('Signup', [
       $scope.hasEverRegistered = data.has_ever_registered;
       $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
       $scope.hasUsername = Boolean($scope.username);
-      focusService.setFocus('usernameInputField');
+      FocusManagerService.setFocus('usernameInputField');
     });
 
     $scope.blurredAtLeastOnce = false;
@@ -50,7 +50,8 @@ oppia.controller('Signup', [
 
     $scope.showLicenseExplanationModal = function() {
       $modal.open({
-        templateUrl: 'modals/licenseExplanation',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/signup/licence_explanation_modal_directive.html'),
         backdrop: true,
         resolve: {},
         controller: [

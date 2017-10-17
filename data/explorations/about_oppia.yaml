@@ -72,7 +72,7 @@ states:
       html: <div>If you have a question relating to this site, you can get in touch
         by posting to our forum:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://www.oppia.org/forum&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
         can also follow our blog to get the latest updates:</div><div><oppia-noninteractive-link
-        url-with-value="&amp;quot;http://oppiablog.blogspot.com/&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
+        url-with-value="&amp;quot;https://medium.com/oppia-org&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
         you find a bug or have a feature request, please create an issue on the Oppia
         bug tracker:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://github.com/oppia/oppia/issues/new&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
         can also get in touch with the developers of the open-source Oppia codebase

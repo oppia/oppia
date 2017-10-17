@@ -103,8 +103,7 @@ class ConfigProperty(object):
     def refresh_default_value(self, default_value):
         pass
 
-    def __init__(self, name, schema, description, default_value,
-                 is_directly_settable=True):
+    def __init__(self, name, schema, description, default_value):
         if Registry.get_config_property(name):
             raise Exception('Property with name %s already exists' % name)
 
@@ -113,7 +112,6 @@ class ConfigProperty(object):
         self._description = description
         self._default_value = schema_utils.normalize_against_schema(
             default_value, self._schema)
-        self._is_directly_settable = is_directly_settable
 
         Registry.init_config_property(self.name, self)
 
@@ -132,10 +130,6 @@ class ConfigProperty(object):
     @property
     def default_value(self):
         return self._default_value
-
-    @property
-    def is_directly_settable(self):
-        return self._is_directly_settable
 
     @property
     def value(self):
@@ -205,12 +199,11 @@ class Registry(object):
         schemas_dict = {}
 
         for (property_name, instance) in cls._config_registry.iteritems():
-            if instance.is_directly_settable:
-                schemas_dict[property_name] = {
-                    'schema': instance.schema,
-                    'description': instance.description,
-                    'value': instance.value
-                }
+            schemas_dict[property_name] = {
+                'schema': instance.schema,
+                'description': instance.description,
+                'value': instance.value
+            }
 
         return schemas_dict
 
