@@ -404,16 +404,16 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         rights_manager.unpublish_exploration(self.user, exploration_id)
         search_services.delete_explorations_from_search_index([
             exploration_id])
-   
         exp_rights = rights_manager.get_exploration_rights(exploration_id)
 
         # If moderator emails can be sent, send an email to the all owners of
         # the exploration notifying them of the change.
         if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+            intent = 'unpublish_exploration'
             for owner_id in exp_rights.owner_ids:
                 email_manager.send_moderator_action_email(
                     self.user_id, owner_id,
-                    feconf.VALID_MODERATOR_ACTIONS['unpublish_exploration']['email_intent'],
+                    feconf.VALID_MODERATOR_ACTIONS[intent]['email_intent'],
                     exploration.title, email_body)
 
         self.render_json({

@@ -355,7 +355,8 @@ oppia.controller('SettingsTab', [
             }
           ]
         }).result.then(function(result) {
-          explorationRightsService.saveModeratorChangeToBackend(result.emailBody);
+          explorationRightsService.saveModeratorChangeToBackend(
+            result.emailBody);
         });
       });
     };
