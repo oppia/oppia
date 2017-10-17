@@ -249,7 +249,8 @@ oppia.controller('StatisticsTab', [
               $scope.pieChartData2 = [
                 ['Type', 'Number'],
                 ['Solutions used to answer', numTimesSolutionViewed],
-                ['Solutions not used', totalAnswersCount - numTimesSolutionViewed]
+                ['Solutions not used', totalAnswersCount - (
+                  numTimesSolutionViewed)]
               ];
 
               var _getVisualizationsHtml = function() {
