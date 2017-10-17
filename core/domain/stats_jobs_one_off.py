@@ -37,8 +37,9 @@ class RecomputeStateCompleteStatistics(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        yield ((item.exp_id, item.exp_version, item.state_name),
-               1)
+        if item.event_schema_version == 2:
+            yield ((item.exp_id, item.exp_version, item.state_name),
+                   1)
 
     @staticmethod
     def reduce(key, values):
@@ -48,7 +49,7 @@ class RecomputeStateCompleteStatistics(jobs.BaseMapReduceOneOffJobManager):
             key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[key[2]]
-        state_stats['num_completions'] = num_completions
+        state_stats['num_completions_v2'] = num_completions
         model.state_stats_mapping[key[2]] = state_stats
         model.put()
 
@@ -64,8 +65,9 @@ class RecomputeAnswerSubmittedStatistics(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        yield ((item.exp_id, item.exp_version, item.state_name),
-               item.is_feedback_useful)
+        if item.event_schema_version == 2:
+            yield ((item.exp_id, item.exp_version, item.state_name),
+                   item.is_feedback_useful)
 
     @staticmethod
     def reduce(key, values):
@@ -78,8 +80,8 @@ class RecomputeAnswerSubmittedStatistics(jobs.BaseMapReduceOneOffJobManager):
             key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[key[2]]
-        state_stats['total_answers_count'] = total_answers_count
-        state_stats['useful_feedback_count'] = useful_feedback_count
+        state_stats['total_answers_count_v2'] = total_answers_count
+        state_stats['useful_feedback_count_v2'] = useful_feedback_count
         model.state_stats_mapping[key[2]] = state_stats
         model.put()
 
@@ -95,8 +97,9 @@ class RecomputeStateHitStatistics(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        yield ((item.exploration_id, item.exploration_version, item.state_name),
-               item.session_id)
+        if item.event_schema_version == 2:
+            yield ((item.exploration_id, item.exploration_version,
+                    item.state_name), item.session_id)
 
     @staticmethod
     def reduce(key, values):
@@ -114,8 +117,8 @@ class RecomputeStateHitStatistics(jobs.BaseMapReduceOneOffJobManager):
             key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[key[2]]
-        state_stats['total_hit_count'] = total_hit_count
-        state_stats['first_hit_count'] = first_hit_count
+        state_stats['total_hit_count_v2'] = total_hit_count
+        state_stats['first_hit_count_v2'] = first_hit_count
         model.state_stats_mapping[key[2]] = state_stats
         model.put()
 
@@ -131,8 +134,9 @@ class RecomputeSolutionHitStatistics(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        yield ((item.exp_id, item.exp_version, item.state_name),
-               item.session_id)
+        if item.event_schema_version == 2:
+            yield ((item.exp_id, item.exp_version, item.state_name),
+                   item.session_id)
 
     @staticmethod
     def reduce(key, values):
@@ -148,7 +152,7 @@ class RecomputeSolutionHitStatistics(jobs.BaseMapReduceOneOffJobManager):
             key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[key[2]]
-        state_stats['num_times_solution_viewed'] = solution_triggered
+        state_stats['num_times_solution_viewed_v2'] = solution_triggered
         model.state_stats_mapping[key[2]] = state_stats
         model.put()
 
@@ -164,8 +168,9 @@ class RecomputeActualStartStatistics(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        yield ((item.exp_id, item.exp_version),
-               1)
+        if item.event_schema_version == 2:
+            yield ((item.exp_id, item.exp_version),
+                   1)
 
     @staticmethod
     def reduce(key, values):
@@ -174,7 +179,7 @@ class RecomputeActualStartStatistics(jobs.BaseMapReduceOneOffJobManager):
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
-        model.num_actual_starts = num_actual_starts
+        model.num_actual_starts_v2 = num_actual_starts
         model.put()
 
 
@@ -189,8 +194,9 @@ class RecomputeCompleteEventStatistics(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        yield ((item.exploration_id, item.exploration_version),
-               1)
+        if item.event_schema_version == 2:
+            yield ((item.exploration_id, item.exploration_version),
+                   1)
 
     @staticmethod
     def reduce(key, values):
@@ -199,7 +205,7 @@ class RecomputeCompleteEventStatistics(jobs.BaseMapReduceOneOffJobManager):
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             key[0], key[1])
         model = stats_models.ExplorationStatsModel.get(model_id)
-        model.num_completions = num_completions
+        model.num_completions_v2 = num_completions
         model.put()
 
 
