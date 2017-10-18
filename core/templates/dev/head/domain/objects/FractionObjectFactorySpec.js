@@ -16,7 +16,7 @@
  * @fileoverview unit tests for the fraction object type factory service.
  */
 
- fdescribe('FractionObjectFactory', function() {
+ describe('FractionObjectFactory', function() {
    beforeEach(module('oppia'));
 
    describe('fraction object factory', function() {
