@@ -662,7 +662,7 @@ def apply_change_list(collection_id, change_list):
                 collection.add_question_id_to_skill(
                     change.skill_name, change.question_id)
             elif (change.cmd ==
-                    collection_domain.CMD_REMOVE_QUESTION_ID_FROM_SKILL):
+                  collection_domain.CMD_REMOVE_QUESTION_ID_FROM_SKILL):
                 collection.remove_question_id_from_skill(
                     change.skill_id, change.question_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_SKILL:
