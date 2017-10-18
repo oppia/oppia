@@ -411,8 +411,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def _create_fraction_dict(
             self, is_negative, whole_number, numerator, denominator):
         return {
-            "is_negative": is_negative,
-            "whole_number": whole_number,
+            "isNegative": is_negative,
+            "wholeNumber": whole_number,
             "numerator": numerator,
             "denominator": denominator
         }

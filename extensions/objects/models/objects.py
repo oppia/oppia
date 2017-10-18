@@ -787,8 +787,8 @@ class Fraction(BaseObject):
     edit_html_filename = 'unicode_string_editor'
     edit_js_filename = 'FractionEditor'
     default_value = {
-        'is_negative': False,
-        'whole_number': 0,
+        'isNegative': False,
+        'wholeNumber': 0,
         'numerator': 0,
         'denominator': 1
     }
@@ -796,14 +796,14 @@ class Fraction(BaseObject):
     SCHEMA = {
         'type': 'dict',
         'properties': [{
-            'name': 'is_negative',
+            'name': 'isNegative',
             'schema': {
                 'type': 'bool'
             }
         }, {
-            'name': 'whole_number',
+            'name': 'wholeNumber',
             'schema': {
-                'type': 'int'
+                'type': NonnegativeInt.SCHEMA
             }
         }, {
             'name': 'numerator',
