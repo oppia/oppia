@@ -23,19 +23,19 @@
     <div class="oppia-wide-panel oppia-error-wide-container">
       <div class="oppia-wide-panel-content protractor-test-error-container">
         <h1 class="oppia-error-h1">
-          <div ng-if="errorCode === 400">
+          <div ng-if="statusCode === 400">
             <span translate="I18N_ERROR_HEADER_400"></span>
             - Bad Request
           </div>
-          <div ng-if="errorCode === 401">
+          <div ng-if="statusCode === 401">
             <span translate="I18N_ERROR_HEADER_401"></span>
             - Unauthorized
           </div>
-          <div ng-if="errorCode === 404">
+          <div ng-if="statusCode === 404">
             <span translate="I18N_ERROR_HEADER_404"></span>
             - Page Not Found
           </div>
-          <div ng-if="errorCode === 500">
+          <div ng-if="statusCode === 500">
             <span translate="I18N_ERROR_HEADER_500"></span>
             - System Error
           </div>
@@ -45,18 +45,10 @@
 
         <img ng-src="<[oopsMintImgUrl]>" alt="Oops!" width="299" height="142"/>
         <p>
-          <div ng-if="errorCode === 400">
-            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_400"></h2>
-          </div>
-          <div ng-if="errorCode === 401">
-            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_401"></h2>
-          </div>
-          <div ng-if="errorCode === 404">
-            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_404"></h2>
-          </div>
-          <div ng-if="errorCode === 500">
-            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_500"></h2>
-          </div>
+          <h2 ng-if="statusCode === 400" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_400"></h2>
+          <h2 ng-if="statusCode === 401" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_401"></h2>
+          <h2 ng-if="statusCode === 404" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_404"></h2>
+          <h2 ng-if="statusCode === 500" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_500"></h2>
         </p>
         <p><span translate="I18N_ERROR_NEXT_STEPS" translate-values="{issueTrackerUrl: 'https://github.com/oppia/oppia/issues/new', homeUrl: '/'}"></span></p>
       </div>

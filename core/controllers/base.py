@@ -336,6 +336,9 @@ class BaseHandler(webapp2.RequestHandler):
             'promo_bar_message': promo_bar_message,
         })
 
+        if 'status_code' not in values:
+            values['status_code'] = 200
+
         if 'meta_name' not in values:
             values['meta_name'] = 'Personalized Online Learning from Oppia'
 
