@@ -56,6 +56,14 @@ DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
 
 def _get_exploration_player_data(
         exploration_id, version, collection_id, can_edit):
+    """Returns a dict of exploration player data.
+
+    Args:
+        exploration_id: str. The id of the exploration.
+        version: int or None. The version of the exploration.
+        collection_id: str. ID of the collection.
+        can_edit: bool. Whether the given user can edit this activity.
+    """
     try:
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
@@ -115,7 +123,11 @@ class ExplorationPageEmbed(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
         exploration_rights = rights_manager.get_exploration_rights(
@@ -153,7 +165,11 @@ class ExplorationPage(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
         exploration_rights = rights_manager.get_exploration_rights(
@@ -192,7 +208,11 @@ class ExplorationHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
-        """Populates the data on the individual exploration page."""
+        """Populates the data on the individual exploration page.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         version = self.request.get('v')
         version = int(version) if version else None
 
@@ -251,6 +271,11 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
         answer = self.payload.get('answer')
@@ -294,7 +319,11 @@ class StateHitEventHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         new_state_name = self.payload.get('new_state_name')
         exploration_version = self.payload.get('exploration_version')
         session_id = self.payload.get('session_id')
@@ -349,7 +378,11 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         state_name = self.payload.get('state_name')
         subject = self.payload.get('subject', 'Feedback from a learner')
         feedback = self.payload.get('feedback')
@@ -371,7 +404,11 @@ class ExplorationStartEventHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         event_services.StartExplorationEventHandler.record(
             exploration_id, self.payload.get('version'),
             self.payload.get('state_name'),
@@ -390,7 +427,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
 
         # This will be None if the exploration is not being played within the
         # context of a collection.
@@ -437,7 +478,11 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         version = self.payload.get('version')
         state_name = self.payload.get('state_name')
         user_id = self.user_id
@@ -468,6 +513,12 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
     """
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type, activity_id):
+        """Removes exploration or collection from incomplete list.
+
+        Args:
+            activity_type: str. The activity type.
+            activity_id: str. The exploration id which is to be deleted.
+        """
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
             learner_progress_services.remove_exp_from_incomplete_list(
                 self.user_id, activity_id)
@@ -577,6 +628,11 @@ class FlagExplorationHandler(base.BaseHandler):
 
     @acl_decorators.can_flag_exploration
     def post(self, exploration_id):
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,
             self.payload.get('report_text'),
