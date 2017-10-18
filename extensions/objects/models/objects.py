@@ -805,17 +805,11 @@ class Fraction(BaseObject):
             'schema': {
                 'type': 'int'
             }
-
         }, {
             'name': 'numerator',
-            'schema': {
-                'type': 'int'
-            }
-
+            'schema': NonnegativeInt.SCHEMA
         }, {
             'name': 'denominator',
-            'schema': {
-                'type': 'int'
-            }
+            'schema': NonnegativeInt.SCHEMA
         }]
     }
