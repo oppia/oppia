@@ -161,6 +161,13 @@ def apply_change_list(question_id, change_list):
                 elif (change.cmd ==
                       question_domain.QUESTION_PROPERTY_QUESTION_DATA):
                     question.update_question_data(change.new_value)
+                elif (change.cmd == 
+                      question_domain.QUESTION_PROPERTY_ADD_SKILL):
+                    question.add_skill(change.skill_name)
+                elif (change.cmd ==
+                      question_domain.QUESTION_PROPERTY_DELETE_SKILL):
+                    question.delete_skill(change.skill_id)
+
         return question
 
     except Exception as e:
@@ -223,7 +230,7 @@ def update_question(committer_id, question_id, change_list, commit_message):
 
 
 def get_questions_batch(
-        collection_id, skill_ids, user_id, question_play_counts, batch_size):
+        collection_id, skill_ids, user_id, batch_size):
     """Fetches a batch of questions for a user based on the provided
     skill_ids, matching them with user skills.
 
@@ -231,8 +238,6 @@ def get_questions_batch(
         collection_id: str. Id of the collection.
         skill_ids: list(str). A list of skill ids.
         user_id: str. Id of the user.
-        question_play_counts: dict. A dict mapping question ids to the number
-            of times it has been played in this question session.
         batch_size: int. The intended number of questions to be returned.
 
     Returns:
@@ -257,5 +262,4 @@ def get_questions_batch(
     questions_batch = []
     for question_id in random_question_ids:
         questions_batch.append(get_question_by_id(question_id))
-        question_play_counts[question_id] += 1
     return questions_batch

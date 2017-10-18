@@ -59,6 +59,10 @@ CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 CMD_ADD_COLLECTION_SKILL = 'add_collection_skill'
 # This takes an additional 'skill_id' parameter.
 CMD_DELETE_COLLECTION_SKILL = 'delete_collection_skill'
+# This takes an additional 'question_id', 'skill' parameter.
+CMD_ADD_QUESTION_ID_TO_SKILL = 'add_question_id_to_skill'
+# This takes an additional 'question_id', 'skill_id' parameter.
+CMD_REMOVE_QUESTION_ID_FROM_SKILL = 'remove_question_id_from_skill'
 
 
 class CollectionChange(object):
@@ -129,6 +133,12 @@ class CollectionChange(object):
             self.to_version = change_dict['to_version']
         elif self.cmd == CMD_ADD_COLLECTION_SKILL:
             self.name = change_dict['name']
+        elif self.cmd == CMD_ADD_QUESTION_ID_TO_SKILL:
+            self.skill_name = change_dict['skill_name']
+            self.question_id = change_dict['question_id']
+        elif self.cmd == CMD_REMOVE_QUESTION_ID_FROM_SKILL:
+            self.skill_id = change_dict['skill_id']
+            self.question_id = change_dict['question_id']
         elif self.cmd == CMD_DELETE_COLLECTION_SKILL:
             self.skill_id = change_dict['skill_id']
         else:
@@ -1078,6 +1088,23 @@ class Collection(object):
         self.next_skill_id += 1
         return skill_id
 
+    def get_skill_id_from_skill_name(self, skill_name):
+        """Gets the skill id from the skill name.
+
+        Args:
+            skill_name: str. The name of the skill.
+
+        Returns:
+            str. The id of the skill.
+        """
+        index = 0
+        for _, skill in self.skills.iteritems():
+            if skill.name == skill_name:        
+                skill_index = index
+            index += 1
+        skill_id = CollectionSkill.get_skill_id_from_index(skill_index)
+        return skill_id
+
     def update_skill(self, skill_id, new_skill_name):
         """Renames skill with specified id to the new skill name."""
         if skill_id not in self.skills:
@@ -1104,6 +1131,47 @@ class Collection(object):
                 node.acquired_skill_ids.remove(skill_id)
 
         del self.skills[skill_id]
+
+    def add_question_id_to_skill(self, skill_name, question_id):
+        """Adds the question id to the question list of the appropriate skill.
+
+        Args:
+            skill_name: str. The name of the skill.
+            question_id: str. The id of the question.
+
+        Raises:
+            Exception: question_id is already present in skill.
+        """
+        index = 0
+        for _, skill in self.skills.iteritems():
+            if skill.name == skill_name:        
+                skill_index = index
+            index += 1
+        skill_id = CollectionSkill.get_skill_id_from_index(skill_index)
+        question_ids = self.skills[skill_id].question_ids
+        if question_id not in question_ids:
+            self.skills[skill_id].question_ids.append(
+                question_id)
+        else:
+            raise Exception(
+                '%s is already present in %s' % (self.question_id, skill_name))
+
+    def remove_question_id_from_skill(self, skill_id, question_id):
+        """Removes question id from the question list of the appropriate skill.
+
+        Args:
+            skill_id: str. The id of the skill.
+            question_id: str. The id of the question.
+
+        Raises:
+            Exception: question_id is not present in the skill.
+        """
+        if question_id not in self.skills[skill_id].question_ids:
+            raise Exception(
+                '%s is not present in %s' % (
+                    question_id, self.skills[skill_id].name))
+        else:
+            self.skills[skill_id].question_ids.remove(question_id)
 
     def get_acquired_skill_ids_from_exploration_ids(self, exploration_ids):
         """Returns a list of skill ids acquired by completing the explorations
