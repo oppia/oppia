@@ -168,12 +168,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify add_skill, get_skills and remove_skill methods of
         the question domain object."""
         collection_id = 'col1'
-        EXP_ID = '0_exploration_id'
+        exp_id = '0_exploration_id'
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         # Create a new collection and exploration.
         collection_services.save_new_valid_collection(
-            collection_id, owner_id, exploration_id=EXP_ID)
+            collection_id, owner_id, exploration_id=exp_id)
 
         # Add a skill.
         collection_services.update_collection(
