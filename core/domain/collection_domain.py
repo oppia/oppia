@@ -1099,7 +1099,7 @@ class Collection(object):
         """
         index = 0
         for _, skill in self.skills.iteritems():
-            if skill.name == skill_name:        
+            if skill.name == skill_name:
                 skill_index = index
             index += 1
         skill_id = CollectionSkill.get_skill_id_from_index(skill_index)
@@ -1144,7 +1144,7 @@ class Collection(object):
         """
         index = 0
         for _, skill in self.skills.iteritems():
-            if skill.name == skill_name:        
+            if skill.name == skill_name:
                 skill_index = index
             index += 1
         skill_id = CollectionSkill.get_skill_id_from_index(skill_index)

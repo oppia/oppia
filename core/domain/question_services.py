@@ -161,12 +161,12 @@ def apply_change_list(question_id, change_list):
                 elif (change.cmd ==
                       question_domain.QUESTION_PROPERTY_QUESTION_DATA):
                     question.update_question_data(change.new_value)
-                elif (change.cmd == 
+                elif (change.cmd ==
                       question_domain.QUESTION_PROPERTY_ADD_SKILL):
-                    question.add_skill(change.skill_name)
+                    question.add_skill(change.skill_name, change.user_id)
                 elif (change.cmd ==
                       question_domain.QUESTION_PROPERTY_DELETE_SKILL):
-                    question.delete_skill(change.skill_id)
+                    question.remove_skill(change.skill_id, change.user_id)
 
         return question
 
