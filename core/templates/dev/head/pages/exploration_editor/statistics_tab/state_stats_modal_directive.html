@@ -2,7 +2,7 @@
   <h3>Statistics for "<[stateName]>"</h3>
 </div>
 
-<div class="modal-body oppia-state-stats-modal-body" ng-if="enableNewFramework">
+<div class="modal-body oppia-state-stats-modal-body" ng-if="ENABLE_NEW_STATS_FRAMEWORK">
   <div class="oppia-state-stats-warning" ng-if="improvementType">
     <div ng-if="improvementType == 'May be confusing'">
       <i class="material-icons">&#xE002;</i>
@@ -46,7 +46,7 @@
   <div class="section" angular-html-bind="visualizationsHtml"></div>
 </div>
 
-<div class="modal-body oppia-state-stats-modal-body" ng-if="!enableNewFramework">
+<div class="modal-body oppia-state-stats-modal-body" ng-if="!ENABLE_NEW_STATS_FRAMEWORK">
   <div class="oppia-state-stats-warning" ng-if="improvementType">
     <div ng-if="improvementType == 'May be confusing'">
       <i class="material-icons">&#xE002;</i>

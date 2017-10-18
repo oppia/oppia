@@ -701,15 +701,29 @@ class ExplorationStatisticsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            if exploration_version == 'all':
-                exploration_version = current_exploration.version
-            self.render_json(stats_services.get_exploration_stats(
-                exploration_id, exploration_version))
-        else:
-            self.render_json(stats_services_old.get_exploration_stats(
-                current_exploration.id, exploration_version,
-                current_exploration.states))
+        self.render_json(stats_services_old.get_exploration_stats(
+            current_exploration.id, exploration_version,
+            current_exploration.states))
+
+
+class ExplorationStatisticsHandlerV2(EditorHandler):
+    """Returns statistics for an exploration. This is the handler for the new
+    statistics framework.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        try:
+            current_exploration = exp_services.get_exploration_by_id(
+                exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        self.render_json(stats_services.get_exploration_stats(
+            exploration_id, current_exploration.version))
 
 
 class ExplorationStatsVersionsHandler(EditorHandler):

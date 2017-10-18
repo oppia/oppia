@@ -58,7 +58,7 @@ oppia.controller('StatisticsTab', [
         millisSinceEpoch);
     };
 
-    $scope.enableNewFramework = ENABLE_NEW_STATS_FRAMEWORK;
+    $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
     $scope.hasTabLoaded = false;
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
@@ -70,11 +70,16 @@ oppia.controller('StatisticsTab', [
       });
     });
 
-    $scope.hasExplorationBeenVisited = false;
+    $scope.explorationHasBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {
-      $scope.explorationStatisticsUrl = (
-        '/createhandler/statistics/' + explorationData.explorationId +
-        '/' + version);
+      if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
+        $scope.explorationStatisticsUrl = (
+          '/createhandler/statistics_v2/' + explorationData.explorationId);
+      } else {
+        $scope.explorationStatisticsUrl = (
+          '/createhandler/statistics/' + explorationData.explorationId +
+          '/' + version);
+      }
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           explorationData.explorationId).then(function(response) {
@@ -99,7 +104,26 @@ oppia.controller('StatisticsTab', [
             });
           }
         );
-        if (!$scope.enableNewFramework) {
+        // From this point on, all computation done is for the new stats
+        // framework under a development flag.
+        if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
+          var data = response.data;
+          var numStarts = data.num_starts;
+          var numActualStarts = data.num_actual_starts;
+          var numCompletions = data.num_completions;
+          $scope.stateStats = data.state_stats_mapping;
+
+          if (numStarts > 0) {
+            $scope.explorationHasBeenVisited = true;
+          }
+
+          $scope.pieChartData = [
+            ['Type', 'Number'],
+            ['Passerby', numStarts - numActualStarts],
+            ['Completions', numCompletions],
+            ['Non-Completions', numActualStarts - numCompletions]
+          ];
+        } else {
           var data = response.data;
           var numVisits = data.num_starts;
           var numCompletions = data.num_completions;
@@ -108,7 +132,7 @@ oppia.controller('StatisticsTab', [
           $scope.lastUpdated = data.last_updated;
 
           if (numVisits > 0) {
-            $scope.hasExplorationBeenVisited = true;
+            $scope.explorationHasBeenVisited = true;
           }
 
           $scope.chartData = [
@@ -134,30 +158,6 @@ oppia.controller('StatisticsTab', [
           });
 
           $scope.hasTabLoaded = true;
-        }
-
-        // From this point on, all computation done is for the new stats
-        // framework under a development flag.
-        if ($scope.enableNewFramework) {
-          var data = response.data;
-          console.log(data);
-          var numStarts = data.num_starts_v1 + data.num_starts_v2;
-          var numActualStarts = (
-            data.num_actual_starts_v1 + data.num_actual_starts_v2);
-          var numCompletions = (
-            data.num_completions_v1 + data.num_completions_v2);
-          $scope.stateStats = data.state_stats_mapping;
-
-          if (numStarts > 0) {
-            $scope.hasExplorationBeenVisited = true;
-          }
-
-          $scope.pieChartData = [
-            ['Type', 'Number'],
-            ['Passerby', numStarts - numActualStarts],
-            ['Completions', numCompletions],
-            ['Non-Completions', numActualStarts - numCompletions]
-          ];
         }
       });
     };
@@ -199,8 +199,7 @@ oppia.controller('StatisticsTab', [
             function($scope, $modalInstance, $filter, stateName, stateStats,
                 improvementType, visualizationsInfo, HtmlEscaperService,
                 ENABLE_NEW_STATS_FRAMEWORK) {
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = {
-                title: 'Answer feedback statistics',
+              var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                 left: 0,
                 pieHole: 0.6,
                 pieSliceTextStyleColor: 'black',
@@ -211,18 +210,17 @@ oppia.controller('StatisticsTab', [
                 legendPosition: 'right',
                 width: 240
               };
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = {
-                title: 'Solution usage statistics',
-                left: 0,
-                pieHole: 0.6,
-                pieSliceTextStyleColor: 'black',
-                pieSliceBorderColor: 'black',
-                chartAreaWidth: 240,
-                colors: ['#d8d8d8', '#008808', 'blue'],
-                height: 270,
-                legendPosition: 'right',
-                width: 240
-              };
+
+              var title1 = 'Answer feedback statistics';
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = (
+                COMPLETION_RATE_PIE_CHART_OPTIONS);
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1
+
+              var title2 = 'Solution usage statistics';
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = (
+                COMPLETION_RATE_PIE_CHART_OPTIONS);
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2
+
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;

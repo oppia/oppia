@@ -1,6 +1,6 @@
 <div ng-controller="StatisticsTab" ng-cloak>
   <md-card class="oppia-editor-card" ng-if="!loadingMessage">
-    <div ng-if="hasExplorationBeenVisited && enableNewFramework">
+    <div ng-if="explorationHasBeenVisited && ENABLE_NEW_STATS_FRAMEWORK">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
         <pie-chart data="pieChartData"
@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div ng-if="hasExplorationBeenVisited && !enableNewFramework">
+    <div ng-if="explorationHasBeenVisited && !ENABLE_NEW_STATS_FRAMEWORK">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
         <bar-chart data="chartData"
@@ -52,7 +52,7 @@
         </div>
       </div>
     </div>
-    <div ng-if="!hasExplorationBeenVisited">
+    <div ng-if="!explorationHasBeenVisited">
       <em>
         This exploration has not been visited by anyone yet, so there are no statistics to display.
       </em>

@@ -42,10 +42,10 @@ def get_exploration_stats(exp_id, exp_version):
     exploration_stats = get_exploration_stats_by_id(exp_id, exp_version)
 
     if exploration_stats is None:
-        exploration_stats = stats_domain.ExplorationStats(
-            exp_id, exp_version, 0, 0, 0, 0, 0, 0, {})
+        exploration_stats = stats_domain.ExplorationStats.create_default(
+            exp_id, exp_version, {})
 
-    return exploration_stats.to_dict()
+    return exploration_stats.to_frontend_dict()
 
 def update_stats(exp_id, exp_version, state_name, event_type, update_params):
     """Updates ExplorationStatsModel according to the incoming event model.
@@ -102,8 +102,8 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
         for state_name in state_names
     }
 
-    exploration_stats = stats_domain.ExplorationStats(
-        exp_id, exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping)
+    exploration_stats = stats_domain.ExplorationStats.create_default(
+        exp_id, exp_version, state_stats_mapping)
     create_stats_model(exploration_stats)
 
 

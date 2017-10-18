@@ -31,12 +31,10 @@ oppia.factory('StateImprovementSuggestionService', [
         explorationStates.getStateNames().forEach(function(stateName) {
           var stateStats = allStateStats[stateName];
           if (ENABLE_NEW_STATS_FRAMEWORK) {
-            var totalEntryCount = (
-              stateStats.total_hit_count_v1 + stateStats.total_hit_count_v2);
-            var noAnswerSubmittedCount = (totalEntryCount - (
-              stateStats.num_completions_v1 + stateStats.num_completions_v2));
-          }
-          else {
+            var totalEntryCount = stateStats.total_hit_count;
+            var noAnswerSubmittedCount = totalEntryCount - (
+              stateStats.num_completions);
+          } else {
             var totalEntryCount = stateStats.total_entry_count;
             var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
           }
