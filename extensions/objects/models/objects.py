@@ -802,9 +802,7 @@ class Fraction(BaseObject):
             }
         }, {
             'name': 'wholeNumber',
-            'schema': {
-                'type': NonnegativeInt.SCHEMA
-            }
+            'schema': NonnegativeInt.SCHEMA
         }, {
             'name': 'numerator',
             'schema': NonnegativeInt.SCHEMA
