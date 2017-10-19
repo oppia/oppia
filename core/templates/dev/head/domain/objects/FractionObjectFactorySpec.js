@@ -21,8 +21,10 @@
 
    describe('fraction object factory', function() {
      var errors = {
-       InvalidChars: 'Please only use numerical digits, spaces or forward slashes (/)',
-       InvalidFormat: 'Please enter answer in fraction format (e.g. 5/3 or 1 2/3)',
+       InvalidChars:
+         'Please only use numerical digits, spaces or forward slashes (/)',
+       InvalidFormat:
+         'Please enter answer in fraction format (e.g. 5/3 or 1 2/3)',
        DivideByZero: 'Please do not put 0 in the denominator'
      };
      var Fraction = null;
@@ -92,8 +94,6 @@
          new Error(errors.DivideByZero));
        expect(function() {Fraction.parse('1 2 /0')}).toThrow(
          new Error(errors.DivideByZero));
-
      });
-
    });
  });
