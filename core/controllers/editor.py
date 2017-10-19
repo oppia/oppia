@@ -687,7 +687,7 @@ class ExplorationRevertHandler(EditorHandler):
         self.render_json({})
 
 
-class ExplorationStatisticsHandler(EditorHandler):
+class ExplorationStatisticsHandlerOld(EditorHandler):
     """Returns statistics for an exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -706,7 +706,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             current_exploration.states))
 
 
-class ExplorationStatisticsHandlerV2(EditorHandler):
+class ExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration. This is the handler for the new
     statistics framework.
     """

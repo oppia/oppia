@@ -74,10 +74,10 @@ oppia.controller('StatisticsTab', [
     $scope.refreshExplorationStatistics = function(version) {
       if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
         $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics_v2/' + explorationData.explorationId);
+          '/createhandler/statistics/' + explorationData.explorationId);
       } else {
         $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics/' + explorationData.explorationId +
+          '/createhandler/statistics_old/' + explorationData.explorationId +
           '/' + version);
       }
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
@@ -212,12 +212,12 @@ oppia.controller('StatisticsTab', [
               };
 
               var title1 = 'Answer feedback statistics';
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = (
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = angular.copy(
                 COMPLETION_RATE_PIE_CHART_OPTIONS);
               $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1
 
               var title2 = 'Solution usage statistics';
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = (
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = angular.copy(
                 COMPLETION_RATE_PIE_CHART_OPTIONS);
               $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2
 
