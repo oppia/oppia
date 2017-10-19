@@ -31,11 +31,11 @@ import utils
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class MigrateStatisticsTest(test_utils.GenericTestBase):
+class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
     """Tests for the one-off migration job for stats events."""
 
     def setUp(self):
-        super(MigrateStatisticsTest, self).setUp()
+        super(GenerateV1StatisticsJobTest, self).setUp()
 
         self.exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -78,14 +78,54 @@ class MigrateStatisticsTest(test_utils.GenericTestBase):
             'TextInput', 0, 0, exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
             'session_id2', 0, {}, 'answer2')
 
+    def test_creation_of_stats_model_for_v1(self):
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exploration.version)
+        self.assertEqual(exploration_stats.num_starts_v1, 2)
+        self.assertEqual(exploration_stats.num_completions_v1, 1)
+        self.assertEqual(exploration_stats.num_actual_starts_v1, 1)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].first_hit_count_v1, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].first_hit_count_v1, 1)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].total_hit_count_v1, 3)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].total_hit_count_v1, 1)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].num_completions_v1, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].num_completions_v1, 1)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].total_answers_count_v1, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].total_answers_count_v1,
+            0)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].useful_feedback_count_v1, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'End'].useful_feedback_count_v1, 0)
+
+    def test_creation_of_stats_model_for_addition(self):
         # Update exploration to version 2.
         change_list = [{
-            'cmd': 'add_state',
+            'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state',
-        }, {
-            'cmd': 'rename_state',
-            'old_state_name': 'New state',
-            'new_state_name': 'Renamed state'
         }]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
@@ -100,7 +140,7 @@ class MigrateStatisticsTest(test_utils.GenericTestBase):
             self.exp_id, self.exploration.version, 'Home', 'session_id3',
             {}, feconf.PLAY_TYPE_NORMAL)
         stats_models.StateHitEventLogEntryModel.create(
-            self.exp_id, self.exploration.version, 'Renamed state',
+            self.exp_id, self.exploration.version, 'New state',
             'session_id3', {}, feconf.PLAY_TYPE_NORMAL)
         stats_models.StateHitEventLogEntryModel.create(
             self.exp_id, self.exploration.version, 'End', 'session_id3',
@@ -113,17 +153,16 @@ class MigrateStatisticsTest(test_utils.GenericTestBase):
             'TextInput', 0, 0, exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
             'session_id3', 0, {}, 'answer2')
         event_services.AnswerSubmissionEventHandler.record(
-            self.exp_id, self.exploration.version, 'Renamed state',
+            self.exp_id, self.exploration.version, 'New state',
             'TextInput', 0, 0, exp_domain.EXPLICIT_CLASSIFICATION,
             'session_id3', 0, {}, 'answer3')
         event_services.AnswerSubmissionEventHandler.record(
-            self.exp_id, self.exploration.version, 'Renamed state',
+            self.exp_id, self.exploration.version, 'New state',
             'TextInput', 0, 0, exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
             'session_id3', 0, {}, 'answer4')
 
-    def test_creation_of_stats_model(self):
-        job_id = stats_jobs_one_off.MigrateStatistics.create_new()
-        stats_jobs_one_off.MigrateStatistics.enqueue(job_id)
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
 
         self.assertEqual(self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
@@ -141,7 +180,7 @@ class MigrateStatisticsTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping['End'].first_hit_count_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].first_hit_count_v1, 1)
+                'New state'].first_hit_count_v1, 1)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping['Home'].total_hit_count_v1, 4)
@@ -149,7 +188,7 @@ class MigrateStatisticsTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping['End'].total_hit_count_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].total_hit_count_v1, 1)
+                'New state'].total_hit_count_v1, 1)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping['Home'].num_completions_v1, 3)
@@ -157,7 +196,7 @@ class MigrateStatisticsTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping['End'].num_completions_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].num_completions_v1, 1)
+                'New state'].num_completions_v1, 1)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping[
@@ -167,7 +206,7 @@ class MigrateStatisticsTest(test_utils.GenericTestBase):
             0)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].total_answers_count_v1, 2)
+                'New state'].total_answers_count_v1, 2)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping[
@@ -177,4 +216,49 @@ class MigrateStatisticsTest(test_utils.GenericTestBase):
                 'End'].useful_feedback_count_v1, 0)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'Renamed state'].useful_feedback_count_v1, 1)
+                'New state'].useful_feedback_count_v1, 1)
+
+    def test_creation_of_stats_model_for_deletion(self):
+        # Update exploration to version 2.
+        change_list = [{
+            'cmd': exp_domain.CMD_DELETE_STATE,
+            'state_name': 'End',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exploration.version)
+        self.assertEqual(exploration_stats.num_starts_v1, 2)
+        self.assertEqual(exploration_stats.num_completions_v1, 1)
+        # Deletion of 'End' state makes the exploration a one-state exploration,
+        # thus making num_actual_starts equal to num_starts.
+        self.assertEqual(exploration_stats.num_actual_starts_v1, 2)
+
+        self.assertFalse('End' in exploration_stats.state_stats_mapping)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].first_hit_count_v1, 2)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].total_hit_count_v1, 3)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].num_completions_v1, 2)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].total_answers_count_v1, 2)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].useful_feedback_count_v1, 1)

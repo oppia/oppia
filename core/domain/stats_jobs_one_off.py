@@ -33,9 +33,12 @@ import utils
 ])
 
 
-class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off migration of existing event model instance to generate
-    ExplorationStatsModel instances for all existing explorations.
+class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off migration of existing event model instances to generate
+    ExplorationStatsModel instances for all existing explorations. This job
+    will handle only event models with event schema version 1. This job will
+    exclusively update only the *_v1 fields of the analytics model so that
+    future re-computation would not be needed.
     """
 
     EVENT_TYPE_STATE_ANSWERS = 'state_answers'
@@ -74,8 +77,7 @@ class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
                         'version': str. Version of the exploration.
                         'state_name': str. Name of the state.
                         'session_id': str. ID of the session.
-                        'created_on': How many milliseconds ago the event was
-                            created.
+                        'created_on': milliseconds since Epoch.
                     }
             tuple. For StateAnswersModel, a 2-tuple of the form
                 (exp_id, value).
@@ -89,18 +91,16 @@ class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
                     }
         """
         if isinstance(item, stats_models.StartExplorationEventLogEntryModel):
-            yield(
-                item.exploration_id,
-                {'event_type': feconf.EVENT_TYPE_START_EXPLORATION})
+            yield (item.exploration_id, {
+                'event_type': feconf.EVENT_TYPE_START_EXPLORATION
+            })
 
         elif isinstance(
                 item, stats_models.CompleteExplorationEventLogEntryModel):
-            yield(
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-                    'session_id': item.session_id
-                })
+            yield (item.exploration_id, {
+                'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+                'session_id': item.session_id
+            })
 
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
             value = {
@@ -110,36 +110,29 @@ class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
                 'session_id': item.session_id,
                 'created_on': utils.get_time_in_millisecs(item.created_on)
             }
-            yield(item.exploration_id, value)
+            yield (item.exploration_id, value)
 
         else:
             value = {
-                'event_type': MigrateStatistics.EVENT_TYPE_STATE_ANSWERS,
+                'event_type': GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
                 'version': item.exploration_version,
                 'state_name': item.state_name,
                 'submitted_answer_list': item.submitted_answer_list
             }
-            yield(item.exploration_id, value)
+            yield (item.exploration_id, value)
 
     @staticmethod
-    def reduce(key, stringified_values):
+    def reduce(exp_id, stringified_values):
         num_starts = 0
         num_completions = 0
 
-        exp_id = key
         exploration = exp_services.get_exploration_by_id(exp_id)
         latest_exp_version = exploration.version
 
-        # Check if model already exists. If it does, delete it.
-        exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
-            exp_id, latest_exp_version)
-        if exploration_stats_model is not None:
-            exploration_stats_model.delete()
-
         # The list of state hit events in stringified_values.
-        values_state_hit = []
+        state_hit_event_dicts = []
         # The list of state answers instances in stringified_values.
-        values_state_answer = []
+        state_answer_event_dicts = []
         # The list of session_ids of learners completing an exploration.
         completed_session_ids = []
         for value_str in stringified_values:
@@ -151,26 +144,32 @@ class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
                 num_completions += 1
                 completed_session_ids.append(value['session_id'])
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
-                values_state_hit.append(value)
+                state_hit_event_dicts.append(value)
             elif value['event_type'] == (
-                    MigrateStatistics.EVENT_TYPE_STATE_ANSWERS):
-                values_state_answer.append(value)
+                    GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS):
+                state_answer_event_dicts.append(value)
 
+        # This dict will store the cumulative values of state stats from version
+        # 1 till the latest version of an exploration.
         state_stats_mapping = {}
-        # Sort list of state hit events in increasing order of it's timestamp.
-        values_state_hit = sorted(values_state_hit, key=lambda k: k[
+        # Sort list of state hit events in increasing order of timestamp.
+        state_hit_event_dicts = sorted(state_hit_event_dicts, key=lambda e: e[
             'created_on'])
         for version in range(1, latest_exp_version+1):
-            values_state_hit_versioned = [
-                val for val in values_state_hit if val['version'] == version]
-            values_state_answer_versioned = [
-                val for val in values_state_answer if val['version'] == version]
-            exploration_versioned = exp_services.get_exploration_by_id(
-                exp_id, version)
+            print version
+            state_hit_events_for_this_version = [
+                val for val in state_hit_event_dicts if val[
+                    'version'] == version]
+            state_answer_events_for_this_version = [
+                val for val in state_answer_event_dicts if val[
+                    'version'] == version]
+            versioned_exploration = exp_services.get_exploration_by_id(
+                exp_id, version=version)
 
             if version == 1:
                 # Create default state stats mapping for the first version.
-                for state_name in exploration_versioned.states:
+                for state_name in versioned_exploration.states:
+                    print state_name
                     state_stats_mapping[state_name] = (
                         stats_domain.StateStats.create_default())
             else:
@@ -190,41 +189,49 @@ class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
                             state_stats_mapping.pop(
                                 change_dict['old_state_name']))
 
+            # Dict mapping each session ID to the list of state hit events for
+            # that session.
+            state_hit_events_session_id_mapping = {}
             # Dict mapping each state name of the exploration and the list of
             # unique session IDs that have entered that state.
             state_session_ids = {
-                state_name: [] for state_name in exploration_versioned.states
+                state_name: [] for state_name in versioned_exploration.states
             }
             session_ids_set = set()
             # Compute total_hit_count and first_hit_count for the states.
-            for value in values_state_hit_versioned:
-                state_name = value['state_name']
+            for state_hit_event in state_hit_events_for_this_version:
+                state_name = state_hit_event['state_name']
                 state_stats_mapping[state_name].total_hit_count_v1 += 1
-                if value['session_id'] not in state_session_ids[state_name]:
+                if state_hit_event['session_id'] not in state_session_ids[
+                        state_name]:
                     state_stats_mapping[state_name].first_hit_count_v1 += 1
-                    state_session_ids[state_name].append(value['session_id'])
-                    session_ids_set.add(value['session_id'])
+                    state_session_ids[state_name].append(state_hit_event[
+                        'session_id'])
+                    session_ids_set.add(state_hit_event['session_id'])
+                if state_hit_event['session_id'] not in (
+                        state_hit_events_session_id_mapping):
+                    state_hit_events_session_id_mapping[state_hit_event[
+                        'session_id']] = []
+                state_hit_events_session_id_mapping[state_hit_event[
+                    'session_id']].append(state_hit_event)
 
             # Compute num_completions for the states.
             for session_id in session_ids_set:
-                values_state_hit_sessioned = [
-                    val for val in values_state_hit_versioned if val[
-                        'session_id'] == session_id]
+                state_hit_event_dicts_sessioned = (
+                    state_hit_events_session_id_mapping[session_id])
                 # All states in the above list except the last element (only if
                 # complete exploration event doesn't exist for the session ID)
                 # are counted as completed because they are ordered by their
                 # timestamp.
-                if session_id not in completed_session_ids:
-                    for value in values_state_hit_sessioned[:-1]:
-                        state_stats_mapping[value[
-                            'state_name']].num_completions_v1 += 1
-                else:
-                    for value in values_state_hit_sessioned:
-                        state_stats_mapping[value[
-                            'state_name']].num_completions_v1 += 1
+                for state_hit_event in state_hit_event_dicts_sessioned[:-1]:
+                    state_stats_mapping[state_hit_event[
+                        'state_name']].num_completions_v1 += 1
+                if session_id in completed_session_ids:
+                    state_stats_mapping[state_hit_event_dicts_sessioned[-1][
+                        'state_name']].num_completions_v1 += 1
 
             # Compute total_answers_count and useful_feedback_count.
-            for value in values_state_answer_versioned:
+            for value in state_answer_events_for_this_version:
                 for answer in value['submitted_answer_list']:
                     state_stats_mapping[value[
                         'state_name']].total_answers_count_v1 += 1
@@ -234,20 +241,41 @@ class MigrateStatistics(jobs.BaseMapReduceOneOffJobManager):
                             'state_name']].useful_feedback_count_v1 += 1
 
         # Now that the stats for the complete exploration are computed,
-        # calculate num_actual_starts.
-        num_actual_starts = state_stats_mapping[
-            exploration.states[
-                exploration.init_state_name].interaction.answer_groups[
-                    0].outcome.dest].first_hit_count_v1
+        # calculate num_actual_starts. To compute this, we take the max of the
+        # first hit counts of all states that the initial state leads to.
+        max_first_hit_from_init_state = 0
+        for answer_group in exploration.states[
+                exploration.init_state_name].interaction.answer_groups:
+            if answer_group.outcome.dest != exploration.init_state_name:
+                if state_stats_mapping[
+                        answer_group.outcome.dest].first_hit_count_v1 > (
+                            max_first_hit_from_init_state):
+                    max_first_hit_from_init_state = state_stats_mapping[
+                        answer_group.outcome.dest].first_hit_count_v1
+        if max_first_hit_from_init_state == 0:
+            num_actual_starts = num_starts
+        else:
+            num_actual_starts = max_first_hit_from_init_state
 
-        # Create the ExplorationStatsModel instance.
-        exploration_stats = stats_domain.ExplorationStats(
-            exp_id, latest_exp_version, num_starts, 0, num_actual_starts, 0,
-            num_completions, 0, state_stats_mapping)
-        stats_services.create_stats_model(exploration_stats)
+        # Check if model already exists. If it does, update it, otherwise
+        # create a fresh ExplorationStatsModel instance.
+        exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
+            exp_id, latest_exp_version)
+        if exploration_stats_model is not None:
+            exploration_stats = stats_domain.ExplorationStats(
+                exp_id, latest_exp_version, num_starts,
+                exploration_stats_model.num_starts_v2, num_actual_starts,
+                exploration_stats_model.num_actual_starts_v2, num_completions,
+                exploration_stats_model.num_completions_v2, state_stats_mapping)
+            stats_services.save_stats_model(exploration_stats_model)
+        else:
+            exploration_stats = stats_domain.ExplorationStats(
+                exp_id, latest_exp_version, num_starts, 0, num_actual_starts, 0,
+                num_completions, 0, state_stats_mapping)
+            stats_services.create_stats_model(exploration_stats)
 
 
-class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
+class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
     """A one-off statistics audit.
 
     Performs a brief audit of exploration stats values to ensure that they
@@ -260,21 +288,12 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def require_non_negative(
-            cls, exp_id, property_name, value, state_name=None):
-        if not state_name:
-            if value[property_name] < 0:
-                yield (
-                    'Negative %s count: exp_id:%s version:%s %s:%s' % (
-                        property_name, exp_id, value['version'], property_name,
-                        value[property_name]),)
-        else:
-            if value['state_stats_mapping'][state_name][property_name] < 0:
-                yield (
-                    'Negative %s count: exp_id:%s version:%s state:%s %s:%s' % (
-                        property_name, exp_id, value['version'], state_name,
-                        property_name,
-                        value['state_stats_mapping'][state_name][
-                            property_name]),)
+            cls, exp_id, exp_version, property_name, value, state_name=None):
+        state_name = state_name if state_name else ''
+        if value[property_name] < 0:
+            yield (
+                'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
+                    exp_id, exp_version, property_name, state_name, value))
 
     @staticmethod
     def map(item):
@@ -288,131 +307,139 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
                 (exp_id, value) where value is of the form:
                     {
                         'version': int. Version of the exploration.
-                        'num_starts': int. # of times exploration was started.
-                        'num_completions': int. # of times exploration was
+                        'num_starts_v1': int. # of times exploration was
+                            started.
+                        'num_completions_v1': int. # of times exploration was
                             completed.
-                        'num_actual_starts': int. # of times exploration was
+                        'num_actual_starts_v1': int. # of times exploration was
                             actually started.
                         'state_stats_mapping': A dict containing the values of
                             stats for the states of the exploration. It is
                             formatted as follows:
                             {
                                 state_name: {
-                                    'total_answers_count',
-                                    'useful_feedback_count',
-                                    'total_hit_count',
-                                    'first_hit_count',
-                                    'num_completions'
+                                    'total_answers_count_v1',
+                                    'useful_feedback_count_v1',
+                                    'total_hit_count_v1',
+                                    'first_hit_count_v1',
+                                    'num_completions_v1'
                                 }
                             }
                     }
         """
         reduced_state_stats_mapping = {
             state_name: {
-                'total_answers_count': item.state_stats_mapping[state_name][
+                'total_answers_count_v1': item.state_stats_mapping[state_name][
                     'total_answers_count_v1'],
-                'useful_feedback_count': item.state_stats_mapping[state_name][
-                    'useful_feedback_count_v1'],
-                'total_hit_count': item.state_stats_mapping[state_name][
+                'useful_feedback_count_v1': item.state_stats_mapping[
+                    state_name]['useful_feedback_count_v1'],
+                'total_hit_count_v1': item.state_stats_mapping[state_name][
                     'total_hit_count_v1'],
-                'first_hit_count': item.state_stats_mapping[state_name][
+                'first_hit_count_v1': item.state_stats_mapping[state_name][
                     'first_hit_count_v1'],
-                'num_completions': item.state_stats_mapping[state_name][
+                'num_completions_v1': item.state_stats_mapping[state_name][
                     'num_completions_v1']
             } for state_name in item.state_stats_mapping
         }
 
-        yield(
-            item.exp_id,
-            {
-                'version': item.exp_version,
-                'num_starts': item.num_starts_v1,
-                'num_completions': item.num_completions_v1,
-                'num_actual_starts': item.num_actual_starts_v1,
-                'state_stats_mapping': reduced_state_stats_mapping
-            })
+        yield (item.exp_id, {
+            'exp_version': item.exp_version,
+            'num_starts_v1': item.num_starts_v1,
+            'num_completions_v1': item.num_completions_v1,
+            'num_actual_starts_v1': item.num_actual_starts_v1,
+            'state_stats_mapping': reduced_state_stats_mapping
+        })
 
     @staticmethod
-    def reduce(key, stringified_values):
-        for value in stringified_values:
-            value = ast.literal_eval(value)
-            version = value['version']
+    def reduce(exp_id, stringified_values):
+        for exp_stats in stringified_values:
+            exp_stats = ast.literal_eval(exp_stats)
+            exp_version = exp_stats['exp_version']
 
-            num_starts = value['num_starts']
-            num_completions = value['num_completions'],
-            num_actual_starts = value['num_actual_starts']
+            num_starts_v1 = exp_stats['num_starts_v1']
+            num_completions_v1 = exp_stats['num_completions_v1'],
+            num_actual_starts_v1 = exp_stats['num_actual_starts_v1']
 
-            StatisticsAuditV2.require_non_negative(key, 'num_starts', value)
-            StatisticsAuditV2.require_non_negative(
-                key, 'num_completions', value)
-            StatisticsAuditV2.require_non_negative(
-                key, 'num_actual_starts', value)
+            StatisticsAuditV1.require_non_negative(
+                exp_id, exp_version, 'num_starts_v1', num_starts_v1)
+            StatisticsAuditV1.require_non_negative(
+                exp_id, exp_version, 'num_completions_v1', num_completions_v1)
+            StatisticsAuditV1.require_non_negative(
+                exp_id, exp_version, 'num_actual_starts_v1',
+                num_actual_starts_v1)
 
             # Number of starts must never be less than the number of
             # completions.
-            if num_starts < num_completions:
-                yield ('Completions > starts: exp_id:%s version:%s %s>%s' % (
-                    key, version, num_completions, num_starts),)
+            if num_starts_v1 < num_completions_v1:
+                yield ('Completions > starts: exp_id:%s version:%s %s > %s' % (
+                    exp_id, exp_version, num_completions_v1, num_starts_v1),)
 
             # Number of actual starts must never be less than the number of
             # completions.
-            if num_actual_starts < num_completions:
-                yield ('Completions > actual starts: exp_id:%s version:%s %s>%s' % ( # pylint: disable=line-too-long
-                    key, version, num_completions, num_actual_starts),)
+            if num_actual_starts_v1 < num_completions_v1:
+                yield ('Completions > actual starts: exp_id:%s version:%s %s > %s' % ( # pylint: disable=line-too-long
+                    exp_id, exp_version, num_completions_v1,
+                    num_actual_starts_v1),)
 
             # Number of starts must never be less than the number of actual
             # starts.
-            if num_starts < num_actual_starts:
-                yield ('Actual starts > starts: exp_id:%s version:%s %s>%s' % (
-                    key, version, num_actual_starts, num_starts),)
+            if num_starts_v1 < num_actual_starts_v1:
+                yield ('Actual starts > starts: exp_id:%s version:%s %s > %s' % ( # pylint: disable=line-too-long
+                    exp_id, exp_version, num_actual_starts_v1, num_starts_v1),)
 
-            for state_name in value['state_stats_mapping']:
-                state_stats = value['state_stats_mapping'][state_name]
+            for state_name in exp_stats['state_stats_mapping']:
+                state_stats = exp_stats['state_stats_mapping'][state_name]
 
-                total_answers_count = state_stats['total_answers_count']
-                useful_feedback_count = state_stats['useful_feedback_count']
-                total_hit_count = state_stats['total_hit_count']
-                first_hit_count = state_stats['first_hit_count']
-                num_completions = state_stats['num_completions']
+                total_answers_count_v1 = state_stats['total_answers_count_v1']
+                useful_feedback_count_v1 = state_stats[
+                    'useful_feedback_count_v1']
+                total_hit_count_v1 = state_stats['total_hit_count_v1']
+                first_hit_count_v1 = state_stats['first_hit_count_v1']
+                num_completions_v1 = state_stats['num_completions_v1']
 
-                StatisticsAuditV2.require_non_negative(
-                    key, 'total_answers_count', value, state_name)
-                StatisticsAuditV2.require_non_negative(
-                    key, 'useful_feedback_count', value, state_name)
-                StatisticsAuditV2.require_non_negative(
-                    key, 'total_hit_count', value, state_name)
-                StatisticsAuditV2.require_non_negative(
-                    key, 'first_hit_count', value, state_name)
-                StatisticsAuditV2.require_non_negative(
-                    key, 'num_completions', value, state_name)
+                StatisticsAuditV1.require_non_negative(
+                    exp_id, exp_version, 'total_answers_count_v1',
+                    total_answers_count_v1, state_name)
+                StatisticsAuditV1.require_non_negative(
+                    exp_id, exp_version, 'useful_feedback_count_v1',
+                    useful_feedback_count_v1, state_name)
+                StatisticsAuditV1.require_non_negative(
+                    exp_id, exp_version, 'total_hit_count_v1',
+                    total_hit_count_v1, state_name)
+                StatisticsAuditV1.require_non_negative(
+                    exp_id, exp_version, 'first_hit_count_v1',
+                    first_hit_count_v1, state_name)
+                StatisticsAuditV1.require_non_negative(
+                    exp_id, exp_version, 'num_completions_v1',
+                    num_completions_v1, state_name)
 
                 # The total number of answers submitted can never be less than
                 # the number of submitted answers for which useful feedback was
                 # given.
-                if total_answers_count < useful_feedback_count:
+                if total_answers_count_v1 < useful_feedback_count_v1:
                     yield (
                         'Total answers < Answers with useful feedback: '
-                        'exp_id:%s version:%s state:%s %s>%s' % (
-                            key, version, state_name, total_answers_count,
-                            useful_feedback_count),)
+                        'exp_id:%s version:%s state:%s %s > %s' % (
+                            exp_id, exp_version, state_name,
+                            total_answers_count_v1, useful_feedback_count_v1),)
 
                 # The total hit count for a state can never be less than the
                 # number of times the state was hit for the first time.
-                if total_hit_count < first_hit_count:
+                if total_hit_count_v1 < first_hit_count_v1:
                     yield (
                         'Total state hits < First state hits: '
-                        'exp_id:%s version:%s state:%s %s>%s' % (
-                            key, version, state_name, total_hit_count,
-                            first_hit_count),)
+                        'exp_id:%s version:%s state:%s %s > %s' % (
+                            exp_id, exp_version, state_name, total_hit_count_v1,
+                            first_hit_count_v1),)
 
                 # The total hit count for a state can never be less than the
                 # total number of times the state was completed.
-                if total_hit_count < num_completions:
+                if total_hit_count_v1 < num_completions_v1:
                     yield (
                         'Total state hits < Total state completions: '
-                        'exp_id:%s version:%s state:%s %s>%s' % (
-                            key, version, state_name, total_hit_count,
-                            num_completions),)
+                        'exp_id:%s version:%s state:%s %s > %s' % (
+                            exp_id, exp_version, state_name, total_hit_count_v1,
+                            num_completions_v1),)
 
 
 class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
