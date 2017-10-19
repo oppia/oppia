@@ -21,7 +21,7 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var admin = require('../protractor_utils/admin.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
@@ -31,7 +31,11 @@ var _selectLanguage = function(language) {
 };
 
 describe('Site language', function() {
+  var adminPage = null;
+
   beforeEach(function() {
+    adminPage = new AdminPage.AdminPage();
+
     // Starting language is English
     browser.get('/about');
     _selectLanguage('English');
@@ -105,7 +109,7 @@ describe('Site language', function() {
     users.login('mangue@example.com', true);
     browser.get('/about');
     _selectLanguage('Español');
-    admin.reloadExploration('protractor_test_1.yaml');
+    adminPage.reloadExploration('protractor_test_1.yaml');
     // Open exploration
     general.openPlayer('12');
     // Spanish is still selected

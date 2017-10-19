@@ -16,7 +16,7 @@
  * @fileoverview End-to-end tests for the learner dashboard page.
  */
 
-var admin = require('../protractor_utils/admin.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
@@ -28,12 +28,14 @@ var users = require('../protractor_utils/users.js');
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
+  var adminPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 
   beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     // Create a new learner.
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
     users.createUser(
@@ -43,13 +45,8 @@ describe('Learner dashboard functionality', function() {
 
     var USERNAME = 'creator1learnerDashboard';
     users.createAndLoginAdminUser('creator1@learnerDashboard.com', USERNAME);
-    browser.get(general.ADMIN_URL_SUFFIX);
-    // Load all the demo explorations.
-    element.all(by.css(
-      '.protractor-test-reload-all-explorations-button')).first().click();
-    general.acceptAlert();
-    browser.waitForAngular();
-    admin.updateRole(USERNAME, 'collection editor');
+    adminPage.reloadAllExplorations();
+    adminPage.updateRole(USERNAME, 'collection editor');
     browser.get(general.SERVER_URL_PREFIX);
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();
