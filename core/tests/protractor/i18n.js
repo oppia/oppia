@@ -16,12 +16,14 @@
  * @fileoverview End-to-end tests of the i18n platform and the completion of
  * translations.
  *
- * @author Milagro Teruel (milagro.teruel@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
+var workflow = require('../protractor_utils/workflow.js');
+var editor = require('../protractor_utils/editor.js');
+var forms = require('../protractor_utils/forms.js');
 
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
@@ -105,10 +107,14 @@ describe('Site language', function() {
     users.login('mangue@example.com', true);
     browser.get('/about');
     _selectLanguage('Español');
-    admin.reloadExploration('protractor_test_1.yaml');
-    // Open exploration
-    general.openPlayer('12');
-    // Spanish is still selected
+
+    // Create an exploration.
+    workflow.createExploration();
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('Misc testing'));
+    // Set it with numeric input.
+    editor.setInteraction('NumericInput');
+
     var placeholder = element(by.css('.protractor-test-float-form-input'))
       .getAttribute('placeholder');
     expect(placeholder).toEqual('Ingresa un número');

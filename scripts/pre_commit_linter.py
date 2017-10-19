@@ -111,9 +111,9 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
-BAD_PATTERNS_APP_YAML = {
-    'MINIFICATION: true': {
-        'message': 'Please set the MINIFICATION env variable in app.yaml'
+REQUIRED_STRINGS_FECONF = {
+    'FORCE_PROD_MODE = False': {
+        'message': 'Please set the FORCE_PROD_MODE variable in feconf.py '
                    'to False before committing.',
         'excluded_files': ()}
 }
@@ -539,13 +539,13 @@ def _check_bad_patterns(all_files):
                                 filename,
                                 regexp['message'])
                             total_error_count += 1
-            if filename == 'app.yaml':
-                for pattern in BAD_PATTERNS_APP_YAML:
-                    if pattern in content:
+            if filename == 'feconf.py':
+                for pattern in REQUIRED_STRINGS_FECONF:
+                    if pattern not in content:
                         failed = True
                         print '%s --> %s' % (
                             filename,
-                            BAD_PATTERNS_APP_YAML[pattern]['message'])
+                            REQUIRED_STRINGS_FECONF[pattern]['message'])
                         total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED

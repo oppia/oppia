@@ -108,7 +108,9 @@ script:
 - if [ $RUN_E2E_TESTS_LIBRARY_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
 - if [ $RUN_E2E_TESTS_MISC_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="misc" --prod_env; fi
 - if [ $RUN_E2E_TESTS_USERS_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
-- if [ $RUN_E2E_TESTS_EMBEDDING_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env; fi
+# This is commented out because in production exploration can not be reloaded.
+# TODO: create new exploration and make sure all test are running as in development env.
+# - if [ $RUN_E2E_TESTS_EMBEDDING_PROD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env; fi
 
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi
