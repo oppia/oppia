@@ -67,13 +67,11 @@ def _apply_changes_to_feconf():
 def _update_feconf():
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
-    # REPLACE
-    # common.verify_local_repo_is_clean()
     assert common.get_current_branch_name().startswith('release-')
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
 
     _apply_changes_to_feconf()
-    print 'Done!'
+    print 'Done! Please check manually to ensure all the changes are correct.'
 
 
 if __name__ == '__main__':
