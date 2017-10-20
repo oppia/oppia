@@ -156,7 +156,6 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         state_hit_event_dicts = sorted(state_hit_event_dicts, key=lambda e: e[
             'created_on'])
         for version in range(1, latest_exp_version+1):
-            print version
             state_hit_events_for_this_version = [
                 val for val in state_hit_event_dicts if val[
                     'version'] == version]
@@ -219,10 +218,13 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             for session_id in session_ids_set:
                 state_hit_event_dicts_sessioned = (
                     state_hit_events_session_id_mapping[session_id])
-                # All states in the above list except the last element (only if
-                # complete exploration event doesn't exist for the session ID)
-                # are counted as completed because they are ordered by their
-                # timestamp.
+                # All state hit events in the above list are ordered by their
+                # timestamp. This implies that the last state hit event is the
+                # state at which the learner quit the exploration (This is only
+                # True if the last state hit event is not the terminal state).
+                # So, if the last state is not the terminal state, we increment
+                # num_completions for all states except the last state.
+                # Otherwise, we increment num_completions for all the states.
                 for state_hit_event in state_hit_event_dicts_sessioned[:-1]:
                     state_stats_mapping[state_hit_event[
                         'state_name']].num_completions_v1 += 1
@@ -242,7 +244,11 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Now that the stats for the complete exploration are computed,
         # calculate num_actual_starts. To compute this, we take the max of the
-        # first hit counts of all states that the initial state leads to.
+        # first hit counts of all states that the initial state leads to. The
+        # max is taken instead of sum because the sum of first_hit_counts
+        # will sometimes end up counting a single learner twice. The max of both
+        # first hit counts ensures that we are counting only unique learners
+        # who traversed past the initial state.
         max_first_hit_from_init_state = 0
         for answer_group in exploration.states[
                 exploration.init_state_name].interaction.answer_groups:
