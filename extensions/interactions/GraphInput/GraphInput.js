@@ -202,9 +202,9 @@ oppia.directive('graphViz', function() {
     },
     templateUrl: 'graphViz/graphVizSvg',
     controller: [
-      '$scope', '$element', '$attrs', '$document', 'focusService',
+      '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
       'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
-      function($scope, $element, $attrs, $document, focusService,
+      function($scope, $element, $attrs, $document, FocusManagerService,
           graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
         var _MODES = {
           MOVE: 0,
@@ -478,12 +478,12 @@ oppia.directive('graphViz', function() {
 
         var beginEditVertexLabel = function(index) {
           $scope.state.selectedVertex = index;
-          focusService.setFocus('vertexLabelEditBegun');
+          FocusManagerService.setFocus('vertexLabelEditBegun');
         };
 
         var beginEditEdgeWeight = function(index) {
           $scope.state.selectedEdge = index;
-          focusService.setFocus('edgeWeightEditBegun');
+          FocusManagerService.setFocus('edgeWeightEditBegun');
         };
 
         var deleteEdge = function(index) {

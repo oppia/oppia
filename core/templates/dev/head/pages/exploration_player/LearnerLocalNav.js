@@ -15,18 +15,24 @@
 /**
  * @fileoverview Controller for the local navigation in the learner view.
  */
+
 oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
   '$scope', '$modal', '$http', 'ExplorationPlayerService', 'alertsService',
-  'UrlInterpolationService', 'focusService', 'FLAG_EXPLORATION_URL_TEMPLATE',
-  function($scope, $modal, $http, ExplorationPlayerService, alertsService,
-    UrlInterpolationService, focusService, FLAG_EXPLORATION_URL_TEMPLATE) {
+  'FocusManagerService', 'UrlInterpolationService',
+  'FLAG_EXPLORATION_URL_TEMPLATE',
+  function(
+    $scope, $modal, $http, ExplorationPlayerService, alertsService,
+    FocusManagerService, UrlInterpolationService,
+    FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
       $modal.open({
-        templateUrl: 'modals/learnerViewSuggestion',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_player/' +
+          'learner_view_suggestion_modal_directive.html'),
         backdrop: 'static',
         resolve: {},
         controller: [
@@ -70,7 +76,9 @@ oppia.controller('LearnerLocalNav', [
           alertsService.addWarning(res);
         });
         $modal.open({
-          templateUrl: 'modals/learnerSuggestionSubmitted',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/' +
+            'learner_suggestion_submitted_modal_directive.html'),
           backdrop: true,
           resolve: {},
           controller: [
@@ -99,7 +107,7 @@ oppia.controller('LearnerLocalNav', [
             $scope.showFlagMessageTextarea = function(value) {
               if (value) {
                 $scope.flagMessageTextareaIsShown = true;
-                focusService.setFocus('flagMessageTextarea');
+                FocusManagerService.setFocus('flagMessageTextarea');
               }
             };
 
