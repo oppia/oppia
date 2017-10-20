@@ -225,14 +225,12 @@ oppia.controller('StatisticsTab', [
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
 
-              $scope.enableNewFramework = ENABLE_NEW_STATS_FRAMEWORK;
+              $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
 
               var usefulFeedbackCount = (
-                $scope.stateStats.useful_feedback_count_v1 + (
-                  $scope.stateStats.useful_feedback_count_v2));
+                $scope.stateStats.useful_feedback_count);
               var totalAnswersCount = (
-                $scope.stateStats.total_answers_count_v1 + (
-                  $scope.stateStats.total_answers_count_v2));
+                $scope.stateStats.total_answers_count);
               if (totalAnswersCount > 0) {
                 $scope.hasExplorationBeenAnswered = true;
               }
@@ -243,7 +241,7 @@ oppia.controller('StatisticsTab', [
               ];
 
               var numTimesSolutionViewed = (
-                $scope.stateStats.num_times_solution_viewed_v2);
+                $scope.stateStats.num_times_solution_viewed);
               $scope.pieChartData2 = [
                 ['Type', 'Number'],
                 ['Solutions used to answer', numTimesSolutionViewed],

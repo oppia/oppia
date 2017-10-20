@@ -128,6 +128,7 @@ oppia.factory('ExplorationPlayerService', [
       if (!_editorPreviewMode) {
         StatsReportingService.recordExplorationStarted(
           exploration.initStateName, newParams);
+        console.log('Exploration started');
         visitedStateNames.push(exploration.initStateName);
       }
 
@@ -156,6 +157,7 @@ oppia.factory('ExplorationPlayerService', [
     // exploration.
     $rootScope.$on('playerStateChange', function(evt, newStateName) {
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
+        console.log('Exploration completed');
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
       }
@@ -317,6 +319,7 @@ oppia.factory('ExplorationPlayerService', [
             interactionRulesService));
 
         if (!_editorPreviewMode) {
+          console.log('Answer submitted');
           StatsReportingService.recordAnswerSubmitted(
             oldStateName,
             LearnerParamsService.getAllParams(),
@@ -375,20 +378,29 @@ oppia.factory('ExplorationPlayerService', [
         if (!_editorPreviewMode) {
           var isFirstHit = Boolean(visitedStateNames.indexOf(
             newStateName) === -1);
-          StatsReportingService.recordStateTransition(
-            oldStateName, newStateName, answer,
-            LearnerParamsService.getAllParams(), isFirstHit);
-          StatsReportingService.recordStateCompleted(oldStateName);
-          if (exploration.isStateTerminal(newStateName)) {
-            StatsReportingService.recordStateCompleted(newStateName);
-          }
-          visitedStateNames.push(newStateName);
+          if (newStateName !== oldStateName) {
+            console.log('State hit ' + newStateName);
+            StatsReportingService.recordStateTransition(
+              oldStateName, newStateName, answer,
+              LearnerParamsService.getAllParams(), isFirstHit);
 
-          if (oldStateName === exploration.initStateName && (
-              !explorationActuallyStarted)) {
-            StatsReportingService.recordExplorationActuallyStarted(
-              oldStateName);
-            explorationActuallyStarted = true;
+            console.log('State complete ' + oldStateName);
+            StatsReportingService.recordStateCompleted(oldStateName);
+            visitedStateNames.push(newStateName);
+
+            if (oldStateName === exploration.initStateName && (
+                !explorationActuallyStarted)) {
+              console.log('Exploration actual start');
+              StatsReportingService.recordExplorationActuallyStarted(
+                oldStateName);
+              explorationActuallyStarted = true;
+            }
+          }
+          if (exploration.isStateTerminal(newStateName)) {
+            StatsReportingService.recordStateTransition(
+              oldStateName, newStateName, answer,
+              LearnerParamsService.getAllParams(), isFirstHit);
+            StatsReportingService.recordStateCompleted(newStateName);
           }
         }
 
@@ -427,6 +439,7 @@ oppia.factory('ExplorationPlayerService', [
         return deferred.promise;
       },
       recordSolutionHit: function(stateName) {
+        console.log('Solution hit');
         StatsReportingService.recordSolutionHit(stateName);
       }
     };
