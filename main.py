@@ -380,9 +380,9 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.ExplorationStatsVersionsHandler),
     get_redirect_route(
         r'/createhandler/statistics_old/<exploration_id>/<exploration_version>',
-        editor.ExplorationStatisticsHandlerOld),
+        editor.OldExplorationStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/statistics/<exploration_id>/<exploration_version>',
+        r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long

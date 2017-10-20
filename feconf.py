@@ -641,7 +641,7 @@ SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # Bool to enable update of analytics models.
 # NOTE TO DEVELOPERS: This should be synchronized with app.js
-ENABLE_NEW_STATS_FRAMEWORK = False
+ENABLE_NEW_STATS_FRAMEWORK = True
 # Current event models schema version. All event models with
 # event_schema_version as 1 are the events collected before the rework of the
 # statistics framework which brought about the recording of new event models.
