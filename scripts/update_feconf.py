@@ -36,10 +36,10 @@ def _apply_changes_to_feconf():
     line in feconf.py.
     """
     with open(FECONF_CONFIG_PATH, 'r') as f1:
-        config_lines = f1.read().strip().split('\n')
+        config_lines = f1.read().splitlines()
 
     with open(LOCAL_FECONF_PATH, 'r') as f2:
-        feconf_lines = f2.read().strip().split('\n')
+        feconf_lines = f2.read().splitlines()
 
     # First, verify the config file.
     feconf_line_numbers = []
@@ -47,6 +47,9 @@ def _apply_changes_to_feconf():
         assert config_line.count('=') == 1, (
             'Invalid line in feconf config file: %s' % config_line)
         config_line_parts = config_line.split('=')
+        # We intentionally check for the space before the '=' to avoid possible
+        # overlap with prefixes.
+        assert config_line_parts[0].endswith(' ')
         matching_feconf_line_numbers = [
             feconf_line_number
             for (feconf_line_number, feconf_line) in enumerate(feconf_lines)
@@ -61,7 +64,7 @@ def _apply_changes_to_feconf():
         feconf_lines[feconf_line_numbers[index]] = config_line
 
     with open(LOCAL_FECONF_PATH, 'w') as f3:
-        f3.write('\n'.join(feconf_lines))
+        f3.write('\n'.join(feconf_lines) + '\n')
 
 
 def _update_feconf():
