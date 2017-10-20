@@ -89,7 +89,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400,
             upload_files=(('image', 'unused_filename', raw_image),)
         )
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
             response_dict['error'],
             'Expected a filename ending in .png, received test.jpg')
@@ -122,7 +122,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400,
             upload_files=(('image', 'unused_filename', ''),)
         )
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'No image supplied')
 
         self.logout()
@@ -143,7 +143,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400,
             upload_files=(('image', 'unused_filename', 'non_image_data'),)
         )
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'Image not recognized')
 
         self.logout()
@@ -172,7 +172,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             expect_errors=True, expected_status_int=400,
             upload_files=(('image', 'unused_filename', raw_image),),
         )
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn('Filenames should not include', response_dict['error'])
 
         self.logout()
@@ -192,7 +192,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             expect_errors=True, expected_status_int=400,
             upload_files=(('image', 'unused_filename', raw_image),),
         )
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn('Image filename with no extension',
                       response_dict['error'])
 
@@ -213,7 +213,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             expect_errors=True, expected_status_int=400,
             upload_files=(('image', 'unused_filename', raw_image),),
         )
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn('Expected a filename ending in .png, received test.pdf',
                       response_dict['error'])
 
@@ -296,7 +296,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
             response_dict['error'],
             'Invalid filename extension: it should have '
@@ -320,7 +320,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             upload_files=(('raw_audio_file', 'unused_filename', ''),)
         )
         self.logout()
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'No audio supplied')
 
     def test_upload_bad_audio(self):
@@ -339,7 +339,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
                 ('raw_audio_file', 'unused_filename', 'non_audio_data'),)
         )
         self.logout()
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'Audio not recognized as '
                          'a mp3 file')
 
@@ -363,7 +363,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'],
                          'No filename extension: it should have '
                          'one of the following extensions: '
@@ -389,7 +389,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn('Audio files must be under %s seconds in length'
                       % feconf.MAX_AUDIO_FILE_LENGTH_SEC,
                       response_dict['error'])
@@ -419,6 +419,6 @@ class AudioHandlerTest(test_utils.GenericTestBase):
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'Audio not recognized as '
                          'a mp3 file')

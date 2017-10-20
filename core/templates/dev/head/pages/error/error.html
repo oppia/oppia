@@ -4,16 +4,17 @@
 {% endblock navbar_breadcrumb %}
 
 {% block maintitle %}
-  {% if code == 400 %}
+  {% if status_code == 400 %}
     I18N_ERROR_PAGE_TITLE_400
-  {% elif code == 401 %}
+  {% elif status_code == 401 %}
     I18N_ERROR_PAGE_TITLE_401
-  {% elif code == 404 %}
+  {% elif status_code == 404 %}
     I18N_ERROR_PAGE_TITLE_404
-  {% elif code == 500 %}
+  {% elif status_code == 500 %}
     I18N_ERROR_PAGE_TITLE_500
   {% endif %}
 {% endblock maintitle %}
+
 
 {% block content %}
   <div class="oppia-content oppia-error-page-main-content" ng-controller="Error">
@@ -22,34 +23,32 @@
     <div class="oppia-wide-panel oppia-error-wide-container">
       <div class="oppia-wide-panel-content protractor-test-error-container">
         <h1 class="oppia-error-h1">
-          {% if code == 400 %}
+          <div ng-if="statusCode === 400">
             <span translate="I18N_ERROR_HEADER_400"></span>
             - Bad Request
-          {% elif code == 401 %}
+          </div>
+          <div ng-if="statusCode === 401">
             <span translate="I18N_ERROR_HEADER_401"></span>
             - Unauthorized
-          {% elif code == 404 %}
+          </div>
+          <div ng-if="statusCode === 404">
             <span translate="I18N_ERROR_HEADER_404"></span>
             - Page Not Found
-          {% elif code == 500 %}
+          </div>
+          <div ng-if="statusCode === 500">
             <span translate="I18N_ERROR_HEADER_500"></span>
             - System Error
-          {% endif %}
+          </div>
         </h1>
 
         <br>
 
         <img ng-src="<[oopsMintImgUrl]>" alt="Oops!" width="299" height="142"/>
         <p>
-          {% if code == 400 %}
-            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_400"></h2>
-          {% elif code == 401 %}
-            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_401"></h2>
-          {% elif code == 404 %}
-            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_404"></h2>
-          {% elif code == 500 %}
-            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_500"></h2>
-          {% endif %}
+          <h2 ng-if="statusCode === 400" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_400"></h2>
+          <h2 ng-if="statusCode === 401" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_401"></h2>
+          <h2 ng-if="statusCode === 404" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_404"></h2>
+          <h2 ng-if="statusCode === 500" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_500"></h2>
         </p>
         <p><span translate="I18N_ERROR_NEXT_STEPS" translate-values="{issueTrackerUrl: 'https://github.com/oppia/oppia/issues/new', homeUrl: '/'}"></span></p>
       </div>
