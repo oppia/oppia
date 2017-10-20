@@ -272,7 +272,7 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
     for calculation_id in calculation_ids:
         # This is None if the calculation job has not yet been run for this
         # state.
-        calc_output_domain_object = get_calc_output(
+        calc_output_domain_object = _get_calc_output(
             exp_id, state_name, calculation_id)
 
         # If the calculation job has not yet been run for this state, we simply
@@ -393,7 +393,7 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
         for submitted_answer_dict in sample_answers]
 
 
-def get_calc_output(
+def _get_calc_output(
         exploration_id, state_name, calculation_id,
         exploration_version=VERSION_ALL):
     """Get state answers calculation output domain object obtained from
