@@ -238,7 +238,6 @@ def save_stats_model(exploration_stats):
 
     exploration_stats_model.put()
 
-# TODO(bhenning): Test.
 def get_visualizations_info(exp_id, state_name, interaction_id):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.
@@ -393,9 +392,7 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
         for submitted_answer_dict in sample_answers]
 
 
-def _get_calc_output(
-        exploration_id, state_name, calculation_id,
-        exploration_version=VERSION_ALL):
+def _get_calc_output(exploration_id, state_name, calculation_id):
     """Get state answers calculation output domain object obtained from
     StateAnswersCalcOutputModel instance stored in the data store. The
     calculation ID comes from the name of the calculation class used to compute
@@ -407,17 +404,16 @@ def _get_calc_output(
         exploration_id: str. ID of the exploration.
         state_name: str. Name of the state.
         calculation_id: str. Name of the calculation class.
-        exploration_version: int. Version of the exploration.
 
     Returns:
         StateAnswersCalcOutput|None. The state answers calculation output
             domain object or None.
     """
     calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
-        exploration_id, exploration_version, state_name, calculation_id)
+        exploration_id, VERSION_ALL, state_name, calculation_id)
     if calc_output_model:
         return stats_domain.StateAnswersCalcOutput(
-            exploration_id, exploration_version, state_name,
+            exploration_id, VERSION_ALL, state_name,
             calculation_id, calc_output_model.calculation_output)
     else:
         return None
