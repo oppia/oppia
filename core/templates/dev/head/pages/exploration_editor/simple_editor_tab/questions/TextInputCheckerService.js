@@ -26,9 +26,9 @@
      // imposed by the UI of the simple editor.
      isValid: function(customizationArgs, answerGroups) {
        // Invariant to check:
-       // - Answer group rule type is 'Contains'.
+       // - Answer group rule type is 'Equals'.
        // - There is only one answer group at index 0.
-       if (answerGroups.length === 1 && answerGroups[0]) {
+       if (answerGroups.length === 1) {
          var rules = answerGroups[0].rules;
          if (rules.length !== 1 || rules[0].type !== 'Equals') {
            return false;

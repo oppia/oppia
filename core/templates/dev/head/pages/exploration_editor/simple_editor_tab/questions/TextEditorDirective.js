@@ -19,8 +19,9 @@
 oppia.directive('textEditor', [
     'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
     'StatusObjectFactory', 'OutcomeObjectFactory', 'UrlInterpolationService',
-    function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory,
-          StatusObjectFactory, OutcomeObjectFactory, UrlInterpolationService) {
+    function(
+        QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory,
+        StatusObjectFactory, OutcomeObjectFactory, UrlInterpolationService) {
       return {
         restrict: 'E',
         scope: {
@@ -66,16 +67,15 @@ oppia.directive('textEditor', [
               if (newAnswerGroups.length === 0) {
                 var newStateName = $scope.addState();
                 newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-                RuleObjectFactory.createNew('Equals', {
-                  x: newAnswer
-                })
+                  RuleObjectFactory.createNew('Equals', {
+                    x: newAnswer
+                  })
                 ], OutcomeObjectFactory.createEmpty(newStateName), false));
 
                 $scope.saveAnswerGroups({
                   newValue: newAnswerGroups
                 });
-              }
-              else {
+              } else {
                 newAnswerGroups[0].rules[0].inputs.x = newAnswer;
                 $scope.saveAnswerGroups({
                   newValue: newAnswerGroups

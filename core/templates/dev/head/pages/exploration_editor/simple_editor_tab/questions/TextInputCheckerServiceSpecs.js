@@ -18,10 +18,15 @@
  describe('Text interaction input checker service', function() {
    beforeEach(module('oppia'));
 
+   beforeEach(inject(function($injector) {
+     AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
+     tics = $injector.get('TextInputCheckerService');
+   }));
+   
    var AnswerGroupObjectFactory;
-   var mcics;
+   var tics;
 
-   it('should return true for rule type Contains ', function() {
+   it('should return true for rule type EqualsS ', function() {
      var answerGroupsTrue = [{
        rules: [{
          type: 'Equals',
@@ -35,10 +40,10 @@
          dest: 'Question 1'
        }
      }];
-     expect(mcics.isValid('', answerGroupsTrue)).toBe(true);
+     expect(tics.isValid('', answerGroupsTrue)).toBe(true);
    });
 
-   it('should return false for rule type other than Contains', function() {
+   it('should return false for rule type other than Equals', function() {
      var answerGroupsFalse = [{
        rules: [{
          type: 'FuzzyEquals',
@@ -52,7 +57,7 @@
          dest: 'Question 1'
        }
      }];
-     expect(mcics.isValid('', answerGroupsFalse)).toBe(false);
+     expect(tics.isValid('', answerGroupsFalse)).toBe(false);
    });
 
    it('should return false for more than one rule', function() {
@@ -75,11 +80,6 @@
          dest: 'Question 1'
        }
      }];
-     expect(mcics.isValid('', answerGroupsFalse)).toBe(false);
+     expect(tics.isValid('', answerGroupsFalse)).toBe(false);
    });
-
-   beforeEach(inject(function($injector) {
-     AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
-     mcics = $injector.get('TextInputCheckerService');
-   }));
  });
