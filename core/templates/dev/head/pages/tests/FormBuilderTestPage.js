@@ -16,31 +16,35 @@
  * @fileoverview Controllers for the form builder test page.
  */
 
-oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
-  return {
-    scope: {
-      definition: '=',
-      isDisabled: '&',
-      savedValue: '='
-    },
-    templateUrl: 'formOverlay/entryPoint',
-    restrict: 'E',
-    compile: recursionHelper.compile,
-    controller: ['$scope', function($scope) {
-      $scope.$watch('savedValue', function() {
-        $scope.localValue = angular.copy($scope.savedValue);
-      });
+oppia.directive('formOverlay', [
+  'recursionHelper', 'UrlInterpolationService',
+  function(recursionHelper, UrlInterpolationService) {
+    return {
+      scope: {
+        definition: '=',
+        isDisabled: '&',
+        savedValue: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/tests/form_entry_point_modal_directive.html'),
+      restrict: 'E',
+      compile: recursionHelper.compile,
+      controller: ['$scope', function($scope) {
+        $scope.$watch('savedValue', function() {
+          $scope.localValue = angular.copy($scope.savedValue);
+        });
 
-      $scope.submitValue = function() {
-        $scope.savedValue = angular.copy($scope.localValue);
-        alert($scope.savedValue);
-      };
-      $scope.cancelEdit = function() {
-        $scope.localValue = angular.copy($scope.savedValue);
-      };
-    }]
-  };
-}]);
+        $scope.submitValue = function() {
+          $scope.savedValue = angular.copy($scope.localValue);
+          alert($scope.savedValue);
+        };
+        $scope.cancelEdit = function() {
+          $scope.localValue = angular.copy($scope.savedValue);
+        };
+      }]
+    };
+  }
+]);
 
 oppia.controller('FormBuilderTests', [
   '$scope', function($scope) {

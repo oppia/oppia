@@ -746,29 +746,6 @@ oppia.directive('conversationSkin', [
             return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
           };
 
-          $scope.isScreenNarrowAndShowingTutorCard = function() {
-            if (!$scope.isCurrentSupplementalCardNonempty()) {
-              return $scope.isViewportNarrow();
-            }
-            return $scope.isViewportNarrow() && tutorCardIsDisplayedIfNarrow;
-          };
-
-          $scope.isScreenNarrowAndShowingSupplementalCard = function() {
-            return $scope.isViewportNarrow() && !tutorCardIsDisplayedIfNarrow;
-          };
-
-          $scope.showTutorCardIfScreenIsNarrow = function() {
-            if ($scope.isViewportNarrow()) {
-              tutorCardIsDisplayedIfNarrow = true;
-            }
-          };
-
-          $scope.showSupplementalCardIfScreenIsNarrow = function() {
-            if ($scope.isViewportNarrow()) {
-              tutorCardIsDisplayedIfNarrow = false;
-            }
-          };
-
           $scope.initializePage();
           LearnerViewRatingService.init(function(userRating) {
             $scope.userRating = userRating;

@@ -336,6 +336,9 @@ class BaseHandler(webapp2.RequestHandler):
             'promo_bar_message': promo_bar_message,
         })
 
+        if 'status_code' not in values:
+            values['status_code'] = 200
+
         if 'meta_name' not in values:
             values['meta_name'] = 'Personalized Online Learning from Oppia'
 
@@ -404,7 +407,7 @@ class BaseHandler(webapp2.RequestHandler):
             values: dict. The key-value pairs to include in the response.
         """
         assert error_code in [400, 401, 404, 500]
-        values['code'] = error_code
+        values['status_code'] = error_code
 
         # This checks if the response should be JSON or HTML.
         # For GET requests, there is no payload, so we check against
