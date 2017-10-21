@@ -3521,7 +3521,7 @@ class ExplorationSummary(object):
         }
 
 
-class StateIDMapping(object):
+class StateIdMapping(object):
     """Domain object for state ID mapping model."""
 
     def __init__(
@@ -3572,7 +3572,7 @@ class StateIDMapping(object):
                 exploration.
 
         Returns:
-            StateIDMapping. Domain object for state id mapping.
+            StateIdMapping. Domain object for state id mapping.
         """
         new_state_names = []
         state_ids_to_names = {}
@@ -3661,7 +3661,7 @@ class StateIDMapping(object):
             assert state_name not in new_state_names_to_ids.keys()
             new_state_names_to_ids[state_name] = largest_state_id_used
 
-        state_id_map = StateIDMapping(
+        state_id_map = StateIdMapping(
             new_exploration.id, new_exploration.version, new_state_names_to_ids,
             largest_state_id_used)
         state_id_map.validate()
@@ -3676,7 +3676,7 @@ class StateIDMapping(object):
                 is to be generated.
 
         Returns:
-            StateIDMapping. Domain object for state id mapping.
+            StateIdMapping. Domain object for state id mapping.
         """
         largest_state_id_used = -1
         state_names_to_ids = {}

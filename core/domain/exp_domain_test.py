@@ -2620,15 +2620,15 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertNotIn('END', exploration.states)
 
 
-class StateIDMappingTests(test_utils.GenericTestBase):
-    """Tests for StateIDMapping domain class."""
+class StateIdMappingTests(test_utils.GenericTestBase):
+    """Tests for StateIdMapping domain class."""
 
     EXP_ID = 'eid'
 
     def setUp(self):
         """Initialize owner and store default exploration before each test case.
         """
-        super(StateIDMappingTests, self).setUp()
+        super(StateIdMappingTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         # Create a default exploration.

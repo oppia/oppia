@@ -2745,7 +2745,7 @@ class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
         self.assertIsNone(exp_rights)
 
 
-class ExplorationStateIDMappingTests(test_utils.GenericTestBase):
+class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
     """Tests for functions associated with creating and updating state id
     mapping."""
 
@@ -2753,7 +2753,7 @@ class ExplorationStateIDMappingTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Initialize owner before each test case."""
-        super(ExplorationStateIDMappingTests, self).setUp()
+        super(ExplorationStateIdMappingTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 

@@ -517,7 +517,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(limit)
 
 
-class StateIDMappingModel(base_models.BaseModel):
+class StateIdMappingModel(base_models.BaseModel):
     """State ID model for Oppia explorations.
 
     This model maps each exploration version's state to a unique id.
@@ -532,7 +532,7 @@ class StateIDMappingModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(indexed=True, required=True)
 
     # The version of the exploration.
-    exploration_version = ndb.IntegerProperty(required=True)
+    exploration_version = ndb.IntegerProperty(indexed=True, required=True)
 
     # A dict which maps each state name to a unique id.
     state_names_to_ids = ndb.JsonProperty(required=True)
@@ -566,7 +566,7 @@ class StateIDMappingModel(base_models.BaseModel):
                 used as a state ID for this exploration.
 
         Returns:
-            StateIDMappingModel. Instance of the state id mapping model.
+            StateIdMappingModel. Instance of the state id mapping model.
         """
         instance_id = cls._generate_instance_id(exp_id, exp_version)
         if cls.get_by_id(instance_id):
@@ -589,11 +589,11 @@ class StateIDMappingModel(base_models.BaseModel):
         Args:
             exp_id: str. The exploration id.
             exp_version: int. The exploration version.
-            strict: bool. Whether to raise an error if no StateIDMappingModel
+            strict: bool. Whether to raise an error if no StateIdMappingModel
                 entry is found for the given exploration id and version.
 
         Returns:
-            StateIDMappingModel. The model retrieved from the datastore.
+            StateIdMappingModel. The model retrieved from the datastore.
         """
         instance_id = cls._generate_instance_id(exp_id, exp_version)
         instance = cls.get(instance_id)
