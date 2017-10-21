@@ -1197,6 +1197,7 @@ var addHint = function(hint) {
   browser.switchTo().activeElement().sendKeys(hint);
   general.waitForSystem();
   element(by.css('.protractor-test-save-hint')).click();
+  general.waitForSystem();
 };
 
 // Hints are zero-indexed.
