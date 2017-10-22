@@ -85,7 +85,6 @@ oppia.factory('StatsReportingService', [
     }
 
     var postEventsToBackend = function() {
-      console.log('Sending to backend ' + eventDicts.length.toString());
       $http.post(getFullStatsUrl('STATS_EVENTS'), {
         event_dicts: eventDicts,
         exp_version: explorationVersion

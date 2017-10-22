@@ -200,7 +200,7 @@ oppia.controller('StatisticsTab', [
                 improvementType, visualizationsInfo, HtmlEscaperService,
                 ENABLE_NEW_STATS_FRAMEWORK) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
-                left: 0,
+                left: 20,
                 pieHole: 0.6,
                 pieSliceTextStyleColor: 'black',
                 pieSliceBorderColor: 'black',
