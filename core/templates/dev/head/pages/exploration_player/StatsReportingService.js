@@ -46,10 +46,12 @@ oppia.factory('StatsReportingService', [
   '$http', '$interval', 'StopwatchObjectFactory', 'MessengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
   'ENABLE_NEW_STATS_FRAMEWORK', 'STATS_EVENT_TYPES',
+  'explorationContextService', 'PAGE_CONTEXT',
   function(
       $http, $interval, StopwatchObjectFactory, MessengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
-      ENABLE_NEW_STATS_FRAMEWORK, STATS_EVENT_TYPES) {
+      ENABLE_NEW_STATS_FRAMEWORK, STATS_EVENT_TYPES,
+      explorationContextService, PAGE_CONTEXT) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -58,11 +60,15 @@ oppia.factory('StatsReportingService', [
     var optionalCollectionId = undefined;
     var statesVisited = {};
     var numStatesVisited = 0;
+    var explorationIsComplete = false;
+
+    var _editorPreviewMode = (
+      explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
 
     // The following list of dicts will contain all events accumulated over the
     // interval time and will be reset when events are sent to backend for
     // recording.
-    var eventDicts = {};
+    var eventDicts = [];
 
     var getFullStatsUrl = function(urlIdentifier) {
       return UrlInterpolationService.interpolateUrl(
@@ -71,14 +77,15 @@ oppia.factory('StatsReportingService', [
         });
     };
 
-    if (ENABLE_NEW_STATS_FRAMEWORK) {
+    if (ENABLE_NEW_STATS_FRAMEWORK && !_editorPreviewMode && (
+        !explorationIsComplete)) {
       $interval(function() {
         postEventsToBackend();
-      }, 15000);
+      }, 10000);
     }
 
     var postEventsToBackend = function() {
-      console.log('Sending to backend');
+      console.log('Sending to backend ' + eventDicts.length.toString());
       $http.post(getFullStatsUrl('STATS_EVENTS'), {
         event_dicts: eventDicts,
         exp_version: explorationVersion
@@ -114,7 +121,8 @@ oppia.factory('StatsReportingService', [
             old_params: params,
             session_id: sessionId,
             new_state_name: stateName,
-            exploration_version: explorationVersion
+            exploration_version: explorationVersion,
+            is_first_hit: true
           });
         }
 
@@ -130,7 +138,7 @@ oppia.factory('StatsReportingService', [
           exploration_version: explorationVersion,
           new_state_name: stateName,
           old_params: params,
-          session_id: sessionId
+          session_id: sessionId,
         });
 
         MessengerService.sendMessage(MessengerService.EXPLORATION_LOADED, {
@@ -264,6 +272,8 @@ oppia.factory('StatsReportingService', [
         });
 
         siteAnalyticsService.registerFinishExploration();
+        explorationIsComplete = true;
+        postEventsToBackend();
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
