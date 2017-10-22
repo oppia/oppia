@@ -156,6 +156,7 @@ var expectContentTextToEqual = function(text) {
 // most purposes. Additional arguments may be sent to this function,
 // and they will be passed on to the relevant interaction editor.
 var setInteraction = function(interactionId) {
+  general.waitForSystem();
   openInteraction(interactionId);
   customizeInteraction.apply(null, arguments);
   // If the "Add Response" modal opens, close it.
