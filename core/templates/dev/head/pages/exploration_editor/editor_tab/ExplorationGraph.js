@@ -17,11 +17,11 @@
  */
 
 oppia.controller('ExplorationGraph', [
-  '$scope', '$modal', 'editorContextService', 'alertsService',
+  '$scope', '$modal', 'editorContextService', 'AlertsService',
   'explorationStatesService', 'editabilityService', 'RouterService',
   'graphDataService', 'UrlInterpolationService',
   function(
-    $scope, $modal, editorContextService, alertsService,
+    $scope, $modal, editorContextService, AlertsService,
     explorationStatesService, editabilityService, RouterService,
     graphDataService, UrlInterpolationService) {
     $scope.getGraphData = graphDataService.getGraphData;
@@ -47,7 +47,7 @@ oppia.controller('ExplorationGraph', [
     };
 
     $scope.openStateGraphModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -84,7 +84,7 @@ oppia.controller('ExplorationGraph', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]

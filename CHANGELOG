@@ -1245,7 +1245,7 @@ v2.1.5 (3 Apr 2016)
 Overall site design and navigation:
 * Fix #1347: redesign the navbar, and include a "create" button on more pages.
 * Fix #1533: make "My Explorations" the homepage for logged-in users.
-* Fix #1531: introduce an alertsService to display warnings and transitory info messages.
+* Fix #1531: introduce an AlertsService to display warnings and transitory info messages.
 * Fix #1622: replace PNG images with icon fonts (where possible) to improve performance.
 
 Gallery page:

@@ -23,12 +23,12 @@ oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
 oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 
 oppia.factory('CollectionEditorStateService', [
-  '$rootScope', 'alertsService', 'CollectionObjectFactory',
+  '$rootScope', 'AlertsService', 'CollectionObjectFactory',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
   'UndoRedoService', 'EditableCollectionBackendApiService',
   'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
   function(
-      $rootScope, alertsService, CollectionObjectFactory,
+      $rootScope, AlertsService, CollectionObjectFactory,
       CollectionRightsBackendApiService, CollectionRightsObjectFactory,
       UndoRedoService, EditableCollectionBackendApiService,
       EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED) {
@@ -74,7 +74,7 @@ oppia.factory('CollectionEditorStateService', [
             _updateCollection(newBackendCollectionObject);
           },
           function(error) {
-            alertsService.addWarning(
+            AlertsService.addWarning(
               error || 'There was an error when loading the collection.');
             _isLoadingCollection = false;
           });
@@ -83,7 +83,7 @@ oppia.factory('CollectionEditorStateService', [
             _updateCollectionRights(newBackendCollectionRightsObject);
             _isLoadingCollection = false;
           }, function(error) {
-            alertsService.addWarning(
+            AlertsService.addWarning(
               error ||
               'There was an error when loading the collection rights.');
             _isLoadingCollection = false;
@@ -163,7 +163,7 @@ oppia.factory('CollectionEditorStateService', [
        */
       saveCollection: function(commitMessage, successCallback) {
         if (!_collectionIsInitialized) {
-          alertsService.fatalWarning(
+          AlertsService.fatalWarning(
             'Cannot save a collection before one is loaded.');
         }
 
@@ -183,7 +183,7 @@ oppia.factory('CollectionEditorStateService', [
               successCallback();
             }
           }, function(error) {
-            alertsService.addWarning(
+            AlertsService.addWarning(
               error || 'There was an error when saving the collection.');
             _isSavingCollection = false;
           });

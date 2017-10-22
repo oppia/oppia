@@ -28,7 +28,7 @@ oppia.constant('EDITOR_TAB_CONTEXT', {
   PREVIEW: 'preview'
 });
 
-oppia.factory('explorationContextService', [
+oppia.factory('ExplorationContextService', [
   'currentLocationService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
   function(currentLocationService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
     var pageContext = null;
@@ -100,7 +100,7 @@ oppia.factory('explorationContextService', [
           }
 
           throw Error(
-            'ERROR: explorationContextService should not be used outside the ' +
+            'ERROR: ExplorationContextService should not be used outside the ' +
             'context of an exploration.');
         }
       },
