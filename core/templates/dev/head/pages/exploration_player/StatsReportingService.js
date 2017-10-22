@@ -272,7 +272,9 @@ oppia.factory('StatsReportingService', [
 
         siteAnalyticsService.registerFinishExploration();
         explorationIsComplete = true;
-        postEventsToBackend();
+        if (ENABLE_NEW_STATS_FRAMEWORK) {
+          postEventsToBackend();
+        }
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
