@@ -66,8 +66,8 @@ oppia.directive('numericEditor', [
 
             $scope.saveAnswer = function(newAnswer) {
               var newAnswerGroups = answerGroups;
-              var validValue = /^[0-9]+$/;
-              if(newAnswer.match(validValue)) {
+              var validValue = /^-?[0-9]\d*(\.\d+)?$/;
+              if (newAnswer.match(validValue)) {
                 if (newAnswerGroups.length === 0) {
                   var newStateName = $scope.addState();
                   newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
@@ -79,15 +79,13 @@ oppia.directive('numericEditor', [
                   $scope.saveAnswerGroups({
                     newValue: newAnswerGroups
                   });
-                }
-                else {
+                } else {
                   newAnswerGroups[0].rules[0].inputs.x = newAnswer;
                   $scope.saveAnswerGroups({
                     newValue: newAnswerGroups
                   });
                 }
-              }
-              else {
+              } else {
                 alertsService.addWarning('Cannot save a non numeric answer.');
                 return StatusObjectFactory.createFailure(
                   'Cannot save a non numeric answer'

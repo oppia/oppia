@@ -49,11 +49,6 @@ oppia.factory('SimpleEditorManagerService', [
         }
       },
       NumericInput: {
-        CUSTOMIZATION_ARGS:  {
-          choices: {
-            value: ['<p>Option 1</p>']
-          }
-        },
         FIRST_ANSWER_GROUP_RULE: {
           type: 'Equals',
           value: {

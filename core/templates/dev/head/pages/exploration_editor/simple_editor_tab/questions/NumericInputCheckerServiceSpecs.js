@@ -18,10 +18,15 @@
  describe('Numeric interaction input checker service', function() {
    beforeEach(module('oppia'));
 
-   var AnswerGroupObjectFactory;
-   var mcics;
+   beforeEach(inject(function($injector) {
+     AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
+     nics = $injector.get('NumericInputCheckerService');
+   }));
 
-   it('should return true for rule type Contains ', function() {
+   var AnswerGroupObjectFactory;
+   var nics;
+
+   it('should return true for rule type Equals ', function() {
      var answerGroupsTrue = [{
        rules: [{
          type: 'Equals',
@@ -35,10 +40,10 @@
          dest: 'Question 1'
        }
      }];
-     expect(mcics.isValid('', answerGroupsTrue)).toBe(true);
+     expect(nics.isValid('', answerGroupsTrue)).toBe(true);
    });
 
-   it('should return false for rule type other than Contains', function() {
+   it('should return false for rule type other than Equals', function() {
      var answerGroupsFalse = [{
        rules: [{
          type: 'IsGreaterThan',
@@ -52,7 +57,7 @@
          dest: 'Question 1'
        }
      }];
-     expect(mcics.isValid('', answerGroupsFalse)).toBe(false);
+     expect(nics.isValid('', answerGroupsFalse)).toBe(false);
    });
 
    it('should return false for more than one rule', function() {
@@ -75,11 +80,7 @@
          dest: 'Question 1'
        }
      }];
-     expect(mcics.isValid('', answerGroupsFalse)).toBe(false);
+     expect(nics.isValid('', answerGroupsFalse)).toBe(false);
    });
 
-   beforeEach(inject(function($injector) {
-     AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
-     mcics = $injector.get('NumericInputCheckerService');
-   }));
  });

@@ -27,7 +27,7 @@
      isValid: function(customizationArgs, answerGroups) {
        // Invariant to check:
        // - Answer group rule type is 'Equals'.
-       if (answerGroups[0] && answerGroups.length ===1) {
+       if (answerGroups.length === 1) {
          var rules = answerGroups[0].rules;
          if (rules.length !== 1 || rules[0].type !== 'Equals') {
            return false;
