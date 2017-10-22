@@ -54,65 +54,59 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
 
         # Pass in exploration start event to stats model created in setup
         # function.
+        event_params = [{
+            'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
+            'update_params': {}
+        }, {
+            'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+            'update_params': {}
+        }, {
+            'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+            'update_params': {}
+        }, {
+            'event_type': feconf.EVENT_TYPE_STATE_HIT,
+            'state_name': 'Home',
+            'update_params': {
+                'is_first_hit': True
+            }
+        }, {
+            'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
+            'state_name': 'Home',
+            'update_params': {
+                'feedback_is_useful': True
+            }
+        }, {
+            'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
+            'state_name': 'Home',
+            'update_params': {}
+        }, {
+            'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
+            'state_name': 'Home',
+            'update_params': {}
+        }]
+
         stats_services.update_stats(
-            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_START_EXPLORATION, {})
+            'exp_id1', 1, event_params)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         self.assertEqual(exploration_stats.num_starts_v2, 1)
-
-        # Pass in exploration actual start event.
-        stats_services.update_stats(
-            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
-            {})
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            'exp_id1', 1)
         self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
-
-        # Pass in exploration complete event.
-        stats_services.update_stats(
-            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-            {})
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            'exp_id1', 1)
         self.assertEqual(exploration_stats.num_completions_v2, 1)
-
-        # Pass in answer submitted event.
-        stats_services.update_stats(
-            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_ANSWER_SUBMITTED,
-            {'feedback_is_useful': True})
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            'exp_id1', 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].total_hit_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].first_hit_count_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'Home'].total_answers_count_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'Home'].useful_feedback_count_v2, 1)
-
-        # Pass in state hit event.
-        stats_services.update_stats(
-            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_STATE_HIT,
-            {'is_first_hit': True})
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            'exp_id1', 1)
         self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].total_hit_count_v2, 1)
-        self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].first_hit_count_v2, 1)
-
-        # Pass in state finish event.
-        stats_services.update_stats(
-            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_STATE_COMPLETED, {})
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            'exp_id1', 1)
-        self.assertEqual(
-            exploration_stats.state_stats_mapping['Home'].num_completions_v2, 1)
-
-        # Pass in solution hit event.
-        stats_services.update_stats(
-            'exp_id1', 1, 'Home', feconf.EVENT_TYPE_SOLUTION_HIT, {})
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            'exp_id1', 1)
+            exploration_stats.state_stats_mapping[
+                'Home'].num_completions_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'Home'].num_times_solution_viewed_v2, 1)

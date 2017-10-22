@@ -244,6 +244,20 @@ class ExplorationHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class StatsEventsHandler(base.BaseHandler):
+    """Handles a batch of events coming in from the frontend."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        event_dicts = self.payload.get('event_dicts')
+        exp_version = self.payload.get('exp_version')
+        event_services.StatsEventsHandler.record(
+            exploration_id, exp_version, event_dicts)
+        self.render_json({})
+
+
 class AnswerSubmittedEventHandler(base.BaseHandler):
     """Tracks a learner submitting an answer."""
 
@@ -302,13 +316,12 @@ class StateHitEventHandler(base.BaseHandler):
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
-        is_first_hit = self.payload.get('is_first_hit')
 
         # Record the state hit, if it is not the END state.
         if new_state_name is not None:
             event_services.StateHitEventHandler.record(
                 exploration_id, exploration_version, new_state_name,
-                session_id, old_params, feconf.PLAY_TYPE_NORMAL, is_first_hit)
+                session_id, old_params, feconf.PLAY_TYPE_NORMAL)
         else:
             logging.error('Unexpected StateHit event for the END state.')
         self.render_json({})

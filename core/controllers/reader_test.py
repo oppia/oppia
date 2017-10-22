@@ -821,138 +821,88 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             state_stats_mapping)
         stats_services.create_stats_model(exploration_stats)
 
-    def test_answer_submitted_handler(self):
-        """Test the handler for recording answer submitted events."""
+        self.event_dicts = [{
+            'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
+            'old_state_name': self.state_name,
+            'answer': 'answer1',
+            'params': {},
+            'version': self.exp_version,
+            'session_id': self.session_id,
+            'client_time_spent_in_secs': 0,
+            'answer_group_index': 1,
+            'rule_spec_index': 1,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+        }, {
+            'event_type': feconf.EVENT_TYPE_STATE_HIT,
+            'new_state_name': self.state_name,
+            'old_params': {},
+            'exploration_version': self.exp_version,
+            'session_id': self.session_id,
+            'client_time_spent_in_secs': 0,
+            'is_first_hit': True
+        }, {
+            'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
+            'state_name': self.state_name,
+            'exp_version': self.exp_version,
+            'session_id': self.session_id,
+            'time_spent_in_state_secs': 0,
+        }, {
+            'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+            'state_name': self.state_name,
+            'exploration_version': self.exp_version,
+            'session_id': self.session_id,
+        }, {
+            'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
+            'state_name': self.state_name,
+            'exploration_version': self.exp_version,
+            'session_id': self.session_id,
+            'time_spent_in_state_secs': 0,
+        }, {
+            'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+            'state_name': self.state_name,
+            'collection_id': None,
+            'params': {},
+            'version': self.exp_version,
+            'session_id': self.session_id,
+            'client_time_spent_in_secs': 0,
+        }, {
+            'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
+            'state_name': self.state_name,
+            'params': {},
+            'version': self.exp_version,
+            'session_id': self.session_id,
+        }]
+
+    def test_stats_events_handler(self):
+        """Test the handler for handling batched events."""
         with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json('/explorehandler/answer_submitted_event/%s' % (
+            self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
-                    'old_state_name': self.state_name,
-                    'answer': 'answer1',
-                    'params': {},
-                    'version': self.exp_version,
-                    'session_id': self.session_id,
-                    'client_time_spent_in_secs': 0,
-                    'answer_group_index': 1,
-                    'rule_spec_index': 1,
-                    'classification_categorization': (
-                        exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-                })
+                    'event_dicts': self.event_dicts,
+                    'exp_version': self.exp_version})
 
         # Check that the models are updated.
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
-        self.assertEqual(
-            exploration_stats.state_stats_mapping[
-                self.state_name].total_answers_count_v2, 1)
-        self.assertEqual(
-            exploration_stats.state_stats_mapping[
-                self.state_name].useful_feedback_count_v2, 0)
-
-    def test_state_hit_handler(self):
-        """Test the handler for recording state hit events."""
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json('/explorehandler/state_hit_event/%s' % (
-                self.exp_id), {
-                    'new_state_name': self.state_name,
-                    'old_params': {},
-                    'exploration_version': self.exp_version,
-                    'session_id': self.session_id,
-                    'client_time_spent_in_secs': 0,
-                    'is_first_hit': True
-                })
-
-        # Check that the models are updated.
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version)
+        self.assertEqual(exploration_stats.num_starts_v2, 1)
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
+        self.assertEqual(exploration_stats.num_completions_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 self.state_name].total_hit_count_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 self.state_name].first_hit_count_v2, 1)
-
-    def test_state_complete_handler(self):
-        """Test the handler for recording state complete events."""
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json('/explorehandler/state_complete_event/%s' % (
-                self.exp_id), {
-                    'state_name': self.state_name,
-                    'exp_version': self.exp_version,
-                    'session_id': self.session_id,
-                    'time_spent_in_state_secs': 0,
-                })
-
-        # Check that the models are updated.
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                self.state_name].total_answers_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                self.state_name].useful_feedback_count_v2, 0)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 self.state_name].num_completions_v2, 1)
-
-    def test_exploration_actual_start_handler(self):
-        """Test the handler for recording exploration actual start events."""
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json(
-                '/explorehandler/exploration_actual_start_event/%s' % (
-                    self.exp_id), {
-                        'state_name': self.state_name,
-                        'exploration_version': self.exp_version,
-                        'session_id': self.session_id,
-                    })
-
-        # Check that the models are updated.
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version)
-        self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
-
-    def test_solution_hit_handler(self):
-        """Test the handler for recording solution hit events."""
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json('/explorehandler/solution_hit_event/%s' % (
-                self.exp_id), {
-                    'state_name': self.state_name,
-                    'exploration_version': self.exp_version,
-                    'session_id': self.session_id,
-                    'time_spent_in_state_secs': 0,
-                })
-
-        # Check that the models are updated.
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 self.state_name].num_times_solution_viewed_v2, 1)
-
-    def test_exploration_complete_handler(self):
-        """Test the handler for recording exploration complete events."""
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json('/explorehandler/exploration_complete_event/%s' % (
-                self.exp_id), {
-                    'state_name': self.state_name,
-                    'collection_id': None,
-                    'params': {},
-                    'version': self.exp_version,
-                    'session_id': self.session_id,
-                    'client_time_spent_in_secs': 0,
-                })
-
-        # Check that the models are updated.
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version)
-        self.assertEqual(exploration_stats.num_completions_v2, 1)
-
-    def test_exploration_start_handler(self):
-        """Test the handler for recording exploration start events."""
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json('/explorehandler/exploration_start_event/%s' % (
-                self.exp_id), {
-                    'state_name': self.state_name,
-                    'params': {},
-                    'version': self.exp_version,
-                    'session_id': self.session_id,
-                })
-
-        # Check that the models are updated.
-        exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version)
-        self.assertEqual(exploration_stats.num_starts_v2, 1)
