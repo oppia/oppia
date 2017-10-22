@@ -70,6 +70,8 @@ class StatsEventsHandler(BaseEventHandler):
     event models.
     """
 
+    EVENT_TYPE = feconf.EVENT_TYPE_ALL_STATS
+
     @classmethod
     def _handle_event(cls, exploration_id, exp_version, event_dicts):
         event_params = []

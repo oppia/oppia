@@ -600,6 +600,7 @@ NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
 
 # Event types.
+EVENT_TYPE_ALL_STATS = 'all_stats'
 EVENT_TYPE_STATE_HIT = 'state_hit'
 EVENT_TYPE_STATE_COMPLETED = 'state_complete'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
